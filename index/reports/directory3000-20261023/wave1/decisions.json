@@ -1,0 +1,64 @@
+{
+  "generatedAt": "2026-10-23T20:46:19.087Z",
+  "reviewSha256": "0f82248532c12f89a9ddd5fce2383174faaf259f10cf96c05f0d350a09dd2283",
+  "excludeRepos": [],
+  "excludeIds": [
+    "carta/plugins:plugins/carta-investors/skills/carta-consolidating-financial-reports",
+    "carta/plugins:plugins/carta-investors/skills/carta-manco",
+    "carta/plugins:plugins/carta-investors/skills/carta-manco-reporting",
+    "synter-media-ai/plugin:skills/ad-copy-generation",
+    "synter-media-ai/plugin:skills/launch",
+    "synter-media-ai/plugin:skills/platform-amazon",
+    "synter-media-ai/plugin:skills/replicate"
+  ],
+  "excluded": [
+    {
+      "id": "carta/plugins:plugins/carta-investors/skills/carta-consolidating-financial-reports",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-investors/skills/carta-manco",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-investors/skills/carta-manco-reporting",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/ad-copy-generation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "context/brand-and-safety.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/launch",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "context/brand-and-safety.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/platform-amazon",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "context/brand-and-safety.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/replicate",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "context/brand-and-safety.md"
+      ],
+      "agents": []
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Reviewed first-party sources; exact skill packages only. Hold unresolved companion context, external named agents, mirrored ambiguities and oversized repositories.",
+  "reviewed": 579,
+  "approvedCount": 125
+}

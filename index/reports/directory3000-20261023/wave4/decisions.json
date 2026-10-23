@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-10-23T20:48:37.765Z",
+  "reviewSha256": "8275d83ffa9c0d61b9047400447534e676ed9fc634ffc381a8d297979983f401",
+  "excludeRepos": [
+    "jenson500/truinorva-triz"
+  ],
+  "excludeIds": [
+    "hzblj/skills:skills/shared/how",
+    "curtisthe/three-pillars-plugin:skills/tp-design-complete",
+    "curtisthe/three-pillars-plugin:skills/tp-pr-fix",
+    "mickzijdel/rails-toolkit:skills/rails-clean-test-output"
+  ],
+  "excluded": [
+    {
+      "id": "hzblj/skills:skills/shared/how",
+      "reason": "explicit-third-party-source-attribution"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-design-complete",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-pr-fix",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-clean-test-output",
+      "reason": "plugin-root-or-external-package-dependency"
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Original creator playbooks reviewed. Hold TRIZ prompt collection with third-party copyright authors, hzblj/how verbatim Cursor adaptation, and missing companion file/agent dependencies. Keep original standalone developer, Flutter, React, rails, BIM and founder guidance only.",
+  "reviewed": 580,
+  "approvedCount": 280
+}

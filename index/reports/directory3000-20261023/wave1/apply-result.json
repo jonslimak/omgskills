@@ -1,0 +1,914 @@
+{
+  "generatedAt": "2026-10-23T20:46:28.994Z",
+  "wave": "wave1",
+  "summary": {
+    "planCandidateCount": 125,
+    "finalCount": 125,
+    "pendingCount": 0,
+    "addedCount": 125,
+    "existingCount": 0,
+    "policySkippedCount": 0,
+    "stableFailedCount": 0,
+    "transientFailedCount": 0
+  },
+  "sharedApproval": {
+    "changedCreators": [
+      "carta",
+      "synter-media-ai",
+      "zuora",
+      "countz-ai",
+      "cockroachdb",
+      "urbanairship",
+      "googlecloudplatform"
+    ],
+    "beforeRevision": "sha256:34f879eb1b187c1e3fc6ecf9a3326bdb7771ac38a467a4d0ab8224813e1dbf14",
+    "afterRevision": "sha256:28d5012103cb9282a86f5f19ee4b57d9f2fbfa9a36cc925b2df742374c8b242a"
+  },
+  "priorAdditionsPreserved": 1500,
+  "totalCampaignAdditions": 1625,
+  "beforeCount": 49190,
+  "afterCount": 49315,
+  "addedSkills": [
+    {
+      "id": "carta/plugins:plugins/carta-cap-table/skills/carta-compensation-rolematcher",
+      "name": "carta-compensation-rolematcher",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-cap-table/skills/carta-compensation-rolematcher/SKILL.md",
+      "sha": "f70cede6b67dc5e568a559056a14bb77dbbd5f29"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-cap-table/skills/carta-compensation-scorecard",
+      "name": "carta-compensation-scorecard",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-cap-table/skills/carta-compensation-scorecard/SKILL.md",
+      "sha": "b1e11b22693cc492e9133b8e99cadee5aefd2b18"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-cap-table/skills/carta-conversion-calculator",
+      "name": "carta-conversion-calculator",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-cap-table/skills/carta-conversion-calculator/SKILL.md",
+      "sha": "d7ae34c95a1b0f74c1bb91ab07ceb3baa63068b5"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-cap-table/skills/carta-grant-vesting",
+      "name": "carta-grant-vesting",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-cap-table/skills/carta-grant-vesting/SKILL.md",
+      "sha": "00059bf7069d2ac71f835eec81f5a4dfa3b8f1a1"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-cap-table/skills/carta-hmrc-limits",
+      "name": "carta-hmrc-limits",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-cap-table/skills/carta-hmrc-limits/SKILL.md",
+      "sha": "d0f10a69bf6ca816e3325d813fccbbd9a6e2089a"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-cap-table/skills/carta-market-benchmarks",
+      "name": "carta-market-benchmarks",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-cap-table/skills/carta-market-benchmarks/SKILL.md",
+      "sha": "7221f1da1cc38a520b55d901af8f1440706ab32b"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-cap-table/skills/carta-portfolio-alerts",
+      "name": "carta-portfolio-alerts",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-cap-table/skills/carta-portfolio-alerts/SKILL.md",
+      "sha": "d54c16d8ad6c677825f795b353e2cafb9a95adc0"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-cap-table/skills/carta-round-history",
+      "name": "carta-round-history",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-cap-table/skills/carta-round-history/SKILL.md",
+      "sha": "da6d209e454e8f92aba9cb54eea4a72fcbf16bef"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-cap-table/skills/carta-valuation-history",
+      "name": "carta-valuation-history",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-cap-table/skills/carta-valuation-history/SKILL.md",
+      "sha": "00859a4c26bbf104b17a608df40b73a12667d6ff"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-cap-table/skills/carta-witness-signatures",
+      "name": "carta-witness-signatures",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-cap-table/skills/carta-witness-signatures/SKILL.md",
+      "sha": "f8de0c64879dcc15637d11f88fb2c89407d7afaa"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/add-company",
+      "name": "add-company",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/add-company/SKILL.md",
+      "sha": "df260da7564e8a8e72dc2118af827999277fc133"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/add-contact",
+      "name": "add-contact",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/add-contact/SKILL.md",
+      "sha": "a72c44ce94eef9d0e437d2d2aba343a56e394351"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/add-deal",
+      "name": "add-deal",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/add-deal/SKILL.md",
+      "sha": "500e6027a349656b6256c7970340753fbe7f8938"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/add-fundraising",
+      "name": "add-fundraising",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/add-fundraising/SKILL.md",
+      "sha": "7f12405714ad146a51f1175856d0a8c8c0ff08a7"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/add-investor",
+      "name": "add-investor",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/add-investor/SKILL.md",
+      "sha": "6413c9d5ac0951655a4a5c451caebb6dd457b4bb"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/add-note",
+      "name": "add-note",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/add-note/SKILL.md",
+      "sha": "ad1f4083422f43c9b5071be54899653b2039bc1b"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/enrich-company",
+      "name": "enrich-company",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/enrich-company/SKILL.md",
+      "sha": "8469454882c2427ef751a5529560b1a98af447a8"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/home",
+      "name": "home",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/home/SKILL.md",
+      "sha": "b1d8347efd845970f198cefcbccea2692dabb9d5"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/search-companies",
+      "name": "search-companies",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/search-companies/SKILL.md",
+      "sha": "e7f979e62e6a1a35b54ba68abc6c78fefd6eda30"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/search-contacts",
+      "name": "search-contacts",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/search-contacts/SKILL.md",
+      "sha": "b49894dad685e92b74cc069f0eb9c414dba617e8"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/search-deals",
+      "name": "search-deals",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/search-deals/SKILL.md",
+      "sha": "e424f5cfdf02adc4a606430313ae320a9f587f55"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/search-fundraisings",
+      "name": "search-fundraisings",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/search-fundraisings/SKILL.md",
+      "sha": "e34277ba323a412ccf286e852a6dfa2c1d920024"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/search-investors",
+      "name": "search-investors",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/search-investors/SKILL.md",
+      "sha": "2214d3147c82986754b1f7974696eed7e614b279"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/search-notes",
+      "name": "search-notes",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/search-notes/SKILL.md",
+      "sha": "6628877af2e625d9160020cfae3e9d5e8cf7712b"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/search-reports",
+      "name": "search-reports",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/search-reports/SKILL.md",
+      "sha": "cb663191d8303ad2ba31a76feba6a7d0d95d5902"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/tutorial",
+      "name": "tutorial",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/tutorial/SKILL.md",
+      "sha": "537997f7f0a6571979b3d1319e8cd9bef7a85755"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/update-company",
+      "name": "update-company",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/update-company/SKILL.md",
+      "sha": "f2979d82a5e93e78f8adcea0bf3ac34de492537d"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/update-contact",
+      "name": "update-contact",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/update-contact/SKILL.md",
+      "sha": "91d79b1cba0ac1179bb935b7dd4e64b77ea60fee"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/update-deal",
+      "name": "update-deal",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/update-deal/SKILL.md",
+      "sha": "53e16f90bf090274f3fb53385c92060fcda6450e"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/update-fundraising",
+      "name": "update-fundraising",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/update-fundraising/SKILL.md",
+      "sha": "0532c0e50d7f906b596267baa751175fbf8819a7"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/update-investor",
+      "name": "update-investor",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/update-investor/SKILL.md",
+      "sha": "c952fa2e9de8b83d889ad1e530eaca4162b6a4dd"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-crm/skills/update-note",
+      "name": "update-note",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-crm/skills/update-note/SKILL.md",
+      "sha": "a03c1d6d9c6a2ef02ae79736d538bf0ce00eba22"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-investors/skills/carta-data-collection",
+      "name": "carta-data-collection",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-investors/skills/carta-data-collection/SKILL.md",
+      "sha": "f9e2d45b019808e0488fd937e130acc79929a8fb"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-investors/skills/carta-download-tearsheet",
+      "name": "carta-download-tearsheet",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-investors/skills/carta-download-tearsheet/SKILL.md",
+      "sha": "10f73406b9c93ab066cdb4c59c1f47589eb11af0"
+    },
+    {
+      "id": "carta/plugins:plugins/carta-investors/skills/carta-fund-admin-requests",
+      "name": "carta-fund-admin-requests",
+      "repo": "carta/plugins",
+      "path": "plugins/carta-investors/skills/carta-fund-admin-requests/SKILL.md",
+      "sha": "41769fb35d97f650b5a5ed4ec5e763913d439fb9"
+    },
+    {
+      "id": "cockroachdb/claude-plugin:skills/cockroachdb-onboarding-and-migrations/molt-fetch",
+      "name": "molt-fetch",
+      "repo": "cockroachdb/claude-plugin",
+      "path": "skills/cockroachdb-onboarding-and-migrations/molt-fetch/SKILL.md",
+      "sha": "4c84239a6f84596bd8c81c8afe69e25d0cbad1a2"
+    },
+    {
+      "id": "cockroachdb/claude-plugin:skills/cockroachdb-onboarding-and-migrations/molt-replicator",
+      "name": "molt-replicator",
+      "repo": "cockroachdb/claude-plugin",
+      "path": "skills/cockroachdb-onboarding-and-migrations/molt-replicator/SKILL.md",
+      "sha": "15ad811536a9b5f910e52af124c3fcd48f610023"
+    },
+    {
+      "id": "cockroachdb/claude-plugin:skills/cockroachdb-onboarding-and-migrations/molt-verify",
+      "name": "molt-verify",
+      "repo": "cockroachdb/claude-plugin",
+      "path": "skills/cockroachdb-onboarding-and-migrations/molt-verify/SKILL.md",
+      "sha": "41d33b4b3d526844386349c71cabe0d3a20f6031"
+    },
+    {
+      "id": "cockroachdb/claude-plugin:skills/cockroachdb-query-and-schema-design/cockroachdb-sql",
+      "name": "cockroachdb-sql",
+      "repo": "cockroachdb/claude-plugin",
+      "path": "skills/cockroachdb-query-and-schema-design/cockroachdb-sql/SKILL.md",
+      "sha": "2690e972a99fe632818f0fc1a434080bc7acd917"
+    },
+    {
+      "id": "countz-ai/agentic-tools:countz-accounting/skills/check-analyze",
+      "name": "check-analyze",
+      "repo": "countz-ai/agentic-tools",
+      "path": "countz-accounting/skills/check-analyze/SKILL.md",
+      "sha": "1cab01631f250e6a296acb903b18ce36b2e41682"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/accidental-data-loss-prevention",
+      "name": "accidental-data-loss-prevention",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/accidental-data-loss-prevention/SKILL.md",
+      "sha": "beefb25a7547984b0eeffcbb06bb61e36a9e7465"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/bigquery-ai-ml",
+      "name": "bigquery-ai-ml",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/bigquery-ai-ml/SKILL.md",
+      "sha": "e945cf42fe1346c5bac73156ea612ffcaadae293"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/bigquery-bigframes",
+      "name": "bigquery-bigframes",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/bigquery-bigframes/SKILL.md",
+      "sha": "cc79be3ac6bec94ff9cd6d69add6174c22ba809f"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/bigquery-data-transfer-service",
+      "name": "bigquery-data-transfer-service",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/bigquery-data-transfer-service/SKILL.md",
+      "sha": "f7c36b2c369d00887d5066d9ed485df93d31925c"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/bigquery-sql",
+      "name": "bigquery-sql",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/bigquery-sql/SKILL.md",
+      "sha": "40d6553c2b793dcfc68521fb28770dc9b31731ea"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/bigtable-basics",
+      "name": "bigtable-basics",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/bigtable-basics/SKILL.md",
+      "sha": "e1bf9c27dde0a7b9a85e3101fc621b3db91559b0"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/building-data-apps",
+      "name": "building-data-apps",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/building-data-apps/SKILL.md",
+      "sha": "e7dea702dc27704fc353a1480d696ddef5f558f3"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/data-autocleaning",
+      "name": "data-autocleaning",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/data-autocleaning/SKILL.md",
+      "sha": "a3182b47d78413cd62da47d23d9baee0bbe7db6e"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/dataform-bigquery",
+      "name": "dataform-bigquery",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/dataform-bigquery/SKILL.md",
+      "sha": "1db914a0d83ad54cb13c22ec03c25093bc04d08d"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/dbt-bigquery",
+      "name": "dbt-bigquery",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/dbt-bigquery/SKILL.md",
+      "sha": "680ac7c00885e1efa4e3292cd738c2fe0c5e8002"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/discovering-gcp-data-assets",
+      "name": "discovering-gcp-data-assets",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/discovering-gcp-data-assets/SKILL.md",
+      "sha": "1819147d0700c66138cc3cda1c71e21d53aae870"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/enforcing-resource-attribution",
+      "name": "enforcing-resource-attribution",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/enforcing-resource-attribution/SKILL.md",
+      "sha": "46370fd6a4cdfd326ef1765e9d79bf7eb393178d"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/federate-lakehouse-catalog",
+      "name": "federate-lakehouse-catalog",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/federate-lakehouse-catalog/SKILL.md",
+      "sha": "22822b8da46173bd3818cd9d5251a0fa4c0386c4"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/gcp-composer-troubleshooting",
+      "name": "gcp-composer-troubleshooting",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/gcp-composer-troubleshooting/SKILL.md",
+      "sha": "9cc335d9fdcc5b8640fe9edef4ef1285ef21d4d6"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/gcp-data-pipelines",
+      "name": "gcp-data-pipelines",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/gcp-data-pipelines/SKILL.md",
+      "sha": "38ff6963d99130e264048669c3af60f47da146b4"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/gcp-dataflow",
+      "name": "gcp-dataflow",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/gcp-dataflow/SKILL.md",
+      "sha": "fc8312a350940aaeb5d18a2937c93bf29ada0cda"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/gcp-managed-airflow-dag-authoring",
+      "name": "gcp-managed-airflow-dag-authoring",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/gcp-managed-airflow-dag-authoring/SKILL.md",
+      "sha": "266aa6951e7c46b75ea48f1a6feb4e71e925876b"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/gcp-managed-airflow-migrations",
+      "name": "gcp-managed-airflow-migrations",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/gcp-managed-airflow-migrations/SKILL.md",
+      "sha": "cae3c4c335f791321640c585589c712f50561651"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/gcp-managed-airflow-recommendations",
+      "name": "gcp-managed-airflow-recommendations",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/gcp-managed-airflow-recommendations/SKILL.md",
+      "sha": "98a5722743a57cf9aab868ec00fc0b2cce8f4fbb"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/gcp-pipeline-orchestration",
+      "name": "gcp-pipeline-orchestration",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/gcp-pipeline-orchestration/SKILL.md",
+      "sha": "bf6ef00962287020cec81e6561de5f37887054f6"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/gcp-pipeline-resource-provisioning",
+      "name": "gcp-pipeline-resource-provisioning",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/gcp-pipeline-resource-provisioning/SKILL.md",
+      "sha": "d1b50f6ba37c5ba8b241e7c4f74dd736d717a405"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/gcp-spark",
+      "name": "gcp-spark",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/gcp-spark/SKILL.md",
+      "sha": "44543776b5158db0039f588dba423900f0b48a3c"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/gcs-security-assessment",
+      "name": "gcs-security-assessment",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/gcs-security-assessment/SKILL.md",
+      "sha": "062b4f7730145ad3adb94bf2d320e8322ebde21d"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/google-cloud-auth-verification",
+      "name": "google-cloud-auth-verification",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/google-cloud-auth-verification/SKILL.md",
+      "sha": "cf100cbddc877a48676869fec2ef48f694b18692"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/google-cloud-storage-basics",
+      "name": "google-cloud-storage-basics",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/google-cloud-storage-basics/SKILL.md",
+      "sha": "d45f2552c1843416e8be2ac06dac475947ff4752"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/google-cloud-storage-bucket-architect",
+      "name": "google-cloud-storage-bucket-architect",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/google-cloud-storage-bucket-architect/SKILL.md",
+      "sha": "6c014275ab3f7f5c6b23e73d5155296172c6b593"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/google-cloud-storage-fuse",
+      "name": "google-cloud-storage-fuse",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/google-cloud-storage-fuse/SKILL.md",
+      "sha": "bbe836db26414049a819a3945e2ba6504e666658"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/managing-python-dependencies",
+      "name": "managing-python-dependencies",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/managing-python-dependencies/SKILL.md",
+      "sha": "ced64b1772bfa72b807e97d75d438d398f49b6bc"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/ml-best-practices",
+      "name": "ml-best-practices",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/ml-best-practices/SKILL.md",
+      "sha": "ac28b7eded79c42fc6147e8fe4521a7b17e262bd"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/notebook-guidance",
+      "name": "notebook-guidance",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/notebook-guidance/SKILL.md",
+      "sha": "31574589f01cf6835e2d1f20b8d15a9f5d98e58f"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/resolving-mcp-region-configs",
+      "name": "resolving-mcp-region-configs",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/resolving-mcp-region-configs/SKILL.md",
+      "sha": "5d888f108a7f7f933b21d7803054efff8a289f2d"
+    },
+    {
+      "id": "googlecloudplatform/data-agent-kit-plugin:skills/schema-mapping",
+      "name": "schema-mapping",
+      "repo": "googlecloudplatform/data-agent-kit-plugin",
+      "path": "skills/schema-mapping/SKILL.md",
+      "sha": "27615a45d10713f0abfaf829ca5bdb4070ff8a46"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/ad-policy-compliance",
+      "name": "ad-policy-compliance",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/ad-policy-compliance/SKILL.md",
+      "sha": "f1e6f2b4186c8f050196d03e9f1cefa433e64797"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/anomaly-detector",
+      "name": "anomaly-detector",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/anomaly-detector/SKILL.md",
+      "sha": "e931df385f03fe60280301c78e48b26a47aa9921"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/attribution",
+      "name": "attribution",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/attribution/SKILL.md",
+      "sha": "6ddee1f2d0cb019d750fc4f59454258800c3d319"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/audience",
+      "name": "audience",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/audience/SKILL.md",
+      "sha": "ca6b263c3bb36a122679c0b07c9997ad644e1705"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/audience-expansion-strategy",
+      "name": "audience-expansion-strategy",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/audience-expansion-strategy/SKILL.md",
+      "sha": "b56e0012da4e6211e18fdd5202439ee02ddfba71"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/bid-optimization",
+      "name": "bid-optimization",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/bid-optimization/SKILL.md",
+      "sha": "e552788c17bfbf44cd2ec1f003a9bcb5f362efe2"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/campaign-preflight",
+      "name": "campaign-preflight",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/campaign-preflight/SKILL.md",
+      "sha": "ade139fece372683a5388d93518e7b594afcceb6"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/campaign-structure-auditor",
+      "name": "campaign-structure-auditor",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/campaign-structure-auditor/SKILL.md",
+      "sha": "6f99231a8e664a5d348eae592c60026dda296dfb"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/competitor-analysis",
+      "name": "competitor-analysis",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/competitor-analysis/SKILL.md",
+      "sha": "88161b3673d91dba4ac9e33ecaef61c0fd5af0dd"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/connect",
+      "name": "connect",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/connect/SKILL.md",
+      "sha": "ad3a015b27ce40a41cfb6aa6b04f43bdfa11ae37"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/conversion-tracking",
+      "name": "conversion-tracking",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/conversion-tracking/SKILL.md",
+      "sha": "7c13e57c5f1034fc635f8330e1a8df97c579a30b"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/creative-fatigue-detector",
+      "name": "creative-fatigue-detector",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/creative-fatigue-detector/SKILL.md",
+      "sha": "2a70f8d7f2ead65abec3735b9f3d5cb75eb31d47"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/creative-testing",
+      "name": "creative-testing",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/creative-testing/SKILL.md",
+      "sha": "b51b5a829222a8578df9ae09e299e108889e4703"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/dayparting",
+      "name": "dayparting",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/dayparting/SKILL.md",
+      "sha": "ab4381f9f4a1467f0458c6cc943a03b332766a03"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/executive-reporting",
+      "name": "executive-reporting",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/executive-reporting/SKILL.md",
+      "sha": "6a96c34977f862b7745d75b3ca98c1e3233d8b5d"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/first-party-data-strategy",
+      "name": "first-party-data-strategy",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/first-party-data-strategy/SKILL.md",
+      "sha": "1aeb40d04ffe07be3c91708e68f90382047bd7c2"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/geo-integrity-audit",
+      "name": "geo-integrity-audit",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/geo-integrity-audit/SKILL.md",
+      "sha": "abdecd6973208050d29908540bc70da35a335394"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/google-ads-quality-score",
+      "name": "google-ads-quality-score",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/google-ads-quality-score/SKILL.md",
+      "sha": "09580dc274307569cb235520847d495356b30203"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/google-shopping-optimizer",
+      "name": "google-shopping-optimizer",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/google-shopping-optimizer/SKILL.md",
+      "sha": "6f80228a88bf29102205af7ff4b871f2acaa2e2d"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/incrementality-testing",
+      "name": "incrementality-testing",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/incrementality-testing/SKILL.md",
+      "sha": "f0ed5f50c2d27b3530ea078318b5753a07152aef"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/keyword-research",
+      "name": "keyword-research",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/keyword-research/SKILL.md",
+      "sha": "d90e434c20c601623747e9b72eefaaf3b6e8a646"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/kill-scale-rules",
+      "name": "kill-scale-rules",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/kill-scale-rules/SKILL.md",
+      "sha": "f03d3948395b92ea0d8d115f20c695a0f045b134"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/linkedin-ads-targeting",
+      "name": "linkedin-ads-targeting",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/linkedin-ads-targeting/SKILL.md",
+      "sha": "f40cf2f8fb5b00b17c48e4a37939a48cd1c5e09b"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/media-plan",
+      "name": "media-plan",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/media-plan/SKILL.md",
+      "sha": "0776381e772b8ceb6fa980858573b80ea682c78e"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/meta-ads-diagnostics",
+      "name": "meta-ads-diagnostics",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/meta-ads-diagnostics/SKILL.md",
+      "sha": "a82bbbb797fce87b71d007c6c62762c14cdb658e"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/mmm-budget-planner",
+      "name": "mmm-budget-planner",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/mmm-budget-planner/SKILL.md",
+      "sha": "6ef03eccfbc2afb3cb6319d0b4691ae5c980f070"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/negative-keywords",
+      "name": "negative-keywords",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/negative-keywords/SKILL.md",
+      "sha": "c91001a76b877d25bcde689c65ecd00e1ed924f6"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/optimize",
+      "name": "optimize",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/optimize/SKILL.md",
+      "sha": "4b11e42bf71b865d04e7fda343fd61d7da4fa50b"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/performance-max-optimizer",
+      "name": "performance-max-optimizer",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/performance-max-optimizer/SKILL.md",
+      "sha": "0c32a70228344809cdf118c96fe24ee021322dda"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/pixel-capi-auditor",
+      "name": "pixel-capi-auditor",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/pixel-capi-auditor/SKILL.md",
+      "sha": "369f739cd58d067e5de61fed6895f6d6f62fbe42"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/platform-benchmarks",
+      "name": "platform-benchmarks",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/platform-benchmarks/SKILL.md",
+      "sha": "ec5963e58cf8b0519fec155ed007fd8176837069"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/platform-google",
+      "name": "platform-google",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/platform-google/SKILL.md",
+      "sha": "3d534f574716f23843ad4ecc3bc2f09b9932e15f"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/platform-linkedin",
+      "name": "platform-linkedin",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/platform-linkedin/SKILL.md",
+      "sha": "58be634ce6fe51128cc6bcfeb83d29c62d25fc34"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/platform-meta",
+      "name": "platform-meta",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/platform-meta/SKILL.md",
+      "sha": "875fe1f91d575455ee7d94aa330760cb27ba4719"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/platform-microsoft",
+      "name": "platform-microsoft",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/platform-microsoft/SKILL.md",
+      "sha": "6de4bb1a40720c5fc0bce99fa60a5b9972edcba3"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/platform-openai",
+      "name": "platform-openai",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/platform-openai/SKILL.md",
+      "sha": "e760ff75e549a10953e65860923a5e3835fe4fb4"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/platform-reddit",
+      "name": "platform-reddit",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/platform-reddit/SKILL.md",
+      "sha": "dac8f6acd6c1a96a3f2a1ad657990d5834e1e559"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/platform-tiktok",
+      "name": "platform-tiktok",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/platform-tiktok/SKILL.md",
+      "sha": "a0a97b154c9aa9051a8aaa8d06cd37c55586d950"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/platform-x",
+      "name": "platform-x",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/platform-x/SKILL.md",
+      "sha": "8768f4fe67049d6a99c0c34e4d3003000f6b403f"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/pre-pause-analysis",
+      "name": "pre-pause-analysis",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/pre-pause-analysis/SKILL.md",
+      "sha": "7c3878c7cd722e8b45c0de295f6a4d998f421078"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/quickstart",
+      "name": "quickstart",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/quickstart/SKILL.md",
+      "sha": "8659bfd6377da65c2e12ebbc5fdb79ea51cf7f8e"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/report",
+      "name": "report",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/report/SKILL.md",
+      "sha": "12ef44b378a759197eae8291a769545a5b1a0cdb"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/retargeting-sequence-designer",
+      "name": "retargeting-sequence-designer",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/retargeting-sequence-designer/SKILL.md",
+      "sha": "cccc857ba12542d54ce70e6b4cf1637d5ea42e71"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/roas-calculator",
+      "name": "roas-calculator",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/roas-calculator/SKILL.md",
+      "sha": "48ac649069111a4c88ab7686c344e834416d3947"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/seasonal-budget-planner",
+      "name": "seasonal-budget-planner",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/seasonal-budget-planner/SKILL.md",
+      "sha": "b243ad0861514a1d84e7ced2dbcf16ab8e8635cf"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/utm-builder",
+      "name": "utm-builder",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/utm-builder/SKILL.md",
+      "sha": "d01d37b3d68065c91aa48cd811b383e976aa381f"
+    },
+    {
+      "id": "synter-media-ai/plugin:skills/video-ad-scriptwriter",
+      "name": "video-ad-scriptwriter",
+      "repo": "synter-media-ai/plugin",
+      "path": "skills/video-ad-scriptwriter/SKILL.md",
+      "sha": "4f984f879a46d2a3964feb492b8e06cc774b8e61"
+    },
+    {
+      "id": "urbanairship/agent-tools:skills/mobile/custom-views",
+      "name": "custom-views",
+      "repo": "urbanairship/agent-tools",
+      "path": "skills/mobile/custom-views/SKILL.md",
+      "sha": "2d0682c5f03a2e519a8168a4e7709f83cb087cd8"
+    },
+    {
+      "id": "urbanairship/agent-tools:skills/mobile/message-center",
+      "name": "message-center",
+      "repo": "urbanairship/agent-tools",
+      "path": "skills/mobile/message-center/SKILL.md",
+      "sha": "6edaed6f24b159af3a6e454de824c325e7329f60"
+    },
+    {
+      "id": "urbanairship/agent-tools:skills/mobile/sdk-reference",
+      "name": "sdk-reference",
+      "repo": "urbanairship/agent-tools",
+      "path": "skills/mobile/sdk-reference/SKILL.md",
+      "sha": "80cab51333d1111c5a48dc675b13e92aec5a0cc1"
+    },
+    {
+      "id": "zuora/zuora-coding-agent:skills/zuora-dynamic-pricing-build",
+      "name": "zuora-dynamic-pricing-build",
+      "repo": "zuora/zuora-coding-agent",
+      "path": "skills/zuora-dynamic-pricing-build/SKILL.md",
+      "sha": "9071139cfb718dd9ba8d17106afc6f9a4b883222"
+    },
+    {
+      "id": "zuora/zuora-coding-agent:skills/zuora-dynamic-pricing-design",
+      "name": "zuora-dynamic-pricing-design",
+      "repo": "zuora/zuora-coding-agent",
+      "path": "skills/zuora-dynamic-pricing-design/SKILL.md",
+      "sha": "1fd44d24403f40ce7ab337e140c9cea11ec430ba"
+    },
+    {
+      "id": "zuora/zuora-coding-agent:skills/zuora-uat/design",
+      "name": "zuora-uat-design-worker",
+      "repo": "zuora/zuora-coding-agent",
+      "path": "skills/zuora-uat/design/SKILL.md",
+      "sha": "fbba869bbb1b77a24734554fd82f7f4317cae159"
+    }
+  ],
+  "cutoverValidationPassed": true,
+  "existingRecordsChanged": 0,
+  "productionDataChanged": false,
+  "combinedCrawlRun": false,
+  "published": false,
+  "archive": "/Users/jonslimak/Projects/omgskills/index/shadow/directory3000-wave1-20261023"
+}

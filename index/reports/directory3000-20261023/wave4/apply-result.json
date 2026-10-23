@@ -1,0 +1,2003 @@
+{
+  "generatedAt": "2026-10-23T20:57:20.836Z",
+  "wave": "wave4",
+  "summary": {
+    "planCandidateCount": 280,
+    "finalCount": 280,
+    "pendingCount": 0,
+    "addedCount": 280,
+    "existingCount": 0,
+    "policySkippedCount": 0,
+    "stableFailedCount": 0,
+    "transientFailedCount": 0
+  },
+  "sharedApproval": {
+    "changedCreators": [
+      "nielsmadan",
+      "zakariaf",
+      "hzblj",
+      "curtisthe",
+      "petrovicistefan",
+      "auralshin",
+      "ironyjk",
+      "oegeyilmaz9",
+      "mickzijdel",
+      "utopia5327",
+      "impactbrussels"
+    ],
+    "beforeRevision": "sha256:3ef18963c0cf4dac5f6aeab2d9ac7b9bf18c0ec1e76382922458adefb4c0ce50",
+    "afterRevision": "sha256:4d54610c2718b15767e8726c81814d868493144e322064288e9a43b68c3f1ce9"
+  },
+  "priorAdditionsPreserved": 2235,
+  "totalCampaignAdditions": 2515,
+  "beforeCount": 49925,
+  "afterCount": 50205,
+  "addedSkills": [
+    {
+      "id": "auralshin/coding-skills:skills/algorithmic-complexity-attacks",
+      "name": "algorithmic-complexity-attacks",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/algorithmic-complexity-attacks/SKILL.md",
+      "sha": "702c157717a815a4c884a8542f3a9bd9ea502f76"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/cache-stampede",
+      "name": "cache-stampede",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/cache-stampede/SKILL.md",
+      "sha": "1adc2146038f2cb8329cf842b5202dcaf1e38e5b"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/clocks-and-time",
+      "name": "clocks-and-time",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/clocks-and-time/SKILL.md",
+      "sha": "1923bd78f19b7fcf66c6310b3b40a8e4d1ffa95b"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/code-hotspots",
+      "name": "code-hotspots",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/code-hotspots/SKILL.md",
+      "sha": "4c06a58df657c55e0819450e28c4fc4f5fd0124a"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/connascence",
+      "name": "connascence",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/connascence/SKILL.md",
+      "sha": "6487394e0895ab324271c0f4ae00eb38fbfacad6"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/connection-pooling",
+      "name": "connection-pooling",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/connection-pooling/SKILL.md",
+      "sha": "b6ac892100364f121e577bf7f2d1e2362a035f13"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/consistent-hashing",
+      "name": "consistent-hashing",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/consistent-hashing/SKILL.md",
+      "sha": "72af2ee2ee11bacd66b3a0cafcc04eed8faac3f1"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/coordinated-omission",
+      "name": "coordinated-omission",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/coordinated-omission/SKILL.md",
+      "sha": "1bd06f7f02029af7906f2d6ae83889274059ed4e"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/cyclomatic-complexity",
+      "name": "cyclomatic-complexity",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/cyclomatic-complexity/SKILL.md",
+      "sha": "dcc5ce8a4f54dc29e6086e7daee5f294228e3efa"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/database-queues",
+      "name": "database-queues",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/database-queues/SKILL.md",
+      "sha": "adb6fb0a693267dfe641db3276c16474ef365633"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/dependency-confusion",
+      "name": "dependency-confusion",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/dependency-confusion/SKILL.md",
+      "sha": "d5291efe7da616321591b352caddefe1fc01f961"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/expand-contract",
+      "name": "expand-contract",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/expand-contract/SKILL.md",
+      "sha": "05640cd295b27bb2b3c9be8cb6e4fe6f85a44d46"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/floating-point",
+      "name": "floating-point",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/floating-point/SKILL.md",
+      "sha": "171bb86b349326c0486d9c0548b3cf7a3ecbfd68"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/hyrums-law",
+      "name": "hyrums-law",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/hyrums-law/SKILL.md",
+      "sha": "13c78ce0f5fe04142c55dae24592ca650cf103ed"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/index-design",
+      "name": "index-design",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/index-design/SKILL.md",
+      "sha": "3cdd069c6480b345a6f059ae2eefddff689342b2"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/isolation-anomalies",
+      "name": "isolation-anomalies",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/isolation-anomalies/SKILL.md",
+      "sha": "bbcc80b3168428fa189834b9d4b89be354e078c2"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/keyset-pagination",
+      "name": "keyset-pagination",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/keyset-pagination/SKILL.md",
+      "sha": "ff20c582569680c68fb1e7a183e7b3943d74171c"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/metamorphic-testing",
+      "name": "metamorphic-testing",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/metamorphic-testing/SKILL.md",
+      "sha": "2d0e1341452c981e50296f03bf30e2b0a0d5116d"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/module-depth",
+      "name": "module-depth",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/module-depth/SKILL.md",
+      "sha": "9f539e6755121c65b8b95fd449f0f963629de9ce"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/mutation-testing",
+      "name": "mutation-testing",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/mutation-testing/SKILL.md",
+      "sha": "7a2a0d524bd6456560aca19e6b87031c64922aa9"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/mvcc-and-bloat",
+      "name": "mvcc-and-bloat",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/mvcc-and-bloat/SKILL.md",
+      "sha": "d1fe46fcf48f424fb050e34a1cb6822fe7909a4f"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/parse-dont-validate",
+      "name": "parse-dont-validate",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/parse-dont-validate/SKILL.md",
+      "sha": "77a868722d752fcc5e1ea6ad797b97da74f22844"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/query-plans",
+      "name": "query-plans",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/query-plans/SKILL.md",
+      "sha": "7f6fe1e1a2652741ab32e24c8c299ff3aacf3f95"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/queueing-and-utilization",
+      "name": "queueing-and-utilization",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/queueing-and-utilization/SKILL.md",
+      "sha": "810b70caf706cd50a948a3059436585767af6f78"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/retry-amplification",
+      "name": "retry-amplification",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/retry-amplification/SKILL.md",
+      "sha": "f7b1ea77780b525198c9ab8b995b6d24726519d0"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/start-here",
+      "name": "start-here",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/start-here/SKILL.md",
+      "sha": "b8b61405a65318337d0a83eac2364e70960b894a"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/tail-latency",
+      "name": "tail-latency",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/tail-latency/SKILL.md",
+      "sha": "93a144a961ff2e0a9feff6d72ae40d04c1bf1124"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/unicode-pitfalls",
+      "name": "unicode-pitfalls",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/unicode-pitfalls/SKILL.md",
+      "sha": "88cf760a9b5c03708a42f91ebc82512bd35de8de"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/universal-scalability-law",
+      "name": "universal-scalability-law",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/universal-scalability-law/SKILL.md",
+      "sha": "32a987356e5dcf7ff495bdd2143b8022fb443f30"
+    },
+    {
+      "id": "auralshin/coding-skills:skills/write-amplification",
+      "name": "write-amplification",
+      "repo": "auralshin/coding-skills",
+      "path": "skills/write-amplification/SKILL.md",
+      "sha": "64b06820d369637233ec39b54992af08bfab2f3c"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/council",
+      "name": "council",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/council/SKILL.md",
+      "sha": "313621457a7b26ff52434988b277d6cfe32ba618"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-design",
+      "name": "tp-design",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-design/SKILL.md",
+      "sha": "026508960625938b5baf32845b7afc764bad8fbe"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-design-audit",
+      "name": "tp-design-audit",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-design-audit/SKILL.md",
+      "sha": "820d8c0addc7b2dedb61cb8d8d8f315b4970fcd8"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-design-detail",
+      "name": "tp-design-detail",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-design-detail/SKILL.md",
+      "sha": "f9b93bacb7f529f528d703fb90a4e0f59a5b9967"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-design-release",
+      "name": "tp-design-release",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-design-release/SKILL.md",
+      "sha": "c177b0543dca4a3c7690757122cbdc23582869c6"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-docs-init",
+      "name": "tp-docs-init",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-docs-init/SKILL.md",
+      "sha": "38c148937ec408e5466cf477ce67b03b96862ae6"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-docs-update",
+      "name": "tp-docs-update",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-docs-update/SKILL.md",
+      "sha": "efdab939ce851d0546bd38ca663bc1b99bfeaf38"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-guide",
+      "name": "tp-guide",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-guide/SKILL.md",
+      "sha": "50d5bcbfabae6939315cc83d6b0a2ce6b47e803d"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-implementation-audit",
+      "name": "tp-implementation-audit",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-implementation-audit/SKILL.md",
+      "sha": "2230a8683caf72c758de116720af944e8ff24dce"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-inflight",
+      "name": "tp-inflight",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-inflight/SKILL.md",
+      "sha": "cbce1d5760bb5352a6693026a726f757b3854861"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-merge-from-main",
+      "name": "tp-merge-from-main",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-merge-from-main/SKILL.md",
+      "sha": "6494f3a42856f2c3bfee7716736c41c49129e1c6"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-migrate",
+      "name": "tp-migrate",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-migrate/SKILL.md",
+      "sha": "16f8d4a066f9f2fa2d93c3ad8ae8bf26f46d031e"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-phase-implement",
+      "name": "tp-phase-implement",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-phase-implement/SKILL.md",
+      "sha": "c7a47af5779f96001693a1343fb20ea480872ed8"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-phase-review",
+      "name": "tp-phase-review",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-phase-review/SKILL.md",
+      "sha": "24296d24735ebd512d41fc3db0d84bd6ce969234"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-plan",
+      "name": "tp-plan",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-plan/SKILL.md",
+      "sha": "7c83211d83aa0b0934eb0280141be8c21f487c73"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-plan-audit",
+      "name": "tp-plan-audit",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-plan-audit/SKILL.md",
+      "sha": "168be856b4985c2011b7d94274137ed3ee5b740b"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-pr-iterate",
+      "name": "tp-pr-iterate",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-pr-iterate/SKILL.md",
+      "sha": "fab9794693336a19003a18e67f5cfc5dc250f287"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-promote",
+      "name": "tp-promote",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-promote/SKILL.md",
+      "sha": "76ff143cbf1722594eaf3c5dadbe0b2700236b9b"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-run-full-design",
+      "name": "tp-run-full-design",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-run-full-design/SKILL.md",
+      "sha": "20d39c5b0d0f97485d7f847886131293dbda6917"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-session-clear",
+      "name": "tp-session-clear",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-session-clear/SKILL.md",
+      "sha": "53deaaf1ec19892d65dc7e885950a873e1304c46"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-session-restore",
+      "name": "tp-session-restore",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-session-restore/SKILL.md",
+      "sha": "27f1accdfc570902d684c57b92d37f3c40c5eb52"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-session-save",
+      "name": "tp-session-save",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-session-save/SKILL.md",
+      "sha": "a47e9a86883907c06d9219a56010e89f5bad5933"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-setup",
+      "name": "tp-setup",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-setup/SKILL.md",
+      "sha": "d90d24d5e77cdfbbee4d6ea08051ce59ef9552ee"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-spec",
+      "name": "tp-spec",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-spec/SKILL.md",
+      "sha": "d5e78ce83a400719a48b4f1f0733113b256454b5"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-spike",
+      "name": "tp-spike",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-spike/SKILL.md",
+      "sha": "175f43168756fd4c8e8ca4ee9e7301b149277bbc"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-spike-auto",
+      "name": "tp-spike-auto",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-spike-auto/SKILL.md",
+      "sha": "f187704fd8b6be92f8d8b23f25ff833d869876c8"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-spike-implement",
+      "name": "tp-spike-implement",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-spike-implement/SKILL.md",
+      "sha": "af3e44441a286d320a6a4d1348c2a94886c789d7"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-spike-plan",
+      "name": "tp-spike-plan",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-spike-plan/SKILL.md",
+      "sha": "981556e32c33f9534ab5301637928d893f844bd8"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-spike-results",
+      "name": "tp-spike-results",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-spike-results/SKILL.md",
+      "sha": "d0c4bacdf93a8dfa5ac78c5490243d7aff850c30"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-task-cycle",
+      "name": "tp-task-cycle",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-task-cycle/SKILL.md",
+      "sha": "a64b8bdacc49d579d958c81c66196a576e9ced67"
+    },
+    {
+      "id": "curtisthe/three-pillars-plugin:skills/tp-test-setup",
+      "name": "tp-test-setup",
+      "repo": "curtisthe/three-pillars-plugin",
+      "path": "skills/tp-test-setup/SKILL.md",
+      "sha": "02daeb594f0054176c431f125958fcb23763e4b6"
+    },
+    {
+      "id": "hzblj/skills:skills/mobile/animations/skia",
+      "name": "skia",
+      "repo": "hzblj/skills",
+      "path": "skills/mobile/animations/skia/SKILL.md",
+      "sha": "b8bef3b10a942acd786c350a40241c70fbb3bc06"
+    },
+    {
+      "id": "hzblj/skills:skills/mobile/navigation/react-navigation",
+      "name": "react-navigation",
+      "repo": "hzblj/skills",
+      "path": "skills/mobile/navigation/react-navigation/SKILL.md",
+      "sha": "87b8eb4f3d09e2ba3ba525c64513767ceae38200"
+    },
+    {
+      "id": "hzblj/skills:skills/mobile/styling/native-feel",
+      "name": "native-feel",
+      "repo": "hzblj/skills",
+      "path": "skills/mobile/styling/native-feel/SKILL.md",
+      "sha": "09387cc8b58e686e22f36e3988a66cf9ea0d8029"
+    },
+    {
+      "id": "hzblj/skills:skills/mobile/ui/lists",
+      "name": "lists",
+      "repo": "hzblj/skills",
+      "path": "skills/mobile/ui/lists/SKILL.md",
+      "sha": "89276120f2fd38b7fe64b8d31b37b660c3934c48"
+    },
+    {
+      "id": "hzblj/skills:skills/shared/hooks",
+      "name": "hooks",
+      "repo": "hzblj/skills",
+      "path": "skills/shared/hooks/SKILL.md",
+      "sha": "f881e33f08c4c0c09a71ca896c684fb945dc3605"
+    },
+    {
+      "id": "hzblj/skills:skills/shared/orchestration",
+      "name": "orchestration",
+      "repo": "hzblj/skills",
+      "path": "skills/shared/orchestration/SKILL.md",
+      "sha": "b6aada2e766013530d6a4f02fe85bea6eaaf1f72"
+    },
+    {
+      "id": "hzblj/skills:skills/shared/project",
+      "name": "project",
+      "repo": "hzblj/skills",
+      "path": "skills/shared/project/SKILL.md",
+      "sha": "cd8500f61088500b1bbbf246b2639eda0935eb6c"
+    },
+    {
+      "id": "hzblj/skills:skills/shared/teach",
+      "name": "teach",
+      "repo": "hzblj/skills",
+      "path": "skills/shared/teach/SKILL.md",
+      "sha": "852425d3368a1f954b58fd9fd6e6c223f324c21d"
+    },
+    {
+      "id": "hzblj/skills:skills/shared/ui/component-architecture",
+      "name": "component-architecture",
+      "repo": "hzblj/skills",
+      "path": "skills/shared/ui/component-architecture/SKILL.md",
+      "sha": "44ad969abcab9ba6418fd0eb9b353bfce367c541"
+    },
+    {
+      "id": "hzblj/skills:skills/shared/ui/motion",
+      "name": "ui-motion",
+      "repo": "hzblj/skills",
+      "path": "skills/shared/ui/motion/SKILL.md",
+      "sha": "601d4675d1029e8e72f9b205f416cad822532fb3"
+    },
+    {
+      "id": "hzblj/skills:skills/shared/ui/surfaces",
+      "name": "ui-surfaces",
+      "repo": "hzblj/skills",
+      "path": "skills/shared/ui/surfaces/SKILL.md",
+      "sha": "eeedc159e2dd25c7762194cb2bc0a4c204be155e"
+    },
+    {
+      "id": "hzblj/skills:skills/shared/ui/typography",
+      "name": "ui-typography",
+      "repo": "hzblj/skills",
+      "path": "skills/shared/ui/typography/SKILL.md",
+      "sha": "537099de349692f58b4316eaca246c56a11342f7"
+    },
+    {
+      "id": "hzblj/skills:skills/web/navigation/nextjs-routing",
+      "name": "nextjs-routing",
+      "repo": "hzblj/skills",
+      "path": "skills/web/navigation/nextjs-routing/SKILL.md",
+      "sha": "e96899bcce50145bda7835a15610294246bf26f3"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/apply-mental-models",
+      "name": "apply-mental-models",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/apply-mental-models/SKILL.md",
+      "sha": "066d92344ae0c6771d2c034cc122895df40a1ee0"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/brand-and-naming",
+      "name": "brand-and-naming",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/brand-and-naming/SKILL.md",
+      "sha": "256005756e9a4e9cde7f8033a58fc27be8448538"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/capture-learning",
+      "name": "capture-learning",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/capture-learning/SKILL.md",
+      "sha": "70313b179e7c8252c9ec10306c4f4b0b1459ac2d"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/cofounder-and-equity",
+      "name": "cofounder-and-equity",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/cofounder-and-equity/SKILL.md",
+      "sha": "79225e9481836672bc7d9a99a4b6237083a85eee"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/customer-interviews",
+      "name": "customer-interviews",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/customer-interviews/SKILL.md",
+      "sha": "83a852ca40fdd8d0935fd8c73a80505fcec84f8a"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/find-first-customers",
+      "name": "find-first-customers",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/find-first-customers/SKILL.md",
+      "sha": "51b5d7387002731c82755e807f7a02e27223c210"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/first-hire",
+      "name": "first-hire",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/first-hire/SKILL.md",
+      "sha": "b7a46ec85936a83645b0a247d1318461e418debc"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/founderos-prompt-scaffold",
+      "name": "founderos-prompt-scaffold",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/founderos-prompt-scaffold/SKILL.md",
+      "sha": "1df5dad85d2cb1bd66e7560cfde2b5a38a632558"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/investor-pipeline",
+      "name": "investor-pipeline",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/investor-pipeline/SKILL.md",
+      "sha": "cf58e5c55e6045cb7cd79c8b22c1d626e183c070"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/landing-page-copy",
+      "name": "landing-page-copy",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/landing-page-copy/SKILL.md",
+      "sha": "6fe494d777c4e8efa6b11787a3d59d493c59c0de"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/launch-plan",
+      "name": "launch-plan",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/launch-plan/SKILL.md",
+      "sha": "b5e3a599edef776138da81cb2ac82e6c37c09224"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/legal-and-incorporation",
+      "name": "legal-and-incorporation",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/legal-and-incorporation/SKILL.md",
+      "sha": "46caa2788b872707f2e41dc3ea39486066c4185f"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/north-star-metrics",
+      "name": "north-star-metrics",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/north-star-metrics/SKILL.md",
+      "sha": "cd4de38c7f607a21ff65667c18fd743964fe312d"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/pitch-deck",
+      "name": "pitch-deck",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/pitch-deck/SKILL.md",
+      "sha": "cf0bd68c8d60fbbf2994e9ed9fe24dab36f06e72"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/pivot-decision",
+      "name": "pivot-decision",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/pivot-decision/SKILL.md",
+      "sha": "846f4e20947a27ab60f898cfe92d73d76711e2a5"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/positioning-and-gtm",
+      "name": "positioning-and-gtm",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/positioning-and-gtm/SKILL.md",
+      "sha": "375f2fcc962adea60bdd08ee99e56fdb911a1cc6"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/pricing-strategy",
+      "name": "pricing-strategy",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/pricing-strategy/SKILL.md",
+      "sha": "8ccef739c31c514dce55a9a81d253abb0ef985c7"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/runway-and-unit-economics",
+      "name": "runway-and-unit-economics",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/runway-and-unit-economics/SKILL.md",
+      "sha": "247bb094f53f82bf5595694c199cd314571800f2"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/scope-mvp",
+      "name": "scope-mvp",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/scope-mvp/SKILL.md",
+      "sha": "9413e035374d8155625d96b327c21ff1f9e7cb31"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/start-here",
+      "name": "start-here",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/start-here/SKILL.md",
+      "sha": "7954ab330d03e4254c43d8b5d23273f1bb715bff"
+    },
+    {
+      "id": "impactbrussels/founderos:skills/validate-idea",
+      "name": "validate-idea",
+      "repo": "impactbrussels/founderos",
+      "path": "skills/validate-idea/SKILL.md",
+      "sha": "4b63e8a54709505ce8b4cc4945b78e6355f4a4c9"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:ansoff-matrix",
+      "name": "ansoff-matrix",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "ansoff-matrix/SKILL.md",
+      "sha": "91f54177f2c9c56cd576afe7569207e5f6822a05"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:bcg-matrix",
+      "name": "bcg-matrix",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "bcg-matrix/SKILL.md",
+      "sha": "492e4ffb69a6aba11619a3ae0e85c049fa63abdb"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:blue-ocean",
+      "name": "blue-ocean",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "blue-ocean/SKILL.md",
+      "sha": "4a1b9212b54153689adcc365cd503ba027695e8d"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:bmc",
+      "name": "bmc",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "bmc/SKILL.md",
+      "sha": "d16277625e3ca8b1ce183dadb7320b7577b046c7"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:bsc",
+      "name": "bsc",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "bsc/SKILL.md",
+      "sha": "bfe81523e35aac1fdea49be4bfeff202cb6964a6"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:design-thinking",
+      "name": "design-thinking",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "design-thinking/SKILL.md",
+      "sha": "d427efea325f79dbf857464b411c01fd04cae3cb"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:disruptive-innovation",
+      "name": "disruptive-innovation",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "disruptive-innovation/SKILL.md",
+      "sha": "dbae6c9ea6eb0334f690ce3bd47d6cb07a9cc3b4"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:drucker",
+      "name": "drucker",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "drucker/SKILL.md",
+      "sha": "23ad563374e9a9188b353e235d5cdd9d32b03596"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:first-principles",
+      "name": "first-principles",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "first-principles/SKILL.md",
+      "sha": "314197d0347e7393edc6777c5c1ac58f897d984e"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:game-theory",
+      "name": "game-theory",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "game-theory/SKILL.md",
+      "sha": "f8324c1a16a7ea44f59e81584478790870595351"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:jtbd",
+      "name": "jtbd",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "jtbd/SKILL.md",
+      "sha": "d4ae32edf737f8303095cdfbd2b57b93f4be8354"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:kotter",
+      "name": "kotter",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "kotter/SKILL.md",
+      "sha": "d7cf1dacc11b96e09c99bbdf0f649215fef1c341"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:lean-startup",
+      "name": "lean-startup",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "lean-startup/SKILL.md",
+      "sha": "55dfc41d52a3a068fcaeb447a6d2fa6018612e6f"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:marketing-mix",
+      "name": "marketing-mix",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "marketing-mix/SKILL.md",
+      "sha": "bf9c36bdd061e06098a38ded00e29d00ea512165"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:mckinsey-7s",
+      "name": "mckinsey-7s",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "mckinsey-7s/SKILL.md",
+      "sha": "2c5aa86d57b8d67032da842281ebbcd43c7ba038"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:okr",
+      "name": "okr",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "okr/SKILL.md",
+      "sha": "d1719fb234f703b6a3ddbb9c56487d185fa52733"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:ooda",
+      "name": "ooda",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "ooda/SKILL.md",
+      "sha": "d6ea08a9cee6cd042fdd89f751de43357fe57fbd"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:porter",
+      "name": "porter",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "porter/SKILL.md",
+      "sha": "c1c305a1488fa24983474d47f153d7b2bfc60488"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:pyramid-principle",
+      "name": "pyramid-principle",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "pyramid-principle/SKILL.md",
+      "sha": "afc550e11b61bc4b0c64acc0f33de3974d55403a"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:rbv",
+      "name": "rbv",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "rbv/SKILL.md",
+      "sha": "fbc3fe665c64d10fe41cd48df433ca502ceaf981"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:real-options",
+      "name": "real-options",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "real-options/SKILL.md",
+      "sha": "2d1960bbfc92d29774900a1e059508773a004704"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:scenario-planning",
+      "name": "scenario-planning",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "scenario-planning/SKILL.md",
+      "sha": "3991435cbf6db103e1f706e901b5acb5a49b72c6"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:stp",
+      "name": "stp",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "stp/SKILL.md",
+      "sha": "fbab9b243e2e687535d0ae56cc8e36b260a4060f"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:swot-pestel",
+      "name": "swot-pestel",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "swot-pestel/SKILL.md",
+      "sha": "ffef1cfb76bd1ff5cb8661ba745ce12aca9768ce"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:systems-thinking",
+      "name": "systems-thinking",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "systems-thinking/SKILL.md",
+      "sha": "3e4c3c430d7bb456e547355ffdcf783a40dd2bca"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:think",
+      "name": "think",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "think/SKILL.md",
+      "sha": "5116ddaa8355108fb8dc82c6d13c019b8bafb7fd"
+    },
+    {
+      "id": "ironyjk/strategy-frameworks:wardley",
+      "name": "wardley",
+      "repo": "ironyjk/strategy-frameworks",
+      "path": "wardley/SKILL.md",
+      "sha": "37e52fd7d0e415dfd002d486b2f39481f0411758"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-activestorage",
+      "name": "rails-activestorage",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-activestorage/SKILL.md",
+      "sha": "327d1b39366b7ef6ffab1bef62868c162979de25"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-api",
+      "name": "rails-api",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-api/SKILL.md",
+      "sha": "a96a4f6d3ffe81060ce765075388f65b622ac466"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-audit",
+      "name": "rails-audit",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-audit/SKILL.md",
+      "sha": "f8eaf3d7e92d6ed187e87777d294f105a7e21cf4"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-controllers",
+      "name": "rails-controllers",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-controllers/SKILL.md",
+      "sha": "f9a5bdd05462d07bee7b0a5ddce4ce3a52fa7a32"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-core",
+      "name": "rails-core",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-core/SKILL.md",
+      "sha": "8c8fa52f3cb5805a8f326984e19d36f352e9982a"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-database-performance",
+      "name": "rails-database-performance",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-database-performance/SKILL.md",
+      "sha": "68243d5b99a6c013161a21b52160d822d3344d42"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-i18n",
+      "name": "rails-i18n",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-i18n/SKILL.md",
+      "sha": "69547ccacf21bbe99a44116374b01f463797fc96"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-jobs",
+      "name": "rails-jobs",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-jobs/SKILL.md",
+      "sha": "9b4d16c331b0129b79af53562ac97464f0ffdb42"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-logging",
+      "name": "rails-logging",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-logging/SKILL.md",
+      "sha": "f15a9c6b1cc91dfdfa4fdcc08fd1c554f986762b"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-mailers",
+      "name": "rails-mailers",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-mailers/SKILL.md",
+      "sha": "a9f7bc86df2107f62978ff81e2b7e8738e4ef1ec"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-migrations",
+      "name": "rails-migrations",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-migrations/SKILL.md",
+      "sha": "65233df0d2048d4b51db0d8c8e215b3d52636314"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-models",
+      "name": "rails-models",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-models/SKILL.md",
+      "sha": "6fe09249210ce370c3022070e36364c5a97064f6"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-multi-tenancy",
+      "name": "rails-multi-tenancy",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-multi-tenancy/SKILL.md",
+      "sha": "e603b287b75771bb9561051c1f6895b674e558f7"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-performance",
+      "name": "rails-performance",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-performance/SKILL.md",
+      "sha": "58e9df0ea493db2586ab72344841a9bdc2078261"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-philosophy",
+      "name": "rails-philosophy",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-philosophy/SKILL.md",
+      "sha": "c18046716cc0c943c7f7ed43917d3baf202045c4"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-security",
+      "name": "rails-security",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-security/SKILL.md",
+      "sha": "78ad8c5ec8efee429bcc320b11bcda3b90f97804"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-stimulus",
+      "name": "rails-stimulus",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-stimulus/SKILL.md",
+      "sha": "9a2e8639c76a56c934525936edb9f789baefa874"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-style",
+      "name": "rails-style",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-style/SKILL.md",
+      "sha": "885b111485b321ac1358d1e773a8e8865c79bb70"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-testing",
+      "name": "rails-testing",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-testing/SKILL.md",
+      "sha": "9f08220b0d719f64339d2d4cfc854cc331399c1a"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-turbo",
+      "name": "rails-turbo",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-turbo/SKILL.md",
+      "sha": "8760ff0ad62dcefbb6814f9db8dd9e336ae23951"
+    },
+    {
+      "id": "mickzijdel/rails-toolkit:skills/rails-viewcomponents",
+      "name": "rails-viewcomponents",
+      "repo": "mickzijdel/rails-toolkit",
+      "path": "skills/rails-viewcomponents/SKILL.md",
+      "sha": "d14aa9bc0d9d0ba510842dff5f558e85f4e15189"
+    },
+    {
+      "id": "nielsmadan/skills:skills/blind-spots",
+      "name": "blind-spots",
+      "repo": "nielsmadan/skills",
+      "path": "skills/blind-spots/SKILL.md",
+      "sha": "48a9f05f8c206e33ad49d9a10176d76ea695e417"
+    },
+    {
+      "id": "nielsmadan/skills:skills/check-agent-logs",
+      "name": "check-agent-logs",
+      "repo": "nielsmadan/skills",
+      "path": "skills/check-agent-logs/SKILL.md",
+      "sha": "3b47eac144b5b9eed07fafcf5261552921767da0"
+    },
+    {
+      "id": "nielsmadan/skills:skills/code-review",
+      "name": "code-review",
+      "repo": "nielsmadan/skills",
+      "path": "skills/code-review/SKILL.md",
+      "sha": "2f81fe91429449afd691fe355b98edce3379ba1e"
+    },
+    {
+      "id": "nielsmadan/skills:skills/debug-log",
+      "name": "debug-log",
+      "repo": "nielsmadan/skills",
+      "path": "skills/debug-log/SKILL.md",
+      "sha": "f4ddba469d680cc29b804a3e04e65f32cd0c8d72"
+    },
+    {
+      "id": "nielsmadan/skills:skills/deslop",
+      "name": "deslop",
+      "repo": "nielsmadan/skills",
+      "path": "skills/deslop/SKILL.md",
+      "sha": "452325068e180f4926796f034f5c64e09b61bc92"
+    },
+    {
+      "id": "nielsmadan/skills:skills/doc",
+      "name": "doc",
+      "repo": "nielsmadan/skills",
+      "path": "skills/doc/SKILL.md",
+      "sha": "f66b97d822207620955f4a3c550936d5daab7fc7"
+    },
+    {
+      "id": "nielsmadan/skills:skills/evaluate-tech",
+      "name": "evaluate-tech",
+      "repo": "nielsmadan/skills",
+      "path": "skills/evaluate-tech/SKILL.md",
+      "sha": "202c80206d5780c5eba1ffa1ba0e4d55972ceb2d"
+    },
+    {
+      "id": "nielsmadan/skills:skills/guide",
+      "name": "guide",
+      "repo": "nielsmadan/skills",
+      "path": "skills/guide/SKILL.md",
+      "sha": "b999929077c80cb50991c98744b2c420e6c7ed76"
+    },
+    {
+      "id": "nielsmadan/skills:skills/hard-fix",
+      "name": "hard-fix",
+      "repo": "nielsmadan/skills",
+      "path": "skills/hard-fix/SKILL.md",
+      "sha": "914d3dee4dbe8895fa0bdc5dd5fa2760b134ba22"
+    },
+    {
+      "id": "nielsmadan/skills:skills/huh",
+      "name": "huh",
+      "repo": "nielsmadan/skills",
+      "path": "skills/huh/SKILL.md",
+      "sha": "5aca0e360e728c44d0c23810e6dc3b76a463284f"
+    },
+    {
+      "id": "nielsmadan/skills:skills/ideation",
+      "name": "ideation",
+      "repo": "nielsmadan/skills",
+      "path": "skills/ideation/SKILL.md",
+      "sha": "753b2d5902a6ed450f8aaf50ff36edd1ef10041b"
+    },
+    {
+      "id": "nielsmadan/skills:skills/improve-agent-instructions",
+      "name": "improve-agent-instructions",
+      "repo": "nielsmadan/skills",
+      "path": "skills/improve-agent-instructions/SKILL.md",
+      "sha": "915377a62957a92f913cf8159e5c42fa490e0b6f"
+    },
+    {
+      "id": "nielsmadan/skills:skills/library-docs",
+      "name": "library-docs",
+      "repo": "nielsmadan/skills",
+      "path": "skills/library-docs/SKILL.md",
+      "sha": "cc4f492b120024799ec91a018761664b5c33fe75"
+    },
+    {
+      "id": "nielsmadan/skills:skills/longshot",
+      "name": "longshot",
+      "repo": "nielsmadan/skills",
+      "path": "skills/longshot/SKILL.md",
+      "sha": "26f04d0e4546a3937db17bd60cec7a045a6ef720"
+    },
+    {
+      "id": "nielsmadan/skills:skills/pdf",
+      "name": "pdf",
+      "repo": "nielsmadan/skills",
+      "path": "skills/pdf/SKILL.md",
+      "sha": "245c1c2298f6d3edc0596f8eeb38592745d0a62b"
+    },
+    {
+      "id": "nielsmadan/skills:skills/plan",
+      "name": "plan",
+      "repo": "nielsmadan/skills",
+      "path": "skills/plan/SKILL.md",
+      "sha": "6f6a08f09dd2e56c96d5b1c81a4a2d664c01a139"
+    },
+    {
+      "id": "nielsmadan/skills:skills/pre-existing",
+      "name": "pre-existing",
+      "repo": "nielsmadan/skills",
+      "path": "skills/pre-existing/SKILL.md",
+      "sha": "b8d7e1dbcceebbcd7d34ec6086baf4e2adf72ccc"
+    },
+    {
+      "id": "nielsmadan/skills:skills/read-docs",
+      "name": "read-docs",
+      "repo": "nielsmadan/skills",
+      "path": "skills/read-docs/SKILL.md",
+      "sha": "576916f8681a0c39219668d6bc803bc39bbc4b26"
+    },
+    {
+      "id": "nielsmadan/skills:skills/release-review",
+      "name": "release-review",
+      "repo": "nielsmadan/skills",
+      "path": "skills/release-review/SKILL.md",
+      "sha": "c62f967080f18d544bfdba9b86e5117f723f6f5c"
+    },
+    {
+      "id": "nielsmadan/skills:skills/research-general",
+      "name": "research-general",
+      "repo": "nielsmadan/skills",
+      "path": "skills/research-general/SKILL.md",
+      "sha": "740d75aecd0f2d5debfef64629fc59b46e35c40a"
+    },
+    {
+      "id": "nielsmadan/skills:skills/research-tech",
+      "name": "research-tech",
+      "repo": "nielsmadan/skills",
+      "path": "skills/research-tech/SKILL.md",
+      "sha": "7faa146695d45bba5c8f6650bbb240578874d3a0"
+    },
+    {
+      "id": "nielsmadan/skills:skills/resolve-conflicts",
+      "name": "resolve-conflicts",
+      "repo": "nielsmadan/skills",
+      "path": "skills/resolve-conflicts/SKILL.md",
+      "sha": "c30fa205dc0ddc6f6030d32fecb4d111eba63b40"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-architecture",
+      "name": "review-architecture",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-architecture/SKILL.md",
+      "sha": "381e11e96d960030e47077ff9ae956fe3760f1eb"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-cleancode",
+      "name": "review-cleancode",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-cleancode/SKILL.md",
+      "sha": "c1d85eae4d832d9cd751a40d899aff627293d103"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-comments",
+      "name": "review-comments",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-comments/SKILL.md",
+      "sha": "65572413832ab5130e2913e8cf27bbfd04da5f21"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-history",
+      "name": "review-history",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-history/SKILL.md",
+      "sha": "5dca785116949b8a4accd629373d2c2a442e9e2c"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-interfaces",
+      "name": "review-interfaces",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-interfaces/SKILL.md",
+      "sha": "ac11b975ac1a431394741044fe5bc30e69b46550"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-library-use",
+      "name": "review-library-use",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-library-use/SKILL.md",
+      "sha": "329bb0ac300be5cf61e6edaf8089ffcef362bcd0"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-logs",
+      "name": "review-logs",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-logs/SKILL.md",
+      "sha": "53e62b772a2e83d4c239b1f4c7ca708e97d5846a"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-perf",
+      "name": "review-perf",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-perf/SKILL.md",
+      "sha": "4007dce2771dfd1163c8d1972def431ad9da8123"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-plan",
+      "name": "review-plan",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-plan/SKILL.md",
+      "sha": "b4bc326bbad821cad28ff4b0fd0ec5c349cda00b"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-product",
+      "name": "review-product",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-product/SKILL.md",
+      "sha": "b89d8a18c33fc5800fbf10b20cef8fac66e6b193"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-security",
+      "name": "review-security",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-security/SKILL.md",
+      "sha": "60ef7ff581d0a0ad65db4263aaa9b2e2f27049aa"
+    },
+    {
+      "id": "nielsmadan/skills:skills/review-todo",
+      "name": "review-todo",
+      "repo": "nielsmadan/skills",
+      "path": "skills/review-todo/SKILL.md",
+      "sha": "0f1c8f85f6258c109feb7b9fa8d3af4ebfdd4dba"
+    },
+    {
+      "id": "nielsmadan/skills:skills/second-opinion",
+      "name": "second-opinion",
+      "repo": "nielsmadan/skills",
+      "path": "skills/second-opinion/SKILL.md",
+      "sha": "1578564c59f5755237b65fa46242813d4e9d883d"
+    },
+    {
+      "id": "nielsmadan/skills:skills/squash-commits",
+      "name": "squash-commits",
+      "repo": "nielsmadan/skills",
+      "path": "skills/squash-commits/SKILL.md",
+      "sha": "7a441c7c1fb2c70ab5daba452b74a28ad009a4c8"
+    },
+    {
+      "id": "nielsmadan/skills:skills/status",
+      "name": "status",
+      "repo": "nielsmadan/skills",
+      "path": "skills/status/SKILL.md",
+      "sha": "54ff806f32922d6e73eb635e046c501bd77b6021"
+    },
+    {
+      "id": "nielsmadan/skills:skills/temp",
+      "name": "temp",
+      "repo": "nielsmadan/skills",
+      "path": "skills/temp/SKILL.md",
+      "sha": "a661127bb220700e18379f54e349ce06b8fb0708"
+    },
+    {
+      "id": "oegeyilmaz9/seo-aeo-geo-ultimate:skills/optimise-seo",
+      "name": "optimise-seo",
+      "repo": "oegeyilmaz9/seo-aeo-geo-ultimate",
+      "path": "skills/optimise-seo/SKILL.md",
+      "sha": "501ffc61da22d36900c640dc26e5bc18c035e163"
+    },
+    {
+      "id": "oegeyilmaz9/seo-aeo-geo-ultimate:skills/seo-aeo",
+      "name": "seo-aeo",
+      "repo": "oegeyilmaz9/seo-aeo-geo-ultimate",
+      "path": "skills/seo-aeo/SKILL.md",
+      "sha": "4111472573bad4d8f3936c673214e8487a822dc2"
+    },
+    {
+      "id": "oegeyilmaz9/seo-aeo-geo-ultimate:skills/seo-geo",
+      "name": "seo-geo",
+      "repo": "oegeyilmaz9/seo-aeo-geo-ultimate",
+      "path": "skills/seo-geo/SKILL.md",
+      "sha": "f6bb44abe7274450e0ff5cd9f07657b064c97a67"
+    },
+    {
+      "id": "oegeyilmaz9/seo-aeo-geo-ultimate:skills/seo-plan",
+      "name": "seo-plan",
+      "repo": "oegeyilmaz9/seo-aeo-geo-ultimate",
+      "path": "skills/seo-plan/SKILL.md",
+      "sha": "f65ca46b1677354dd8e0a72bab7156e51a0081cc"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:a11y-enforcer/skills/a11y-enforcer",
+      "name": "a11y-enforcer",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "a11y-enforcer/skills/a11y-enforcer/SKILL.md",
+      "sha": "e742f7dfb50f4eab9ca1e8e968dbad8e6586af9e"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:api-doc-generator/skills/api-doc-generator",
+      "name": "api-doc-generator",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "api-doc-generator/skills/api-doc-generator/SKILL.md",
+      "sha": "2299a187605bd85c8644e35983a52ce88b8b6424"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:api-drift-detector/skills/api-drift-detector",
+      "name": "api-drift-detector",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "api-drift-detector/skills/api-drift-detector/SKILL.md",
+      "sha": "11d280fa93bf7ccf54a0c0d11ce758ae69dcd700"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:api-load-tester/skills/api-load-tester",
+      "name": "api-load-tester",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "api-load-tester/skills/api-load-tester/SKILL.md",
+      "sha": "74e3c39c9c9c53c368053bbbb42116b7588c55b5"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:aws-cost-guard/skills/aws-cost-guard",
+      "name": "aws-cost-guard",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "aws-cost-guard/skills/aws-cost-guard/SKILL.md",
+      "sha": "f79867fbd3c76bbce935b50730b48a386693a846"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:bundle-size-sentinel/skills/bundle-size-sentinel",
+      "name": "bundle-size-sentinel",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "bundle-size-sentinel/skills/bundle-size-sentinel/SKILL.md",
+      "sha": "c09459100ca1099a63d118f2ac1268b5697d4417"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:caveman/skills/caveman",
+      "name": "caveman",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "caveman/skills/caveman/SKILL.md",
+      "sha": "e6d6fdae311bfcdfed652c45c1bf808af36aecca"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:ci-optimizer/skills/ci-optimizer",
+      "name": "ci-optimizer",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "ci-optimizer/skills/ci-optimizer/SKILL.md",
+      "sha": "cc22c4908a9f57ea916168f678159f784d90dc55"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:code-metrics-tracker/skills/code-metrics-tracker",
+      "name": "code-metrics-tracker",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "code-metrics-tracker/skills/code-metrics-tracker/SKILL.md",
+      "sha": "bc6282d34106e145faf60bc64f802aa7379d04f2"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:context-compactor/skills/context-compactor",
+      "name": "context-compactor",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "context-compactor/skills/context-compactor/SKILL.md",
+      "sha": "de2fdfae9bc08830b56799ea09b5a197d020984b"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:data-pipeline-builder/skills/data-pipeline-builder",
+      "name": "data-pipeline-builder",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "data-pipeline-builder/skills/data-pipeline-builder/SKILL.md",
+      "sha": "ce48b253b1ccbfbeea9a9e9c659c6f79550e2c59"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:db-schema-spy/skills/db-schema-spy",
+      "name": "db-schema-spy",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "db-schema-spy/skills/db-schema-spy/SKILL.md",
+      "sha": "e59e2da37c462b1476cbcfcaba68b63679e18b82"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:dependency-sentinel/skills/dependency-sentinel",
+      "name": "dependency-sentinel",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "dependency-sentinel/skills/dependency-sentinel/SKILL.md",
+      "sha": "d00acc70a52ad289db4276f2d5131e1ae000a1ff"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:e2e-test-generator/skills/e2e-test-generator",
+      "name": "e2e-test-generator",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "e2e-test-generator/skills/e2e-test-generator/SKILL.md",
+      "sha": "ad944ef2d691465494f4f02282fcb301183a3e92"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:env-protector/skills/env-protector",
+      "name": "env-protector",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "env-protector/skills/env-protector/SKILL.md",
+      "sha": "ad3b2ed0aaaca48cba8d825b76e824103a5ede16"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:figma-to-code/skills/figma-to-code",
+      "name": "figma-to-code",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "figma-to-code/skills/figma-to-code/SKILL.md",
+      "sha": "eeac04eaabe4fef65b6d85fc0452873dccc6555a"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:graphql-guardian/skills/graphql-guardian",
+      "name": "graphql-guardian",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "graphql-guardian/skills/graphql-guardian/SKILL.md",
+      "sha": "8580be18937497f37c534f8561ff2adfd740167a"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:headroom/skills/headroom",
+      "name": "headroom",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "headroom/skills/headroom/SKILL.md",
+      "sha": "8419c447179181296f5b2ede98b2a9a005fa49a9"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:i18n-sync/skills/i18n-sync",
+      "name": "i18n-sync",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "i18n-sync/skills/i18n-sync/SKILL.md",
+      "sha": "5603c3bac46f7b12cd8545617c1cbae484920d13"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:iac-reviewer/skills/iac-reviewer",
+      "name": "iac-reviewer",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "iac-reviewer/skills/iac-reviewer/SKILL.md",
+      "sha": "c122c5ca7f6baa70062ddd948e123035638cec8b"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:legacy-refactor-pilot/skills/legacy-refactor-pilot",
+      "name": "legacy-refactor-pilot",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "legacy-refactor-pilot/skills/legacy-refactor-pilot/SKILL.md",
+      "sha": "8860762680bb76752847c101ede8f375862e0d5c"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:mobile-release-check/skills/mobile-release-check",
+      "name": "mobile-release-check",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "mobile-release-check/skills/mobile-release-check/SKILL.md",
+      "sha": "6971bd43f0f34cc06aec497b64dda9b9b04de8f5"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:mock-data-hydrator/skills/mock-data-hydrator",
+      "name": "mock-data-hydrator",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "mock-data-hydrator/skills/mock-data-hydrator/SKILL.md",
+      "sha": "0227004930d6da9cd0aaabfbf8c5bce25992fdad"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:omniout/skills/omniout",
+      "name": "omniout",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "omniout/skills/omniout/SKILL.md",
+      "sha": "fb4f5f5b0a21b0a2e56a398aa829a6a7c447a149"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:perf-profiler/skills/perf-profiler",
+      "name": "perf-profiler",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "perf-profiler/skills/perf-profiler/SKILL.md",
+      "sha": "3adf1874b2074e83c824b09aabb698fc37494b48"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:pr-story-aligner/skills/pr-story-aligner",
+      "name": "pr-story-aligner",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "pr-story-aligner/skills/pr-story-aligner/SKILL.md",
+      "sha": "12efae41fc250627beda2cd7df90351fa5fdcb76"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:project-memory/skills/project-memory",
+      "name": "project-memory",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "project-memory/skills/project-memory/SKILL.md",
+      "sha": "c3e669c25397de7e1c7620f5ba959f04f42e30fb"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:prompt-tightener/skills/prompt-tightener",
+      "name": "prompt-tightener",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "prompt-tightener/skills/prompt-tightener/SKILL.md",
+      "sha": "5123fed41b80cb61fa376b0385cc9a9ea63187f0"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:responsive-check/skills/responsive-check",
+      "name": "responsive-check",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "responsive-check/skills/responsive-check/SKILL.md",
+      "sha": "01de444490ff0ffc5ccfdc436aec45990b5162d5"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:rls-schema-explorer/skills/rls-schema-explorer",
+      "name": "rls-schema-explorer",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "rls-schema-explorer/skills/rls-schema-explorer/SKILL.md",
+      "sha": "bb29cb6cbcb3f691d4285a92ebb576659a80f63e"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:service-boundary-tests/skills/service-boundary-tests",
+      "name": "service-boundary-tests",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "service-boundary-tests/skills/service-boundary-tests/SKILL.md",
+      "sha": "5e110e321df4b617b63597c7a275b9850200953b"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:smart-commits/skills/smart-commits",
+      "name": "smart-commits",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "smart-commits/skills/smart-commits/SKILL.md",
+      "sha": "a23d2e96a61d8b636f6bdc700ff3054ea754fcd9"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:task-observer/skills/task-observer",
+      "name": "task-observer",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "task-observer/skills/task-observer/SKILL.md",
+      "sha": "fa759151f4922d76aefdad92e0126935f4a9b822"
+    },
+    {
+      "id": "petrovicistefan/claude-code-plugins:test-coverage-intelligence/skills/test-coverage-intelligence",
+      "name": "test-coverage-intelligence",
+      "repo": "petrovicistefan/claude-code-plugins",
+      "path": "test-coverage-intelligence/skills/test-coverage-intelligence/SKILL.md",
+      "sha": "2fee8b4011c28cca45e3f1acf29c1ff78b006434"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/acc-api-setup",
+      "name": "acc-api-setup",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/acc-api-setup/SKILL.md",
+      "sha": "3878d3bbfe6573d4962a0eb0392f884bf8ca792a"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/acc-coordinate",
+      "name": "acc-coordinate",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/acc-coordinate/SKILL.md",
+      "sha": "527373cc85dbd18828758b297108a70969632d0a"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/acc-design-collaboration",
+      "name": "acc-design-collaboration",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/acc-design-collaboration/SKILL.md",
+      "sha": "74f4f5480b88b9bb849cb8b5e4a728b590a506dc"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/acc-docs",
+      "name": "acc-docs",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/acc-docs/SKILL.md",
+      "sha": "927cb830ff6d2fca42a7a6ea493c4a7637436cbd"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/acc-reports",
+      "name": "acc-reports",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/acc-reports/SKILL.md",
+      "sha": "735dbb11551a91fba3fed8b597b49c4467b179a3"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/analyze-rooms",
+      "name": "analyze-rooms",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/analyze-rooms/SKILL.md",
+      "sha": "d9843324ff9e81f4619c917e82b1a470436c6a39"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/audit-model",
+      "name": "audit-model",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/audit-model/SKILL.md",
+      "sha": "861867ee190ebd2df0c910b4e8bfe26421d5d6bd"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/batch-rename-elements",
+      "name": "batch-rename-elements",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/batch-rename-elements/SKILL.md",
+      "sha": "7070c8d032ca9c05b71695971bab4239dc1ec32d"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/clash-detection",
+      "name": "clash-detection",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/clash-detection/SKILL.md",
+      "sha": "4b62249264ccd7994a4d260633dab289d60b1e35"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/create-schedule",
+      "name": "create-schedule",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/create-schedule/SKILL.md",
+      "sha": "391b60d99f40266a0d32513d3138518c861ea506"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/create-view-filters",
+      "name": "create-view-filters",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/create-view-filters/SKILL.md",
+      "sha": "1f8fc19463af897ff2047e2bdaa8c88208808277"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/export-dynamo-file",
+      "name": "export-dynamo-file",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/export-dynamo-file/SKILL.md",
+      "sha": "33a7240b98e697c25ebbe4588563405f415dd8d5"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/export-ifc",
+      "name": "export-ifc",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/export-ifc/SKILL.md",
+      "sha": "cf8f06c67c71e544ed9d626eb2c410e163d8316f"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/export-to-excel",
+      "name": "export-to-excel",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/export-to-excel/SKILL.md",
+      "sha": "29bfd0351b47057b8f9e90b4c3a0dfc346b24e48"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/generate-dynamo",
+      "name": "generate-dynamo",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/generate-dynamo/SKILL.md",
+      "sha": "04de37fec10a87d70194fbe501f5f43fbed02a7c"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/linked-model-check",
+      "name": "linked-model-check",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/linked-model-check/SKILL.md",
+      "sha": "7ef03c555c7a71e501ed47a9921c93007208d713"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/manage-parameters",
+      "name": "manage-parameters",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/manage-parameters/SKILL.md",
+      "sha": "254537280bebcc23b8a265ddbb7f4606af3a39be"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/manage-sheets",
+      "name": "manage-sheets",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/manage-sheets/SKILL.md",
+      "sha": "3303fb0348cd26a28dc8c1ab1fd5de6f2493d13b"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/manipulate-elements",
+      "name": "manipulate-elements",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/manipulate-elements/SKILL.md",
+      "sha": "ee49df1a83c2b9db3e1321a56b7bfcb1fc5eb38e"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/project-setup",
+      "name": "project-setup",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/project-setup/SKILL.md",
+      "sha": "771dc8b3d38d7885737e0542e3474e3988d107b6"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/query-model",
+      "name": "query-model",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/query-model/SKILL.md",
+      "sha": "bb8cc0066aa11e14071de37a8815ae0f901c23f2"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/revit-api-code",
+      "name": "revit-api-code",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/revit-api-code/SKILL.md",
+      "sha": "cf2283cd8bde65a72a895db3c68f5b0cf88ff75b"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/shared-parameters",
+      "name": "shared-parameters",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/shared-parameters/SKILL.md",
+      "sha": "68c74441f731e72f3212d0c8f96973de1944faeb"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/validate-parameters",
+      "name": "validate-parameters",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/validate-parameters/SKILL.md",
+      "sha": "a39c1ffa683cfcfa5bdc3410d2d59d374796f2cf"
+    },
+    {
+      "id": "utopia5327/claude-plugin-for-revit-bim:skills/workset-manager",
+      "name": "workset-manager",
+      "repo": "utopia5327/claude-plugin-for-revit-bim",
+      "path": "skills/workset-manager/SKILL.md",
+      "sha": "2089cd4387612e3a9b53a9be7f14ff8b098c9f91"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/accessibility-as-code",
+      "name": "accessibility-as-code",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/accessibility-as-code/SKILL.md",
+      "sha": "26e427464fafdc9df4e36a1258cb7a909f95f41e"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/adaptive-layout",
+      "name": "adaptive-layout",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/adaptive-layout/SKILL.md",
+      "sha": "ffaa64135bc98a8458f0e1bd74efeefd0f88edc2"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/ads-and-iap-monetization",
+      "name": "ads-and-iap-monetization",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/ads-and-iap-monetization/SKILL.md",
+      "sha": "6ce9357eec70b009fe237314713dcad001b14162"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/app-startup-and-bootstrap",
+      "name": "app-startup-and-bootstrap",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/app-startup-and-bootstrap/SKILL.md",
+      "sha": "345a42d51a21f31cccb4a6e63e4755353ea507dd"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/codegen-and-toolchain",
+      "name": "codegen-and-toolchain",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/codegen-and-toolchain/SKILL.md",
+      "sha": "0afcc39eabe519eed656888dffc29facf0523d71"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/custom-canvas-and-gestures",
+      "name": "custom-canvas-and-gestures",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/custom-canvas-and-gestures/SKILL.md",
+      "sha": "0059e3ab10984cb71a73df20dd3fe2cafdc8c8f3"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/dart3-idioms-and-coding-standards",
+      "name": "dart3-idioms-and-coding-standards",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/dart3-idioms-and-coding-standards/SKILL.md",
+      "sha": "1116ddbf66d4d9b8ada36a2055106b747b24a3e4"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/dartdoc-conventions",
+      "name": "dartdoc-conventions",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/dartdoc-conventions/SKILL.md",
+      "sha": "9950430da72942c1627035385b062d72f7892457"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/data-export-and-restore",
+      "name": "data-export-and-restore",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/data-export-and-restore/SKILL.md",
+      "sha": "8701b40aa9af88b92f19e850f272ea6e8c016939"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/dependency-hygiene",
+      "name": "dependency-hygiene",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/dependency-hygiene/SKILL.md",
+      "sha": "ff37a87bac3819be492ae81346b0f653ff41d103"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/design-system-structure",
+      "name": "design-system-structure",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/design-system-structure/SKILL.md",
+      "sha": "4a700e7d4474e9a600aafff6ca1efbf198daf842"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/error-handling-typed-results",
+      "name": "error-handling-typed-results",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/error-handling-typed-results/SKILL.md",
+      "sha": "5f1baac56141e3041e0644b0272383184675f649"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/flutter-architecture",
+      "name": "flutter-architecture",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/flutter-architecture/SKILL.md",
+      "sha": "cbbf578eb5ce619d0b7498460f601517d0c89c46"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/flutter-conventions-index",
+      "name": "flutter-conventions-index",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/flutter-conventions-index/SKILL.md",
+      "sha": "97e20fc5a2555e1ea8adb3a5c6882648d54d79bd"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/flutter-performance",
+      "name": "flutter-performance",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/flutter-performance/SKILL.md",
+      "sha": "607eb6542a1b468b0ef598ec9d743372431755f7"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/forms-and-input",
+      "name": "forms-and-input",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/forms-and-input/SKILL.md",
+      "sha": "cf95570eea4d2410a9d619811412e7bdb45413cc"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/lint-and-style-config",
+      "name": "lint-and-style-config",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/lint-and-style-config/SKILL.md",
+      "sha": "cff2246f291150faeef0eee347cbc4f639c92604"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/local-notifications-scheduler",
+      "name": "local-notifications-scheduler",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/local-notifications-scheduler/SKILL.md",
+      "sha": "42476d33244ece9a8ae9df97a6cd0d315d7b33f5"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/motion-and-haptics",
+      "name": "motion-and-haptics",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/motion-and-haptics/SKILL.md",
+      "sha": "56ca5fc03663b53c91582e90d80b64a6e688c305"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/naming-conventions",
+      "name": "naming-conventions",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/naming-conventions/SKILL.md",
+      "sha": "31d160bcefbd3042b5ccc15f3da4e1cec01aaa1c"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/navigation-and-routing",
+      "name": "navigation-and-routing",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/navigation-and-routing/SKILL.md",
+      "sha": "a188caadeb1b20956df195b970086fce11f75629"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/persistence-drift",
+      "name": "persistence-drift",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/persistence-drift/SKILL.md",
+      "sha": "dfc47f09b642df76f32e854ac77c6c2405987fea"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/project-structure-and-packages",
+      "name": "project-structure-and-packages",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/project-structure-and-packages/SKILL.md",
+      "sha": "c2d95b781ff763e12a5a9631205c29573286a278"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/release-and-store-shipping",
+      "name": "release-and-store-shipping",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/release-and-store-shipping/SKILL.md",
+      "sha": "d976b51846744b00f346777dd624027ac8c76a3e"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/run-codegen",
+      "name": "run-codegen",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/run-codegen/SKILL.md",
+      "sha": "0e7abf3ce2f2fff5b0861df207a1a00b251f2c0e"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/run-goldens-rebaseline",
+      "name": "run-goldens-rebaseline",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/run-goldens-rebaseline/SKILL.md",
+      "sha": "e2b711e3d8ee57bdc07c31ce954d06c7e5e1d2a2"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/run-migration",
+      "name": "run-migration",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/run-migration/SKILL.md",
+      "sha": "8ee1c2da24fe3390d6b22f409e5be2c97ceea139"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/scaffold-feature-module",
+      "name": "scaffold-feature-module",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/scaffold-feature-module/SKILL.md",
+      "sha": "cbbee4d5a6993d90e7da7a9745885ebe92c36db1"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/seeded-determinism-and-golden-vectors",
+      "name": "seeded-determinism-and-golden-vectors",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/seeded-determinism-and-golden-vectors/SKILL.md",
+      "sha": "3bbfaa91e54daed1a5068de6095558a1568a04b1"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/service-boundary-and-native",
+      "name": "service-boundary-and-native",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/service-boundary-and-native/SKILL.md",
+      "sha": "d7c1bed3a776e8c362a7dd6be7a9ae617009dfc1"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/state-management-riverpod",
+      "name": "state-management-riverpod",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/state-management-riverpod/SKILL.md",
+      "sha": "7a3f29411cbf0be01175d588c2e8822cb325f177"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/testing-strategy",
+      "name": "testing-strategy",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/testing-strategy/SKILL.md",
+      "sha": "5bac3c10c244344a311d8d6d5a2d1de3049cd8ab"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/ui-states-and-feedback",
+      "name": "ui-states-and-feedback",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/ui-states-and-feedback/SKILL.md",
+      "sha": "5a4a57a377cb9623e94eed7fad214d4ae033fb18"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/value-objects-money-and-units",
+      "name": "value-objects-money-and-units",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/value-objects-money-and-units/SKILL.md",
+      "sha": "5739d268d519fbd27e041e6bd9cef22c0c2205b0"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/widget-composition",
+      "name": "widget-composition",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/widget-composition/SKILL.md",
+      "sha": "41c47c4da911c56e82795f412d57d2f5f26a0d7e"
+    },
+    {
+      "id": "zakariaf/flutter-skills:skills/widget-golden-and-a11y-testing",
+      "name": "widget-golden-and-a11y-testing",
+      "repo": "zakariaf/flutter-skills",
+      "path": "skills/widget-golden-and-a11y-testing/SKILL.md",
+      "sha": "7f080cc9ec1b7115625b73f4c28d02cfe8103a80"
+    }
+  ],
+  "cutoverValidationPassed": true,
+  "existingRecordsChanged": 0,
+  "productionDataChanged": false,
+  "combinedCrawlRun": false,
+  "published": false,
+  "archive": "/Users/jonslimak/Projects/omgskills/index/shadow/directory3000-wave4-20261023"
+}

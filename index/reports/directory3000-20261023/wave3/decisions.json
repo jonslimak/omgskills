@@ -1,0 +1,102 @@
+{
+  "generatedAt": "2026-10-23T20:48:37.492Z",
+  "reviewSha256": "98951a6015c56d4d2c1944dd0d9d35532023e1560a99f5eeb57db95d63cb76fd",
+  "excludeRepos": [],
+  "excludeIds": [
+    "seranking/seo-skills:skills/seo-images",
+    "novainsilico/jinko-skills:skills/jinko",
+    "novainsilico/jinko-skills:skills/jinko-calibration-cmaes",
+    "novainsilico/jinko-skills:skills/jinko-calibration-subsampling",
+    "novainsilico/jinko-skills:skills/jinko-context",
+    "novainsilico/jinko-skills:skills/jinko-data-table",
+    "novainsilico/jinko-skills:skills/jinko-model",
+    "novainsilico/jinko-skills:skills/jinko-output-set",
+    "novainsilico/jinko-skills:skills/jinko-protocol",
+    "novainsilico/jinko-skills:skills/jinko-reference",
+    "novainsilico/jinko-skills:skills/jinko-task-define-param-to-calibrate",
+    "novainsilico/jinko-skills:skills/jinko-task-export-to-matlab",
+    "novainsilico/jinko-skills:skills/jinko-task-extract-data-table",
+    "novainsilico/jinko-skills:skills/jinko-task-from-nonmem",
+    "novainsilico/jinko-skills:skills/jinko-trial",
+    "novainsilico/jinko-skills:skills/jinko-trial-viz",
+    "novainsilico/jinko-skills:skills/jinko-vpop"
+  ],
+  "excluded": [
+    {
+      "id": "seranking/seo-skills:skills/seo-images",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/pagespeed_check.py"
+      ],
+      "agents": []
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko",
+      "reason": "router-requires-separately-installed-companion-skills"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-calibration-cmaes",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-calibration-subsampling",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-context",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-data-table",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-model",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-output-set",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-protocol",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-reference",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-task-define-param-to-calibrate",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-task-export-to-matlab",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-task-extract-data-table",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-task-from-nonmem",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-trial",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-trial-viz",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "novainsilico/jinko-skills:skills/jinko-vpop",
+      "reason": "plugin-root-or-external-package-dependency"
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "First-party product workflows inspected. Hold Jinko pure router plus all external companion-file dependencies; keep substantive standalone packages and ordinary documented service/CLI prerequisites. No catalog exemptions or broad trust.",
+  "reviewed": 540,
+  "approvedCount": 368
+}

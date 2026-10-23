@@ -1,0 +1,596 @@
+# Directory backfill review
+
+Wave: wave1; reviewed 579; recommended 132.
+
+- manifoldmcp/marketing-skills: 0/116 recommended; The free marketing data connector for AI agents. One sign-in gives Claude, ChatGPT or any MCP client live data from Google search, AI answers, Search Console, Google Analytics, Google Maps, Reddit, TikTok, Instagram, YouTube, LinkedIn and the ad libraries. Plugin and marketing skills; the server is hosted.
+- carta/plugins: 38/69 recommended; Centralized repository for public facing plugins
+- synter-media-ai/plugin: 51/52 recommended; Synter — the AI Agent Operator for Ads. Claude Code / Claude Desktop plugin: agents, skills, and the Synter MCP. You direct, the agents execute.
+- aws/agent-toolkit-for-aws: 0/49 recommended; Official, AWS-supported MCP servers, skills, and plugins to help AI agents build on AWS
+- devinosolutions/claude-plugins: 0/49 recommended; Claude Code and Cowork plugins for Devino Solutions products: MCP connector + workflow skills per app
+- zuora/zuora-coding-agent: 3/42 recommended;
+- countz-ai/agentic-tools: 1/40 recommended; Agentic skills and tools for Countz accounting platform.
+- posthog/ai-plugin: 0/36 recommended; Official PostHog plugin for Claude Code, Cursor, Gemini, Codex and other AI coding tools
+- cockroachdb/claude-plugin: 4/34 recommended; CockroachDB development plugin for Claude
+- urbanairship/agent-tools: 3/34 recommended; Airship tools and skills for AI Agents.
+- googlecloudplatform/data-agent-kit-plugin: 32/33 recommended; Your entire data stack in your favorite agentic tool.
+- anthropics/knowledge-work-plugins: 0/25 recommended; Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork
+
+- not-found: manifoldmcp/marketing-skills analyze-viral-reel
+- not-found: manifoldmcp/marketing-skills analyze-viral-tiktok
+- not-found: manifoldmcp/marketing-skills analyze-viral-youtube-video
+- not-found: manifoldmcp/marketing-skills audit-facebook-page
+- not-found: manifoldmcp/marketing-skills audit-instagram-account
+- not-found: manifoldmcp/marketing-skills audit-linkedin-page
+- not-found: manifoldmcp/marketing-skills audit-technical-seo
+- not-found: manifoldmcp/marketing-skills audit-tiktok-account
+- not-found: manifoldmcp/marketing-skills audit-x-account
+- not-found: manifoldmcp/marketing-skills audit-youtube-channel
+- not-found: manifoldmcp/marketing-skills build-ai-citations
+- not-found: manifoldmcp/marketing-skills build-lead-list
+- not-found: manifoldmcp/marketing-skills build-personas
+- not-found: manifoldmcp/marketing-skills check-ai-crawler-access
+- not-found: manifoldmcp/marketing-skills check-ai-overviews
+- not-found: manifoldmcp/marketing-skills check-ai-visibility
+- not-found: manifoldmcp/marketing-skills check-demand
+- not-found: manifoldmcp/marketing-skills check-google-brand-bidding
+- not-found: manifoldmcp/marketing-skills clean-email-list
+- not-found: manifoldmcp/marketing-skills compare-messaging
+- not-found: manifoldmcp/marketing-skills create-ai-search-plan
+- not-found: manifoldmcp/marketing-skills create-competitor-plan
+- not-found: manifoldmcp/marketing-skills create-content-calendar
+- not-found: manifoldmcp/marketing-skills create-digital-pr-plan
+- not-found: manifoldmcp/marketing-skills create-facebook-plan
+- not-found: manifoldmcp/marketing-skills create-growth-plan
+- not-found: manifoldmcp/marketing-skills create-gtm-plan
+- not-found: manifoldmcp/marketing-skills create-influencer-plan
+- not-found: manifoldmcp/marketing-skills create-instagram-plan
+- not-found: manifoldmcp/marketing-skills create-launch-plan
+- not-found: manifoldmcp/marketing-skills create-link-building-plan
+- not-found: manifoldmcp/marketing-skills create-linkedin-plan
+- not-found: manifoldmcp/marketing-skills create-market-entry-plan
+- not-found: manifoldmcp/marketing-skills create-migration-plan
+- not-found: manifoldmcp/marketing-skills create-outbound-plan
+- not-found: manifoldmcp/marketing-skills create-paid-ads-plan
+- not-found: manifoldmcp/marketing-skills create-reddit-plan
+- not-found: manifoldmcp/marketing-skills create-seo-content-plan
+- not-found: manifoldmcp/marketing-skills create-seo-plan
+- not-found: manifoldmcp/marketing-skills create-tiktok-plan
+- not-found: manifoldmcp/marketing-skills create-youtube-plan
+- not-found: manifoldmcp/marketing-skills diagnose-traffic-drop
+- not-found: manifoldmcp/marketing-skills enrich-lead-list
+- not-found: manifoldmcp/marketing-skills find-affiliate-partners
+- not-found: manifoldmcp/marketing-skills find-backlink-targets
+- not-found: manifoldmcp/marketing-skills find-best-of-lists
+- not-found: manifoldmcp/marketing-skills find-brand-fans
+- not-found: manifoldmcp/marketing-skills find-buying-signals
+- not-found: manifoldmcp/marketing-skills find-competitor-complaints
+- not-found: manifoldmcp/marketing-skills find-competitors
+- not-found: manifoldmcp/marketing-skills find-content-ideas
+- not-found: manifoldmcp/marketing-skills find-creators
+- not-found: manifoldmcp/marketing-skills find-first-customers
+- not-found: manifoldmcp/marketing-skills find-google-ads-keywords
+- not-found: manifoldmcp/marketing-skills find-instagram-creators
+- not-found: manifoldmcp/marketing-skills find-instagram-hooks
+- not-found: manifoldmcp/marketing-skills find-journalists
+- not-found: manifoldmcp/marketing-skills find-linkedin-buyer-posts
+- not-found: manifoldmcp/marketing-skills find-linkedin-post-formats
+- not-found: manifoldmcp/marketing-skills find-linkedin-posts-to-comment
+- not-found: manifoldmcp/marketing-skills find-linkedin-topic-leaders
+- not-found: manifoldmcp/marketing-skills find-lookalike-companies
+- not-found: manifoldmcp/marketing-skills find-objections
+- not-found: manifoldmcp/marketing-skills find-pain-points
+- not-found: manifoldmcp/marketing-skills find-podcasts
+- not-found: manifoldmcp/marketing-skills find-positioning
+- not-found: manifoldmcp/marketing-skills find-reddit-pain-points
+- not-found: manifoldmcp/marketing-skills find-reddit-threads
+- not-found: manifoldmcp/marketing-skills find-reels-trends
+- not-found: manifoldmcp/marketing-skills find-seo-quick-wins
+- not-found: manifoldmcp/marketing-skills find-subreddits
+- not-found: manifoldmcp/marketing-skills find-tiktok-creators
+- not-found: manifoldmcp/marketing-skills find-tiktok-hooks
+- not-found: manifoldmcp/marketing-skills find-tiktok-trends
+- not-found: manifoldmcp/marketing-skills find-ugc-creators
+- not-found: manifoldmcp/marketing-skills find-unlinked-mentions
+- not-found: manifoldmcp/marketing-skills find-youtube-creators
+- not-found: manifoldmcp/marketing-skills find-youtube-video-ideas
+- not-found: manifoldmcp/marketing-skills fix-keyword-cannibalization
+- not-found: manifoldmcp/marketing-skills fix-wrong-ai-answers
+- plugin-runtime-review: manifoldmcp/marketing-skills manifold-get-started (skills/manifold-get-started/SKILL.md)
+- not-found: manifoldmcp/marketing-skills map-market
+- not-found: manifoldmcp/marketing-skills measure-brand-awareness
+- not-found: manifoldmcp/marketing-skills mine-facebook-comments
+- not-found: manifoldmcp/marketing-skills mine-facebook-groups
+- not-found: manifoldmcp/marketing-skills mine-instagram-comments
+- not-found: manifoldmcp/marketing-skills mine-tiktok-comments
+- not-found: manifoldmcp/marketing-skills mine-youtube-comments
+- not-found: manifoldmcp/marketing-skills monitor-brand-mentions
+- not-found: manifoldmcp/marketing-skills monitor-competitors
+- not-found: manifoldmcp/marketing-skills monitor-search-console
+- not-found: manifoldmcp/marketing-skills onboard-client
+- not-found: manifoldmcp/marketing-skills optimize-page
+- not-found: manifoldmcp/marketing-skills pick-channels
+- not-found: manifoldmcp/marketing-skills plan-comparison-pages
+- not-found: manifoldmcp/marketing-skills prepare-client-pitch
+- not-found: manifoldmcp/marketing-skills reclaim-lost-links
+- not-found: manifoldmcp/marketing-skills refresh-content
+- not-found: manifoldmcp/marketing-skills repurpose-content
+- not-found: manifoldmcp/marketing-skills research-account
+- not-found: manifoldmcp/marketing-skills research-google-ads
+- not-found: manifoldmcp/marketing-skills research-linkedin-ads
+- not-found: manifoldmcp/marketing-skills research-meta-ads
+- not-found: manifoldmcp/marketing-skills research-tiktok-ads
+- not-found: manifoldmcp/marketing-skills size-market
+- not-found: manifoldmcp/marketing-skills tear-down-competitor
+- not-found: manifoldmcp/marketing-skills track-job-changes
+- not-found: manifoldmcp/marketing-skills track-rankings
+- not-found: manifoldmcp/marketing-skills vet-creator
+- not-found: manifoldmcp/marketing-skills write-ad-brief
+- not-found: manifoldmcp/marketing-skills write-battlecard
+- not-found: manifoldmcp/marketing-skills write-client-report
+- not-found: manifoldmcp/marketing-skills write-creator-brief
+- not-found: manifoldmcp/marketing-skills write-first-lines
+- not-found: manifoldmcp/marketing-skills write-seo-brief
+- not-found: manifoldmcp/marketing-skills write-weekly-report
+- recommended: carta/plugins add-company (plugins/carta-crm/skills/add-company/SKILL.md)
+- recommended: carta/plugins add-contact (plugins/carta-crm/skills/add-contact/SKILL.md)
+- recommended: carta/plugins add-deal (plugins/carta-crm/skills/add-deal/SKILL.md)
+- recommended: carta/plugins add-fundraising (plugins/carta-crm/skills/add-fundraising/SKILL.md)
+- recommended: carta/plugins add-investor (plugins/carta-crm/skills/add-investor/SKILL.md)
+- recommended: carta/plugins add-note (plugins/carta-crm/skills/add-note/SKILL.md)
+- plugin-runtime-review: carta/plugins adviser-tracker (plugins/carta-crm/skills/adviser-tracker/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-crm-home-build (plugins/carta-crm/skills/carta-crm-home-build/SKILL.md)
+- plugin-runtime-review: carta/plugins deal-flow-analytics (plugins/carta-crm/skills/deal-flow-analytics/SKILL.md)
+- recommended: carta/plugins enrich-company (plugins/carta-crm/skills/enrich-company/SKILL.md)
+- plugin-runtime-review: carta/plugins get-angles (plugins/carta-crm/skills/get-angles/SKILL.md)
+- recommended: carta/plugins home (plugins/carta-crm/skills/home/SKILL.md)
+- plugin-runtime-review: carta/plugins prepare-for-meeting (plugins/carta-crm/skills/prepare-for-meeting/SKILL.md)
+- recommended: carta/plugins search-companies (plugins/carta-crm/skills/search-companies/SKILL.md)
+- recommended: carta/plugins search-contacts (plugins/carta-crm/skills/search-contacts/SKILL.md)
+- recommended: carta/plugins search-deals (plugins/carta-crm/skills/search-deals/SKILL.md)
+- recommended: carta/plugins search-fundraisings (plugins/carta-crm/skills/search-fundraisings/SKILL.md)
+- recommended: carta/plugins search-investors (plugins/carta-crm/skills/search-investors/SKILL.md)
+- recommended: carta/plugins search-notes (plugins/carta-crm/skills/search-notes/SKILL.md)
+- recommended: carta/plugins search-reports (plugins/carta-crm/skills/search-reports/SKILL.md)
+- recommended: carta/plugins tutorial (plugins/carta-crm/skills/tutorial/SKILL.md)
+- recommended: carta/plugins update-company (plugins/carta-crm/skills/update-company/SKILL.md)
+- recommended: carta/plugins update-contact (plugins/carta-crm/skills/update-contact/SKILL.md)
+- recommended: carta/plugins update-deal (plugins/carta-crm/skills/update-deal/SKILL.md)
+- recommended: carta/plugins update-fundraising (plugins/carta-crm/skills/update-fundraising/SKILL.md)
+- recommended: carta/plugins update-investor (plugins/carta-crm/skills/update-investor/SKILL.md)
+- recommended: carta/plugins update-note (plugins/carta-crm/skills/update-note/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-agm-deck-builder (plugins/carta-investors/skills/carta-agm-deck-builder/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-brand-extraction (plugins/carta-investors/skills/carta-brand-extraction/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-co-investors (plugins/carta-investors/skills/carta-co-investors/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-compliance-routing (plugins/carta-investors/skills/carta-compliance-routing/SKILL.md)
+- recommended: carta/plugins carta-consolidating-financial-reports (plugins/carta-investors/skills/carta-consolidating-financial-reports/SKILL.md)
+- recommended: carta/plugins carta-data-collection (plugins/carta-investors/skills/carta-data-collection/SKILL.md)
+- recommended: carta/plugins carta-download-tearsheet (plugins/carta-investors/skills/carta-download-tearsheet/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-explore-data (plugins/carta-investors/skills/carta-explore-data/SKILL.md)
+- recommended: carta/plugins carta-fund-admin-requests (plugins/carta-investors/skills/carta-fund-admin-requests/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-fund-forecasting (plugins/carta-investors/skills/carta-fund-forecasting/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-fund-modeling (plugins/carta-investors/skills/carta-fund-modeling/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-fund-performance (plugins/carta-investors/skills/carta-fund-performance/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-home-build (plugins/carta-investors/skills/carta-home-build/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-loan-dashboard (plugins/carta-investors/skills/carta-loan-dashboard/SKILL.md)
+- recommended: carta/plugins carta-manco (plugins/carta-investors/skills/carta-manco/SKILL.md)
+- recommended: carta/plugins carta-manco-reporting (plugins/carta-investors/skills/carta-manco-reporting/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-portfolio-analytics-app (plugins/carta-investors/skills/carta-portfolio-analytics-app/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-portfolio-analytics-routing (plugins/carta-investors/skills/carta-portfolio-analytics-routing/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-portfolio-valuations (plugins/carta-investors/skills/carta-portfolio-valuations/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-spa-audit (plugins/carta-investors/skills/carta-spa-audit/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-waterfall-modeling (plugins/carta-investors/skills/carta-waterfall-modeling/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-workhub-build (plugins/carta-investors/skills/carta-workhub-build/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-captable-home-build (plugins/carta-cap-table/skills/carta-captable-home-build/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-compensation-app (plugins/carta-cap-table/skills/carta-compensation-app/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-compensation-benchmarks (plugins/carta-cap-table/skills/carta-compensation-benchmarks/SKILL.md)
+- recommended: carta/plugins carta-compensation-rolematcher (plugins/carta-cap-table/skills/carta-compensation-rolematcher/SKILL.md)
+- recommended: carta/plugins carta-compensation-scorecard (plugins/carta-cap-table/skills/carta-compensation-scorecard/SKILL.md)
+- recommended: carta/plugins carta-conversion-calculator (plugins/carta-cap-table/skills/carta-conversion-calculator/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-discover-commands (plugins/carta-cap-table/skills/carta-discover-commands/SKILL.md)
+- recommended: carta/plugins carta-grant-vesting (plugins/carta-cap-table/skills/carta-grant-vesting/SKILL.md)
+- recommended: carta/plugins carta-hmrc-limits (plugins/carta-cap-table/skills/carta-hmrc-limits/SKILL.md)
+- dependency-review: carta/plugins carta-interaction-reference (plugins/carta-cap-table/skills/carta-interaction-reference/SKILL.md)
+- dependency-review: carta/plugins carta-interaction-reference-core (plugins/carta-cap-table/skills/carta-interaction-reference-core/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-issuance (plugins/carta-cap-table/skills/carta-issuance/SKILL.md)
+- recommended: carta/plugins carta-market-benchmarks (plugins/carta-cap-table/skills/carta-market-benchmarks/SKILL.md)
+- recommended: carta/plugins carta-portfolio-alerts (plugins/carta-cap-table/skills/carta-portfolio-alerts/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-reporting (plugins/carta-cap-table/skills/carta-reporting/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-reporting-excel (plugins/carta-cap-table/skills/carta-reporting-excel/SKILL.md)
+- plugin-runtime-review: carta/plugins carta-reporting-markdown (plugins/carta-cap-table/skills/carta-reporting-markdown/SKILL.md)
+- recommended: carta/plugins carta-round-history (plugins/carta-cap-table/skills/carta-round-history/SKILL.md)
+- recommended: carta/plugins carta-valuation-history (plugins/carta-cap-table/skills/carta-valuation-history/SKILL.md)
+- recommended: carta/plugins carta-witness-signatures (plugins/carta-cap-table/skills/carta-witness-signatures/SKILL.md)
+- recommended: synter-media-ai/plugin ad-copy-generation (skills/ad-copy-generation/SKILL.md)
+- recommended: synter-media-ai/plugin ad-policy-compliance (skills/ad-policy-compliance/SKILL.md)
+- recommended: synter-media-ai/plugin anomaly-detector (skills/anomaly-detector/SKILL.md)
+- recommended: synter-media-ai/plugin attribution (skills/attribution/SKILL.md)
+- recommended: synter-media-ai/plugin audience (skills/audience/SKILL.md)
+- recommended: synter-media-ai/plugin audience-expansion-strategy (skills/audience-expansion-strategy/SKILL.md)
+- recommended: synter-media-ai/plugin bid-optimization (skills/bid-optimization/SKILL.md)
+- recommended: synter-media-ai/plugin campaign-preflight (skills/campaign-preflight/SKILL.md)
+- recommended: synter-media-ai/plugin campaign-structure-auditor (skills/campaign-structure-auditor/SKILL.md)
+- recommended: synter-media-ai/plugin competitor-analysis (skills/competitor-analysis/SKILL.md)
+- recommended: synter-media-ai/plugin connect (skills/connect/SKILL.md)
+- recommended: synter-media-ai/plugin conversion-tracking (skills/conversion-tracking/SKILL.md)
+- recommended: synter-media-ai/plugin creative-fatigue-detector (skills/creative-fatigue-detector/SKILL.md)
+- recommended: synter-media-ai/plugin creative-testing (skills/creative-testing/SKILL.md)
+- recommended: synter-media-ai/plugin dayparting (skills/dayparting/SKILL.md)
+- recommended: synter-media-ai/plugin executive-reporting (skills/executive-reporting/SKILL.md)
+- recommended: synter-media-ai/plugin first-party-data-strategy (skills/first-party-data-strategy/SKILL.md)
+- recommended: synter-media-ai/plugin geo-integrity-audit (skills/geo-integrity-audit/SKILL.md)
+- recommended: synter-media-ai/plugin google-ads-quality-score (skills/google-ads-quality-score/SKILL.md)
+- recommended: synter-media-ai/plugin google-shopping-optimizer (skills/google-shopping-optimizer/SKILL.md)
+- ambiguous-paths: synter-media-ai/plugin help
+- recommended: synter-media-ai/plugin incrementality-testing (skills/incrementality-testing/SKILL.md)
+- recommended: synter-media-ai/plugin keyword-research (skills/keyword-research/SKILL.md)
+- recommended: synter-media-ai/plugin kill-scale-rules (skills/kill-scale-rules/SKILL.md)
+- recommended: synter-media-ai/plugin launch (skills/launch/SKILL.md)
+- recommended: synter-media-ai/plugin linkedin-ads-targeting (skills/linkedin-ads-targeting/SKILL.md)
+- recommended: synter-media-ai/plugin media-plan (skills/media-plan/SKILL.md)
+- recommended: synter-media-ai/plugin meta-ads-diagnostics (skills/meta-ads-diagnostics/SKILL.md)
+- recommended: synter-media-ai/plugin mmm-budget-planner (skills/mmm-budget-planner/SKILL.md)
+- recommended: synter-media-ai/plugin negative-keywords (skills/negative-keywords/SKILL.md)
+- recommended: synter-media-ai/plugin optimize (skills/optimize/SKILL.md)
+- recommended: synter-media-ai/plugin performance-max-optimizer (skills/performance-max-optimizer/SKILL.md)
+- recommended: synter-media-ai/plugin pixel-capi-auditor (skills/pixel-capi-auditor/SKILL.md)
+- recommended: synter-media-ai/plugin platform-amazon (skills/platform-amazon/SKILL.md)
+- recommended: synter-media-ai/plugin platform-benchmarks (skills/platform-benchmarks/SKILL.md)
+- recommended: synter-media-ai/plugin platform-google (skills/platform-google/SKILL.md)
+- recommended: synter-media-ai/plugin platform-linkedin (skills/platform-linkedin/SKILL.md)
+- recommended: synter-media-ai/plugin platform-meta (skills/platform-meta/SKILL.md)
+- recommended: synter-media-ai/plugin platform-microsoft (skills/platform-microsoft/SKILL.md)
+- recommended: synter-media-ai/plugin platform-openai (skills/platform-openai/SKILL.md)
+- recommended: synter-media-ai/plugin platform-reddit (skills/platform-reddit/SKILL.md)
+- recommended: synter-media-ai/plugin platform-tiktok (skills/platform-tiktok/SKILL.md)
+- recommended: synter-media-ai/plugin platform-x (skills/platform-x/SKILL.md)
+- recommended: synter-media-ai/plugin pre-pause-analysis (skills/pre-pause-analysis/SKILL.md)
+- recommended: synter-media-ai/plugin quickstart (skills/quickstart/SKILL.md)
+- recommended: synter-media-ai/plugin replicate (skills/replicate/SKILL.md)
+- recommended: synter-media-ai/plugin report (skills/report/SKILL.md)
+- recommended: synter-media-ai/plugin retargeting-sequence-designer (skills/retargeting-sequence-designer/SKILL.md)
+- recommended: synter-media-ai/plugin roas-calculator (skills/roas-calculator/SKILL.md)
+- recommended: synter-media-ai/plugin seasonal-budget-planner (skills/seasonal-budget-planner/SKILL.md)
+- recommended: synter-media-ai/plugin utm-builder (skills/utm-builder/SKILL.md)
+- recommended: synter-media-ai/plugin video-ad-scriptwriter (skills/video-ad-scriptwriter/SKILL.md)
+- deferred: aws/agent-toolkit-for-aws aws-ai-ml: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-auth: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-billing-and-cost-management: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-blocks: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-cdk: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-compute: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-database: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-deployment: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-iam: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-messaging-and-streaming: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-networking: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-observability: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-sdk-js-v3-usage: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-sdk-python-usage: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-sdk-swift-usage: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-secrets-manager: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-storage: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws aws-well-architected-review: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws launch-with-aws: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws signing-in-to-aws: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws analyzing-release-readiness: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws chatting-with-aws-devops-agent: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws coordinating-multi-space-devops-agent: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws diff-scanning-with-aws-security-agent: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws investigating-incidents-with-aws-devops-agent: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws pentesting-with-aws-security-agent: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws remediating-with-aws-security-agent: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws running-release-tests: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws scanning-with-aws-security-agent: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws setup: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws setup-devops-agent: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws setup-security-agent: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws threat-modeling-with-aws-security-agent: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws agents-build: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws agents-connect: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws agents-debug: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws agents-deploy: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws agents-get-started: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws agents-harden: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws agents-optimize: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws agents-pay: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws connecting-to-data-source: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws creating-data-lake-table: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws exploring-data-catalog: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws finding-data-lake-assets: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws ingesting-into-data-lake: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws querying-data-lake: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws redshift-guide: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: aws/agent-toolkit-for-aws storing-and-querying-vectors: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- ambiguous-paths: devinosolutions/claude-plugins capturing-tasks
+- ambiguous-paths: devinosolutions/claude-plugins investigating-tasks
+- ambiguous-paths: devinosolutions/claude-plugins reviewing-workload
+- ambiguous-paths: devinosolutions/claude-plugins searching-getitdone-api-docs
+- ambiguous-paths: devinosolutions/claude-plugins setup-getitdone
+- ambiguous-paths: devinosolutions/claude-plugins building-onboarding-workflows
+- ambiguous-paths: devinosolutions/claude-plugins checking-email-deliverability
+- ambiguous-paths: devinosolutions/claude-plugins reviewing-email-performance
+- ambiguous-paths: devinosolutions/claude-plugins sending-email-campaigns
+- ambiguous-paths: devinosolutions/claude-plugins setup-sendly
+- ambiguous-paths: devinosolutions/claude-plugins discussing-builds
+- ambiguous-paths: devinosolutions/claude-plugins handling-flaky-changes
+- ambiguous-paths: devinosolutions/claude-plugins reporting-snapvisor-usage
+- ambiguous-paths: devinosolutions/claude-plugins reviewing-visual-builds
+- ambiguous-paths: devinosolutions/claude-plugins setup-snapvisor
+- ambiguous-paths: devinosolutions/claude-plugins chasing-unpaid-invoices
+- ambiguous-paths: devinosolutions/claude-plugins cleaning-up-bookkeeping
+- ambiguous-paths: devinosolutions/claude-plugins drafting-invoices
+- ambiguous-paths: devinosolutions/claude-plugins reading-financial-reports
+- ambiguous-paths: devinosolutions/claude-plugins setup-superbooks
+- ambiguous-paths: devinosolutions/claude-plugins adding-uptime-monitors
+- ambiguous-paths: devinosolutions/claude-plugins checking-uptime-status
+- ambiguous-paths: devinosolutions/claude-plugins responding-to-incidents
+- ambiguous-paths: devinosolutions/claude-plugins setup-uptimely
+- ambiguous-paths: devinosolutions/claude-plugins writing-postmortems
+- ambiguous-paths: devinosolutions/claude-plugins analyzing-page-performance
+- ambiguous-paths: devinosolutions/claude-plugins editing-page-drafts
+- ambiguous-paths: devinosolutions/claude-plugins publishing-pages
+- ambiguous-paths: devinosolutions/claude-plugins setup-bioflow
+- ambiguous-paths: devinosolutions/claude-plugins checking-notification-delivery
+- ambiguous-paths: devinosolutions/claude-plugins reviewing-notification-workflows
+- ambiguous-paths: devinosolutions/claude-plugins sending-notifications
+- ambiguous-paths: devinosolutions/claude-plugins setup-notifly
+- ambiguous-paths: devinosolutions/claude-plugins drafting-social-posts
+- ambiguous-paths: devinosolutions/claude-plugins managing-content-calendar
+- ambiguous-paths: devinosolutions/claude-plugins reviewing-social-performance
+- ambiguous-paths: devinosolutions/claude-plugins setup-postify
+- ambiguous-paths: devinosolutions/claude-plugins researching-summary-library
+- ambiguous-paths: devinosolutions/claude-plugins setup-shorty
+- ambiguous-paths: devinosolutions/claude-plugins summarizing-sources
+- ambiguous-paths: devinosolutions/claude-plugins transcribing-media
+- ambiguous-paths: devinosolutions/claude-plugins checking-domain-connections
+- ambiguous-paths: devinosolutions/claude-plugins connecting-customer-domains
+- ambiguous-paths: devinosolutions/claude-plugins preflighting-domains
+- ambiguous-paths: devinosolutions/claude-plugins setup-dodomain
+- ambiguous-paths: devinosolutions/claude-plugins building-study-guides
+- ambiguous-paths: devinosolutions/claude-plugins planning-revision
+- ambiguous-paths: devinosolutions/claude-plugins researching-course-material
+- ambiguous-paths: devinosolutions/claude-plugins setup-unotes
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-api-build (skills/zuora-api-build/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-api-design (skills/zuora-api-design/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-context (skills/zuora-context/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-cpq-apex-build (skills/zuora-cpq-apex-build/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-cpq-apex-design (skills/zuora-cpq-apex-design/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-cpq-context (skills/zuora-cpq-context/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-cpq-js-build (skills/zuora-cpq-js-build/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-cpq-js-design (skills/zuora-cpq-js-design/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-cpq-migration-design (skills/zuora-cpq-migration-design/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-cpq-review (skills/zuora-cpq-review/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-cpq-validate (skills/zuora-cpq-validate/SKILL.md)
+- recommended: zuora/zuora-coding-agent zuora-dynamic-pricing-build (skills/zuora-dynamic-pricing-build/SKILL.md)
+- recommended: zuora/zuora-coding-agent zuora-dynamic-pricing-design (skills/zuora-dynamic-pricing-design/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-html-template-designer (skills/zuora-html-template-designer/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-is-migration-build (skills/zuora-is-migration-build/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-is-migration-design (skills/zuora-is-migration-design/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-meter-build (skills/zuora-meter-build/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-meter-design (skills/zuora-meter-design/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-order-migration-build (skills/zuora-order-migration-build/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-order-migration-design (skills/zuora-order-migration-design/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-review (skills/zuora-review/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-tenant-config-build (skills/zuora-tenant-config-build/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-tenant-config-design (skills/zuora-tenant-config-design/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-build (skills/zuora-uat-build/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-context (skills/zuora-uat-context/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-design (skills/zuora-uat-design/SKILL.md)
+- recommended: zuora/zuora-coding-agent zuora-uat-design-worker (skills/zuora-uat/design/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-execute-api (skills/zuora-uat/execute-api/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-execute-ui (skills/zuora-uat/execute-ui/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-fix (skills/zuora-uat/fix/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-generate-api (skills/zuora-uat/generate-api/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-generate-feature (skills/zuora-uat/generate-feature/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-generate-ui (skills/zuora-uat/generate-ui/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-plan (skills/zuora-uat/plan/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-review (skills/zuora-uat/review/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-run (skills/zuora-uat-run/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-run-feature (skills/zuora-uat/run-feature/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-uat-verify (skills/zuora-uat/verify/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-validate (skills/zuora-validate/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-workflow-build (skills/zuora-workflow-build/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-workflow-design (skills/zuora-workflow-design/SKILL.md)
+- plugin-runtime-review: zuora/zuora-coding-agent zuora-workflow-verify (skills/zuora-workflow-verify/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools accounts-receivable (countz-accounting/skills/accounts-receivable/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools arr-analysis (countz-accounting/skills/arr-analysis/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools cash (countz-accounting/skills/cash/SKILL.md)
+- recommended: countz-ai/agentic-tools check-analyze (countz-accounting/skills/check-analyze/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools check-completeness (countz-accounting/skills/check-completeness/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools check-cutoff (countz-accounting/skills/check-cutoff/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools check-extract (countz-accounting/skills/check-extract/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools check-plan (countz-accounting/skills/check-plan/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools check-recon (countz-accounting/skills/check-recon/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools check-report (countz-accounting/skills/check-report/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools check-review (countz-accounting/skills/check-review/SKILL.md)
+- dependency-review: countz-ai/agentic-tools check-tie (countz-accounting/skills/check-tie/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools check-vouch (countz-accounting/skills/check-vouch/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools contract-costs (countz-accounting/skills/contract-costs/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools countz (countz-accounting/skills/countz/SKILL.md)
+- not-found: countz-ai/agentic-tools countz-analysis
+- plugin-runtime-review: countz-ai/agentic-tools create-arr-policy (countz-accounting/skills/create-arr-policy/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools create-recipe (countz-accounting/skills/create-recipe/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools debt (countz-accounting/skills/debt/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools extract-arr-policy (countz-accounting/skills/extract-arr-policy/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools fixed-assets (countz-accounting/skills/fixed-assets/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools going-concern (countz-accounting/skills/going-concern/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools income-taxes (countz-accounting/skills/income-taxes/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools journal-entry-review (countz-accounting/skills/journal-entry-review/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools lease (countz-accounting/skills/lease/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools opening-balances (countz-accounting/skills/opening-balances/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools payroll (countz-accounting/skills/payroll/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools playbook (countz-accounting/skills/playbook/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools playbook-next (countz-accounting/skills/playbook-next/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools playbook-save (countz-accounting/skills/playbook-save/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools prepaid-expenses (countz-accounting/skills/prepaid-expenses/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools qoe (countz-accounting/skills/qoe/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools recon (countz-accounting/skills/recon/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools related-parties (countz-accounting/skills/related-parties/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools revenue-leak (countz-accounting/skills/revenue-leak/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools revenue-recognition (countz-accounting/skills/revenue-recognition/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools stock-based-compensation (countz-accounting/skills/stock-based-compensation/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools stockholders-equity (countz-accounting/skills/stockholders-equity/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools tieout (countz-accounting/skills/tieout/SKILL.md)
+- plugin-runtime-review: countz-ai/agentic-tools unrecorded-liabilities (countz-accounting/skills/unrecorded-liabilities/SKILL.md)
+- deferred: posthog/ai-plugin adding-warehouse-person-properties: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin analyzing-task-runs: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin auditing-experiments-flags: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin building-canvases: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin building-html-canvases: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin building-react-quill-canvases: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin cleaning-up-stale-feature-flags: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin composing-grid-canvases: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin context-layer-consolidation: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin context-layer-dreaming: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin context-layer-health-check: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin copying-flags-across-projects: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin debugging-experiments: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin debugging-local-replay: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin debugging-mcp-analytics: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin diagnosing-failed-warehouse-syncs: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin diagnosing-sdk-health: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin exploring-autocapture-events: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin exploring-live-traffic: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin exploring-llm-traces: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin exploring-mcp-tool-original-user-motive: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin feature-usage-feed: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin investigate-metric: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin organizing-conversations-code: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin querying-canvas-data: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin scanning-experiments-with-replay-vision: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin setting-up-a-data-warehouse-source: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin signals: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin signals-scout-customer-analytics-billing-and-usage: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin skills-store: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin suggesting-data-imports: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin suggesting-path-cleaning-rules: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin triaging-visual-review-runs: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin tuning-incremental-sync-config: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin validating-and-publishing-canvases: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: posthog/ai-plugin working-with-task-comments: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- dependency-review: cockroachdb/claude-plugin analyzing-range-distribution (skills/cockroachdb-observability-and-diagnostics/analyzing-range-distribution/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin analyzing-schema-change-storage-risk (skills/cockroachdb-observability-and-diagnostics/analyzing-schema-change-storage-risk/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin auditing-cis-benchmark (skills/cockroachdb-security-and-governance/auditing-cis-benchmark/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin auditing-cloud-cluster-security (skills/cockroachdb-security-and-governance/auditing-cloud-cluster-security/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin auditing-table-statistics (skills/cockroachdb-observability-and-diagnostics/auditing-table-statistics/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin benchmarking-transaction-patterns (skills/cockroachdb-application-development/benchmarking-transaction-patterns/SKILL.md)
+- recommended: cockroachdb/claude-plugin cockroachdb-sql (skills/cockroachdb-query-and-schema-design/cockroachdb-sql/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin configuring-audit-logging (skills/cockroachdb-security-and-governance/configuring-audit-logging/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin configuring-ip-allowlists (skills/cockroachdb-security-and-governance/configuring-ip-allowlists/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin configuring-log-export (skills/cockroachdb-security-and-governance/configuring-log-export/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin configuring-private-connectivity (skills/cockroachdb-security-and-governance/configuring-private-connectivity/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin configuring-sso-and-scim (skills/cockroachdb-security-and-governance/configuring-sso-and-scim/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin designing-application-transactions (skills/cockroachdb-application-development/designing-application-transactions/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin designing-multi-region-applications (skills/cockroachdb-application-development/designing-multi-region-applications/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin enabling-cmek-encryption (skills/cockroachdb-security-and-governance/enabling-cmek-encryption/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin enforcing-password-policies (skills/cockroachdb-security-and-governance/enforcing-password-policies/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin hardening-user-privileges (skills/cockroachdb-security-and-governance/hardening-user-privileges/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin managing-certificates-and-encryption (skills/cockroachdb-operations-and-lifecycle/managing-certificates-and-encryption/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin managing-cluster-capacity (skills/cockroachdb-operations-and-lifecycle/managing-cluster-capacity/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin managing-cluster-settings (skills/cockroachdb-operations-and-lifecycle/managing-cluster-settings/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin managing-tls-certificates (skills/cockroachdb-security-and-governance/managing-tls-certificates/SKILL.md)
+- recommended: cockroachdb/claude-plugin molt-fetch (skills/cockroachdb-onboarding-and-migrations/molt-fetch/SKILL.md)
+- recommended: cockroachdb/claude-plugin molt-replicator (skills/cockroachdb-onboarding-and-migrations/molt-replicator/SKILL.md)
+- recommended: cockroachdb/claude-plugin molt-verify (skills/cockroachdb-onboarding-and-migrations/molt-verify/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin monitoring-background-jobs (skills/cockroachdb-observability-and-diagnostics/monitoring-background-jobs/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin performing-cluster-maintenance (skills/cockroachdb-operations-and-lifecycle/performing-cluster-maintenance/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin preparing-compliance-documentation (skills/cockroachdb-security-and-governance/preparing-compliance-documentation/SKILL.md)
+- plugin-runtime-review: cockroachdb/claude-plugin profiling-statement-fingerprints (skills/cockroachdb-observability-and-diagnostics/profiling-statement-fingerprints/SKILL.md)
+- plugin-runtime-review: cockroachdb/claude-plugin profiling-transaction-fingerprints (skills/cockroachdb-observability-and-diagnostics/profiling-transaction-fingerprints/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin provisioning-cluster-for-production (skills/cockroachdb-operations-and-lifecycle/provisioning-cluster-for-production/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin reviewing-cluster-health (skills/cockroachdb-operations-and-lifecycle/reviewing-cluster-health/SKILL.md)
+- security-review: cockroachdb/claude-plugin setting-up-local-cluster (skills/cockroachdb-onboarding-and-migrations/setting-up-local-cluster/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin triaging-live-sql-activity (skills/cockroachdb-observability-and-diagnostics/triaging-live-sql-activity/SKILL.md)
+- dependency-review: cockroachdb/claude-plugin upgrading-cluster-version (skills/cockroachdb-operations-and-lifecycle/upgrading-cluster-version/SKILL.md)
+- dependency-review: urbanairship/agent-tools app-activity-summary (skills/workflows/app-activity-summary/SKILL.md)
+- dependency-review: urbanairship/agent-tools channel-listing (skills/api/channel-listing/SKILL.md)
+- plugin-runtime-review: urbanairship/agent-tools complete-user-onboarding (skills/workflows/complete-user-onboarding/SKILL.md)
+- plugin-runtime-review: urbanairship/agent-tools create-custom-event-automation (skills/workflows/create-custom-event-automation/SKILL.md)
+- dependency-review: urbanairship/agent-tools create-pipeline (skills/api/create-pipeline/SKILL.md)
+- plugin-runtime-review: urbanairship/agent-tools custom-event-automation-discovery (skills/workflows/custom-event-automation-discovery/SKILL.md)
+- dependency-review: urbanairship/agent-tools custom-events (skills/api/custom-events/SKILL.md)
+- recommended: urbanairship/agent-tools custom-views (skills/mobile/custom-views/SKILL.md)
+- plugin-runtime-review: urbanairship/agent-tools download-entire-audience (skills/workflows/download-entire-audience/SKILL.md)
+- dependency-review: urbanairship/agent-tools email-lookup (skills/api/email-lookup/SKILL.md)
+- dependency-review: urbanairship/agent-tools email-registration (skills/api/email-registration/SKILL.md)
+- dependency-review: urbanairship/agent-tools email-replace (skills/api/email-replace/SKILL.md)
+- plugin-runtime-review: urbanairship/agent-tools extract-unique-tags-and-attributes (skills/workflows/extract-unique-tags-and-attributes/SKILL.md)
+- dependency-review: urbanairship/agent-tools list-pipelines (skills/api/list-pipelines/SKILL.md)
+- recommended: urbanairship/agent-tools message-center (skills/mobile/message-center/SKILL.md)
+- plugin-runtime-review: urbanairship/agent-tools migration (skills/mobile/migration/SKILL.md)
+- dependency-review: urbanairship/agent-tools named-users (skills/api/named-users/SKILL.md)
+- dependency-review: urbanairship/agent-tools open-channel-middleware (skills/workflows/open-channel-middleware/SKILL.md)
+- dependency-review: urbanairship/agent-tools open-channel-registration (skills/api/open-channel-registration/SKILL.md)
+- plugin-runtime-review: urbanairship/agent-tools purchase-to-pass-update (skills/workflows/purchase-to-pass-update/SKILL.md)
+- dependency-review: urbanairship/agent-tools push (skills/mobile/push/SKILL.md)
+- dependency-review: urbanairship/agent-tools push-notification (skills/api/push-notification/SKILL.md)
+- dependency-review: urbanairship/agent-tools push-performance-analysis (skills/workflows/push-performance-analysis/SKILL.md)
+- plugin-runtime-review: urbanairship/agent-tools register-associate-email (skills/workflows/register-associate-email/SKILL.md)
+- plugin-runtime-review: urbanairship/agent-tools register-associate-sms (skills/workflows/register-associate-sms/SKILL.md)
+- plugin-runtime-review: urbanairship/agent-tools replace-email-address (skills/workflows/replace-email-address/SKILL.md)
+- dependency-review: urbanairship/agent-tools reports (skills/api/reports/SKILL.md)
+- dependency-review: urbanairship/agent-tools rtds-connection (skills/rtds/rtds-connection/SKILL.md)
+- plugin-runtime-review: urbanairship/agent-tools rtds-monitoring (skills/workflows/rtds-monitoring/SKILL.md)
+- recommended: urbanairship/agent-tools sdk-reference (skills/mobile/sdk-reference/SKILL.md)
+- dependency-review: urbanairship/agent-tools sms-lookup (skills/api/sms-lookup/SKILL.md)
+- dependency-review: urbanairship/agent-tools sms-registration (skills/api/sms-registration/SKILL.md)
+- dependency-review: urbanairship/agent-tools tags (skills/api/tags/SKILL.md)
+- dependency-review: urbanairship/agent-tools update-wallet-pass (skills/wallet/update-wallet-pass/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin accidental-data-loss-prevention (skills/accidental-data-loss-prevention/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin bigquery-ai-ml (skills/bigquery-ai-ml/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin bigquery-bigframes (skills/bigquery-bigframes/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin bigquery-data-transfer-service (skills/bigquery-data-transfer-service/SKILL.md)
+- not-found: googlecloudplatform/data-agent-kit-plugin bigquery-graph
+- recommended: googlecloudplatform/data-agent-kit-plugin bigquery-sql (skills/bigquery-sql/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin bigtable-basics (skills/bigtable-basics/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin building-data-apps (skills/building-data-apps/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin data-autocleaning (skills/data-autocleaning/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin dataform-bigquery (skills/dataform-bigquery/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin dbt-bigquery (skills/dbt-bigquery/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin discovering-gcp-data-assets (skills/discovering-gcp-data-assets/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin enforcing-resource-attribution (skills/enforcing-resource-attribution/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin federate-lakehouse-catalog (skills/federate-lakehouse-catalog/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin gcp-composer-troubleshooting (skills/gcp-composer-troubleshooting/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin gcp-data-pipelines (skills/gcp-data-pipelines/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin gcp-dataflow (skills/gcp-dataflow/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin gcp-managed-airflow-dag-authoring (skills/gcp-managed-airflow-dag-authoring/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin gcp-managed-airflow-migrations (skills/gcp-managed-airflow-migrations/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin gcp-managed-airflow-recommendations (skills/gcp-managed-airflow-recommendations/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin gcp-pipeline-orchestration (skills/gcp-pipeline-orchestration/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin gcp-pipeline-resource-provisioning (skills/gcp-pipeline-resource-provisioning/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin gcp-spark (skills/gcp-spark/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin gcs-security-assessment (skills/gcs-security-assessment/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin google-cloud-auth-verification (skills/google-cloud-auth-verification/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin google-cloud-storage-basics (skills/google-cloud-storage-basics/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin google-cloud-storage-bucket-architect (skills/google-cloud-storage-bucket-architect/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin google-cloud-storage-fuse (skills/google-cloud-storage-fuse/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin managing-python-dependencies (skills/managing-python-dependencies/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin ml-best-practices (skills/ml-best-practices/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin notebook-guidance (skills/notebook-guidance/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin resolving-mcp-region-configs (skills/resolving-mcp-region-configs/SKILL.md)
+- recommended: googlecloudplatform/data-agent-kit-plugin schema-mapping (skills/schema-mapping/SKILL.md)
+- deferred: anthropics/knowledge-work-plugins ad-manager: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins ap-processor: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins brand-style: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins build-connector: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins crm-autopilot: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins grant-rfp-writer: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins grow-pipeline: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins growth-pulse: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins hiring-screener: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins inbox-manager: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins inventory-planner: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins lead-finder: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins marketing-monday: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins outreach-composer: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins pay-the-bills: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins payroll-prep: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins proposal-builder: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins reactivate: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins report-builder: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins report-pack: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins restock: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins review-reputation: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins seo-ai-visibility: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins social-content-engine: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer
+- deferred: anthropics/knowledge-work-plugins speed-to-lead: AssertionError [ERR_ASSERTION]: Repo exceeds 150-skill review cap; defer

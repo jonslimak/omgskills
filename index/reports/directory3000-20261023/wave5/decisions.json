@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-10-23T20:51:45.756Z",
+  "reviewSha256": "a927d569c53c9cdfd05d37cbf78608551da36eb8756ebc6b49459aeb3eeccf60",
+  "excludeRepos": [],
+  "excludeIds": [
+    "jgsystemsconsulting/jgs-magic-sysmlv1-read-skills:skills/jgs-v1",
+    "nodesource/nsolid-skills-plugin:skills/ns-generate-asset"
+  ],
+  "excluded": [
+    {
+      "id": "jgsystemsconsulting/jgs-magic-sysmlv1-read-skills:skills/jgs-v1",
+      "reason": "router-requires-separately-installed-companion-skills"
+    },
+    {
+      "id": "nodesource/nsolid-skills-plugin:skills/ns-generate-asset",
+      "reason": "plugin-root-or-external-package-dependency"
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "First-party sources inspected; hold JGS pure router requiring sibling skills, plus external context/agent dependencies. Keep substantive self-contained skill packages with configured CLI/MCP prerequisites, not implied bundled integrations.",
+  "reviewed": 376,
+  "approvedCount": 252
+}

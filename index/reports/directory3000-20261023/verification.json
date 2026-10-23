@@ -1,0 +1,16 @@
+{
+  "verifiedAt": "2026-10-23T21:05:00.926Z",
+  "typecheck": "passed",
+  "focusedBackfillAndPolicyTests": "passed",
+  "shadowGuardAndRegistryTests": "passed",
+  "strictPolicyValidation": "0 findings, 0 blocking",
+  "diffCheck": "passed",
+  "sourcePinAndPersistenceVerification": "passed",
+  "productionDataChanged": false,
+  "combinedCrawlRun": false,
+  "published": false,
+  "limitations": [
+    "Source/package review is not a runtime installation or exhaustive security audit.",
+    "Creator-backfill currently emits legacy install rows; reviewed commit/tree pins are in batch evidence, not optional client install metadata."
+  ]
+}

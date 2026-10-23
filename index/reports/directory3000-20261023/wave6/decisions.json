@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-10-23T20:51:45.994Z",
+  "reviewSha256": "52a380ee4ea222371dac8f70ae51cb34e2a124c396f5ae1daa5a34822b4a40da",
+  "excludeRepos": [],
+  "excludeIds": [
+    "wix/skills:skills/wix-docs",
+    "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/bad-frontmatter",
+    "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/good-skill",
+    "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/inlined-refs",
+    "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/leaky-data",
+    "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/stale-expectations",
+    "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/trigger-overlap",
+    "humanmade/accelerate-ai-toolkit:skills/accelerate-connect",
+    "humanmade/accelerate-ai-toolkit:skills/accelerate-status"
+  ],
+  "excluded": [
+    {
+      "id": "wix/skills:skills/wix-docs",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/bad-frontmatter",
+      "reason": "evaluation-or-mock-fixture-not-a-library-skill"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/good-skill",
+      "reason": "evaluation-or-mock-fixture-not-a-library-skill"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/inlined-refs",
+      "reason": "evaluation-or-mock-fixture-not-a-library-skill"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/leaky-data",
+      "reason": "evaluation-or-mock-fixture-not-a-library-skill"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/stale-expectations",
+      "reason": "evaluation-or-mock-fixture-not-a-library-skill"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/confluent-skill-reviewer/evals/mock-skills/trigger-overlap",
+      "reason": "evaluation-or-mock-fixture-not-a-library-skill"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-connect",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/connection.py",
+        "scripts/connection.py",
+        "scripts/connection.py",
+        "scripts/connection.py"
+      ],
+      "agents": []
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-status",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/connection.py",
+        "scripts/connection.py",
+        "scripts/connection.py",
+        "scripts/connection.py"
+      ],
+      "agents": []
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Original product skills reviewed. Explicitly hold Confluent bad-frontmatter evaluation fixture, Adobe oversized tree, and outside-package dependencies. First-party product distribution mirrors are allowed only under their own publisher; copied third-party sources are not.",
+  "reviewed": 307,
+  "approvedCount": 251
+}

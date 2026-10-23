@@ -1,0 +1,1680 @@
+{
+  "generatedAt": "2026-10-23T21:03:04.570Z",
+  "wave": "wave6",
+  "summary": {
+    "planCandidateCount": 233,
+    "finalCount": 233,
+    "pendingCount": 0,
+    "addedCount": 233,
+    "existingCount": 0,
+    "policySkippedCount": 0,
+    "stableFailedCount": 0,
+    "transientFailedCount": 0
+  },
+  "sharedApproval": {
+    "changedCreators": [
+      "datarails",
+      "dynatrace",
+      "recharm",
+      "spiceai",
+      "wix",
+      "airport-lounge-list",
+      "arcads-ai",
+      "carsxe",
+      "cellcog",
+      "confluentinc",
+      "fiber-ai",
+      "humanmade",
+      "lmtydotcom",
+      "marky-team",
+      "playcanvas",
+      "ringcentral",
+      "yourbeckett"
+    ],
+    "beforeRevision": "sha256:50980c55528926a94239025022cfed8faff68bc06187ca28e548c1330512b722",
+    "afterRevision": "sha256:1108ea71213bc8396d70234ec60cd4481a29485152612b1344e58fd8bb69020e"
+  },
+  "priorAdditionsPreserved": 2767,
+  "totalCampaignAdditions": 3000,
+  "beforeCount": 50457,
+  "afterCount": 50690,
+  "addedSkills": [
+    {
+      "id": "airport-lounge-list/mcp-server:skills/airline-lounge-access",
+      "name": "airline-lounge-access",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/airline-lounge-access/SKILL.md",
+      "sha": "f251e82fe292f045ee86271dde829b0716bba294"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/best-lounges-at-airport",
+      "name": "best-lounges-at-airport",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/best-lounges-at-airport/SKILL.md",
+      "sha": "996ca526b11f622c253fe5fb2b37ebeae9d4e755"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/buy-lounge-day-pass",
+      "name": "buy-lounge-day-pass",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/buy-lounge-day-pass/SKILL.md",
+      "sha": "48e387cc3fb2d22c050a350e979cf3f1585952a0"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/check-lounge-access",
+      "name": "check-lounge-access",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/check-lounge-access/SKILL.md",
+      "sha": "01fc26687dfb961b3b2d0c20e14f9e5e95468191"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/choose-lounge-credit-card",
+      "name": "choose-lounge-credit-card",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/choose-lounge-credit-card/SKILL.md",
+      "sha": "bdadfff2c3877f2dba0f733464a475a49f3dbf5a"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/compare-lounge-networks",
+      "name": "compare-lounge-networks",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/compare-lounge-networks/SKILL.md",
+      "sha": "6c8a3d2f356157e15c3aab8f62f35b1dadd1478e"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/does-my-card-get-lounge-access",
+      "name": "does-my-card-get-lounge-access",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/does-my-card-get-lounge-access/SKILL.md",
+      "sha": "70b43a56a39c3f52148ef7547cb2d6feb524d546"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/find-airport-lounges",
+      "name": "find-airport-lounges",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/find-airport-lounges/SKILL.md",
+      "sha": "1aabd6911fb54730b0f378c34a7ff5224feb77a8"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/find-lounge-by-amenity",
+      "name": "find-lounge-by-amenity",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/find-lounge-by-amenity/SKILL.md",
+      "sha": "87ecaef9aa3b6c1469a0fa323d14d10d53001028"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/list-lounge-brand-locations",
+      "name": "list-lounge-brand-locations",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/list-lounge-brand-locations/SKILL.md",
+      "sha": "8dc5229c699e232cb8d68c6672d307cbc0bb12b6"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/lounge-tool-best-practice",
+      "name": "lounge-tool-best-practice",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/lounge-tool-best-practice/SKILL.md",
+      "sha": "565bba4f9dbd718d46463d810c05a6ac5432e87b"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/lounge-wishlist-and-passport",
+      "name": "lounge-wishlist-and-passport",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/lounge-wishlist-and-passport/SKILL.md",
+      "sha": "8d487a65eed57975193dad373a113d4c973561f3"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/manage-lounge-history",
+      "name": "manage-lounge-history",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/manage-lounge-history/SKILL.md",
+      "sha": "395b823767b7e88915af201a8a34378090bec131"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/plan-layover-lounges",
+      "name": "plan-layover-lounges",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/plan-layover-lounges/SKILL.md",
+      "sha": "281f57b1ebcc12d41ff5b8485b0703ae684463d8"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/plan-whole-trip",
+      "name": "plan-whole-trip",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/plan-whole-trip/SKILL.md",
+      "sha": "cda4cf6f5ab63a8abe89a5325ad994f3c6072d71"
+    },
+    {
+      "id": "airport-lounge-list/mcp-server:skills/track-lounge-visits",
+      "name": "track-lounge-visits",
+      "repo": "airport-lounge-list/mcp-server",
+      "path": "skills/track-lounge-visits/SKILL.md",
+      "sha": "20d22053f6acbd2c3fecbff58ab5af8d94a275c8"
+    },
+    {
+      "id": "arcads-ai/skills:skills/ads",
+      "name": "ads",
+      "repo": "arcads-ai/skills",
+      "path": "skills/ads/SKILL.md",
+      "sha": "e748da23eb1700e30bfc59ed60c47a04d3601b00"
+    },
+    {
+      "id": "arcads-ai/skills:skills/amazon-listing-system",
+      "name": "amazon-listing-system",
+      "repo": "arcads-ai/skills",
+      "path": "skills/amazon-listing-system/SKILL.md",
+      "sha": "8dcd2e685c9572734012ac8eccff55c237d323d6"
+    },
+    {
+      "id": "arcads-ai/skills:skills/animated-ad",
+      "name": "animated-ad",
+      "repo": "arcads-ai/skills",
+      "path": "skills/animated-ad/SKILL.md",
+      "sha": "5dca5e047bcc90a038fc1acca4ef2f4440d5c464"
+    },
+    {
+      "id": "arcads-ai/skills:skills/cinematic-ads",
+      "name": "cinematic-ads",
+      "repo": "arcads-ai/skills",
+      "path": "skills/cinematic-ads/SKILL.md",
+      "sha": "b07d3d2f8c69cda69f3091013ba4ff10b5cfbd86"
+    },
+    {
+      "id": "arcads-ai/skills:skills/clone-hook",
+      "name": "clone-hook",
+      "repo": "arcads-ai/skills",
+      "path": "skills/clone-hook/SKILL.md",
+      "sha": "1956b867927a404e33f88618eb6c227180f39c70"
+    },
+    {
+      "id": "arcads-ai/skills:skills/clone-static-ad",
+      "name": "clone-static-ad",
+      "repo": "arcads-ai/skills",
+      "path": "skills/clone-static-ad/SKILL.md",
+      "sha": "ff08b0275766ce8963fb396662e700fa6136e56e"
+    },
+    {
+      "id": "arcads-ai/skills:skills/collage-motion",
+      "name": "collage-motion",
+      "repo": "arcads-ai/skills",
+      "path": "skills/collage-motion/SKILL.md",
+      "sha": "24cd3e75df6e6fa8d18311555df3168e0c5bb0f5"
+    },
+    {
+      "id": "arcads-ai/skills:skills/fpv-drone-path",
+      "name": "fpv-drone-path",
+      "repo": "arcads-ai/skills",
+      "path": "skills/fpv-drone-path/SKILL.md",
+      "sha": "ea4d044db1819389ee3825894a92c06fa9482ebc"
+    },
+    {
+      "id": "arcads-ai/skills:skills/image-to-motion",
+      "name": "image-to-motion",
+      "repo": "arcads-ai/skills",
+      "path": "skills/image-to-motion/SKILL.md",
+      "sha": "408c7b061902622e14bf466d069aad9911875438"
+    },
+    {
+      "id": "arcads-ai/skills:skills/media-router",
+      "name": "media-router",
+      "repo": "arcads-ai/skills",
+      "path": "skills/media-router/SKILL.md",
+      "sha": "bf9acad8abd42704489668f9996b17e529f09859"
+    },
+    {
+      "id": "arcads-ai/skills:skills/omniflash-restyle",
+      "name": "omniflash-restyle",
+      "repo": "arcads-ai/skills",
+      "path": "skills/omniflash-restyle/SKILL.md",
+      "sha": "f71e8363e8e9c983dc58a24f0667d7906fcf1f78"
+    },
+    {
+      "id": "arcads-ai/skills:skills/pixar-ad",
+      "name": "pixar-ad",
+      "repo": "arcads-ai/skills",
+      "path": "skills/pixar-ad/SKILL.md",
+      "sha": "a8c17bb9f83dc05b27451dfef3eb69c6d69ef928"
+    },
+    {
+      "id": "arcads-ai/skills:skills/spy-competitor-ads",
+      "name": "spy-competitor-ads",
+      "repo": "arcads-ai/skills",
+      "path": "skills/spy-competitor-ads/SKILL.md",
+      "sha": "7de043bf3807d670c807b177f905b5660e546bc3"
+    },
+    {
+      "id": "arcads-ai/skills:skills/static-to-motion",
+      "name": "static-to-motion",
+      "repo": "arcads-ai/skills",
+      "path": "skills/static-to-motion/SKILL.md",
+      "sha": "1e597aa6aae313fd61e0a728200f8dc8628bd693"
+    },
+    {
+      "id": "arcads-ai/skills:skills/tsunami-soundstage",
+      "name": "tsunami-soundstage",
+      "repo": "arcads-ai/skills",
+      "path": "skills/tsunami-soundstage/SKILL.md",
+      "sha": "306369a9c5659e9ce38bf65f9d8832896b37b812"
+    },
+    {
+      "id": "arcads-ai/skills:skills/viral-clone",
+      "name": "viral-clone",
+      "repo": "arcads-ai/skills",
+      "path": "skills/viral-clone/SKILL.md",
+      "sha": "9f03abb9cc51bb4c93f6350c376bddb5e1bc3733"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/international-vin",
+      "name": "international-vin",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/international-vin/SKILL.md",
+      "sha": "8670df8e9faaad339ccef0dcc2882a4b8f41e7a5"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/lien-theft",
+      "name": "lien-theft",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/lien-theft/SKILL.md",
+      "sha": "b28ce7c01efdf680035a88952a9b23caa0db30c4"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/market-value",
+      "name": "market-value",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/market-value/SKILL.md",
+      "sha": "5648ec0ad69f2223949f52933a9b5c0609823835"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/obd-decoder",
+      "name": "obd-decoder",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/obd-decoder/SKILL.md",
+      "sha": "441edb41c763915d5813d671406f6ab609ede805"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/ownership",
+      "name": "ownership",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/ownership/SKILL.md",
+      "sha": "e177f7e1d72a9201258d6266a7db39ef2174dc76"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/plate-decoder",
+      "name": "plate-decoder",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/plate-decoder/SKILL.md",
+      "sha": "e3b4eab690041e7878a0760e73fac9e0fb5ebd85"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/plate-image-recognition",
+      "name": "plate-image-recognition",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/plate-image-recognition/SKILL.md",
+      "sha": "d92ea9139de0220fedb016aaeb9bb31a4fecadd3"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/recalls-batch",
+      "name": "recalls-batch",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/recalls-batch/SKILL.md",
+      "sha": "940857ced3983a6daf362c7f85e6eb354d70c3ec"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/recalls-ymm",
+      "name": "recalls-ymm",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/recalls-ymm/SKILL.md",
+      "sha": "2d79b8ff13c4685fce70229469d69bddfc7d2b2d"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/vehicle-history",
+      "name": "vehicle-history",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/vehicle-history/SKILL.md",
+      "sha": "33f151fc9c4bb8495e53547186f5e37f35bdb9d9"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/vehicle-images",
+      "name": "vehicle-images",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/vehicle-images/SKILL.md",
+      "sha": "94dd76a2ddccc71ec777c0b3db61b433b02d0301"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/vehicle-recalls",
+      "name": "vehicle-recalls",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/vehicle-recalls/SKILL.md",
+      "sha": "5345eacca2733acbe95e9bdd2b7ba698d583e463"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/vehicle-specs",
+      "name": "vehicle-specs",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/vehicle-specs/SKILL.md",
+      "sha": "480aac715d763c7ec5dbf0eda021bdce5e9b1a44"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/vin-ocr",
+      "name": "vin-ocr",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/vin-ocr/SKILL.md",
+      "sha": "f37fe56dfcdf550c1e773ef68061f83ca3bbfc84"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/year-make-model",
+      "name": "year-make-model",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/year-make-model/SKILL.md",
+      "sha": "069fe30aa05e38fb4f43b354965c8f782c11e411"
+    },
+    {
+      "id": "carsxe/carsxe-claude-plugin:carsxe/skills/ymm-options",
+      "name": "ymm-options",
+      "repo": "carsxe/carsxe-claude-plugin",
+      "path": "carsxe/skills/ymm-options/SKILL.md",
+      "sha": "2b6efb890a043b6cbd56ce231a05702884a2a8d1"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/3d-model-generation-cellcog",
+      "name": "3d-model-generation-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/3d-model-generation-cellcog/SKILL.md",
+      "sha": "b19a3fe84def19e573fe01dd2a915a689d1fb992"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/audio-generation-cellcog",
+      "name": "audio-generation-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/audio-generation-cellcog/SKILL.md",
+      "sha": "3b5639e5ad3a3e42e128807b470c9e49d0c5e00e"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/cellcog",
+      "name": "cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/cellcog/SKILL.md",
+      "sha": "f7a39bbf8b14ad0cb3afb7eb85d7e29140b48063"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/data-analysis-cellcog",
+      "name": "data-analysis-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/data-analysis-cellcog/SKILL.md",
+      "sha": "c1591b2e5ec3c27a525bd8cb56e9e7409db9b7f1"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/deep-research-cellcog",
+      "name": "deep-research-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/deep-research-cellcog/SKILL.md",
+      "sha": "f6b02627cf94cf4076004d5ba4f6c92c06cb865c"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/diagram-flowchart-cellcog",
+      "name": "diagram-flowchart-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/diagram-flowchart-cellcog/SKILL.md",
+      "sha": "9664151bac388e1eae2fb6466cb1a31d8e04fcc4"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/excel-spreadsheet-cellcog",
+      "name": "excel-spreadsheet-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/excel-spreadsheet-cellcog/SKILL.md",
+      "sha": "5d4cba76e2a81b3acaa744cda7d614ba7f58d5ff"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/game-asset-generation-cellcog",
+      "name": "game-asset-generation-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/game-asset-generation-cellcog/SKILL.md",
+      "sha": "c760d53ba2d91e7c361e8c79e132ccac492c11e9"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/image-generation-cellcog",
+      "name": "image-generation-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/image-generation-cellcog/SKILL.md",
+      "sha": "6bd27b497a0500032062ac5cbb07bb3b40a66533"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/meme-generator-cellcog",
+      "name": "meme-generator-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/meme-generator-cellcog/SKILL.md",
+      "sha": "f18c10c3680b30b75c6ea0a6175b86b15ea48e76"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/music-generation-cellcog",
+      "name": "music-generation-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/music-generation-cellcog/SKILL.md",
+      "sha": "7a8509ef4f8347883fb7bbc07c48de67c27003f3"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/pdf-document-generation-cellcog",
+      "name": "pdf-document-generation-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/pdf-document-generation-cellcog/SKILL.md",
+      "sha": "dc2add7f90dbfb930b19dcf8f8fd1c537e8fe37a"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/presentation-slides-cellcog",
+      "name": "presentation-slides-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/presentation-slides-cellcog/SKILL.md",
+      "sha": "17ee477966e01c2b6e58023a4afef1ddd95de5db"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/sticker-generator-cellcog",
+      "name": "sticker-generator-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/sticker-generator-cellcog/SKILL.md",
+      "sha": "0aadb04e1a65be618bccfd4824fa473654352fe7"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/ui-prototype-wireframe-cellcog",
+      "name": "ui-prototype-wireframe-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/ui-prototype-wireframe-cellcog/SKILL.md",
+      "sha": "42b61495654b1e5f9aaa5f7cf861881d21656934"
+    },
+    {
+      "id": "cellcog/cellcog-plugin:skills/video-generation-cellcog",
+      "name": "video-generation-cellcog",
+      "repo": "cellcog/cellcog-plugin",
+      "path": "skills/video-generation-cellcog/SKILL.md",
+      "sha": "c0f11b41a2055b31f17a3097cef7a9643d774211"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/confluent-cloud-cdc-tableflow",
+      "name": "confluent-cloud-cdc-tableflow",
+      "repo": "confluentinc/agent-skills",
+      "path": "skills/confluent-cloud-cdc-tableflow/SKILL.md",
+      "sha": "3d296ef3744b2747254168ce8e5bd8e7ae8e8153"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/confluent-cloud-flink-sql",
+      "name": "confluent-cloud-flink-sql",
+      "repo": "confluentinc/agent-skills",
+      "path": "skills/confluent-cloud-flink-sql/SKILL.md",
+      "sha": "78f9f00f707810c0008c487af250b0ab6b28ffe8"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/confluent-tuning-advisor",
+      "name": "confluent-tuning-advisor",
+      "repo": "confluentinc/agent-skills",
+      "path": "skills/confluent-tuning-advisor/SKILL.md",
+      "sha": "ac2521bd1b1171a94b01f87495c2d27edc3a064a"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/developing-kafka-java-client",
+      "name": "developing-kafka-java-client",
+      "repo": "confluentinc/agent-skills",
+      "path": "skills/developing-kafka-java-client/SKILL.md",
+      "sha": "c42f94aaebf3b61d58c349066ddcf0d3a34d1d5e"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/developing-kafka-python-client",
+      "name": "developing-kafka-python-client",
+      "repo": "confluentinc/agent-skills",
+      "path": "skills/developing-kafka-python-client/SKILL.md",
+      "sha": "2309e7a58c671af918f88293b46c7ed05987a5aa"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/flink-udf",
+      "name": "flink-udf",
+      "repo": "confluentinc/agent-skills",
+      "path": "skills/flink-udf/SKILL.md",
+      "sha": "592f7d1743e7dcb0710ae952f11d0b7ae4e5e1ec"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/kafka-schema-registry",
+      "name": "kafka-schema-registry",
+      "repo": "confluentinc/agent-skills",
+      "path": "skills/kafka-schema-registry/SKILL.md",
+      "sha": "f04bd18ad65063438fe74b9379f21be538c7650d"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/kafka-streams-programming",
+      "name": "kafka-streams-programming",
+      "repo": "confluentinc/agent-skills",
+      "path": "skills/kafka-streams-programming/SKILL.md",
+      "sha": "07483da75dc0037a0cb795c86e83604a025f0773"
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/msk-migration",
+      "name": "msk-migration",
+      "repo": "confluentinc/agent-skills",
+      "path": "skills/msk-migration/SKILL.md",
+      "sha": "d57058ca963123e8623dc27eeff3717cf478eafe"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/dashboard",
+      "name": "dr-dashboard",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/dashboard/SKILL.md",
+      "sha": "6ba2268b723af911293b29b58869fc333f686fc0"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/datarails-excel-agent",
+      "name": "datarails-excel-agent",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/datarails-excel-agent/SKILL.md",
+      "sha": "aaabbf845d70ac131a861535e4ec136966730b3a"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/departments",
+      "name": "dr-departments",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/departments/SKILL.md",
+      "sha": "419c1c2832232a23b1cf9dd191ca5aef43317fc4"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/drilldown",
+      "name": "dr-drilldown",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/drilldown/SKILL.md",
+      "sha": "2fb74c4190c7cb3d86ba99d158c52b1f4c65d72d"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/excel-context",
+      "name": "excel-context",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/excel-context/SKILL.md",
+      "sha": "e7dc6064a0dc8b33cbd5eed896008e513afc44b1"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/expense-analysis",
+      "name": "dr-expense-analysis",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/expense-analysis/SKILL.md",
+      "sha": "ff058ef963f2a7b9131407449ed9d6d26ad960d7"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/extract",
+      "name": "dr-extract",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/extract/SKILL.md",
+      "sha": "ae207e2af3c6612dff52fc5dce9115bf205e7541"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/financial-summary",
+      "name": "dr-financial-summary",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/financial-summary/SKILL.md",
+      "sha": "31ca943f9351be01d717b42ac1f235ccb465e5a7"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/forecast-variance",
+      "name": "dr-forecast-variance",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/forecast-variance/SKILL.md",
+      "sha": "5fb38cea72d876304d7fbefbfc64a521d04e5858"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/get-formula",
+      "name": "dr-get-formula",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/get-formula/SKILL.md",
+      "sha": "d34fa31721e371a2b653b2e7fe31f4edfaa23026"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/insights",
+      "name": "dr-insights",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/insights/SKILL.md",
+      "sha": "43555b45fb744102e5722cadcd24ac9c5930115d"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/profile",
+      "name": "dr-profile",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/profile/SKILL.md",
+      "sha": "7fa7661d587daa790140c714b36455914b682e46"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/query",
+      "name": "dr-query",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/query/SKILL.md",
+      "sha": "acbd78e4899cb2f0ccd5cf852207d682f2d0d8bd"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/reconciliation",
+      "name": "dr-reconcile",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/reconciliation/SKILL.md",
+      "sha": "089c858f0c1d471b1de85edfa3876aa558aa8f88"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/revenue-trends",
+      "name": "dr-revenue-trends",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/revenue-trends/SKILL.md",
+      "sha": "b330aad2cbd4b1a5652701043f9fa7f83b3b2b74"
+    },
+    {
+      "id": "datarails/dr-claude-code-plugins-re:skills/tables",
+      "name": "dr-tables",
+      "repo": "datarails/dr-claude-code-plugins-re",
+      "path": "skills/tables/SKILL.md",
+      "sha": "e65d27f067c9c260e5f1ceda5c7fd80740e0737f"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-obs-analytics",
+      "name": "dt-obs-analytics",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-obs-analytics/SKILL.md",
+      "sha": "82443e33b2c0d570aa3b6cd7022d97bfad528784"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-obs-compliance-assistant",
+      "name": "dt-obs-compliance-assistant",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-obs-compliance-assistant/SKILL.md",
+      "sha": "6db720076bc8d5e2445a72dfdfc0360806021cd6"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-obs-ext-monitors",
+      "name": "dt-obs-ext-monitors",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-obs-ext-monitors/SKILL.md",
+      "sha": "a8db4c6cc5e178eb1c763b0f7ad5fcf1d4be7248"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-obs-genai",
+      "name": "dt-obs-genai",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-obs-genai/SKILL.md",
+      "sha": "2cc32bf8c6bbe75b298c4ad8871ec6985f7e2a0f"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-obs-log-semantic-mapping",
+      "name": "dt-obs-log-semantic-mapping",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-obs-log-semantic-mapping/SKILL.md",
+      "sha": "d3fc4ef68ad518e98a019fd6daedffc62079fbe5"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-platform-costs",
+      "name": "dt-platform-costs",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-platform-costs/SKILL.md",
+      "sha": "665c88c4942ae0770efb524a244fb3e1f88895b9"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-sec-contextualization",
+      "name": "dt-sec-contextualization",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-sec-contextualization/SKILL.md",
+      "sha": "74582bc5645a6791bdeed19afe8fdecc8777cdba"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-sec-insights",
+      "name": "dt-sec-insights",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-sec-insights/SKILL.md",
+      "sha": "fe383a29ea3735ef1776be0979179a258470980d"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-sec-semantic-mapping",
+      "name": "dt-sec-semantic-mapping",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-sec-semantic-mapping/SKILL.md",
+      "sha": "23a898ccc5a7b5f70f8c911a7d990dbc8ef7eff6"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-setup-android",
+      "name": "dt-setup-android",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-setup-android/SKILL.md",
+      "sha": "bb7ed5c03dbc21339f4957082699244924dc0359"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-setup-flutter",
+      "name": "dt-setup-flutter",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-setup-flutter/SKILL.md",
+      "sha": "d3b29ac4c0bc8c09b25fdc0483c60daecfd2dade"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-setup-ios",
+      "name": "dt-setup-ios",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-setup-ios/SKILL.md",
+      "sha": "78fc0837fc274c1f27dd9e7993b422272ad79754"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-setup-oneagent",
+      "name": "dt-setup-oneagent",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-setup-oneagent/SKILL.md",
+      "sha": "03cbc71fd2efd8fff3816187be82cd5ce39f1347"
+    },
+    {
+      "id": "dynatrace/dynatrace-for-ai:skills/dt-setup-react-native",
+      "name": "dt-setup-react-native",
+      "repo": "dynatrace/dynatrace-for-ai",
+      "path": "skills/dt-setup-react-native/SKILL.md",
+      "sha": "86880396533d61ca31265f8ad77b7493cf58035b"
+    },
+    {
+      "id": "fiber-ai/fiber-ai-plugin:skills/audience",
+      "name": "audience",
+      "repo": "fiber-ai/fiber-ai-plugin",
+      "path": "skills/audience/SKILL.md",
+      "sha": "9252084350c3805f2651c89fb9aea893fd581c8b"
+    },
+    {
+      "id": "fiber-ai/fiber-ai-plugin:skills/enrich",
+      "name": "enrich",
+      "repo": "fiber-ai/fiber-ai-plugin",
+      "path": "skills/enrich/SKILL.md",
+      "sha": "c24210a8fa526bbc8a519ebeaf70234a2260019c"
+    },
+    {
+      "id": "fiber-ai/fiber-ai-plugin:skills/find-similar-companies",
+      "name": "find-similar-companies",
+      "repo": "fiber-ai/fiber-ai-plugin",
+      "path": "skills/find-similar-companies/SKILL.md",
+      "sha": "c11fd054e34e730149fb007599e0316b5159c87e"
+    },
+    {
+      "id": "fiber-ai/fiber-ai-plugin:skills/help",
+      "name": "help",
+      "repo": "fiber-ai/fiber-ai-plugin",
+      "path": "skills/help/SKILL.md",
+      "sha": "eeae4b32dde04a5769f92496b53db939846b56e4"
+    },
+    {
+      "id": "fiber-ai/fiber-ai-plugin:skills/quickstart",
+      "name": "quickstart",
+      "repo": "fiber-ai/fiber-ai-plugin",
+      "path": "skills/quickstart/SKILL.md",
+      "sha": "51aac65da94623b6936b50944a3fdb4e72e8b698"
+    },
+    {
+      "id": "fiber-ai/fiber-ai-plugin:skills/sdk-py",
+      "name": "sdk-py",
+      "repo": "fiber-ai/fiber-ai-plugin",
+      "path": "skills/sdk-py/SKILL.md",
+      "sha": "9c925151d259768510f9b9580b249b98e6bf77c0"
+    },
+    {
+      "id": "fiber-ai/fiber-ai-plugin:skills/sdk-ts",
+      "name": "sdk-ts",
+      "repo": "fiber-ai/fiber-ai-plugin",
+      "path": "skills/sdk-ts/SKILL.md",
+      "sha": "63fe51b619f6a8b896415cf97bf42baaa001f828"
+    },
+    {
+      "id": "fiber-ai/fiber-ai-plugin:skills/search",
+      "name": "search",
+      "repo": "fiber-ai/fiber-ai-plugin",
+      "path": "skills/search/SKILL.md",
+      "sha": "3d0f545d9c74cdcea23ba403841323c7ba1ca1a7"
+    },
+    {
+      "id": "fiber-ai/fiber-ai-plugin:skills/setup",
+      "name": "setup",
+      "repo": "fiber-ai/fiber-ai-plugin",
+      "path": "skills/setup/SKILL.md",
+      "sha": "b98b6469108a8616ad7984aa68cd2de75808c36f"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate",
+      "name": "accelerate",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate/SKILL.md",
+      "sha": "6fdfea6f4517561c2595426e07347c193729bda3"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-abilities-reference",
+      "name": "accelerate-abilities-reference",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-abilities-reference/SKILL.md",
+      "sha": "26c82247644b9daa79f122be9351e0be020bd610"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-campaigns",
+      "name": "accelerate-campaigns",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-campaigns/SKILL.md",
+      "sha": "3af43630ab95a52067ba90e06247292812db06ec"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-content-plan",
+      "name": "accelerate-content-plan",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-content-plan/SKILL.md",
+      "sha": "cd2cf84c029b60c71714524c49a1cae594492a28"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-design",
+      "name": "accelerate-design",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-design/SKILL.md",
+      "sha": "3ff71049a9655d1e0f311a433eace785581a3547"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-diagnose",
+      "name": "accelerate-diagnose",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-diagnose/SKILL.md",
+      "sha": "fd3ff68eaf265fa6e6e950711e2a214254a3e6b7"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-evolve",
+      "name": "accelerate-evolve",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-evolve/SKILL.md",
+      "sha": "661ef0b2433085e71fb492102905e515f277b78c"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-opportunities",
+      "name": "accelerate-opportunities",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-opportunities/SKILL.md",
+      "sha": "97b05f3ff2516260633ce7834d9d7729b3ec86d4"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-optimize-landing-page",
+      "name": "accelerate-optimize-landing-page",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-optimize-landing-page/SKILL.md",
+      "sha": "30067cd4c72ea34b9f5ae0885393994eeea2c779"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-personalize",
+      "name": "accelerate-personalize",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-personalize/SKILL.md",
+      "sha": "63933f322770ff3beaf461a110d2fd32988bde5f"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-realtime",
+      "name": "accelerate-realtime",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-realtime/SKILL.md",
+      "sha": "0c0a5a0ab1186ef51bcb41a57c57ab732896e3fe"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-review",
+      "name": "accelerate-review",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-review/SKILL.md",
+      "sha": "a3ed11ff80b9ff2ceef351779bf4c40c568a6606"
+    },
+    {
+      "id": "humanmade/accelerate-ai-toolkit:skills/accelerate-test",
+      "name": "accelerate-test",
+      "repo": "humanmade/accelerate-ai-toolkit",
+      "path": "skills/accelerate-test/SKILL.md",
+      "sha": "1df0b3386c59617ced04a69d5b6ea52781704c7a"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-asset-audit",
+      "name": "competitive-asset-audit",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-asset-audit/SKILL.md",
+      "sha": "b8319f3b1810c594b79024a9ea4d1f5086f23ff0"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-battlecard",
+      "name": "competitive-battlecard",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-battlecard/SKILL.md",
+      "sha": "edf3b7acacd64fd7c0b6d33183463e0a346e1601"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-deal-prep",
+      "name": "competitive-deal-prep",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-deal-prep/SKILL.md",
+      "sha": "d84a2be8b83b91a2b670134af9138b433189364f"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-deep-dive",
+      "name": "competitive-deep-dive",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-deep-dive/SKILL.md",
+      "sha": "9705594a42abea650a8e5aea60009a7807bf1428"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-enablement-refresh",
+      "name": "competitive-enablement-refresh",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-enablement-refresh/SKILL.md",
+      "sha": "7aef3798dca181c167394332ea8150a34ca11b5f"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-executive-market-brief",
+      "name": "competitive-executive-market-brief",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-executive-market-brief/SKILL.md",
+      "sha": "de788511a5e6b48d8cfe20ece2536a8f3bd34d95"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-launch-readiness",
+      "name": "competitive-launch-readiness",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-launch-readiness/SKILL.md",
+      "sha": "3fa3cafb7e98c478103da0ccac3d71473f78e181"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-market-briefing",
+      "name": "competitive-market-briefing",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-market-briefing/SKILL.md",
+      "sha": "1a2215a15b0f223ebbc14bfa6adea99764f986c1"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-market-shift-analysis",
+      "name": "competitive-market-shift-analysis",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-market-shift-analysis/SKILL.md",
+      "sha": "ba91b7f9f3351bdc9d2e0adb8ebf756adacc3d68"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-messaging-audit",
+      "name": "competitive-messaging-audit",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-messaging-audit/SKILL.md",
+      "sha": "e47d024b28452d146877c592a1af649d557d9856"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-objection-response",
+      "name": "competitive-objection-response",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-objection-response/SKILL.md",
+      "sha": "23c28348d6a2d9338c61008bcca89fbfb2de7b24"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-poc-rfp-plan",
+      "name": "competitive-poc-rfp-plan",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-poc-rfp-plan/SKILL.md",
+      "sha": "e082f759b6cc3e9ceaee09bc3bdee45f7c91f2a8"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-positioning",
+      "name": "competitive-positioning",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-positioning/SKILL.md",
+      "sha": "37efeed35aa2c0779c3e492eceab11a44e3a0b2c"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-pricing-packaging-review",
+      "name": "competitive-pricing-packaging-review",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-pricing-packaging-review/SKILL.md",
+      "sha": "ebd1e6e00f389e3dd62b2071262426c83adb1324"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-roadmap-review",
+      "name": "competitive-roadmap-review",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-roadmap-review/SKILL.md",
+      "sha": "4c7a3c74efc44cccb2cf8c43b0ca84f9df9fdd69"
+    },
+    {
+      "id": "lmtydotcom/skills:skills/competitive-win-loss-analysis",
+      "name": "competitive-win-loss-analysis",
+      "repo": "lmtydotcom/skills",
+      "path": "skills/competitive-win-loss-analysis/SKILL.md",
+      "sha": "5b7b745351e6d75b155dd9a2563af73dea311443"
+    },
+    {
+      "id": "marky-team/marky-skills:skills/build-brand-kit",
+      "name": "build-brand-kit",
+      "repo": "marky-team/marky-skills",
+      "path": "skills/build-brand-kit/SKILL.md",
+      "sha": "1a5efc4e139c38a81cbe41a0ded63eba59c1d9db"
+    },
+    {
+      "id": "marky-team/marky-skills:skills/create-post-carousel",
+      "name": "create-post-carousel",
+      "repo": "marky-team/marky-skills",
+      "path": "skills/create-post-carousel/SKILL.md",
+      "sha": "ed00ed5bc1781a5f6ce2e5fd55ab2202be26160b"
+    },
+    {
+      "id": "marky-team/marky-skills:skills/create-post-countdown",
+      "name": "create-post-countdown",
+      "repo": "marky-team/marky-skills",
+      "path": "skills/create-post-countdown/SKILL.md",
+      "sha": "254a52be4935c2469192fd1e8a1c6e94fa110f81"
+    },
+    {
+      "id": "marky-team/marky-skills:skills/create-post-from-image",
+      "name": "create-post-from-image",
+      "repo": "marky-team/marky-skills",
+      "path": "skills/create-post-from-image/SKILL.md",
+      "sha": "87d63992f319632862298f40a382e0fca329b1ee"
+    },
+    {
+      "id": "marky-team/marky-skills:skills/create-post-variations",
+      "name": "create-post-variations",
+      "repo": "marky-team/marky-skills",
+      "path": "skills/create-post-variations/SKILL.md",
+      "sha": "71e34d34ff5e887b1d299211a859182b5281a20a"
+    },
+    {
+      "id": "marky-team/marky-skills:skills/get-started",
+      "name": "get-started",
+      "repo": "marky-team/marky-skills",
+      "path": "skills/get-started/SKILL.md",
+      "sha": "cbc768ae8cd84b578fa46cd9eb6004cb13607900"
+    },
+    {
+      "id": "marky-team/marky-skills:skills/humanize",
+      "name": "humanize",
+      "repo": "marky-team/marky-skills",
+      "path": "skills/humanize/SKILL.md",
+      "sha": "701fdd948fee8106940ac23730eba034a77ce36c"
+    },
+    {
+      "id": "marky-team/marky-skills:skills/manage-library",
+      "name": "manage-library",
+      "repo": "marky-team/marky-skills",
+      "path": "skills/manage-library/SKILL.md",
+      "sha": "bae9f0ff5dac89a74e5b35ebd2932fff650a397a"
+    },
+    {
+      "id": "marky-team/marky-skills:skills/marky-api",
+      "name": "marky-api",
+      "repo": "marky-team/marky-skills",
+      "path": "skills/marky-api/SKILL.md",
+      "sha": "4efb2313eac522d537ae9d4d0c155dd61f1528ab"
+    },
+    {
+      "id": "marky-team/marky-skills:skills/review-performance",
+      "name": "review-performance",
+      "repo": "marky-team/marky-skills",
+      "path": "skills/review-performance/SKILL.md",
+      "sha": "21abeb6e107c6d384d4c12e0662e509726adb41c"
+    },
+    {
+      "id": "marky-team/marky-skills:skills/suggest-topics",
+      "name": "suggest-topics",
+      "repo": "marky-team/marky-skills",
+      "path": "skills/suggest-topics/SKILL.md",
+      "sha": "d552d55c46010f37a05063ebab024f855bf99ea7"
+    },
+    {
+      "id": "playcanvas/skills:skills/add-effects",
+      "name": "add-effects",
+      "repo": "playcanvas/skills",
+      "path": "skills/add-effects/SKILL.md",
+      "sha": "98d7f1798b10bcb273c7f9913acc89d2447ee8e7"
+    },
+    {
+      "id": "playcanvas/skills:skills/apply-conventions",
+      "name": "apply-conventions",
+      "repo": "playcanvas/skills",
+      "path": "skills/apply-conventions/SKILL.md",
+      "sha": "6ebe4b23c4d0bcbbbf5822e9475360631528ee16"
+    },
+    {
+      "id": "playcanvas/skills:skills/assemble-scene",
+      "name": "assemble-scene",
+      "repo": "playcanvas/skills",
+      "path": "skills/assemble-scene/SKILL.md",
+      "sha": "e0be4025407e0ebc6ea23ab9cf97502bb7a1ab78"
+    },
+    {
+      "id": "playcanvas/skills:skills/bake-lighting",
+      "name": "bake-lighting",
+      "repo": "playcanvas/skills",
+      "path": "skills/bake-lighting/SKILL.md",
+      "sha": "25df45ccf3772f7f78ad9716d6e85da0a4df1340"
+    },
+    {
+      "id": "playcanvas/skills:skills/build-app",
+      "name": "build-app",
+      "repo": "playcanvas/skills",
+      "path": "skills/build-app/SKILL.md",
+      "sha": "145b9e586d9b781958c68fcc330080958d9cfbbe"
+    },
+    {
+      "id": "playcanvas/skills:skills/calibrate-model",
+      "name": "calibrate-model",
+      "repo": "playcanvas/skills",
+      "path": "skills/calibrate-model/SKILL.md",
+      "sha": "134b703b5c8701b935a4c2d98363f8d8501f6cea"
+    },
+    {
+      "id": "playcanvas/skills:skills/configure-animation",
+      "name": "configure-animation",
+      "repo": "playcanvas/skills",
+      "path": "skills/configure-animation/SKILL.md",
+      "sha": "84ab18c0e7441f8494c1c190b300c2b88aa0ce76"
+    },
+    {
+      "id": "playcanvas/skills:skills/find-examples",
+      "name": "find-examples",
+      "repo": "playcanvas/skills",
+      "path": "skills/find-examples/SKILL.md",
+      "sha": "ca15e1e63b14ae01a1fb6b55ce57b69373d32703"
+    },
+    {
+      "id": "playcanvas/skills:skills/inspect-glb",
+      "name": "inspect-glb",
+      "repo": "playcanvas/skills",
+      "path": "skills/inspect-glb/SKILL.md",
+      "sha": "7b900e74275e9d7527d1865f6d1df4753d2b331f"
+    },
+    {
+      "id": "playcanvas/skills:skills/inspect-runtime",
+      "name": "inspect-runtime",
+      "repo": "playcanvas/skills",
+      "path": "skills/inspect-runtime/SKILL.md",
+      "sha": "a6027206343ddc8f3d2aa9fa51b6714c29e9fd53"
+    },
+    {
+      "id": "playcanvas/skills:skills/light-scene",
+      "name": "light-scene",
+      "repo": "playcanvas/skills",
+      "path": "skills/light-scene/SKILL.md",
+      "sha": "c05ffcbc87ec35d7e562509550fd86013ce67513"
+    },
+    {
+      "id": "playcanvas/skills:skills/load-assets",
+      "name": "load-assets",
+      "repo": "playcanvas/skills",
+      "path": "skills/load-assets/SKILL.md",
+      "sha": "261b824c4d26a45a685a7333beedaf7b082bf446"
+    },
+    {
+      "id": "playcanvas/skills:skills/override-shader-chunks",
+      "name": "override-shader-chunks",
+      "repo": "playcanvas/skills",
+      "path": "skills/override-shader-chunks/SKILL.md",
+      "sha": "8c58f60243646c8d50dbf22240b6c5f45c263218"
+    },
+    {
+      "id": "playcanvas/skills:skills/reduce-draw-calls",
+      "name": "reduce-draw-calls",
+      "repo": "playcanvas/skills",
+      "path": "skills/reduce-draw-calls/SKILL.md",
+      "sha": "eeffe685906deaa432c2782118ece40398705751"
+    },
+    {
+      "id": "playcanvas/skills:skills/reuse-scripts",
+      "name": "reuse-scripts",
+      "repo": "playcanvas/skills",
+      "path": "skills/reuse-scripts/SKILL.md",
+      "sha": "c4c4677046dceeafdf7e582068da8c48eca538ee"
+    },
+    {
+      "id": "playcanvas/skills:skills/verify-pixels",
+      "name": "verify-pixels",
+      "repo": "playcanvas/skills",
+      "path": "skills/verify-pixels/SKILL.md",
+      "sha": "2536d39dde5be5f4968ae9bd2e97a0c21b6bf909"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/aspire-tone-brief",
+      "name": "aspire-tone-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/aspire-tone-brief/SKILL.md",
+      "sha": "a3603b2b1bd3e15ab20184df71c9753a439f638f"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/authority-ad-brief",
+      "name": "authority-ad-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/authority-ad-brief/SKILL.md",
+      "sha": "36354dd210bc331c36982d0d70a6d21fcf5ac9fc"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/brief-creator",
+      "name": "brief-creator",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/brief-creator/SKILL.md",
+      "sha": "3b801a2ae6c88c541889f4827590e791b7c4d620"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/commitment-consistency-ad-brief",
+      "name": "commitment-consistency-ad-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/commitment-consistency-ad-brief/SKILL.md",
+      "sha": "cae9900fea5dbbe2d8d6b0a1d972651c864b0a47"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/creator-finder",
+      "name": "creator-finder",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/creator-finder/SKILL.md",
+      "sha": "8c7a73f0210da7cd32af346520ef1ea3151aa142"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/footage-gap-finder",
+      "name": "footage-gap-finder",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/footage-gap-finder/SKILL.md",
+      "sha": "a3ce47c216eba8bc6f33c07c0e3757fa6128c124"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/herd-psychology-brief",
+      "name": "herd-psychology-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/herd-psychology-brief/SKILL.md",
+      "sha": "31385947df76fb7c851f171ea6dee11227454c7f"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/hook-explorer",
+      "name": "hook-explorer",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/hook-explorer/SKILL.md",
+      "sha": "cfde49d9003487cd67d101f9f0d3834b4eb1afb3"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/liking-ad-brief",
+      "name": "liking-ad-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/liking-ad-brief/SKILL.md",
+      "sha": "f42e86b05b6bf3c8db0390a5dcb618320b35bd3a"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/problem-aware-ad-brief",
+      "name": "problem-aware-ad-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/problem-aware-ad-brief/SKILL.md",
+      "sha": "f9c5090cfe6559622c0b21c84ef2b5474f0cac2b"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/reciprocity-ad-brief",
+      "name": "reciprocity-ad-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/reciprocity-ad-brief/SKILL.md",
+      "sha": "3e79f43a447a291ab76a4f409164988325d97468"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/scarcity-ad-brief",
+      "name": "scarcity-ad-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/scarcity-ad-brief/SKILL.md",
+      "sha": "b4b84367ac59d58afe9a7bed297c7242ace50df2"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/social-proof-ad-brief",
+      "name": "social-proof-ad-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/social-proof-ad-brief/SKILL.md",
+      "sha": "3732432d2d42e1bf02d0d803441102fc660bbc58"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/solution-aware-ad-brief",
+      "name": "solution-aware-ad-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/solution-aware-ad-brief/SKILL.md",
+      "sha": "4dd0dd1c381340372084cd1e220dd492b5be25e8"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/uber-ad-brief",
+      "name": "uber-ad-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/uber-ad-brief/SKILL.md",
+      "sha": "ac385ba713342759a68c78d2a156c00c74b182d3"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/unaware-ad-brief",
+      "name": "unaware-ad-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/unaware-ad-brief/SKILL.md",
+      "sha": "7adfd4eb9727ca5d59e7c6e590b65c44f48acc70"
+    },
+    {
+      "id": "recharm/claude-plugin:skills/unity-ad-brief",
+      "name": "unity-ad-brief",
+      "repo": "recharm/claude-plugin",
+      "path": "skills/unity-ad-brief/SKILL.md",
+      "sha": "d0ca2662553db39d82da9b42d95f1b260cb22bfe"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/call-followup-email",
+      "name": "call-followup-email",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/call-followup-email/SKILL.md",
+      "sha": "0983299091b8d3d83fc5d4278a476894a099567f"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/call-recap",
+      "name": "call-recap",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/call-recap/SKILL.md",
+      "sha": "cd6ce83b420d2e1f7a1d0ac153844f832a5fc1a4"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/colleague-lookup",
+      "name": "colleague-lookup",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/colleague-lookup/SKILL.md",
+      "sha": "ff5c7c761d6ffbf9cdd432a9ba5bc708e0c7d104"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/communications-brief",
+      "name": "communications-brief",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/communications-brief/SKILL.md",
+      "sha": "f902c3a34eb99a5bfe18e58a07593dca0cf38972"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/fax-inbox",
+      "name": "fax-inbox",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/fax-inbox/SKILL.md",
+      "sha": "b404ac383ff600599bcd0a450dc31fe16287bf36"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/manage-adaptive-cards",
+      "name": "manage-adaptive-cards",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/manage-adaptive-cards/SKILL.md",
+      "sha": "27cf722c07f8801997d221d188293552b1791a36"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/manage-events",
+      "name": "manage-events",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/manage-events/SKILL.md",
+      "sha": "4c3bbdb31a1f28563c33f9bc7275b3aa792b4065"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/manage-notes",
+      "name": "manage-notes",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/manage-notes/SKILL.md",
+      "sha": "b76e56eda42b83e9a1550cfa4a685a0434c856ac"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/manage-tasks",
+      "name": "manage-tasks",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/manage-tasks/SKILL.md",
+      "sha": "238ffd0e10957c9d31614eb5c2c0da85842865b5"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/manage-teams",
+      "name": "manage-teams",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/manage-teams/SKILL.md",
+      "sha": "687e65f20491fa999572f8f2b029d056512966bf"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/manage-webhooks",
+      "name": "manage-webhooks",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/manage-webhooks/SKILL.md",
+      "sha": "e9fb64402f33cdd5edfcb022fd78f000ab665cb2"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/post-to-chat",
+      "name": "post-to-chat",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/post-to-chat/SKILL.md",
+      "sha": "9bc2cf46746e8e3b36fcb42366ec69ac90fadc90"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/read-team-chat",
+      "name": "read-team-chat",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/read-team-chat/SKILL.md",
+      "sha": "603c5940772480c2696daf37654f1e26a87e14fb"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/send-sms",
+      "name": "send-sms",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/send-sms/SKILL.md",
+      "sha": "96c4198331c6b34272cf6547847229e341b9a6a7"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/sms-inbox",
+      "name": "sms-inbox",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/sms-inbox/SKILL.md",
+      "sha": "988db56da6c46f135acebe85ef204b458aab8b43"
+    },
+    {
+      "id": "ringcentral/ringex-claude-plugin:skills/voicemail-inbox",
+      "name": "voicemail-inbox",
+      "repo": "ringcentral/ringex-claude-plugin",
+      "path": "skills/voicemail-inbox/SKILL.md",
+      "sha": "cfbe90ab3d6dde24e917404dca2f49fffcdbb3a9"
+    },
+    {
+      "id": "spiceai/skills:skills/acceleration",
+      "name": "acceleration",
+      "repo": "spiceai/skills",
+      "path": "skills/acceleration/SKILL.md",
+      "sha": "b92333b0ffb7dabf554ff1d5c2de1a6787af00af"
+    },
+    {
+      "id": "spiceai/skills:skills/accelerators",
+      "name": "accelerators",
+      "repo": "spiceai/skills",
+      "path": "skills/accelerators/SKILL.md",
+      "sha": "6882008e854ec70a2f89008d6ab32cbdb87635a4"
+    },
+    {
+      "id": "spiceai/skills:skills/cache",
+      "name": "cache",
+      "repo": "spiceai/skills",
+      "path": "skills/cache/SKILL.md",
+      "sha": "30dacdad5a8c0a62d06b1ebee6efd01ed8a7cc10"
+    },
+    {
+      "id": "spiceai/skills:skills/chat",
+      "name": "chat",
+      "repo": "spiceai/skills",
+      "path": "skills/chat/SKILL.md",
+      "sha": "23a8e6f6a6905ccd8f02fecb9da65f4e843ee380"
+    },
+    {
+      "id": "spiceai/skills:skills/cloud",
+      "name": "cloud",
+      "repo": "spiceai/skills",
+      "path": "skills/cloud/SKILL.md",
+      "sha": "976b4006f03b14d2cfc4a547d14a237e798e5fa8"
+    },
+    {
+      "id": "spiceai/skills:skills/connectors",
+      "name": "connectors",
+      "repo": "spiceai/skills",
+      "path": "skills/connectors/SKILL.md",
+      "sha": "343108e7f505ce061a26dcd0c39054f2fe06f706"
+    },
+    {
+      "id": "spiceai/skills:skills/cookbook",
+      "name": "cookbook",
+      "repo": "spiceai/skills",
+      "path": "skills/cookbook/SKILL.md",
+      "sha": "3655392a6f0a64f23d32cac947ba1aa066dbe0f0"
+    },
+    {
+      "id": "spiceai/skills:skills/datasets",
+      "name": "datasets",
+      "repo": "spiceai/skills",
+      "path": "skills/datasets/SKILL.md",
+      "sha": "9f8f699d2acfd76e9d005854c7553e4cf53a2d2a"
+    },
+    {
+      "id": "spiceai/skills:skills/models",
+      "name": "models",
+      "repo": "spiceai/skills",
+      "path": "skills/models/SKILL.md",
+      "sha": "712ff810f81490e2c18c3246a3463a83bce9f0bc"
+    },
+    {
+      "id": "spiceai/skills:skills/sdk",
+      "name": "sdk",
+      "repo": "spiceai/skills",
+      "path": "skills/sdk/SKILL.md",
+      "sha": "1f1f37c8c9867c7a8d7f95fd1dc7af6070bfea5d"
+    },
+    {
+      "id": "spiceai/skills:skills/search",
+      "name": "search",
+      "repo": "spiceai/skills",
+      "path": "skills/search/SKILL.md",
+      "sha": "27e4fbc4709f0a904322f006907dd75e08240aa5"
+    },
+    {
+      "id": "spiceai/skills:skills/secrets",
+      "name": "secrets",
+      "repo": "spiceai/skills",
+      "path": "skills/secrets/SKILL.md",
+      "sha": "67402492d34902698b0424cf9ec662d81229ef96"
+    },
+    {
+      "id": "spiceai/skills:skills/setup",
+      "name": "setup",
+      "repo": "spiceai/skills",
+      "path": "skills/setup/SKILL.md",
+      "sha": "a997aea940c0ed14a49d7d0e419ae9457df51fc4"
+    },
+    {
+      "id": "spiceai/skills:skills/spicepod",
+      "name": "spicepod",
+      "repo": "spiceai/skills",
+      "path": "skills/spicepod/SKILL.md",
+      "sha": "b554395f2f7ee57b680799fa59e76236569d6041"
+    },
+    {
+      "id": "spiceai/skills:skills/sql",
+      "name": "sql",
+      "repo": "spiceai/skills",
+      "path": "skills/sql/SKILL.md",
+      "sha": "8340e8d12f234b4dc587c6c0c1735f3038e87737"
+    },
+    {
+      "id": "spiceai/skills:skills/terraform",
+      "name": "terraform",
+      "repo": "spiceai/skills",
+      "path": "skills/terraform/SKILL.md",
+      "sha": "12cdd89feed0557b4194020245e0db782958d20a"
+    },
+    {
+      "id": "wix/skills:skills/wix-base44-connector",
+      "name": "wix-base44-connector",
+      "repo": "wix/skills",
+      "path": "skills/wix-base44-connector/SKILL.md",
+      "sha": "7d9ccfcfca2bb0de5d1e1bba98973e7fc0ff34e6"
+    },
+    {
+      "id": "wix/skills:skills/wix-headless-cold-start",
+      "name": "wix-headless-cold-start",
+      "repo": "wix/skills",
+      "path": "skills/wix-headless-cold-start/SKILL.md",
+      "sha": "de51cf3304cabc4451b6247a65ede4964bf38692"
+    },
+    {
+      "id": "wix/skills:skills/wix-vibe-headless",
+      "name": "wix-vibe-headless",
+      "repo": "wix/skills",
+      "path": "skills/wix-vibe-headless/SKILL.md",
+      "sha": "d559e5258dc492c82fa12ab9d546a455af54b873"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/birthdays",
+      "name": "birthdays",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/birthdays/SKILL.md",
+      "sha": "badccb4df3e8f6960c54825947a02780f3bb2023"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/bookmarks",
+      "name": "bookmarks",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/bookmarks/SKILL.md",
+      "sha": "b927e6b58d4f82f2b7935f6a1c6e1322a5b26e59"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/calendar",
+      "name": "calendar",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/calendar/SKILL.md",
+      "sha": "888b4bf9dda4eed47fa3a8d3fad6ee6fc5381e19"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/check-ins",
+      "name": "check-ins",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/check-ins/SKILL.md",
+      "sha": "c021e2843e2d5663c9a07ba173434b9b4108742d"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/grocery-list",
+      "name": "grocery-list",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/grocery-list/SKILL.md",
+      "sha": "5cac069d34a027cc43014bde96945ffb860a0bd9"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/habits",
+      "name": "habits",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/habits/SKILL.md",
+      "sha": "916f01e11d36ec538c9527101d65e5ac0dfbb5cf"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/meal-plan",
+      "name": "meal-plan",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/meal-plan/SKILL.md",
+      "sha": "ab166413396c2311a134437b4eeedc3ee49eaaa5"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/notes",
+      "name": "notes",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/notes/SKILL.md",
+      "sha": "d335f3ff68d6492eb02b22f5b32d02fd9155273e"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/people",
+      "name": "people",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/people/SKILL.md",
+      "sha": "c84babc962f2e5584bfdf47898f236e6ec6fbad6"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/projects",
+      "name": "projects",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/projects/SKILL.md",
+      "sha": "1710e97faba5dffa8f36dc5e9a8c77f9b35be33f"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/recipes",
+      "name": "recipes",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/recipes/SKILL.md",
+      "sha": "46be45b968af7b35e6ab21976dfa2108ae69722d"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/reminders",
+      "name": "reminders",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/reminders/SKILL.md",
+      "sha": "ddc90a8c2281a1bb0d654e1fcf97783d440d00d0"
+    },
+    {
+      "id": "yourbeckett/beckett-for-claude:skills/start",
+      "name": "start",
+      "repo": "yourbeckett/beckett-for-claude",
+      "path": "skills/start/SKILL.md",
+      "sha": "ff7ffdf588054e95d855fbfdf5e118e828591674"
+    }
+  ],
+  "cutoverValidationPassed": true,
+  "existingRecordsChanged": 0,
+  "productionDataChanged": false,
+  "combinedCrawlRun": false,
+  "published": false,
+  "archive": "/Users/jonslimak/Projects/omgskills/index/shadow/directory3000-wave6-20261023"
+}

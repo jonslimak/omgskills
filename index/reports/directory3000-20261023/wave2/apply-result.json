@@ -1,0 +1,1731 @@
+{
+  "generatedAt": "2026-10-23T20:49:51.948Z",
+  "wave": "wave2",
+  "summary": {
+    "planCandidateCount": 242,
+    "finalCount": 242,
+    "pendingCount": 0,
+    "addedCount": 242,
+    "existingCount": 0,
+    "policySkippedCount": 0,
+    "stableFailedCount": 0,
+    "transientFailedCount": 0
+  },
+  "sharedApproval": {
+    "changedCreators": [
+      "appsvortex",
+      "metafloor-ai",
+      "dtsong",
+      "marfoerst",
+      "thejefflarson"
+    ],
+    "beforeRevision": "sha256:28d5012103cb9282a86f5f19ee4b57d9f2fbfa9a36cc925b2df742374c8b242a",
+    "afterRevision": "sha256:eae2ab538f0a1cbe7f8e7657222e71c2f3703b1fe5770c4a02c7e1828e341734"
+  },
+  "priorAdditionsPreserved": 1625,
+  "totalCampaignAdditions": 1867,
+  "beforeCount": 49315,
+  "afterCount": 49557,
+  "addedSkills": [
+    {
+      "id": "appsvortex/arness:plugins/arn-code/skills/arn-code-taskify",
+      "name": "arn-code-taskify",
+      "repo": "appsvortex/arness",
+      "path": "plugins/arn-code/skills/arn-code-taskify/SKILL.md",
+      "sha": "3682c461243e7a2ffef325201999530ba7058e6c"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/advocate-a11y-audit",
+      "name": "a11y-audit",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/advocate-a11y-audit/SKILL.md",
+      "sha": "85ff79cf32a1b4e0be6dc746c0c323cd9330cd0b"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/advocate-i18n-review",
+      "name": "i18n-review",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/advocate-i18n-review/SKILL.md",
+      "sha": "818e784cf579b4ea0f3a0bea9740fabffc0dda7d"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/advocate-interaction-design",
+      "name": "interaction-design",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/advocate-interaction-design/SKILL.md",
+      "sha": "0650831318245963e2eff4ea21d13a750b56b516"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/advocate-journey-mapping",
+      "name": "journey-mapping",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/advocate-journey-mapping/SKILL.md",
+      "sha": "62c5d87dae8bc03b4a45260b04a66d5f3a71bbc8"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/alchemist-ml-workflow",
+      "name": "ml-workflow",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/alchemist-ml-workflow/SKILL.md",
+      "sha": "d0c36d0c814fc61053a37331dfbaac53d69847a5"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/alchemist-pipeline-design",
+      "name": "pipeline-design",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/alchemist-pipeline-design/SKILL.md",
+      "sha": "d3a41df5fad7f865ee89be7f11fa0aed3e948a32"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/alchemist-schema-evaluation",
+      "name": "schema-evaluation",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/alchemist-schema-evaluation/SKILL.md",
+      "sha": "0fcec9a38aa7e69bfac86a8185c620318bffc58c"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/architect-api-design",
+      "name": "api-design",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/architect-api-design/SKILL.md",
+      "sha": "944ed161e22dafd59c735e10f2b5e3ec05dbbd43"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/architect-codebase-context",
+      "name": "codebase-context",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/architect-codebase-context/SKILL.md",
+      "sha": "5088ad663c1c1bfffec246a7a467aafbdc43773c"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/architect-distributed-patterns",
+      "name": "distributed-patterns",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/architect-distributed-patterns/SKILL.md",
+      "sha": "3d9d278a55f75365b6932b0dd4a0ebce7e7603ae"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/architect-schema-design",
+      "name": "schema-design",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/architect-schema-design/SKILL.md",
+      "sha": "63aae046b0e2532357a1a5f5ffa3bd98e9f23b53"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/artisan-design-system-architecture",
+      "name": "design-system-architecture",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/artisan-design-system-architecture/SKILL.md",
+      "sha": "c2322273371af220da8ba5d140aaf31fb0d7c3d9"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/artisan-motion-design",
+      "name": "motion-design",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/artisan-motion-design/SKILL.md",
+      "sha": "99753f304698ee2ebbdc720d4b9edf894ce918d4"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/artisan-visual-audit",
+      "name": "visual-audit",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/artisan-visual-audit/SKILL.md",
+      "sha": "f7b6a614e7c8f63919727b7372677249d1ce4fd1"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/chronicler-adr-template",
+      "name": "adr-template",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/chronicler-adr-template/SKILL.md",
+      "sha": "e5ff5e14aa8176105d59f7b9ddbe33b087be1a09"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/chronicler-documentation-plan",
+      "name": "documentation-plan",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/chronicler-documentation-plan/SKILL.md",
+      "sha": "31f3a243498bdd15a7f4363904124764916f8511"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/cipher-crypto-review",
+      "name": "crypto-review",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/cipher-crypto-review/SKILL.md",
+      "sha": "81f2b97614d951245f8130403607dbbe98ac0aa2"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/cipher-pqc-readiness",
+      "name": "pqc-readiness",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/cipher-pqc-readiness/SKILL.md",
+      "sha": "ea829f5d8538aebea50ac53afb5de297909ebe6a"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/cipher-protocol-analysis",
+      "name": "protocol-analysis",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/cipher-protocol-analysis/SKILL.md",
+      "sha": "cbd1ae3a70744ae854c7cad55f1e845df90f2aaf"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/craftsman-e2e-testing",
+      "name": "e2e-testing",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/craftsman-e2e-testing/SKILL.md",
+      "sha": "779c02f05edb2de87adead8438f90884e0d7f12c"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/craftsman-pattern-analysis",
+      "name": "pattern-analysis",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/craftsman-pattern-analysis/SKILL.md",
+      "sha": "b8d32dfadc0cd89b18112f943db4c637d2aa88d8"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/craftsman-testing-strategy",
+      "name": "testing-strategy",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/craftsman-testing-strategy/SKILL.md",
+      "sha": "f1568ce9807283d6a8d366a38abdd3c3eea18b06"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/finance-close-checklist",
+      "name": "finance-close-checklist",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/finance-close-checklist/SKILL.md",
+      "sha": "a92d680e27a65b13a6d65af3ea89b33f302a52d3"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/finance-controls-audit",
+      "name": "finance-controls-audit",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/finance-controls-audit/SKILL.md",
+      "sha": "448d9bca966ee7a2f9b4b3f75dcb62b23c23f26f"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/finance-journal-entries",
+      "name": "finance-journal-entries",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/finance-journal-entries/SKILL.md",
+      "sha": "267a4951a62fc9320ebeacfcd2ed29fdd289f6f0"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/finance-reconciliation",
+      "name": "finance-reconciliation",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/finance-reconciliation/SKILL.md",
+      "sha": "734b3e8bfb6ec862145ec1ad1b85ec26c1f2bbd0"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/finance-tax-research",
+      "name": "finance-tax-research",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/finance-tax-research/SKILL.md",
+      "sha": "66040697d77a0ffe18d9ec75c51f70e10fdbc296"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/finance-variance-analysis",
+      "name": "finance-variance-analysis",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/finance-variance-analysis/SKILL.md",
+      "sha": "f92b0d54b4e4520bda7afedae6184108d4060478"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/guardian-audit-trail-design",
+      "name": "audit-trail-design",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/guardian-audit-trail-design/SKILL.md",
+      "sha": "b8d653c83c49d2a7022840843b9b4bc1dd8c28c0"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/guardian-compliance-review",
+      "name": "compliance-review",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/guardian-compliance-review/SKILL.md",
+      "sha": "5bbf0cbc7fbec00f9510ed242f47481c639937e3"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/guardian-data-classification",
+      "name": "data-classification",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/guardian-data-classification/SKILL.md",
+      "sha": "75a1d2548d084f11a008c1fbdc45766183e80057"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/herald-growth-engineering",
+      "name": "growth-engineering",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/herald-growth-engineering/SKILL.md",
+      "sha": "87aa3f8ac479b26fd8b6b832fbc41ba518d8166e"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/herald-messaging-strategy",
+      "name": "messaging-strategy",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/herald-messaging-strategy/SKILL.md",
+      "sha": "f2c130db8196666e6198a595a5b8e806bceb9fda"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/herald-monetization-design",
+      "name": "monetization-design",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/herald-monetization-design/SKILL.md",
+      "sha": "fec6b4c82c8265bafafee2df2cc16752b1cefe94"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/operator-cost-analysis",
+      "name": "cost-analysis",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/operator-cost-analysis/SKILL.md",
+      "sha": "8f14a70ad5ed7b58fde7826e13aba9433553e66e"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/operator-deployment-plan",
+      "name": "deployment-plan",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/operator-deployment-plan/SKILL.md",
+      "sha": "314dbc494d993991fe5183ef2ada4fc2f4e8ee09"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/operator-finops-analysis",
+      "name": "finops-analysis",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/operator-finops-analysis/SKILL.md",
+      "sha": "e26abb0a7c6932e53347b9f0753d1b5851d0780e"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/operator-observability-design",
+      "name": "observability-design",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/operator-observability-design/SKILL.md",
+      "sha": "ed369057b0488804a9083b82462cdbbcb1cdd776"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/oracle-ai-evaluation",
+      "name": "ai-evaluation",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/oracle-ai-evaluation/SKILL.md",
+      "sha": "ea75180b18a48f3d7a3067ea1238a2bc5ec948cb"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/oracle-rag-architecture",
+      "name": "rag-architecture",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/oracle-rag-architecture/SKILL.md",
+      "sha": "2a4bf3db503d3961a76348c7fd5915a11895eba6"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/pathfinder-device-integration",
+      "name": "device-integration",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/pathfinder-device-integration/SKILL.md",
+      "sha": "93727b7723af44d83915d06b0cd79ffa52ae0d9b"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/pathfinder-navigation-design",
+      "name": "navigation-design",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/pathfinder-navigation-design/SKILL.md",
+      "sha": "9dc6fedc569fd03563feeb7845b4aed5d532b867"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/pathfinder-platform-audit",
+      "name": "platform-audit",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/pathfinder-platform-audit/SKILL.md",
+      "sha": "ffd6dcbc1879b61a87400f498abd84876e7f381e"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/prover-formal-spec",
+      "name": "formal-spec",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/prover-formal-spec/SKILL.md",
+      "sha": "5940a1ae87a619c7eab6a2fae63dfe2bbe005b2e"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/prover-invariant-analysis",
+      "name": "invariant-analysis",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/prover-invariant-analysis/SKILL.md",
+      "sha": "cfe60c520dc1d763bce6b9db4c6ef76dc2028bf7"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/scout-competitive-analysis",
+      "name": "competitive-analysis",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/scout-competitive-analysis/SKILL.md",
+      "sha": "76cd34a3ad489c4e7b7f46eca47d9995bae8e2d1"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/scout-enterprise-search-strategy",
+      "name": "enterprise-search-strategy",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/scout-enterprise-search-strategy/SKILL.md",
+      "sha": "dfff68493121ee4997e6f37f816ea25bf0fa85c0"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/scout-library-evaluation",
+      "name": "library-evaluation",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/scout-library-evaluation/SKILL.md",
+      "sha": "1b50a1ec2f398eb56f9eab39e661be77709438bf"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/scout-technology-radar",
+      "name": "technology-radar",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/scout-technology-radar/SKILL.md",
+      "sha": "345e08df064996eea109383ff51ae324c87f54f1"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/sentinel-embedded-architecture",
+      "name": "embedded-architecture",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/sentinel-embedded-architecture/SKILL.md",
+      "sha": "a9ffbf22cd66005499cac7789ed3f32111977da1"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/sentinel-fleet-management",
+      "name": "fleet-management",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/sentinel-fleet-management/SKILL.md",
+      "sha": "b333ab684276e60022fc91fa370853818ea958e1"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/sentinel-protocol-design",
+      "name": "protocol-design",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/sentinel-protocol-design/SKILL.md",
+      "sha": "23373704cd347b62042573ad471eb5e0c67dd296"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/skeptic-edge-case-enumeration",
+      "name": "edge-case-enumeration",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/skeptic-edge-case-enumeration/SKILL.md",
+      "sha": "523070f36bc8dbbe1377b9cd09f911b5ce3895c1"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/skeptic-failure-mode-analysis",
+      "name": "failure-mode-analysis",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/skeptic-failure-mode-analysis/SKILL.md",
+      "sha": "a6f85259a30d5633d8c8d96b82cd72da9a7fc1b8"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/skeptic-threat-model",
+      "name": "threat-model",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/skeptic-threat-model/SKILL.md",
+      "sha": "d5326597dd01b91930d5184724bb0e463bf1779f"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/strategist-analytics-design",
+      "name": "analytics-design",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/strategist-analytics-design/SKILL.md",
+      "sha": "a4ee7edcb465b5225bf0828da803e062971a4a5a"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/strategist-impact-estimation",
+      "name": "impact-estimation",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/strategist-impact-estimation/SKILL.md",
+      "sha": "cd83effcd0c2fbc08fbda29bd83e4bf854866c12"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/strategist-mvp-scoping",
+      "name": "mvp-scoping",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/strategist-mvp-scoping/SKILL.md",
+      "sha": "d1a8221b0e5bd42d9b9874fa8c4d743817c1a551"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/tuner-caching-strategy",
+      "name": "caching-strategy",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/tuner-caching-strategy/SKILL.md",
+      "sha": "5dfff316598b0eb0e38fb3765bb34d232051ff8f"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/tuner-load-modeling",
+      "name": "load-modeling",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/tuner-load-modeling/SKILL.md",
+      "sha": "80230120bb41cbb15016483898d8daabadb537f3"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/tuner-performance-audit",
+      "name": "performance-audit",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/tuner-performance-audit/SKILL.md",
+      "sha": "a53451903caff63611e77b2d9ad5aa7826a85752"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/warden-hw-sw-boundary",
+      "name": "hw-sw-boundary",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/warden-hw-sw-boundary/SKILL.md",
+      "sha": "403372325c7f69a696f44cedcb206922964ebea4"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/warden-isolation-review",
+      "name": "isolation-review",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/warden-isolation-review/SKILL.md",
+      "sha": "56246c7c388584f4afc5c598a489e412cf6787fb"
+    },
+    {
+      "id": "dtsong/agentic-council:skills/warden-kernel-hardening",
+      "name": "kernel-hardening",
+      "repo": "dtsong/agentic-council",
+      "path": "skills/warden-kernel-hardening/SKILL.md",
+      "sha": "061309085b4b02cac3b68e127e4b436bf73ff176"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-ab-test",
+      "name": "pm-ab-test",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-ab-test/SKILL.md",
+      "sha": "6345ba4ee4c3ac7fd92844075d547917fe48ab7b"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-ai-pricing",
+      "name": "pm-ai-pricing",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-ai-pricing/SKILL.md",
+      "sha": "8b29e5bbbd43b6913527301dac48d9ea01ee4141"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-battlecard",
+      "name": "pm-battlecard",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-battlecard/SKILL.md",
+      "sha": "3834fcd3dd2cf24cbdb7f667bfd562fdee9c20fe"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-board-deck",
+      "name": "pm-board-deck",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-board-deck/SKILL.md",
+      "sha": "1ce1ac39b65c40093427e17b5fa8a3875cc222ca"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-build-vs-buy",
+      "name": "pm-build-vs-buy",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-build-vs-buy/SKILL.md",
+      "sha": "4ab26750feaf2f9b8c3ebe369f65f832454efad9"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-cohort-planner",
+      "name": "pm-cohort-planner",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-cohort-planner/SKILL.md",
+      "sha": "89d7d6021479f45879d753c91a77ad9b70938e6b"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-customer-success",
+      "name": "pm-customer-success",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-customer-success/SKILL.md",
+      "sha": "083ab4c4bf0eb05c31e256cce55b2d726b0f7d5e"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-dashboard-designer",
+      "name": "pm-dashboard-designer",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-dashboard-designer/SKILL.md",
+      "sha": "6214e56bb8bcf22d3849d1ea256fb0cac5f9e272"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-decision-document",
+      "name": "pm-decision-document",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-decision-document/SKILL.md",
+      "sha": "c6f15e2d0ec25dec7aa165f44ce50025bc714d45"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-devils-advocate",
+      "name": "pm-devils-advocate",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-devils-advocate/SKILL.md",
+      "sha": "30ca5e1cd993e420fa70225385313dea7e02f1c8"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-due-diligence",
+      "name": "pm-due-diligence",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-due-diligence/SKILL.md",
+      "sha": "5bf49fbc6740f58053e6c8348454258a89642745"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-executive-update",
+      "name": "pm-executive-update",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-executive-update/SKILL.md",
+      "sha": "b2b4ebf73df534d8801dda7e18fb1717ebf46b9f"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-feature-requests",
+      "name": "pm-feature-requests",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-feature-requests/SKILL.md",
+      "sha": "bcfae865d633f7639c3d9467650e45d92157be2d"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-feedback-categorizer",
+      "name": "pm-feedback-categorizer",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-feedback-categorizer/SKILL.md",
+      "sha": "04ca14bb3dd9f59a3c990d83441908fdf4776bd0"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-funnel-analyzer",
+      "name": "pm-funnel-analyzer",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-funnel-analyzer/SKILL.md",
+      "sha": "9b87013c4506467ddff255f3c6a7d76a2e9f931b"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-gtm-launch",
+      "name": "pm-gtm-launch",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-gtm-launch/SKILL.md",
+      "sha": "7e6772b0c0e6362744b4b53e2a4c4e302a97ac97"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-hub",
+      "name": "pm-hub",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-hub/SKILL.md",
+      "sha": "25266622c642e40dfc174484969818750ed05a9a"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-journey-map",
+      "name": "pm-journey-map",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-journey-map/SKILL.md",
+      "sha": "22805e3c3f6fac24ee6aeaedd79ea33d14d962c1"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-jtbd",
+      "name": "pm-jtbd",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-jtbd/SKILL.md",
+      "sha": "ca8b967f72450969d71997e9a41639d456be5e72"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-meeting-notes",
+      "name": "pm-meeting-notes",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-meeting-notes/SKILL.md",
+      "sha": "cfc2e5628ccbe83c742ade0be643d01313b9aaad"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-messaging-framework",
+      "name": "pm-messaging-framework",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-messaging-framework/SKILL.md",
+      "sha": "18e9f224a90dff50edc72f14d50a3d02ab89efe1"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-metric-framework",
+      "name": "pm-metric-framework",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-metric-framework/SKILL.md",
+      "sha": "24e2e67303b99e6eb888c3ab7380f749cadd02eb"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-migration-planner",
+      "name": "pm-migration-planner",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-migration-planner/SKILL.md",
+      "sha": "09766fbef3053171e5d56e18631011111e522047"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-north-star",
+      "name": "pm-north-star",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-north-star/SKILL.md",
+      "sha": "7fde97433c2ab83bb31c40ab8ebdab30b4f664b8"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-objection-handler",
+      "name": "pm-objection-handler",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-objection-handler/SKILL.md",
+      "sha": "89555c7e94399d0c37e9301ba199338ec26b8e16"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-okr",
+      "name": "pm-okr",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-okr/SKILL.md",
+      "sha": "177b8e55a3c17b932be7c609e5c3f5aea9d82d5d"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-onboarding-flow",
+      "name": "pm-onboarding-flow",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-onboarding-flow/SKILL.md",
+      "sha": "c2b8f26ceca2c95b9f5fdfd18c203020b479cf00"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-one-pager",
+      "name": "pm-one-pager",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-one-pager/SKILL.md",
+      "sha": "5f6c1fd41ba3098d10f108273341ac0ccb7f0807"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-opportunity-tree",
+      "name": "pm-opportunity-tree",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-opportunity-tree/SKILL.md",
+      "sha": "5dbbd3d3ad7b5b838dee2c210e8643d822c08f4b"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-pe-migration-report",
+      "name": "pm-pe-migration-report",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-pe-migration-report/SKILL.md",
+      "sha": "bc3b46524d073dd921e54dd3b1d772c5e1ade74f"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-persona-generator",
+      "name": "pm-persona-generator",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-persona-generator/SKILL.md",
+      "sha": "1f78b9d43365ab160f00ae1f1eb64917c1216422"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-postmortem",
+      "name": "pm-postmortem",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-postmortem/SKILL.md",
+      "sha": "b4015a2ac9d9c3e9e85db61b7bd1008a228fe26a"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-prd",
+      "name": "pm-prd",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-prd/SKILL.md",
+      "sha": "d9d76f278adc831869c387e860fcdf0a944aee8d"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-pricing",
+      "name": "pm-pricing",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-pricing/SKILL.md",
+      "sha": "9aa488f46b66e7aeb45b3ecc49a24e5a27707412"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-process-docs",
+      "name": "pm-process-docs",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-process-docs/SKILL.md",
+      "sha": "f318fa8f36ac33aaa78551908fc850c69266f533"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-product-brief",
+      "name": "pm-product-brief",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-product-brief/SKILL.md",
+      "sha": "46ffc5b69092cdccf6980d179344f140211b9ba2"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-productboard-insights",
+      "name": "pm-productboard-insights",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-productboard-insights/SKILL.md",
+      "sha": "45e31117d77b8a5f73b7f0c5527fba8068c2a9dc"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-quarterly-planning",
+      "name": "pm-quarterly-planning",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-quarterly-planning/SKILL.md",
+      "sha": "2e4825f3d505a48941bcbb428aa8794ebfe3f18e"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-release-notes",
+      "name": "pm-release-notes",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-release-notes/SKILL.md",
+      "sha": "ddfb41b39ecfd19e3b446f3c27970744de039678"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-review",
+      "name": "pm-review",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-review/SKILL.md",
+      "sha": "976ac4467ea011cec769469b0e6c10cb0497a5c8"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-risk-register",
+      "name": "pm-risk-register",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-risk-register/SKILL.md",
+      "sha": "42b40d8a1e8fc11db2b5d2accf6627043f02948a"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-sales-deck",
+      "name": "pm-sales-deck",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-sales-deck/SKILL.md",
+      "sha": "a32ae07b87d0b7ac5fd9c0d14ea8aa26e05eaa7e"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-sprint-retro",
+      "name": "pm-sprint-retro",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-sprint-retro/SKILL.md",
+      "sha": "162f461b6dd98d76b515d577270e1e6c140927fb"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-stakeholder-simulator",
+      "name": "pm-stakeholder-simulator",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-stakeholder-simulator/SKILL.md",
+      "sha": "70327ada7c23c30b853ef7ab45a0b88cbc12a79b"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-strategic-review",
+      "name": "pm-strategic-review",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-strategic-review/SKILL.md",
+      "sha": "cde8e833837227166967c7260c8e59dd33353c34"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-swot",
+      "name": "pm-swot",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-swot/SKILL.md",
+      "sha": "d09e0e2a77546c5fe4679f371fc59384cfb1f402"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-value-prop-canvas",
+      "name": "pm-value-prop-canvas",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-value-prop-canvas/SKILL.md",
+      "sha": "d23f13c0570cd1857ad17977c618dc31611deda3"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-win-loss",
+      "name": "pm-win-loss",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-win-loss/SKILL.md",
+      "sha": "cf771586f44bdda5009dcf7cd54037a699918680"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-workflow-competitive-intel",
+      "name": "pm-workflow-competitive-intel",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-workflow-competitive-intel/SKILL.md",
+      "sha": "dcd1ba488dac8c070aefc7f9df25b52a23553acb"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-workflow-migration",
+      "name": "pm-workflow-migration",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-workflow-migration/SKILL.md",
+      "sha": "040eb25becc3036ec42b1e41c90b87e32746d11a"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-workflow-problem-to-prd",
+      "name": "pm-workflow-problem-to-prd",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-workflow-problem-to-prd/SKILL.md",
+      "sha": "bb4fdc22f3273ed626778d2152043904407cb10a"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-workflow-problem-to-stories",
+      "name": "pm-workflow-problem-to-stories",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-workflow-problem-to-stories/SKILL.md",
+      "sha": "6d0cb6164e8f1030a91c1bf9f72d1451760cb953"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-workflow-quarterly-cycle",
+      "name": "pm-workflow-quarterly-cycle",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-workflow-quarterly-cycle/SKILL.md",
+      "sha": "5d355247675492054bf62aceed08095afabcdda3"
+    },
+    {
+      "id": "marfoerst/the-pragmatic-pm:skills/pm-workflow-sales-enablement",
+      "name": "pm-workflow-sales-enablement",
+      "repo": "marfoerst/the-pragmatic-pm",
+      "path": "skills/pm-workflow-sales-enablement/SKILL.md",
+      "sha": "c4283ed20299915cbf34ff7524488f3d58093023"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/atp-ctp-check",
+      "name": "atp-ctp-check",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/atp-ctp-check/SKILL.md",
+      "sha": "3f5a750a97a787458cc8058ae0810af9f2fa83d3"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/confirmation-slip-reschedule",
+      "name": "confirmation-slip-reschedule",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/confirmation-slip-reschedule/SKILL.md",
+      "sha": "220720248fd47c1a1f7e6b7a33eebdef5d29fde6"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/correlated-supplier-slip",
+      "name": "correlated-supplier-slip",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/correlated-supplier-slip/SKILL.md",
+      "sha": "9f0ac6a2d0f549dbd5352d9c60e4e07a4ce8f8e1"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/customs-screen-shipment",
+      "name": "customs-screen-shipment",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/customs-screen-shipment/SKILL.md",
+      "sha": "b5f2fe48274b1b5262cd7cc5326f698ba6b41e8c"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/cycle-count-triage",
+      "name": "cycle-count-triage",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/cycle-count-triage/SKILL.md",
+      "sha": "e2809651877c2f3642d9b4baeadd84cac5af01eb"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/dc-stock-split",
+      "name": "dc-stock-split",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/dc-stock-split/SKILL.md",
+      "sha": "df583390aeba855f0b1c66ce1b293c8b36088925"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/demand-supply-rebalance",
+      "name": "demand-supply-rebalance",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/demand-supply-rebalance/SKILL.md",
+      "sha": "b1bcf59387e9167d99d8e80947e9dce19338cafd"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/expedite-or-absorb",
+      "name": "expedite-or-absorb",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/expedite-or-absorb/SKILL.md",
+      "sha": "e2aeba90867f0e815a168304e4243383765c8889"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/forecast-reconciliation",
+      "name": "forecast-reconciliation",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/forecast-reconciliation/SKILL.md",
+      "sha": "36e7a8ff6a287deacee169998ed4cca5f4891a7f"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/inventory-positioning",
+      "name": "inventory-positioning",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/inventory-positioning/SKILL.md",
+      "sha": "3a20887f2c2e3c81fc01a7b3a137acaae1391151"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/invoice-3way-match",
+      "name": "invoice-3way-match",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/invoice-3way-match/SKILL.md",
+      "sha": "bb71b0a7e94bee1027695806b967b9ea995b52de"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/linedown-warroom",
+      "name": "linedown-warroom",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/linedown-warroom/SKILL.md",
+      "sha": "ddebda21b701d163cc798b3c481bd901d9303946"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/nonconformance-disposition",
+      "name": "nonconformance-disposition",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/nonconformance-disposition/SKILL.md",
+      "sha": "67c7560500b01226825727a3694f7433f28bdb3c"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/recall-execution",
+      "name": "recall-execution",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/recall-execution/SKILL.md",
+      "sha": "2a9f2c7177da72f33fa8247d8e81c69599d016b3"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/rfx-scoring",
+      "name": "rfx-scoring",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/rfx-scoring/SKILL.md",
+      "sha": "dec51e25e7a0a60d6e8fa0c54d4ce86639005ab4"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/business-workflows/subtier-shortage",
+      "name": "subtier-shortage",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/business-workflows/subtier-shortage/SKILL.md",
+      "sha": "f6f8560e1208ece6e752e39f4d60db43a649c4af"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/gating/supply-chain-gating",
+      "name": "supply-chain-gating",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/gating/supply-chain-gating/SKILL.md",
+      "sha": "0ad6699801d5e9fdad1bc3a56dd2b0bf29981f4b"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/contracts/docusign-clm",
+      "name": "docusign-clm",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/contracts/docusign-clm/SKILL.md",
+      "sha": "e444874c1426bbfbbf679be013302606360131d0"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/contracts/icertis",
+      "name": "icertis",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/contracts/icertis/SKILL.md",
+      "sha": "f8a133e524dd6d92f3a14cb4779507a69dba8499"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/contracts/sap-ariba-clm",
+      "name": "sap-ariba-clm",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/contracts/sap-ariba-clm/SKILL.md",
+      "sha": "1f7bb41452eb712f3cf6b3f656759679397cb3a6"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/crm/dynamics-crm",
+      "name": "dynamics-crm",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/crm/dynamics-crm/SKILL.md",
+      "sha": "6138855876c4cd2362eaf7360b786c247760608a"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/crm/salesforce",
+      "name": "salesforce",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/crm/salesforce/SKILL.md",
+      "sha": "9ef1dafa2bc10b2927ae8edb6411d8ccc79d63ab"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/customs/descartes",
+      "name": "descartes",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/customs/descartes/SKILL.md",
+      "sha": "301f1fc93730b92cafac6c2008aa48abcf14f56b"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/customs/e2open-gts",
+      "name": "e2open-gts",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/customs/e2open-gts/SKILL.md",
+      "sha": "42c6c5b7bc65ca0e5cb9a571772aa8fb7305e557"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/customs/onesource-gts",
+      "name": "onesource-gts",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/customs/onesource-gts/SKILL.md",
+      "sha": "3c9ef192dea1f54aa48f3ca2f315782742dc630e"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/customs/sap-gts",
+      "name": "sap-gts",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/customs/sap-gts/SKILL.md",
+      "sha": "63f9c6747abd2396965c7a5e09e45d06bb887847"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/erp/dynamics365-fo",
+      "name": "dynamics365-fo",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/erp/dynamics365-fo/SKILL.md",
+      "sha": "8e9f89edf3ddf28f36842c8cbd5200035f30c7df"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/erp/infor",
+      "name": "infor",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/erp/infor/SKILL.md",
+      "sha": "1f2e763ee6f10acbc1b9286addb0558791072c97"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/erp/netsuite",
+      "name": "netsuite",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/erp/netsuite/SKILL.md",
+      "sha": "0e31b6253e1ea2ed72225f7ee23ef6a0f63083b3"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/erp/oracle-erp",
+      "name": "oracle-erp",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/erp/oracle-erp/SKILL.md",
+      "sha": "56feb783998f09ea3edbc9263843e270f4b5fab4"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/erp/sap-fi",
+      "name": "sap-fi",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/erp/sap-fi/SKILL.md",
+      "sha": "865a7e9c0269606a63c58b658eec68fb293898f3"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/erp/sap-mm",
+      "name": "sap-mm",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/erp/sap-mm/SKILL.md",
+      "sha": "a337f213bbf112137334d27e8f3e69f541bba532"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/maintenance/ibm-maximo",
+      "name": "ibm-maximo",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/maintenance/ibm-maximo/SKILL.md",
+      "sha": "7679c34a245ec73234074a1abdd4add38200f2fa"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/maintenance/infor-eam",
+      "name": "infor-eam",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/maintenance/infor-eam/SKILL.md",
+      "sha": "72572bf4d76b6e45f480f6129bb125608ef91d48"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/maintenance/sap-pm",
+      "name": "sap-pm",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/maintenance/sap-pm/SKILL.md",
+      "sha": "b9a9cf5a855d05e89a18854cf7f1f3a4ad1d738c"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/mes/aveva-mes",
+      "name": "aveva-mes",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/mes/aveva-mes/SKILL.md",
+      "sha": "a2d6ac97e5f7efb13556f488e5fa0ab604f3e91a"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/mes/rockwell-factorytalk",
+      "name": "rockwell-factorytalk",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/mes/rockwell-factorytalk/SKILL.md",
+      "sha": "b3a5101de2879c77de901103f9f41347331f874f"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/mes/sap-dm",
+      "name": "sap-dm",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/mes/sap-dm/SKILL.md",
+      "sha": "2e8966c24ac39cd5c0be716b0e6e46c7fc3ca361"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/mes/siemens-opcenter",
+      "name": "siemens-opcenter",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/mes/siemens-opcenter/SKILL.md",
+      "sha": "f9b1ea58289d177966b8baff21ab25a884bb6e42"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/oms/fluent-oms",
+      "name": "fluent-oms",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/oms/fluent-oms/SKILL.md",
+      "sha": "c802a3200d3ac47cc0a1faec060c035a00f72734"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/oms/manhattan-oms",
+      "name": "manhattan-oms",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/oms/manhattan-oms/SKILL.md",
+      "sha": "876b1bff2ae87642e4a4fb9d095dfdea93ac822a"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/planning/anaplan",
+      "name": "anaplan",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/planning/anaplan/SKILL.md",
+      "sha": "36529e5d00ac7d6e09f9c3989727adc953d8e26d"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/planning/blueyonder-planning",
+      "name": "blueyonder-planning",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/planning/blueyonder-planning/SKILL.md",
+      "sha": "35d2558479eca8df5e25b110ad0e5d812e7455e1"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/planning/kinaxis",
+      "name": "kinaxis",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/planning/kinaxis/SKILL.md",
+      "sha": "0ddfdd295b40933de9412ac75f341ad999c70dda"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/planning/o9",
+      "name": "o9",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/planning/o9/SKILL.md",
+      "sha": "1999caad1b6c48e1cbdb4826ac65c464e3fa5a39"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/planning/sap-ibp",
+      "name": "sap-ibp",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/planning/sap-ibp/SKILL.md",
+      "sha": "97e03d5b670ac6231aa3e3d2cbce28722b5fb6eb"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/plm/oracle-agile-plm",
+      "name": "oracle-agile-plm",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/plm/oracle-agile-plm/SKILL.md",
+      "sha": "c61319a7dc51bbc69bc30131813cbd9eaad6cecf"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/plm/ptc-windchill",
+      "name": "ptc-windchill",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/plm/ptc-windchill/SKILL.md",
+      "sha": "35b4b360b89baba8881076526c04b8b1c534ce74"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/plm/siemens-teamcenter",
+      "name": "siemens-teamcenter",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/plm/siemens-teamcenter/SKILL.md",
+      "sha": "5cca3d57d9083f53cda23f121e30f34dc78dce49"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/procurement/coupa",
+      "name": "coupa",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/procurement/coupa/SKILL.md",
+      "sha": "509e21ce2d4322909f77a0a80559dcac226f8437"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/procurement/gep",
+      "name": "gep",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/procurement/gep/SKILL.md",
+      "sha": "12737e24f653c1ac34704f54abd4070b7ff64368"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/procurement/ivalua",
+      "name": "ivalua",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/procurement/ivalua/SKILL.md",
+      "sha": "fd3a819b71154dc66a79c0dc4beae24f8152ab3c"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/procurement/jaggaer",
+      "name": "jaggaer",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/procurement/jaggaer/SKILL.md",
+      "sha": "6b5bbfc95a4b6c2afa2a3d35d93ab08963b55e9d"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/procurement/oracle-procurement",
+      "name": "oracle-procurement",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/procurement/oracle-procurement/SKILL.md",
+      "sha": "8c9c4a817098a65bda199355dbf7f25edd456d8b"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/procurement/sap-ariba",
+      "name": "sap-ariba",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/procurement/sap-ariba/SKILL.md",
+      "sha": "6606339bbeb3b91e4c66aaa8ac6409f4b03b204e"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/quality/labware",
+      "name": "labware",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/quality/labware/SKILL.md",
+      "sha": "1a724d46efd610b4b127a5536dd78286cf7086dd"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/quality/mastercontrol",
+      "name": "mastercontrol",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/quality/mastercontrol/SKILL.md",
+      "sha": "f3f7ff761da97ab63ec11be4344c67206ca9119f"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/quality/sap-qm",
+      "name": "sap-qm",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/quality/sap-qm/SKILL.md",
+      "sha": "1b8892636ced287feca39ba04eb81d3076bf27fa"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/quality/veeva-vault-qms",
+      "name": "veeva-vault-qms",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/quality/veeva-vault-qms/SKILL.md",
+      "sha": "84d4094dc434a8bd34762a5cf3a152ca081c5c55"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/risk/everstream",
+      "name": "everstream",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/risk/everstream/SKILL.md",
+      "sha": "9a52bb050c9f2a8178fb18668cb2b841fb1748cf"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/risk/interos",
+      "name": "interos",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/risk/interos/SKILL.md",
+      "sha": "b97096a346531590d3f435106afbf77cc95b86a2"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/risk/resilinc",
+      "name": "resilinc",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/risk/resilinc/SKILL.md",
+      "sha": "bacf84133bc54d8dc7545301df653392249a2aa7"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/transportation/blueyonder-tms",
+      "name": "blueyonder-tms",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/transportation/blueyonder-tms/SKILL.md",
+      "sha": "eeba41439b4d6df67cbda2f98d15ac9c4ec9d183"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/transportation/manhattan-tms",
+      "name": "manhattan-tms",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/transportation/manhattan-tms/SKILL.md",
+      "sha": "ba33dfbbe62544c9e8f367495ffb7de3f0681f1c"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/transportation/oracle-otm",
+      "name": "oracle-otm",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/transportation/oracle-otm/SKILL.md",
+      "sha": "0652d0d843e0e0ef329330170686cdaadeb19f44"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/transportation/sap-tm",
+      "name": "sap-tm",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/transportation/sap-tm/SKILL.md",
+      "sha": "f3a6f7dd85ed377fe6b65c004bc1831395987c2d"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/visibility/fourkites",
+      "name": "fourkites",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/visibility/fourkites/SKILL.md",
+      "sha": "80d5c1b44c30c58c83a07208b4fb064cb845c493"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/visibility/project44",
+      "name": "project44",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/visibility/project44/SKILL.md",
+      "sha": "c607354d10377468b12352f40061bf1fd04c10f6"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/warehouse/blueyonder-wms",
+      "name": "blueyonder-wms",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/warehouse/blueyonder-wms/SKILL.md",
+      "sha": "7347bc1fdbcc3db861dceea424cc6da76a86c081"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/warehouse/korber",
+      "name": "korber",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/warehouse/korber/SKILL.md",
+      "sha": "835afebeb1e74d4deb9cff97303692dca28bc99c"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/warehouse/manhattan-wms",
+      "name": "manhattan-wms",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/warehouse/manhattan-wms/SKILL.md",
+      "sha": "e81dd831ed1b9a798c3c68ab8115d7b16321271d"
+    },
+    {
+      "id": "metafloor-ai/metafloor-scm-plugin:skills/platforms/warehouse/sap-ewm",
+      "name": "sap-ewm",
+      "repo": "metafloor-ai/metafloor-scm-plugin",
+      "path": "skills/platforms/warehouse/sap-ewm/SKILL.md",
+      "sha": "95aadc70510439aa3acb44f9451d016b019618fe"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/authentication-failures",
+      "name": "authentication-failures",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/authentication-failures/SKILL.md",
+      "sha": "2bf8193eb52621aed033236585c6dd8bb812d600"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/broken-access-control",
+      "name": "broken-access-control",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/broken-access-control/SKILL.md",
+      "sha": "70830998ff9b3e9857754666006d21e64418ea3e"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/concurrency-correctness",
+      "name": "concurrency-correctness",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/concurrency-correctness/SKILL.md",
+      "sha": "5dff726d266e2cec8a01f37cc87b18a8c878bdd7"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/contract-review",
+      "name": "contract-review",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/contract-review/SKILL.md",
+      "sha": "eaf8b33bfbc0a799849f2d15ab786661b5a7e2a8"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/crypto-library-misuse",
+      "name": "crypto-library-misuse",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/crypto-library-misuse/SKILL.md",
+      "sha": "b8e70f383f9a874bd9ad339a54c3361b412b316c"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/cryptographic-failures",
+      "name": "cryptographic-failures",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/cryptographic-failures/SKILL.md",
+      "sha": "05adfa21e411d5b2c5821f30912b201e1aba89ad"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/csrf",
+      "name": "csrf",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/csrf/SKILL.md",
+      "sha": "61b447304b72d8ba295bc9a883774b6beb4ead87"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/exceptional-conditions",
+      "name": "exceptional-conditions",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/exceptional-conditions/SKILL.md",
+      "sha": "cffb843167ca02ec325dfe9373b98da063e2aef6"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/excessive-agency",
+      "name": "excessive-agency",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/excessive-agency/SKILL.md",
+      "sha": "c11a50c0df6b440551cf6ef97a002a605f89be85"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/file-upload",
+      "name": "file-upload",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/file-upload/SKILL.md",
+      "sha": "fdb7cdde1c579eee29724dff7bb22a9d68686c4b"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/graphql-security",
+      "name": "graphql-security",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/graphql-security/SKILL.md",
+      "sha": "eb40835e5aab363dc075a6926a5b685ba027b09a"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/hardcoded-secrets",
+      "name": "hardcoded-secrets",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/hardcoded-secrets/SKILL.md",
+      "sha": "7e5ae0abfc39c9830d7d264207a62a40fb08aba2"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/header-injection",
+      "name": "header-injection",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/header-injection/SKILL.md",
+      "sha": "0efa6f7eea0ece1608f7ff734c1ea51a28080f31"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/hotspots",
+      "name": "hotspots",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/hotspots/SKILL.md",
+      "sha": "dd4280aacf2668c593ee71e51968b44c11cded52"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/injection",
+      "name": "injection",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/injection/SKILL.md",
+      "sha": "88e8033267fe17abe5c821e23fd99bf7c58166de"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/insecure-design",
+      "name": "insecure-design",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/insecure-design/SKILL.md",
+      "sha": "645bb8592a76ae42390f852a4bc9b61b47b94616"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/insecure-local-storage",
+      "name": "insecure-local-storage",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/insecure-local-storage/SKILL.md",
+      "sha": "1f7f7cd82bb210822fc72cbc8fba716cd843116f"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/insecure-output-handling",
+      "name": "insecure-output-handling",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/insecure-output-handling/SKILL.md",
+      "sha": "ba51ad9217df9587354bd24ce81c52c42ad55d5e"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/insecure-plugin-design",
+      "name": "insecure-plugin-design",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/insecure-plugin-design/SKILL.md",
+      "sha": "1898d69a3dba89943be0ea2027f404dac24308fd"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/integrity-failures",
+      "name": "integrity-failures",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/integrity-failures/SKILL.md",
+      "sha": "ef3ab82eb2eb4616fc89e9238c3f380005f472da"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/ipc-security",
+      "name": "ipc-security",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/ipc-security/SKILL.md",
+      "sha": "956997c48108ddd6947a4931dd4309df8fe141d7"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/llm-supply-chain",
+      "name": "llm-supply-chain",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/llm-supply-chain/SKILL.md",
+      "sha": "71bf3dfa8cc02e3e10b448ecd4130934f1d6de99"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/mass-assignment",
+      "name": "mass-assignment",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/mass-assignment/SKILL.md",
+      "sha": "01da0cf395682880074d01db049c65dadb7ecde2"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/mcp-security",
+      "name": "mcp-security",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/mcp-security/SKILL.md",
+      "sha": "c4d20af7e79271fbd1be81586d82f37b969fa4ba"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/memory-api-misuse",
+      "name": "memory-api-misuse",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/memory-api-misuse/SKILL.md",
+      "sha": "08f5178812f3e2acfb041d28ade78103d6e59e70"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/model-dos",
+      "name": "model-dos",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/model-dos/SKILL.md",
+      "sha": "04dff1fec3f2c9983afacbd9f2829c3a58d7a645"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/model-theft",
+      "name": "model-theft",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/model-theft/SKILL.md",
+      "sha": "62ae2deb3095e046b9c4969999171c1bf0ff0bb0"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/multi-agent-trust",
+      "name": "multi-agent-trust",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/multi-agent-trust/SKILL.md",
+      "sha": "fd31ba07582953a6e2ed939e8f0d3d7bc55fd004"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/nosql-injection",
+      "name": "nosql-injection",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/nosql-injection/SKILL.md",
+      "sha": "5471c69690360993c7cc3e8bebb06db444be9510"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/numeric-trust-boundary",
+      "name": "numeric-trust-boundary",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/numeric-trust-boundary/SKILL.md",
+      "sha": "e467a5ba6e2d0df73c43d434d58acb9c5aafb6b8"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/oauth-implementation",
+      "name": "oauth-implementation",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/oauth-implementation/SKILL.md",
+      "sha": "7af45069218a46032bd44449d6e69ab4c1c418eb"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/open-redirect",
+      "name": "open-redirect",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/open-redirect/SKILL.md",
+      "sha": "9ea25b1a5479dc19bab0828923b01261a4652632"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/overreliance",
+      "name": "overreliance",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/overreliance/SKILL.md",
+      "sha": "cc06f1da3a39b30ef2b4e3137dfff8a6b3e2c73b"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/path-traversal",
+      "name": "path-traversal",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/path-traversal/SKILL.md",
+      "sha": "77a6b0a8f70166e569f2033dd178b70d889797fa"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/pr-review",
+      "name": "pr-review",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/pr-review/SKILL.md",
+      "sha": "ccd1e2e86adf836a0dfe64f6e17bf77ef9a6d717"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/privilege-handling",
+      "name": "privilege-handling",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/privilege-handling/SKILL.md",
+      "sha": "9aab0d75a7ce6f15d6b4f02cbc8d17329e6a3e1c"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/prompt-injection",
+      "name": "prompt-injection",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/prompt-injection/SKILL.md",
+      "sha": "bda2f594f04561dd6f317fdba7eb5d4e2c19aac8"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/prototype-pollution",
+      "name": "prototype-pollution",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/prototype-pollution/SKILL.md",
+      "sha": "25fcbb9242fa108e5ce65f9545517e541cf79352"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/race-condition",
+      "name": "race-condition",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/race-condition/SKILL.md",
+      "sha": "b58d379351eafa438342e3de24f5c363e938d213"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/rag-security",
+      "name": "rag-security",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/rag-security/SKILL.md",
+      "sha": "0e9c56c945cc075c56dca8ab87a5b41cee114c08"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/redos",
+      "name": "redos",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/redos/SKILL.md",
+      "sha": "cd630c3de3f8aed0d7d443c0e8c57d4e141d9874"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/security-cleanup",
+      "name": "security-cleanup",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/security-cleanup/SKILL.md",
+      "sha": "4c1de6ee8aab9600cf24da95e8f223e26cdc214a"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/security-misconfiguration",
+      "name": "security-misconfiguration",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/security-misconfiguration/SKILL.md",
+      "sha": "ab753ef37c72a37967c5d7a3531600292fffab5c"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/security-review",
+      "name": "security-review",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/security-review/SKILL.md",
+      "sha": "7c9bb91178942d0a4cda876fc5d8937f62ff84bd"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/sensitive-disclosure",
+      "name": "sensitive-disclosure",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/sensitive-disclosure/SKILL.md",
+      "sha": "330a4c24c2a1d60c6d26abbcdc6141e30c8c3262"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/ssrf",
+      "name": "ssrf",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/ssrf/SKILL.md",
+      "sha": "a77937a0d14379d7eeef6e21169ce3f27c8ffebe"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/supply-chain",
+      "name": "supply-chain",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/supply-chain/SKILL.md",
+      "sha": "69ccae24d56c3c3294fe5330eec8dec65386881c"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/threat-model",
+      "name": "threat-model",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/threat-model/SKILL.md",
+      "sha": "9092fa1d3af980dd914899c1598e7a317347d2d9"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/token-smuggling",
+      "name": "token-smuggling",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/token-smuggling/SKILL.md",
+      "sha": "15b5e0e62e08665d5ccbfabb118f7be90d01676b"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/training-data-poisoning",
+      "name": "training-data-poisoning",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/training-data-poisoning/SKILL.md",
+      "sha": "be3ff9cb814cb4d9fd2ad3d18cb9b885574101f9"
+    },
+    {
+      "id": "thejefflarson/soundcheck:.claude/skills/unsafe-api-consumption",
+      "name": "unsafe-api-consumption",
+      "repo": "thejefflarson/soundcheck",
+      "path": ".claude/skills/unsafe-api-consumption/SKILL.md",
+      "sha": "ad93d6a6eb3eba2865bfb661a7b708800707cebb"
+    }
+  ],
+  "cutoverValidationPassed": true,
+  "existingRecordsChanged": 0,
+  "productionDataChanged": false,
+  "combinedCrawlRun": false,
+  "published": false,
+  "archive": "/Users/jonslimak/Projects/omgskills/index/shadow/directory3000-wave2-20261023"
+}

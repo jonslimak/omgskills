@@ -1,0 +1,101 @@
+# Directory backfill: 3,000 staged skills
+
+Verified: 2026-10-23T21:04:52.619Z
+
+- This round: 1,500 additional skills. Prior 1,500 preserved; 3,000 total.
+- Repositories added this round: 74. Candidates reviewed: 3243.
+- Local cutover: 50690. Production baseline remains 52284.
+- All 3,000 staged IDs and source SHAs are unique and absent from the unchanged production baseline.
+- All staged skills remain in both skill/repo overlays and cutover. Existing records unchanged.
+- New 1,500 reviewed source commit/tree/blob/path pins and exact creator coverage verified against batch evidence.
+- Client install metadata: 0 pinned; 1500 legacy. Existing backfill does not add optional pinned-install fields; this is not pinned-install acceptance.
+- Cutover validation passes. No featured status or broad trust roles granted.
+- No combined crawl, promotion, publish, deploy, commit or push in this round.
+- This is staged overlay data, not a publish-ready replacement. Local shadow predates production; reconcile through a separately approved combined crawl before publishing.
+- Source/package review only, not runtime installation testing or exhaustive security/accuracy certification.
+
+## Waves
+
+- wave1: 125; apply batches 125.
+- wave2: 242; apply batches 150 + 92.
+- wave3: 368; apply batches 150 + 150 + 68.
+- wave4: 280; apply batches 150 + 130.
+- wave5: 252; apply batches 150 + 102.
+- wave6: 233; apply batches 150 + 83.
+
+## Added By Repository
+
+- acksession/easyesuite-claude-plugin: 20
+- adspirer/adspirer-claude-plugin: 16
+- airport-lounge-list/mcp-server: 16
+- ansight-ai/ansight-claude: 7
+- anysiteio/agent-skills: 17
+- appsvortex/arness: 1
+- arcads-ai/skills: 16
+- assistant-labs/claude-plugin: 9
+- auralshin/coding-skills: 30
+- awslabs/agent-plugins: 17
+- bigmindai/ext-plugins: 38
+- carsxe/carsxe-claude-plugin: 16
+- carta/plugins: 35
+- cellcog/cellcog-plugin: 16
+- closedloop-ai-org/claude-code-skills: 21
+- cockroachdb/claude-plugin: 4
+- confluentinc/agent-skills: 9
+- countz-ai/agentic-tools: 1
+- curetcore/karrito-claude-plugin: 27
+- curtisthe/three-pillars-plugin: 31
+- datarails/dr-claude-code-plugins-re: 16
+- dtsong/agentic-council: 64
+- dynatrace/dynatrace-for-ai: 14
+- fiber-ai/fiber-ai-plugin: 9
+- geoff-lew/numeric-toolkit: 17
+- gleanwork/claude-plugins: 14
+- googlecloudplatform/data-agent-kit-plugin: 32
+- hereya/dilaya-plugin: 21
+- holistics/skills: 11
+- hsaripalli/fracfyi_claude_plugin: 32
+- humanmade/accelerate-ai-toolkit: 13
+- hyperfx-ai/marketing-skills: 18
+- hzblj/skills: 13
+- impactbrussels/founderos: 21
+- incubyte/ai-plugins: 19
+- ironyjk/strategy-frameworks: 27
+- jgsystemsconsulting/jgs-magic-sysmlv1-read-skills: 10
+- joomcode/joompulse-skills: 18
+- khadinakbarlabs/shopify-app-builder: 30
+- kong/ai-marketplace: 22
+- lmtydotcom/skills: 16
+- marfoerst/the-pragmatic-pm: 54
+- marky-team/marky-skills: 11
+- metafloor-ai/metafloor-scm-plugin: 72
+- mickzijdel/rails-toolkit: 21
+- mindmaster-code/gestao-agil-skills: 32
+- mralaminahamed/wp-dev-skills: 17
+- muend/geoai-skills: 13
+- nielsmadan/skills: 38
+- nodesource/nsolid-skills-plugin: 16
+- novainsilico/jinko-skills: 5
+- oegeyilmaz9/seo-aeo-geo-ultimate: 4
+- openplanr/marketplace: 30
+- petrovicistefan/claude-code-plugins: 34
+- playcanvas/skills: 16
+- qdrant/skills: 23
+- recharm/claude-plugin: 17
+- ringcentral/ringex-claude-plugin: 16
+- seranking/seo-skills: 7
+- shadowwalker2014/accountable-plugin: 11
+- spiceai/skills: 16
+- synter-media-ai/plugin: 47
+- thejefflarson/soundcheck: 51
+- tirion-data/tirion-claude-plugin: 5
+- urbanairship/agent-tools: 3
+- utopia5327/claude-plugin-for-revit-bim: 25
+- velt-js/velt-plugin-cursor: 25
+- voicenterteam/claude-marketplace: 17
+- voxel51/fiftyone-skills: 15
+- wix/skills: 3
+- yourbeckett/beckett-for-claude: 13
+- zakariaf/flutter-skills: 36
+- zilliztech/zilliz-plugin: 20
+- zuora/zuora-coding-agent: 3

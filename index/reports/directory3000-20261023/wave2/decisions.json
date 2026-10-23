@@ -1,0 +1,291 @@
+{
+  "generatedAt": "2026-10-23T20:46:27.431Z",
+  "reviewSha256": "b9c4d1392af261a3f81e68e341364696624b623eb7e1902e8bb9b59a743e63b7",
+  "excludeRepos": [
+    "social-media-skills/skills",
+    "a-ng-d/claude-ui-color-palette",
+    "tmargolis/career-navigator"
+  ],
+  "excludeIds": [
+    "social-media-skills/skills:skills/ai-image-editing",
+    "social-media-skills/skills:skills/ai-music-and-sound",
+    "social-media-skills/skills:skills/ai-voiceover",
+    "social-media-skills/skills:skills/canva",
+    "social-media-skills/skills:skills/capcut",
+    "social-media-skills/skills:skills/captions-and-clipping",
+    "social-media-skills/skills:skills/descript",
+    "social-media-skills/skills:skills/flux",
+    "social-media-skills/skills:skills/heygen",
+    "social-media-skills/skills:skills/ideogram",
+    "social-media-skills/skills:skills/kling",
+    "social-media-skills/skills:skills/luma",
+    "social-media-skills/skills:skills/nano-banana",
+    "social-media-skills/skills:skills/opus-clip",
+    "social-media-skills/skills:skills/platform-specs-and-validation",
+    "social-media-skills/skills:skills/profile-optimization",
+    "social-media-skills/skills:skills/reels-script",
+    "social-media-skills/skills:skills/runway",
+    "social-media-skills/skills:skills/scheduling-and-queue",
+    "social-media-skills/skills:skills/suno",
+    "social-media-skills/skills:skills/synthesia",
+    "social-media-skills/skills:skills/tiktok-script",
+    "social-media-skills/skills:skills/veo-3",
+    "social-media-skills/skills:skills/youtube-long-form",
+    "social-media-skills/skills:skills/youtube-shorts",
+    "appsvortex/arness:plugins/arn-code/skills/arn-code-execute-task",
+    "tmargolis/career-navigator:skills/tailor-resume"
+  ],
+  "excluded": [
+    {
+      "id": "social-media-skills/skills:skills/ai-image-editing",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/ai-image-editing.md",
+        "tools/integrations/ai-image-editing.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/ai-music-and-sound",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/ai-music-and-sound.md",
+        "tools/integrations/elevenlabs.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/ai-voiceover",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/elevenlabs.md",
+        "tools/REGISTRY.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/canva",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/canva.md",
+        "tools/integrations/canva.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/capcut",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/capcut.md",
+        "tools/integrations/capcut.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/captions-and-clipping",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/clipping.md",
+        "tools/REGISTRY.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/descript",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/descript.md",
+        "tools/integrations/descript.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/flux",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/flux.md",
+        "tools/integrations/flux.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/heygen",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/heygen.md",
+        "tools/REGISTRY.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/ideogram",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/ideogram.md",
+        "tools/integrations/ideogram.md",
+        "tools/integrations/ideogram.md",
+        "tools/integrations/ideogram.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/kling",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/kling.md",
+        "tools/REGISTRY.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/luma",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/luma.md",
+        "tools/integrations/luma.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/nano-banana",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/nano-banana.md",
+        "tools/integrations/nano-banana.md",
+        "tools/integrations/nano-banana.md",
+        "tools/integrations/nano-banana.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/opus-clip",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/opus-clip.md",
+        "tools/integrations/clipping.md",
+        "tools/integrations/opus-clip.md",
+        "tools/integrations/opus-clip.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/platform-specs-and-validation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/woopsocial.md",
+        "tools/integrations/woopsocial.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/profile-optimization",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/ideogram.md",
+        "tools/integrations/ideogram.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/reels-script",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/veo.md",
+        "tools/integrations/veo.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/runway",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/runway.md",
+        "tools/REGISTRY.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/scheduling-and-queue",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/woopsocial.md",
+        "tools/integrations/woopsocial.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/suno",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/suno.md",
+        "tools/integrations/suno.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/synthesia",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/synthesia.md",
+        "tools/integrations/synthesia.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/tiktok-script",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/veo.md",
+        "tools/integrations/veo.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/veo-3",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/veo.md",
+        "tools/integrations/veo.md",
+        "tools/integrations/veo.md",
+        "tools/integrations/veo.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/youtube-long-form",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/woopsocial.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "social-media-skills/skills:skills/youtube-shorts",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/integrations/woopsocial.md"
+      ],
+      "agents": []
+    },
+    {
+      "id": "appsvortex/arness:plugins/arn-code/skills/arn-code-execute-task",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [
+        "arn-code-task-executor"
+      ]
+    },
+    {
+      "id": "tmargolis/career-navigator:skills/tailor-resume",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/resume-coach/AGENT.md"
+      ],
+      "agents": []
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Reviewed original supply-chain guidance, engineering council, security and PM methods. Defer social-media suite and Career Navigator because individual folders rely on unbundled companion skills/agents/context. Defer the color-palette repository because advertised purpose and indexed GitLab sources do not establish clean originality. Exact package scope only.",
+  "reviewed": 726,
+  "approvedCount": 242
+}
