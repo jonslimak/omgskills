@@ -118,6 +118,39 @@ test("README file names are tried in order and missing names fall through", asyn
   assert.equal(value.readme.sourceUrl, "https://github.com/owner/repo/blob/HEAD/readme.md");
 });
 
+test("README source links preserve repository names beginning with HEAD", async () => {
+  for (const repository of ["owner/HEAD-tools", "HEAD-owner/HEAD"]) {
+    const handler = createSkillReadmeHandler({
+      lookupSkill: async () => ({ id, github_url: `https://github.com/${repository}` }),
+      fetcher: async () => github(),
+    });
+    const value = await (await handler(request())).json();
+    assert.equal(value.readme.sourceUrl, `https://github.com/${repository}/blob/HEAD/README.md`);
+  }
+});
+
+test("README filename fallbacks share one timeout budget and remain retryable", async () => {
+  const signals: AbortSignal[] = [];
+  let retry = false;
+  const handler = createSkillReadmeHandler({ lookupSkill, timeoutMs: 20, fetcher: async (_url, init) => {
+    if (retry) return github();
+    const signal = init!.signal!;
+    signals.push(signal);
+    if (signals.length === 1) return new Response("", { status: 404 });
+    return new Promise<Response>((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error("Timeout did not abort")), 500);
+      const aborted = () => { clearTimeout(timer); resolve(new Response("", { status: 404 })); };
+      if (signal.aborted) aborted();
+      else signal.addEventListener("abort", aborted, { once: true });
+    });
+  } });
+  assert.equal((await handler(request())).status, 503);
+  assert.equal(signals[1], signals[0], "each fallback must use the same timeout signal");
+  assert.equal(signals.length, 2, "an exhausted timeout must stop further filename attempts");
+  retry = true;
+  assert.equal((await handler(request())).status, 200);
+});
+
 test("README text is truncated independently of the description", async () => {
   const text = "# Long README\n" + "x".repeat(22_000);
   const handler = createSkillReadmeHandler({ lookupSkill, fetcher: async () => github(text) });

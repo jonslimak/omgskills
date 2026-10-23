@@ -96,18 +96,20 @@ export function createSkillReadmeHandler(options: Options = {}) {
 
   async function loadReadme(repository: string): Promise<SkillReadme | null> {
     const [owner, repo] = repository.split("/");
-    const base = `${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/HEAD`;
+    const repositoryPath = `${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
+    const signal = AbortSignal.timeout(timeoutMs);
     for (const name of readmeNames) {
-      const response = await fetcher(`https://raw.githubusercontent.com/${base}/${name}`, {
+      signal.throwIfAborted();
+      const response = await fetcher(`https://raw.githubusercontent.com/${repositoryPath}/HEAD/${name}`, {
         method: "GET", credentials: "omit", redirect: "error", referrerPolicy: "no-referrer",
-        signal: AbortSignal.timeout(timeoutMs),
+        signal,
         headers: { Accept: "text/plain", "User-Agent": "omgskills-public-readme" },
       });
       if (response.status === 404) { await response.body?.cancel(); continue; }
       if (!response.ok) { await response.body?.cancel(); throw new Error("GitHub unavailable"); }
       const markdown = new TextDecoder("utf-8", { fatal: true }).decode(await boundedBytes(response, fileByteLimit));
       if (!markdown.trim()) return null;
-      return { repository, sourceUrl: `https://github.com/${base.replace("/HEAD", "/blob/HEAD")}/${name}`,
+      return { repository, sourceUrl: `https://github.com/${repositoryPath}/blob/HEAD/${name}`,
         truncated: markdown.length > characterLimit,
         markdown: markdown.slice(0, characterLimit).replace(/[\uD800-\uDBFF]$/, "") };
     }
