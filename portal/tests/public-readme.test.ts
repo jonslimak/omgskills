@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { PublicReadmeClient, parseReadme, publicReadmeId } from "../src/app/unified/public-readme";
+import { PublicReadmeClient, parseDocuments, parseReadme, publicReadmeId, readmeBrowseUrl, readmeTitle } from "../src/app/unified/public-readme";
 import type { SkillDisplay } from "../src/app/unified/model";
 
 const id = "owner/repo:skills/design";
 const skill: SkillDisplay = { key: `catalog:${id}`, catalogId: id, name: "Design", description: "", author: "owner", githubUrl: "https://github.com/owner/repo", tags: [] };
-const readme = { markdown: "# Repo\n\nDocumentation.", repository: "owner/repo", sourceUrl: "https://github.com/owner/repo/blob/custom/README.md", truncated: false };
+const readme = { markdown: "# Repo\n\nDocumentation.", repository: "owner/repo", sourceUrl: "https://github.com/owner/repo/blob/custom/README.md", truncated: false, kind: "repository" as const };
 const payload = { skillId: id, readme };
+const docs = { skill: null, readme };
 const signal = () => new AbortController().signal;
 
 test("only public catalog identities enter the README request", () => {
@@ -18,6 +19,7 @@ test("only public catalog identities enter the README request", () => {
   assert.equal(publicReadmeId({ ...skill, setItemKind: "private-release" }), "");
   assert.equal(publicReadmeId({ ...skill, setItemKind: "github" }), "");
   assert.equal(publicReadmeId({ ...skill, catalogId: "synced:private" }), "");
+  assert.equal(publicReadmeId({ ...skill, catalogId: "owner/repo" }), "owner/repo", "repo-level skills have no :skill part");
 });
 
 test("README reads use no account credentials, source filters or private context", async () => {
@@ -31,14 +33,14 @@ test("README reads use no account credentials, source filters or private context
     assert.equal(init.body, undefined);
     return Response.json(payload);
   });
-  assert.deepEqual(await client.load(id, signal()), readme);
+  assert.deepEqual(await client.load(id, signal()), docs);
 });
 
 test("successful and empty README reads are cached with expiry", async () => {
   for (const document of [readme, null]) {
     let calls = 0, now = 0;
     const client = new PublicReadmeClient(async () => { calls++; return Response.json({ skillId: id, readme: document }); }, () => now);
-    assert.deepEqual(await client.load(id, signal()), document);
+    assert.deepEqual(await client.load(id, signal()), document && { skill: null, readme: document });
     await client.load(id, signal());
     assert.equal(calls, 1);
     now = document ? 600_001 : 60_001;
@@ -52,7 +54,7 @@ test("not found hides the README, but upstream failures retry rather than poison
   let calls = 0;
   const client = new PublicReadmeClient(async () => ++calls === 1 ? new Response("", { status: 503 }) : Response.json(payload));
   await assert.rejects(client.load(id, signal()));
-  assert.deepEqual(await client.load(id, signal()), readme);
+  assert.deepEqual(await client.load(id, signal()), docs);
   assert.equal(calls, 2);
 });
 
@@ -67,7 +69,7 @@ test("cancellation prevents a late response from entering the cache", async () =
   controller.abort();
   release(Response.json(payload));
   await assert.rejects(pending);
-  assert.deepEqual(await client.load(id, signal()), readme);
+  assert.deepEqual(await client.load(id, signal()), docs);
   assert.equal(calls, 2);
 });
 
@@ -103,4 +105,36 @@ test("stalled README fetches time out without blocking the ordinary skill detail
     init.signal!.addEventListener("abort", () => { clearTimeout(timer); reject(new Error("Timed out")); }, { once: true });
   }), Date.now, 5);
   await assert.rejects(client.load(id, signal()));
+});
+
+test("README kinds are validated; responses cached before kinds existed read as repository READMEs", () => {
+  for (const kind of ["skill-readme", "skill", "repository"] as const) {
+    assert.equal(parseReadme({ skillId: id, readme: { ...readme, kind } }, id)?.kind, kind);
+  }
+  const { kind: _kind, ...legacy } = readme;
+  assert.equal(parseReadme({ skillId: id, readme: legacy }, id)?.kind, "repository");
+  assert.throws(() => parseReadme({ skillId: id, readme: { ...readme, kind: "html" } }, id));
+});
+
+test("panel titles say whose documentation is shown", () => {
+  assert.equal(readmeTitle("owner/repo:skills/design", "skill"), "Skill instructions");
+  assert.equal(readmeTitle("owner/repo:skills/design", "skill-readme"), "README");
+  assert.equal(readmeTitle("owner/repo:skills/design", "repository"), "Repository README");
+  assert.equal(readmeTitle("owner/ponytail:skills/ponytail", "repository"), "README");
+  assert.equal(readmeTitle("owner/repo", "repository"), "README");
+});
+
+test("the README link opens the skill's folder, or the repository for a root skill", () => {
+  const skill = { ...readme, kind: "skill" as const, sourceUrl: "https://github.com/owner/repo/blob/HEAD/skills/design/SKILL.md" };
+  assert.equal(readmeBrowseUrl(skill), "https://github.com/owner/repo/tree/HEAD/skills/design");
+  assert.equal(readmeBrowseUrl({ ...skill, sourceUrl: "https://github.com/owner/repo/blob/HEAD/SKILL.md" }), "https://github.com/owner/repo#readme");
+});
+
+test("both documents are read together; an older single-document SKILL.md moves to the skill tab", () => {
+  const skillDoc = { ...readme, kind: "skill" as const, sourceUrl: "https://github.com/owner/repo/blob/HEAD/skills/design/SKILL.md" };
+  assert.deepEqual(parseDocuments({ skillId: id, skill: skillDoc, readme }, id), { skill: skillDoc, readme });
+  assert.deepEqual(parseDocuments({ skillId: id, readme: skillDoc }, id), { skill: skillDoc, readme: null });
+  assert.equal(parseDocuments({ skillId: id, skill: null, readme: null }, id), null);
+  assert.throws(() => parseDocuments({ skillId: id, skill: readme, readme }, id), "a README cannot fill the skill tab");
+  assert.throws(() => parseDocuments({ skillId: id, skill: skillDoc, readme: skillDoc }, id));
 });

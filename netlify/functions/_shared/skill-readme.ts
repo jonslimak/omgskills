@@ -1,5 +1,10 @@
-type PublicSkill = { id: string; github_url: string };
-export type SkillReadme = { markdown: string; repository: string; sourceUrl: string; truncated: boolean };
+type PublicSkill = { id: string; github_url: string; skill_md_path?: string | null };
+/** skill-readme: the skill folder's README; skill: its SKILL.md; repository: the repo README. */
+export type ReadmeKind = "skill-readme" | "skill" | "repository";
+export type SkillReadme = { markdown: string; repository: string; sourceUrl: string; truncated: boolean; kind: ReadmeKind };
+/** The skill's SKILL.md and its human README, shown as two tabs in the app. */
+export type SkillDocuments = { skill: SkillReadme | null; readme: SkillReadme | null };
+type SkillSource = { repository: string; folder: string; skillFile: string | null };
 type Entry<T> = { expires: number; promise: Promise<T> };
 type Options = {
   fetcher?: typeof fetch;
@@ -13,7 +18,18 @@ const fileByteLimit = 256_000;
 // raw.githubusercontent.com has no per-IP API quota (the REST API allows 60/hour
 // unauthenticated). HEAD resolves the default branch; names are case-sensitive.
 const readmeNames = ["README.md", "readme.md", "Readme.md", "README.markdown", "README.mdx", "README.txt", "README"];
-const idPattern = /^[a-z0-9][a-z0-9-]{0,99}\/[a-z0-9_.-]+:[^\x00-\x1f\x7f]{1,800}$/i;
+const folderReadmeNames = ["README.md", "readme.md"];
+// `owner/repo` (a repo-level skill) or `owner/repo:skill/path`.
+const idPattern = /^[a-z0-9][a-z0-9-]{0,99}\/[a-z0-9_.-]+(?::[^\x00-\x1f\x7f]{1,800})?$/i;
+const frontmatter = /^\uFEFF?---\r?\n[\s\S]*?\r?\n---[ \t]*(?:\r?\n|$)/;
+
+/** A catalog SKILL.md path, as safe relative segments; anything else falls back to the repo README. */
+function skillFileSegments(value: unknown): string[] | null {
+  if (typeof value !== "string" || value.length > 800 || /[\\\x00-\x1f\x7f]/.test(value)) return null;
+  const segments = value.split("/");
+  if (segments.some(segment => !segment || segment === "." || segment === "..")) return null;
+  return /^skill\.md$/i.test(segments.at(-1)!) ? segments : null;
+}
 
 async function boundedBytes(response: Response, limit: number) {
   if (Number(response.headers.get("content-length")) > limit) {
@@ -54,8 +70,8 @@ export function createSkillReadmeHandler(options: Options = {}) {
   const fetcher = options.fetcher ?? fetch;
   const now = options.now ?? Date.now;
   const timeoutMs = options.timeoutMs ?? 8_000;
-  const skillCache = new Map<string, Entry<string | null>>();
-  const readmeCache = new Map<string, Entry<SkillReadme | null>>();
+  const skillCache = new Map<string, Entry<SkillSource | null>>();
+  const readmeCache = new Map<string, Entry<SkillDocuments | null>>();
   let active = 0;
 
   function cached<T>(cache: Map<string, Entry<T>>, key: string, load: () => Promise<T>): Promise<T> {
@@ -91,16 +107,16 @@ export function createSkillReadmeHandler(options: Options = {}) {
     if (envelope.error || envelope.result?.isError || envelope.id !== 1) throw new Error("Invalid catalog result");
     if (value?.found === false && value.skill === null) return null;
     if (value?.found !== true || value.skill?.id !== id || typeof value.skill.github_url !== "string") throw new Error("Invalid catalog skill");
-    return { id, github_url: value.skill.github_url };
+    return { id, github_url: value.skill.github_url, skill_md_path: value.skill.skill_md_path ?? null };
   }
 
-  async function loadReadme(repository: string): Promise<SkillReadme | null> {
+  async function firstFile(repository: string, paths: string[], signal: AbortSignal) {
     const [owner, repo] = repository.split("/");
     const repositoryPath = `${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
-    const signal = AbortSignal.timeout(timeoutMs);
-    for (const name of readmeNames) {
+    for (const path of paths) {
       signal.throwIfAborted();
-      const response = await fetcher(`https://raw.githubusercontent.com/${repositoryPath}/HEAD/${name}`, {
+      const encoded = path.split("/").map(encodeURIComponent).join("/");
+      const response = await fetcher(`https://raw.githubusercontent.com/${repositoryPath}/HEAD/${encoded}`, {
         method: "GET", credentials: "omit", redirect: "error", referrerPolicy: "no-referrer",
         signal,
         headers: { Accept: "text/plain", "User-Agent": "omgskills-public-readme" },
@@ -108,12 +124,35 @@ export function createSkillReadmeHandler(options: Options = {}) {
       if (response.status === 404) { await response.body?.cancel(); continue; }
       if (!response.ok) { await response.body?.cancel(); throw new Error("GitHub unavailable"); }
       const markdown = new TextDecoder("utf-8", { fatal: true }).decode(await boundedBytes(response, fileByteLimit));
-      if (!markdown.trim()) return null;
-      return { repository, sourceUrl: `https://github.com/${repositoryPath}/blob/HEAD/${name}`,
-        truncated: markdown.length > characterLimit,
-        markdown: markdown.slice(0, characterLimit).replace(/[\uD800-\uDBFF]$/, "") };
+      return { markdown, sourceUrl: `https://github.com/${repositoryPath}/blob/HEAD/${encoded}` };
     }
     return null;
+  }
+
+  function readme(repository: string, kind: ReadmeKind, file: { markdown: string; sourceUrl: string }): SkillReadme | null {
+    const markdown = kind === "skill" ? file.markdown.replace(frontmatter, "").replace(/^(?:[ \t]*\r?\n)+/, "") : file.markdown;
+    if (!markdown.trim()) return null;
+    return { repository, kind, sourceUrl: file.sourceUrl, truncated: markdown.length > characterLimit,
+      markdown: markdown.slice(0, characterLimit).replace(/[\uD800-\uDBFF]$/, "") };
+  }
+
+  // Load both documents in parallel: the SKILL.md (what the agent reads and what gets
+  // installed) and the human README (the skill folder's, else the repository's).
+  async function loadDocuments({ repository, folder, skillFile }: SkillSource): Promise<SkillDocuments | null> {
+    const signal = AbortSignal.timeout(timeoutMs);
+    const [skill, readmeDoc] = await Promise.all([
+      skillFile ? firstFile(repository, [skillFile], signal).then(file => file && readme(repository, "skill", file)) : null,
+      (async () => {
+        if (folder) {
+          const own = await firstFile(repository, folderReadmeNames.map(name => `${folder}/${name}`), signal);
+          const ownReadme = own && readme(repository, "skill-readme", own);
+          if (ownReadme) return ownReadme;
+        }
+        const repo = await firstFile(repository, readmeNames, signal);
+        return repo && readme(repository, "repository", repo);
+      })(),
+    ]);
+    return skill || readmeDoc ? { skill: skill ?? null, readme: readmeDoc ?? null } : null;
   }
 
   function json(body: unknown, status = 200, ttl = 0) {
@@ -134,15 +173,18 @@ export function createSkillReadmeHandler(options: Options = {}) {
       return json({ error: "A public catalog skill ID is required." }, 400);
     }
     try {
-      const repository = await cached(skillCache, id, async () => {
+      const source = await cached(skillCache, id, async () => {
         const skill = await (options.lookupSkill ?? lookupPublicSkill)(id);
         if (!skill) return null;
         if (skill.id !== id) throw new Error("Mismatched skill");
-        return repositoryFromUrl(skill.github_url);
+        const segments = skillFileSegments(skill.skill_md_path);
+        return { repository: repositoryFromUrl(skill.github_url),
+          folder: segments ? segments.slice(0, -1).join("/") : "", skillFile: segments ? segments.join("/") : null };
       });
-      if (!repository) return json({ error: "Public skill not found." }, 404);
-      const readme = await cached(readmeCache, repository.toLowerCase(), () => loadReadme(repository));
-      return json({ skillId: id, readme }, 200, readme ? 600 : 60);
+      if (!source) return json({ error: "Public skill not found." }, 404);
+      const doc = await cached(readmeCache, `${source.repository.toLowerCase()}:${source.folder}:${source.skillFile ?? ""}`,
+        () => loadDocuments(source));
+      return json({ skillId: id, skill: doc?.skill ?? null, readme: doc?.readme ?? null }, 200, doc ? 600 : 60);
     } catch {
       return json({ error: "README temporarily unavailable. Please try again." }, 503);
     }
