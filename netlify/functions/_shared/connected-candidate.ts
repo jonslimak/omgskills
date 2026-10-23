@@ -6,7 +6,7 @@ export const connectedCandidateOrigin = "https://omgskills-setup-test-f3b.netlif
 export const connectedCandidateSiteId = "16f435c1-e5d0-4b40-b174-382d839e877b";
 export const connectedCandidatePaths = [
   "/api/portal/sync-pairing-code", "/api/portal/sync-exchange", "/api/portal/sync-upload",
-  "/api/portal/synced-skills", "/api/portal/device-revoke",
+  "/api/portal/synced-skills", "/api/portal/device-revoke", "/api/portal/device-reconnect-key",
   "/api/portal/devices", "/api/portal/profile", "/api/portal/groups", "/api/portal/shared",
   "/api/portal/groups/:groupId",
 ] as const;
@@ -25,7 +25,7 @@ export type ConnectedCandidateConfiguration = Readonly<{
   secretKey: string;
 }>;
 export type CandidateRoute = "pair" | "exchange" | "revision" | "upload" | "read" | "revoke"
-  | "devices" | "profile" | "groups" | "shared" | "group-detail";
+  | "reconnect-key" | "devices" | "profile" | "groups" | "shared" | "group-detail";
 const accountReadRoutes: Readonly<Record<string, CandidateRoute>> = {
   "/api/portal/devices": "devices", "/api/portal/profile": "profile",
   "/api/portal/groups": "groups", "/api/portal/shared": "shared",
@@ -100,6 +100,7 @@ export function candidateRoute(req: Request): CandidateRoute {
     case "/api/portal/sync-exchange": return "exchange";
     case "/api/portal/sync-upload": return "upload";
     case "/api/portal/device-revoke": return "revoke";
+    case "/api/portal/device-reconnect-key": return "reconnect-key";
     default: throw new Response("Method not allowed", { status: 405 });
   }
 }
