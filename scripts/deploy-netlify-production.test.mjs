@@ -19,6 +19,21 @@ const env = {
   NETLIFY_PRODUCTION_STABILIZATION_DELAY_MS: "0",
 };
 
+const migrationNames = Array.from({ length: 13 }, (_, i) => `migration-${i}`);
+const migrationEntries = migrationNames.map((name, version) => ({ name, version }));
+const productionHistory = {
+  applied: migrationEntries.slice(0, 9),
+  pending: migrationEntries.slice(9),
+  missingOnDisk: [],
+  outOfOrder: [],
+};
+const previewHistory = {
+  applied: migrationEntries,
+  pending: [],
+  missingOnDisk: [],
+  outOfOrder: [],
+};
+
 function createHarness({
   head = "commit-1",
   originMain = "commit-1",
@@ -27,8 +42,10 @@ function createHarness({
   liveAfterFailure = "candidate-2",
   openIssue = null,
   helperAssetError = null,
-  previewMigrationCount = 13,
+  previewMigrationCount = 4,
   previewDatabaseBranchId = "preview-database-1",
+  productionStatus = productionHistory,
+  previewStatus = previewHistory,
 } = {}) {
   const calls = [];
   const receipts = [];
@@ -39,6 +56,11 @@ function createHarness({
     calls.push({ type: "command", key, env: options.env });
     if (key === "git rev-parse HEAD") return { stdout: `${head}\n`, stderr: "" };
     if (key === "git rev-parse origin/main") return { stdout: `${originMain}\n`, stderr: "" };
+    if (key.includes("netlify-cli database status")) {
+      const status = args[args.indexOf("--branch") + 1] === "production"
+        ? productionStatus : previewStatus;
+      return { stdout: JSON.stringify({ ...status, connectionString: "database-secret" }), stderr: "" };
+    }
     if (key.includes("netlify-cli deploy")) {
       if (args.includes("--prod")) {
         return { stdout: JSON.stringify({ deploy_id: "candidate-2" }), stderr: "" };
@@ -88,7 +110,9 @@ function createHarness({
       return Response.json({
         site_id: "site-123",
         database_branch_id: previewDatabaseBranchId,
-        database_migrations: { files: Array.from({ length: previewMigrationCount }, (_, i) => `migration-${i}`) },
+        database_migrations: {
+          files: migrationNames.slice(13 - previewMigrationCount).map((name) => ({ name, applied: true })),
+        },
       });
     }
     siteLookups += 1;
@@ -101,14 +125,14 @@ function createHarness({
     receipts,
     run,
     fetchImpl,
-    stageMigrations: async () => Array.from({ length: 13 }, (_, i) => `migration-${i}`),
+    stageMigrations: async () => migrationNames,
     verifyHelperAssets: async () => {
       calls.push({ type: "helper-assets" });
       if (helperAssetError) throw helperAssetError;
     },
     writeReceipt: async (_path, receipt) => {
       const serialized = JSON.stringify(receipt);
-      assert.doesNotMatch(serialized, /netlify-secret|github-secret/);
+      assert.doesNotMatch(serialized, /netlify-secret|github-secret|database-secret/);
       receipts.push(structuredClone(receipt));
     },
     sleep: async (milliseconds) => {
@@ -154,6 +178,7 @@ test("accepts the workflow's pushed commit and records a verified receipt", asyn
   assert.equal(deployCalls[1].key.includes("--build"), true);
   assert.equal(deployCalls[1].key.includes("--context=production"), true);
   assert.equal(receipt.previewMigrationCount, 13);
+  assert.deepEqual(receipt.pendingProductionMigrations, migrationNames.slice(9));
   assert.equal(receipt.previewDatabaseBranchId, "preview-database-1");
   const previewCheck = harness.calls.find(
     (call) => call.key?.includes("verify-production-deploy.mjs")
@@ -175,10 +200,24 @@ test("accepts the workflow's pushed commit and records a verified receipt", asyn
   );
 });
 
-test("missing migrations or a non-isolated draft database blocks production", async (t) => {
+test("already-migrated previews and production need no newly applied migrations", async () => {
+  const harness = createHarness({ previewMigrationCount: 0, productionStatus: previewHistory });
+  const receipt = await deployProduction({ env, ...harness });
+  assert.equal(receipt.status, "verified");
+  assert.equal(receipt.previewMigrationCount, 13);
+  assert.deepEqual(receipt.pendingProductionMigrations, []);
+});
+
+test("incomplete, mismatched or unsafe database history blocks production", async (t) => {
   for (const options of [
-    { previewMigrationCount: 0 },
-    { previewMigrationCount: 12 },
+    { previewStatus: { ...previewHistory, applied: migrationEntries.slice(0, 12) } },
+    { previewStatus: { ...previewHistory, applied: [...migrationEntries.slice(0, 12), { name: "wrong" }] } },
+    { previewStatus: { ...previewHistory, applied: [...migrationEntries.slice(0, 12), migrationEntries[0]] } },
+    { previewStatus: { ...productionHistory } },
+    { previewStatus: { ...previewHistory, missingOnDisk: [migrationEntries[0]] } },
+    { previewStatus: { ...previewHistory, outOfOrder: [migrationEntries[0]] } },
+    { previewStatus: { ...previewHistory, applied: null } },
+    { productionStatus: { ...productionHistory, pending: [] } },
     { previewDatabaseBranchId: null },
     { previewDatabaseBranchId: "production" },
   ]) {
@@ -271,9 +310,12 @@ test("stops without restoring the previous deploy and opens the circuit-breaker 
   assert.equal(productionChecks.at(0).env.VERIFY_CANDIDATE_FEATURES, "1");
   assert.equal(productionChecks.length, 3);
   assert.equal(productionChecks.at(-1).env.VERIFY_CANDIDATE_FEATURES, "1");
-  assert.equal(
-    harness.calls.some((call) => /database|migration|sql/i.test(call.key || call.path || "")),
-    false,
+  assert.deepEqual(
+    harness.calls.filter((call) => /database|migration|sql/i.test(call.key || call.path || "")).map((call) => call.key),
+    [
+      "npx netlify-cli database status --branch production --json",
+      "npx netlify-cli database status --branch preview-database-1 --json",
+    ],
   );
 });
 
