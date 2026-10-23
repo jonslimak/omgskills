@@ -55,6 +55,20 @@ test("invalid complete policy writes nothing", () => {
   if (!result.ok) assert.match(result.errors.join("\n"), /invalid-handle/);
 });
 
+test("creator save preserves exact path coverage and rejects malformed allowlists", () => {
+  const creator = { handle: "openai", roles: ["vendor" as const], watch: true, featured: true,
+    skillCoverage: "selected" as const, skillRepos: ["openai/codex"], skillPaths: ["openai/codex#skills/review/SKILL.md"] };
+  const saved = prepareEditoolPolicySave({ loaded: fixture(), replacements: { creators: { creators: [creator] } }, catalogContext });
+  assert.equal(saved.ok, true);
+  if (saved.ok) {
+    assert.equal(saved.entries.length, 1);
+    assert.deepEqual(saved.entries[0]!.value, { creators: [creator] });
+  }
+  const rejected = prepareEditoolPolicySave({ loaded: fixture(),
+    replacements: { creators: { creators: [{ ...creator, skillPaths: ["openai/codex#../SKILL.md"] }] } }, catalogContext });
+  assert.equal(rejected.ok, false);
+});
+
 test("combined proposal is validated once before preparing selected writes", () => {
   const result = prepareEditoolPolicySave({
     loaded: fixture(),

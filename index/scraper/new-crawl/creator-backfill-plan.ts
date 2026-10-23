@@ -10,7 +10,7 @@ import { isKnownCatalogRepo } from "./catalog-policy.js";
 import { deriveSkillIdFromPath, deriveSkillPathFromId } from "./candidate-path.js";
 import type { TrustedSeeds } from "./types.js";
 
-export const CREATOR_BACKFILL_PLAN_VERSION = 5;
+export const CREATOR_BACKFILL_PLAN_VERSION = 6;
 export const CREATOR_BACKFILL_LARGE_REPO_SKILL_LIMIT = 150;
 export const CREATOR_BACKFILL_INITIAL_QUOTA_MINIMUM = 3500;
 export const CREATOR_BACKFILL_QUOTA_RESERVE = 2000;
@@ -32,6 +32,7 @@ export type CreatorBackfillRepoScan = {
   paths?: string[];
   pathShas?: Record<string, string>;
   excludedPathPrefixes?: string[];
+  allowedSkillPaths?: string[];
 };
 
 export type CreatorBackfillPlanCandidate = {
@@ -41,6 +42,7 @@ export type CreatorBackfillPlanCandidate = {
   defaultBranch: string;
   path: string;
   proposedId: string;
+  repoAliases?: string[];
 };
 
 export type CreatorBackfillPlanExclusion = {
@@ -201,6 +203,10 @@ function mergeCanonicalRepoScans(scans: CreatorBackfillRepoScan[]): CreatorBackf
     const paths = [...new Set(ranked.flatMap((scan) => scan.paths ?? []))].sort();
     const aliases = [...new Set(ranked.flatMap((scan) => scan.aliases ?? []).map(normalizePolicyRepo))].sort();
     const excludedPathPrefixes = [...new Set(ranked.flatMap((scan) => scan.excludedPathPrefixes ?? []))].sort();
+    const restricted = ranked.filter(scan => scan.allowedSkillPaths !== undefined);
+    const allowedSkillPaths = restricted.length
+      ? [...new Set(restricted.flatMap(scan => scan.allowedSkillPaths ?? []))].sort()
+      : undefined;
     const allTreesUnavailable = ranked.every((scan) => scan.treeUnavailableReason !== undefined);
 
     return {
@@ -216,6 +222,7 @@ function mergeCanonicalRepoScans(scans: CreatorBackfillRepoScan[]): CreatorBackf
       paths,
       pathShas,
       excludedPathPrefixes,
+      allowedSkillPaths,
     };
   });
 }
@@ -309,6 +316,11 @@ export function buildCreatorBackfillPlan(input: {
     } else {
       for (const path of paths) {
         const proposedId = deriveSkillIdFromPath(scan.repoFullName, path);
+        if (scan.allowedSkillPaths !== undefined && !scan.allowedSkillPaths.includes(path)) {
+          reasons.add("creator-path-not-approved");
+          exclusions.push(exclusion(scan, "creator-path-not-approved", path, proposedId));
+          continue;
+        }
         if (matchesExcludedPathPrefix(path, scan.excludedPathPrefixes ?? [])) {
           reasons.add("creator-path-excluded");
           exclusions.push(exclusion(scan, "creator-path-excluded", path, proposedId));
@@ -358,6 +370,7 @@ export function buildCreatorBackfillPlan(input: {
           defaultBranch: scan.defaultBranch,
           path,
           proposedId,
+          ...(scan.aliases?.length ? { repoAliases: scan.aliases } : {}),
         });
       }
     }

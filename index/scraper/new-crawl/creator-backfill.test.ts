@@ -212,6 +212,31 @@ test("plans exact SKILL.md files at arbitrary depth deterministically", () => {
   ]);
 });
 
+test("exact path scope excludes unapproved files even from an explicitly approved large repo", () => {
+  const paths = Array.from({ length: 388 }, (_, i) => `skills/skill-${i}/SKILL.md`);
+  const plan = build([scan({ paths, explicitlyApproved: true, allowedSkillPaths: paths.slice(0, 6) })]);
+  assert.equal(plan.candidates.length, 6);
+  assert.equal(plan.exclusions.length, 382);
+  assert.ok(plan.exclusions.every(row => row.reason === "creator-path-not-approved"));
+  assert.deepEqual(plan.candidates.map(row => row.path).sort(), paths.slice(0, 6).sort());
+});
+
+test("empty exact path scope fails closed and existing exclusion policy still wins", () => {
+  assert.equal(build([scan({ allowedSkillPaths: [] })]).candidates.length, 0);
+  assert.equal(build([scan({ allowedSkillPaths: ["skills/one/SKILL.md"], excludedPathPrefixes: ["skills/one"] })]).candidates.length, 0);
+  const blocked = seeds({ doNotCrawlRepos: new Set(["creator/skills"]) });
+  assert.equal(build([scan({ allowedSkillPaths: ["skills/one/SKILL.md"] })], [], blocked).candidates.length, 0);
+});
+
+test("canonical alias scans retain exact path restrictions and alias evidence for apply", () => {
+  const plan = build([
+    scan({ aliases: ["creator/old"], allowedSkillPaths: ["skills/one/SKILL.md"] }),
+    scan({ paths: ["skills/two/SKILL.md"] }),
+  ]);
+  assert.deepEqual(plan.candidates.map(row => row.path), ["skills/one/SKILL.md"]);
+  assert.deepEqual(plan.candidates[0]?.repoAliases, ["creator/old"]);
+});
+
 test("creator backfill excludes raw source, test data, and fixture path segments", () => {
   const blockedPaths = [
     "brain/.raw/sources/skill/SKILL.md",

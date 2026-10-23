@@ -1,0 +1,1082 @@
+{
+  "generatedAt": "2026-10-23T17:16:02.577Z",
+  "status": "applied-shadow-only",
+  "isolatedCheckout": "/private/tmp/omgskills-exact-creator-paths-20261023",
+  "summary": {
+    "planCandidateCount": 40,
+    "finalCount": 40,
+    "pendingCount": 0,
+    "addedCount": 40,
+    "existingCount": 0,
+    "policySkippedCount": 0,
+    "stableFailedCount": 0,
+    "transientFailedCount": 0
+  },
+  "addedSkills": [
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/account-context",
+      "name": "account-context",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/account-context/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/account-plan",
+      "name": "account-plan",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/account-plan/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/account-tiering",
+      "name": "account-tiering",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/account-tiering/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/close-plan",
+      "name": "close-plan",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/close-plan/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/crm-hygiene-check",
+      "name": "crm-hygiene-check",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/crm-hygiene-check/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/customer-health",
+      "name": "customer-health",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/customer-health/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/customer-voice",
+      "name": "customer-voice",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/customer-voice/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/deal-advance-gap",
+      "name": "deal-advance-gap",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/deal-advance-gap/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/deal-review",
+      "name": "deal-review",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/deal-review/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/deal-signals",
+      "name": "deal-signals",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/deal-signals/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/deal-slip-scenario",
+      "name": "deal-slip-scenario",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/deal-slip-scenario/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/end-of-day",
+      "name": "end-of-day",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/end-of-day/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/expansion-whitespace",
+      "name": "expansion-whitespace",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/expansion-whitespace/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/handle-objection",
+      "name": "handle-objection",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/handle-objection/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/inbox-sweep",
+      "name": "inbox-sweep",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/inbox-sweep/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/log-activity",
+      "name": "log-activity",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/log-activity/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/renewal-radar",
+      "name": "renewal-radar",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/renewal-radar/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/rep-context",
+      "name": "rep-context",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/rep-context/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/route-lead",
+      "name": "route-lead",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/route-lead/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/schedule-meeting",
+      "name": "schedule-meeting",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/schedule-meeting/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/setup",
+      "name": "setup",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/setup/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/stakeholder-map",
+      "name": "stakeholder-map",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/stakeholder-map/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/team-pipeline",
+      "name": "team-pipeline",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/team-pipeline/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/update-opportunity",
+      "name": "update-opportunity",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/update-opportunity/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/weekly-wrap",
+      "name": "weekly-wrap",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/weekly-wrap/SKILL.md"
+    },
+    {
+      "id": "anthropics/knowledge-work-plugins:sales/skills/win-loss-review",
+      "name": "win-loss-review",
+      "repo": "anthropics/knowledge-work-plugins",
+      "path": "sales/skills/win-loss-review/SKILL.md"
+    },
+    {
+      "id": "posthog/ai-plugin:skills/authoring-data-quality-checks",
+      "name": "authoring-data-quality-checks",
+      "repo": "posthog/ai-plugin",
+      "path": "skills/authoring-data-quality-checks/SKILL.md"
+    },
+    {
+      "id": "posthog/ai-plugin:skills/creating-box-plot-insights",
+      "name": "creating-box-plot-insights",
+      "repo": "posthog/ai-plugin",
+      "path": "skills/creating-box-plot-insights/SKILL.md"
+    },
+    {
+      "id": "posthog/ai-plugin:skills/instrument-metrics",
+      "name": "instrument-metrics",
+      "repo": "posthog/ai-plugin",
+      "path": "skills/instrument-metrics/SKILL.md"
+    },
+    {
+      "id": "posthog/ai-plugin:skills/review-hog-resolution-criteria",
+      "name": "review-hog-resolution-criteria",
+      "repo": "posthog/ai-plugin",
+      "path": "skills/review-hog-resolution-criteria/SKILL.md"
+    },
+    {
+      "id": "posthog/ai-plugin:skills/setting-up-warehouse-properties",
+      "name": "setting-up-warehouse-properties",
+      "repo": "posthog/ai-plugin",
+      "path": "skills/setting-up-warehouse-properties/SKILL.md"
+    },
+    {
+      "id": "posthog/ai-plugin:skills/understanding-billing-usage",
+      "name": "understanding-billing-usage",
+      "repo": "posthog/ai-plugin",
+      "path": "skills/understanding-billing-usage/SKILL.md"
+    },
+    {
+      "id": "posthog/ai-plugin:skills/working-with-scouts",
+      "name": "working-with-scouts",
+      "repo": "posthog/ai-plugin",
+      "path": "skills/working-with-scouts/SKILL.md"
+    },
+    {
+      "id": "posthog/ai-plugin:skills/writing-simplified-technical-english",
+      "name": "writing-simplified-technical-english",
+      "repo": "posthog/ai-plugin",
+      "path": "skills/writing-simplified-technical-english/SKILL.md"
+    },
+    {
+      "id": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/coordinate-team-work",
+      "name": "coordinate-team-work",
+      "repo": "ruvnet/ruflo",
+      "path": "plugins/ruflo-ai-team/skills/coordinate-team-work/SKILL.md"
+    },
+    {
+      "id": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/launch-ai-team",
+      "name": "launch-ai-team",
+      "repo": "ruvnet/ruflo",
+      "path": "plugins/ruflo-ai-team/skills/launch-ai-team/SKILL.md"
+    },
+    {
+      "id": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/manage-team-lifecycle",
+      "name": "manage-team-lifecycle",
+      "repo": "ruvnet/ruflo",
+      "path": "plugins/ruflo-ai-team/skills/manage-team-lifecycle/SKILL.md"
+    },
+    {
+      "id": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/monitor-ai-team",
+      "name": "monitor-ai-team",
+      "repo": "ruvnet/ruflo",
+      "path": "plugins/ruflo-ai-team/skills/monitor-ai-team/SKILL.md"
+    },
+    {
+      "id": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/remember-team-context",
+      "name": "remember-team-context",
+      "repo": "ruvnet/ruflo",
+      "path": "plugins/ruflo-ai-team/skills/remember-team-context/SKILL.md"
+    },
+    {
+      "id": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/review-team-deliverables",
+      "name": "review-team-deliverables",
+      "repo": "ruvnet/ruflo",
+      "path": "plugins/ruflo-ai-team/skills/review-team-deliverables/SKILL.md"
+    }
+  ],
+  "workspaceBeforeCount": 47731,
+  "workspaceAfterCount": 47771,
+  "earlierAdditionsPreserved": 41,
+  "missingBaselineCount": 0,
+  "cutoverValidationPassed": true,
+  "pinnedSourceBlobMatches": 40,
+  "rufloCoverage": {
+    "exactPathCount": 6,
+    "reviewedRepositorySkillCount": 388,
+    "remainingPathsApproved": false
+  },
+  "productionDataChanged": false,
+  "combinedCrawlRun": false,
+  "published": false,
+  "sourceChangesCommittedAtApply": false,
+  "archive": "/Users/jonslimak/Projects/omgskills/index/shadow/directory-recommended-40-20261023",
+  "finalReport": {
+    "version": 1,
+    "generatedAt": "2026-10-23T17:14:35.383Z",
+    "sourceCommit": "c738922fc31b31f2d2ddaab58f2219bb0924fc50",
+    "policyDigest": "sha256:a20333ffe327b57470a2480f28675a0307aff5abd3ebc933d2fb49ca964971cc",
+    "creatorRegistryRevision": "sha256:0e2b745cbc5c20dae2a06bdb02819e3990948ad0ac903767e9d958e8c190bc56",
+    "planFingerprint": "sha256:2315a9cb9c0c35519c5e94ee5d15a5493768ab07478a5ed1cf21b2165d1966d5",
+    "ready": true,
+    "summary": {
+      "discoveredSkillCount": 40,
+      "dispositionCount": 40,
+      "addedCount": 40,
+      "alreadyPresentCount": 0,
+      "policyRejectedCount": 0,
+      "invalidCount": 0,
+      "transientFailedCount": 0,
+      "pendingCount": 0,
+      "reviewRequiredRepositoryCount": 0
+    },
+    "issues": [],
+    "dispositions": [
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/account-context/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/account-context/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/account-context",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/account-plan/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/account-plan/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/account-plan",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/account-tiering/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/account-tiering/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/account-tiering",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/close-plan/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/close-plan/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/close-plan",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/crm-hygiene-check/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/crm-hygiene-check/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/crm-hygiene-check",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/customer-health/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/customer-health/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/customer-health",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/customer-voice/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/customer-voice/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/customer-voice",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/deal-advance-gap/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/deal-advance-gap/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/deal-advance-gap",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/deal-review/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/deal-review/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/deal-review",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/deal-signals/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/deal-signals/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/deal-signals",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/deal-slip-scenario/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/deal-slip-scenario/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/deal-slip-scenario",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/end-of-day/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/end-of-day/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/end-of-day",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/expansion-whitespace/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/expansion-whitespace/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/expansion-whitespace",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/handle-objection/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/handle-objection/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/handle-objection",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/inbox-sweep/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/inbox-sweep/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/inbox-sweep",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/log-activity/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/log-activity/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/log-activity",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/renewal-radar/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/renewal-radar/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/renewal-radar",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/rep-context/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/rep-context/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/rep-context",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/route-lead/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/route-lead/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/route-lead",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/schedule-meeting/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/schedule-meeting/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/schedule-meeting",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/setup/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/setup/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/setup",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/stakeholder-map/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/stakeholder-map/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/stakeholder-map",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/team-pipeline/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/team-pipeline/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/team-pipeline",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/update-opportunity/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/update-opportunity/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/update-opportunity",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/weekly-wrap/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/weekly-wrap/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/weekly-wrap",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "anthropics/knowledge-work-plugins#sales/skills/win-loss-review/skill.md",
+        "creator": "anthropics",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/win-loss-review/SKILL.md",
+        "proposedId": "anthropics/knowledge-work-plugins:sales/skills/win-loss-review",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "posthog/ai-plugin#skills/authoring-data-quality-checks/skill.md",
+        "creator": "posthog",
+        "repo": "posthog/ai-plugin",
+        "path": "skills/authoring-data-quality-checks/SKILL.md",
+        "proposedId": "posthog/ai-plugin:skills/authoring-data-quality-checks",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "posthog/ai-plugin#skills/creating-box-plot-insights/skill.md",
+        "creator": "posthog",
+        "repo": "posthog/ai-plugin",
+        "path": "skills/creating-box-plot-insights/SKILL.md",
+        "proposedId": "posthog/ai-plugin:skills/creating-box-plot-insights",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "posthog/ai-plugin#skills/instrument-metrics/skill.md",
+        "creator": "posthog",
+        "repo": "posthog/ai-plugin",
+        "path": "skills/instrument-metrics/SKILL.md",
+        "proposedId": "posthog/ai-plugin:skills/instrument-metrics",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "posthog/ai-plugin#skills/review-hog-resolution-criteria/skill.md",
+        "creator": "posthog",
+        "repo": "posthog/ai-plugin",
+        "path": "skills/review-hog-resolution-criteria/SKILL.md",
+        "proposedId": "posthog/ai-plugin:skills/review-hog-resolution-criteria",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "posthog/ai-plugin#skills/setting-up-warehouse-properties/skill.md",
+        "creator": "posthog",
+        "repo": "posthog/ai-plugin",
+        "path": "skills/setting-up-warehouse-properties/SKILL.md",
+        "proposedId": "posthog/ai-plugin:skills/setting-up-warehouse-properties",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "posthog/ai-plugin#skills/understanding-billing-usage/skill.md",
+        "creator": "posthog",
+        "repo": "posthog/ai-plugin",
+        "path": "skills/understanding-billing-usage/SKILL.md",
+        "proposedId": "posthog/ai-plugin:skills/understanding-billing-usage",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "posthog/ai-plugin#skills/working-with-scouts/skill.md",
+        "creator": "posthog",
+        "repo": "posthog/ai-plugin",
+        "path": "skills/working-with-scouts/SKILL.md",
+        "proposedId": "posthog/ai-plugin:skills/working-with-scouts",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "posthog/ai-plugin#skills/writing-simplified-technical-english/skill.md",
+        "creator": "posthog",
+        "repo": "posthog/ai-plugin",
+        "path": "skills/writing-simplified-technical-english/SKILL.md",
+        "proposedId": "posthog/ai-plugin:skills/writing-simplified-technical-english",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "ruvnet/ruflo#plugins/ruflo-ai-team/skills/coordinate-team-work/skill.md",
+        "creator": "ruvnet",
+        "repo": "ruvnet/ruflo",
+        "path": "plugins/ruflo-ai-team/skills/coordinate-team-work/SKILL.md",
+        "proposedId": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/coordinate-team-work",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "ruvnet/ruflo#plugins/ruflo-ai-team/skills/launch-ai-team/skill.md",
+        "creator": "ruvnet",
+        "repo": "ruvnet/ruflo",
+        "path": "plugins/ruflo-ai-team/skills/launch-ai-team/SKILL.md",
+        "proposedId": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/launch-ai-team",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "ruvnet/ruflo#plugins/ruflo-ai-team/skills/manage-team-lifecycle/skill.md",
+        "creator": "ruvnet",
+        "repo": "ruvnet/ruflo",
+        "path": "plugins/ruflo-ai-team/skills/manage-team-lifecycle/SKILL.md",
+        "proposedId": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/manage-team-lifecycle",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "ruvnet/ruflo#plugins/ruflo-ai-team/skills/monitor-ai-team/skill.md",
+        "creator": "ruvnet",
+        "repo": "ruvnet/ruflo",
+        "path": "plugins/ruflo-ai-team/skills/monitor-ai-team/SKILL.md",
+        "proposedId": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/monitor-ai-team",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "ruvnet/ruflo#plugins/ruflo-ai-team/skills/remember-team-context/skill.md",
+        "creator": "ruvnet",
+        "repo": "ruvnet/ruflo",
+        "path": "plugins/ruflo-ai-team/skills/remember-team-context/SKILL.md",
+        "proposedId": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/remember-team-context",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      },
+      {
+        "key": "ruvnet/ruflo#plugins/ruflo-ai-team/skills/review-team-deliverables/skill.md",
+        "creator": "ruvnet",
+        "repo": "ruvnet/ruflo",
+        "path": "plugins/ruflo-ai-team/skills/review-team-deliverables/SKILL.md",
+        "proposedId": "ruvnet/ruflo:plugins/ruflo-ai-team/skills/review-team-deliverables",
+        "status": "added",
+        "reason": "added",
+        "attemptCount": 1
+      }
+    ]
+  },
+  "reviewedPins": [
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "account-context",
+      "path": "sales/skills/account-context/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "35158c9fc52165f0ce1e9df7497261f20ebcd6b0",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/account-context/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "account-plan",
+      "path": "sales/skills/account-plan/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "57234423eca761f9608bc7a545c78f4247f54039",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/account-plan/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "account-tiering",
+      "path": "sales/skills/account-tiering/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "2962fc140b7b566d852d6f8408fd10aed66d1396",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/account-tiering/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "close-plan",
+      "path": "sales/skills/close-plan/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "9c9a9f450e8142d9b5fd02ea066dd17dd90eb1cd",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/close-plan/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "crm-hygiene-check",
+      "path": "sales/skills/crm-hygiene-check/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "d33ec209b96e53f5e07be4dc3c5855fa068d367f",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/crm-hygiene-check/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "customer-health",
+      "path": "sales/skills/customer-health/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "54f16a39595c8a2d9730c4916d24e776b8e17a4d",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/customer-health/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "customer-voice",
+      "path": "sales/skills/customer-voice/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "3f031770add09cb26bfb4e7d8fc6c448bb658c41",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/customer-voice/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "deal-advance-gap",
+      "path": "sales/skills/deal-advance-gap/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "f671b26aff5e10e243f5c60e36d962b3e1def7e1",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/deal-advance-gap/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "deal-review",
+      "path": "sales/skills/deal-review/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "b1e911d45ddba2fa1c812a9578a229bf04793c32",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/deal-review/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "deal-signals",
+      "path": "sales/skills/deal-signals/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "472800e2d929c21baa6f7840bc22a1ded4248d00",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/deal-signals/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "deal-slip-scenario",
+      "path": "sales/skills/deal-slip-scenario/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "6a978ae72c0b0135311c33a2846f50e0ed64aef0",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/deal-slip-scenario/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "end-of-day",
+      "path": "sales/skills/end-of-day/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "20ced094b793090a709e6af762115b97008b9a74",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/end-of-day/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "expansion-whitespace",
+      "path": "sales/skills/expansion-whitespace/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "456f1fb69a2a32188eba935bbebcb62a1e682c14",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/expansion-whitespace/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "handle-objection",
+      "path": "sales/skills/handle-objection/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "3c66962f9c87a8e9a2769556f49f04f3043a0098",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/handle-objection/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "inbox-sweep",
+      "path": "sales/skills/inbox-sweep/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "ace73fa51264bd5d0c6a53be29d9db485a0fe66b",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/inbox-sweep/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "log-activity",
+      "path": "sales/skills/log-activity/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "8e11317f3378b8986f1ed8c1f2a6e3a6d54098ab",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/log-activity/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "renewal-radar",
+      "path": "sales/skills/renewal-radar/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "5d9c42b8ffdfb8dd3a0d16d048a874fb82a401b9",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/renewal-radar/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "rep-context",
+      "path": "sales/skills/rep-context/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "5636a06ee57755ccfd145b2342f50de76490ea30",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/rep-context/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "route-lead",
+      "path": "sales/skills/route-lead/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "3aa58f8c0f2712df1e6e7de9242daaa7ee40ef20",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/route-lead/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "schedule-meeting",
+      "path": "sales/skills/schedule-meeting/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "de86832420a0a08081d54e3233525f536c651bcb",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/schedule-meeting/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "setup",
+      "path": "sales/skills/setup/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "2852c46ca5d9855e18535320f2b2d542d39dcc00",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/setup/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "stakeholder-map",
+      "path": "sales/skills/stakeholder-map/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "09e7f8d5785bfaf622b5d383309d0d1e6ef96dcc",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/stakeholder-map/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "team-pipeline",
+      "path": "sales/skills/team-pipeline/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "b290583ddd4cf429df3e7c079c0f1ec29b55a3bf",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/team-pipeline/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "update-opportunity",
+      "path": "sales/skills/update-opportunity/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "bc83e11d06917adfed2f74d04d00b5c358e89b70",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/update-opportunity/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "weekly-wrap",
+      "path": "sales/skills/weekly-wrap/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "050aceabf8f83355d18414f248d67ab1a7e8b85d",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/weekly-wrap/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "name": "win-loss-review",
+      "path": "sales/skills/win-loss-review/SKILL.md",
+      "commitSha": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "skillMdSha": "742bcab82f9b9ad465955ba8a11ec0aed3f85246",
+      "sourceUrl": "https://github.com/anthropics/knowledge-work-plugins/blob/33d3dea41a341b341d4f5da2e8801ae0c89be2b8/sales/skills/win-loss-review/SKILL.md",
+      "runtimeNote": "Supports connector inputs or uploaded/pasted files; no integration test performed."
+    },
+    {
+      "repo": "posthog/ai-plugin",
+      "name": "authoring-data-quality-checks",
+      "path": "skills/authoring-data-quality-checks/SKILL.md",
+      "commitSha": "0809767db74e427a9596e8c370d94df288082dc0",
+      "skillMdSha": "4684e1d1d9e1fc7ee9c3cb8c027e94a55154f16d",
+      "sourceUrl": "https://github.com/posthog/ai-plugin/blob/0809767db74e427a9596e8c370d94df288082dc0/skills/authoring-data-quality-checks/SKILL.md",
+      "runtimeNote": "PostHog feature/connector prerequisites vary by skill; no integration test performed."
+    },
+    {
+      "repo": "posthog/ai-plugin",
+      "name": "creating-box-plot-insights",
+      "path": "skills/creating-box-plot-insights/SKILL.md",
+      "commitSha": "0809767db74e427a9596e8c370d94df288082dc0",
+      "skillMdSha": "53f1dc6febbe38fffa802966623fbf6db6649c61",
+      "sourceUrl": "https://github.com/posthog/ai-plugin/blob/0809767db74e427a9596e8c370d94df288082dc0/skills/creating-box-plot-insights/SKILL.md",
+      "runtimeNote": "PostHog feature/connector prerequisites vary by skill; no integration test performed."
+    },
+    {
+      "repo": "posthog/ai-plugin",
+      "name": "instrument-metrics",
+      "path": "skills/instrument-metrics/SKILL.md",
+      "commitSha": "0809767db74e427a9596e8c370d94df288082dc0",
+      "skillMdSha": "0e47802dafa30e7470a7a60d77fb49ce38b91d4f",
+      "sourceUrl": "https://github.com/posthog/ai-plugin/blob/0809767db74e427a9596e8c370d94df288082dc0/skills/instrument-metrics/SKILL.md",
+      "runtimeNote": "PostHog feature/connector prerequisites vary by skill; no integration test performed."
+    },
+    {
+      "repo": "posthog/ai-plugin",
+      "name": "review-hog-resolution-criteria",
+      "path": "skills/review-hog-resolution-criteria/SKILL.md",
+      "commitSha": "0809767db74e427a9596e8c370d94df288082dc0",
+      "skillMdSha": "06e3675bdcfd1ed2e8cb6549d9c46e3cdb5c164c",
+      "sourceUrl": "https://github.com/posthog/ai-plugin/blob/0809767db74e427a9596e8c370d94df288082dc0/skills/review-hog-resolution-criteria/SKILL.md",
+      "runtimeNote": "PostHog feature/connector prerequisites vary by skill; no integration test performed."
+    },
+    {
+      "repo": "posthog/ai-plugin",
+      "name": "setting-up-warehouse-properties",
+      "path": "skills/setting-up-warehouse-properties/SKILL.md",
+      "commitSha": "0809767db74e427a9596e8c370d94df288082dc0",
+      "skillMdSha": "9b8a22d618d409b69c8923b698c065c4898014fe",
+      "sourceUrl": "https://github.com/posthog/ai-plugin/blob/0809767db74e427a9596e8c370d94df288082dc0/skills/setting-up-warehouse-properties/SKILL.md",
+      "runtimeNote": "PostHog feature/connector prerequisites vary by skill; no integration test performed."
+    },
+    {
+      "repo": "posthog/ai-plugin",
+      "name": "understanding-billing-usage",
+      "path": "skills/understanding-billing-usage/SKILL.md",
+      "commitSha": "0809767db74e427a9596e8c370d94df288082dc0",
+      "skillMdSha": "70a1654d289e6350722d94b63bb98f5c9ba00750",
+      "sourceUrl": "https://github.com/posthog/ai-plugin/blob/0809767db74e427a9596e8c370d94df288082dc0/skills/understanding-billing-usage/SKILL.md",
+      "runtimeNote": "PostHog feature/connector prerequisites vary by skill; no integration test performed."
+    },
+    {
+      "repo": "posthog/ai-plugin",
+      "name": "working-with-scouts",
+      "path": "skills/working-with-scouts/SKILL.md",
+      "commitSha": "0809767db74e427a9596e8c370d94df288082dc0",
+      "skillMdSha": "e33bf368a32c7af46fbf9c672a540af27e2ac9ab",
+      "sourceUrl": "https://github.com/posthog/ai-plugin/blob/0809767db74e427a9596e8c370d94df288082dc0/skills/working-with-scouts/SKILL.md",
+      "runtimeNote": "PostHog feature/connector prerequisites vary by skill; no integration test performed."
+    },
+    {
+      "repo": "posthog/ai-plugin",
+      "name": "writing-simplified-technical-english",
+      "path": "skills/writing-simplified-technical-english/SKILL.md",
+      "commitSha": "0809767db74e427a9596e8c370d94df288082dc0",
+      "skillMdSha": "85b1a6a90a8942d2f50438d12ef7afa24a507dd1",
+      "sourceUrl": "https://github.com/posthog/ai-plugin/blob/0809767db74e427a9596e8c370d94df288082dc0/skills/writing-simplified-technical-english/SKILL.md",
+      "runtimeNote": "PostHog feature/connector prerequisites vary by skill; no integration test performed."
+    },
+    {
+      "repo": "ruvnet/ruflo",
+      "name": "coordinate-team-work",
+      "path": "plugins/ruflo-ai-team/skills/coordinate-team-work/SKILL.md",
+      "commitSha": "e8c98eb91606bf1ee71229a04621d71491feecf3",
+      "skillMdSha": "5c582cddac85c58314e89f1bc160b8922dc0e547",
+      "sourceUrl": "https://github.com/ruvnet/ruflo/blob/e8c98eb91606bf1ee71229a04621d71491feecf3/plugins/ruflo-ai-team/skills/coordinate-team-work/SKILL.md",
+      "runtimeNote": "Requires the separately configured RuFlo AI Team MCP connector."
+    },
+    {
+      "repo": "ruvnet/ruflo",
+      "name": "launch-ai-team",
+      "path": "plugins/ruflo-ai-team/skills/launch-ai-team/SKILL.md",
+      "commitSha": "e8c98eb91606bf1ee71229a04621d71491feecf3",
+      "skillMdSha": "33831f0e4fed4f9acfdd4e01a74a6e8701988390",
+      "sourceUrl": "https://github.com/ruvnet/ruflo/blob/e8c98eb91606bf1ee71229a04621d71491feecf3/plugins/ruflo-ai-team/skills/launch-ai-team/SKILL.md",
+      "runtimeNote": "Requires the separately configured RuFlo AI Team MCP connector."
+    },
+    {
+      "repo": "ruvnet/ruflo",
+      "name": "manage-team-lifecycle",
+      "path": "plugins/ruflo-ai-team/skills/manage-team-lifecycle/SKILL.md",
+      "commitSha": "e8c98eb91606bf1ee71229a04621d71491feecf3",
+      "skillMdSha": "6603a8a4f0d8fbc7c862a0c27f4f48aa374dc6cb",
+      "sourceUrl": "https://github.com/ruvnet/ruflo/blob/e8c98eb91606bf1ee71229a04621d71491feecf3/plugins/ruflo-ai-team/skills/manage-team-lifecycle/SKILL.md",
+      "runtimeNote": "Requires the separately configured RuFlo AI Team MCP connector."
+    },
+    {
+      "repo": "ruvnet/ruflo",
+      "name": "monitor-ai-team",
+      "path": "plugins/ruflo-ai-team/skills/monitor-ai-team/SKILL.md",
+      "commitSha": "e8c98eb91606bf1ee71229a04621d71491feecf3",
+      "skillMdSha": "e41c926f07ca205a6c3308c5e3788f3a538379ea",
+      "sourceUrl": "https://github.com/ruvnet/ruflo/blob/e8c98eb91606bf1ee71229a04621d71491feecf3/plugins/ruflo-ai-team/skills/monitor-ai-team/SKILL.md",
+      "runtimeNote": "Requires the separately configured RuFlo AI Team MCP connector."
+    },
+    {
+      "repo": "ruvnet/ruflo",
+      "name": "remember-team-context",
+      "path": "plugins/ruflo-ai-team/skills/remember-team-context/SKILL.md",
+      "commitSha": "e8c98eb91606bf1ee71229a04621d71491feecf3",
+      "skillMdSha": "abbebd50b1f61c9a8be0d16be1586d6ba357112c",
+      "sourceUrl": "https://github.com/ruvnet/ruflo/blob/e8c98eb91606bf1ee71229a04621d71491feecf3/plugins/ruflo-ai-team/skills/remember-team-context/SKILL.md",
+      "runtimeNote": "Requires the separately configured RuFlo AI Team MCP connector."
+    },
+    {
+      "repo": "ruvnet/ruflo",
+      "name": "review-team-deliverables",
+      "path": "plugins/ruflo-ai-team/skills/review-team-deliverables/SKILL.md",
+      "commitSha": "e8c98eb91606bf1ee71229a04621d71491feecf3",
+      "skillMdSha": "3af899e9602467356fa9f795b6fdad4e132f3a82",
+      "sourceUrl": "https://github.com/ruvnet/ruflo/blob/e8c98eb91606bf1ee71229a04621d71491feecf3/plugins/ruflo-ai-team/skills/review-team-deliverables/SKILL.md",
+      "runtimeNote": "Requires the separately configured RuFlo AI Team MCP connector."
+    }
+  ],
+  "sourceVerification": [
+    {
+      "repo": "anthropics/knowledge-work-plugins",
+      "commit": "33d3dea41a341b341d4f5da2e8801ae0c89be2b8",
+      "fullSkillFileCount": 252,
+      "selectedCount": 26,
+      "pathRestrictionCount": null
+    },
+    {
+      "repo": "posthog/ai-plugin",
+      "commit": "0809767db74e427a9596e8c370d94df288082dc0",
+      "fullSkillFileCount": 173,
+      "selectedCount": 8,
+      "pathRestrictionCount": null
+    },
+    {
+      "repo": "ruvnet/ruflo",
+      "commit": "e8c98eb91606bf1ee71229a04621d71491feecf3",
+      "fullSkillFileCount": 388,
+      "selectedCount": 6,
+      "pathRestrictionCount": 6
+    }
+  ],
+  "appliedPlanPath": "index/reports/claude-directory-recommended-40.applied-plan.json"
+}

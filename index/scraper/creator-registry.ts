@@ -18,6 +18,7 @@ export type CreatorRegistryEntry = {
   aliases?: string[];
   skillCoverage?: CreatorSkillCoverage;
   skillRepos?: string[];
+  skillPaths?: string[];
   skillPathExclusions?: string[];
   notes?: string;
 };
@@ -49,6 +50,45 @@ export function hasApprovedCreatorCoverage(entry: CreatorRegistryEntry): boolean
     entry.skillCoverage === "all"
     || (entry.skillCoverage === "selected" && Boolean(entry.skillRepos?.length))
   );
+}
+
+function parseSkillPath(value: string): { repo: string; path: string } {
+  const separator = value.indexOf("#");
+  const repo = value.slice(0, separator);
+  const path = value.slice(separator + 1);
+  if (separator <= 0 || value.indexOf("#", separator + 1) >= 0 || !isValidPolicyRepo(repo)
+    || path.includes("\\") || /[\x00-\x1f?#]/.test(path) || path !== path.trim()
+    || path.split("/").some(segment => !segment || segment === "." || segment === "..")
+    || !(path === "SKILL.md" || path.endsWith("/SKILL.md"))) {
+    throw new Error("skillPaths must use owner/repo#exact/path/SKILL.md.");
+  }
+  return { repo: normalizePolicyRepo(repo), path };
+}
+
+export function creatorSkillPathsForRepo(
+  entry: CreatorRegistryEntry, repo: string, aliases: string[] = [],
+): string[] | undefined {
+  if (entry.skillPaths === undefined) return undefined;
+  const repos = new Set([repo, ...aliases].map(normalizePolicyRepo));
+  return entry.skillPaths.map(parseSkillPath).filter(rule => repos.has(rule.repo)).map(rule => rule.path);
+}
+
+export function isCreatorSkillPathApproved(
+  entry: CreatorRegistryEntry, repo: string, path: string, aliases: string[] = [],
+): boolean {
+  if (!hasApprovedCreatorCoverage(entry)) return false;
+  const repos = new Set([repo, ...aliases].map(normalizePolicyRepo));
+  if (entry.skillCoverage === "selected" && !(entry.skillRepos ?? []).some(value => repos.has(normalizePolicyRepo(value)))) {
+    return false;
+  }
+  const allowed = creatorSkillPathsForRepo(entry, repo, aliases);
+  if (allowed !== undefined && !allowed.includes(path)) return false;
+  return !(entry.skillPathExclusions ?? []).some(rule => {
+    const separator = rule.indexOf("#");
+    const prefix = rule.slice(separator + 1).replace(/^\.\//, "").replace(/^\/+|\/+$/g, "").toLowerCase();
+    return repos.has(normalizePolicyRepo(rule.slice(0, separator)))
+      && (path.toLowerCase() === prefix || path.toLowerCase().startsWith(`${prefix}/`));
+  });
 }
 
 export function buildCreatorRegistry(source: CreatorRegistrySource): CreatorRegistry {
@@ -123,6 +163,21 @@ export function buildCreatorRegistry(source: CreatorRegistrySource): CreatorRegi
     }
     if (coverage === "selected" && !entry.skillRepos?.length) {
       throw new Error(`Invalid creators.json entry for ${canonical}: selected coverage requires skillRepos.`);
+    }
+    if (entry.skillPaths !== undefined) {
+      if (coverage !== "selected" || !Array.isArray(entry.skillPaths) || !entry.skillPaths.length) {
+        throw new Error(`Invalid creators.json entry for ${canonical}: skillPaths requires selected coverage and a non-empty array.`);
+      }
+      const repos = new Set((entry.skillRepos ?? []).map(normalizePolicyRepo));
+      const paths = new Set<string>();
+      for (const value of entry.skillPaths) {
+        if (typeof value !== "string") throw new Error(`Invalid skillPaths entry for ${canonical}.`);
+        const rule = parseSkillPath(value);
+        if (!repos.has(rule.repo)) throw new Error(`Invalid skillPaths entry for ${canonical}: ${rule.repo} is not in skillRepos.`);
+        const key = `${rule.repo}#${rule.path}`;
+        if (paths.has(key)) throw new Error(`Duplicate skillPaths entry for ${canonical}: ${key}.`);
+        paths.add(key);
+      }
     }
     if (entry.skillPathExclusions !== undefined) {
       if (!coverage) {

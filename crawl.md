@@ -140,6 +140,13 @@ Registry fields have separate meanings:
   it does not independently admit catalog rows
 - aliases normalize old or alternate handles to one registry owner
 
+For reviewed partial-repo coverage, `skillPaths` optionally lists exact
+`owner/repo#path/to/SKILL.md` entries alongside `skillCoverage: "selected"` and
+`skillRepos`. When present, only those exact paths can enter creator coverage,
+including future maintenance and apply runs; new sibling skills are not implicitly
+approved. Git path casing is preserved. Existing path exclusions and other policy
+still win. Omitting `skillPaths` retains normal repo-level coverage.
+
 ### Door 3 — Featured (fully human)
 
 Public endorsement: creator profiles, collections. Granted only by the

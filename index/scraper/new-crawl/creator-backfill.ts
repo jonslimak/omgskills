@@ -5,6 +5,8 @@ import { octokit } from "../client.js";
 import { enrichCandidate, type Candidate } from "../enrich.js";
 import {
   loadCreatorRegistry,
+  creatorSkillPathsForRepo,
+  isCreatorSkillPathApproved,
   normalizeCreatorHandle,
   type CreatorRegistryEntry,
 } from "../creator-registry.js";
@@ -323,6 +325,7 @@ export async function collectCreatorBackfillScans(
         paths,
         pathShas,
         excludedPathPrefixes,
+        allowedSkillPaths: creatorSkillPathsForRepo(entry, repo.repo, repo.aliases),
         treeTruncated,
         ...(treeUnavailableReason ? { treeUnavailableReason } : {}),
       });
@@ -465,10 +468,10 @@ async function runApply(
     creatorRegistryRevision: editoolFileRevision(loadedPolicy.paths.creators),
   });
 
-  const coverageCreators = new Set(
+  const coverageCreators = new Map(
     registry.entries
       .filter((entry) => entry.watch && entry.skillCoverage)
-      .map((entry) => normalizeCreatorHandle(entry.handle)),
+      .map((entry) => [normalizeCreatorHandle(entry.handle), entry]),
   );
   let currentSkills = loadCreatorBackfillExistingSkills();
   const priorProgress = readJson<CreatorBackfillApplyProgress | null>(progressPath, null);
@@ -496,6 +499,9 @@ async function runApply(
         ?? normalizeCreatorHandle(candidate.creator);
       if (!coverageCreators.has(creator)) {
         return { status: "policy-skipped", reason: "creator-coverage-removed" };
+      }
+      if (!isCreatorSkillPathApproved(coverageCreators.get(creator)!, candidate.repo, candidate.path, candidate.repoAliases)) {
+        return { status: "policy-skipped", reason: "creator-path-not-approved" };
       }
       const repoPolicy = evaluateEffectiveRepoPolicy(candidate.repo, seeds);
       if (repoPolicy.excluded) {
@@ -538,6 +544,9 @@ async function runApply(
       }
       if (repoFromGithubUrl(result.skill.github_url) !== normalizePolicyRepo(candidate.repo)) {
         return { status: "policy-skipped", reason: "canonical-repo-mismatch" };
+      }
+      if (result.skill.skill_md_path !== candidate.path) {
+        return { status: "policy-skipped", reason: "skill-path-mismatch" };
       }
       const shadowSkill = toShadowSkillRecord(result.skill, seeds);
       if (shadowSkill.provenance_type !== "original") {

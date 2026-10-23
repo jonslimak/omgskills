@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { isCreatorSkillPathApproved, type CreatorRegistryEntry } from "../creator-registry.js";
 import type { ShadowSkillRecord } from "./types.js";
 import {
   creatorBackfillCandidateKey,
@@ -19,6 +20,22 @@ import {
 } from "./shadow-skill-persistence.js";
 
 const timestamp = "2026-08-10T20:00:00.000Z";
+
+test("apply rechecks exact coverage before enrichment even for an overbroad reviewed plan", async () => {
+  const creator: CreatorRegistryEntry = { handle: "creator", watch: true, skillCoverage: "selected",
+    skillRepos: ["creator/skills"], skillPaths: ["creator/skills#skills/0/SKILL.md"] };
+  const attempted: string[] = [];
+  const result = await executeCreatorBackfillApply({
+    plan: plan(3), progress: null, limit: 3, now: () => timestamp,
+    initialQuotaPreflight: async () => {}, reserveQuotaAvailable: async () => true,
+    reconcile: async row => isCreatorSkillPathApproved(creator, row.repo, row.path, row.repoAliases)
+      ? null : { status: "policy-skipped", reason: "creator-path-not-approved" },
+    enrich: async row => { attempted.push(row.path); return { status: "stable-failed", reason: "test-only" }; },
+    persist: async () => { throw new Error("No additions expected"); }, writeProgress: () => {},
+  });
+  assert.deepEqual(attempted, ["skills/0/SKILL.md"]);
+  assert.equal(result.summary.policySkippedCount, 2);
+});
 
 function candidate(index: number): CreatorBackfillPlanCandidate {
   return {
