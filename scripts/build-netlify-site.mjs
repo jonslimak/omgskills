@@ -15,6 +15,7 @@ import {
 import { stageNetlifyDbMigrations } from "./stage-netlify-db-migrations.mjs";
 import { appDomainRedirects } from "./portal-redirects.mjs";
 import { verifyPortalBuildEnv } from "./portal-build-env.mjs";
+import { takeoverPilotEnabled, writeTakeoverPilot } from "./takeover-pages.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.join(repoRoot, "site");
@@ -131,6 +132,7 @@ async function main() {
     path.join(outputAppDir, "release-config.json"),
     `${JSON.stringify(publicReleaseConfig(productionFeatures), null, 2)}\n`,
   );
+  if (takeoverPilotEnabled()) console.log(`Takeover pilot pages: ${(await writeTakeoverPilot(outputDir)).join(", ")}`);
   await mergeRedirects();
   await verifyRequiredOutput();
   const stagedMigrations = await stageNetlifyDbMigrations();

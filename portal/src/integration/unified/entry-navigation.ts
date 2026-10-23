@@ -6,6 +6,9 @@ export function entryNavigation(pathname: string, search: string, base: string):
   // Clean public addresses are always readable, even where this entry still writes ?view=.
   const clean = pathname.startsWith(base) ? parsePublicNavigationPath(pathname.slice(base.length), search) : null;
   if (clean) return clean;
+  // A static library page taken over by the app keeps its root /library/... address.
+  const root = pathname.startsWith("/library/") ? parsePublicNavigationPath(pathname.slice(1), search) : null;
+  if (root) return root;
   const route = parseRoute(pathname, search, base);
   if (route.page === "detail") return { ...initialNavigation, view: "set", id: route.groupId! };
   if (route.page === "agents") return { ...initialNavigation, view: "agents" };

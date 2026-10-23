@@ -83,11 +83,16 @@ test("entry reads clean paths, old ?view= links and legacy path routes", () => {
     "catalog:obra/superpowers:brainstorming");
   assert.deepEqual(entryNavigation("/app/groups/abc", "", "/app/"), { ...initialNavigation, view: "set", id: "abc" });
   assert.deepEqual(entryNavigation("/app/", "", "/app/"), nav({}));
+  // A taken-over static page keeps its root /library/... address.
+  assert.deepEqual(entryNavigation("/library/anthropics/", "", "/app/"), nav({ view: "creator", id: "anthropics" }));
+  assert.equal(entryNavigation("/library/anthropics/skills/skills/frontend-design/", "", "/app/").selected,
+    "catalog:anthropics/skills:skills/frontend-design");
 });
 
 test("signed-out public entries rewrite old links without rewriting private destinations", () => {
   const session = readFileSync(new URL("../src/integration/unified/Session.tsx", import.meta.url), "utf8");
-  assert.match(session, /if \(available \|\| isDiscovery\(requested\.view\)\) history\.replaceState\(\{ nav \}, "", current\)/);
+  assert.match(session, /if \(!\(available \|\| isDiscovery\(requested\.view\)\)\) return;/);
+  assert.match(session, /history\.replaceState\(\{ nav \}, "", keep \? here : current\)/);
   const cases: [string, string][] = [
     ["?view=creator&id=anthropics&sort=stars", "library/anthropics/?sort=stars"],
     ["?view=collection&id=starter-pack", "library/collections/starter-pack/"],
