@@ -1857,6 +1857,32 @@
   font-size: 11px;
   font-weight: 600;
 }
+.ua-readme-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  gap: 2px;
+  padding: 2px;
+  margin-bottom: 10px;
+  background: var(--ua-selection);
+  border-radius: 9px;
+}
+.ua-readme-tabs button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ua-muted);
+}
+.ua-readme-tabs button[aria-selected="true"] {
+  color: var(--ua-ink);
+  background: var(--ua-bg);
+  box-shadow: 0 1px 2px #0000001f;
+}
 .ua-readme-error { display: flex; align-items: center; gap: 8px; }
 .ua-readme-markdown { min-width: 0; }
 .ua-readme-markdown > :first-child { margin-top: 0; }

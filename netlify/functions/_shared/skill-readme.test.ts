@@ -91,7 +91,7 @@ test("a missing README is a short-cached empty result, while GitHub failures are
   let calls = 0, time = 0;
   const handler = createSkillReadmeHandler({ lookupSkill, now: () => time, fetcher: async () => { calls++; return new Response("", { status: 404 }); } });
   const response = await handler(request());
-  assert.deepEqual(await response.json(), { skillId: id, readme: null });
+  assert.deepEqual(await response.json(), { skillId: id, skill: null, readme: null });
   const names = calls; // every README name was tried once
   await handler(request());
   assert.equal(calls, names);
@@ -194,4 +194,109 @@ test("too many unique pending requests are rejected without unbounded upstream w
   assert.equal(releases.length, 16);
   releases.forEach(release => release());
   assert.ok((await Promise.all(pending)).every(response => response.status === 404));
+});
+
+test("both documents load together: SKILL.md without metadata, and the folder README else the repo README", async () => {
+  const files: Record<string, string> = {
+    "skills/design/README.md": "# Design skill\n\nHow to use it.",
+    "skills/design/SKILL.md": "---\nname: design\ndescription: x\n---\n\n# Instructions\n\nDo this.",
+    "README.md": "# Whole repository",
+  };
+  const run = async (available: string[], skill_md_path: string | null = "skills/design/SKILL.md") => {
+    const urls: string[] = [];
+    const handler = createSkillReadmeHandler({ lookupSkill: async value => ({ id: value, github_url: "https://github.com/owner/repo", skill_md_path }),
+      fetcher: async input => {
+        const path = String(input).split("/HEAD/")[1];
+        urls.push(path);
+        return available.includes(path) ? github(files[path]) : new Response("404: Not Found", { status: 404 });
+      } });
+    return { value: await (await handler(request())).json(), urls };
+  };
+  const all = await run(Object.keys(files));
+  assert.equal(all.value.skill.kind, "skill");
+  assert.equal(all.value.skill.markdown, "# Instructions\n\nDo this.");
+  assert.equal(all.value.skill.sourceUrl, "https://github.com/owner/repo/blob/HEAD/skills/design/SKILL.md");
+  assert.equal(all.value.readme.kind, "skill-readme");
+  assert.equal(all.value.readme.sourceUrl, "https://github.com/owner/repo/blob/HEAD/skills/design/README.md");
+  const repoOnly = await run(["skills/design/SKILL.md", "README.md"]);
+  assert.equal(repoOnly.value.readme.kind, "repository");
+  const noSkill = await run(["README.md"]);
+  assert.equal(noSkill.value.skill, null);
+  assert.equal(noSkill.value.readme.kind, "repository");
+  for (const unsafe of ["../SKILL.md", "/etc/SKILL.md", "skills/design/notes.md", "skills\\design/SKILL.md", null]) {
+    const fallback = await run(Object.keys(files), unsafe);
+    assert.equal(fallback.value.skill, null, String(unsafe));
+    assert.equal(fallback.value.readme.kind, "repository", String(unsafe));
+    assert.deepEqual(fallback.urls, ["README.md"]);
+  }
+});
+
+test("repo-level skills also show a root SKILL.md first", async () => {
+  const handler = createSkillReadmeHandler({
+    lookupSkill: async value => ({ id: value, github_url: "https://github.com/owner/repo", skill_md_path: "SKILL.md" }),
+    fetcher: async input => {
+      const path = String(input).split("/HEAD/")[1];
+      return path === "SKILL.md" ? github("---\nname: x\n---\n# Skill") : path === "README.md" ? github("# Repo") : new Response("", { status: 404 });
+    } });
+  const value = await (await handler(request("owner/repo"))).json();
+  assert.equal(value.skill.kind, "skill");
+  assert.equal(value.skill.markdown, "# Skill");
+  assert.equal(value.readme.kind, "repository");
+});
+
+test("one failed document preserves the other and remains retryable without refetching the good document", async () => {
+  for (const failedKind of ["skill", "readme"] as const) {
+    for (const failure of ["http", "oversized", "timeout"] as const) {
+      let recovered = false;
+      const calls = { skill: 0, readme: 0 };
+      const handler = createSkillReadmeHandler({
+        lookupSkill: async value => ({ id: value, github_url: "https://github.com/owner/repo", skill_md_path: "SKILL.md" }),
+        timeoutMs: 20,
+        fetcher: async (input, init) => {
+          const kind = String(input).endsWith("/SKILL.md") ? "skill" : "readme";
+          calls[kind]++;
+          if (kind === failedKind && !recovered) {
+            if (failure === "http") return new Response("", { status: 500 });
+            if (failure === "oversized") return new Response("", { headers: { "content-length": "256001" } });
+            return new Promise<Response>((_resolve, reject) => {
+              const timer = setTimeout(() => reject(new Error("Timeout did not abort")), 500);
+              const abort = () => { clearTimeout(timer); reject(new Error("Timed out")); };
+              if (init!.signal!.aborted) abort();
+              else init!.signal!.addEventListener("abort", abort, { once: true });
+            });
+          }
+          return github(kind === "skill" ? "# Instructions" : "# README");
+        },
+      });
+      const response = await handler(request());
+      assert.equal(response.status, 200, `${failedKind}: ${failure}`);
+      assert.equal(response.headers.get("cache-control"), "no-store");
+      assert.equal(response.headers.get("netlify-cdn-cache-control"), "no-store");
+      const value = await response.json();
+      const goodKind = failedKind === "skill" ? "readme" : "skill";
+      assert.equal(value[failedKind], null);
+      assert.ok(value[goodKind]?.markdown);
+      recovered = true;
+      const retry = await handler(request());
+      const retried = await retry.json();
+      assert.ok(retried.skill?.markdown);
+      assert.ok(retried.readme?.markdown);
+      assert.equal(calls[goodKind], 1, "keep the successful document cached independently");
+      assert.equal(calls[failedKind], 2, "retry the failed document immediately");
+      assert.match(retry.headers.get("netlify-cdn-cache-control")!, /max-age=600/);
+    }
+  }
+});
+
+test("a failed document with no usable alternative remains a retryable error", async () => {
+  let recovered = false;
+  const handler = createSkillReadmeHandler({
+    lookupSkill: async value => ({ id: value, github_url: "https://github.com/owner/repo", skill_md_path: "SKILL.md" }),
+    fetcher: async input => String(input).endsWith("/SKILL.md")
+      ? recovered ? github("# Instructions") : new Response("", { status: 500 })
+      : new Response("", { status: 404 }),
+  });
+  assert.equal((await handler(request())).status, 503);
+  recovered = true;
+  assert.equal((await handler(request())).status, 200);
 });
