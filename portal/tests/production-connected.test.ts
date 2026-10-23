@@ -16,10 +16,12 @@ import type { CatalogInstallSetup } from "../src/app/unified/CatalogInstallSetup
 import type { SkillDisplay } from "../src/app/unified/model";
 
 const enabled = { ...productionFeatures, connectedInventoryReadEnabled: true, connectedInventorySyncEnabled: true };
+const disabled = { ...enabled, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false };
 
 test("production inventory and installs are opt-in, separate from test flags, and keep reads when paused", () => {
   const href = "https://omgskills.com/app/my-skills";
-  assert.deepEqual(productionConnectedProfile(href, "pk_live_fixture"), { inventory: false, sync: false });
+  assert.deepEqual(productionConnectedProfile(href, "pk_live_fixture"), { inventory: true, sync: true });
+  assert.deepEqual(productionConnectedProfile(href, "pk_live_fixture", disabled), { inventory: false, sync: false });
   assert.deepEqual(productionConnectedProfile(href, "pk_live_fixture", enabled), { inventory: true, sync: true });
   assert.deepEqual(productionConnectedProfile(href, "pk_live_fixture", { ...enabled, connectedInventorySyncEnabled: false }),
     { inventory: true, sync: false });
@@ -107,6 +109,6 @@ test("production setup references only the exact separately published Mac releas
   assert.equal(productionDistribution.version, "0.0.24");
   assert.equal(productionDistribution.build, "24");
   assert.equal(productionDistribution.sha256, "f4e9cc243e5d2bb191a971d474704e66c011ee333ba485ce1d2e2469895d00e2");
-  assert.equal(productionFeatures.connectedInventoryReadEnabled, false);
-  assert.equal(productionFeatures.connectedInventorySyncEnabled, false);
+  assert.equal(productionFeatures.connectedInventoryReadEnabled, true);
+  assert.equal(productionFeatures.connectedInventorySyncEnabled, true);
 });

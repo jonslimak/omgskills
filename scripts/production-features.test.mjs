@@ -137,11 +137,14 @@ test("rejects malformed or ambiguous production feature state", async () => {
   );
 });
 
-test("connected production activation defaults off and can pause reporting without losing reads", async () => {
+test("tracked connected production is enabled, defaults remain off, and reporting can pause without losing reads", async () => {
   const tracked = await loadProductionFeatures();
-  assert.equal(tracked.connectedInventoryReadEnabled, false);
-  assert.equal(tracked.connectedInventorySyncEnabled, false);
+  assert.equal(tracked.connectedInventoryReadEnabled, true);
+  assert.equal(tracked.connectedInventorySyncEnabled, true);
   const base = { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, portalUnifiedEnabled: true };
+  const defaults = await loadProductionFeatures(await configUrl(JSON.stringify(base)));
+  assert.equal(defaults.connectedInventoryReadEnabled, false);
+  assert.equal(defaults.connectedInventorySyncEnabled, false);
   for (const sync of [false, true]) {
     const features = await loadProductionFeatures(await configUrl(JSON.stringify({ ...base,
       connectedInventoryReadEnabled: true, connectedInventorySyncEnabled: sync })));
