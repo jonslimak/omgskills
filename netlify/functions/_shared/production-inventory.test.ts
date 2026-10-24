@@ -44,6 +44,31 @@ test("production policy is opt-in, site/account-environment bound, and reads sur
   }
 });
 
+test("production runtime without build-only CONTEXT reaches authentication, not storage", async () => {
+  const runtimeEnv = { CLERK_SECRET_KEY: env.CLERK_SECRET_KEY };
+  const unauthorized = async () => { throw new Response("Unauthorized", { status: 401 }); };
+  const read = new Request("https://omgskills.com/api/portal/synced-skills?version=3");
+  assert.equal((await portalSyncedSkills(read, context, {
+    getEnvironment: () => runtimeEnv, getPgPool: noStorage, requirePortalUser: unauthorized,
+  })).status, 401);
+  const revision = new Request("https://omgskills.com/api/portal/sync-upload?reportVersion=3");
+  assert.equal((await portalSyncUpload(revision, context, {
+    getEnvironment: () => runtimeEnv, getPgPool: noStorage,
+    requireSkillGroupsWebFeature() {}, performSyncUpload: noStorage,
+  })).status, 401);
+  const body = { state: "a".repeat(43), codeChallenge: "b".repeat(43), codeChallengeMethod: "S256",
+    scopes: ["sync:write", "self:revoke"] };
+  assert.equal((await portalSyncPairingCode(request("/api/portal/sync-pairing-code?inventory=3", body), context, {
+    getEnvironment: () => runtimeEnv, getPgPool: noStorage,
+    requirePortalUser: unauthorized, issuePairingCode: noStorage,
+  })).status, 401);
+  for (const deploy of ["deploy-preview", undefined]) {
+    for (const operation of ["read", "sync"] as const) {
+      assert.throws(() => requireProductionInventory(read, runtimeEnv, deploy, context.site.id, operation, features));
+    }
+  }
+});
+
 test("normal production endpoints retain disabled-policy and authenticated inventory/report contracts", async () => {
   const read = request("/api/portal/synced-skills?version=3");
   const report = { reportVersion: 3, baseRevision: null,

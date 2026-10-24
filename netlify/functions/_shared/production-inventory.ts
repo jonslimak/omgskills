@@ -14,12 +14,13 @@ export function requireProductionInventory(
   features: ProductionInventoryFeatures = productionFeatures,
 ) {
   const url = new URL(req.url);
+  // CONTEXT may be absent at runtime; the runtime deployContext must still be production.
   if (features.skillGroupsWebEnabled !== true || features.portalUnifiedEnabled !== true
     || features.connectedInventoryReadEnabled !== true
     || (operation === "sync" && features.connectedInventorySyncEnabled !== true)
     || url.origin !== "https://omgskills.com"
     || siteId !== "dfdb618d-b748-4c4f-a535-646dc5db449f"
-    || env.CONTEXT !== "production" || deployContext !== "production"
+    || (env.CONTEXT !== undefined && env.CONTEXT !== "production") || deployContext !== "production"
     || !/^sk_live_[A-Za-z0-9]+$/.test(env.CLERK_SECRET_KEY ?? "")
     || [env.OMGSKILLS_CONNECTED_INVENTORY_TEST, env.OMGSKILLS_INVENTORY_RECONCILIATION_TEST,
       env.OMGSKILLS_CONNECTED_CANDIDATE].some(value => value !== undefined && value !== "0")) {
