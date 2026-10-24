@@ -1,0 +1,891 @@
+{
+  "generatedAt": "2026-10-24T19:40:47.808Z",
+  "reviewSha256": "c0f2340013e239d8759ee52952ce7ab12127f75a082f70a70e8e7d6e11bb55a7",
+  "excludeRepos": [],
+  "excludeIds": [
+    "ololand-ai/ololand-plugins:plugins/ololand-dd/skills/deal-sourcing",
+    "akshaypimprikar/pragma:.claude/skills/benchmark",
+    "akshaypimprikar/pragma:.claude/skills/bugfix",
+    "akshaypimprikar/pragma:.claude/skills/design",
+    "akshaypimprikar/pragma:.claude/skills/feature",
+    "akshaypimprikar/pragma:.claude/skills/parallel-review",
+    "akshaypimprikar/pragma:.claude/skills/status",
+    "akshaypimprikar/pragma:.claude/skills/trim-context",
+    "cedricfarinazzo/agile-skills:agile-merge-review/skills/merge-fix-until-satisfied",
+    "leiverkus/research-superpowers:skills/brainstorming-research",
+    "recoupable/recoup-catalogs-plugin:skills/recoup-catalog-analyze",
+    "recoupable/recoup-catalogs-plugin:skills/recoup-catalog-demo",
+    "recoupable/recoup-catalogs-plugin:skills/recoup-catalog-qc",
+    "recoupable/recoup-catalogs-plugin:skills/recoup-royalty-audit",
+    "recoupable/recoup-catalogs-plugin:skills/recoup-seller-prep",
+    "imgly/codesign:plugins/codesign/skills/animate",
+    "imgly/codesign:plugins/codesign/skills/api",
+    "imgly/codesign:plugins/codesign/skills/brand",
+    "imgly/codesign:plugins/codesign/skills/create",
+    "imgly/codesign:plugins/codesign/skills/formats",
+    "imgly/codesign:plugins/codesign/skills/judge",
+    "imgly/codesign:plugins/codesign/skills/launch-video",
+    "imgly/codesign:plugins/codesign/skills/layerize",
+    "imgly/codesign:plugins/codesign/skills/localize",
+    "imgly/codesign:plugins/codesign/skills/models",
+    "imgly/codesign:plugins/codesign/skills/onboard",
+    "imgly/codesign:plugins/codesign/skills/resize",
+    "imgly/codesign:plugins/codesign/skills/video-thumbnail-template",
+    "sealmetrics/seal-copilot:seal-copilot/skills/cart-watchdog",
+    "sealmetrics/seal-copilot:seal-copilot/skills/cost-reduction",
+    "sealmetrics/seal-copilot:seal-copilot/skills/create-alert",
+    "sealmetrics/seal-copilot:seal-copilot/skills/property-explorer",
+    "sealmetrics/seal-copilot:seal-copilot/skills/seal-copilot",
+    "statsclaw/statsclaw:skills/attribution",
+    "statsclaw/statsclaw:skills/brain-sync",
+    "statsclaw/statsclaw:skills/contribute",
+    "statsclaw/statsclaw:skills/credential-setup",
+    "statsclaw/statsclaw:skills/handoff",
+    "statsclaw/statsclaw:skills/isolation",
+    "statsclaw/statsclaw:skills/issue-patrol",
+    "statsclaw/statsclaw:skills/mailbox",
+    "statsclaw/statsclaw:skills/privacy-scrub",
+    "statsclaw/statsclaw:skills/profile-detection",
+    "statsclaw/statsclaw:skills/progress-bar",
+    "statsclaw/statsclaw:skills/simplified-workflow",
+    "adologyai/content-intelligence-plugin:skills/audience-deep-dive",
+    "adologyai/content-intelligence-plugin:skills/brand-partnership-vetting",
+    "greenflash-ai/agent-skills:skills/greenflash",
+    "greenflash-ai/agent-skills:skills/greenflash-diagnose",
+    "greenflash-ai/agent-skills:skills/greenflash-health",
+    "greenflash-ai/agent-skills:skills/greenflash-inbox",
+    "greenflash-ai/agent-skills:skills/greenflash-onboard",
+    "greenflash-ai/agent-skills:skills/greenflash-onboard-agentic",
+    "greenflash-ai/agent-skills:skills/greenflash-onboard-events",
+    "greenflash-ai/agent-skills:skills/greenflash-onboard-prompts",
+    "greenflash-ai/agent-skills:skills/greenflash-onboard-unified",
+    "greenflash-ai/agent-skills:skills/greenflash-prompts",
+    "greenflash-ai/agent-skills:skills/greenflash-update-context",
+    "greenflash-ai/agent-skills:skills/greenflash-users",
+    "jerrymwolf/scriptorium-cowork:skills/contradictions",
+    "jerrymwolf/scriptorium-cowork:skills/review",
+    "jerrymwolf/scriptorium-cowork:skills/search",
+    "jerrymwolf/scriptorium-cowork:skills/synthesize",
+    "mattlane66/planning-skills-for-agents-and-humans:skills/breadboard-reflection",
+    "mattlane66/planning-skills-for-agents-and-humans:skills/breadboarding",
+    "mattlane66/planning-skills-for-agents-and-humans:skills/dumplink",
+    "mattlane66/planning-skills-for-agents-and-humans:skills/feed-planning-context",
+    "mattlane66/planning-skills-for-agents-and-humans:skills/planning-router",
+    "mattlane66/planning-skills-for-agents-and-humans:skills/shaping",
+    "mattlane66/planning-skills-for-agents-and-humans:skills/sketch-reconciliation",
+    "mattlane66/planning-skills-for-agents-and-humans:skills/wayfinding",
+    "nimbleway/agent-skills:skills/company-deep-dive",
+    "nimbleway/agent-skills:skills/competitor-intel",
+    "nimbleway/agent-skills:skills/competitor-positioning",
+    "nimbleway/agent-skills:skills/market-finder",
+    "nimbleway/agent-skills:skills/meeting-prep",
+    "nimbleway/agent-skills:skills/talent-sourcing",
+    "probabl-ai/skore-skills:skills/smoke-test-ml-pipeline",
+    "suresofttechnologies/dvera-plugin:skills/ct-analysis-loop",
+    "suresofttechnologies/dvera-plugin:skills/ct-init-project",
+    "suresofttechnologies/dvera-plugin:skills/ct-make-conf",
+    "suresofttechnologies/dvera-plugin:skills/ct-regression",
+    "suresofttechnologies/dvera-plugin:skills/ct-setup-project",
+    "suresofttechnologies/dvera-plugin:skills/ct-test-loop",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/analytics",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/comments",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/draft-in-brand-voice",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/errors",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/generate",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/getting-started",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/history",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/media",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/messages",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/post",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/profiles",
+    "ayrshare/ayrshare-social-media-api-claude-plugin:skills/webhooks"
+  ],
+  "excluded": [
+    {
+      "id": "ololand-ai/ololand-plugins:plugins/ololand-dd/skills/deal-sourcing",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "akshaypimprikar/pragma:.claude/skills/benchmark",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/capture_pipeline_metrics.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "akshaypimprikar/pragma:.claude/skills/bugfix",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude/context/invariants.md",
+        ".claude/context/rejections.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "akshaypimprikar/pragma:.claude/skills/design",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "feature",
+        "sync-workflow"
+      ]
+    },
+    {
+      "id": "akshaypimprikar/pragma:.claude/skills/feature",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude/context/invariants.md",
+        ".claude/context/rejections.md"
+      ],
+      "agents": [],
+      "skills": [
+        "pr-followup"
+      ]
+    },
+    {
+      "id": "akshaypimprikar/pragma:.claude/skills/parallel-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude/context/invariants.md",
+        ".claude/context/rejections.md",
+        ".claude/skills/gates/SKILL.md",
+        ".claude/skills/review/SKILL.md",
+        ".claude/skills/review/SKILL.md",
+        ".claude/context/rejections.md",
+        ".claude/context/rejections.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "akshaypimprikar/pragma:.claude/skills/status",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "gates",
+        "review"
+      ]
+    },
+    {
+      "id": "akshaypimprikar/pragma:.claude/skills/trim-context",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "cedricfarinazzo/agile-skills:agile-merge-review/skills/merge-fix-until-satisfied",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "merge-review-pr",
+        "merge-update-pr"
+      ]
+    },
+    {
+      "id": "leiverkus/research-superpowers:skills/brainstorming-research",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "writing-research-plan",
+        "writing-research-plan",
+        "writing-research-plan"
+      ]
+    },
+    {
+      "id": "recoupable/recoup-catalogs-plugin:skills/recoup-catalog-analyze",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/run-deal-checks.py",
+        "scripts/calculate-concentration.py",
+        "scripts/calculate-nps-nls-bridge.py",
+        "scripts/validate-dashboard.py"
+      ],
+      "agents": [],
+      "skills": [
+        "recoup-catalog-deal"
+      ]
+    },
+    {
+      "id": "recoupable/recoup-catalogs-plugin:skills/recoup-catalog-demo",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/recoup-catalog-deal/SKILL.md",
+        "skills/recoup-catalog-deal/SKILL.md"
+      ],
+      "agents": [],
+      "skills": [
+        "recoup-catalog-deal"
+      ]
+    },
+    {
+      "id": "recoupable/recoup-catalogs-plugin:skills/recoup-catalog-qc",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/run-deal-checks.py",
+        "scripts/build-deal-readiness.py",
+        "scripts/validate-dashboard.py"
+      ],
+      "agents": [
+        "deal-qc-reviewer"
+      ],
+      "skills": [
+        "recoup-catalog-deal"
+      ]
+    },
+    {
+      "id": "recoupable/recoup-catalogs-plugin:skills/recoup-royalty-audit",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/recoup-catalog-analysis/references/pro-performance-income.md",
+        "skills/recoup-catalog-analysis/references/pro-performance-income.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "recoupable/recoup-catalogs-plugin:skills/recoup-seller-prep",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "recoup-deal-kickoff"
+      ]
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/animate",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/api",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/brand",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "judge"
+      ]
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/create",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/formats",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/judge",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/launch-video",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/layerize",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/localize",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/models",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/onboard",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "judge"
+      ]
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/resize",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "imgly/codesign:plugins/codesign/skills/video-thumbnail-template",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "judge"
+      ]
+    },
+    {
+      "id": "sealmetrics/seal-copilot:seal-copilot/skills/cart-watchdog",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "calibrate-watchdog"
+      ]
+    },
+    {
+      "id": "sealmetrics/seal-copilot:seal-copilot/skills/cost-reduction",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "channel-mix-optimizer"
+      ]
+    },
+    {
+      "id": "sealmetrics/seal-copilot:seal-copilot/skills/create-alert",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "watcher/README.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "sealmetrics/seal-copilot:seal-copilot/skills/property-explorer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "channel-mix-optimizer",
+        "product-friction",
+        "funnel-analysis"
+      ]
+    },
+    {
+      "id": "sealmetrics/seal-copilot:seal-copilot/skills/seal-copilot",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "watcher/README.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/attribution",
+      "reason": "harness-housekeeping-not-an-independent-task-skill"
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/brain-sync",
+      "reason": "harness-housekeeping-not-an-independent-task-skill"
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/contribute",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/brain-sync/SKILL.md",
+        "agents/distiller.md",
+        "skills/privacy-scrub/SKILL.md",
+        "agents/shipper.md",
+        "skills/brain-sync/SKILL.md",
+        "agents/distiller.md",
+        "skills/privacy-scrub/SKILL.md",
+        "templates/brain-entry.md",
+        "agents/shipper.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/credential-setup",
+      "reason": "harness-housekeeping-not-an-independent-task-skill"
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/handoff",
+      "reason": "harness-housekeeping-not-an-independent-task-skill"
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/isolation",
+      "reason": "harness-housekeeping-not-an-independent-task-skill"
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/issue-patrol",
+      "reason": "harness-housekeeping-not-an-independent-task-skill"
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/mailbox",
+      "reason": "harness-housekeeping-not-an-independent-task-skill"
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/privacy-scrub",
+      "reason": "harness-housekeeping-not-an-independent-task-skill"
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/profile-detection",
+      "reason": "harness-housekeeping-not-an-independent-task-skill"
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/progress-bar",
+      "reason": "harness-housekeeping-not-an-independent-task-skill"
+    },
+    {
+      "id": "statsclaw/statsclaw:skills/simplified-workflow",
+      "reason": "harness-housekeeping-not-an-independent-task-skill"
+    },
+    {
+      "id": "adologyai/content-intelligence-plugin:skills/audience-deep-dive",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "thumbnails"
+      ]
+    },
+    {
+      "id": "adologyai/content-intelligence-plugin:skills/brand-partnership-vetting",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "thumbnails",
+        "thumbnails"
+      ]
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "greenflash-onboard-unified"
+      ]
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash-diagnose",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "greenflash-update-context"
+      ]
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash-health",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash-inbox",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash-onboard",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash-onboard-agentic",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "greenflash-onboard"
+      ]
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash-onboard-events",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "greenflash-onboard"
+      ]
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash-onboard-prompts",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "greenflash-onboard"
+      ]
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash-onboard-unified",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "greenflash-onboard",
+        "greenflash-onboard-prompts",
+        "greenflash-onboard-agentic",
+        "greenflash-onboard-events",
+        "greenflash-verify"
+      ]
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash-prompts",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash-update-context",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "greenflash-onboard-prompts",
+        "greenflash-verify",
+        "greenflash-verify",
+        "greenflash-onboard-prompts"
+      ]
+    },
+    {
+      "id": "greenflash-ai/agent-skills:skills/greenflash-users",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "jerrymwolf/scriptorium-cowork:skills/contradictions",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "synthesize"
+      ]
+    },
+    {
+      "id": "jerrymwolf/scriptorium-cowork:skills/review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "contradictions",
+        "synthesize"
+      ]
+    },
+    {
+      "id": "jerrymwolf/scriptorium-cowork:skills/search",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "scope"
+      ]
+    },
+    {
+      "id": "jerrymwolf/scriptorium-cowork:skills/synthesize",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "runtime/cite-check.py",
+        "runtime/cite-check.py",
+        "runtime/cite-check.py"
+      ],
+      "agents": [],
+      "skills": [
+        "contradictions",
+        "contradictions"
+      ]
+    },
+    {
+      "id": "mattlane66/planning-skills-for-agents-and-humans:skills/breadboard-reflection",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/breadboard-reflection.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mattlane66/planning-skills-for-agents-and-humans:skills/breadboarding",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/guided-whiteboard-capture.md",
+        "docs/guided-whiteboard-capture.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mattlane66/planning-skills-for-agents-and-humans:skills/dumplink",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/execution-graph.md",
+        "docs/execution-graph.md",
+        "templates/execution-graph.yaml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mattlane66/planning-skills-for-agents-and-humans:skills/feed-planning-context",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agent-execution-appetite.md",
+        "templates/context-packet.md",
+        "docs/agent-execution-appetite.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mattlane66/planning-skills-for-agents-and-humans:skills/planning-router",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/guided-whiteboard-capture.md",
+        "docs/guided-whiteboard-capture.md",
+        "templates/spike.md",
+        "templates/spike.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mattlane66/planning-skills-for-agents-and-humans:skills/shaping",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/guided-whiteboard-capture.md",
+        "docs/guided-whiteboard-capture.md",
+        "templates/shaping.md",
+        "templates/appetite-card.md",
+        "breadboarding/references/candidate-shape-mode.md",
+        "templates/spike.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mattlane66/planning-skills-for-agents-and-humans:skills/sketch-reconciliation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/guided-whiteboard-capture.md",
+        "docs/guided-whiteboard-capture.md",
+        "templates/sketch-reconciliation.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mattlane66/planning-skills-for-agents-and-humans:skills/wayfinding",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/wayfinding-map.md",
+        "templates/wayfinding-ticket.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "nimbleway/agent-skills:skills/company-deep-dive",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/nimble-researcher.md",
+        "agents/nimble-researcher.md"
+      ],
+      "agents": [
+        "nimble-researcher"
+      ],
+      "skills": [
+        "competitor-intel",
+        "meeting-prep",
+        "competitor-positioning"
+      ]
+    },
+    {
+      "id": "nimbleway/agent-skills:skills/competitor-intel",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/nimble-researcher.md",
+        "agents/nimble-analyst.md",
+        "agents/nimble-researcher.md",
+        "agents/nimble-analyst.md"
+      ],
+      "agents": [
+        "nimble-researcher"
+      ],
+      "skills": [
+        "competitor-positioning",
+        "company-deep-dive",
+        "meeting-prep"
+      ]
+    },
+    {
+      "id": "nimbleway/agent-skills:skills/competitor-positioning",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/nimble-researcher.md",
+        "agents/nimble-researcher.md"
+      ],
+      "agents": [],
+      "skills": [
+        "competitor-intel",
+        "company-deep-dive",
+        "meeting-prep"
+      ]
+    },
+    {
+      "id": "nimbleway/agent-skills:skills/market-finder",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/nimble-researcher.md",
+        "agents/nimble-researcher.md"
+      ],
+      "agents": [],
+      "skills": [
+        "company-deep-dive",
+        "competitor-positioning",
+        "local-places"
+      ]
+    },
+    {
+      "id": "nimbleway/agent-skills:skills/meeting-prep",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/nimble-researcher.md",
+        "agents/nimble-researcher.md"
+      ],
+      "agents": [
+        "nimble-researcher"
+      ],
+      "skills": []
+    },
+    {
+      "id": "nimbleway/agent-skills:skills/talent-sourcing",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/nimble-researcher.md",
+        "agents/nimble-researcher.md"
+      ],
+      "agents": [
+        "nimble-researcher"
+      ],
+      "skills": [
+        "company-deep-dive",
+        "meeting-prep"
+      ]
+    },
+    {
+      "id": "probabl-ai/skore-skills:skills/smoke-test-ml-pipeline",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup-ml-project",
+        "setup-ml-project",
+        "add-python-package",
+        "model-ml-pipeline",
+        "build-ml-pipeline",
+        "add-python-package"
+      ]
+    },
+    {
+      "id": "suresofttechnologies/dvera-plugin:skills/ct-analysis-loop",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "ct-init-project",
+        "ct-extract-macro"
+      ]
+    },
+    {
+      "id": "suresofttechnologies/dvera-plugin:skills/ct-init-project",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "ct-extract-macro"
+      ]
+    },
+    {
+      "id": "suresofttechnologies/dvera-plugin:skills/ct-make-conf",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "ct-init-project"
+      ]
+    },
+    {
+      "id": "suresofttechnologies/dvera-plugin:skills/ct-regression",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "ct-init-project",
+        "ct-test-loop"
+      ]
+    },
+    {
+      "id": "suresofttechnologies/dvera-plugin:skills/ct-setup-project",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "ct-init-project",
+        "ct-init-project",
+        "ct-init-project",
+        "ct-init-project"
+      ]
+    },
+    {
+      "id": "suresofttechnologies/dvera-plugin:skills/ct-test-loop",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "ct-init-project",
+        "ct-analysis-loop",
+        "ct-init-project",
+        "ct-analysis-loop"
+      ]
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/analytics",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/comments",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/draft-in-brand-voice",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/errors",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/generate",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/getting-started",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/history",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/media",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/messages",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/post",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/profiles",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ayrshare/ayrshare-social-media-api-claude-plugin:skills/webhooks",
+      "reason": "plugin-root-or-external-package-dependency"
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Final source and complete package-boundary review. Reject embedded templates and harness housekeeping; hold external companion requirements. Accepted skills remain task-focused, original, source-pinned and unpublished.",
+  "reviewed": 487,
+  "approvedCount": 269
+}

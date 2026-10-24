@@ -1,0 +1,373 @@
+{
+  "generatedAt": "2026-10-24T19:40:23.563Z",
+  "reviewSha256": "ebc0bf8f1303c5e630931001cf218dc1f7d7e585fbb105353d0fc082ee850ca1",
+  "excludeRepos": [],
+  "excludeIds": [
+    "softwaretestingtrends/snagly:skills/crud-tester",
+    "softwaretestingtrends/snagly:skills/qa-onboarding",
+    "softwaretestingtrends/snagly:skills/start-testing",
+    "softwaretestingtrends/snagly:skills/visual-regression",
+    "signalpilot-labs/signalpilot-plugin:skills/signalpilot",
+    "donheidi/online-writing-skills:skills/explore-idea",
+    "donheidi/online-writing-skills:skills/rewrite-de",
+    "donheidi/online-writing-skills:skills/schreibe-entwurf",
+    "creativeclawco/creative-claw-marketplace:plugins/creative-claw/skills/creativeclaw",
+    "mattsears/rails-cto:skills/rails-cto",
+    "mattsears/rails-cto:skills/rails-cto-architect",
+    "mattsears/rails-cto:skills/rails-cto-qa",
+    "vruum-gtm/skills:skills/deal-triage",
+    "vruum-gtm/skills:skills/engagement-triage",
+    "vruum-gtm/skills:skills/expansion-fill",
+    "vruum-gtm/skills:skills/objective-doctor",
+    "vruum-gtm/skills:skills/outreach-triage",
+    "vruum-gtm/skills:skills/pipeline-fill",
+    "vruum-gtm/skills:skills/winback-fill",
+    "drewcrawford/drewcrawford-skills:skills/changelog",
+    "drewcrawford/drewcrawford-skills:skills/gitea",
+    "drewcrawford/drewcrawford-skills:skills/github",
+    "drewcrawford/drewcrawford-skills:skills/release_prep",
+    "adrianosantostreina/delphi-dev:skills/delphi-acbr",
+    "adrianosantostreina/delphi-dev:skills/delphi-async",
+    "adrianosantostreina/delphi-dev:skills/delphi-build",
+    "adrianosantostreina/delphi-dev:skills/delphi-encoding",
+    "adrianosantostreina/delphi-dev:skills/delphi-firedac",
+    "adrianosantostreina/delphi-dev:skills/delphi-fmx",
+    "adrianosantostreina/delphi-dev:skills/delphi-legacy",
+    "adrianosantostreina/delphi-dev:skills/delphi-spring4d",
+    "adrianosantostreina/delphi-dev:skills/delphi-standards"
+  ],
+  "excluded": [
+    {
+      "id": "softwaretestingtrends/snagly:skills/crud-tester",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "targets/README.md"
+      ],
+      "agents": [],
+      "skills": [
+        "scenario-mapper"
+      ]
+    },
+    {
+      "id": "softwaretestingtrends/snagly:skills/qa-onboarding",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "flow-runner"
+      ]
+    },
+    {
+      "id": "softwaretestingtrends/snagly:skills/start-testing",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "visual-snapshot"
+      ]
+    },
+    {
+      "id": "softwaretestingtrends/snagly:skills/visual-regression",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "visual-snapshot",
+        "visual-snapshot"
+      ]
+    },
+    {
+      "id": "signalpilot-labs/signalpilot-plugin:skills/signalpilot",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "dbt-workflow",
+        "sql-workflow"
+      ]
+    },
+    {
+      "id": "donheidi/online-writing-skills:skills/explore-idea",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "donheidi/online-writing-skills:skills/rewrite-de",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "diagnose"
+      ]
+    },
+    {
+      "id": "donheidi/online-writing-skills:skills/schreibe-entwurf",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "diagnose"
+      ]
+    },
+    {
+      "id": "creativeclawco/creative-claw-marketplace:plugins/creative-claw/skills/creativeclaw",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "creativeclaw-generate-voiceover"
+      ]
+    },
+    {
+      "id": "mattsears/rails-cto:skills/rails-cto",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "rails-cto-engineer",
+        "rails-cto-minitest",
+        "rails-cto-erb"
+      ]
+    },
+    {
+      "id": "mattsears/rails-cto:skills/rails-cto-architect",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "rails-cto-security",
+        "rails-cto-qa"
+      ]
+    },
+    {
+      "id": "mattsears/rails-cto:skills/rails-cto-qa",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "rails-cto-minitest",
+        "rails-cto-static-analysis"
+      ]
+    },
+    {
+      "id": "vruum-gtm/skills:skills/deal-triage",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/vruum-deal-reviewer.md",
+        "agents/vruum-deal-reviewer.md"
+      ],
+      "agents": [
+        "vruum-deal-reviewer"
+      ],
+      "skills": []
+    },
+    {
+      "id": "vruum-gtm/skills:skills/engagement-triage",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/vruum-engagement-reviewer.md",
+        "agents/vruum-engagement-reviewer.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "vruum-gtm/skills:skills/expansion-fill",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "pipeline-fill"
+      ]
+    },
+    {
+      "id": "vruum-gtm/skills:skills/objective-doctor",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "pipeline-fill",
+        "pipeline-fill",
+        "pipeline-fill"
+      ]
+    },
+    {
+      "id": "vruum-gtm/skills:skills/outreach-triage",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/vruum-outreach-reviewer.md",
+        "agents/vruum-outreach-reviewer.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "vruum-gtm/skills:skills/pipeline-fill",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "sales-nav-deep-fill",
+        "yc-pipeline-fill",
+        "csv-pipeline-fill"
+      ]
+    },
+    {
+      "id": "vruum-gtm/skills:skills/winback-fill",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "pipeline-fill"
+      ]
+    },
+    {
+      "id": "drewcrawford/drewcrawford-skills:skills/changelog",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "drewcrawford/drewcrawford-skills:skills/gitea",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "drewcrawford/drewcrawford-skills:skills/github",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "drewcrawford/drewcrawford-skills:skills/release_prep",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-acbr",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "knowledge/core/acbr-nfce-integracao.md",
+        "knowledge/core/acbr-nfce-integracao.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-async",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "knowledge/core/delphi-async.md",
+        "knowledge/core/delphi-async.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-build",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "knowledge/core/build-via-bat-com-log.md",
+        "knowledge/core/msb6003-command-line-too-long.md",
+        "knowledge/fmx/android-deploy-e8712-buildtools.md",
+        "knowledge/core/build-via-bat-com-log.md",
+        "knowledge/core/msb6003-command-line-too-long.md",
+        "knowledge/fmx/android-deploy-e8712-buildtools.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-encoding",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "knowledge/core/encoding-utf8-bom.md",
+        "knowledge/core/encoding-utf8-bom.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-firedac",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "knowledge/core/firedac-registro-drivers.md",
+        "knowledge/core/firedac-registro-drivers.md",
+        "knowledge/core/firedac-console-firebird.md",
+        "knowledge/core/adrconnection-query-builder.md",
+        "knowledge/core/firedac-registro-drivers.md",
+        "knowledge/core/firedac-registro-drivers.md",
+        "knowledge/core/firedac-console-firebird.md",
+        "knowledge/core/adrconnection-query-builder.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-fmx",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "knowledge/fmx/INDEX.md",
+        "knowledge/core/delphi-android-ios-versions.md",
+        "knowledge/fmx/unit-naming-android.md",
+        "knowledge/fmx/dimensoes-form-mobile.md",
+        "knowledge/fmx/INDEX.md",
+        "knowledge/fmx/cores-argb.md",
+        "knowledge/fmx/uses-fmx-components.md",
+        "knowledge/core/firedac-registro-drivers.md",
+        "knowledge/fmx/deployment-arquivos-extras.md",
+        "knowledge/fmx/inherited-forms.md",
+        "knowledge/fmx/campos-orfaos-fmx.md",
+        "knowledge/fmx/onclick-vs-ontap-mobile.md",
+        "knowledge/fmx/imei-device.md",
+        "knowledge/fmx/ssl-tls-android.md",
+        "knowledge/fmx/INDEX.md",
+        "knowledge/core/delphi-android-ios-versions.md",
+        "knowledge/fmx/unit-naming-android.md",
+        "knowledge/fmx/dimensoes-form-mobile.md",
+        "knowledge/fmx/INDEX.md",
+        "knowledge/fmx/cores-argb.md",
+        "knowledge/fmx/uses-fmx-components.md",
+        "knowledge/core/firedac-registro-drivers.md",
+        "knowledge/fmx/deployment-arquivos-extras.md",
+        "knowledge/fmx/inherited-forms.md",
+        "knowledge/fmx/campos-orfaos-fmx.md",
+        "knowledge/fmx/onclick-vs-ontap-mobile.md",
+        "knowledge/fmx/imei-device.md",
+        "knowledge/fmx/ssl-tls-android.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-legacy",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/legacy.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-spring4d",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/architecture.md",
+        "rules/architecture.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-standards",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/naming.md",
+        "rules/architecture.md",
+        "rules/forbidden.md",
+        "rules/security.md",
+        "rules/legacy.md",
+        "rules/testing.md"
+      ],
+      "agents": [],
+      "skills": []
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Final source, author and package checks; original task skills only. Held candidates are decisions, not new suppression/block rules.",
+  "reviewed": 406,
+  "approvedCount": 250
+}
