@@ -1,0 +1,152 @@
+{
+  "generatedAt": "2026-10-24T14:29:56.898Z",
+  "sourceCommit": "616835a29d3a92fcf6e309e4fc402d5084b5d81f",
+  "sourcePatchSha256": "8aec8fe9c2ca75866e5c5e5fb952766dd820390f8c5e2d483af4a20351ae1609",
+  "sourceFiles": [
+    {
+      "path": "index/scraper/new-crawl/build-shadow.ts",
+      "bytes": 123252,
+      "sha256": "b5b618b0ef2ab529970efd32abbc88a60d3b614ae2e1acbfe1041f4117f2bab9"
+    },
+    {
+      "path": "index/scraper/new-crawl/policy-snapshot.test.ts",
+      "bytes": 3150,
+      "sha256": "d2bd7db05ba1ec0beb68b8b5f6fe6450a30ae3a7373d87090f85c99c95da276f"
+    }
+  ],
+  "baseline": {
+    "path": "index/skills.json",
+    "bytes": 80095262,
+    "sha256": "f7b32cb54b00a80fc8f78e21755ce42e4e7d2effb880a2603a7ca1da9317e517"
+  },
+  "creators": {
+    "path": "index/seeds/creators.json",
+    "bytes": 302326,
+    "sha256": "917649d54d52ec0f5eb0bac66247509ec04c46d7c76de92552aa7171510b00c7"
+  },
+  "inputOverlays": [
+    {
+      "name": "package-metadata.overlay.json",
+      "bytes": 1360957,
+      "sha256": "706b71dadd394a30f037e4ecc0b2d2a56474bded39cdfd31993ab82527bc07ad"
+    },
+    {
+      "name": "repo-index.overlay.json",
+      "bytes": 6394415,
+      "sha256": "998f559f320f7c9110f935ba47bcc491864f1543df4cd43648a0d452b1470e86"
+    },
+    {
+      "name": "repo-index.shadow.json",
+      "bytes": 12794260,
+      "sha256": "e2887cf6c113fec955a985f67706ebcc6b3638d7d2934ff2911abc1abae0d38e"
+    },
+    {
+      "name": "skills.overlay.json",
+      "bytes": 7764155,
+      "sha256": "c7f1220b36782d25495e1ebfd6c8d07892e3fa662a4e5a05709768a45af2d993"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "index/shadow/cutover-compare.shadow.json",
+      "bytes": 2133,
+      "sha256": "3e11b851de03e077f3c15def449aaa847aabb2a0fa95f663c15d75fdc1edae1f"
+    },
+    {
+      "path": "index/shadow/cutover-compare.shadow.md",
+      "bytes": 1842,
+      "sha256": "fcb3345935525a2c5dbc0eb8ad449757abf82e2e309115ee2da0aaadbec32cfe"
+    },
+    {
+      "path": "index/shadow/package-metadata.overlay.json",
+      "bytes": 1599561,
+      "sha256": "c78e5f1562c264ab84ee9ef83696ffaf8e53cc4a44ea1092df97b0ba9206161e"
+    },
+    {
+      "path": "index/shadow/policy-precedence-input.shadow.json",
+      "bytes": 31471276,
+      "sha256": "07fdc5e0550a59898251a70bf27a4fc6c1af3128cc7f60aee597394c3a72613e"
+    },
+    {
+      "path": "index/shadow/policy-precedence.shadow.json",
+      "bytes": 3345,
+      "sha256": "66189e7d5a779fe757eec4bc26cb040af8d8e64997c7b8409aee231056b7f7cf"
+    },
+    {
+      "path": "index/shadow/policy-precedence.shadow.md",
+      "bytes": 2120,
+      "sha256": "b0e52adb124c4afa85e9cb0eed7f3b29f29231477c328314c832972f543cf1f9"
+    },
+    {
+      "path": "index/shadow/repo-index.overlay.json",
+      "bytes": 5076575,
+      "sha256": "3f35d914e8e6410a4f2d8d14f4843e2a99eed8205b7e6070713bc61b84d2c453"
+    },
+    {
+      "path": "index/shadow/repo-index.shadow.json",
+      "bytes": 14219245,
+      "sha256": "a038e054c21a75d85b7a6e6c5c28c7687727363109493027dc9381d10b7b3d3b"
+    },
+    {
+      "path": "index/shadow/sha-canonical.shadow.json",
+      "bytes": 912370,
+      "sha256": "f25bcc23d27858aabee81f07143b56d15bd32e5ea4cb85c89597261890dd45b4"
+    },
+    {
+      "path": "index/shadow/shadow-report.json",
+      "bytes": 138270,
+      "sha256": "be5c36d8707c1bfde04d1506278fb6b9df676def6b6567fb7d646186198e5840"
+    },
+    {
+      "path": "index/shadow/shadow-summary.md",
+      "bytes": 17120,
+      "sha256": "571708902b15aa09f02fe71e0e6ba2f5921290c2a28a809cbe041d81e67f2d27"
+    },
+    {
+      "path": "index/shadow/skill-equivalence-review.shadow.json",
+      "bytes": 6360,
+      "sha256": "09c51e3b3ab05357f2e0cace7584997a92828ff339d31d7bc1f433750bb6a4cc"
+    },
+    {
+      "path": "index/shadow/skill-equivalence.shadow.json",
+      "bytes": 38103,
+      "sha256": "692cba014a019b6fcf09cab1a49b317fb3a35334cf908536008687e52f9d9ab8"
+    },
+    {
+      "path": "index/shadow/skill-signals.cutover.shadow.json",
+      "bytes": 4343571,
+      "sha256": "dd0f9c0bd0b355b89acfd24f93559b811f91bc4db3e02fc957825ae4aff13d04"
+    },
+    {
+      "path": "index/shadow/skill-signals.shadow.json",
+      "bytes": 65,
+      "sha256": "e462275a8507990a64cee418f647445bc3eefbc15c854ac197a4621641db2b89"
+    },
+    {
+      "path": "index/shadow/skills.cutover.shadow.json",
+      "bytes": 89425533,
+      "sha256": "2e672861e1b327ef3de8afcdba76bf05eed57e1637785a969dd4dbbd832d212b"
+    },
+    {
+      "path": "index/shadow/skills.inspectable.shadow.json",
+      "bytes": 87621244,
+      "sha256": "c473ef506ccd9ae1b67b781dbc9205b5f6d9ea9b7821c842d40a8459530ea51b"
+    },
+    {
+      "path": "index/shadow/skills.overlay.json",
+      "bytes": 7700848,
+      "sha256": "0badad2c23522565915cabeac687513d0240845b55fa93caa06367ebb1b7e9f1"
+    },
+    {
+      "path": "index/shadow/skills.shadow.json",
+      "bytes": 87621244,
+      "sha256": "c473ef506ccd9ae1b67b781dbc9205b5f6d9ea9b7821c842d40a8459530ea51b"
+    }
+  ],
+  "reviewedPinnedCount": 3000,
+  "baselineIdsPreserved": 52284,
+  "cutoverCount": 55289,
+  "projectionOnly": true,
+  "published": false,
+  "deployed": false
+}

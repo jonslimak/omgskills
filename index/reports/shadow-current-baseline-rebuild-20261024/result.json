@@ -1,0 +1,66 @@
+{
+  "generatedAt": "2026-10-24T14:28:20.209Z",
+  "sourceCommit": "616835a29d3a92fcf6e309e4fc402d5084b5d81f",
+  "sourceModified": true,
+  "sourcePatchSha256": "8aec8fe9c2ca75866e5c5e5fb952766dd820390f8c5e2d483af4a20351ae1609",
+  "buildSeconds": 8.751503667000001,
+  "policyFileReads": 2,
+  "mode": "existing offline package-metadata-overlay rebuild; not a network refresh",
+  "baselineCount": 52284,
+  "cutoverCount": 55289,
+  "addedCount": 3005,
+  "campaignCount": 3000,
+  "missingBaselineCount": 0,
+  "missingSelectedCount": 0,
+  "pinnedOrCoverageIssueCount": 0,
+  "cutoverValidationIssueCount": 0,
+  "policyExcludedCount": 0,
+  "unresolvedCatalogLikeCount": 0,
+  "tieredOverlayEntryCount": 0,
+  "oldExtraOverlaySkillsPreserved": [
+    "alchaincyf/huashu-design:huashu-design",
+    "better-auth/better-icons:skills",
+    "blader/arbitrage:arbitrage",
+    "jackwener/wechat-article-to-markdown",
+    "mukul975/anthropic-cybersecurity-skills:hunting-for-cobalt-strike-beacons"
+  ],
+  "sourceRunCount": 0,
+  "enrichmentCounts": {
+    "cheapReposChecked": 0,
+    "dailyPriorityRepoCount": 0,
+    "skillsDeepRefreshed": 0,
+    "monitoredDeepRefreshed": 0,
+    "cheapTriggeredRefreshCandidateCount": 0,
+    "cheapTriggeredRefreshDeferredCount": 0,
+    "cheapTriggeredDeepRefreshed": 0,
+    "carriedForwardCount": 52284,
+    "correctedCount": 0,
+    "staleInvalidCandidateCount": 0
+  },
+  "publicationImpactProjections": [
+    {
+      "track": "v2",
+      "added": 3005,
+      "removed": 0,
+      "blocked": false,
+      "missingExistingCollectionMembers": 0,
+      "issues": []
+    },
+    {
+      "track": "crawl4",
+      "added": 3005,
+      "removed": 0,
+      "blocked": false,
+      "missingExistingCollectionMembers": 0,
+      "issues": []
+    }
+  ],
+  "networkAttempts": 0,
+  "sharedCrawlerDataUnchanged": true,
+  "productionFilesChanged": false,
+  "promoted": false,
+  "published": false,
+  "deployed": false,
+  "output": "/private/tmp/omgskills-shadow-current-baseline-20261024/index/shadow/skills.cutover.shadow.json",
+  "status": "passed"
+}

@@ -408,8 +408,7 @@ export function removeFilteredCatalogOnlyRepos(
   repoIndex.repoCount = repoIndex.repos.length;
 }
 
-function toShadowSkillRecord(skill: Skill): ShadowSkillRecord {
-  const seeds = loadTrustedSeeds();
+function toShadowSkillRecord(skill: Skill, seeds: TrustedSeeds): ShadowSkillRecord {
   const provenance = resolveShadowProvenance(skill, seeds);
   return {
     ...skill,
@@ -422,8 +421,8 @@ function toShadowSkillRecord(skill: Skill): ShadowSkillRecord {
   };
 }
 
-function buildShadowSkills(skills: Skill[]): ShadowSkillRecord[] {
-  return skills.map(toShadowSkillRecord);
+function buildShadowSkills(skills: Skill[], seeds: TrustedSeeds): ShadowSkillRecord[] {
+  return skills.map((skill) => toShadowSkillRecord(skill, seeds));
 }
 
 function capReadmeSnippet(skill: ShadowSkillRecord): ShadowSkillRecord {
@@ -438,11 +437,12 @@ export function buildFinalShadowSkills(
   baselineSkills: Skill[],
   shadowById: Map<string, ShadowSkillRecord>,
   bootstrappedSkills: Skill[],
+  seeds: TrustedSeeds = loadTrustedSeeds(),
 ): ShadowSkillRecord[] {
   const baselineSkillIds = new Set(baselineSkills.map((skill) => skill.id));
-  const baselineShadowSkills = baselineSkills.map((skill) => shadowById.get(skill.id) ?? toShadowSkillRecord(skill));
+  const baselineShadowSkills = baselineSkills.map((skill) => shadowById.get(skill.id) ?? toShadowSkillRecord(skill, seeds));
   const carriedForwardShadowSkills = [...shadowById.values()].filter((skill) => !baselineSkillIds.has(skill.id));
-  const bootstrappedShadowSkills = bootstrappedSkills.map((skill) => toShadowSkillRecord(skill));
+  const bootstrappedShadowSkills = bootstrappedSkills.map((skill) => toShadowSkillRecord(skill, seeds));
 
   return [...new Map(
     [...baselineShadowSkills, ...carriedForwardShadowSkills, ...bootstrappedShadowSkills].map((skill) => [skill.id, skill] as const),
@@ -549,8 +549,8 @@ function buildRepoIndex(
   skills: Skill[],
   goldBasketSkills: Skill[],
   checkedAt: string,
+  seeds: TrustedSeeds,
 ): { repoIndex: ShadowRepoIndex; unresolvedBaselineSkillCount: number } {
-  const seeds = loadTrustedSeeds();
   const goldBasketRepos = new Set(
     goldBasketSkills
       .map(repoKeyFor)
@@ -1223,6 +1223,7 @@ async function runShadowRefresh(
   discovered: Map<string, DiscoveredRepoRecord>,
   checkedAt: string,
   newlyAdmittedRepos: Set<string>,
+  trustedSeeds: TrustedSeeds,
   options: { forceWebLibrarySnippets?: boolean; skipRefreshWork?: boolean; skipAllNetworkWork?: boolean } = {},
 ): Promise<ShadowRefreshResult> {
   const baselineById = new Map(baselineSkills.map((skill) => [skill.id, skill]));
@@ -1256,7 +1257,6 @@ async function runShadowRefresh(
       return { ...result, skill: preserveLastGoodPinnedSkill(result.skill, skills.get(result.skill.id)) };
     }
   };
-  const trustedSeeds = loadTrustedSeeds();
   const pilotAssets = loadWebLibraryPilotAssets([
     join(indexRoot, "..", "site", "data", "crawl4", "manifest.json"),
     join(indexRoot, "..", "site", "data", "v2", "manifest.json"),
@@ -1272,7 +1272,7 @@ async function runShadowRefresh(
     });
   };
   if (options.skipAllNetworkWork) {
-    const refreshedShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, []);
+    const refreshedShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, [], trustedSeeds);
     return {
       shadowSkills: refreshedShadowSkills,
       webLibraryPilotSnippetCoverage: buildWebLibraryPilotSnippetCoverage({
@@ -1361,14 +1361,14 @@ async function runShadowRefresh(
   });
   removeFailedNewlyAdmittedRepos(repoIndex, newlyAdmittedRepos);
   for (const skill of bootstrapResult.bootstrappedSkills) {
-    shadowById.set(skill.id, toShadowSkillRecord(skill));
+    shadowById.set(skill.id, toShadowSkillRecord(skill, trustedSeeds));
   }
   const repoByName = new Map(repoIndex.repos.map((repo) => [repo.repo, repo]));
-  const bootstrappedShadowSkills = bootstrapResult.bootstrappedSkills.map((skill) => toShadowSkillRecord(skill));
+  const bootstrappedShadowSkills = bootstrapResult.bootstrappedSkills.map((skill) => toShadowSkillRecord(skill, trustedSeeds));
   const catalogAdmissionSample = buildCatalogAdmissionSample(bootstrappedShadowSkills);
 
   if (options.skipRefreshWork) {
-    const refreshedShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills);
+    const refreshedShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills, trustedSeeds);
     enrichmentWarnings.push("high-star backfill-only mode skipped monitored and cheap refresh work");
     return {
       shadowSkills: refreshedShadowSkills,
@@ -1541,7 +1541,7 @@ async function runShadowRefresh(
         repo.repoUrl = result.skill.github_url;
         repo.lastObservedRepoUpdatedAt = result.skill.last_updated;
         repo.staleOrInvalidState = null;
-        shadowById.set(skillId, toShadowSkillRecord(result.skill));
+        shadowById.set(skillId, toShadowSkillRecord(result.skill, trustedSeeds));
         refreshedSkillIds.add(result.skill.id);
         if (isMeaningfullyCorrected(baselineSkill, result.skill)) {
           correctedCount += 1;
@@ -1592,7 +1592,7 @@ async function runShadowRefresh(
   let pilotSkillIds: string[] = [];
   if (shouldRefreshWebLibrarySnippets) {
     while (true) {
-      const currentShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills);
+      const currentShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills, trustedSeeds);
       const currentSkillById = new Map(currentShadowSkills.map((skill) => [skill.id, skill] as const));
       pilotSkillIds = buildPilotSkillIds(currentShadowSkills);
       const pilotSkillIdsToRefresh = pilotSkillIds
@@ -1623,7 +1623,7 @@ async function runShadowRefresh(
         }
         skillsDeepRefreshed += 1;
         successfulPilotSnippetRefreshSkillIds.add(skillId);
-        shadowById.set(result.skill.id, toShadowSkillRecord(result.skill));
+        shadowById.set(result.skill.id, toShadowSkillRecord(result.skill, trustedSeeds));
         const refreshedRepo = repoByName.get(repoKeyFor(result.skill)?.repo ?? "");
         if (refreshedRepo) {
           refreshedRepo.stars = result.skill.stars;
@@ -1637,7 +1637,7 @@ async function runShadowRefresh(
     }
   }
 
-  const refreshedShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills);
+  const refreshedShadowSkills = buildFinalShadowSkills(baselineSkills, shadowById, bootstrapResult.bootstrappedSkills, trustedSeeds);
   pilotSkillIds = buildPilotSkillIds(refreshedShadowSkills);
   const webLibraryPilotSnippetCoverage = buildWebLibraryPilotSnippetCoverage({
     skillIds: pilotSkillIds,
@@ -1799,6 +1799,7 @@ async function runDiscovery(
   forceHighStarSkillMd: boolean,
   onlyHighStarBackfill: boolean,
   highStarQueryBatch: HighStarQueryBatch | null,
+  seeds: TrustedSeeds,
 ): Promise<{
   sourceRuns: SourceRunSummary[];
   discovered: Map<string, DiscoveredRepoRecord>;
@@ -1816,7 +1817,6 @@ async function runDiscovery(
   const lanes = CADENCE_LANES[cadence];
   const sourceRuns: SourceRunSummary[] = [];
   const discovered = new Map<string, DiscoveredRepoRecord>();
-  const seeds = loadTrustedSeeds();
   const discoveryBudgetApplied = cadence === "background" || cadence === "combined";
   const discoveryBudgetSummary = discoveryBudgetApplied
     ? {
@@ -2297,11 +2297,11 @@ async function main() {
   timings.loadBaseline = Math.round(performance.now() - baselineStart);
 
   const provenanceStart = performance.now();
-  let shadowSkills = buildShadowSkills(baselineSkills);
+  let shadowSkills = buildShadowSkills(baselineSkills, seeds);
   timings.buildProvenance = Math.round(performance.now() - provenanceStart);
 
   const repoIndexStart = performance.now();
-  const { repoIndex, unresolvedBaselineSkillCount } = buildRepoIndex(baselineSkills, goldBasketSkills, checkedAt);
+  const { repoIndex, unresolvedBaselineSkillCount } = buildRepoIndex(baselineSkills, goldBasketSkills, checkedAt, seeds);
   const baselineRepoIndexForOverlay = cloneRepoIndex(repoIndex);
   const priorShadowRepoIndex = loadShadowRepoIndex(repoIndexOutPath);
   mergePriorShadowRepoTimestamps(baselineRepoIndexForOverlay, priorShadowRepoIndex, checkedAt);
@@ -2373,6 +2373,7 @@ async function main() {
         forceHighStarSkillMd || onlyHighStarBackfill,
         onlyHighStarBackfill,
         highStarQueryBatch,
+        seeds,
       );
   for (const repo of [...discovered.keys()]) {
     if (isDoNotCrawlRepo(repo, seeds)) discovered.delete(repo);
@@ -2489,6 +2490,7 @@ async function main() {
     discovered,
     checkedAt,
     newlyAdmittedRepos,
+    seeds,
     {
       forceWebLibrarySnippets,
       skipRefreshWork: onlyHighStarBackfill,
@@ -2744,7 +2746,7 @@ async function main() {
       unresolvedCatalogPublishers: buildUnresolvedCatalogPublishers(shadowSkills),
       discovered,
       momentumByRepo,
-      seeds: loadTrustedSeeds(),
+      seeds,
     }),
     nextPromotionCandidateCount: nextPromotionCandidates.length,
     nextPromotionCandidatesSample: nextPromotionCandidates.slice(0, 10),

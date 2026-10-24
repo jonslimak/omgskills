@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-24T14:28:19.419Z",
+  "track": "v2",
+  "sourceCommit": "616835a29d3a92fcf6e309e4fc402d5084b5d81f",
+  "policyDigest": "sha256:ff72daf582e9c5544aaf7547bb03cf9136ff917957fddf37a2c85c3d234b68f8",
+  "baseline": {
+    "manifestGeneratedAt": "2026-10-22T12:32:42Z",
+    "skillsCount": 52284,
+    "collectionsCount": 92,
+    "membershipCount": 933
+  },
+  "proposed": {
+    "manifestGeneratedAt": "2026-10-24T14:28:19.352Z",
+    "skillsCount": 55289,
+    "collectionsCount": 92,
+    "membershipCount": 933
+  },
+  "skills": {
+    "addedCount": 3005,
+    "removedCount": 0,
+    "removalThreshold": 500,
+    "addedSample": [
+      "1password/1password-claude-plugin:skills/1password-environments",
+      "42crunch-ai/claude-plugins:plugins/api-security-testing/skills/generate-oas",
+      "acksession/easyesuite-claude-plugin:skills/ap-cash-outlook",
+      "acksession/easyesuite-claude-plugin:skills/ar-collections",
+      "acksession/easyesuite-claude-plugin:skills/building-workflows",
+      "acksession/easyesuite-claude-plugin:skills/create-sales-order",
+      "acksession/easyesuite-claude-plugin:skills/customers-and-vendors",
+      "acksession/easyesuite-claude-plugin:skills/erp-quickstart",
+      "acksession/easyesuite-claude-plugin:skills/financial-reports",
+      "acksession/easyesuite-claude-plugin:skills/fulfill-and-ship-orders",
+      "acksession/easyesuite-claude-plugin:skills/inventory-operations",
+      "acksession/easyesuite-claude-plugin:skills/inventory-replenishment-report",
+      "acksession/easyesuite-claude-plugin:skills/inventory-reports",
+      "acksession/easyesuite-claude-plugin:skills/invoicing-and-payments",
+      "acksession/easyesuite-claude-plugin:skills/manage-catalog-items",
+      "acksession/easyesuite-claude-plugin:skills/marketplace-connector-ops",
+      "acksession/easyesuite-claude-plugin:skills/open-orders-aging",
+      "acksession/easyesuite-claude-plugin:skills/purchase-order-lifecycle",
+      "acksession/easyesuite-claude-plugin:skills/purchasing-reports",
+      "acksession/easyesuite-claude-plugin:skills/returns-and-refunds"
+    ],
+    "removedSample": []
+  },
+  "collections": {
+    "addedIds": [],
+    "removedIds": [],
+    "removedMembershipCount": 0,
+    "removedMembershipPercent": 0
+  },
+  "assets": {
+    "addedKeys": [],
+    "removedKeys": [],
+    "authorizedRemovedKeys": []
+  },
+  "override": {
+    "enabled": false,
+    "reason": null
+  },
+  "issues": [],
+  "blocked": false,
+  "projectionOnly": true,
+  "missingExistingCollectionMemberCount": 0
+}
