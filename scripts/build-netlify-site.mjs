@@ -132,7 +132,7 @@ async function main() {
     path.join(outputAppDir, "release-config.json"),
     `${JSON.stringify(publicReleaseConfig(productionFeatures), null, 2)}\n`,
   );
-  if (takeoverPilotEnabled()) console.log(`Takeover pilot pages: ${(await writeTakeoverPilot(outputDir)).join(", ")}`);
+  if (takeoverPilotEnabled(process.env, productionFeatures)) console.log(`Takeover pilot pages: ${(await writeTakeoverPilot(outputDir)).join(", ")}`);
   await mergeRedirects();
   await verifyRequiredOutput();
   const stagedMigrations = await stageNetlifyDbMigrations();

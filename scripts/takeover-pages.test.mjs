@@ -14,6 +14,9 @@ test("the pilot is off unless explicitly enabled", () => {
   assert.equal(takeoverPilotEnabled({}), false);
   assert.equal(takeoverPilotEnabled({ PORTAL_TAKEOVER_PILOT: "true" }), false);
   assert.equal(takeoverPilotEnabled({ PORTAL_TAKEOVER_PILOT: "1" }), true);
+  assert.equal(takeoverPilotEnabled({}, { takeoverPilotEnabled: true }), true, "reviewed production setting");
+  assert.equal(takeoverPilotEnabled({}, { takeoverPilotEnabled: false }), false);
+  assert.equal(takeoverPilotEnabled({ PORTAL_TAKEOVER_PILOT: "0" }, { takeoverPilotEnabled: true }), false, "local override off");
 });
 
 test("a static page keeps its content and metadata, gains the app, and marks its own styles", () => {

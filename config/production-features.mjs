@@ -4,7 +4,7 @@ export function validateProductionFeatures(parsed) {
     throw new Error("production-features.json must declare skillGroupsWebEnabled and skillGroupsAuthEnabled as booleans");
   }
   const optional = ["portalRedesignEnabled", "portalUnifiedEnabled", "catalogSearchEnabled",
-    "connectedInventoryReadEnabled", "connectedInventorySyncEnabled"];
+    "connectedInventoryReadEnabled", "connectedInventorySyncEnabled", "takeoverPilotEnabled"];
   for (const key of optional) {
     if (parsed[key] !== undefined && typeof parsed[key] !== "boolean") throw new Error(`${key} must be a boolean when present`);
   }
@@ -17,9 +17,13 @@ export function validateProductionFeatures(parsed) {
   if (parsed.connectedInventorySyncEnabled && !parsed.connectedInventoryReadEnabled) {
     throw new Error("connectedInventorySyncEnabled requires connectedInventoryReadEnabled");
   }
+  if (parsed.takeoverPilotEnabled && !parsed.portalUnifiedEnabled) {
+    throw new Error("takeoverPilotEnabled requires the unified web app");
+  }
   return Object.freeze({ skillGroupsWebEnabled: parsed.skillGroupsWebEnabled, skillGroupsAuthEnabled: parsed.skillGroupsAuthEnabled,
     portalRedesignEnabled: parsed.portalRedesignEnabled === true, portalUnifiedEnabled: parsed.portalUnifiedEnabled === true,
     catalogSearchEnabled: parsed.catalogSearchEnabled === true,
     connectedInventoryReadEnabled: parsed.connectedInventoryReadEnabled === true,
-    connectedInventorySyncEnabled: parsed.connectedInventorySyncEnabled === true });
+    connectedInventorySyncEnabled: parsed.connectedInventorySyncEnabled === true,
+    takeoverPilotEnabled: parsed.takeoverPilotEnabled === true });
 }
