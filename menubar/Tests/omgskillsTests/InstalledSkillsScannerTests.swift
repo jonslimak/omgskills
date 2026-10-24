@@ -380,6 +380,82 @@ struct InstalledSkillsScannerTests {
         #expect(InstalledSkillsScanner.scanWithSummary(filesystemPaths: paths).roots.isEmpty)
     }
 
+    @Test(arguments: [false, true], [false, true])
+    func scanIgnoresConfirmedEmptyFolders(_ collectCoverage: Bool, _ bounded: Bool) throws {
+        let root = try temporaryDirectory().resolvingSymlinksInPath()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let agentRoot = root.appendingPathComponent("codex")
+        let good = agentRoot.appendingPathComponent("good")
+        try FileManager.default.createDirectory(at: good, withIntermediateDirectories: true)
+        try writeSkill(at: good, name: "good")
+        try FileManager.default.createDirectory(at: agentRoot.appendingPathComponent("empty"), withIntermediateDirectories: true)
+
+        let scan = InstalledSkillsScanner.scan(roots: [.init(url: agentRoot, origin: "Codex")],
+            pathAnchor: bounded ? root : nil, collectCoverage: collectCoverage)
+        #expect(scan.installations.map(\.name) == ["good"])
+        #expect(scan.issues.isEmpty)
+        #expect(scan.roots == (collectCoverage ? [.init(source: "codex", state: .complete, reason: nil)] : []))
+    }
+
+    @Test(arguments: ["hiddenFile", "missingSkill", "brokenSkillLink", "brokenFolderLink", "emptyFolderLink", "unreadableFolder", "unreadableSkill"])
+    func scanKeepsWarningsUnlessFolderIsConfirmedEmpty(_ failure: String) throws {
+        let root = try temporaryDirectory().resolvingSymlinksInPath()
+        let agentRoot = root.appendingPathComponent("codex")
+        let bad = agentRoot.appendingPathComponent("bad")
+        defer {
+            try? FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: bad.path)
+            try? FileManager.default.removeItem(at: root)
+        }
+        try FileManager.default.createDirectory(at: agentRoot, withIntermediateDirectories: true)
+        if failure == "brokenFolderLink" || failure == "emptyFolderLink" {
+            let target = root.appendingPathComponent("target")
+            if failure == "emptyFolderLink" {
+                try FileManager.default.createDirectory(at: target, withIntermediateDirectories: true)
+            }
+            try FileManager.default.createSymbolicLink(at: bad, withDestinationURL: target)
+        } else {
+            try FileManager.default.createDirectory(at: bad, withIntermediateDirectories: true)
+            switch failure {
+            case "hiddenFile", "missingSkill":
+                try Data("not a skill".utf8).write(to: bad.appendingPathComponent(failure == "hiddenFile" ? ".placeholder" : "notes.txt"))
+            case "brokenSkillLink":
+                try FileManager.default.createSymbolicLink(at: bad.appendingPathComponent("SKILL.md"),
+                    withDestinationURL: root.appendingPathComponent("missing"))
+            case "unreadableFolder":
+                try FileManager.default.setAttributes([.posixPermissions: 0], ofItemAtPath: bad.path)
+                #expect(throws: (any Error).self) { try FileManager.default.contentsOfDirectory(atPath: bad.path) }
+            default:
+                try writeSkill(at: bad, name: "bad")
+                try FileManager.default.setAttributes([.posixPermissions: 0], ofItemAtPath: bad.appendingPathComponent("SKILL.md").path)
+                #expect(throws: (any Error).self) { try Data(contentsOf: bad.appendingPathComponent("SKILL.md")) }
+            }
+        }
+
+        let scan = InstalledSkillsScanner.scan(roots: [.init(url: agentRoot, origin: "Codex")],
+            pathAnchor: root, collectCoverage: true)
+        #expect(scan.installations.isEmpty)
+        #expect(scan.issues == [.skippedSkill(source: "Codex", folder: "bad")])
+        #expect(scan.roots.first?.state == .incomplete)
+    }
+
+    @Test func reconciliationDoesNotIgnoreChangesToAnEmptyFolder() throws {
+        let root = try temporaryDirectory().resolvingSymlinksInPath()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let agentRoot = root.appendingPathComponent("codex")
+        let empty = agentRoot.appendingPathComponent("empty")
+        try FileManager.default.createDirectory(at: empty, withIntermediateDirectories: true)
+        var reads = 0
+        let scan = InstalledSkillsScanner.scan(roots: [.init(url: agentRoot, origin: "Codex")],
+            pathAnchor: root, collectCoverage: true, directoryReader: { url in
+                reads += 1
+                if reads == 2 {
+                    try Data("changed".utf8).write(to: empty.appendingPathComponent(".placeholder"))
+                }
+                return try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)
+            })
+        #expect(scan.roots == [.init(source: "codex", state: .incomplete, reason: .changed)])
+    }
+
     @Test(arguments: ["invalid", "broken", "oversize"])
     func reconciliationKeepsOtherRootsCompleteWhenOneEntryCannotBeReported(_ failure: String) async throws {
         let root = try temporaryDirectory().resolvingSymlinksInPath()

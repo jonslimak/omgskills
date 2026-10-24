@@ -153,6 +153,9 @@ enum InstalledSkillsScanner {
                 // Regular files cannot contain SKILL.md; resolving that child can fail with ENOTDIR.
                 if collectCoverage && fileStamp(entry)?.type == FileAttributeType.typeRegular.rawValue { continue }
                 let skillMd = entry.appendingPathComponent("SKILL.md")
+                if !fm.fileExists(atPath: skillMd.path),
+                   isWithinPathAnchor(entry, pathAnchor: pathAnchor),
+                   isConfirmedEmptyDirectory(entry) { continue }
                 if let pathAnchor {
                     guard isWithinPathAnchor(entry, pathAnchor: pathAnchor),
                           isWithinPathAnchor(skillMd, pathAnchor: pathAnchor) else {
@@ -260,6 +263,12 @@ enum InstalledSkillsScanner {
                 skillFile: allowed ? fileStamp(skillFile) : nil,
                 resolvedSkillFile: allowed ? fileStamp(skillFile.resolvingSymlinksInPath()) : nil))
         })
+    }
+
+    private static func isConfirmedEmptyDirectory(_ url: URL) -> Bool {
+        guard fileStamp(url)?.type == FileAttributeType.typeDirectory.rawValue else { return false }
+        // Include hidden and broken-link entries; failed reads must not count as empty.
+        return (try? FileManager.default.contentsOfDirectory(atPath: url.path).isEmpty) == true
     }
 
     private static func directoryEntries(_ url: URL) throws -> [URL] {
