@@ -133,3 +133,14 @@ test("every public catalog ID round-trips through its address or keeps the ?view
   assert.ok(skills.length > 1000);
   assert.ok(fallbacks / skills.length < 0.001, `${fallbacks} of ${skills.length} IDs need the ?view= form`);
 });
+
+test("only addresses nothing recognizes count as unknown", async () => {
+  const { unknownAppAddress } = await import("../src/integration/unified/entry-navigation");
+  for (const known of ["/app/", "/app/library/", "/app/library/nobody-xyz/", "/app/library/a/b/c/", "/app/groups/abc", "/app/agents", "/app/home"]) {
+    assert.equal(unknownAppAddress(known, "/app/"), false, known);
+  }
+  for (const unknown of ["/app/library/a//b/", "/app/whatever", "/app/library/collections/a/b/"]) {
+    assert.equal(unknownAppAddress(unknown, "/app/"), true, unknown);
+  }
+  assert.equal(unknownAppAddress("/library/anthropics/", "/app/"), false, "outside the app base");
+});

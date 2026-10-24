@@ -1050,6 +1050,9 @@ async function verifyLiveNotFound(urlPath) {
   if (response.status !== 404) {
     throw new Error(`${url} returned ${response.status} (${response.headers.get("location") || "no redirect"}), expected 404`);
   }
+  if (!(await response.text()).includes("<title>Page not found | omgskills</title>")) {
+    throw new Error(`${url} did not serve the site's own 404 page`);
+  }
 }
 
 async function main() {

@@ -7,7 +7,7 @@ import { appendPublicPage, publicPageRequest, requiresPageRestart, type PublicPa
 export type PublicStatus = {
   list: LoadState; error?: string; note?: string;
   metadata?: LoadState; metadataError?: string;
-  detail: LoadState; detailError?: string;
+  detail: LoadState; detailError?: string; detailMissing?: boolean;
   retry: () => void; retryDetail: () => void;
   page?: PublicPageInfo; loaded?: number; moreState?: LoadState; moreError?: string;
   restartPages?: boolean; loadMore?: () => void;
@@ -38,7 +38,7 @@ export function usePublicCatalog(client: PublicCatalogClient, nav: Navigation, e
   const [more, setMore] = useState({ scope: "", state: "ready" as LoadState, error: "", restart: false });
   const appendRequest = useRef<{ scope: string; controller: AbortController } | null>(null);
   const seenCursors = useRef(new Set<string>());
-  const [detail, setDetail] = useState({ key: "", skill: null as CatalogSummary | null, state: "loading" as LoadState, error: "" });
+  const [detail, setDetail] = useState({ key: "", skill: null as CatalogSummary | null, state: "loading" as LoadState, error: "", missing: false });
   const selectedId = enabled && nav.selected.startsWith("catalog:") ? nav.selected.slice(8) : "";
 
   useEffect(() => {
@@ -120,14 +120,19 @@ export function usePublicCatalog(client: PublicCatalogClient, nav: Navigation, e
   useEffect(() => {
     if (!selectedId) return;
     const controller = new AbortController();
-    setDetail({ key: selectedId, skill: null, state: "loading", error: "" });
+    setDetail({ key: selectedId, skill: null, state: "loading", error: "", missing: false });
     client.skill(selectedId, controller.signal).then(async (skill) => {
-      if (!skill) throw new Error("This skill is no longer available in the catalog.");
-      if (!controller.signal.aborted) setDetail({ key: selectedId, skill, state: "ready", error: "" });
+      if (!skill) {
+        // Not a loading failure: retrying cannot help, so the panel says so plainly.
+        if (!controller.signal.aborted) setDetail({ key: selectedId, skill: null, state: "error", missing: true,
+          error: "This skill isn't in the catalog. The link may be wrong, or the skill was removed." });
+        return;
+      }
+      if (!controller.signal.aborted) setDetail({ key: selectedId, skill, state: "ready", error: "", missing: false });
       const publicUrl = await client.publicUrl(selectedId, controller.signal).catch(() => undefined);
-      if (!controller.signal.aborted && publicUrl) setDetail({ key: selectedId, skill: { ...skill, publicUrl }, state: "ready", error: "" });
+      if (!controller.signal.aborted && publicUrl) setDetail({ key: selectedId, skill: { ...skill, publicUrl }, state: "ready", error: "", missing: false });
     }).catch((error) => {
-      if (!controller.signal.aborted) setDetail({ key: selectedId, skill: null, state: "error", error: message(error) });
+      if (!controller.signal.aborted) setDetail({ key: selectedId, skill: null, state: "error", error: message(error), missing: false });
     });
     return () => controller.abort();
   }, [client, selectedId, detailRevision]);
@@ -140,7 +145,7 @@ export function usePublicCatalog(client: PublicCatalogClient, nav: Navigation, e
     list: active ? current.state : "ready",
     metadata: active ? current.metadata : "ready", metadataError: current.metadataError,
     error: current.error, note: current.note,
-    detail: currentDetail?.state ?? "loading", detailError: currentDetail?.error,
+    detail: currentDetail?.state ?? "loading", detailError: currentDetail?.error, detailMissing: currentDetail?.missing,
     retry,
     retryDetail: () => setDetailRevision((value) => value + 1),
     page: current.page, loaded: current.catalog.resultIds?.length ?? 0,
