@@ -1015,15 +1015,17 @@ function renderCollectionPage(collection, featuredSkills, allSkills, skillUrlByI
 }
 
 function renderSkillsIndexPage({ profileCollections, topicCollections, skills }, skillUrlById) {
-  const body = `    <h1>Skills</h1>
+  const body = `    <h1>Agent skills for Claude &amp; Codex</h1>
     <p>The best &amp; latest skills from the most trusted sources</p>
     <div class="section"><div class="eyebrow">Featured</div><div class="grid">${profileCollections.map((collection) => directoryCard(collection)).join("")}</div></div>
     <div class="section"><div class="eyebrow">Collections</div><div class="grid">${topicCollections.map((collection) => directoryCard(collection)).join("")}</div></div>
     ${skillSection("Skills", skills, skillUrlById, { eyebrow: true })}`;
 
   return pageShell({
-    title: "Skills - omgskills",
-    description: "Browse featured profiles, collections, and selected AI agent skills in the omgskills web library.",
+    // Search Console, 2026-10-24: this page had three quarters of all impressions but a 0.3%
+    // click rate under the generic "Skills - omgskills" title.
+    title: "Claude & Codex agent skills: browse and install | omgskills",
+    description: "Agent skills for Claude Code and Codex from Anthropic, OpenAI, Vercel and more. Browse curated collections and trending skills, and install them with omgskills.",
     path: "/skills/",
     ogImage: sharedSocialImageUrl,
     ogImageWidth: "1200",
@@ -1034,8 +1036,8 @@ function renderSkillsIndexPage({ profileCollections, topicCollections, skills },
     structuredData: {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      name: "omgskills web library",
-      description: "Featured profiles, collections, and selected AI agent skills.",
+      name: "Claude & Codex agent skills",
+      description: "Agent skills for Claude Code and Codex from trusted creators, curated collections and trending skills.",
       url: `${origin}/skills/`,
     },
   });
