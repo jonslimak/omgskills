@@ -1,0 +1,27 @@
+{
+  "notes": "Conservative source/package review. Service and CLI prerequisites are allowed; copied packs, unavailable companion runtimes, and connector-only forwarding stubs are held. Holds do not create owner blocks or alter existing library entries.",
+  "excludedRepos": [
+    { "repo": "ihlamury/design-drift", "reason": "generated-brand-snapshots-with-inconsistent-design-tokens-and-many-invalid-siblings" },
+    { "repo": "laurac8r/claude-damn", "reason": "superpowers-derived-workflow-pack-needs-source-attribution-review" },
+    { "repo": "unifapi-agent/agents", "reason": "mixed-original-and-explicitly-adapted-source-pack-needs-per-skill-attribution" },
+    { "repo": "houseofmvps/ultraship", "reason": "superpowers-named-workflow-repackaging-not-established-as-original" },
+    { "repo": "usermuse/em-plugin", "reason": "readme-explicitly-adapts-third-party-methodology-skills" },
+    { "repo": "etr/groundwork", "reason": "mixed-derived-skills-and-plugin-orchestration-needs-per-skill-review" },
+    { "repo": "svyatov/supermatt", "reason": "explicit-mattpocock-superpowers-compound-engineering-derived-pack" },
+    { "repo": "msapps-mobile/claude-plugins", "reason": "mixed-vendor-plugin-pack-with-upstream-named-skills-attribution-unresolved" },
+    { "repo": "ziazon/zizi-skills", "reason": "readme-discloses-adapted-upstream-skills" },
+    { "repo": "zunosmartlabs/zsl-superpowers", "reason": "explicit-mattpocock-derived-workflow-pack" },
+    { "repo": "drizzy07x/skillquiver", "reason": "curated-superpowers-named-pack-attribution-unresolved" },
+    { "repo": "hllj/sdd-superpowers", "reason": "explicit-superpowers-derived-pack" },
+    { "repo": "rishav1305/preset-toolkit", "reason": "skills-import-plugin-root-python-modules-and-route-to-companion-skills" },
+    { "repo": "websublime/mister-anderson", "reason": "plugin-supervisor-and-beads-runtime-not-contained-in-individual-packages" },
+    { "repo": "decibelsystems/superpowers", "reason": "explicit-superpowers-remix" },
+    { "repo": "legalvelocity/lvai-pro", "reason": "connector-get-skill-forwarding-stubs-not-local-task-instructions" },
+    { "repo": "9aoyang/stackpilot", "reason": "coupled-stackpilot-runtime-agents-and-workspace-orchestration" },
+    { "repo": "inalps/ddw", "reason": "plugin-root-agent-profiles-scripts-and-companion-workflows-required" },
+    { "repo": "rampstackco/claude-skills-starter", "reason": "readme-says-all-skills-copied-verbatim-from-parent-catalog" },
+    { "repo": "morganongithub/tackle", "reason": "superpowers-inspired-workflow-pack-needs-originality-review" },
+    { "repo": "dollardill/beads-superpowers", "reason": "readme-identifies-derived-superpowers-and-gstack-skills" }
+  ],
+  "excludedSkills": []
+}

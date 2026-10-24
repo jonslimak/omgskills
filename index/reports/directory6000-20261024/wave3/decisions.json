@@ -1,0 +1,2227 @@
+{
+  "generatedAt": "2026-10-24T20:42:22.748Z",
+  "reviewSha256": "d586257202713923fe95e02ed85713f59119125454c64bb654484e57aee4939f",
+  "excludeRepos": [
+    "dariovr1/sixth-sense",
+    "karolusd/fellowship",
+    "rampstackco/claude-skills-seo",
+    "papischolz/sdlc-assist",
+    "nicodiansk/turbocharge",
+    "toruai/toru-claude-agents",
+    "woldinius/wai-skill-suite",
+    "wolfgangrush/indian-rent-control-drafting",
+    "cloverink/shipwright",
+    "j0hanz/squad-agents"
+  ],
+  "excludeIds": [
+    "clawpage/clawpage-skill:skills/delete-page",
+    "dariovr1/sixth-sense:skills/dispatching-parallel-agents",
+    "dariovr1/sixth-sense:skills/domain-modeling",
+    "dariovr1/sixth-sense:skills/dylan-dog",
+    "dariovr1/sixth-sense:skills/roundtable",
+    "fibtecltd/pyvar:plugins/arch/api-gateway",
+    "fibtecltd/pyvar:plugins/arch/compute",
+    "fibtecltd/pyvar:plugins/arch/data-ingestion",
+    "fibtecltd/pyvar:plugins/arch/observability",
+    "fibtecltd/pyvar:plugins/arch/storage",
+    "fibtecltd/pyvar:plugins/liquidity-risk",
+    "fibtecltd/pyvar:plugins/market-risk",
+    "fibtecltd/pyvar:plugins/portfolio-analytics",
+    "fibtecltd/pyvar:plugins/regulatory",
+    "jaan-mustafa/10x-team:skills/cto",
+    "jaan-mustafa/10x-team:skills/dba",
+    "jaan-mustafa/10x-team:skills/devops-engineer",
+    "jaan-mustafa/10x-team:skills/engineering-manager",
+    "jaan-mustafa/10x-team:skills/principal-architect",
+    "jaan-mustafa/10x-team:skills/product-manager",
+    "jaan-mustafa/10x-team:skills/qa-engineer",
+    "jaan-mustafa/10x-team:skills/sde",
+    "jaan-mustafa/10x-team:skills/security-engineer",
+    "jaan-mustafa/10x-team:skills/senior-engineer",
+    "jaan-mustafa/10x-team:skills/sre",
+    "jaan-mustafa/10x-team:skills/staff-engineer",
+    "woldinius/wai-skill-suite:.claude/skills/wai",
+    "abhisekjha/pith:skills/pith-graph",
+    "abhisekjha/pith:skills/pith-setup",
+    "abhisekjha/pith:skills/pith-tour",
+    "cloverink/shipwright:skills/skill-creator",
+    "enpitech/ai-tools:skills/cr-deps",
+    "enpitech/ai-tools:skills/cr-fullstack",
+    "enpitech/ai-tools:skills/cr-general",
+    "enpitech/ai-tools:skills/cr-node",
+    "enpitech/ai-tools:skills/cr-python",
+    "enpitech/ai-tools:skills/cr-react",
+    "enpitech/ai-tools:skills/cra-fullstack",
+    "enpitech/ai-tools:skills/cra-general",
+    "enpitech/ai-tools:skills/cra-node",
+    "enpitech/ai-tools:skills/cra-python",
+    "enpitech/ai-tools:skills/cra-react",
+    "karolusd/fellowship:skills/codebase-map",
+    "karolusd/fellowship:skills/investigate",
+    "nguyengiatam/crewmarshal:skills/orchestrating-executors",
+    "nguyengiatam/crewmarshal:skills/project-working-agreement",
+    "rampstackco/claude-skills-seo:skills/seo-onpage",
+    "redhuntlabs/wizard:skills/building-a-discipline-spell",
+    "redhuntlabs/wizard:skills/building-a-spell",
+    "redhuntlabs/wizard:skills/chaining-spells",
+    "redhuntlabs/wizard:skills/inferring-a-spell-from-examples",
+    "redhuntlabs/wizard:skills/intuitive-interviewing",
+    "redhuntlabs/wizard:skills/pressure-testing-a-spell",
+    "redhuntlabs/wizard:skills/using-wizard",
+    "sidub-inc/monaiq.ai:skills/analyze-codebase",
+    "sidub-inc/monaiq.ai:skills/design-monetization",
+    "sidub-inc/monaiq.ai:skills/getting-started",
+    "sidub-inc/monaiq.ai:skills/scenario-advisor",
+    "benskamps/career-compass-plugin:skills/career-compass",
+    "eikiyo/convertia-plugin:plugins/convertia/skills/convertia",
+    "insideout-ai/make-it-work:skills/find-the-repos",
+    "insideout-ai/make-it-work:skills/go-deep",
+    "insideout-ai/make-it-work:skills/slice-the-epic",
+    "mhihasan/agentic-sdlc:skills/crafting-commits",
+    "mhihasan/agentic-sdlc:skills/generating-tasks",
+    "mhihasan/agentic-sdlc:skills/implementing-tasks",
+    "mhihasan/agentic-sdlc:skills/picking-up-task",
+    "mhihasan/agentic-sdlc:skills/planning-from-spec",
+    "mhihasan/agentic-sdlc:skills/receiving-plan-review",
+    "mhihasan/agentic-sdlc:skills/reviewing-code",
+    "mhihasan/agentic-sdlc:skills/reviewing-plan",
+    "nidrissi/mathbox:skills/research-program",
+    "chamseddin98/daymark:plugin/skills/planner-calendar-sync",
+    "chamseddin98/daymark:plugin/skills/planner-delete",
+    "chamseddin98/daymark:plugin/skills/planner-markdown-sync",
+    "chamseddin98/daymark:plugin/skills/planner-schedule",
+    "datumlabsio/swantje:skills/assistant",
+    "datumlabsio/swantje:skills/connect-bigquery",
+    "datumlabsio/swantje:skills/connect-clickhouse",
+    "datumlabsio/swantje:skills/connect-dagster",
+    "datumlabsio/swantje:skills/connect-dbt",
+    "datumlabsio/swantje:skills/connect-dlt",
+    "datumlabsio/swantje:skills/connect-github",
+    "datumlabsio/swantje:skills/connect-hex",
+    "datumlabsio/swantje:skills/onboard",
+    "deadsimple-xyz/hats:skills/autopilot",
+    "deadsimple-xyz/hats:skills/cto",
+    "deadsimple-xyz/hats:skills/designer",
+    "deadsimple-xyz/hats:skills/developer",
+    "deadsimple-xyz/hats:skills/init",
+    "deadsimple-xyz/hats:skills/manager",
+    "deadsimple-xyz/hats:skills/qa",
+    "felipefontoura/claude-sdd-kit:skills/idea",
+    "felipefontoura/claude-sdd-kit:skills/init",
+    "felipefontoura/claude-sdd-kit:skills/plan",
+    "felipefontoura/claude-sdd-kit:skills/prd",
+    "felipefontoura/claude-sdd-kit:skills/review",
+    "felipefontoura/claude-sdd-kit:skills/spec",
+    "felipefontoura/claude-sdd-kit:skills/status",
+    "felipefontoura/claude-sdd-kit:skills/tasks",
+    "helixis-plugins/pm:skills/decision-support",
+    "helixis-plugins/pm:skills/package-generation",
+    "helixis-plugins/pm:skills/progress-tracking",
+    "helixis-plugins/pm:skills/project-state",
+    "helixis-plugins/pm:skills/quality-assurance",
+    "helixis-plugins/pm:skills/scaffold-creation",
+    "helixis-plugins/pm:skills/spec-writing",
+    "helixis-plugins/pm:skills/troubleshooting",
+    "joetawil7/first-pass:skills/fix-the-class",
+    "joetawil7/first-pass:skills/review",
+    "kamenkurtev/ui-consistency:skills/accessibility",
+    "kamenkurtev/ui-consistency:skills/adjusting",
+    "kamenkurtev/ui-consistency:skills/conventions",
+    "kamenkurtev/ui-consistency:skills/decisions",
+    "kamenkurtev/ui-consistency:skills/finding-patterns",
+    "kamenkurtev/ui-consistency:skills/implementing",
+    "kamenkurtev/ui-consistency:skills/planning",
+    "kamenkurtev/ui-consistency:skills/values",
+    "kamenkurtev/ui-consistency:skills/verifying",
+    "kodwai/plugin:plugins/kodwai/skills/submit",
+    "matteo-stratega/claude-cortex:skills/brief",
+    "matteo-stratega/claude-cortex:skills/close",
+    "matteo-stratega/claude-cortex:skills/daily-wrap",
+    "matteo-stratega/claude-cortex:skills/setup",
+    "matteo-stratega/claude-cortex:skills/start",
+    "matteo-stratega/claude-cortex:skills/weekly",
+    "nicodiansk/turbocharge:skills/brainstorm",
+    "nicodiansk/turbocharge:skills/build",
+    "nicodiansk/turbocharge:skills/plan",
+    "nicodiansk/turbocharge:skills/review",
+    "nicodiansk/turbocharge:skills/wrap",
+    "roxanneallard/euxlab-skills:skills/loop/euxlab-create-personas-and-job-stories",
+    "roxanneallard/euxlab-skills:skills/loop/euxlab-design-brief",
+    "roxanneallard/euxlab-skills:skills/loop/euxlab-design-review",
+    "roxanneallard/euxlab-skills:skills/loop/euxlab-grill-the-ask",
+    "roxanneallard/euxlab-skills:skills/reference/euxlab-grilling",
+    "roxanneallard/euxlab-skills:skills/loop/euxlab-synthesize",
+    "sampath9966/slipstream:skills/advisor",
+    "sampath9966/slipstream:skills/guard",
+    "sampath9966/slipstream:skills/onboard",
+    "sampath9966/slipstream:skills/setup",
+    "slogsdon/loop-and-gate-foundation:skills/improve",
+    "slogsdon/loop-and-gate-foundation:skills/loop",
+    "solofounder-ai/solofounder:skills/flow-composer",
+    "solofounder-ai/solofounder:skills/using-solofounder",
+    "vadimsv1/ship-plugin:skills/ship-build",
+    "vadimsv1/ship-plugin:skills/ship-expert-qa",
+    "vadimsv1/ship-plugin:skills/ship-monitor",
+    "vadimsv1/ship-plugin:skills/ship-prod-prep",
+    "vadimsv1/ship-plugin:skills/ship-research",
+    "vadimsv1/ship-plugin:skills/ship-spec",
+    "ayejk/phase-runner:plugin/skills/phase-builder",
+    "ayejk/phase-runner:plugin/skills/product-planner",
+    "clientgen/clientgen-reach:skills/marketing-compliance",
+    "clientgen/clientgen-reach:skills/postcard",
+    "fusion-software-ltd/decision-council:skills/convene",
+    "fusion-software-ltd/decision-council:skills/quick",
+    "gg-mo/repo-hygiene:skills/cleaning-existing-codebase",
+    "j0hanz/squad-agents:skills/request-code-review",
+    "kgelster/awesome-ecom-skills:skills/shopify-alt-text",
+    "kgelster/awesome-ecom-skills:skills/shopify-catalog-audit",
+    "mario-montanari/querymantic:skills/querymantic",
+    "prepforeverything/prepkit-product:skills/product-prd-authoring",
+    "papischolz/sdlc-assist:plugins/sdlc-assist/skills/spec-driven-development",
+    "revelata/deepkpi-agents:skills/company-summary",
+    "revelata/deepkpi-agents:skills/filing",
+    "revelata/deepkpi-agents:skills/ideas",
+    "revelata/deepkpi-agents:skills/pressure-test",
+    "revelata/deepkpi-agents:skills/revelata",
+    "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/alternatives-map",
+    "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/brand-voice",
+    "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/buyer-personas",
+    "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/ideal-customer-profile",
+    "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/market-context",
+    "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/message-house",
+    "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/positioning-messaging",
+    "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/product-messaging-playbook",
+    "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/proof-points",
+    "t1djani/servo:skills/gather-context",
+    "t1djani/servo:skills/scan-project",
+    "t1djani/servo:skills/seal-plan",
+    "t1djani/servo:skills/shape-spec",
+    "adnanmir123/ux-superpowers:skills/ux-discover",
+    "backedbydata-co/okrdev:skills/install",
+    "backedbydata-co/okrdev:skills/plan",
+    "backedbydata-co/okrdev:skills/retro",
+    "backedbydata-co/okrdev:skills/side-quest"
+  ],
+  "excluded": [
+    {
+      "id": "clawpage/clawpage-skill:skills/delete-page",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "references/api-quickref.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "dariovr1/sixth-sense:skills/dispatching-parallel-agents",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/test-driven-development/references/java.md",
+        "skills/dylan-dog/checklist.md",
+        "skills/test-driven-development/references/java.md",
+        "skills/dylan-dog/checklist.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "dariovr1/sixth-sense:skills/domain-modeling",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "dylan-dog"
+      ]
+    },
+    {
+      "id": "dariovr1/sixth-sense:skills/dylan-dog",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [
+        "dylan-dog-triage",
+        "dylan-dog-hunter"
+      ],
+      "skills": []
+    },
+    {
+      "id": "dariovr1/sixth-sense:skills/roundtable",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "domain-modeling"
+      ]
+    },
+    {
+      "id": "fibtecltd/pyvar:plugins/arch/api-gateway",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/gen_p3.py",
+        "schemas/var.py",
+        "docs/plan-durable-api-keys.md",
+        "api/middleware/api_keys.py",
+        "docs/plan-durable-api-keys.md",
+        "pyvar-cdk/lambda/public_data_publisher/handler.py",
+        "pyvar-cdk/stacks/edge_stack.py",
+        "pyvar-cdk/config.py",
+        "pyvar-cdk/stacks/ses_stack.py",
+        "api/routes/auth.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "fibtecltd/pyvar:plugins/arch/compute",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "pyvar-cdk/stacks/ami_stack.py",
+        "pyvar-cdk/stacks/compute_stack.py",
+        "pyvar-cdk/stacks/ami_stack.py",
+        "api/routes/var.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "fibtecltd/pyvar:plugins/arch/data-ingestion",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tasks/var_task.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "fibtecltd/pyvar:plugins/arch/observability",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/fetch-config.sh",
+        ".github/workflows/ci.yml",
+        "pyvar-cdk/stacks/alerts_stack.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "fibtecltd/pyvar:plugins/arch/storage",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "api/middleware/rate_limit.py",
+        "pyvar-cdk/stacks/data_stack.py",
+        "pyvar-cdk/stacks/pipeline_stack.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "fibtecltd/pyvar:plugins/liquidity-risk",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "engine/liquidity_ratios.py",
+        "tests/validation/test_liquidity_ref.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "fibtecltd/pyvar:plugins/market-risk",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "schemas/var.py",
+        "docs/p9-function-catalogue-reconciliation.md",
+        "engine/pnl_attribution.py",
+        "engine/greeks.py",
+        "engine/stress.py",
+        "engine/volatility.py",
+        "engine/var_models.py",
+        "engine/expected_shortfall.py",
+        "engine/backtesting.py",
+        "engine/pnl_attribution.py",
+        "engine/greeks.py",
+        "engine/stress.py",
+        "engine/volatility.py",
+        "engine/frtb.py",
+        "schemas/var.py",
+        "engine/var_models.py",
+        "engine/expected_shortfall.py",
+        "engine/backtesting.py",
+        "engine/pnl_attribution.py",
+        "engine/backtesting.py",
+        "engine/deriv_options_exotic.py",
+        "engine/var_models.py",
+        "engine/expected_shortfall.py",
+        "tests/validation/test_market_ref.py",
+        "portal/functions.json",
+        "engine/metrics.py",
+        "docs/p9-function-catalogue-reconciliation.md",
+        "portal/functions.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "fibtecltd/pyvar:plugins/portfolio-analytics",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "schemas/portfolio.py",
+        "schemas/portfolio.py",
+        "engine/portfolio_factor.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "fibtecltd/pyvar:plugins/regulatory",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "engine/reg_solvency.py",
+        "engine/reg_mifid_emir.py",
+        "engine/montecarlo.py",
+        "storage/models.py",
+        "api/routes/regulatory.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/cto",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/dba",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/devops-engineer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/engineering-manager",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/principal-architect",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/product-manager",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/qa-engineer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/sde",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/security-engineer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/senior-engineer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/sre",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "jaan-mustafa/10x-team:skills/staff-engineer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "10x-team"
+      ]
+    },
+    {
+      "id": "woldinius/wai-skill-suite:.claude/skills/wai",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/architecture/quality-attributes.md",
+        "docs/architecture/quality-attributes.md",
+        "docs/architecture/quality-attributes.md",
+        "docs/architecture/invocation-log.md",
+        "docs/architecture/quality-attributes.md",
+        "docs/architecture/quality-attributes.md",
+        "docs/architecture/quality-attributes.md",
+        "docs/architecture/invocation-log.md",
+        "docs/architecture/quality-attributes.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "abhisekjha/pith:skills/pith-graph",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/graph_generator.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "abhisekjha/pith:skills/pith-setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/setup.py",
+        "tools/setup.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "abhisekjha/pith:skills/pith-tour",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/tour.py",
+        "tools/tour.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "cloverink/shipwright:skills/skill-creator",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude-plugin/plugin.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "enpitech/ai-tools:skills/cr-deps",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/deps.md",
+        "rules/autofix.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "enpitech/ai-tools:skills/cr-fullstack",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/fullstack.md",
+        "rules/react.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/node.md",
+        "rules/python.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/react.md",
+        "rules/node.md",
+        "rules/python.md",
+        "rules/general.md",
+        "rules/fullstack.md",
+        "rules/autofix.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "enpitech/ai-tools:skills/cr-general",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/general.md",
+        "rules/autofix.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "enpitech/ai-tools:skills/cr-node",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/node.md",
+        "rules/autofix.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "enpitech/ai-tools:skills/cr-python",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/python.md",
+        "rules/autofix.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "enpitech/ai-tools:skills/cr-react",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/react.md",
+        "rules/autofix.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "enpitech/ai-tools:skills/cra-fullstack",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/fullstack.md",
+        "rules/deps.md",
+        "rules/react.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/node.md",
+        "rules/python.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/general.md",
+        "rules/react.md",
+        "rules/node.md",
+        "rules/python.md",
+        "rules/general.md",
+        "rules/fullstack.md",
+        "rules/deps.md",
+        "rules/autofix.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "enpitech/ai-tools:skills/cra-general",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/general.md",
+        "rules/deps.md",
+        "rules/deps.md",
+        "rules/autofix.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "enpitech/ai-tools:skills/cra-node",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/node.md",
+        "rules/deps.md",
+        "rules/deps.md",
+        "rules/autofix.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "enpitech/ai-tools:skills/cra-python",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/python.md",
+        "rules/deps.md",
+        "rules/deps.md",
+        "rules/autofix.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "enpitech/ai-tools:skills/cra-react",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/react.md",
+        "rules/deps.md",
+        "rules/deps.md",
+        "rules/autofix.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "karolusd/fellowship:skills/codebase-map",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/fellowship/codebase-map.md",
+        "docs/fellowship/codebase-map.md",
+        "docs/fellowship/codebase-map.md",
+        "docs/fellowship/codebase-map.md",
+        "docs/fellowship/codebase-map.md",
+        "docs/fellowship/codebase-map.md",
+        "docs/fellowship/codebase-map.md",
+        "docs/fellowship/codebase-map.md",
+        "docs/fellowship/codebase-map.md",
+        "docs/fellowship/codebase-map.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "karolusd/fellowship:skills/investigate",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/gimli.md",
+        "agents/gimli.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "nguyengiatam/crewmarshal:skills/orchestrating-executors",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "checkpoint-verification",
+        "checkpoint-verification"
+      ]
+    },
+    {
+      "id": "nguyengiatam/crewmarshal:skills/project-working-agreement",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/working-agreement.md",
+        "docs/working-agreement.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "rampstackco/claude-skills-seo:skills/seo-onpage",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "seo-keyword"
+      ]
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/building-a-discipline-spell",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/building-a-spell/examples/example-discipline.md",
+        "skills/building-a-spell/examples/example-discipline.md"
+      ],
+      "agents": [],
+      "skills": [
+        "pressure-testing-a-spell"
+      ]
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/building-a-spell",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/spell-tester.md",
+        "templates/spell-template.md",
+        "agents/spell-tester.md"
+      ],
+      "agents": [
+        "spell-tester"
+      ],
+      "skills": [
+        "inferring-a-spell-from-examples",
+        "intuitive-interviewing"
+      ]
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/chaining-spells",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/spell-template-chained.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/inferring-a-spell-from-examples",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/capturing-chats.md",
+        "docs/capturing-chats.md",
+        "templates/spell-template.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/intuitive-interviewing",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/building-a-spell/interview-questions.md",
+        "skills/building-a-spell/interview-questions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/pressure-testing-a-spell",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/spell-tester.md",
+        "agents/spell-tester.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/using-wizard",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "spells/work/writing-a-status-update/SKILL.md"
+      ],
+      "agents": [],
+      "skills": [
+        "building-a-spell",
+        "discovering-spells"
+      ]
+    },
+    {
+      "id": "sidub-inc/monaiq.ai:skills/analyze-codebase",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "scenario-advisor"
+      ]
+    },
+    {
+      "id": "sidub-inc/monaiq.ai:skills/design-monetization",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "manage-catalog"
+      ]
+    },
+    {
+      "id": "sidub-inc/monaiq.ai:skills/getting-started",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "manage-catalog",
+        "implement-licensing"
+      ]
+    },
+    {
+      "id": "sidub-inc/monaiq.ai:skills/scenario-advisor",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "design-monetization"
+      ]
+    },
+    {
+      "id": "benskamps/career-compass-plugin:skills/career-compass",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "eikiyo/convertia-plugin:plugins/convertia/skills/convertia",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "insideout-ai/make-it-work:skills/find-the-repos",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/autopilot-log-schema.md",
+        "docs/autopilot-log-schema.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "insideout-ai/make-it-work:skills/go-deep",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/autopilot-log-schema.md",
+        "docs/autopilot-log-schema.md",
+        "docs/autopilot-log-schema.md",
+        "docs/autopilot-log-schema.md",
+        "docs/autopilot-log-schema.md",
+        "docs/autopilot-log-schema.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "insideout-ai/make-it-work:skills/slice-the-epic",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/autopilot-log-schema.md",
+        "docs/autopilot-log-schema.md",
+        "docs/autopilot-log-schema.md",
+        "docs/autopilot-log-schema.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mhihasan/agentic-sdlc:skills/crafting-commits",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "reviewing-code"
+      ]
+    },
+    {
+      "id": "mhihasan/agentic-sdlc:skills/generating-tasks",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "planning-from-spec"
+      ]
+    },
+    {
+      "id": "mhihasan/agentic-sdlc:skills/implementing-tasks",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "reviewing-plan",
+        "reviewing-code"
+      ]
+    },
+    {
+      "id": "mhihasan/agentic-sdlc:skills/picking-up-task",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "planning-from-spec",
+        "fetching-tickets",
+        "fetching-tickets",
+        "fetching-tickets",
+        "fetching-tickets"
+      ]
+    },
+    {
+      "id": "mhihasan/agentic-sdlc:skills/planning-from-spec",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "picking-up-task"
+      ]
+    },
+    {
+      "id": "mhihasan/agentic-sdlc:skills/receiving-plan-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "reviewing-plan",
+        "reviewing-plan"
+      ]
+    },
+    {
+      "id": "mhihasan/agentic-sdlc:skills/reviewing-code",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "crafting-commits",
+        "crafting-commits"
+      ]
+    },
+    {
+      "id": "mhihasan/agentic-sdlc:skills/reviewing-plan",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "generating-tasks",
+        "receiving-plan-review",
+        "receiving-plan-review",
+        "receiving-plan-review"
+      ]
+    },
+    {
+      "id": "nidrissi/mathbox:skills/research-program",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "proof-audit"
+      ]
+    },
+    {
+      "id": "chamseddin98/daymark:plugin/skills/planner-calendar-sync",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/API.md",
+        "docs/GOOGLE_SETUP.md",
+        "docs/API.md",
+        "docs/GOOGLE_SETUP.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chamseddin98/daymark:plugin/skills/planner-delete",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/PLAN.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chamseddin98/daymark:plugin/skills/planner-markdown-sync",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/PLAN.md",
+        "docs/PLAN.md",
+        "docs/API.md",
+        "docs/PLAN.md",
+        "docs/API.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chamseddin98/daymark:plugin/skills/planner-schedule",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/PLAN.md"
+      ],
+      "agents": [],
+      "skills": [
+        "planner-create"
+      ]
+    },
+    {
+      "id": "datumlabsio/swantje:skills/assistant",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".swantje/config.json"
+      ],
+      "agents": [],
+      "skills": [
+        "onboard",
+        "glossary"
+      ]
+    },
+    {
+      "id": "datumlabsio/swantje:skills/connect-bigquery",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".swantje/config.json",
+        ".swantje/config.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "datumlabsio/swantje:skills/connect-clickhouse",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".swantje/config.json",
+        ".swantje/config.json",
+        ".swantje/config.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "datumlabsio/swantje:skills/connect-dagster",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".swantje/config.json",
+        ".swantje/config.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "datumlabsio/swantje:skills/connect-dbt",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".swantje/config.json",
+        ".swantje/config.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "datumlabsio/swantje:skills/connect-dlt",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".swantje/config.json",
+        ".swantje/config.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "datumlabsio/swantje:skills/connect-github",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".swantje/config.json",
+        ".swantje/config.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "datumlabsio/swantje:skills/connect-hex",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".swantje/config.json",
+        ".swantje/config.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "datumlabsio/swantje:skills/onboard",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".swantje/config.json",
+        ".swantje/config.json",
+        ".swantje/config.json",
+        ".swantje/config.json"
+      ],
+      "agents": [],
+      "skills": [
+        "connect-clickhouse",
+        "glossary"
+      ]
+    },
+    {
+      "id": "deadsimple-xyz/hats:skills/autopilot",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/qa.md",
+        "agents/qa.md",
+        "agents/qa.md",
+        "agents/developer.md",
+        "agents/developer.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "deadsimple-xyz/hats:skills/cto",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/cto.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "deadsimple-xyz/hats:skills/designer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/designer.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "deadsimple-xyz/hats:skills/developer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/developer.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "deadsimple-xyz/hats:skills/init",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/channel.sh",
+        "scripts/channel.sh",
+        "scripts/channel.sh",
+        "scripts/channel.sh",
+        "scripts/channel.sh",
+        "scripts/channel.sh",
+        "scripts/channel.sh"
+      ],
+      "agents": [],
+      "skills": [
+        "manager"
+      ]
+    },
+    {
+      "id": "deadsimple-xyz/hats:skills/manager",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/manager.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "deadsimple-xyz/hats:skills/qa",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/qa.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "felipefontoura/claude-sdd-kit:skills/idea",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/idea.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "felipefontoura/claude-sdd-kit:skills/init",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/sdd-workflow.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "felipefontoura/claude-sdd-kit:skills/plan",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/plan.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "felipefontoura/claude-sdd-kit:skills/prd",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/requirements.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "felipefontoura/claude-sdd-kit:skills/review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/review.md",
+        "templates/handoff.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "felipefontoura/claude-sdd-kit:skills/spec",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/design.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "felipefontoura/claude-sdd-kit:skills/status",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/sdd-index.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "felipefontoura/claude-sdd-kit:skills/tasks",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/tasks.md",
+        "templates/handoff.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "helixis-plugins/pm:skills/decision-support",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".dev/DECISIONS.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "helixis-plugins/pm:skills/package-generation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/build-package.md",
+        ".dev/DECISIONS.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "helixis-plugins/pm:skills/progress-tracking",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".dev/PROJECT.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "helixis-plugins/pm:skills/project-state",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".dev/STATUS.md",
+        "templates/STATUS.md",
+        ".dev/STATUS.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "helixis-plugins/pm:skills/quality-assurance",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude-plugin/plugin.json",
+        ".dev/STANDARDS.md",
+        ".dev/DECISIONS.md",
+        ".dev/STANDARDS.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "helixis-plugins/pm:skills/scaffold-creation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".dev/PROJECT.md",
+        "templates/STATUS.md",
+        "templates/LEARNING.md",
+        "templates/PARKED.md",
+        "templates/CLAUDE.md",
+        ".dev/STATUS.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "helixis-plugins/pm:skills/spec-writing",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/product-spec.md",
+        ".dev/PROJECT.md",
+        ".dev/PROJECT.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "helixis-plugins/pm:skills/troubleshooting",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude-plugin/plugin.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "joetawil7/first-pass:skills/fix-the-class",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "premortem",
+        "ship-check"
+      ]
+    },
+    {
+      "id": "joetawil7/first-pass:skills/review",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "kamenkurtev/ui-consistency:skills/accessibility",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "kamenkurtev/ui-consistency:skills/adjusting",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "kamenkurtev/ui-consistency:skills/conventions",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "kamenkurtev/ui-consistency:skills/decisions",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "kamenkurtev/ui-consistency:skills/finding-patterns",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "values"
+      ]
+    },
+    {
+      "id": "kamenkurtev/ui-consistency:skills/implementing",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "kamenkurtev/ui-consistency:skills/planning",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "kamenkurtev/ui-consistency:skills/values",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "kamenkurtev/ui-consistency:skills/verifying",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "finding-patterns"
+      ]
+    },
+    {
+      "id": "kodwai/plugin:plugins/kodwai/skills/submit",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "status"
+      ]
+    },
+    {
+      "id": "matteo-stratega/claude-cortex:skills/brief",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "brain/context.md",
+        "brain/team.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "matteo-stratega/claude-cortex:skills/close",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "brain/team.md",
+        "brain/team.md",
+        "brain/team.md",
+        "brain/team.md",
+        "brain/context.md",
+        "brain/context.md",
+        "brain/context.md",
+        "brain/changelog.md",
+        "brain/contexts/work.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "matteo-stratega/claude-cortex:skills/daily-wrap",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "brain/context.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "matteo-stratega/claude-cortex:skills/setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "brain/context.md",
+        "brain/contexts/work.md",
+        "brain/contexts/projects.md",
+        "brain/contexts/content.md",
+        "brain/context.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "matteo-stratega/claude-cortex:skills/start",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "brain/team.md",
+        "brain/team.md",
+        "brain/context.md",
+        "brain/contexts/work.md",
+        "brain/contexts/projects.md",
+        "brain/contexts/content.md",
+        "brain/context.md",
+        "brain/team.md",
+        "brain/team.md",
+        "brain/context.md",
+        "brain/changelog.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "matteo-stratega/claude-cortex:skills/weekly",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "brain/team.md",
+        "brain/context.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "nicodiansk/turbocharge:skills/brainstorm",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude/CLAUDE.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "nicodiansk/turbocharge:skills/build",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude/CLAUDE.md",
+        ".claude/CLAUDE.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "nicodiansk/turbocharge:skills/plan",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude/CLAUDE.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "nicodiansk/turbocharge:skills/review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude/CLAUDE.md",
+        ".claude/CLAUDE.md",
+        ".claude/CLAUDE.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "nicodiansk/turbocharge:skills/wrap",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/atlas/SKILL.md",
+        ".claude/CLAUDE.md"
+      ],
+      "agents": [],
+      "skills": [
+        "atlas"
+      ]
+    },
+    {
+      "id": "roxanneallard/euxlab-skills:skills/loop/euxlab-create-personas-and-job-stories",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "euxlab-outcome-vocabulary"
+      ]
+    },
+    {
+      "id": "roxanneallard/euxlab-skills:skills/loop/euxlab-design-brief",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "euxlab-outcome-vocabulary"
+      ]
+    },
+    {
+      "id": "roxanneallard/euxlab-skills:skills/loop/euxlab-design-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "euxlab-design-brief",
+        "euxlab-enterprise-ux-stance",
+        "euxlab-evidence-standards"
+      ]
+    },
+    {
+      "id": "roxanneallard/euxlab-skills:skills/loop/euxlab-grill-the-ask",
+      "reason": "readme-attributes-grilling-primitive-to-mattpocock"
+    },
+    {
+      "id": "roxanneallard/euxlab-skills:skills/reference/euxlab-grilling",
+      "reason": "readme-attributes-grilling-primitive-to-mattpocock"
+    },
+    {
+      "id": "roxanneallard/euxlab-skills:skills/loop/euxlab-synthesize",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "euxlab-evidence-standards"
+      ]
+    },
+    {
+      "id": "sampath9966/slipstream:skills/advisor",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "anchor"
+      ]
+    },
+    {
+      "id": "sampath9966/slipstream:skills/guard",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".slipstream/rules.yaml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "sampath9966/slipstream:skills/onboard",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "coach"
+      ]
+    },
+    {
+      "id": "sampath9966/slipstream:skills/setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "doctor"
+      ]
+    },
+    {
+      "id": "slogsdon/loop-and-gate-foundation:skills/improve",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude-plugin/plugin.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "slogsdon/loop-and-gate-foundation:skills/loop",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/capture/SKILL.md",
+        "skills/reflect/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "solofounder-ai/solofounder:skills/flow-composer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "role-generator"
+      ]
+    },
+    {
+      "id": "solofounder-ai/solofounder:skills/using-solofounder",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "exception-enforcement",
+        "flow-composer"
+      ]
+    },
+    {
+      "id": "vadimsv1/ship-plugin:skills/ship-build",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/CLAUDE.md",
+        "templates/ci-build-jobs.example.yml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "vadimsv1/ship-plugin:skills/ship-expert-qa",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "spec/pipeline.yml",
+        "spec/pipeline.yml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "vadimsv1/ship-plugin:skills/ship-monitor",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "ship-seo-strategy"
+      ]
+    },
+    {
+      "id": "vadimsv1/ship-plugin:skills/ship-prod-prep",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/production_runbook.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "vadimsv1/ship-plugin:skills/ship-research",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/RESEARCH_INDEX.md",
+        "spec/pipeline.yml",
+        "spec/observation-policy.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "vadimsv1/ship-plugin:skills/ship-spec",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "spec/pipeline.yml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "ayejk/phase-runner:plugin/skills/phase-builder",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "design-planner",
+        "phase-verify",
+        "phase-doc-sync",
+        "phase-wave-test"
+      ]
+    },
+    {
+      "id": "ayejk/phase-runner:plugin/skills/product-planner",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "phase-planner"
+      ]
+    },
+    {
+      "id": "clientgen/clientgen-reach:skills/marketing-compliance",
+      "reason": "readme-explicitly-identifies-adapted-upstream-compliance-skill"
+    },
+    {
+      "id": "clientgen/clientgen-reach:skills/postcard",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "marketing-compliance"
+      ]
+    },
+    {
+      "id": "fusion-software-ltd/decision-council:skills/convene",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "debrief"
+      ]
+    },
+    {
+      "id": "fusion-software-ltd/decision-council:skills/quick",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "debrief"
+      ]
+    },
+    {
+      "id": "gg-mo/repo-hygiene:skills/cleaning-existing-codebase",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "orienting-to-repo"
+      ]
+    },
+    {
+      "id": "j0hanz/squad-agents:skills/request-code-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "receive-code-review",
+        "receive-code-review"
+      ]
+    },
+    {
+      "id": "kgelster/awesome-ecom-skills:skills/shopify-alt-text",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "kgelster/awesome-ecom-skills:skills/shopify-catalog-audit",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "mario-montanari/querymantic:skills/querymantic",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/querymantic_run.py",
+        "scripts/querymantic_run.py",
+        "scripts/querymantic_run.py",
+        "schemas/run.schema.json",
+        "schemas/run.schema.json",
+        "schemas/run.schema.json",
+        "schemas/run.schema.json",
+        "querymantic/run_state.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "prepforeverything/prepkit-product:skills/product-prd-authoring",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "papischolz/sdlc-assist:plugins/sdlc-assist/skills/spec-driven-development",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tasks/plan.md",
+        "tasks/todo.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "revelata/deepkpi-agents:skills/company-summary",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "revelata/deepkpi-agents:skills/filing",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "revelata/deepkpi-agents:skills/ideas",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "revelata/deepkpi-agents:skills/pressure-test",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "revelata/deepkpi-agents:skills/revelata",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/alternatives-map",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "context/meta-patterns.md",
+        "context/meta-patterns.md",
+        "context/meta-patterns.md",
+        "product-marketing-context/.claude-plugin/skill-sessions-format.md",
+        "product-marketing-context/.claude-plugin/next-skill-map.md"
+      ],
+      "agents": [],
+      "skills": [
+        "product-marketing-context",
+        "product-marketing-context",
+        "product-marketing-context"
+      ]
+    },
+    {
+      "id": "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/brand-voice",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "context/meta-patterns.md",
+        "context/meta-patterns.md",
+        "product-marketing-context/.claude-plugin/skill-sessions-format.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/buyer-personas",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "context/meta-patterns.md",
+        "context/meta-patterns.md",
+        "context/meta-patterns.md",
+        "context/meta-patterns.md",
+        "product-marketing-context/.claude-plugin/skill-sessions-format.md",
+        "product-marketing-context/.claude-plugin/next-skill-map.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/ideal-customer-profile",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "context/meta-patterns.md",
+        "context/meta-patterns.md",
+        "context/meta-patterns.md",
+        "product-marketing-context/.claude-plugin/skill-sessions-format.md",
+        "product-marketing-context/.claude-plugin/next-skill-map.md"
+      ],
+      "agents": [],
+      "skills": [
+        "product-marketing-context",
+        "product-marketing-context",
+        "product-marketing-context"
+      ]
+    },
+    {
+      "id": "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/market-context",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "context/meta-patterns.md",
+        "context/meta-patterns.md",
+        "product-marketing-context/.claude-plugin/skill-sessions-format.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/message-house",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "product-marketing-context/.claude-plugin/skill-sessions-format.md",
+        "product-marketing-context/.claude-plugin/skill-sessions-format.md"
+      ],
+      "agents": [],
+      "skills": [
+        "positioning-messaging",
+        "positioning-messaging"
+      ]
+    },
+    {
+      "id": "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/positioning-messaging",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "context/meta-patterns.md",
+        "product-marketing-context/references/gaps-format.md",
+        "product-marketing-context/.claude-plugin/skill-sessions-format.md"
+      ],
+      "agents": [],
+      "skills": [
+        "product-marketing-context"
+      ]
+    },
+    {
+      "id": "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/product-messaging-playbook",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "product-marketing-context/references/gaps-format.md",
+        "product-marketing-context/.claude-plugin/skill-sessions-format.md",
+        "product-marketing-context/.claude-plugin/skill-sessions-format.md"
+      ],
+      "agents": [],
+      "skills": [
+        "product-marketing-context",
+        "proof-points",
+        "proof-points"
+      ]
+    },
+    {
+      "id": "stefanoskarakasis/product-marketing-skills:pmm-positioning/skills/proof-points",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "product-marketing-context/.claude-plugin/skill-sessions-format.md",
+        "product-marketing-context/.claude-plugin/next-skill-map.md"
+      ],
+      "agents": [],
+      "skills": [
+        "product-marketing-context",
+        "product-marketing-context",
+        "product-marketing-context"
+      ]
+    },
+    {
+      "id": "t1djani/servo:skills/gather-context",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "scan-project"
+      ]
+    },
+    {
+      "id": "t1djani/servo:skills/scan-project",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/manifest.md",
+        "docs/manifest.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "t1djani/servo:skills/seal-plan",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "servo-gate"
+      ]
+    },
+    {
+      "id": "t1djani/servo:skills/shape-spec",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "servo-gate"
+      ]
+    },
+    {
+      "id": "adnanmir123/ux-superpowers:skills/ux-discover",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "research-intake",
+        "persona-builder",
+        "jobs-to-be-done",
+        "user-journey",
+        "telemetry-designer",
+        "insight-synthesizer"
+      ]
+    },
+    {
+      "id": "backedbydata-co/okrdev:skills/install",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/adoption.md",
+        "docs/stack.md",
+        "docs/adoption.md",
+        "okrdev/config.md",
+        ".github/pull_request_template.md",
+        "okrdev/config.md",
+        "okrdev/config.md",
+        "docs/adoption.md",
+        "okrdev/config.md",
+        "templates/okrdev/config.md",
+        "okrdev/PARKING_LOT.md",
+        "templates/okrdev/PARKING_LOT.md",
+        "okrdev/config.md",
+        "okrdev/PARKING_LOT.md",
+        "okrdev/MISSION.md",
+        "templates/okrdev/MISSION.md",
+        "okrdev/LESSONS.md",
+        "templates/okrdev/LESSONS.md",
+        "templates/CLAUDE-okrdev.md",
+        "okrdev/config.md",
+        "okrdev/PARKING_LOT.md",
+        "templates/github/pull_request_template.md",
+        ".github/pull_request_template.md",
+        "templates/github/workflows/okr-gate.yml",
+        "templates/stack/branch-protection.sh",
+        "okrdev/config.md",
+        "templates/stack/README.md",
+        "docs/stack.md",
+        "okrdev/config.md",
+        ".claude-plugin/plugin.json",
+        "okrdev/config.md",
+        ".github/pull_request_template.md",
+        "docs/adoption.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "backedbydata-co/okrdev:skills/plan",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/rituals.md",
+        "docs/method.md",
+        "docs/method.md",
+        "docs/roles.md",
+        "docs/method.md",
+        "okrdev/config.md",
+        "okrdev/config.md",
+        "okrdev/MISSION.md",
+        "okrdev/LESSONS.md",
+        "templates/okrdev/LESSONS.md",
+        "okrdev/config.md",
+        "templates/CLAUDE-okrdev.md",
+        "okrdev/MISSION.md",
+        "okrdev/MISSION.md",
+        "okrdev/MISSION.md",
+        "okrdev/LESSONS.md",
+        "okrdev/PARKING_LOT.md",
+        "okrdev/MISSION.md",
+        "templates/okrdev/okrs/cycle.md",
+        "okrdev/PARKING_LOT.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "backedbydata-co/okrdev:skills/retro",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/rituals.md",
+        "docs/method.md",
+        "okrdev/config.md",
+        "okrdev/config.md",
+        "okrdev/LESSONS.md",
+        "okrdev/LESSONS.md",
+        "okrdev/PARKING_LOT.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "backedbydata-co/okrdev:skills/side-quest",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "okrdev/config.md",
+        "okrdev/PARKING_LOT.md",
+        "okrdev/PARKING_LOT.md"
+      ],
+      "agents": [],
+      "skills": []
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Reviewed task purpose, source attribution, pinned packages and companion dependencies by repository. Held explicit derived skills and unavailable runtime components; ordinary external product APIs/CLIs remain disclosed prerequisites.",
+  "manualReview": {
+    "notes": "Reviewed README provenance, source intros and package dependencies. Runtime library credits alone do not imply copied skills. Normal external service/CLI prerequisites are allowed, while unavailable plugin profiles and explicitly adapted skill content remain held.",
+    "excludedRepos": [
+      {
+        "repo": "dariovr1/sixth-sense",
+        "reason": "readme-explicitly-identifies-superpowers-fork-and-adapted-upstream-skills"
+      },
+      {
+        "repo": "karolusd/fellowship",
+        "reason": "explicit-superpowers-adaptation-needs-per-skill-attribution"
+      },
+      {
+        "repo": "rampstackco/claude-skills-seo",
+        "reason": "curated-copied-subset-of-parent-skill-catalog"
+      },
+      {
+        "repo": "papischolz/sdlc-assist",
+        "reason": "mixed-original-and-bundled-addyosmani-skills-require-attribution-review"
+      },
+      {
+        "repo": "nicodiansk/turbocharge",
+        "reason": "readme-discloses-adapted-debug-ship-plan-skills"
+      },
+      {
+        "repo": "toruai/toru-claude-agents",
+        "reason": "coupled-specialist-agent-runtime-not-contained-in-individual-skill-packages"
+      },
+      {
+        "repo": "woldinius/wai-skill-suite",
+        "reason": "master-runtime-router-with-generated-variant-seeds-not-independent-task-skill"
+      },
+      {
+        "repo": "wolfgangrush/indian-rent-control-drafting",
+        "reason": "internal-base-skill-of-multi-agent-drafting-pipeline"
+      },
+      {
+        "repo": "cloverink/shipwright",
+        "reason": "mixed-design-and-skill-creator-content-plus-plugin-agent-workflow-needs-separate-review"
+      },
+      {
+        "repo": "j0hanz/squad-agents",
+        "reason": "superpowers-named-process-pack-with-attribution-unresolved"
+      }
+    ],
+    "excludedSkills": [
+      {
+        "id": "roxanneallard/euxlab-skills:skills/loop/euxlab-grill-the-ask",
+        "reason": "readme-attributes-grilling-primitive-to-mattpocock"
+      },
+      {
+        "id": "roxanneallard/euxlab-skills:skills/reference/euxlab-grilling",
+        "reason": "readme-attributes-grilling-primitive-to-mattpocock"
+      },
+      {
+        "id": "clientgen/clientgen-reach:skills/marketing-compliance",
+        "reason": "readme-explicitly-identifies-adapted-upstream-compliance-skill"
+      }
+    ]
+  },
+  "reviewed": 1302,
+  "approvedCount": 618
+}

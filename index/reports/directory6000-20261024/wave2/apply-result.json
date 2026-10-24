@@ -1,0 +1,1752 @@
+{
+  "generatedAt": "2026-10-24T20:38:28.371Z",
+  "wave": "wave2",
+  "addedSkills": [
+    {
+      "id": "vellus-ai/sdlc-kit:plugins/extended/skills/sdlc-api",
+      "name": "sdlc-api",
+      "repo": "vellus-ai/sdlc-kit",
+      "path": "plugins/extended/skills/sdlc-api/SKILL.md",
+      "sha": "cd3c8d2158b54b7ef89d57c2ad48b408bf32d9d5",
+      "pinned": {
+        "repo_slug": "vellus-ai/sdlc-kit",
+        "skill_md_path": "plugins/extended/skills/sdlc-api/SKILL.md",
+        "repo_commit_sha": "0a555d842f2f759debde485f69be9fb047646316",
+        "skill_tree_sha": "849d9bca425effdf10efcfa95e8f41a85b932424",
+        "skill_md_sha": "cd3c8d2158b54b7ef89d57c2ad48b408bf32d9d5",
+        "install_target_name": "sdlc-api"
+      }
+    },
+    {
+      "id": "vellus-ai/sdlc-kit:plugins/extended/skills/sdlc-c4",
+      "name": "sdlc-c4",
+      "repo": "vellus-ai/sdlc-kit",
+      "path": "plugins/extended/skills/sdlc-c4/SKILL.md",
+      "sha": "5e07d0513ed4bff395ecd071011de4e6bb035fd1",
+      "pinned": {
+        "repo_slug": "vellus-ai/sdlc-kit",
+        "skill_md_path": "plugins/extended/skills/sdlc-c4/SKILL.md",
+        "repo_commit_sha": "0a555d842f2f759debde485f69be9fb047646316",
+        "skill_tree_sha": "32d7fa9c8385b5a3af3dbdad8192fc04885bf80a",
+        "skill_md_sha": "5e07d0513ed4bff395ecd071011de4e6bb035fd1",
+        "install_target_name": "sdlc-c4"
+      }
+    },
+    {
+      "id": "vellus-ai/sdlc-kit:plugins/extended/skills/sdlc-design-validation",
+      "name": "sdlc-design-validation",
+      "repo": "vellus-ai/sdlc-kit",
+      "path": "plugins/extended/skills/sdlc-design-validation/SKILL.md",
+      "sha": "8d7d68f27d25ac45cc2fcc720808a744830b0110",
+      "pinned": {
+        "repo_slug": "vellus-ai/sdlc-kit",
+        "skill_md_path": "plugins/extended/skills/sdlc-design-validation/SKILL.md",
+        "repo_commit_sha": "0a555d842f2f759debde485f69be9fb047646316",
+        "skill_tree_sha": "70f798853faf7929c18daaa27d742e6e9b2ead76",
+        "skill_md_sha": "8d7d68f27d25ac45cc2fcc720808a744830b0110",
+        "install_target_name": "sdlc-design-validation"
+      }
+    },
+    {
+      "id": "vellus-ai/sdlc-kit:plugins/extended/skills/sdlc-domain",
+      "name": "sdlc-domain",
+      "repo": "vellus-ai/sdlc-kit",
+      "path": "plugins/extended/skills/sdlc-domain/SKILL.md",
+      "sha": "746b7b6541ea74f985ef217d90f184f289926a68",
+      "pinned": {
+        "repo_slug": "vellus-ai/sdlc-kit",
+        "skill_md_path": "plugins/extended/skills/sdlc-domain/SKILL.md",
+        "repo_commit_sha": "0a555d842f2f759debde485f69be9fb047646316",
+        "skill_tree_sha": "6834d24683f2d5016191c025cb138aa50451950a",
+        "skill_md_sha": "746b7b6541ea74f985ef217d90f184f289926a68",
+        "install_target_name": "sdlc-domain"
+      }
+    },
+    {
+      "id": "vellus-ai/sdlc-kit:plugins/core/skills/sdlc-prd",
+      "name": "sdlc-prd",
+      "repo": "vellus-ai/sdlc-kit",
+      "path": "plugins/core/skills/sdlc-prd/SKILL.md",
+      "sha": "5e6b5f32e3c604a036932674f7eb67a46232c715",
+      "pinned": {
+        "repo_slug": "vellus-ai/sdlc-kit",
+        "skill_md_path": "plugins/core/skills/sdlc-prd/SKILL.md",
+        "repo_commit_sha": "0a555d842f2f759debde485f69be9fb047646316",
+        "skill_tree_sha": "5d6bfbd02fb9b1b58088a2d68bd85ced5700e97e",
+        "skill_md_sha": "5e6b5f32e3c604a036932674f7eb67a46232c715",
+        "install_target_name": "sdlc-prd"
+      }
+    },
+    {
+      "id": "vellus-ai/sdlc-kit:plugins/core/skills/sdlc-status",
+      "name": "sdlc-status",
+      "repo": "vellus-ai/sdlc-kit",
+      "path": "plugins/core/skills/sdlc-status/SKILL.md",
+      "sha": "c828564f45a6a087df2f968f4de595c2d3b30c15",
+      "pinned": {
+        "repo_slug": "vellus-ai/sdlc-kit",
+        "skill_md_path": "plugins/core/skills/sdlc-status/SKILL.md",
+        "repo_commit_sha": "0a555d842f2f759debde485f69be9fb047646316",
+        "skill_tree_sha": "b7bc0adb495638d0b9c4ac86fcf223e2592a26b1",
+        "skill_md_sha": "c828564f45a6a087df2f968f4de595c2d3b30c15",
+        "install_target_name": "sdlc-status"
+      }
+    },
+    {
+      "id": "vellus-ai/sdlc-kit:plugins/core/skills/sdlc-task",
+      "name": "sdlc-task",
+      "repo": "vellus-ai/sdlc-kit",
+      "path": "plugins/core/skills/sdlc-task/SKILL.md",
+      "sha": "1dfd3e99fe57ca50838781ae04cbc74597e9ddb2",
+      "pinned": {
+        "repo_slug": "vellus-ai/sdlc-kit",
+        "skill_md_path": "plugins/core/skills/sdlc-task/SKILL.md",
+        "repo_commit_sha": "0a555d842f2f759debde485f69be9fb047646316",
+        "skill_tree_sha": "8bb6cca3b289d51d868e6ac79f2d82ec6b8c2915",
+        "skill_md_sha": "1dfd3e99fe57ca50838781ae04cbc74597e9ddb2",
+        "install_target_name": "sdlc-task"
+      }
+    },
+    {
+      "id": "vellus-ai/sdlc-kit:plugins/core/skills/sdlc-worktree",
+      "name": "sdlc-worktree",
+      "repo": "vellus-ai/sdlc-kit",
+      "path": "plugins/core/skills/sdlc-worktree/SKILL.md",
+      "sha": "aaacbdf344896e417d08d425a1f08690fbe0c32a",
+      "pinned": {
+        "repo_slug": "vellus-ai/sdlc-kit",
+        "skill_md_path": "plugins/core/skills/sdlc-worktree/SKILL.md",
+        "repo_commit_sha": "0a555d842f2f759debde485f69be9fb047646316",
+        "skill_tree_sha": "533cedb7bcb42ba754520ba931863495cb459a03",
+        "skill_md_sha": "aaacbdf344896e417d08d425a1f08690fbe0c32a",
+        "install_target_name": "sdlc-worktree"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/add-bug",
+      "name": "liste-add-bug",
+      "repo": "dove-tools/liste",
+      "path": "skills/add-bug/SKILL.md",
+      "sha": "c8e300a84d8afe7219d33b8b4ee6683811c64faa",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/add-bug/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "8c54a2b4fc60a7f444a13cb82bebe9ece18cea44",
+        "skill_md_sha": "c8e300a84d8afe7219d33b8b4ee6683811c64faa",
+        "install_target_name": "liste-add-bug"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/add-epic",
+      "name": "liste-add-epic",
+      "repo": "dove-tools/liste",
+      "path": "skills/add-epic/SKILL.md",
+      "sha": "df8b865086309de981b9f02971de91b645158fb9",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/add-epic/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "0f9da6af23dc7fd32734a7a1c0df35167cc9f744",
+        "skill_md_sha": "df8b865086309de981b9f02971de91b645158fb9",
+        "install_target_name": "liste-add-epic"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/add-feature",
+      "name": "liste-add-feature",
+      "repo": "dove-tools/liste",
+      "path": "skills/add-feature/SKILL.md",
+      "sha": "daea294244a6eaf8e88adb49fd418af54b43b330",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/add-feature/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "4e1a4629545bc0b21e65990072025a57147611ef",
+        "skill_md_sha": "daea294244a6eaf8e88adb49fd418af54b43b330",
+        "install_target_name": "liste-add-feature"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/add-idea",
+      "name": "liste-add-idea",
+      "repo": "dove-tools/liste",
+      "path": "skills/add-idea/SKILL.md",
+      "sha": "00f926ce142d80a5dc88edd40609474457250751",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/add-idea/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "866467848c09265262ce27b32f44dd74b89e9fd4",
+        "skill_md_sha": "00f926ce142d80a5dc88edd40609474457250751",
+        "install_target_name": "liste-add-idea"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/add-task",
+      "name": "liste-add-task",
+      "repo": "dove-tools/liste",
+      "path": "skills/add-task/SKILL.md",
+      "sha": "e0d1c5994a9b66776db1457af0c89d2836e9ad86",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/add-task/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "860059cbed2978f49407c3e08def0ce2c4161712",
+        "skill_md_sha": "e0d1c5994a9b66776db1457af0c89d2836e9ad86",
+        "install_target_name": "liste-add-task"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/append",
+      "name": "liste-append",
+      "repo": "dove-tools/liste",
+      "path": "skills/append/SKILL.md",
+      "sha": "c16843bd1bf21c32415845417374c96aa1460652",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/append/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "78263273f0eb82625081c2310efea2a513f5fb95",
+        "skill_md_sha": "c16843bd1bf21c32415845417374c96aa1460652",
+        "install_target_name": "liste-append"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/batch",
+      "name": "liste-batch",
+      "repo": "dove-tools/liste",
+      "path": "skills/batch/SKILL.md",
+      "sha": "5b3766b87e116d95910bc0d1aa9d033f208ae350",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/batch/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "019a63585c3a0d0f4766f00bc5bb4f4bafe3a072",
+        "skill_md_sha": "5b3766b87e116d95910bc0d1aa9d033f208ae350",
+        "install_target_name": "liste-batch"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/block",
+      "name": "liste-block",
+      "repo": "dove-tools/liste",
+      "path": "skills/block/SKILL.md",
+      "sha": "38cb9aafbc8642e8dfe8d35a1db613921a89e6e4",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/block/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "ee27a5861ecfa201583c240075620ef89c804aec",
+        "skill_md_sha": "38cb9aafbc8642e8dfe8d35a1db613921a89e6e4",
+        "install_target_name": "liste-block"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/diff",
+      "name": "liste-diff",
+      "repo": "dove-tools/liste",
+      "path": "skills/diff/SKILL.md",
+      "sha": "73c6a20070800d035cde41c51f49370d8d20e887",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/diff/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "0ccbaac8f26e2aebd684295055f7e9e1c5c294a7",
+        "skill_md_sha": "73c6a20070800d035cde41c51f49370d8d20e887",
+        "install_target_name": "liste-diff"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/done",
+      "name": "liste-done",
+      "repo": "dove-tools/liste",
+      "path": "skills/done/SKILL.md",
+      "sha": "bbff2a8210518f4322af997247c214755c993c26",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/done/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "c94e4a7eae4cab590034cadcd17acecad85ffce7",
+        "skill_md_sha": "bbff2a8210518f4322af997247c214755c993c26",
+        "install_target_name": "liste-done"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/find",
+      "name": "liste-find",
+      "repo": "dove-tools/liste",
+      "path": "skills/find/SKILL.md",
+      "sha": "aacc9cfa21b71fc30d0176d3276e53396b4819ee",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/find/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "21f1c06ffd457bfd43516c52d60bae52072e18b1",
+        "skill_md_sha": "aacc9cfa21b71fc30d0176d3276e53396b4819ee",
+        "install_target_name": "liste-find"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/link",
+      "name": "liste-link",
+      "repo": "dove-tools/liste",
+      "path": "skills/link/SKILL.md",
+      "sha": "39f37215901e7009a0415d184eef705fbfc5d547",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/link/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "1e1a77880af3aada9e8dbd11fb1bd0a1b262fc0e",
+        "skill_md_sha": "39f37215901e7009a0415d184eef705fbfc5d547",
+        "install_target_name": "liste-link"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/next",
+      "name": "liste-next",
+      "repo": "dove-tools/liste",
+      "path": "skills/next/SKILL.md",
+      "sha": "8facdd9a4759fa27d3a9bf59af18fe8a4d008a28",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/next/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "56d8423013058d11f461a2d2115da21dad345c45",
+        "skill_md_sha": "8facdd9a4759fa27d3a9bf59af18fe8a4d008a28",
+        "install_target_name": "liste-next"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/progress",
+      "name": "liste-progress",
+      "repo": "dove-tools/liste",
+      "path": "skills/progress/SKILL.md",
+      "sha": "7eb7e927fe2435b962cc1ff3185faaa50a4357b4",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/progress/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "cc855bc986f1557f6bac5dcc7e9f3d0491828eff",
+        "skill_md_sha": "7eb7e927fe2435b962cc1ff3185faaa50a4357b4",
+        "install_target_name": "liste-progress"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/promote",
+      "name": "liste-promote",
+      "repo": "dove-tools/liste",
+      "path": "skills/promote/SKILL.md",
+      "sha": "9161057df8b89b80ae0e7b1ab1e8402c089231c7",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/promote/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "0f570fa0f1cf267139a0b4155a63d1f8ae65cf6a",
+        "skill_md_sha": "9161057df8b89b80ae0e7b1ab1e8402c089231c7",
+        "install_target_name": "liste-promote"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/session-start",
+      "name": "liste-session-start",
+      "repo": "dove-tools/liste",
+      "path": "skills/session-start/SKILL.md",
+      "sha": "a77da4132616800e59d26ac8522f137554f647f1",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/session-start/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "d0aa761251f64eb224d84e2c41c24057d417357a",
+        "skill_md_sha": "a77da4132616800e59d26ac8522f137554f647f1",
+        "install_target_name": "liste-session-start"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/set",
+      "name": "liste-set",
+      "repo": "dove-tools/liste",
+      "path": "skills/set/SKILL.md",
+      "sha": "af0ba9719383532637c3353cff463549bf37ca94",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/set/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "68ce7b55c3df226c2fb556677d7f83db7e7b9ee4",
+        "skill_md_sha": "af0ba9719383532637c3353cff463549bf37ca94",
+        "install_target_name": "liste-set"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/start",
+      "name": "liste-start",
+      "repo": "dove-tools/liste",
+      "path": "skills/start/SKILL.md",
+      "sha": "b2ca8a6ec73075612b866d093719ac915f3ba08a",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/start/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "db25d72e17b30ce43287457a25c24445c10b6f1e",
+        "skill_md_sha": "b2ca8a6ec73075612b866d093719ac915f3ba08a",
+        "install_target_name": "liste-start"
+      }
+    },
+    {
+      "id": "dove-tools/liste:skills/status",
+      "name": "liste-status",
+      "repo": "dove-tools/liste",
+      "path": "skills/status/SKILL.md",
+      "sha": "f42480ef24ac4a837da5fc6bc254cd6e31714628",
+      "pinned": {
+        "repo_slug": "dove-tools/liste",
+        "skill_md_path": "skills/status/SKILL.md",
+        "repo_commit_sha": "2d2e3102be8ba9c453fa6dec9e63d2c17ba3fd36",
+        "skill_tree_sha": "0b77f8bbfff843352a3806e0b390a53855066840",
+        "skill_md_sha": "f42480ef24ac4a837da5fc6bc254cd6e31714628",
+        "install_target_name": "liste-status"
+      }
+    },
+    {
+      "id": "harshdhussa1008/takshak:skills/checkpoint",
+      "name": "checkpoint",
+      "repo": "harshdhussa1008/takshak",
+      "path": "skills/checkpoint/SKILL.md",
+      "sha": "4310225843f3e9beecc8d4863cfdd7562ca801b2",
+      "pinned": {
+        "repo_slug": "HarshDhussa1008/takshak",
+        "skill_md_path": "skills/checkpoint/SKILL.md",
+        "repo_commit_sha": "97255de87238debdb46e505a462aed691753c606",
+        "skill_tree_sha": "cbbfb6fe977e5a73a0d34dfa17b8ee58a86273cd",
+        "skill_md_sha": "4310225843f3e9beecc8d4863cfdd7562ca801b2",
+        "install_target_name": "checkpoint"
+      }
+    },
+    {
+      "id": "harshdhussa1008/takshak:skills/remember",
+      "name": "remember",
+      "repo": "harshdhussa1008/takshak",
+      "path": "skills/remember/SKILL.md",
+      "sha": "c749029c002abb556afa8f50d952f30b53b5cf3c",
+      "pinned": {
+        "repo_slug": "HarshDhussa1008/takshak",
+        "skill_md_path": "skills/remember/SKILL.md",
+        "repo_commit_sha": "97255de87238debdb46e505a462aed691753c606",
+        "skill_tree_sha": "6656d08aa7f73e957e0ebeccbfdeb2e5fd8288a9",
+        "skill_md_sha": "c749029c002abb556afa8f50d952f30b53b5cf3c",
+        "install_target_name": "remember"
+      }
+    },
+    {
+      "id": "harshdhussa1008/takshak:skills/resume",
+      "name": "resume",
+      "repo": "harshdhussa1008/takshak",
+      "path": "skills/resume/SKILL.md",
+      "sha": "dfb1c498f88670df348328c69b4a86d28a7783d7",
+      "pinned": {
+        "repo_slug": "HarshDhussa1008/takshak",
+        "skill_md_path": "skills/resume/SKILL.md",
+        "repo_commit_sha": "97255de87238debdb46e505a462aed691753c606",
+        "skill_tree_sha": "2d18711bb91fabb2e32ab74eb934b92745e203be",
+        "skill_md_sha": "dfb1c498f88670df348328c69b4a86d28a7783d7",
+        "install_target_name": "resume"
+      }
+    },
+    {
+      "id": "nodesource/nsolid-plugin:skills/ns-analyze-tracing",
+      "name": "ns-analyze-tracing",
+      "repo": "nodesource/nsolid-plugin",
+      "path": "skills/ns-analyze-tracing/SKILL.md",
+      "sha": "e252d7e398a6b331a781eb6cab0a5a3035482514",
+      "pinned": {
+        "repo_slug": "nodesource/nsolid-plugin",
+        "skill_md_path": "skills/ns-analyze-tracing/SKILL.md",
+        "repo_commit_sha": "739a8e04c094743266bd1c80235170ec71f7d5c0",
+        "skill_tree_sha": "97fda5f6e8ef83a4831b1174d5861428cadac57d",
+        "skill_md_sha": "e252d7e398a6b331a781eb6cab0a5a3035482514",
+        "install_target_name": "ns-analyze-tracing"
+      }
+    },
+    {
+      "id": "nodesource/nsolid-plugin:skills/ns-audit-dependencies",
+      "name": "ns-audit-dependencies",
+      "repo": "nodesource/nsolid-plugin",
+      "path": "skills/ns-audit-dependencies/SKILL.md",
+      "sha": "398b668c0acdd71106ca8cc1fb4867b27d4dfb35",
+      "pinned": {
+        "repo_slug": "nodesource/nsolid-plugin",
+        "skill_md_path": "skills/ns-audit-dependencies/SKILL.md",
+        "repo_commit_sha": "739a8e04c094743266bd1c80235170ec71f7d5c0",
+        "skill_tree_sha": "41d3c6f83d949a1d17b43495856c44a9e5579436",
+        "skill_md_sha": "398b668c0acdd71106ca8cc1fb4867b27d4dfb35",
+        "install_target_name": "ns-audit-dependencies"
+      }
+    },
+    {
+      "id": "nodesource/nsolid-plugin:skills/ns-switch-org",
+      "name": "ns-switch-org",
+      "repo": "nodesource/nsolid-plugin",
+      "path": "skills/ns-switch-org/SKILL.md",
+      "sha": "e36bb9fc8a0d256b0027675391a31f3d9e91a18f",
+      "pinned": {
+        "repo_slug": "nodesource/nsolid-plugin",
+        "skill_md_path": "skills/ns-switch-org/SKILL.md",
+        "repo_commit_sha": "739a8e04c094743266bd1c80235170ec71f7d5c0",
+        "skill_tree_sha": "b9dd6209c3e8cfa385fa1ae4bbfbc72d636fd39d",
+        "skill_md_sha": "e36bb9fc8a0d256b0027675391a31f3d9e91a18f",
+        "install_target_name": "ns-switch-org"
+      }
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/compare",
+      "name": "compare",
+      "repo": "chikeka/csitrep-generator",
+      "path": "skills/compare/SKILL.md",
+      "sha": "6449c6530bae6f3272acef4ff58074641c414b49",
+      "pinned": {
+        "repo_slug": "chiKeka/csitrep-generator",
+        "skill_md_path": "skills/compare/SKILL.md",
+        "repo_commit_sha": "a40e47b79dfe240b52cb00c8b91364c3b71ddb8c",
+        "skill_tree_sha": "17bb847564855fe7a96d0c100423785549f9d0c0",
+        "skill_md_sha": "6449c6530bae6f3272acef4ff58074641c414b49",
+        "install_target_name": "compare"
+      }
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/dashboard",
+      "name": "dashboard",
+      "repo": "chikeka/csitrep-generator",
+      "path": "skills/dashboard/SKILL.md",
+      "sha": "2573b3d9b2518201ec6812f1b22626a0930a99c4",
+      "pinned": {
+        "repo_slug": "chiKeka/csitrep-generator",
+        "skill_md_path": "skills/dashboard/SKILL.md",
+        "repo_commit_sha": "a40e47b79dfe240b52cb00c8b91364c3b71ddb8c",
+        "skill_tree_sha": "5886a087e3781f8270f3c4ecf7163601eb0710f9",
+        "skill_md_sha": "2573b3d9b2518201ec6812f1b22626a0930a99c4",
+        "install_target_name": "dashboard"
+      }
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/feedback",
+      "name": "feedback",
+      "repo": "chikeka/csitrep-generator",
+      "path": "skills/feedback/SKILL.md",
+      "sha": "9fb3456533ece57e7da9db54f9608b6a7b0bef2e",
+      "pinned": {
+        "repo_slug": "chiKeka/csitrep-generator",
+        "skill_md_path": "skills/feedback/SKILL.md",
+        "repo_commit_sha": "a40e47b79dfe240b52cb00c8b91364c3b71ddb8c",
+        "skill_tree_sha": "81e60b6fcb3f951567a99a5965ef5420cfef3766",
+        "skill_md_sha": "9fb3456533ece57e7da9db54f9608b6a7b0bef2e",
+        "install_target_name": "feedback"
+      }
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/track-actions",
+      "name": "track-actions",
+      "repo": "chikeka/csitrep-generator",
+      "path": "skills/track-actions/SKILL.md",
+      "sha": "cb2da6a83449859591767fa2fbe91d1ed22b04cf",
+      "pinned": {
+        "repo_slug": "chiKeka/csitrep-generator",
+        "skill_md_path": "skills/track-actions/SKILL.md",
+        "repo_commit_sha": "a40e47b79dfe240b52cb00c8b91364c3b71ddb8c",
+        "skill_tree_sha": "55e9d7b69f70c73cbc25c47103e39f5a7f3fa360",
+        "skill_md_sha": "cb2da6a83449859591767fa2fbe91d1ed22b04cf",
+        "install_target_name": "track-actions"
+      }
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/track-changes",
+      "name": "track-changes",
+      "repo": "chikeka/csitrep-generator",
+      "path": "skills/track-changes/SKILL.md",
+      "sha": "9c723c3d2cfe26ce70eb5372bf6ff537bd74a809",
+      "pinned": {
+        "repo_slug": "chiKeka/csitrep-generator",
+        "skill_md_path": "skills/track-changes/SKILL.md",
+        "repo_commit_sha": "a40e47b79dfe240b52cb00c8b91364c3b71ddb8c",
+        "skill_tree_sha": "5c1711db18fcf6e4e384e28a800779b5f0b04b52",
+        "skill_md_sha": "9c723c3d2cfe26ce70eb5372bf6ff537bd74a809",
+        "install_target_name": "track-changes"
+      }
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/track-cost",
+      "name": "track-cost",
+      "repo": "chikeka/csitrep-generator",
+      "path": "skills/track-cost/SKILL.md",
+      "sha": "d12cb4a2b6f40f1f4b24b8524cd1873482a6e05e",
+      "pinned": {
+        "repo_slug": "chiKeka/csitrep-generator",
+        "skill_md_path": "skills/track-cost/SKILL.md",
+        "repo_commit_sha": "a40e47b79dfe240b52cb00c8b91364c3b71ddb8c",
+        "skill_tree_sha": "fbe4c38c8c454268e0e9cef39fefeb925b09b640",
+        "skill_md_sha": "d12cb4a2b6f40f1f4b24b8524cd1873482a6e05e",
+        "install_target_name": "track-cost"
+      }
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/track-risks",
+      "name": "track-risks",
+      "repo": "chikeka/csitrep-generator",
+      "path": "skills/track-risks/SKILL.md",
+      "sha": "a5eb309da0750580cefc82730ca38977587fc659",
+      "pinned": {
+        "repo_slug": "chiKeka/csitrep-generator",
+        "skill_md_path": "skills/track-risks/SKILL.md",
+        "repo_commit_sha": "a40e47b79dfe240b52cb00c8b91364c3b71ddb8c",
+        "skill_tree_sha": "d9f3985f808d7157f5a5c8263b1a10031e0f20e2",
+        "skill_md_sha": "a5eb309da0750580cefc82730ca38977587fc659",
+        "install_target_name": "track-risks"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-adopt",
+      "name": "specdd-adopt",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-adopt/SKILL.md",
+      "sha": "b645fdccb898f4757221ad6e4b5e4b1dbda30b0f",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-adopt/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "aed092ff6a661f819dd4de0f00ee403794116673",
+        "skill_md_sha": "b645fdccb898f4757221ad6e4b5e4b1dbda30b0f",
+        "install_target_name": "specdd-adopt"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-author",
+      "name": "specdd-author",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-author/SKILL.md",
+      "sha": "29d5285d1a1773501d3e61696dec79002a945684",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-author/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "b33853fab64a660e34348556a36ab2e2f7e54577",
+        "skill_md_sha": "29d5285d1a1773501d3e61696dec79002a945684",
+        "install_target_name": "specdd-author"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-cli",
+      "name": "specdd-cli",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-cli/SKILL.md",
+      "sha": "a41b604933c44f62cc0ea50916887b0d6c0023bc",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-cli/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "71c0337c1912dd79bb5598794e8c5e83e21e19ec",
+        "skill_md_sha": "a41b604933c44f62cc0ea50916887b0d6c0023bc",
+        "install_target_name": "specdd-cli"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-debug",
+      "name": "specdd-debug",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-debug/SKILL.md",
+      "sha": "2f92f548f94f130a0b98ede51adb998e528b3231",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-debug/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "dbaf66982a606d8d4a6b94216e5a7baee3f003f7",
+        "skill_md_sha": "2f92f548f94f130a0b98ede51adb998e528b3231",
+        "install_target_name": "specdd-debug"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-do",
+      "name": "specdd-do",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-do/SKILL.md",
+      "sha": "857dc80ea51c03c19231e2d8d1ee481aaaa1b562",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-do/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "2922edc511ade39ac4d3c15b8fc754369ff3699e",
+        "skill_md_sha": "857dc80ea51c03c19231e2d8d1ee481aaaa1b562",
+        "install_target_name": "specdd-do"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-docs",
+      "name": "specdd-docs",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-docs/SKILL.md",
+      "sha": "9e726e53b397b3e377bda8194f050b607b9ba17d",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-docs/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "de55eefbbf37cf84e44222f2938f3cca78abebcb",
+        "skill_md_sha": "9e726e53b397b3e377bda8194f050b607b9ba17d",
+        "install_target_name": "specdd-docs"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-explain",
+      "name": "specdd-explain",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-explain/SKILL.md",
+      "sha": "60cb09253b1a9c31be284536336db5f252436f62",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-explain/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "dead83f13bbd6aeb34ea11acb145610be5db0494",
+        "skill_md_sha": "60cb09253b1a9c31be284536336db5f252436f62",
+        "install_target_name": "specdd-explain"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-orient",
+      "name": "specdd-orient",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-orient/SKILL.md",
+      "sha": "a5103a3544b4beb2f4ad7f8dad9c8bca4a731441",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-orient/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "746c5e92a003d43aae7de83ff8be6400619f2798",
+        "skill_md_sha": "a5103a3544b4beb2f4ad7f8dad9c8bca4a731441",
+        "install_target_name": "specdd-orient"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-plan",
+      "name": "specdd-plan",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-plan/SKILL.md",
+      "sha": "755d4d9e4311cc23c6744217ac3fac32b7b99b85",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-plan/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "36b537c32a203fb99b8d0d111c1d7f9df6490ac8",
+        "skill_md_sha": "755d4d9e4311cc23c6744217ac3fac32b7b99b85",
+        "install_target_name": "specdd-plan"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-refactor",
+      "name": "specdd-refactor",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-refactor/SKILL.md",
+      "sha": "a4883973703a17f0398b109119778bd33f439799",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-refactor/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "edd7836051bb9b13f21cc7fc0ea27d802b314fd0",
+        "skill_md_sha": "a4883973703a17f0398b109119778bd33f439799",
+        "install_target_name": "specdd-refactor"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-review",
+      "name": "specdd-review",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-review/SKILL.md",
+      "sha": "271ef66969fe7cc1cf1122716d7d2eeeaec1ac76",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-review/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "2d5218e4bff2a68280bd612615503b8947e7bc08",
+        "skill_md_sha": "271ef66969fe7cc1cf1122716d7d2eeeaec1ac76",
+        "install_target_name": "specdd-review"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-risk",
+      "name": "specdd-risk",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-risk/SKILL.md",
+      "sha": "03eee74f3530963cf7f1fb3dc6ea6445dcf71996",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-risk/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "646d8ace2d96d5fd1bd3a6412984be00e6d4a8d5",
+        "skill_md_sha": "03eee74f3530963cf7f1fb3dc6ea6445dcf71996",
+        "install_target_name": "specdd-risk"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-task",
+      "name": "specdd-task",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-task/SKILL.md",
+      "sha": "79dc3b9023cc6557c332c6835a5ae4239d3d9b9a",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-task/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "35ab723b1b8ec5ac76499ba64b06e2270662e3ab",
+        "skill_md_sha": "79dc3b9023cc6557c332c6835a5ae4239d3d9b9a",
+        "install_target_name": "specdd-task"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-test",
+      "name": "specdd-test",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-test/SKILL.md",
+      "sha": "3d27496492b5521831bdeb57811fce93fe1a010d",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-test/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "24d9ee229a624f2676eb64a9469dacec5e8fb25e",
+        "skill_md_sha": "3d27496492b5521831bdeb57811fce93fe1a010d",
+        "install_target_name": "specdd-test"
+      }
+    },
+    {
+      "id": "specdd/plugin-claude:skills/specdd-trace",
+      "name": "specdd-trace",
+      "repo": "specdd/plugin-claude",
+      "path": "skills/specdd-trace/SKILL.md",
+      "sha": "abe59a72b28481bc2b29e5f18819905a64220132",
+      "pinned": {
+        "repo_slug": "specdd/plugin-claude",
+        "skill_md_path": "skills/specdd-trace/SKILL.md",
+        "repo_commit_sha": "d1540c0645e3ce8fe9acf3441be0c32a3c4cb95e",
+        "skill_tree_sha": "1a6c22561752ee892c44b7e924d7d82673f1f828",
+        "skill_md_sha": "abe59a72b28481bc2b29e5f18819905a64220132",
+        "install_target_name": "specdd-trace"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/agent-creator",
+      "name": "agent-creator",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/agent-creator/SKILL.md",
+      "sha": "9747aab3556e5c78486ea64074e4e1287d71dbd7",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/agent-creator/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "34e014ffffd5302e97348487c5e6a3c39390eaad",
+        "skill_md_sha": "9747aab3556e5c78486ea64074e4e1287d71dbd7",
+        "install_target_name": "agent-creator"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/auto-dev",
+      "name": "auto-dev",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/auto-dev/SKILL.md",
+      "sha": "18bdcf25a9e18f11d4330e8fe1b27bc55df282e4",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/auto-dev/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "b0f1a9f2f34ec3fd1c08cf6dd961456ee211e449",
+        "skill_md_sha": "18bdcf25a9e18f11d4330e8fe1b27bc55df282e4",
+        "install_target_name": "auto-dev"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/brainstorming",
+      "name": "brainstorming",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/brainstorming/SKILL.md",
+      "sha": "61e086e2deb134d6dfd75be4a558f83444524605",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/brainstorming/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "37b6509a9157aeece692d9b4a9b64993b67522b2",
+        "skill_md_sha": "61e086e2deb134d6dfd75be4a558f83444524605",
+        "install_target_name": "brainstorming"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/child-session",
+      "name": "child-session",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/child-session/SKILL.md",
+      "sha": "3cc8a738e2a106b13cb2a1b8740d085cd036aa27",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/child-session/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "1aeace59c883e8a17fcd16c51696ef7ba7eb990b",
+        "skill_md_sha": "3cc8a738e2a106b13cb2a1b8740d085cd036aa27",
+        "install_target_name": "child-session"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/control-loop",
+      "name": "control-loop",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/control-loop/SKILL.md",
+      "sha": "c2c6dc9adf33a0d6e4b430d9e084b37102801dd3",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/control-loop/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "62b1b54136a719a7025ef7cedef8882d0520d276",
+        "skill_md_sha": "c2c6dc9adf33a0d6e4b430d9e084b37102801dd3",
+        "install_target_name": "control-loop"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/cross-engine-review",
+      "name": "cross-engine-review",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/cross-engine-review/SKILL.md",
+      "sha": "09321e287ffa9058834601c23b49165bed331015",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/cross-engine-review/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "cff033b1a0b6fca9305437e30449ff3c668df783",
+        "skill_md_sha": "09321e287ffa9058834601c23b49165bed331015",
+        "install_target_name": "cross-engine-review"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/debug",
+      "name": "debug",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/debug/SKILL.md",
+      "sha": "e16fb76ea94bb12cf74b627ef88073f418c6e4db",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/debug/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "2736e71fb3056f22aca715f2358f08726542c10e",
+        "skill_md_sha": "e16fb76ea94bb12cf74b627ef88073f418c6e4db",
+        "install_target_name": "debug"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/multi-perspective-review",
+      "name": "multi-perspective-review",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/multi-perspective-review/SKILL.md",
+      "sha": "92f70855289ac8ab13b413f4b4dcb0f58be245b3",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/multi-perspective-review/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "66b34569d2da44e265ffe022b557b6d410f11b0b",
+        "skill_md_sha": "92f70855289ac8ab13b413f4b4dcb0f58be245b3",
+        "install_target_name": "multi-perspective-review"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/plan-task",
+      "name": "plan-task",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/plan-task/SKILL.md",
+      "sha": "9372bc4267c1f5aa7e56fb670ef3e182df243ec3",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/plan-task/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "b624a75a3fb011474703a4ed115c23973d19399a",
+        "skill_md_sha": "9372bc4267c1f5aa7e56fb670ef3e182df243ec3",
+        "install_target_name": "plan-task"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/review",
+      "name": "review",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/review/SKILL.md",
+      "sha": "905b089961847c2fc9329c5f2c2b3023ef5f8b5e",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/review/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "8a5eab1dd2e08ba1aaeb74b54678b39fe59547f1",
+        "skill_md_sha": "905b089961847c2fc9329c5f2c2b3023ef5f8b5e",
+        "install_target_name": "review"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/skill-forge",
+      "name": "skill-forge",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/skill-forge/SKILL.md",
+      "sha": "af88517f58f23d40210e5e2d8efe9dab5e967a16",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/skill-forge/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "ac2d9587df93745ab01f4680fdabf05b1a7d3968",
+        "skill_md_sha": "af88517f58f23d40210e5e2d8efe9dab5e967a16",
+        "install_target_name": "skill-forge"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/using-hiway-kit",
+      "name": "using-hiway-kit",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/using-hiway-kit/SKILL.md",
+      "sha": "f93a0ed8450b2e0ab290a662457c342d211d70ab",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/using-hiway-kit/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "167fb08d78d516a4863ff50bfaecca4323f4534d",
+        "skill_md_sha": "f93a0ed8450b2e0ab290a662457c342d211d70ab",
+        "install_target_name": "using-hiway-kit"
+      }
+    },
+    {
+      "id": "this-hw/hiway-kit:plugins/common/skills/web-research",
+      "name": "web-research",
+      "repo": "this-hw/hiway-kit",
+      "path": "plugins/common/skills/web-research/SKILL.md",
+      "sha": "6305c0416facf8c90456c6321115564863377409",
+      "pinned": {
+        "repo_slug": "This-HW/hiway-kit",
+        "skill_md_path": "plugins/common/skills/web-research/SKILL.md",
+        "repo_commit_sha": "23bffeb2582503d3bf56bce6f71232af731288c3",
+        "skill_tree_sha": "8ef5abc436230fdfe6267febbcf304c4c9a2822f",
+        "skill_md_sha": "6305c0416facf8c90456c6321115564863377409",
+        "install_target_name": "web-research"
+      }
+    },
+    {
+      "id": "usmanmughaltaleemabad/one-shot-plugin:skills/caveman",
+      "name": "caveman",
+      "repo": "usmanmughaltaleemabad/one-shot-plugin",
+      "path": "skills/caveman/SKILL.md",
+      "sha": "f2b9683916fa0b70bcda419bf777e081a9798451",
+      "pinned": {
+        "repo_slug": "usmanmughaltaleemabad/One-Shot-Plugin",
+        "skill_md_path": "skills/caveman/SKILL.md",
+        "repo_commit_sha": "9ca33f190f6fa183fdfaccefdb97f1a248f81977",
+        "skill_tree_sha": "eefa76a67e663d6c7548d8a19edf1a4e109de2d7",
+        "skill_md_sha": "f2b9683916fa0b70bcda419bf777e081a9798451",
+        "install_target_name": "caveman"
+      }
+    },
+    {
+      "id": "usmanmughaltaleemabad/one-shot-plugin:skills/grill-me",
+      "name": "grill-me",
+      "repo": "usmanmughaltaleemabad/one-shot-plugin",
+      "path": "skills/grill-me/SKILL.md",
+      "sha": "68ce70205f830226ad55aaa3816c0700f3e34e29",
+      "pinned": {
+        "repo_slug": "usmanmughaltaleemabad/One-Shot-Plugin",
+        "skill_md_path": "skills/grill-me/SKILL.md",
+        "repo_commit_sha": "9ca33f190f6fa183fdfaccefdb97f1a248f81977",
+        "skill_tree_sha": "2088cc479408e4bd65c9eafd3c12ae10ddff3d83",
+        "skill_md_sha": "68ce70205f830226ad55aaa3816c0700f3e34e29",
+        "install_target_name": "grill-me"
+      }
+    },
+    {
+      "id": "usmanmughaltaleemabad/one-shot-plugin:skills/handoff",
+      "name": "handoff",
+      "repo": "usmanmughaltaleemabad/one-shot-plugin",
+      "path": "skills/handoff/SKILL.md",
+      "sha": "a6cec3ef569d928a406a6aaab91155d36994c16c",
+      "pinned": {
+        "repo_slug": "usmanmughaltaleemabad/One-Shot-Plugin",
+        "skill_md_path": "skills/handoff/SKILL.md",
+        "repo_commit_sha": "9ca33f190f6fa183fdfaccefdb97f1a248f81977",
+        "skill_tree_sha": "621e9af2f7fb7201c8995cd3c94144df21f9cfec",
+        "skill_md_sha": "a6cec3ef569d928a406a6aaab91155d36994c16c",
+        "install_target_name": "handoff"
+      }
+    },
+    {
+      "id": "fullymiddleaged/clawness:skills/add",
+      "name": "add",
+      "repo": "fullymiddleaged/clawness",
+      "path": "skills/add/SKILL.md",
+      "sha": "4b61672b473b600a1e48167507703b93f4b22666",
+      "pinned": {
+        "repo_slug": "fullymiddleaged/Clawness",
+        "skill_md_path": "skills/add/SKILL.md",
+        "repo_commit_sha": "1e633468c03bb6f7620c0dca0faf98b53e341a56",
+        "skill_tree_sha": "1767940be9378e136034a954bc64bceafb323275",
+        "skill_md_sha": "4b61672b473b600a1e48167507703b93f4b22666",
+        "install_target_name": "add"
+      }
+    },
+    {
+      "id": "fullymiddleaged/clawness:skills/messaging",
+      "name": "messaging",
+      "repo": "fullymiddleaged/clawness",
+      "path": "skills/messaging/SKILL.md",
+      "sha": "b69c6ae39abaa4ebfff33d2a631d982155fbac02",
+      "pinned": {
+        "repo_slug": "fullymiddleaged/Clawness",
+        "skill_md_path": "skills/messaging/SKILL.md",
+        "repo_commit_sha": "1e633468c03bb6f7620c0dca0faf98b53e341a56",
+        "skill_tree_sha": "9d0c304181e0f3cadb785a371eb11621ac8dc6f6",
+        "skill_md_sha": "b69c6ae39abaa4ebfff33d2a631d982155fbac02",
+        "install_target_name": "messaging"
+      }
+    },
+    {
+      "id": "fullymiddleaged/clawness:skills/perf",
+      "name": "perf",
+      "repo": "fullymiddleaged/clawness",
+      "path": "skills/perf/SKILL.md",
+      "sha": "ce83f396dbbf524a3781e00c728e27e1cc162669",
+      "pinned": {
+        "repo_slug": "fullymiddleaged/Clawness",
+        "skill_md_path": "skills/perf/SKILL.md",
+        "repo_commit_sha": "1e633468c03bb6f7620c0dca0faf98b53e341a56",
+        "skill_tree_sha": "0a5b46d47731d7da3c19b487552f674085abf07d",
+        "skill_md_sha": "ce83f396dbbf524a3781e00c728e27e1cc162669",
+        "install_target_name": "perf"
+      }
+    },
+    {
+      "id": "fullymiddleaged/clawness:skills/review",
+      "name": "review",
+      "repo": "fullymiddleaged/clawness",
+      "path": "skills/review/SKILL.md",
+      "sha": "59a1d85de5531e363f56c9a671dd6def668da4a4",
+      "pinned": {
+        "repo_slug": "fullymiddleaged/Clawness",
+        "skill_md_path": "skills/review/SKILL.md",
+        "repo_commit_sha": "1e633468c03bb6f7620c0dca0faf98b53e341a56",
+        "skill_tree_sha": "72138d457a8387a11728adb0148a528b03818556",
+        "skill_md_sha": "59a1d85de5531e363f56c9a671dd6def668da4a4",
+        "install_target_name": "review"
+      }
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/pizza-time",
+      "name": "pizza-time",
+      "repo": "jreynolds-dev/sensei",
+      "path": "skills/pizza-time/SKILL.md",
+      "sha": "f237f6225639c192f8dea78cdc49bcb6cb3cc953",
+      "pinned": {
+        "repo_slug": "jreynolds-dev/sensei",
+        "skill_md_path": "skills/pizza-time/SKILL.md",
+        "repo_commit_sha": "e9936fc3614cd5477397db023bf8f52495ba671a",
+        "skill_tree_sha": "e4b5dc4452f934a14ee8349bcd0bf2a0decf641e",
+        "skill_md_sha": "f237f6225639c192f8dea78cdc49bcb6cb3cc953",
+        "install_target_name": "pizza-time"
+      }
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/progress-report",
+      "name": "progress-report",
+      "repo": "jreynolds-dev/sensei",
+      "path": "skills/progress-report/SKILL.md",
+      "sha": "cc6da383d70583fa8d4ccbaf6204f84ac5aa8e3f",
+      "pinned": {
+        "repo_slug": "jreynolds-dev/sensei",
+        "skill_md_path": "skills/progress-report/SKILL.md",
+        "repo_commit_sha": "e9936fc3614cd5477397db023bf8f52495ba671a",
+        "skill_tree_sha": "8d993dad7d55037ab80ae8879e87700141fbfbc6",
+        "skill_md_sha": "cc6da383d70583fa8d4ccbaf6204f84ac5aa8e3f",
+        "install_target_name": "progress-report"
+      }
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/set-mode",
+      "name": "set-mode",
+      "repo": "jreynolds-dev/sensei",
+      "path": "skills/set-mode/SKILL.md",
+      "sha": "a0496c749c07477ac4d2fd1055b52a465cee67cf",
+      "pinned": {
+        "repo_slug": "jreynolds-dev/sensei",
+        "skill_md_path": "skills/set-mode/SKILL.md",
+        "repo_commit_sha": "e9936fc3614cd5477397db023bf8f52495ba671a",
+        "skill_tree_sha": "d04a8dd650bd26936f28e197ab6e7cf10a956854",
+        "skill_md_sha": "a0496c749c07477ac4d2fd1055b52a465cee67cf",
+        "install_target_name": "set-mode"
+      }
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/spar",
+      "name": "spar",
+      "repo": "jreynolds-dev/sensei",
+      "path": "skills/spar/SKILL.md",
+      "sha": "206e416f80aec15419db0ac8c7bb8d891921e365",
+      "pinned": {
+        "repo_slug": "jreynolds-dev/sensei",
+        "skill_md_path": "skills/spar/SKILL.md",
+        "repo_commit_sha": "e9936fc3614cd5477397db023bf8f52495ba671a",
+        "skill_tree_sha": "fcc17984f87f865cb0714399732dc9576bea632f",
+        "skill_md_sha": "206e416f80aec15419db0ac8c7bb8d891921e365",
+        "install_target_name": "spar"
+      }
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/teach-back",
+      "name": "teach-back",
+      "repo": "jreynolds-dev/sensei",
+      "path": "skills/teach-back/SKILL.md",
+      "sha": "0d422ad9206fe66809de3f581321f023d932d0ff",
+      "pinned": {
+        "repo_slug": "jreynolds-dev/sensei",
+        "skill_md_path": "skills/teach-back/SKILL.md",
+        "repo_commit_sha": "e9936fc3614cd5477397db023bf8f52495ba671a",
+        "skill_tree_sha": "d7ac834ce14df68a11d74e37b1916d78e77f872e",
+        "skill_md_sha": "0d422ad9206fe66809de3f581321f023d932d0ff",
+        "install_target_name": "teach-back"
+      }
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/why",
+      "name": "why",
+      "repo": "jreynolds-dev/sensei",
+      "path": "skills/why/SKILL.md",
+      "sha": "34ddc0dcc92c080f00709a385414fabc9f3120f1",
+      "pinned": {
+        "repo_slug": "jreynolds-dev/sensei",
+        "skill_md_path": "skills/why/SKILL.md",
+        "repo_commit_sha": "e9936fc3614cd5477397db023bf8f52495ba671a",
+        "skill_tree_sha": "132d4b000fd36ede90aba1ba19247b9b26b090d0",
+        "skill_md_sha": "34ddc0dcc92c080f00709a385414fabc9f3120f1",
+        "install_target_name": "why"
+      }
+    },
+    {
+      "id": "leosimini/keelokit:skills/ship-release",
+      "name": "ship-release",
+      "repo": "leosimini/keelokit",
+      "path": "skills/ship-release/SKILL.md",
+      "sha": "202ab7b8a1e2c260f94bfc8b7216c4b9fdc74efe",
+      "pinned": {
+        "repo_slug": "leosimini/keelokit",
+        "skill_md_path": "skills/ship-release/SKILL.md",
+        "repo_commit_sha": "67d9fe0cbf1f1218f504f9c0212ab1805ba00ed2",
+        "skill_tree_sha": "943f59919b6a3a19bf76386021a081caf121508b",
+        "skill_md_sha": "202ab7b8a1e2c260f94bfc8b7216c4b9fdc74efe",
+        "install_target_name": "ship-release"
+      }
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vcdevil",
+      "name": "vcdevil",
+      "repo": "maxoliverbr/vcupid-plugin",
+      "path": "skills/vcdevil/SKILL.md",
+      "sha": "acc5280523c9e65e26bc27fcac51bd8563d24ed1",
+      "pinned": {
+        "repo_slug": "maxoliverbr/vcupid-plugin",
+        "skill_md_path": "skills/vcdevil/SKILL.md",
+        "repo_commit_sha": "c8a26e0ba8570a2e1ea5b59dcb6cb24c19ea6f0a",
+        "skill_tree_sha": "6d2f094dd8b603407aadcb63d47138273df808e6",
+        "skill_md_sha": "acc5280523c9e65e26bc27fcac51bd8563d24ed1",
+        "install_target_name": "vcdevil"
+      }
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vclist",
+      "name": "vclist",
+      "repo": "maxoliverbr/vcupid-plugin",
+      "path": "skills/vclist/SKILL.md",
+      "sha": "adea1e8e37bbfe4da7ac0a27e77a329196f934a3",
+      "pinned": {
+        "repo_slug": "maxoliverbr/vcupid-plugin",
+        "skill_md_path": "skills/vclist/SKILL.md",
+        "repo_commit_sha": "c8a26e0ba8570a2e1ea5b59dcb6cb24c19ea6f0a",
+        "skill_tree_sha": "3c68a5ecdd12703835ca3b8c325f924617d782eb",
+        "skill_md_sha": "adea1e8e37bbfe4da7ac0a27e77a329196f934a3",
+        "install_target_name": "vclist"
+      }
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vclp",
+      "name": "vclp",
+      "repo": "maxoliverbr/vcupid-plugin",
+      "path": "skills/vclp/SKILL.md",
+      "sha": "1c680666c4ef3b31f53371f6f5c7c7a17ab192bf",
+      "pinned": {
+        "repo_slug": "maxoliverbr/vcupid-plugin",
+        "skill_md_path": "skills/vclp/SKILL.md",
+        "repo_commit_sha": "c8a26e0ba8570a2e1ea5b59dcb6cb24c19ea6f0a",
+        "skill_tree_sha": "1d4c383c3229f1fb2e8a68a2fdef2db0f50a6645",
+        "skill_md_sha": "1c680666c4ef3b31f53371f6f5c7c7a17ab192bf",
+        "install_target_name": "vclp"
+      }
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vcpartner",
+      "name": "vcpartner",
+      "repo": "maxoliverbr/vcupid-plugin",
+      "path": "skills/vcpartner/SKILL.md",
+      "sha": "ddd6ceca0857f0dc439bf8d2ea8ec9b0ed65bad4",
+      "pinned": {
+        "repo_slug": "maxoliverbr/vcupid-plugin",
+        "skill_md_path": "skills/vcpartner/SKILL.md",
+        "repo_commit_sha": "c8a26e0ba8570a2e1ea5b59dcb6cb24c19ea6f0a",
+        "skill_tree_sha": "aa317d4936a5d465af93f4129480869b03cba21b",
+        "skill_md_sha": "ddd6ceca0857f0dc439bf8d2ea8ec9b0ed65bad4",
+        "install_target_name": "vcpartner"
+      }
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vcperks",
+      "name": "vcperks",
+      "repo": "maxoliverbr/vcupid-plugin",
+      "path": "skills/vcperks/SKILL.md",
+      "sha": "aa30a2455e0ced16da027aa2ec058df0e7a8b764",
+      "pinned": {
+        "repo_slug": "maxoliverbr/vcupid-plugin",
+        "skill_md_path": "skills/vcperks/SKILL.md",
+        "repo_commit_sha": "c8a26e0ba8570a2e1ea5b59dcb6cb24c19ea6f0a",
+        "skill_tree_sha": "77b1e63236e2ba13e2a9f475a2ccd93964df6592",
+        "skill_md_sha": "aa30a2455e0ced16da027aa2ec058df0e7a8b764",
+        "install_target_name": "vcperks"
+      }
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vcprep",
+      "name": "vcprep",
+      "repo": "maxoliverbr/vcupid-plugin",
+      "path": "skills/vcprep/SKILL.md",
+      "sha": "a6b0597933a21f8955581b058a442e6eea50ab56",
+      "pinned": {
+        "repo_slug": "maxoliverbr/vcupid-plugin",
+        "skill_md_path": "skills/vcprep/SKILL.md",
+        "repo_commit_sha": "c8a26e0ba8570a2e1ea5b59dcb6cb24c19ea6f0a",
+        "skill_tree_sha": "813a11811dcf205fe6936118a1f8d0004446c4d9",
+        "skill_md_sha": "a6b0597933a21f8955581b058a442e6eea50ab56",
+        "install_target_name": "vcprep"
+      }
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vcraise",
+      "name": "vcraise",
+      "repo": "maxoliverbr/vcupid-plugin",
+      "path": "skills/vcraise/SKILL.md",
+      "sha": "e033e1964a4b0ff673abdf0994a89560fca84598",
+      "pinned": {
+        "repo_slug": "maxoliverbr/vcupid-plugin",
+        "skill_md_path": "skills/vcraise/SKILL.md",
+        "repo_commit_sha": "c8a26e0ba8570a2e1ea5b59dcb6cb24c19ea6f0a",
+        "skill_tree_sha": "ede9455b94d5a3bf957c4264af11e04e11804184",
+        "skill_md_sha": "e033e1964a4b0ff673abdf0994a89560fca84598",
+        "install_target_name": "vcraise"
+      }
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/binary-releases",
+      "name": "binary-releases",
+      "repo": "sbom-tool/gh-guard",
+      "path": "skills/binary-releases/SKILL.md",
+      "sha": "c97935d4e7f2959761aa4db37ecfc1c1efee8d76",
+      "pinned": {
+        "repo_slug": "sbom-tool/gh-guard",
+        "skill_md_path": "skills/binary-releases/SKILL.md",
+        "repo_commit_sha": "ab077c1f986287f755595fb94ba108e143dc7e66",
+        "skill_tree_sha": "bfee03f29d495997b5af701ce66ef9df95bbe132",
+        "skill_md_sha": "c97935d4e7f2959761aa4db37ecfc1c1efee8d76",
+        "install_target_name": "binary-releases"
+      }
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/cargo-vet",
+      "name": "cargo-vet",
+      "repo": "sbom-tool/gh-guard",
+      "path": "skills/cargo-vet/SKILL.md",
+      "sha": "c19a53c8174ca32a18aa0a181703d561ec4d50cf",
+      "pinned": {
+        "repo_slug": "sbom-tool/gh-guard",
+        "skill_md_path": "skills/cargo-vet/SKILL.md",
+        "repo_commit_sha": "ab077c1f986287f755595fb94ba108e143dc7e66",
+        "skill_tree_sha": "5aa47a7ac169901fdf7bdd1ca330138e87666a68",
+        "skill_md_sha": "c19a53c8174ca32a18aa0a181703d561ec4d50cf",
+        "install_target_name": "cargo-vet"
+      }
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/changelog",
+      "name": "changelog",
+      "repo": "sbom-tool/gh-guard",
+      "path": "skills/changelog/SKILL.md",
+      "sha": "20e96af2bc15c821b98bf568d6f82cad6ecbeb32",
+      "pinned": {
+        "repo_slug": "sbom-tool/gh-guard",
+        "skill_md_path": "skills/changelog/SKILL.md",
+        "repo_commit_sha": "ab077c1f986287f755595fb94ba108e143dc7e66",
+        "skill_tree_sha": "7e17f82a33042b972f32591595297d3aca01544a",
+        "skill_md_sha": "20e96af2bc15c821b98bf568d6f82cad6ecbeb32",
+        "install_target_name": "changelog"
+      }
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/security-findings",
+      "name": "security-findings",
+      "repo": "sbom-tool/gh-guard",
+      "path": "skills/security-findings/SKILL.md",
+      "sha": "9f4aa57fe7cc503a39ebd85d0aac0562e0bdc8cf",
+      "pinned": {
+        "repo_slug": "sbom-tool/gh-guard",
+        "skill_md_path": "skills/security-findings/SKILL.md",
+        "repo_commit_sha": "ab077c1f986287f755595fb94ba108e143dc7e66",
+        "skill_tree_sha": "7e87f88899e9190f8d8ddb924517ecd5a23e13d8",
+        "skill_md_sha": "9f4aa57fe7cc503a39ebd85d0aac0562e0bdc8cf",
+        "install_target_name": "security-findings"
+      }
+    },
+    {
+      "id": "abhisrajput/greenfield-delivery:skills/build-loop",
+      "name": "build-loop",
+      "repo": "abhisrajput/greenfield-delivery",
+      "path": "skills/build-loop/SKILL.md",
+      "sha": "85ccb9e6269cbf354729284ad316c3fd1ad29c18",
+      "pinned": {
+        "repo_slug": "Abhisrajput/greenfield-delivery",
+        "skill_md_path": "skills/build-loop/SKILL.md",
+        "repo_commit_sha": "9777ec19c365ee1eb6d8e72958add92a67e782ac",
+        "skill_tree_sha": "740a670c614bbf0b46793113289c1eb520876ef5",
+        "skill_md_sha": "85ccb9e6269cbf354729284ad316c3fd1ad29c18",
+        "install_target_name": "build-loop"
+      }
+    },
+    {
+      "id": "abhisrajput/greenfield-delivery:skills/build-standards",
+      "name": "build-standards",
+      "repo": "abhisrajput/greenfield-delivery",
+      "path": "skills/build-standards/SKILL.md",
+      "sha": "ea320b80c4f6c23a441d718c7084afbc6dfbfdc3",
+      "pinned": {
+        "repo_slug": "Abhisrajput/greenfield-delivery",
+        "skill_md_path": "skills/build-standards/SKILL.md",
+        "repo_commit_sha": "9777ec19c365ee1eb6d8e72958add92a67e782ac",
+        "skill_tree_sha": "d9a1d0b20d0ac3d75fc8057e805e198de17c52b2",
+        "skill_md_sha": "ea320b80c4f6c23a441d718c7084afbc6dfbfdc3",
+        "install_target_name": "build-standards"
+      }
+    },
+    {
+      "id": "abhisrajput/greenfield-delivery:skills/business-test-cases",
+      "name": "business-test-cases",
+      "repo": "abhisrajput/greenfield-delivery",
+      "path": "skills/business-test-cases/SKILL.md",
+      "sha": "c5d88db8ffcb58d43b18cda1f0ea350154e62af2",
+      "pinned": {
+        "repo_slug": "Abhisrajput/greenfield-delivery",
+        "skill_md_path": "skills/business-test-cases/SKILL.md",
+        "repo_commit_sha": "9777ec19c365ee1eb6d8e72958add92a67e782ac",
+        "skill_tree_sha": "9c287e550708148a4f3cb3693366743ec9145ce4",
+        "skill_md_sha": "c5d88db8ffcb58d43b18cda1f0ea350154e62af2",
+        "install_target_name": "business-test-cases"
+      }
+    },
+    {
+      "id": "abhisrajput/greenfield-delivery:skills/discovery",
+      "name": "discovery",
+      "repo": "abhisrajput/greenfield-delivery",
+      "path": "skills/discovery/SKILL.md",
+      "sha": "964f995bd66b4b052ac4131f709f59134f86dff1",
+      "pinned": {
+        "repo_slug": "Abhisrajput/greenfield-delivery",
+        "skill_md_path": "skills/discovery/SKILL.md",
+        "repo_commit_sha": "9777ec19c365ee1eb6d8e72958add92a67e782ac",
+        "skill_tree_sha": "2c8520852d1707fea4a774f93c2c1523b4d3e469",
+        "skill_md_sha": "964f995bd66b4b052ac4131f709f59134f86dff1",
+        "install_target_name": "discovery"
+      }
+    },
+    {
+      "id": "abhisrajput/greenfield-delivery:skills/greenfield-delivery",
+      "name": "greenfield-delivery",
+      "repo": "abhisrajput/greenfield-delivery",
+      "path": "skills/greenfield-delivery/SKILL.md",
+      "sha": "8fb9b8e5ffdfc9cd6bdc3ae3b7f301449eeb0cd7",
+      "pinned": {
+        "repo_slug": "Abhisrajput/greenfield-delivery",
+        "skill_md_path": "skills/greenfield-delivery/SKILL.md",
+        "repo_commit_sha": "9777ec19c365ee1eb6d8e72958add92a67e782ac",
+        "skill_tree_sha": "63fe28d0be2ba898a05d7107c987dafaa303e49f",
+        "skill_md_sha": "8fb9b8e5ffdfc9cd6bdc3ae3b7f301449eeb0cd7",
+        "install_target_name": "greenfield-delivery"
+      }
+    },
+    {
+      "id": "abhisrajput/greenfield-delivery:skills/handoff",
+      "name": "handoff",
+      "repo": "abhisrajput/greenfield-delivery",
+      "path": "skills/handoff/SKILL.md",
+      "sha": "fdb8918a832244d19f1dcc459224a401d7fd659d",
+      "pinned": {
+        "repo_slug": "Abhisrajput/greenfield-delivery",
+        "skill_md_path": "skills/handoff/SKILL.md",
+        "repo_commit_sha": "9777ec19c365ee1eb6d8e72958add92a67e782ac",
+        "skill_tree_sha": "8c10b7d7058906148b43cecb4abbf268364d5fb2",
+        "skill_md_sha": "fdb8918a832244d19f1dcc459224a401d7fd659d",
+        "install_target_name": "handoff"
+      }
+    },
+    {
+      "id": "abhisrajput/greenfield-delivery:skills/progress-reporting",
+      "name": "progress-reporting",
+      "repo": "abhisrajput/greenfield-delivery",
+      "path": "skills/progress-reporting/SKILL.md",
+      "sha": "cd9f21c1680ca8b46430ee07686dd9141bbd180f",
+      "pinned": {
+        "repo_slug": "Abhisrajput/greenfield-delivery",
+        "skill_md_path": "skills/progress-reporting/SKILL.md",
+        "repo_commit_sha": "9777ec19c365ee1eb6d8e72958add92a67e782ac",
+        "skill_tree_sha": "be0a5f8d313cfde8b2cdfcb17540c2b94130a388",
+        "skill_md_sha": "cd9f21c1680ca8b46430ee07686dd9141bbd180f",
+        "install_target_name": "progress-reporting"
+      }
+    },
+    {
+      "id": "abhisrajput/greenfield-delivery:skills/requirements-gate",
+      "name": "requirements-gate",
+      "repo": "abhisrajput/greenfield-delivery",
+      "path": "skills/requirements-gate/SKILL.md",
+      "sha": "8c7a7875a0ed5562efd5226051710540575fd16c",
+      "pinned": {
+        "repo_slug": "Abhisrajput/greenfield-delivery",
+        "skill_md_path": "skills/requirements-gate/SKILL.md",
+        "repo_commit_sha": "9777ec19c365ee1eb6d8e72958add92a67e782ac",
+        "skill_tree_sha": "9ae5bc5735431c3d772f22b00d5aeead111de196",
+        "skill_md_sha": "8c7a7875a0ed5562efd5226051710540575fd16c",
+        "install_target_name": "requirements-gate"
+      }
+    },
+    {
+      "id": "abhisrajput/greenfield-delivery:skills/tracker-azure-devops",
+      "name": "tracker-azure-devops",
+      "repo": "abhisrajput/greenfield-delivery",
+      "path": "skills/tracker-azure-devops/SKILL.md",
+      "sha": "0df8fe8816da267b0d98baef9a829e5bc8f0d44a",
+      "pinned": {
+        "repo_slug": "Abhisrajput/greenfield-delivery",
+        "skill_md_path": "skills/tracker-azure-devops/SKILL.md",
+        "repo_commit_sha": "9777ec19c365ee1eb6d8e72958add92a67e782ac",
+        "skill_tree_sha": "c8761c364f41a150584b0098d619706c6c3b0b1e",
+        "skill_md_sha": "0df8fe8816da267b0d98baef9a829e5bc8f0d44a",
+        "install_target_name": "tracker-azure-devops"
+      }
+    },
+    {
+      "id": "abhisrajput/greenfield-delivery:skills/tracker-conventions",
+      "name": "tracker-conventions",
+      "repo": "abhisrajput/greenfield-delivery",
+      "path": "skills/tracker-conventions/SKILL.md",
+      "sha": "acb46f02419b84406680ce2bcfce33c5b6b87f85",
+      "pinned": {
+        "repo_slug": "Abhisrajput/greenfield-delivery",
+        "skill_md_path": "skills/tracker-conventions/SKILL.md",
+        "repo_commit_sha": "9777ec19c365ee1eb6d8e72958add92a67e782ac",
+        "skill_tree_sha": "e9eb48dbd07a7fe0def7173469138d52328bef3e",
+        "skill_md_sha": "acb46f02419b84406680ce2bcfce33c5b6b87f85",
+        "install_target_name": "tracker-conventions"
+      }
+    },
+    {
+      "id": "abhisrajput/greenfield-delivery:skills/tracker-jira",
+      "name": "tracker-jira",
+      "repo": "abhisrajput/greenfield-delivery",
+      "path": "skills/tracker-jira/SKILL.md",
+      "sha": "2c499413c6d4e9ef1c1cf83ce717717ac414396c",
+      "pinned": {
+        "repo_slug": "Abhisrajput/greenfield-delivery",
+        "skill_md_path": "skills/tracker-jira/SKILL.md",
+        "repo_commit_sha": "9777ec19c365ee1eb6d8e72958add92a67e782ac",
+        "skill_tree_sha": "c4aa7feefa05fcad71240837bad7c69daff63e64",
+        "skill_md_sha": "2c499413c6d4e9ef1c1cf83ce717717ac414396c",
+        "install_target_name": "tracker-jira"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/adr",
+      "name": "adr-generator",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/adr/SKILL.md",
+      "sha": "91fcfe01c1c2de6bb9e57ead1263e0f5d2b2f341",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/adr/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "230956ec1d0a68d8a41fe8912972e400b45f84e5",
+        "skill_md_sha": "91fcfe01c1c2de6bb9e57ead1263e0f5d2b2f341",
+        "install_target_name": "adr-generator"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/breaking-changes",
+      "name": "breaking-change-detection",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/breaking-changes/SKILL.md",
+      "sha": "6f982283b30ec9851cb6d5f212090e87abe3d5e7",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/breaking-changes/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "8383c5870676ce53cb5c4112548ca27b387aba33",
+        "skill_md_sha": "6f982283b30ec9851cb6d5f212090e87abe3d5e7",
+        "install_target_name": "breaking-change-detection"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/bus-factor",
+      "name": "bus-factor",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/bus-factor/SKILL.md",
+      "sha": "e64170090199011adfcd6a3a42469c84141721e4",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/bus-factor/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "4e1a7e0e0617b027bf25c9eeb4b60a1192136217",
+        "skill_md_sha": "e64170090199011adfcd6a3a42469c84141721e4",
+        "install_target_name": "bus-factor"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/history",
+      "name": "code-history",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/history/SKILL.md",
+      "sha": "4f4f7d83d85efb31bbc0e9493bb56de32660e2d1",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/history/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "42b435f43334203bc4d49601ef206b23a47e1153",
+        "skill_md_sha": "4f4f7d83d85efb31bbc0e9493bb56de32660e2d1",
+        "install_target_name": "code-history"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/deps",
+      "name": "dependency-analysis",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/deps/SKILL.md",
+      "sha": "564e35151b8d9c1a1c6dc7bc8e0285798ceb9460",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/deps/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "91cce09f505ac0e488f19a4761d3181e2982aee9",
+        "skill_md_sha": "564e35151b8d9c1a1c6dc7bc8e0285798ceb9460",
+        "install_target_name": "dependency-analysis"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/impact",
+      "name": "impact-analysis",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/impact/SKILL.md",
+      "sha": "61e731adce89d5dfdbdcedaee402d64553e29b13",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/impact/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "57d83658b6de35fc22c147afc1bf6c5a1050d122",
+        "skill_md_sha": "61e731adce89d5dfdbdcedaee402d64553e29b13",
+        "install_target_name": "impact-analysis"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/onboard",
+      "name": "onboarding-guide",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/onboard/SKILL.md",
+      "sha": "ad469ec30171fbe578a20fa0d9eafc12236de39a",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/onboard/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "6734e3a73160895b0824236a88411976b4190325",
+        "skill_md_sha": "ad469ec30171fbe578a20fa0d9eafc12236de39a",
+        "install_target_name": "onboarding-guide"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/analyze",
+      "name": "project-analyze",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/analyze/SKILL.md",
+      "sha": "95315d277a29e4dbb4932fa61d9ee5a8357f58d6",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/analyze/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "cd29c0df199f53cb9b17f8d2e9a0abeaff3e253f",
+        "skill_md_sha": "95315d277a29e4dbb4932fa61d9ee5a8357f58d6",
+        "install_target_name": "project-analyze"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/project-context",
+      "name": "project-context",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/project-context/SKILL.md",
+      "sha": "ee323940d850952c1a318c95b4ba78a927cb9265",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/project-context/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "98807362b38edf23625cc5869965297dd6b89f02",
+        "skill_md_sha": "ee323940d850952c1a318c95b4ba78a927cb9265",
+        "install_target_name": "project-context"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/dashboard",
+      "name": "project-dashboard",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/dashboard/SKILL.md",
+      "sha": "b2a4207ce7598531255ae42d00798560ac22aaa1",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/dashboard/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "d01f1b450afd586938796a575d57284b0daffbc1",
+        "skill_md_sha": "b2a4207ce7598531255ae42d00798560ac22aaa1",
+        "install_target_name": "project-dashboard"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/release-notes",
+      "name": "release-notes",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/release-notes/SKILL.md",
+      "sha": "c97f2824299f9c97bc0a69e52e9c33f7c26da7c2",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/release-notes/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "ab1da314bd2bcc6ecb6ee62fca86e1c8d706ba4c",
+        "skill_md_sha": "c97f2824299f9c97bc0a69e52e9c33f7c26da7c2",
+        "install_target_name": "release-notes"
+      }
+    },
+    {
+      "id": "bukoo93/project-pilot:skills/sprint-health",
+      "name": "sprint-health",
+      "repo": "bukoo93/project-pilot",
+      "path": "skills/sprint-health/SKILL.md",
+      "sha": "c0663d105da017be12386836bac10ab549940b19",
+      "pinned": {
+        "repo_slug": "bukoo93/project-pilot",
+        "skill_md_path": "skills/sprint-health/SKILL.md",
+        "repo_commit_sha": "bf6eabea4e8bd51a3323ad99d1722fb9b9dfad0c",
+        "skill_tree_sha": "76af3fad2834936b740bc3c5becdfc45106d469e",
+        "skill_md_sha": "c0663d105da017be12386836bac10ab549940b19",
+        "install_target_name": "sprint-health"
+      }
+    }
+  ],
+  "pinnedCount": 116,
+  "cutoverValidationPassed": true,
+  "baselinePreserved": 56789,
+  "productionDataChanged": false,
+  "combinedCrawlRun": false,
+  "published": false
+}

@@ -1,0 +1,1668 @@
+{
+  "generatedAt": "2026-10-24T20:36:53.559Z",
+  "reviewSha256": "3707a33b7761f3016d04bbd2cecac3088001941c58531f06e637bb4783f7d3a3",
+  "excludeRepos": [
+    "ihlamury/design-drift",
+    "laurac8r/claude-damn",
+    "unifapi-agent/agents",
+    "houseofmvps/ultraship",
+    "usermuse/em-plugin",
+    "etr/groundwork",
+    "svyatov/supermatt",
+    "msapps-mobile/claude-plugins",
+    "ziazon/zizi-skills",
+    "zunosmartlabs/zsl-superpowers",
+    "drizzy07x/skillquiver",
+    "hllj/sdd-superpowers",
+    "rishav1305/preset-toolkit",
+    "websublime/mister-anderson",
+    "decibelsystems/superpowers",
+    "legalvelocity/lvai-pro",
+    "9aoyang/stackpilot",
+    "inalps/ddw",
+    "rampstackco/claude-skills-starter",
+    "morganongithub/tackle",
+    "dollardill/beads-superpowers"
+  ],
+  "excludeIds": [
+    "ihlamury/design-drift:skills/fetch",
+    "laurac8r/claude-damn:skills/add-to-roadmap",
+    "laurac8r/claude-damn:skills/check-yourself",
+    "laurac8r/claude-damn:skills/duper-tdd-cat",
+    "laurac8r/claude-damn:skills/expert-duper-tdd-cat-review",
+    "laurac8r/claude-damn:skills/expert-super-duper-tdd-cat-review",
+    "laurac8r/claude-damn:skills/expert-super-tdd-cat-review",
+    "laurac8r/claude-damn:skills/expert-tdd-cat-review",
+    "laurac8r/claude-damn:skills/jcvd",
+    "laurac8r/claude-damn:skills/legal-visual-aid",
+    "laurac8r/claude-damn:skills/super-duper-cat",
+    "laurac8r/claude-damn:skills/super-duper-fixer-tdd-cat",
+    "laurac8r/claude-damn:skills/super-duper-tdd-cat",
+    "laurac8r/claude-damn:skills/super-tdd-cat",
+    "laurac8r/claude-damn:skills/tesseract",
+    "houseofmvps/ultraship:skills/sprint",
+    "etr/groundwork:skills/build-unplanned",
+    "etr/groundwork:skills/check-specs-alignment",
+    "etr/groundwork:skills/finalize-task",
+    "etr/groundwork:skills/source-product-specs-from-code",
+    "etr/groundwork:skills/source-ux-design-from-code",
+    "etr/groundwork:skills/work-on-next-task",
+    "svyatov/supermatt:skills/codebase-design",
+    "svyatov/supermatt:skills/diagnosing-bugs",
+    "svyatov/supermatt:skills/implement",
+    "svyatov/supermatt:skills/improve-architecture",
+    "svyatov/supermatt:skills/improve-file-structure",
+    "svyatov/supermatt:skills/improve-tests",
+    "svyatov/supermatt:skills/refactor",
+    "svyatov/supermatt:skills/to-spec",
+    "svyatov/supermatt:skills/to-tickets",
+    "zunosmartlabs/zsl-superpowers:skills/remote-agents/afk-fanout",
+    "zunosmartlabs/zsl-superpowers:skills/engineering/commit",
+    "zunosmartlabs/zsl-superpowers:skills/engineering/human-itl",
+    "zunosmartlabs/zsl-superpowers:skills/engineering/tdd-parallel",
+    "zunosmartlabs/zsl-superpowers:skills/engineering/to-issues",
+    "zunosmartlabs/zsl-superpowers:skills/engineering/triage",
+    "drizzy07x/skillquiver:skills/improve-agent-instructions",
+    "dollardill/beads-superpowers:skills/brainstorming",
+    "dollardill/beads-superpowers:skills/finishing-a-development-branch",
+    "dollardill/beads-superpowers:skills/systematic-debugging",
+    "dollardill/beads-superpowers:skills/writing-plans",
+    "hllj/sdd-superpowers:skills/finishing-a-development-branch",
+    "hllj/sdd-superpowers:skills/sdd-brainstorm",
+    "hllj/sdd-superpowers:skills/sdd-execute",
+    "hllj/sdd-superpowers:skills/sdd-init",
+    "hllj/sdd-superpowers:skills/sdd-plan",
+    "hllj/sdd-superpowers:skills/sdd-spec-update",
+    "hllj/sdd-superpowers:skills/sdd-specify",
+    "hllj/sdd-superpowers:skills/sdd-tasks",
+    "hllj/sdd-superpowers:skills/using-git",
+    "rishav1305/preset-toolkit:skills/preset",
+    "rishav1305/preset-toolkit:skills/preset-checkpoint",
+    "rishav1305/preset-toolkit:skills/preset-executing-plans",
+    "rishav1305/preset-toolkit:skills/preset-ownership",
+    "rishav1305/preset-toolkit:skills/preset-visual-regression",
+    "websublime/mister-anderson:skills/spec",
+    "9aoyang/stackpilot:claude-config/skills/brainstorming",
+    "9aoyang/stackpilot:claude-config/skills/stackpilot",
+    "9aoyang/stackpilot:claude-config/skills/stackpilot-skill-authoring",
+    "9aoyang/stackpilot:claude-config/skills/stackpilot-sync",
+    "harshdhussa1008/takshak:skills/sdd-implementer",
+    "inalps/ddw:skills/architect",
+    "inalps/ddw:skills/audit",
+    "inalps/ddw:skills/auto",
+    "inalps/ddw:skills/close",
+    "inalps/ddw:skills/decision",
+    "inalps/ddw:skills/ideate",
+    "inalps/ddw:skills/init",
+    "inalps/ddw:skills/pr",
+    "inalps/ddw:skills/qa",
+    "inalps/ddw:skills/review",
+    "inalps/ddw:skills/sendit",
+    "inalps/ddw:skills/sync-spec",
+    "inalps/ddw:skills/upgrade",
+    "nodesource/nsolid-plugin:skills/ns-generate-asset",
+    "chikeka/csitrep-generator:skills/dashboard-ui",
+    "chikeka/csitrep-generator:skills/generate",
+    "chikeka/csitrep-generator:skills/import",
+    "chikeka/csitrep-generator:skills/onboard",
+    "chikeka/csitrep-generator:skills/schedule",
+    "chikeka/csitrep-generator:skills/setup",
+    "chikeka/csitrep-generator:skills/team-setup",
+    "chikeka/csitrep-generator:skills/validate",
+    "usmanmughaltaleemabad/one-shot-plugin:skills/docs-drift",
+    "usmanmughaltaleemabad/one-shot-plugin:skills/multi-stage-workflow",
+    "usmanmughaltaleemabad/one-shot-plugin:skills/slides-from-spec",
+    "fullymiddleaged/clawness:skills/user-docs",
+    "jreynolds-dev/sensei:skills/challenge-me",
+    "jreynolds-dev/sensei:skills/commands",
+    "jreynolds-dev/sensei:skills/dojo-open",
+    "jreynolds-dev/sensei:skills/notecards",
+    "jreynolds-dev/sensei:skills/reset",
+    "jreynolds-dev/sensei:skills/sensei-check",
+    "jreynolds-dev/sensei:skills/setup",
+    "jreynolds-dev/sensei:skills/show-me",
+    "leosimini/keelokit:skills/check-security",
+    "leosimini/keelokit:skills/keelokit",
+    "leosimini/keelokit:skills/plan-intake",
+    "leosimini/keelokit:skills/ship-setup",
+    "maxoliverbr/vcupid-plugin:skills/vcangel",
+    "maxoliverbr/vcupid-plugin:skills/vcdebrief",
+    "maxoliverbr/vcupid-plugin:skills/vcintro",
+    "maxoliverbr/vcupid-plugin:skills/vcmatch",
+    "maxoliverbr/vcupid-plugin:skills/vcposer",
+    "maxoliverbr/vcupid-plugin:skills/vcterm",
+    "maxoliverbr/vcupid-plugin:skills/vctrack",
+    "morganongithub/tackle:skills/writing-skills",
+    "rampstackco/claude-skills-starter:skills/seo-onpage",
+    "sbom-tool/gh-guard:skills/ci-pipeline",
+    "sbom-tool/gh-guard:skills/dependency-policy",
+    "sbom-tool/gh-guard:skills/fuzz-testing",
+    "sbom-tool/gh-guard:skills/release-automation",
+    "sbom-tool/gh-guard:skills/scorecard-checks",
+    "sbom-tool/gh-guard:skills/slsa-provenance",
+    "sbom-tool/gh-guard:skills/trusted-publishing",
+    "sbom-tool/gh-guard:skills/workspace-publishing",
+    "aimsise/simple-workflow:skills/autopilot",
+    "aimsise/simple-workflow:skills/catchup",
+    "aimsise/simple-workflow:skills/create-ticket",
+    "aimsise/simple-workflow:skills/investigate",
+    "aimsise/simple-workflow:skills/plan2doc",
+    "aimsise/simple-workflow:skills/refactor",
+    "aimsise/simple-workflow:skills/scout",
+    "aimsise/simple-workflow:skills/tune"
+  ],
+  "excluded": [
+    {
+      "id": "ihlamury/design-drift:skills/fetch",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/designs/linear.app.md",
+        "skills/designs/mistral.ai.md",
+        "skills/designs/runwayml.md",
+        "skills/designs/theverge.md"
+      ],
+      "agents": [],
+      "skills": [
+        "lock"
+      ]
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/add-to-roadmap",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/check-yourself",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "checkpoint-save"
+      ]
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/duper-tdd-cat",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/tdd-cat/SKILL.md",
+        "skills/tdd-cat/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/expert-duper-tdd-cat-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/tdd-cat/SKILL.md",
+        "skills/tdd-cat/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/expert-super-duper-tdd-cat-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/tdd-cat/SKILL.md",
+        "skills/tdd-cat/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/expert-super-tdd-cat-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/tdd-cat/SKILL.md",
+        "skills/tdd-cat/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/expert-tdd-cat-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/tdd-cat/SKILL.md",
+        "skills/tdd-cat/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/jcvd",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/README.md",
+        "skills/README.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/legal-visual-aid",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "visual-aid",
+        "visual-aid",
+        "visual-aid"
+      ]
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/super-duper-cat",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "super",
+        "duper",
+        "cat"
+      ]
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/super-duper-fixer-tdd-cat",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/tdd-cat/SKILL.md",
+        "skills/tdd-cat/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/super-duper-tdd-cat",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/tdd-cat/SKILL.md",
+        "skills/tdd-cat/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/super-tdd-cat",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/tdd-cat/SKILL.md",
+        "skills/tdd-cat/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "laurac8r/claude-damn:skills/tesseract",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "hooks/block-inline-scripts.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "houseofmvps/ultraship:skills/sprint",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "deploy",
+        "canary",
+        "retro",
+        "canary"
+      ]
+    },
+    {
+      "id": "etr/groundwork:skills/build-unplanned",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "validate"
+      ]
+    },
+    {
+      "id": "etr/groundwork:skills/check-specs-alignment",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "design-product",
+        "source-product-specs-from-code",
+        "source-architecture-from-code",
+        "work-on-next-task"
+      ]
+    },
+    {
+      "id": "etr/groundwork:skills/finalize-task",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "validate"
+      ]
+    },
+    {
+      "id": "etr/groundwork:skills/source-product-specs-from-code",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "source-architecture-from-code"
+      ]
+    },
+    {
+      "id": "etr/groundwork:skills/source-ux-design-from-code",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "source-product-specs-from-code",
+        "source-architecture-from-code"
+      ]
+    },
+    {
+      "id": "etr/groundwork:skills/work-on-next-task",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "design-product",
+        "create-tasks"
+      ]
+    },
+    {
+      "id": "svyatov/supermatt:skills/codebase-design",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "improve-architecture"
+      ]
+    },
+    {
+      "id": "svyatov/supermatt:skills/diagnosing-bugs",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "improve-architecture"
+      ]
+    },
+    {
+      "id": "svyatov/supermatt:skills/implement",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup-supermatt-skills"
+      ]
+    },
+    {
+      "id": "svyatov/supermatt:skills/improve-architecture",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "refactor"
+      ]
+    },
+    {
+      "id": "svyatov/supermatt:skills/improve-file-structure",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "implement"
+      ]
+    },
+    {
+      "id": "svyatov/supermatt:skills/improve-tests",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "improve-architecture"
+      ]
+    },
+    {
+      "id": "svyatov/supermatt:skills/refactor",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "improve-architecture",
+        "improve-architecture"
+      ]
+    },
+    {
+      "id": "svyatov/supermatt:skills/to-spec",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup-supermatt-skills"
+      ]
+    },
+    {
+      "id": "svyatov/supermatt:skills/to-tickets",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup-supermatt-skills",
+        "implement"
+      ]
+    },
+    {
+      "id": "zunosmartlabs/zsl-superpowers:skills/remote-agents/afk-fanout",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/ship-style.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/ship-style.md"
+      ],
+      "agents": [],
+      "skills": [
+        "tdd-parallel"
+      ]
+    },
+    {
+      "id": "zunosmartlabs/zsl-superpowers:skills/engineering/commit",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/ship-style.md",
+        "docs/changelog.md",
+        "docs/agents/ship-style.md",
+        "docs/changelog.md",
+        ".claude-plugin/plugin.json",
+        ".claude-plugin/marketplace.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "zunosmartlabs/zsl-superpowers:skills/engineering/human-itl",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md"
+      ],
+      "agents": [],
+      "skills": [
+        "setup-zsl-superpowers"
+      ]
+    },
+    {
+      "id": "zunosmartlabs/zsl-superpowers:skills/engineering/tdd-parallel",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/ship-style.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/ship-style.md",
+        "docs/agents/ship-style.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/project-board.md",
+        "docs/agents/ship-style.md",
+        "docs/agents/ship-style.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/project-board.md"
+      ],
+      "agents": [],
+      "skills": [
+        "code-review",
+        "code-review"
+      ]
+    },
+    {
+      "id": "zunosmartlabs/zsl-superpowers:skills/engineering/to-issues",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/project-board.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/project-board.md"
+      ],
+      "agents": [],
+      "skills": [
+        "setup-zsl-superpowers"
+      ]
+    },
+    {
+      "id": "zunosmartlabs/zsl-superpowers:skills/engineering/triage",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/issue-tracker.md",
+        "docs/agents/project-board.md",
+        "docs/agents/project-board.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/project-board.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/project-board.md",
+        "docs/agents/project-board.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/project-board.md"
+      ],
+      "agents": [],
+      "skills": [
+        "setup-zsl-superpowers",
+        "to-prd"
+      ]
+    },
+    {
+      "id": "drizzy07x/skillquiver:skills/improve-agent-instructions",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "dollardill/beads-superpowers:skills/brainstorming",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "stress-test",
+        "stress-test",
+        "writing-plans",
+        "writing-plans"
+      ]
+    },
+    {
+      "id": "dollardill/beads-superpowers:skills/finishing-a-development-branch",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "document-release"
+      ]
+    },
+    {
+      "id": "dollardill/beads-superpowers:skills/systematic-debugging",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "verification-before-completion"
+      ]
+    },
+    {
+      "id": "dollardill/beads-superpowers:skills/writing-plans",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "stress-test"
+      ]
+    },
+    {
+      "id": "hllj/sdd-superpowers:skills/finishing-a-development-branch",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "using-git",
+        "session-wrap",
+        "session-wrap"
+      ]
+    },
+    {
+      "id": "hllj/sdd-superpowers:skills/sdd-brainstorm",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "sdd-specify"
+      ]
+    },
+    {
+      "id": "hllj/sdd-superpowers:skills/sdd-execute",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "sdd-spec-update"
+      ]
+    },
+    {
+      "id": "hllj/sdd-superpowers:skills/sdd-init",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/git-convention.md",
+        "docs/git-convention.md",
+        "docs/git-convention.md",
+        ".claude/memory/foundation.md",
+        ".claude/CLAUDE.md",
+        "docs/git-convention.md",
+        ".claude/memory/foundation.md",
+        ".claude/memory/steering/tech-stack.md",
+        ".claude/memory/steering/test-strategy.md",
+        ".claude/memory/steering/conventions.md",
+        ".claude/memory/steering/team-practices.md",
+        ".claude/CLAUDE.md",
+        "docs/git-convention.md",
+        ".claude/settings.json",
+        ".claude/memory/foundation.md",
+        ".claude/CLAUDE.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "hllj/sdd-superpowers:skills/sdd-plan",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "sdd-review",
+        "sdd-specify",
+        "sdd-execute",
+        "sdd-brainstorm"
+      ]
+    },
+    {
+      "id": "hllj/sdd-superpowers:skills/sdd-spec-update",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "sdd-execute"
+      ]
+    },
+    {
+      "id": "hllj/sdd-superpowers:skills/sdd-specify",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "sdd-brainstorm",
+        "sdd-plan"
+      ]
+    },
+    {
+      "id": "hllj/sdd-superpowers:skills/sdd-tasks",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "sdd-plan",
+        "sdd-execute"
+      ]
+    },
+    {
+      "id": "hllj/sdd-superpowers:skills/using-git",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/git-convention.md",
+        "docs/git-convention.md",
+        "docs/git-convention.md",
+        "docs/git-convention.md",
+        "docs/git-convention.md",
+        "docs/git-convention.md",
+        "docs/git-convention.md"
+      ],
+      "agents": [],
+      "skills": [
+        "sdd-init"
+      ]
+    },
+    {
+      "id": "rishav1305/preset-toolkit:skills/preset",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "preset-setup"
+      ]
+    },
+    {
+      "id": "rishav1305/preset-toolkit:skills/preset-checkpoint",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "preset-sync-pull",
+        "preset-validate",
+        "preset-screenshot",
+        "preset-visual-regression"
+      ]
+    },
+    {
+      "id": "rishav1305/preset-toolkit:skills/preset-executing-plans",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "preset-sync-push"
+      ]
+    },
+    {
+      "id": "rishav1305/preset-toolkit:skills/preset-ownership",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/conflict-check-agent.md",
+        "agents/conflict-check-agent.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "rishav1305/preset-toolkit:skills/preset-visual-regression",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/visual-diff-agent.md",
+        "agents/visual-diff-agent.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "websublime/mister-anderson:skills/spec",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "research"
+      ]
+    },
+    {
+      "id": "9aoyang/stackpilot:claude-config/skills/brainstorming",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "stackpilot-planning",
+        "tdd-development",
+        "stackpilot-planning"
+      ]
+    },
+    {
+      "id": "9aoyang/stackpilot:claude-config/skills/stackpilot",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/sync-skills.sh",
+        "scripts/sync-skills.sh",
+        "scripts/init.sh",
+        "scripts/preview/start-server.sh",
+        "scripts/preview/stop-server.sh",
+        ".stackpilot/ARCHITECTURE.md",
+        ".stackpilot/ARCHITECTURE.md",
+        ".stackpilot/ARCHITECTURE.md",
+        ".stackpilot/ARCHITECTURE.md",
+        ".stackpilot/ARCHITECTURE.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "9aoyang/stackpilot:claude-config/skills/stackpilot-skill-authoring",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/sync.md",
+        ".stackpilot/ARCHITECTURE.md",
+        "docs/sync.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "9aoyang/stackpilot:claude-config/skills/stackpilot-sync",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/sync.md",
+        "docs/sync.md",
+        "docs/sync.md",
+        "docs/sync.md",
+        "docs/sync.md",
+        "docs/sync.md",
+        "docs/sync.md",
+        "docs/sync.md",
+        "docs/sync.md",
+        "docs/sync.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "harshdhussa1008/takshak:skills/sdd-implementer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/structure.py",
+        "tools/trace.py"
+      ],
+      "agents": [],
+      "skills": [
+        "reconcile",
+        "redesign",
+        "reconcile"
+      ]
+    },
+    {
+      "id": "inalps/ddw:skills/architect",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/architect.md",
+        "agents/architect.md",
+        "agents/architect.md",
+        "agents/architect.md"
+      ],
+      "agents": [],
+      "skills": [
+        "decision"
+      ]
+    },
+    {
+      "id": "inalps/ddw:skills/audit",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/security.md",
+        "agents/security.md",
+        "agents/security.md",
+        "agents/security.md",
+        "agents/security.md",
+        "agents/security.md",
+        "agents/developer.md",
+        "agents/security.md",
+        "agents/security.md",
+        "agents/security.md",
+        "agents/security.md",
+        "agents/security.md",
+        "agents/developer.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "inalps/ddw:skills/auto",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "close",
+        "review",
+        "sendit",
+        "task",
+        "close",
+        "decision"
+      ]
+    },
+    {
+      "id": "inalps/ddw:skills/close",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "review",
+        "review",
+        "drift"
+      ]
+    },
+    {
+      "id": "inalps/ddw:skills/decision",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/architect.md",
+        "skills/task/SKILL.md",
+        "agents/architect.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "inalps/ddw:skills/ideate",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/shaper.md",
+        "agents/shaper.md",
+        "templates/PRD_TEMPLATE.md"
+      ],
+      "agents": [],
+      "skills": [
+        "decision"
+      ]
+    },
+    {
+      "id": "inalps/ddw:skills/init",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/shaper.md",
+        "agents/shaper.md",
+        "templates/MILESTONES.md",
+        "templates/GUARDRAILS.md",
+        "templates/INVARIANTS.md",
+        "agents/shaper.md",
+        "templates/PRD_TEMPLATE.md",
+        "agents/shaper.md",
+        "templates/CLAUDE_RULES.md",
+        "templates/CLAUDE_RULES.md",
+        "templates/CURRENT_SPEC_TEMPLATE.md",
+        "templates/CURRENT_SPEC_TEMPLATE.md"
+      ],
+      "agents": [],
+      "skills": [
+        "ideate"
+      ]
+    },
+    {
+      "id": "inalps/ddw:skills/pr",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "review",
+        "close"
+      ]
+    },
+    {
+      "id": "inalps/ddw:skills/qa",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/qa.md",
+        "agents/qa.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "inalps/ddw:skills/review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/qa.md",
+        "agents/qa.md",
+        "agents/qa.md",
+        "agents/qa.md",
+        "agents/qa.md"
+      ],
+      "agents": [],
+      "skills": [
+        "close"
+      ]
+    },
+    {
+      "id": "inalps/ddw:skills/sendit",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/developer.md",
+        "scripts/setup-worktree.sh",
+        "agents/developer.md",
+        "agents/developer.md",
+        "agents/developer.md"
+      ],
+      "agents": [],
+      "skills": [
+        "decision",
+        "review"
+      ]
+    },
+    {
+      "id": "inalps/ddw:skills/sync-spec",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/CURRENT_SPEC_TEMPLATE.md"
+      ],
+      "agents": [],
+      "skills": [
+        "init",
+        "drift"
+      ]
+    },
+    {
+      "id": "inalps/ddw:skills/upgrade",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/CURRENT_SPEC_TEMPLATE.md",
+        "templates/CLAUDE_RULES.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "nodesource/nsolid-plugin:skills/ns-generate-asset",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/dashboard-ui",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "generate"
+      ]
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/generate",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/archive-data.sh",
+        "scripts/preprocess.sh"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/import",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/preprocess.sh"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/onboard",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup",
+        "generate"
+      ]
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/schedule",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/preprocess.sh"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/team-setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/preprocess.sh"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chikeka/csitrep-generator:skills/validate",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "usmanmughaltaleemabad/one-shot-plugin:skills/docs-drift",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".beads/docs-state.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "usmanmughaltaleemabad/one-shot-plugin:skills/multi-stage-workflow",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/tier35-agentic.md",
+        "docs/tier35-agentic.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "usmanmughaltaleemabad/one-shot-plugin:skills/slides-from-spec",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/LAUNCH_NARRATIVE.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "fullymiddleaged/clawness:skills/user-docs",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "status"
+      ]
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/challenge-me",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "dojo-open"
+      ]
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/commands",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/dojo-open",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "framework/FRAMEWORK.md",
+        "framework/SKILLS.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/notecards",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "dojo-open"
+      ]
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/reset",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "framework/FRAMEWORK.md",
+        "framework/SKILLS.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/sensei-check",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup",
+        "setup",
+        "setup"
+      ]
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "characters/splinter-commands.md"
+      ],
+      "agents": [],
+      "skills": [
+        "dojo-open"
+      ]
+    },
+    {
+      "id": "jreynolds-dev/sensei:skills/show-me",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "dojo-open"
+      ]
+    },
+    {
+      "id": "leosimini/keelokit:skills/check-security",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/context/product.md",
+        "docs/escapes.md",
+        ".keelokit/bin/audit.py",
+        "docs/context/product.md",
+        "docs/escapes.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "leosimini/keelokit:skills/keelokit",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".keelokit/answers.yml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "leosimini/keelokit:skills/plan-intake",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".keelokit/bin/doctor.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "leosimini/keelokit:skills/ship-setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/context/environments.md",
+        "docs/context/environments.md",
+        "docs/context/environments.md",
+        "docs/context/environments.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vcangel",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "vcdevil"
+      ]
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vcdebrief",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "vctrack"
+      ]
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vcintro",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "vcmatch"
+      ]
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vcmatch",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "vclist",
+        "vctrack"
+      ]
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vcposer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "vclist"
+      ]
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vcterm",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "vctrack"
+      ]
+    },
+    {
+      "id": "maxoliverbr/vcupid-plugin:skills/vctrack",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "vclist"
+      ]
+    },
+    {
+      "id": "morganongithub/tackle:skills/writing-skills",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "evals/scenarios.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "rampstackco/claude-skills-starter:skills/seo-onpage",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "seo-keyword"
+      ]
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/ci-pipeline",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/workflows/ci.yml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/dependency-policy",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/dependabot.yml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/fuzz-testing",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/workflows/fuzz.yml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/release-automation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/release.sh"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/scorecard-checks",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/SECURITY.md",
+        "templates/workflows/ci.yml",
+        "templates/workflows/fuzz.yml",
+        "templates/workflows/codeql.yml",
+        "templates/workflows/publish.yml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/slsa-provenance",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/workflows/publish.yml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/trusted-publishing",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/workflows/publish.yml"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "sbom-tool/gh-guard:skills/workspace-publishing",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/workflows/publish.yml",
+        "templates/release.sh"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "aimsise/simple-workflow:skills/autopilot",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/ticket-executor.md",
+        "agents/ticket-executor.md",
+        "hooks/post-ship-state-auto-compact.sh",
+        "hooks/pre-askuserquestion-guard.sh",
+        "hooks/pre-compact-save.sh",
+        "hooks/post-skill-cleanup.sh",
+        "hooks/pre-next-scout-auto-compact.sh",
+        "hooks/autopilot-continue.sh",
+        "hooks/pre-compact-save.sh",
+        "hooks/pre-state-transition.sh",
+        "hooks/pre-state-transition.sh",
+        "hooks/post-ship-state-auto-compact.sh",
+        "hooks/pre-next-scout-auto-compact.sh",
+        "hooks/session-start.sh",
+        "hooks/autopilot-continue.sh",
+        "agents/ticket-executor.md",
+        "agents/ticket-executor.md",
+        "hooks/pre-compact-save.sh",
+        "hooks/lib/forbidden-rationale-patterns.sh",
+        "hooks/pre-bash-contract-guard.sh",
+        "hooks/lib/forbidden-rationale-patterns.sh",
+        "hooks/pre-compact-save.sh"
+      ],
+      "agents": [],
+      "skills": [
+        "scout",
+        "scout",
+        "create-ticket"
+      ]
+    },
+    {
+      "id": "aimsise/simple-workflow:skills/catchup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/researcher.md",
+        "skills/create-ticket/references/sw-checkpoint-template.md",
+        "agents/researcher.md",
+        "skills/create-ticket/references/sw-checkpoint-template.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "aimsise/simple-workflow:skills/create-ticket",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/researcher.md",
+        "agents/researcher.md",
+        "agents/planner.md",
+        "agents/ticket-evaluator.md",
+        "agents/researcher.md",
+        "agents/researcher.md",
+        "agents/planner.md",
+        "agents/ticket-evaluator.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "aimsise/simple-workflow:skills/investigate",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/create-ticket/references/workflow-patterns.md",
+        "agents/researcher.md",
+        "agents/researcher.md",
+        "agents/researcher.md",
+        "skills/create-ticket/references/workflow-patterns.md",
+        "agents/researcher.md",
+        "agents/researcher.md",
+        "agents/researcher.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "aimsise/simple-workflow:skills/plan2doc",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/create-ticket/references/sw-checkpoint-template.md",
+        "tests/test-skill-contracts.sh",
+        "skills/create-ticket/references/sw-checkpoint-template.md"
+      ],
+      "agents": [
+        "planner",
+        "planner"
+      ],
+      "skills": []
+    },
+    {
+      "id": "aimsise/simple-workflow:skills/refactor",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/create-ticket/references/ac-quality-criteria.md",
+        "agents/planner.md",
+        "skills/autopilot/SKILL.md",
+        "skills/create-ticket/references/sw-checkpoint-template.md",
+        "skills/create-ticket/references/ac-quality-criteria.md",
+        "agents/planner.md",
+        "skills/autopilot/SKILL.md",
+        "skills/create-ticket/references/sw-checkpoint-template.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "aimsise/simple-workflow:skills/scout",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/create-ticket/references/phase-state-schema.md",
+        "skills/create-ticket/references/sw-checkpoint-template.md",
+        "skills/create-ticket/references/sw-checkpoint-template.md",
+        "agents/researcher.md",
+        "skills/create-ticket/references/sw-checkpoint-template.md",
+        "skills/create-ticket/references/phase-state-schema.md",
+        "skills/create-ticket/references/sw-checkpoint-template.md",
+        "skills/create-ticket/references/sw-checkpoint-template.md",
+        "agents/researcher.md",
+        "skills/create-ticket/references/sw-checkpoint-template.md"
+      ],
+      "agents": [],
+      "skills": [
+        "investigate",
+        "investigate",
+        "plan2doc"
+      ]
+    },
+    {
+      "id": "aimsise/simple-workflow:skills/tune",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/tune-analyzer.md",
+        "agents/tune-analyzer.md"
+      ],
+      "agents": [],
+      "skills": []
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Reviewed source, package references and attribution; manual held repos are documented separately. Service/CLI prerequisites allowed, no skill execution.",
+  "manualReview": {
+    "notes": "Conservative source/package review. Service and CLI prerequisites are allowed; copied packs, unavailable companion runtimes, and connector-only forwarding stubs are held. Holds do not create owner blocks or alter existing library entries.",
+    "excludedRepos": [
+      {
+        "repo": "ihlamury/design-drift",
+        "reason": "generated-brand-snapshots-with-inconsistent-design-tokens-and-many-invalid-siblings"
+      },
+      {
+        "repo": "laurac8r/claude-damn",
+        "reason": "superpowers-derived-workflow-pack-needs-source-attribution-review"
+      },
+      {
+        "repo": "unifapi-agent/agents",
+        "reason": "mixed-original-and-explicitly-adapted-source-pack-needs-per-skill-attribution"
+      },
+      {
+        "repo": "houseofmvps/ultraship",
+        "reason": "superpowers-named-workflow-repackaging-not-established-as-original"
+      },
+      {
+        "repo": "usermuse/em-plugin",
+        "reason": "readme-explicitly-adapts-third-party-methodology-skills"
+      },
+      {
+        "repo": "etr/groundwork",
+        "reason": "mixed-derived-skills-and-plugin-orchestration-needs-per-skill-review"
+      },
+      {
+        "repo": "svyatov/supermatt",
+        "reason": "explicit-mattpocock-superpowers-compound-engineering-derived-pack"
+      },
+      {
+        "repo": "msapps-mobile/claude-plugins",
+        "reason": "mixed-vendor-plugin-pack-with-upstream-named-skills-attribution-unresolved"
+      },
+      {
+        "repo": "ziazon/zizi-skills",
+        "reason": "readme-discloses-adapted-upstream-skills"
+      },
+      {
+        "repo": "zunosmartlabs/zsl-superpowers",
+        "reason": "explicit-mattpocock-derived-workflow-pack"
+      },
+      {
+        "repo": "drizzy07x/skillquiver",
+        "reason": "curated-superpowers-named-pack-attribution-unresolved"
+      },
+      {
+        "repo": "hllj/sdd-superpowers",
+        "reason": "explicit-superpowers-derived-pack"
+      },
+      {
+        "repo": "rishav1305/preset-toolkit",
+        "reason": "skills-import-plugin-root-python-modules-and-route-to-companion-skills"
+      },
+      {
+        "repo": "websublime/mister-anderson",
+        "reason": "plugin-supervisor-and-beads-runtime-not-contained-in-individual-packages"
+      },
+      {
+        "repo": "decibelsystems/superpowers",
+        "reason": "explicit-superpowers-remix"
+      },
+      {
+        "repo": "legalvelocity/lvai-pro",
+        "reason": "connector-get-skill-forwarding-stubs-not-local-task-instructions"
+      },
+      {
+        "repo": "9aoyang/stackpilot",
+        "reason": "coupled-stackpilot-runtime-agents-and-workspace-orchestration"
+      },
+      {
+        "repo": "inalps/ddw",
+        "reason": "plugin-root-agent-profiles-scripts-and-companion-workflows-required"
+      },
+      {
+        "repo": "rampstackco/claude-skills-starter",
+        "reason": "readme-says-all-skills-copied-verbatim-from-parent-catalog"
+      },
+      {
+        "repo": "morganongithub/tackle",
+        "reason": "superpowers-inspired-workflow-pack-needs-originality-review"
+      },
+      {
+        "repo": "dollardill/beads-superpowers",
+        "reason": "readme-identifies-derived-superpowers-and-gstack-skills"
+      }
+    ],
+    "excludedSkills": []
+  },
+  "reviewed": 1007,
+  "approvedCount": 116
+}
