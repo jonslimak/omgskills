@@ -1,0 +1,999 @@
+{
+  "generatedAt": "2026-10-24T20:54:49.897Z",
+  "reviewSha256": "2e420d9870c706edc60f192cc6d61aac2afe75528ad6b04c427c70cfd6063497",
+  "excludeRepos": [
+    "rationaleyes/claude-business-plugins",
+    "rishabh-choudhry/anchor-memory",
+    "protonium-labs/axiomcore-plugin",
+    "poulrohan23/mypowers"
+  ],
+  "excludeIds": [
+    "carusela/carusela-plugin:plugins/carusela/skills/build-sales-funnel",
+    "luongnv89/idd:skills/auto-pilot",
+    "luongnv89/idd:skills/issue-resolver",
+    "luongnv89/idd:skills/plan-to-issues",
+    "malicaki/game-trend-skills:skills/brainstorming-game-ideas",
+    "masthead-data/for-agents:skills/masthead-compute-savings-with-pipelines",
+    "masthead-data/for-agents:skills/masthead-storage-savings-with-datasets",
+    "maxoliverbr/clientmate-plugin:skills/cmmatch",
+    "maxoliverbr/clientmate-plugin:skills/cmposer",
+    "maxoliverbr/clientmate-plugin:skills/cmreach",
+    "maxoliverbr/clientmate-plugin:skills/cmstrat",
+    "maxoliverbr/incubae-plugin:skills/incapply",
+    "maxoliverbr/incubae-plugin:skills/incmatch",
+    "maxoliverbr/incubae-plugin:skills/incposer",
+    "maxoliverbr/incubae-plugin:skills/incstrat",
+    "meetstream-ai/claude-plugin:skills/calendar-automation",
+    "meetstream-ai/claude-plugin:skills/getting-started",
+    "meetstream-ai/claude-plugin:skills/meetstream",
+    "meetstream-ai/claude-plugin:skills/notetaker",
+    "meetstream-ai/claude-plugin:skills/sales-coach",
+    "meetstream-ai/claude-plugin:skills/test-bot",
+    "meetstream-ai/claude-plugin:skills/verify-account",
+    "mosofin/mosofin-mcp-plugin:skills/connections",
+    "mosofin/mosofin-mcp-plugin:skills/list-skills",
+    "mosofin/mosofin-mcp-plugin:skills/list-tools",
+    "mosofin/mosofin-mcp-plugin:skills/query-workspace",
+    "mosofin/mosofin-mcp-plugin:skills/run-tool",
+    "mosofin/mosofin-mcp-plugin:skills/workspaces",
+    "tomwebwalker/skills:skills/loop",
+    "tomwebwalker/skills:skills/retro",
+    "xsolla/xsolla-ai-kit:skills/catalog-design",
+    "adplane/claude-plugin:skills/adplane-build-campaign",
+    "alation/alation-plugins:skills/using-alation",
+    "minosin/gtdbrain-claude-plugin:skills/setup",
+    "berkkorkmaz/signal-hunter:skills/deploy",
+    "berkkorkmaz/signal-hunter:skills/setup",
+    "costory-io/costory-finops-mcp-skills:plugins/costory/skills/query",
+    "economico/cfo-skills:add-customer",
+    "economico/cfo-skills:investor-update",
+    "economico/cfo-skills:record-payment",
+    "economico/cfo-skills:record-receipts",
+    "economico/cfo-skills:record-vendor-invoice",
+    "economico/cfo-skills:send-invoice",
+    "eigenwise/atomic-agents:claude-plugin/atomic-agents/skills/framework",
+    "get-tmonier/argot:skills/argot-setup",
+    "hrsandrabi/diataxis:skills/document",
+    "linfootdeclan/getemployed:skills/application-form-fill",
+    "linfootdeclan/getemployed:skills/hiring-contact-outreach",
+    "linfootdeclan/getemployed:skills/resume-job-search",
+    "mohammadshehadeh/pxkit:skills/pxkit-feature",
+    "mohammadshehadeh/pxkit:skills/pxkit-form",
+    "mohammadshehadeh/pxkit:skills/pxkit-nextjs-page",
+    "mohammadshehadeh/pxkit:skills/pxkit-service",
+    "mohammed-abdelhady/hyperflow:skills/handoff",
+    "mohammed-abdelhady/hyperflow:skills/hyperflow",
+    "mohitkale/docker-kubernetes:skills/k8s-debug",
+    "norihiro-kajita/demand-insight:skills/demand-insight",
+    "norihiro-kajita/demand-insight:skills/demand-insight-evaluation",
+    "rishabh-choudhry/anchor-memory:skills/capture-decision",
+    "simons-plugins/indigo-claude-plugin:skills/debug-sqllogger",
+    "simons-plugins/indigo-claude-plugin:skills/html-pages",
+    "terryc21/radar-suite:skills/roundtrip-radar",
+    "terryc21/radar-suite:skills/ui-path-radar",
+    "valsecchi75/project-scaffolder:skills/cortex",
+    "valsecchi75/project-scaffolder:skills/persona-lab",
+    "valsecchi75/project-scaffolder:skills/synapse",
+    "vulca-org/vulca-visual-agent-plugin:skills/visual-brainstorm",
+    "vulca-org/vulca-visual-agent-plugin:skills/visual-discovery",
+    "vulca-org/vulca-visual-agent-plugin:skills/visual-spec",
+    "adaptyteam/adapty-skills:plugin/skills/adapty-integration",
+    "adaptyteam/adapty-skills:plugin/skills/flow-audit",
+    "andonimichael/arxitect:skills/api-design-review",
+    "andonimichael/arxitect:skills/architecture-review",
+    "andonimichael/arxitect:skills/clean-architecture-review",
+    "andonimichael/arxitect:skills/oo-design-review",
+    "andonimichael/arxitect:skills/using-arxitect",
+    "cahenesy/throughline:skills/adr-new",
+    "harish-here/maddog:skills/advisor-mode",
+    "jdsoliveiraa/stream-deck-skill-cc:skills/sdk-reference",
+    "mayeedwin/angular-plugin:skills/angular-generate",
+    "mo-inkhan/rubber-duck:skills/rubber-duck"
+  ],
+  "excluded": [
+    {
+      "id": "carusela/carusela-plugin:plugins/carusela/skills/build-sales-funnel",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "write-sales-pages",
+        "write-sales-pages"
+      ]
+    },
+    {
+      "id": "luongnv89/idd:skills/auto-pilot",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "luongnv89/idd:skills/issue-resolver",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "issue-creator"
+      ]
+    },
+    {
+      "id": "luongnv89/idd:skills/plan-to-issues",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/idd-methodology.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "malicaki/game-trend-skills:skills/brainstorming-game-ideas",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "scanning-game-trends"
+      ]
+    },
+    {
+      "id": "masthead-data/for-agents:skills/masthead-compute-savings-with-pipelines",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "masthead-storage-savings-with-tables"
+      ]
+    },
+    {
+      "id": "masthead-data/for-agents:skills/masthead-storage-savings-with-datasets",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "masthead-storage-savings-with-tables"
+      ]
+    },
+    {
+      "id": "maxoliverbr/clientmate-plugin:skills/cmmatch",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "cmlist"
+      ]
+    },
+    {
+      "id": "maxoliverbr/clientmate-plugin:skills/cmposer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "cmlist"
+      ]
+    },
+    {
+      "id": "maxoliverbr/clientmate-plugin:skills/cmreach",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "cmmatch"
+      ]
+    },
+    {
+      "id": "maxoliverbr/clientmate-plugin:skills/cmstrat",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "cmlist"
+      ]
+    },
+    {
+      "id": "maxoliverbr/incubae-plugin:skills/incapply",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "incmatch"
+      ]
+    },
+    {
+      "id": "maxoliverbr/incubae-plugin:skills/incmatch",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "inclist"
+      ]
+    },
+    {
+      "id": "maxoliverbr/incubae-plugin:skills/incposer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "inclist"
+      ]
+    },
+    {
+      "id": "maxoliverbr/incubae-plugin:skills/incstrat",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "inclist"
+      ]
+    },
+    {
+      "id": "meetstream-ai/claude-plugin:skills/calendar-automation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "getting-started"
+      ]
+    },
+    {
+      "id": "meetstream-ai/claude-plugin:skills/getting-started",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "verify-account"
+      ]
+    },
+    {
+      "id": "meetstream-ai/claude-plugin:skills/meetstream",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "getting-started",
+        "getting-started"
+      ]
+    },
+    {
+      "id": "meetstream-ai/claude-plugin:skills/notetaker",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "getting-started"
+      ]
+    },
+    {
+      "id": "meetstream-ai/claude-plugin:skills/sales-coach",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "getting-started"
+      ]
+    },
+    {
+      "id": "meetstream-ai/claude-plugin:skills/test-bot",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "getting-started"
+      ]
+    },
+    {
+      "id": "meetstream-ai/claude-plugin:skills/verify-account",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "getting-started"
+      ]
+    },
+    {
+      "id": "mosofin/mosofin-mcp-plugin:skills/connections",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/mcp-tool-spec.md",
+        "skills/connect/SKILL.md",
+        "docs/mcp-tool-spec.md",
+        "skills/connect/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mosofin/mosofin-mcp-plugin:skills/list-skills",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/mcp-tool-spec.md",
+        "skills/connect/SKILL.md",
+        "docs/mcp-tool-spec.md",
+        "skills/connect/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mosofin/mosofin-mcp-plugin:skills/list-tools",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/mcp-tool-spec.md",
+        "skills/connect/SKILL.md",
+        "docs/mcp-tool-spec.md",
+        "skills/connect/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mosofin/mosofin-mcp-plugin:skills/query-workspace",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/mcp-tool-spec.md",
+        "docs/plugin-contract.md",
+        "skills/connect/SKILL.md",
+        "docs/mcp-tool-spec.md",
+        "docs/plugin-contract.md",
+        "skills/connect/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mosofin/mosofin-mcp-plugin:skills/run-tool",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/mcp-tool-spec.md",
+        "skills/connect/SKILL.md",
+        "docs/mcp-tool-spec.md",
+        "skills/connect/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mosofin/mosofin-mcp-plugin:skills/workspaces",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/mcp-tool-spec.md",
+        "skills/connect/SKILL.md",
+        "docs/mcp-tool-spec.md",
+        "skills/connect/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "tomwebwalker/skills:skills/loop",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "start-issue"
+      ]
+    },
+    {
+      "id": "tomwebwalker/skills:skills/retro",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup-project-skills"
+      ]
+    },
+    {
+      "id": "xsolla/xsolla-ai-kit:skills/catalog-design",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "merchant-setup"
+      ]
+    },
+    {
+      "id": "adplane/claude-plugin:skills/adplane-build-campaign",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "adplane-google-ads"
+      ]
+    },
+    {
+      "id": "alation/alation-plugins:skills/using-alation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "minosin/gtdbrain-claude-plugin:skills/setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "weekly-review"
+      ]
+    },
+    {
+      "id": "berkkorkmaz/signal-hunter:skills/deploy",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "berkkorkmaz/signal-hunter:skills/setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/digest/SKILL.md"
+      ],
+      "agents": [],
+      "skills": [
+        "digest"
+      ]
+    },
+    {
+      "id": "costory-io/costory-finops-mcp-skills:plugins/costory/skills/query",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "recipes",
+        "recipes",
+        "reports",
+        "virtual-dimensions"
+      ]
+    },
+    {
+      "id": "economico/cfo-skills:add-customer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "economico"
+      ]
+    },
+    {
+      "id": "economico/cfo-skills:investor-update",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "economico"
+      ]
+    },
+    {
+      "id": "economico/cfo-skills:record-payment",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "economico"
+      ]
+    },
+    {
+      "id": "economico/cfo-skills:record-receipts",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "economico"
+      ]
+    },
+    {
+      "id": "economico/cfo-skills:record-vendor-invoice",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "economico"
+      ]
+    },
+    {
+      "id": "economico/cfo-skills:send-invoice",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "economico"
+      ]
+    },
+    {
+      "id": "eigenwise/atomic-agents:claude-plugin/atomic-agents/skills/framework",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "atomic-examples/quickstart/quickstart/1_0_basic_chatbot.py"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "get-tmonier/argot:skills/argot-setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".github/workflows/argot.yml",
+        ".argot/manifest.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "hrsandrabi/diataxis:skills/document",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "survey",
+        "write-doc"
+      ]
+    },
+    {
+      "id": "linfootdeclan/getemployed:skills/application-form-fill",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "application-package",
+        "application-status-check"
+      ]
+    },
+    {
+      "id": "linfootdeclan/getemployed:skills/hiring-contact-outreach",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "application-status-check"
+      ]
+    },
+    {
+      "id": "linfootdeclan/getemployed:skills/resume-job-search",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "job-description"
+      ]
+    },
+    {
+      "id": "mohammadshehadeh/pxkit:skills/pxkit-feature",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "pxkit-conventions"
+      ]
+    },
+    {
+      "id": "mohammadshehadeh/pxkit:skills/pxkit-form",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "pxkit-conventions"
+      ]
+    },
+    {
+      "id": "mohammadshehadeh/pxkit:skills/pxkit-nextjs-page",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "pxkit-conventions"
+      ]
+    },
+    {
+      "id": "mohammadshehadeh/pxkit:skills/pxkit-service",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "pxkit-conventions"
+      ]
+    },
+    {
+      "id": "mohammed-abdelhady/hyperflow:skills/handoff",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "dispatch",
+        "audit"
+      ]
+    },
+    {
+      "id": "mohammed-abdelhady/hyperflow:skills/hyperflow",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "trace",
+        "plan",
+        "audit",
+        "deploy",
+        "handoff"
+      ]
+    },
+    {
+      "id": "mohitkale/docker-kubernetes:skills/k8s-debug",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "reference/pod-error-patterns.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "norihiro-kajita/demand-insight:skills/demand-insight",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "schemas/input.schema.json",
+        "schemas/state.schema.json",
+        "schemas/input.schema.json",
+        "schemas/state.schema.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "norihiro-kajita/demand-insight:skills/demand-insight-evaluation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "schemas/decision.schema.json",
+        "schemas/decision.schema.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "rishabh-choudhry/anchor-memory:skills/capture-decision",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/anchor-anchors-spec.md",
+        "docs/anchor-anchors-spec.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "simons-plugins/indigo-claude-plugin:skills/debug-sqllogger",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/update-plugins/references/install-workflow.md",
+        "skills/update-plugins/references/install-workflow.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "simons-plugins/indigo-claude-plugin:skills/html-pages",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "reference/canonical/api/messages.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "terryc21/radar-suite:skills/roundtrip-radar",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/radar-suite-axis-classification/SKILL.md",
+        "skills/radar-suite-axis-classification/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "terryc21/radar-suite:skills/ui-path-radar",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/radar-suite-axis-classification/SKILL.md",
+        "skills/radar-suite-axis-classification/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "valsecchi75/project-scaffolder:skills/cortex",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/pipeline-logger/SKILL.md",
+        "skills/pipeline-logger/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "valsecchi75/project-scaffolder:skills/persona-lab",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/pipeline-logger/SKILL.md",
+        "skills/pipeline-logger/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "valsecchi75/project-scaffolder:skills/synapse",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/pipeline-logger/SKILL.md",
+        "skills/pipeline-logger/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "vulca-org/vulca-visual-agent-plugin:skills/visual-brainstorm",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "visual-spec"
+      ]
+    },
+    {
+      "id": "vulca-org/vulca-visual-agent-plugin:skills/visual-discovery",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "visual-brainstorm"
+      ]
+    },
+    {
+      "id": "vulca-org/vulca-visual-agent-plugin:skills/visual-spec",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "visual-plan",
+        "visual-plan"
+      ]
+    },
+    {
+      "id": "adaptyteam/adapty-skills:plugin/skills/adapty-integration",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "flow-generator",
+        "purchase-testing"
+      ]
+    },
+    {
+      "id": "adaptyteam/adapty-skills:plugin/skills/flow-audit",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "flow-generator"
+      ]
+    },
+    {
+      "id": "andonimichael/arxitect:skills/api-design-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/architect/review-output-format.md",
+        "skills/architect/review-output-format.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "andonimichael/arxitect:skills/architecture-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/oo-design-review/agent-prompt.md",
+        "skills/clean-architecture-review/agent-prompt.md",
+        "skills/api-design-review/agent-prompt.md",
+        "skills/architect/review-output-format.md",
+        "skills/oo-design-review/agent-prompt.md",
+        "skills/clean-architecture-review/agent-prompt.md",
+        "skills/api-design-review/agent-prompt.md",
+        "skills/architect/review-output-format.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "andonimichael/arxitect:skills/clean-architecture-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/architect/review-output-format.md",
+        "skills/architect/review-output-format.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "andonimichael/arxitect:skills/oo-design-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/architect/review-output-format.md",
+        "skills/architect/review-output-format.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "andonimichael/arxitect:skills/using-arxitect",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "architect",
+        "architecture-review"
+      ]
+    },
+    {
+      "id": "cahenesy/throughline:skills/adr-new",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/adr/INDEX.md",
+        "docs/adr/INDEX.md",
+        "docs/adr/INDEX.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "harish-here/maddog:skills/advisor-mode",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "efficient-md"
+      ]
+    },
+    {
+      "id": "jdsoliveiraa/stream-deck-skill-cc:skills/sdk-reference",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/01-getting-started.md",
+        "docs/02-your-first-changes.md",
+        "docs/03-plugin-environment.md",
+        "docs/04-distribution.md",
+        "docs/05-actions.md",
+        "docs/06-keys.md",
+        "docs/07-dials.md",
+        "docs/08-settings.md",
+        "docs/09-property-inspectors.md",
+        "docs/10-devices.md",
+        "docs/11-profiles.md",
+        "docs/12-embedded-resources.md",
+        "docs/13-system.md",
+        "docs/14-deep-linking.md",
+        "docs/15-app-monitoring.md",
+        "docs/16-secrets.md",
+        "docs/17-logging.md",
+        "docs/18-localization.md",
+        "docs/19-code-linting.md",
+        "docs/20-plugin-guidelines.md",
+        "docs/21-manifest.md",
+        "docs/22-touch-strip-layout.md",
+        "docs/23-changelog.md",
+        "docs/25-websocket-plugin.md",
+        "docs/26-websocket-ui.md",
+        "docs/27-websocket-changelog.md",
+        "docs/30-cli-intro.md",
+        "docs/31-cli-create.md",
+        "docs/32-cli-config.md",
+        "docs/33-cli-dev.md",
+        "docs/34-cli-link.md",
+        "docs/35-cli-list.md",
+        "docs/36-cli-pack.md",
+        "docs/37-cli-restart.md",
+        "docs/38-cli-stop.md",
+        "docs/39-cli-unlink.md",
+        "docs/40-cli-validate.md",
+        "docs/24-upgrading-v2.md",
+        "docs/samples/cat-keys-action.ts",
+        "docs/samples/cat-keys-plugin.ts",
+        "docs/samples/cat-keys-manifest.json",
+        "docs/samples/cat-keys-package.json",
+        "docs/samples/cat-keys-tsconfig.json",
+        "docs/samples/layouts-dial-action.ts",
+        "docs/samples/layouts-manifest.json",
+        "docs/samples/sdk-singleton-action.ts",
+        "docs/samples/sdk-exports.ts",
+        "docs/01-getting-started.md",
+        "docs/02-your-first-changes.md",
+        "docs/03-plugin-environment.md",
+        "docs/04-distribution.md",
+        "docs/05-actions.md",
+        "docs/06-keys.md",
+        "docs/07-dials.md",
+        "docs/08-settings.md",
+        "docs/09-property-inspectors.md",
+        "docs/10-devices.md",
+        "docs/11-profiles.md",
+        "docs/12-embedded-resources.md",
+        "docs/13-system.md",
+        "docs/14-deep-linking.md",
+        "docs/15-app-monitoring.md",
+        "docs/16-secrets.md",
+        "docs/17-logging.md",
+        "docs/18-localization.md",
+        "docs/19-code-linting.md",
+        "docs/20-plugin-guidelines.md",
+        "docs/21-manifest.md",
+        "docs/22-touch-strip-layout.md",
+        "docs/23-changelog.md",
+        "docs/25-websocket-plugin.md",
+        "docs/26-websocket-ui.md",
+        "docs/27-websocket-changelog.md",
+        "docs/30-cli-intro.md",
+        "docs/31-cli-create.md",
+        "docs/32-cli-config.md",
+        "docs/33-cli-dev.md",
+        "docs/34-cli-link.md",
+        "docs/35-cli-list.md",
+        "docs/36-cli-pack.md",
+        "docs/37-cli-restart.md",
+        "docs/38-cli-stop.md",
+        "docs/39-cli-unlink.md",
+        "docs/40-cli-validate.md",
+        "docs/24-upgrading-v2.md",
+        "docs/samples/cat-keys-action.ts",
+        "docs/samples/cat-keys-plugin.ts",
+        "docs/samples/cat-keys-manifest.json",
+        "docs/samples/cat-keys-package.json",
+        "docs/samples/cat-keys-tsconfig.json",
+        "docs/samples/layouts-dial-action.ts",
+        "docs/samples/layouts-manifest.json",
+        "docs/samples/sdk-singleton-action.ts",
+        "docs/samples/sdk-exports.ts"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mayeedwin/angular-plugin:skills/angular-generate",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/STRUCTURE.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "mo-inkhan/rubber-duck:skills/rubber-duck",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [
+        "rubber-duck"
+      ],
+      "skills": []
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Reviewed candidate repos, provenance credits, source intros and package dependencies. Independent task/vendor workflows accepted; copied methodology, external plugin files and opaque forwarding stubs held. No source code executed.",
+  "manualReview": {
+    "notes": "Reviewed source purpose and attribution by repo. Official vendor workflows may require their normal connector or CLI. README mentions of template generation, packaging conventions, or copying a user's own documents are not treated as evidence of copied skills.",
+    "excludedRepos": [
+      {
+        "repo": "rationaleyes/claude-business-plugins",
+        "reason": "readme-explicitly-identifies-anthropic-derived-marketing-plugin"
+      },
+      {
+        "repo": "rishabh-choudhry/anchor-memory",
+        "reason": "coupled-memory-hooks-template-runtime-and-adapted-behavioral-guidelines-needs-separate-review"
+      },
+      {
+        "repo": "protonium-labs/axiomcore-plugin",
+        "reason": "coupled-project-module-runtime-with-adapted-dev-planning-methodology"
+      },
+      {
+        "repo": "poulrohan23/mypowers",
+        "reason": "shared-content-orchestration-and-plugin-hook-runtime-not-independent-task-packages"
+      }
+    ],
+    "excludedSkills": []
+  },
+  "reviewed": 1201,
+  "approvedCount": 748
+}

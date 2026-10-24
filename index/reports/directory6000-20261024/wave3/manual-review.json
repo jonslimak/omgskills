@@ -1,0 +1,20 @@
+{
+  "notes": "Reviewed README provenance, source intros and package dependencies. Runtime library credits alone do not imply copied skills. Normal external service/CLI prerequisites are allowed, while unavailable plugin profiles and explicitly adapted skill content remain held.",
+  "excludedRepos": [
+    { "repo": "dariovr1/sixth-sense", "reason": "readme-explicitly-identifies-superpowers-fork-and-adapted-upstream-skills" },
+    { "repo": "karolusd/fellowship", "reason": "explicit-superpowers-adaptation-needs-per-skill-attribution" },
+    { "repo": "rampstackco/claude-skills-seo", "reason": "curated-copied-subset-of-parent-skill-catalog" },
+    { "repo": "papischolz/sdlc-assist", "reason": "mixed-original-and-bundled-addyosmani-skills-require-attribution-review" },
+    { "repo": "nicodiansk/turbocharge", "reason": "readme-discloses-adapted-debug-ship-plan-skills" },
+    { "repo": "toruai/toru-claude-agents", "reason": "coupled-specialist-agent-runtime-not-contained-in-individual-skill-packages" },
+    { "repo": "woldinius/wai-skill-suite", "reason": "master-runtime-router-with-generated-variant-seeds-not-independent-task-skill" },
+    { "repo": "wolfgangrush/indian-rent-control-drafting", "reason": "internal-base-skill-of-multi-agent-drafting-pipeline" },
+    { "repo": "cloverink/shipwright", "reason": "mixed-design-and-skill-creator-content-plus-plugin-agent-workflow-needs-separate-review" },
+    { "repo": "j0hanz/squad-agents", "reason": "superpowers-named-process-pack-with-attribution-unresolved" }
+  ],
+  "excludedSkills": [
+    { "id": "roxanneallard/euxlab-skills:skills/loop/euxlab-grill-the-ask", "reason": "readme-attributes-grilling-primitive-to-mattpocock" },
+    { "id": "roxanneallard/euxlab-skills:skills/reference/euxlab-grilling", "reason": "readme-attributes-grilling-primitive-to-mattpocock" },
+    { "id": "clientgen/clientgen-reach:skills/marketing-compliance", "reason": "readme-explicitly-identifies-adapted-upstream-compliance-skill" }
+  ]
+}

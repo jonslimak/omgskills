@@ -1,0 +1,10 @@
+{
+  "notes": "Reviewed source purpose and attribution by repo. Official vendor workflows may require their normal connector or CLI. README mentions of template generation, packaging conventions, or copying a user's own documents are not treated as evidence of copied skills.",
+  "excludedRepos": [
+    { "repo": "rationaleyes/claude-business-plugins", "reason": "readme-explicitly-identifies-anthropic-derived-marketing-plugin" },
+    { "repo": "rishabh-choudhry/anchor-memory", "reason": "coupled-memory-hooks-template-runtime-and-adapted-behavioral-guidelines-needs-separate-review" },
+    { "repo": "protonium-labs/axiomcore-plugin", "reason": "coupled-project-module-runtime-with-adapted-dev-planning-methodology" },
+    { "repo": "poulrohan23/mypowers", "reason": "shared-content-orchestration-and-plugin-hook-runtime-not-independent-task-packages" }
+  ],
+  "excludedSkills": []
+}
