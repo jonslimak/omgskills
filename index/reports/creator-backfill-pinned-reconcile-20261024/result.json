@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-10-24T11:38:48.837Z",
+  "status": "passed",
+  "mainCommit": "fe4da682a59cd1bba12bb307ad2bf3ce954d490c",
+  "verifiedCount": 3000,
+  "cutoverSkillCount": 50690,
+  "skillOverlayCount": 3032,
+  "paths": [
+    "/Users/jonslimak/Projects/omgskills/index/shadow/skills.cutover.shadow.json",
+    "/Users/jonslimak/Projects/omgskills/index/shadow/skills.overlay.json",
+    "/Users/jonslimak/Projects/omgskills/index/shadow/package-metadata.overlay.json"
+  ],
+  "onlyPinnedMetadataChanged": true,
+  "idsAndMembershipUnchanged": true,
+  "other32OverlaySkillsUnchanged": true,
+  "repoFilesUnchanged": true,
+  "sharedSourceEditsUnchanged": true,
+  "productionFilesUnchanged": true,
+  "cutoverValidationPassed": true,
+  "rollbackRehearsed": true,
+  "combinedCrawlRun": false,
+  "published": false,
+  "deployed": false,
+  "pushed": false
+}

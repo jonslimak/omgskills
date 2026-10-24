@@ -1,0 +1,79 @@
+{
+  "generatedAt": "2026-10-24T11:04:07.878Z",
+  "status": "passed",
+  "sourceCommit": "6489b08dd49828d176a543a7dc3f2c2ca8ceedbd",
+  "scope": "Five-skill metadata pilot in an isolated worktree only",
+  "verifiedCount": 5,
+  "skills": [
+    {
+      "id": "carta/plugins:plugins/carta-cap-table/skills/carta-compensation-rolematcher",
+      "repo_slug": "carta/plugins",
+      "skill_md_path": "plugins/carta-cap-table/skills/carta-compensation-rolematcher/SKILL.md",
+      "repo_commit_sha": "179e51e07ffea09c7c205e2cb01c6fa9d518f1df",
+      "skill_tree_sha": "e412789da5317dda965fb65f1e979233feaffe20",
+      "skill_md_sha": "f70cede6b67dc5e568a559056a14bb77dbbd5f29",
+      "install_target_name": "carta-compensation-rolematcher",
+      "reviewedCommitVerified": true,
+      "liveBlobVerified": true,
+      "patchedCreatorFinalizerVerified": true
+    },
+    {
+      "id": "qdrant/skills:skills/qdrant-clients-sdk",
+      "repo_slug": "qdrant/skills",
+      "skill_md_path": "skills/qdrant-clients-sdk/SKILL.md",
+      "repo_commit_sha": "75c3322d562210953adb1717bf91d1c09fd4b77f",
+      "skill_tree_sha": "004256bb28372c6b67d2c650dc7bf3977294fba8",
+      "skill_md_sha": "cad861a4dbb8901479f0fa3cca9d9269e850cc02",
+      "install_target_name": "qdrant-clients-sdk",
+      "reviewedCommitVerified": true,
+      "liveBlobVerified": true,
+      "patchedCreatorFinalizerVerified": true
+    },
+    {
+      "id": "qdrant/skills:skills/qdrant-edge",
+      "repo_slug": "qdrant/skills",
+      "skill_md_path": "skills/qdrant-edge/SKILL.md",
+      "repo_commit_sha": "75c3322d562210953adb1717bf91d1c09fd4b77f",
+      "skill_tree_sha": "e57f007b6cb71b140790ad8fdad2cb3640aa9aa2",
+      "skill_md_sha": "ea4236fa931ad21924fb25e4d160955d071be849",
+      "install_target_name": "qdrant-edge",
+      "reviewedCommitVerified": true,
+      "liveBlobVerified": true,
+      "patchedCreatorFinalizerVerified": true
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/confluent-cloud-cdc-tableflow",
+      "repo_slug": "confluentinc/agent-skills",
+      "skill_md_path": "skills/confluent-cloud-cdc-tableflow/SKILL.md",
+      "repo_commit_sha": "f3d95b7e6855b690b7670ecee033404e082ab169",
+      "skill_tree_sha": "61d9cac549d669723e18f8a47dc728acff742e2b",
+      "skill_md_sha": "3d296ef3744b2747254168ce8e5bd8e7ae8e8153",
+      "install_target_name": "confluent-cloud-cdc-tableflow",
+      "reviewedCommitVerified": true,
+      "liveBlobVerified": true,
+      "patchedCreatorFinalizerVerified": true
+    },
+    {
+      "id": "confluentinc/agent-skills:skills/confluent-cloud-flink-sql",
+      "repo_slug": "confluentinc/agent-skills",
+      "skill_md_path": "skills/confluent-cloud-flink-sql/SKILL.md",
+      "repo_commit_sha": "f3d95b7e6855b690b7670ecee033404e082ab169",
+      "skill_tree_sha": "b25e0761802efc8a57a8e5f3b14c4c0cced7dddb",
+      "skill_md_sha": "78f9f00f707810c0008c487af250b0ab6b28ffe8",
+      "install_target_name": "confluent-cloud-flink-sql",
+      "reviewedCommitVerified": true,
+      "liveBlobVerified": true,
+      "patchedCreatorFinalizerVerified": true
+    }
+  ],
+  "sourcePathsAndHashesUnchanged": true,
+  "unselectedRowsChanged": 0,
+  "cutoverValidationPassed": true,
+  "sharedCheckoutUnchanged": true,
+  "productionDataChanged": false,
+  "combinedCrawlRun": false,
+  "published": false,
+  "deployed": false,
+  "sharedStagedSkillsRemainingLegacy": 3000,
+  "isolatedOverlayPath": "/private/tmp/omgskills-creator-backfill-pinned-20261024/index/shadow/package-metadata.overlay.json"
+}
