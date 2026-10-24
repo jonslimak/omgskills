@@ -24,6 +24,7 @@ import {
   executeCreatorBackfillApply,
   parseCreatorBackfillApplyLimit,
   type CreatorBackfillApplyProgress,
+  type CreatorBackfillEnrichResult,
   type CreatorBackfillPersistResult,
 } from "./creator-backfill-apply.js";
 import {
@@ -34,6 +35,7 @@ import {
   executeCreatorBackfillPlan,
   selectCreatorBackfillCoverageEntries,
   type CreatorBackfillPlan,
+  type CreatorBackfillPlanCandidate,
   type CreatorBackfillRepoScan,
 } from "./creator-backfill-plan.js";
 import {
@@ -41,6 +43,7 @@ import {
   getGitHubCoreQuota,
 } from "./github-quota-guard.js";
 import { loadTrustedSeeds } from "./seeds.js";
+import { createPinnedPackageMetadataResolver, pinnedPackageMetadataFromSkill } from "./package-metadata.js";
 import { assertShadowPath, indexRoot, shadowRoot } from "./shadow-path-guard.js";
 import type { ShadowSkillOverlay, TrustedSeeds } from "./types.js";
 import {
@@ -67,7 +70,8 @@ const progressPath = join(shadowRoot, "creator-backfill.apply.json");
 const finalReportJsonPath = join(shadowRoot, "creator-backfill.final.json");
 const finalReportMarkdownPath = join(shadowRoot, "creator-backfill.final.md");
 const quotaRecheckTreeInterval = 25;
-const applyQuotaSafetyBuffer = 100;
+// Reserve room for enrichment and package-coordinate requests between quota checks.
+const applyQuotaSafetyBuffer = 200;
 
 type RepoMetadata = {
   repo: string;
@@ -452,6 +456,53 @@ async function runPlan(
   return plan;
 }
 
+export async function prepareCreatorBackfillAddition(input: {
+  candidate: CreatorBackfillPlanCandidate;
+  skill: Skill;
+  seeds: TrustedSeeds;
+  resolvePackageMetadata: ReturnType<typeof createPinnedPackageMetadataResolver>;
+}): Promise<CreatorBackfillEnrichResult> {
+  const { candidate, skill, seeds, resolvePackageMetadata } = input;
+  if (repoFromGithubUrl(skill.github_url) !== normalizePolicyRepo(candidate.repo)) {
+    return { status: "policy-skipped", reason: "canonical-repo-mismatch" };
+  }
+  if (skill.skill_md_path !== candidate.path) {
+    return { status: "policy-skipped", reason: "skill-path-mismatch" };
+  }
+  const shadowSkill = toShadowSkillRecord(skill, seeds);
+  if (shadowSkill.provenance_type !== "original") {
+    return { status: "policy-skipped", reason: `non-original-${shadowSkill.provenance_type}` };
+  }
+
+  let metadata: Awaited<ReturnType<typeof resolvePackageMetadata>>;
+  try {
+    metadata = await resolvePackageMetadata(shadowSkill, candidate.defaultBranch);
+  } catch {
+    return { status: "transient-failed", reason: "package-metadata-unavailable" };
+  }
+  const pinned = metadata && pinnedPackageMetadataFromSkill(metadata);
+  if (!pinned) return { status: "transient-failed", reason: "package-metadata-unresolved" };
+  if (
+    normalizePolicyRepo(pinned.repo_slug) !== normalizePolicyRepo(candidate.repo)
+    || pinned.skill_md_path !== candidate.path
+    || pinned.skill_md_sha.toLowerCase() !== skill.skill_md_sha?.toLowerCase()
+    || (/^[0-9a-f]{40}$/i.test(candidate.defaultBranch)
+      && pinned.repo_commit_sha.toLowerCase() !== candidate.defaultBranch.toLowerCase())
+  ) {
+    return { status: "transient-failed", reason: "package-metadata-mismatch" };
+  }
+  return {
+    status: "addition",
+    addition: {
+      skill: { ...shadowSkill, ...pinned },
+      repoKey: candidate.repo,
+      repoUrl: candidate.repoUrl,
+      source: CREATOR_BACKFILL_SOURCE,
+      isTrustedCreator: true,
+    },
+  };
+}
+
 async function runApply(
   limit: number,
   initialQuotaRemaining?: number,
@@ -475,6 +526,7 @@ async function runApply(
   );
   let currentSkills = loadCreatorBackfillExistingSkills();
   const priorProgress = readJson<CreatorBackfillApplyProgress | null>(progressPath, null);
+  const resolvePackageMetadata = createPinnedPackageMetadataResolver(octokit);
 
   const progress = await executeCreatorBackfillApply({
     plan,
@@ -542,26 +594,7 @@ async function runApply(
           ? { status: "stable-failed", reason: result.failure.reason }
           : { status: "transient-failed", reason: "enrich-failed" };
       }
-      if (repoFromGithubUrl(result.skill.github_url) !== normalizePolicyRepo(candidate.repo)) {
-        return { status: "policy-skipped", reason: "canonical-repo-mismatch" };
-      }
-      if (result.skill.skill_md_path !== candidate.path) {
-        return { status: "policy-skipped", reason: "skill-path-mismatch" };
-      }
-      const shadowSkill = toShadowSkillRecord(result.skill, seeds);
-      if (shadowSkill.provenance_type !== "original") {
-        return { status: "policy-skipped", reason: `non-original-${shadowSkill.provenance_type}` };
-      }
-      return {
-        status: "addition",
-        addition: {
-          skill: shadowSkill,
-          repoKey: candidate.repo,
-          repoUrl: candidate.repoUrl,
-          source: CREATOR_BACKFILL_SOURCE,
-          isTrustedCreator: true,
-        },
-      };
+      return prepareCreatorBackfillAddition({ candidate, skill: result.skill, seeds, resolvePackageMetadata });
     },
     persist: async (additions: ShadowSkillPersistenceAddition[]): Promise<CreatorBackfillPersistResult[]> => {
       const generatedAt = new Date().toISOString();

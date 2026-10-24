@@ -12,8 +12,11 @@ import {
   assertCreatorBackfillPlanCurrent,
   executeCreatorCoverageMaintenance,
   parseCreatorBackfillArguments,
+  prepareCreatorBackfillAddition,
   summarizeCreatorCoverageRegistry,
 } from "./creator-backfill.js";
+import { executeCreatorBackfillApply } from "./creator-backfill-apply.js";
+import type { PinnedPackageMetadata } from "./package-metadata.js";
 import type { TrustedSeeds } from "./types.js";
 
 function seeds(overrides: Partial<TrustedSeeds> = {}): TrustedSeeds {
@@ -76,6 +79,127 @@ function build(scans: CreatorBackfillRepoScan[], existingSkills: Skill[] = [], t
     seeds: trustedSeeds,
   });
 }
+
+const packageCommit = "b".repeat(40);
+const packageBlob = "a".repeat(40);
+
+function pinnedMetadata(overrides: Partial<PinnedPackageMetadata> = {}): PinnedPackageMetadata {
+  return {
+    repo_slug: "Creator/Skills",
+    skill_md_path: "skills/one/SKILL.md",
+    skill_md_sha: packageBlob,
+    repo_commit_sha: packageCommit,
+    skill_tree_sha: "c".repeat(40),
+    install_target_name: "one",
+    ...overrides,
+  };
+}
+
+for (const path of ["SKILL.md", "skills/one/SKILL.md"]) {
+  test(`creator additions carry complete pinned metadata for ${path}`, async () => {
+    const candidate = build([scan({ defaultBranch: packageCommit, paths: [path] })]).candidates[0];
+    const original = skill({ id: candidate.proposedId, skill_md_path: path, skill_md_sha: packageBlob });
+    const before = structuredClone(original);
+    const metadata = pinnedMetadata({ skill_md_path: path });
+    const result = await prepareCreatorBackfillAddition({
+      candidate, skill: original, seeds: seeds(),
+      resolvePackageMetadata: async (row, ref) => {
+        assert.equal(row.id, original.id);
+        assert.equal(ref, packageCommit);
+        return metadata;
+      },
+    });
+    assert.equal(result.status, "addition");
+    if (result.status !== "addition") return;
+    for (const field of Object.keys(metadata) as Array<keyof PinnedPackageMetadata>) {
+      assert.equal(result.addition.skill[field], metadata[field]);
+    }
+    assert.equal(result.addition.skill.id, original.id);
+    assert.equal(result.addition.skill.description, original.description);
+    assert.equal(result.addition.skill.provenance_type, "original");
+    assert.equal(result.addition.source, "creator-backfill");
+    assert.deepEqual(original, before);
+  });
+}
+
+test("creator metadata resolution also supports normal branch-based plans", async () => {
+  const candidate = build([scan()]).candidates[0];
+  const result = await prepareCreatorBackfillAddition({
+    candidate, skill: skill({ skill_md_sha: packageBlob }), seeds: seeds(),
+    resolvePackageMetadata: async (_row, ref) => {
+      assert.equal(ref, "main");
+      return pinnedMetadata();
+    },
+  });
+  assert.equal(result.status, "addition");
+});
+
+for (const failure of ["unresolved", "unavailable", "partial"] as const) {
+  test(`creator metadata ${failure} leaves the addition retryable without legacy fallback`, async () => {
+    const candidate = build([scan()]).candidates[0];
+    const original = Object.freeze(skill({ skill_md_sha: packageBlob }));
+    const result = await prepareCreatorBackfillAddition({
+      candidate, skill: original, seeds: seeds(),
+      resolvePackageMetadata: async () => {
+        if (failure === "unavailable") throw new Error("GitHub temporarily unavailable");
+        if (failure === "partial") return { repo_slug: "Creator/Skills" } as PinnedPackageMetadata;
+        return null;
+      },
+    });
+    assert.deepEqual(result, { status: "transient-failed", reason: failure === "unavailable"
+      ? "package-metadata-unavailable" : "package-metadata-unresolved" });
+    assert.equal(original.repo_commit_sha, undefined);
+  });
+}
+
+for (const [field, value] of Object.entries({
+  repo_slug: "other/skills",
+  skill_md_path: "skills/moved/SKILL.md",
+  skill_md_sha: "d".repeat(40),
+  repo_commit_sha: "e".repeat(40),
+})) {
+  test(`creator metadata rejects a mismatching ${field}`, async () => {
+    const candidate = build([scan({ defaultBranch: packageCommit })]).candidates[0];
+    const result = await prepareCreatorBackfillAddition({
+      candidate, skill: skill({ skill_md_sha: packageBlob }), seeds: seeds(),
+      resolvePackageMetadata: async () => pinnedMetadata({ [field]: value }),
+    });
+    assert.deepEqual(result, { status: "transient-failed", reason: "package-metadata-mismatch" });
+  });
+}
+
+test("creator metadata work still respects existing repo, path and provenance gates", async () => {
+  const candidate = build([scan()]).candidates[0];
+  for (const input of [
+    { row: skill({ github_url: "https://github.com/other/skills" }), trusted: seeds(), reason: "canonical-repo-mismatch" },
+    { row: skill({ skill_md_path: "skills/other/SKILL.md" }), trusted: seeds(), reason: "skill-path-mismatch" },
+    { row: skill(), trusted: seeds({ catalogRepoRules: [{ repo: "creator/skills", defaultProvenanceType: "catalog" }] }), reason: "non-original-catalog" },
+  ]) {
+    const result = await prepareCreatorBackfillAddition({
+      candidate, skill: input.row, seeds: input.trusted,
+      resolvePackageMetadata: async () => { throw new Error("Must not resolve a rejected skill"); },
+    });
+    assert.deepEqual(result, { status: "policy-skipped", reason: input.reason });
+  }
+});
+
+test("unproven creator metadata cannot reach persistence and remains pending", async () => {
+  const reviewed = build([scan()]);
+  const progress = await executeCreatorBackfillApply({
+    plan: reviewed, progress: null, limit: 1, now: () => reviewed.generatedAt,
+    initialQuotaPreflight: async () => {}, reserveQuotaAvailable: async () => true,
+    reconcile: async () => null,
+    enrich: candidate => prepareCreatorBackfillAddition({
+      candidate, skill: skill({ skill_md_sha: packageBlob }), seeds: seeds(),
+      resolvePackageMetadata: async () => null,
+    }),
+    persist: async () => { throw new Error("Unproven metadata must not reach persistence"); },
+    writeProgress: () => {},
+  });
+  assert.equal(progress.summary.addedCount, 0);
+  assert.equal(progress.summary.transientFailedCount, 1);
+  assert.equal(progress.summary.pendingCount, 1);
+});
 
 test("CLI keeps plan, bounded apply, and maintenance modes separate", () => {
   assert.deepEqual(parseCreatorBackfillArguments(["--plan", "--creators=B,A"]), {
