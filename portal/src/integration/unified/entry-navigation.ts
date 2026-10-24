@@ -1,6 +1,14 @@
 import { initialNavigation, parseNavigation, parsePublicNavigationPath, type Navigation } from "../../app/unified/model";
 import { parseRoute } from "../../app/routes";
 
+/** An address under the app that no view, legacy route or clean path recognizes. */
+export function unknownAppAddress(pathname: string, base: string) {
+  if (!pathname.startsWith(base)) return false;
+  const relative = pathname.slice(base.length);
+  return !!relative.replace(/\/$/, "") && !parsePublicNavigationPath(relative, "")
+    && parseRoute(pathname, "", base).page === "missing";
+}
+
 // Keep previously shared /app/groups/:id links working in the unified shell.
 export function entryNavigation(pathname: string, search: string, base: string): Navigation {
   // Clean public addresses are always readable, even where this entry still writes ?view=.

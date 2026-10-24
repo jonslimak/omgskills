@@ -2,7 +2,7 @@ import { useEffect, useState, type ComponentProps } from "react";
 import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
 import { RefreshCw } from "lucide-react";
 import { UnifiedApp } from "../../app/unified/UnifiedApp";
-import { isDiscovery, navigationLocation, navigationSearch, skillDisplays, type Navigation } from "../../app/unified/model";
+import { initialNavigation, isDiscovery, navigationLocation, navigationSearch, skillDisplays, type Navigation } from "../../app/unified/model";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog, usePublicCatalogPreload } from "../../app/unified/use-public-catalog";
 import { usePortalApi, type PortalApi } from "../../portal-api";
@@ -15,7 +15,7 @@ import { useManagement } from "./useManagement";
 import { DevicesPanel } from "../DevicesPanel";
 import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
 import { ProfilePanel } from "./ProfilePanel";
-import { entryNavigation } from "./entry-navigation";
+import { entryNavigation, unknownAppAddress } from "./entry-navigation";
 import { renderPublicFirst } from "./public-first";
 import { announceAppReady } from "../../takeover";
 import { createPageMetadata, pageTitle } from "../../app/unified/page-metadata";
@@ -54,7 +54,10 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const navigation = composition?.navigation ?? accountNavigation;
   const [leaving, setLeaving] = useState(false);
   const [sessionError, setSessionError] = useState("");
-  const [requested, setRequested] = useState(() => entryNavigation(location.pathname, location.search, base));
+  // A broken address falls back to Discover with a short note; the address is then corrected.
+  const [unknownEntry] = useState(() => unknownAppAddress(location.pathname, base));
+  const [requested, setRequested] = useState(() => unknownEntry
+    ? { ...initialNavigation, view: "discover" as const } : entryNavigation(location.pathname, location.search, base));
   const [installStore] = useState(() => !composition && installClient && base === "/app/"
     ? new InstallIntentStore(() => window.sessionStorage, installClient, "normal") : null);
   const [catalogStore] = useState(() => !composition && (catalogInstallEnabled || productionInstall) && base === "/app/"
@@ -140,6 +143,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
         skill={skill} detailReady={detailReady} store={catalogStore}
         returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} /> : undefined)}
     readOnlyAccount
+    initialNotice={unknownEntry ? "That page wasn't found, so here's Discover." : ""}
     supportedAccountViews={composition?.supportedAccountViews}
     management={available && !composition?.readOnly ? management : undefined}
     onSignIn={() => {
@@ -168,7 +172,8 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
 }
 
 export function UnifiedSession({ base = unifiedBase, local = true, connectedInventory = false, inventoryReconciliation = false, productionInstall = false, composition, cleanPaths = false, publicFirst = false, takeover = false }: { base?: string; local?: boolean; connectedInventory?: boolean; inventoryReconciliation?: boolean; productionInstall?: boolean; composition?: UnifiedSessionComposition; cleanPaths?: boolean; publicFirst?: boolean; takeover?: boolean }) {
-  const [entry] = useState(() => entryNavigation(location.pathname, location.search, base));
+  const [entry] = useState(() => unknownAppAddress(location.pathname, base)
+    ? { ...initialNavigation, view: "discover" as const } : entryNavigation(location.pathname, location.search, base));
   const [publicEntry] = useState(() => accountNavigation(entry, false));
   const [showPublicFirst] = useState(() => renderPublicFirst(publicFirst && !composition, entry, () => document.cookie));
   usePublicCatalogPreload(publicClient, publicEntry);
