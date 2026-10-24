@@ -31,15 +31,15 @@ test("loads the tracked production feature state", async () => {
 test("loads disabled, web-only, and full production feature states", async () => {
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":true,"skillGroupsAuthEnabled":true}')),
-    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false },
+    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false, takeoverPilotEnabled: false },
   );
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":true,"skillGroupsAuthEnabled":false}')),
-    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false },
+    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false, takeoverPilotEnabled: false },
   );
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":false,"skillGroupsAuthEnabled":false}')),
-    { skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false },
+    { skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false, takeoverPilotEnabled: false },
   );
 });
 
@@ -157,4 +157,13 @@ test("tracked connected production is enabled, defaults remain off, and reportin
     { connectedInventoryReadEnabled: true, skillGroupsWebEnabled: false }]) {
     await assert.rejects(loadProductionFeatures(await configUrl(JSON.stringify({ ...base, ...change }))));
   }
+});
+
+test("the takeover pilot setting is a boolean that needs the unified app", async () => {
+  const { validateProductionFeatures } = await import("../config/production-features.mjs");
+  const base = { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, portalUnifiedEnabled: true };
+  assert.equal(validateProductionFeatures({ ...base, takeoverPilotEnabled: true }).takeoverPilotEnabled, true);
+  assert.equal(validateProductionFeatures(base).takeoverPilotEnabled, false);
+  assert.throws(() => validateProductionFeatures({ ...base, takeoverPilotEnabled: "1" }), /takeoverPilotEnabled must be a boolean/);
+  assert.throws(() => validateProductionFeatures({ ...base, portalUnifiedEnabled: false, takeoverPilotEnabled: true }), /requires the unified web app/);
 });
