@@ -5,6 +5,46 @@ import Testing
 
 @MainActor
 struct ConnectedInventoryRuntimeTests {
+    @Test func trackingKeepsConnectionAndSyncOutcomesSeparateAndIgnoresUnchangedChecks() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        await api.setFailure(true)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let automation = InventoryAutomationFixture()
+        var events: [ConnectedAppEvent] = []
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer,
+            automation: automation.configuration, track: { events.append($0) })
+        await runtime.start().value
+        await runtime.start().value
+        #expect(events == [.connection(.restore, .connected), .inventory(.retryable)])
+        await api.setFailure(false)
+        await automation.clock.advance(5)
+        #expect(events == [.connection(.restore, .connected), .inventory(.retryable), .inventory(.reported)])
+        let reportedCount = events.count
+        automation.wakes[0]()
+        await automation.clock.advance(0)
+        #expect(await api.checks == 1)
+        #expect(events.count == reportedCount)
+        await runtime.disconnect().value
+        #expect(events.last == .connection(.disconnect, .disconnected))
+        await runtime.stop()
+        #expect(events.count == reportedCount + 1)
+    }
+
+    @Test func trackingRecordsConnectFailureWithoutReportingSuccess() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        authorizer.failure = .unavailable
+        let connection = makeConnection(store: InventoryCredentialFixture(record: nil), api: api, authorizer: authorizer)
+        var events: [ConnectedAppEvent] = []
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer,
+            track: { events.append($0) })
+        await runtime.connect(deviceName: "Private Mac name").value
+        #expect(events == [.connection(.connect, .authorizationFailed)])
+        #expect(await api.uploads == 0)
+        await runtime.stop()
+    }
+
     @Test func candidatePairingUsesProductSchemeAndRestartKeepsTheStoredMac() async throws {
         let home = try CatalogCandidateRuntimeTests.home()
         defer { try? FileManager.default.removeItem(at: home) }
@@ -483,6 +523,10 @@ struct ConnectedInventoryRuntimeTests {
         #expect(view.contains("anchorProvider: { [weak self] in self?.window }"))
         #expect(view.contains("onReturn: { [weak self] in self?.showStatus() }"))
         #expect(view.contains("connectedRuntime?.receivePairingCallback(url)"))
+        #expect(view.contains("Analytics.connectedTracker(profile: candidate.profile)"))
+        #expect(view.contains("client: .product, track: track"))
+        #expect(view.contains("automation: .live(paths: candidate.paths), track: track"))
+        #expect(view.contains("track(.setupFailed)"))
         #expect(view.contains("filesystemPaths: connected.filesystemPaths, pathAnchor: connected.root"))
         #expect(view.contains("await connectedRuntime?.stop()"))
         #expect(view.contains("inventoryAutomationEnabled: connected.inventoryAutomation"))
@@ -668,10 +712,12 @@ private actor InventoryShutdownGate {
 
 @MainActor
 private final class InventoryAuthorizerFixture: BrowserPairingAuthorizing {
+    var failure: BrowserPairingError?
     var callbacks: [URL] = []
     var scheme: String?
     var authorizationURL: URL?
     func authorize(url: URL, callbackScheme: String) async throws -> URL {
+        if let failure { throw failure }
         scheme = callbackScheme
         authorizationURL = url
         let items = URLComponents(string: "?" + (url.fragment ?? ""))?.queryItems

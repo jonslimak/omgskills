@@ -3,6 +3,53 @@ import Foundation
 @testable import omgskills
 
 struct AnalyticsTests {
+    #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
+    @Test @MainActor func connectedTrackingStartsOnlyForProductionAndUsesFixedFields() {
+        var starts = 0
+        var signals: [(String, [String: String])] = []
+        let candidate = Analytics.connectedTracker(profile: .candidate, start: { starts += 1 },
+            emit: { signals.append(($0, $1)) })
+        candidate(.setupFailed)
+        #expect(starts == 0 && signals.isEmpty)
+
+        let production = Analytics.connectedTracker(profile: .production, start: { starts += 1 },
+            emit: { signals.append(($0, $1)) })
+        production(.install(.installed, agent: .codex))
+        production(.setupFailed)
+        #expect(starts == 1)
+        #expect(signals.map(\.0) == ["connected.install", "connected.setup_failed"])
+        #expect(Set(signals[0].1.keys) == ["app_version", "build_number", "outcome", "agent"])
+        #expect(signals[0].1["outcome"] == "installed")
+        #expect(signals[0].1["agent"] == "codex")
+        #expect(Set(signals[1].1.keys) == ["app_version", "build_number"])
+    }
+
+    @Test func connectedOutcomesNeverIncludePrivateErrorTextOrIdentifiers() {
+        let privateText = "secret-token /Users/private/skills/secret-skill user@example.com"
+        let failure = ConnectedAppEvent.installResult(.failed(privateText), agent: .claude)
+        #expect(failure == .install(.failed, agent: .claude))
+        for error: DeviceConnectionFailure in [.authorization(privateText), .exchange(privateText),
+            .sync(privateText), .replacementRequired, .credentialStorage, .reconnectRequired] {
+            let event = ConnectedAppEvent.connectionResult(.failed(error), action: .connect, hasWarning: false)
+            #expect(event != nil)
+            #expect(Set(event?.parameters.keys.map { $0 } ?? []) == ["app_version", "build_number", "action", "outcome"])
+            #expect(event?.parameters.values.contains(where: { $0.contains(privateText) }) == false)
+        }
+        for outcome in ConnectedAppEvent.InstallOutcome.allCases {
+            let event = ConnectedAppEvent.install(outcome, agent: .codex)
+            #expect(Set(event.parameters.keys) == ["app_version", "build_number", "outcome", "agent"])
+        }
+        for outcome in ConnectedAppEvent.InventoryOutcome.allCases {
+            #expect(Set(ConnectedAppEvent.inventory(outcome).parameters.keys) == ["app_version", "build_number", "outcome"])
+        }
+        #expect(ConnectedAppEvent.inventoryResult(.reported(partial: true)) == .inventory(.partial))
+        #expect(ConnectedAppEvent.inventoryResult(.reported(partial: false)) == .inventory(.reported))
+        #expect(ConnectedAppEvent.inventoryResult(.retryable(retryAfter: 123)) == .inventory(.retryable))
+        #expect(ConnectedAppEvent.inventoryResult(.checked) == nil)
+        #expect(ConnectedAppEvent.inventoryResult(.cancelled) == nil)
+    }
+    #endif
+
     @Test func appVersionParametersIncludeVersionAndBuild() {
         let parameters = Analytics.appVersionParameters()
 

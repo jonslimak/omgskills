@@ -21,6 +21,21 @@ enum Analytics {
         TelemetryDeck.requestImmediateSync()
     }
 
+    #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
+    @MainActor
+    static func connectedTracker(
+        profile: CatalogRuntimeProfile,
+        start: () -> Void = { Analytics.start() },
+        emit: @escaping (_ name: String, _ parameters: [String: String]) -> Void = { name, parameters in
+            Analytics.signal(name, parameters: parameters)
+        }
+    ) -> ConnectedAppEvent.Track {
+        guard profile == .production else { return { _ in } }
+        start()
+        return { event in emit(event.signalName, event.parameters) }
+    }
+    #endif
+
     static func signalIdentityResolution(
         _ measurement: SkillIdentityMeasurement,
         track: LibraryDataTrack

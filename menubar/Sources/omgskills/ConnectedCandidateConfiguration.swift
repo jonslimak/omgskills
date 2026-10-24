@@ -74,7 +74,8 @@ extension ConnectedCandidateConfiguration {
                          try DeviceReconnectKeyStore(apiOrigin: $0, credentialService: $1)
                      },
                      api: (any DeviceSyncServing)? = nil,
-                     automation: ConnectedInventoryRuntime.Automation? = nil) throws -> ConnectedInventoryRuntime {
+                     automation: ConnectedInventoryRuntime.Automation? = nil,
+                     track: @escaping ConnectedAppEvent.Track = { _ in }) throws -> ConnectedInventoryRuntime {
         let reconnectKeyStore = try makeReconnectKeyStore(profile.origin, keychainService)
         let connection = DeviceConnectionModel(
             credentialStore: credentialStore ?? DeviceCredentialStore(service: keychainService),
@@ -87,7 +88,7 @@ extension ConnectedCandidateConfiguration {
                     filesystemPaths: paths, pathAnchor: paths.homeDirectory)
             }, inventoryAutomationEnabled: true)
         return ConnectedInventoryRuntime(connection: connection, authorizer: authorizer,
-            callbackScheme: callbackScheme, automation: automation)
+            callbackScheme: callbackScheme, automation: automation, track: track)
     }
 }
 #endif
