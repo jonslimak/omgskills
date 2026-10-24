@@ -138,6 +138,8 @@ type Props = {
   management?: UnifiedManagement;
   accountPages?: (view: View, theme: string) => ReactNode;
   publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
+  /** Shown once on arrival, e.g. after a broken address fell back to Discover. */
+  initialNotice?: string;
   supportedAccountViews?: readonly View[];
 };
 
@@ -427,6 +429,7 @@ export function UnifiedApp({
   accountPages,
   publicInstallAction,
   supportedAccountViews,
+  initialNotice = "",
 }: Props) {
   const supportsView = (view: View) => !supportedAccountViews || isDiscovery(view) || supportedAccountViews.includes(view);
   const [rail, setRail] = useState(false);
@@ -440,7 +443,7 @@ export function UnifiedApp({
   >(null);
   const [actionSkills, setActionSkills] = useState<SkillDisplay[]>([]);
   const [setName, setSetName] = useState("");
-  const [notice, setNotice] = useState("");
+  const [notice, setNotice] = useState(initialNotice);
   const [showHidden, setShowHidden] = useState(false);
   const [collectionPageIndex, setCollectionPageIndex] = useState(0);
   const [expandedSearchScope, setExpandedSearchScope] = useState<string | null>(null);
@@ -881,9 +884,12 @@ export function UnifiedApp({
         {skills.map((skill, i) => renderRow(skill, ranked ? i + 1 : undefined))}
       </div>
     ) : (
-      <Empty title={nav.query ? "Nothing matches" : "No skills here yet"}>
+      <Empty title={nav.query ? "Nothing matches" : publicStatus && nav.view === "creator" ? "Creator not found"
+        : publicStatus && nav.view === "collection" ? "Collection not found" : "No skills here yet"}>
         {nav.query
           ? "Try a creator or a task."
+          : publicStatus && nav.view === "creator" ? `No creator called @${nav.id} is in the catalog.`
+          : publicStatus && nav.view === "collection" ? "This collection doesn't exist or was removed."
           : "Explore the library for your next useful skill."}
       </Empty>
     );
@@ -1743,7 +1749,7 @@ export function UnifiedApp({
                       <X />
                     </IconButton>
                   </Dialog.Close>
-                  {!detailHeadingKnown ? <Dialog.Title>Skill details</Dialog.Title> : (
+                  {!detailHeadingKnown ? <Dialog.Title>{publicStatus?.detailMissing ? "Skill not found" : "Skill details"}</Dialog.Title> : (
                     <div className="ua-detail-heading">
                       <Avatar
                         src={detail.avatar}
@@ -1830,7 +1836,7 @@ export function UnifiedApp({
                   <>
                     {publicStatus?.detail === "error" ? <>
                       <p role="status">{publicStatus.detailError}</p>
-                      <button className="ua-pill" type="button" onClick={publicStatus.retryDetail}>Try again</button>
+                      {!publicStatus.detailMissing && <button className="ua-pill" type="button" onClick={publicStatus.retryDetail}>Try again</button>}
                     </> : <div className="ua-detail-skeleton" role="status" aria-label="Loading skill">
                       <span /><span /><span /><span />
                     </div>}
