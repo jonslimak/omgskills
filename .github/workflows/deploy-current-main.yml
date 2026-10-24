@@ -75,12 +75,6 @@ jobs:
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
         run: npm run build:netlify
 
-      - name: Wait for firewall approval on this runner
-        id: firewall_approval
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: node ./scripts/wait-for-deploy-firewall-approval.mjs
-
       - name: Deploy site to Netlify
         id: production_deploy
         env:
@@ -103,10 +97,3 @@ jobs:
         run: |
           curl -fsSL https://omgskills.com/appcast.xml | sha256sum | awk '{print $1}' > "$RUNNER_TEMP/appcast.after.sha256"
           diff -u "$RUNNER_TEMP/appcast.sha256" "$RUNNER_TEMP/appcast.after.sha256"
-
-      - name: Remind operator to remove temporary firewall exceptions
-        if: always() && steps.firewall_approval.outputs.issue_url != ''
-        env:
-          FIREWALL_ISSUE_URL: ${{ steps.firewall_approval.outputs.issue_url }}
-        run: |
-          printf '\n## Firewall cleanup required\nRemove this run\x27s temporary IP exceptions from OMGSkills unpublished deploys, even if deployment failed or was cancelled. Keep the block-all baseline and published deploy settings unchanged. Record cleanup in %s.\n' "$FIREWALL_ISSUE_URL" >> "$GITHUB_STEP_SUMMARY"
