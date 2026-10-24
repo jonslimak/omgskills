@@ -76,7 +76,7 @@ test("production deploy paths use the tracked feature configuration", async () =
   const productionFeatures = JSON.parse(
     await readFile(new URL("../config/production-features.json", import.meta.url), "utf8"),
   );
-  assert.deepEqual(Object.keys(productionFeatures), ["skillGroupsWebEnabled", "skillGroupsAuthEnabled", "portalRedesignEnabled", "portalUnifiedEnabled", "catalogSearchEnabled", "connectedInventoryReadEnabled", "connectedInventorySyncEnabled"]);
+  assert.deepEqual(Object.keys(productionFeatures), ["skillGroupsWebEnabled", "skillGroupsAuthEnabled", "portalRedesignEnabled", "portalUnifiedEnabled", "catalogSearchEnabled", "connectedInventoryReadEnabled", "connectedInventorySyncEnabled", "takeoverPilotEnabled"]);
   assert.equal(typeof productionFeatures.skillGroupsWebEnabled, "boolean");
   assert.equal(typeof productionFeatures.skillGroupsAuthEnabled, "boolean");
   assert.equal(typeof productionFeatures.portalRedesignEnabled, "boolean");
@@ -84,6 +84,7 @@ test("production deploy paths use the tracked feature configuration", async () =
   assert.equal(typeof productionFeatures.catalogSearchEnabled, "boolean");
   assert.equal(typeof productionFeatures.connectedInventoryReadEnabled, "boolean");
   assert.equal(typeof productionFeatures.connectedInventorySyncEnabled, "boolean");
+  assert.equal(typeof productionFeatures.takeoverPilotEnabled, "boolean");
   assert.doesNotMatch(script, /VITE_CATALOG_SEARCH_ENABLED/);
   assert.doesNotMatch(script, /VITE_PORTAL_REDESIGN_ENABLED/);
   assert.doesNotMatch(script, /VITE_PORTAL_UNIFIED_ENABLED/);
