@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-10-24T19:40:47.157Z",
+  "held": [
+    {
+      "id": "debabsah/superstack:skills/superstack-smith",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "hooks/test-front-doors.sh",
+        ".claude-plugin/plugin.json",
+        ".claude-plugin/marketplace.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "aictrl-dev/skills:skills/create-issue",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/spec-review/reference/contract-impact.md",
+        "skills/spec-review/reference/contract-impact.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "shimo4228/akc-cycle:skills/harness-boundary",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/common/akc-cycle.md",
+        "rules/common/akc-cycle.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "apurvbazari/claude-plugins:handoff/skills/save",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude/rules/ask-user-question-guard.md"
+      ],
+      "agents": [],
+      "skills": []
+    }
+  ],
+  "baselineRemoved": 0,
+  "skillLevelBlockAdded": false,
+  "reason": "Companion skill dependency; exact-path coverage withdrawn in this isolated campaign only"
+}

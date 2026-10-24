@@ -1,0 +1,65 @@
+{
+  "generatedAt": "2026-10-24T19:40:22.980Z",
+  "reviewSha256": "0d3e580bc157fe627797dcd22c14f3924467ff1c953a8414f90ccba8e8e6ed5f",
+  "excludeRepos": [],
+  "excludeIds": [
+    "proyecto26/system-design-skills:skills/service-decomposition",
+    "vectorlabau/skills:skills/interaction/page-patterns",
+    "vectorlabau/skills:skills/audit/ux-audit",
+    "adimango/ai-adoption-playbook:skills/fluency-assessment",
+    "adimango/ai-adoption-playbook:skills/reporting-readiness-assessment"
+  ],
+  "excluded": [
+    {
+      "id": "proyecto26/system-design-skills:skills/service-decomposition",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "messaging-streaming"
+      ]
+    },
+    {
+      "id": "vectorlabau/skills:skills/interaction/page-patterns",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "surfaces"
+      ]
+    },
+    {
+      "id": "vectorlabau/skills:skills/audit/ux-audit",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude-plugin/plugin.json"
+      ],
+      "agents": [],
+      "skills": [
+        "setup-ui-ux-skills"
+      ]
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/fluency-assessment",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "blocker-diagnosis"
+      ]
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/reporting-readiness-assessment",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "fluency-assessment"
+      ]
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Final source, author and package checks; original task skills only. Held candidates are decisions, not new suppression/block rules.",
+  "reviewed": 135,
+  "approvedCount": 124
+}

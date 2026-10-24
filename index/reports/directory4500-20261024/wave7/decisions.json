@@ -1,0 +1,313 @@
+{
+  "generatedAt": "2026-10-24T19:43:17.608Z",
+  "reviewSha256": "66ef262c799350342c15cd56beca6a8bd34d380833422e332d75b46f4b0122d0",
+  "excludeRepos": [],
+  "excludeIds": [
+    "saketlab/seqout-skills:skills/seqout-explore-disease-tissue",
+    "tbhbooks/tbh-skill:skills/build-chapter",
+    "tbhbooks/tbh-skill:skills/explain",
+    "tbhbooks/tbh-skill:skills/hint",
+    "tbhbooks/tbh-skill:skills/next",
+    "tbhbooks/tbh-skill:skills/review",
+    "tbhbooks/tbh-skill:skills/setup",
+    "tbhbooks/tbh-skill:skills/status",
+    "tbhbooks/tbh-skill:skills/switch",
+    "tbhbooks/tbh-skill:skills/validate",
+    "techwolf-ai/ai-first-toolkit:plugins/content-studio/skills/content-studio",
+    "bugbug-io/agent-plugin:skills/bugbug-project-reporting",
+    "bugbug-io/agent-plugin:skills/bugbug-selectors-authoring",
+    "bugbug-io/agent-plugin:skills/bugbug-steps-authoring",
+    "bugbug-io/agent-plugin:skills/bugbug-test-run-debugging",
+    "bugbug-io/agent-plugin:skills/bugbug-tests-authoring",
+    "bugbug-io/agent-plugin:skills/bugbug-tests-planning",
+    "bugbug-io/agent-plugin:skills/bugbug-tests-refactoring",
+    "bugbug-io/agent-plugin:skills/bugbug-yaml-authoring",
+    "credibledata/credible-plugin:skills/credible-analysis-overview",
+    "credibledata/credible-plugin:skills/malloy-analysis",
+    "koloskus/jotbook:skills/jot",
+    "koloskus/jotbook:skills/jotbook-pencil",
+    "koloskus/jotbook:skills/jotbook-pencil-review",
+    "koloskus/jotbook:skills/jotbook-review",
+    "ubersuggest/seo-skills:plugins/ubersuggest/skills/content-demand-finder"
+  ],
+  "excluded": [
+    {
+      "id": "saketlab/seqout-skills:skills/seqout-explore-disease-tissue",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "seqout-find-datasets"
+      ]
+    },
+    {
+      "id": "tbhbooks/tbh-skill:skills/build-chapter",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "tbhbooks/tbh-skill:skills/explain",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "tbhbooks/tbh-skill:skills/hint",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "tbhbooks/tbh-skill:skills/next",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "tbhbooks/tbh-skill:skills/review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup",
+        "validate"
+      ]
+    },
+    {
+      "id": "tbhbooks/tbh-skill:skills/setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "books/registry.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "tbhbooks/tbh-skill:skills/status",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "tbhbooks/tbh-skill:skills/switch",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "tbhbooks/tbh-skill:skills/validate",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "techwolf-ai/ai-first-toolkit:plugins/content-studio/skills/content-studio",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup-content-studio"
+      ]
+    },
+    {
+      "id": "bugbug-io/agent-plugin:skills/bugbug-project-reporting",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "bugbug-context-discovering",
+        "bugbug-context-discovering"
+      ]
+    },
+    {
+      "id": "bugbug-io/agent-plugin:skills/bugbug-selectors-authoring",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "bugbug-context-discovering",
+        "bugbug-context-discovering"
+      ]
+    },
+    {
+      "id": "bugbug-io/agent-plugin:skills/bugbug-steps-authoring",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "bugbug-context-discovering",
+        "bugbug-selectors-authoring",
+        "bugbug-selectors-authoring"
+      ]
+    },
+    {
+      "id": "bugbug-io/agent-plugin:skills/bugbug-test-run-debugging",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "bugbug-context-discovering",
+        "bugbug-selectors-authoring",
+        "bugbug-context-discovering",
+        "bugbug-selectors-authoring"
+      ]
+    },
+    {
+      "id": "bugbug-io/agent-plugin:skills/bugbug-tests-authoring",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "bugbug-tests-planning",
+        "bugbug-context-discovering",
+        "bugbug-steps-authoring",
+        "bugbug-selectors-authoring",
+        "bugbug-tests-planning",
+        "bugbug-test-run-debugging",
+        "bugbug-steps-authoring",
+        "bugbug-context-discovering",
+        "bugbug-tests-planning",
+        "bugbug-steps-authoring",
+        "bugbug-selectors-authoring"
+      ]
+    },
+    {
+      "id": "bugbug-io/agent-plugin:skills/bugbug-tests-planning",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "bugbug-context-discovering",
+        "bugbug-tests-authoring",
+        "bugbug-context-discovering",
+        "bugbug-selectors-authoring"
+      ]
+    },
+    {
+      "id": "bugbug-io/agent-plugin:skills/bugbug-tests-refactoring",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "bugbug-context-discovering",
+        "bugbug-tests-authoring",
+        "bugbug-steps-authoring",
+        "bugbug-selectors-authoring",
+        "bugbug-context-discovering",
+        "bugbug-selectors-authoring"
+      ]
+    },
+    {
+      "id": "bugbug-io/agent-plugin:skills/bugbug-yaml-authoring",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "bugbug-context-discovering",
+        "bugbug-context-discovering",
+        "bugbug-selectors-authoring"
+      ]
+    },
+    {
+      "id": "credibledata/credible-plugin:skills/credible-analysis-overview",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "malloy-analysis"
+      ]
+    },
+    {
+      "id": "credibledata/credible-plugin:skills/malloy-analysis",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "malloy-phrase-detection",
+        "malloy-queries",
+        "malloy-analysis-pitfalls",
+        "malloy-charts"
+      ]
+    },
+    {
+      "id": "koloskus/jotbook:skills/jot",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "jotbook-review",
+        "jotbook-pencil-review",
+        "jotbook-ink",
+        "jotbook-pencil",
+        "jotbook-init",
+        "jotbook-link",
+        "jotbook-template",
+        "jotbook-stage",
+        "jotbook-stage"
+      ]
+    },
+    {
+      "id": "koloskus/jotbook:skills/jotbook-pencil",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "jotbook-template"
+      ]
+    },
+    {
+      "id": "koloskus/jotbook:skills/jotbook-pencil-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "jotbook-pencil",
+        "jotbook-ink"
+      ]
+    },
+    {
+      "id": "koloskus/jotbook:skills/jotbook-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "jotbook-ink"
+      ]
+    },
+    {
+      "id": "ubersuggest/seo-skills:plugins/ubersuggest/skills/content-demand-finder",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "keyword-research"
+      ]
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Final vendor-batch review: independent original workflows only; retain canonical repo/commit/path evidence, hold attribution/dependency/fixture concerns, and select only enough verified candidates to reach the campaign target.",
+  "reviewed": 276,
+  "approvedCount": 196
+}

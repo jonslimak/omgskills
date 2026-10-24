@@ -1,0 +1,53 @@
+{
+  "generatedAt": "2026-10-24T19:35:41.894Z",
+  "held": [
+    {
+      "id": "proyecto26/system-design-skills:skills/service-decomposition",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "messaging-streaming"
+      ]
+    },
+    {
+      "id": "vectorlabau/skills:skills/interaction/page-patterns",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "surfaces"
+      ]
+    },
+    {
+      "id": "vectorlabau/skills:skills/audit/ux-audit",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup-ui-ux-skills"
+      ]
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/fluency-assessment",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "blocker-diagnosis"
+      ]
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/reporting-readiness-assessment",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "fluency-assessment"
+      ]
+    }
+  ],
+  "baselineRemoved": 0,
+  "skillLevelBlockAdded": false,
+  "reason": "Companion skill dependency; exact-path coverage withdrawn in this isolated campaign only"
+}

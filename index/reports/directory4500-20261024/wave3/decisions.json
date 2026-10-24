@@ -1,0 +1,620 @@
+{
+  "generatedAt": "2026-10-24T19:40:24.197Z",
+  "reviewSha256": "10b72383a960c30f8de1cd8c4441b173cf3239407af4ba72c4433e99e7a2ca80",
+  "excludeRepos": [
+    "qhuang20/shazam",
+    "evanklem/evanflow",
+    "heffrey/hordev"
+  ],
+  "excludeIds": [
+    "ennio-datatide/ultrapowers-dev:skills/express-patterns",
+    "ennio-datatide/ultrapowers-dev:skills/frontend-design",
+    "ennio-datatide/ultrapowers-dev:skills/react-best-practices",
+    "ennio-datatide/ultrapowers-dev:skills/web-design-guidelines",
+    "techygarg/lattice:skills/architecture",
+    "techygarg/lattice:skills/refiners-update",
+    "debabsah/superstack:skills/superstack-execute",
+    "debabsah/superstack:skills/superstack-smith",
+    "sergicoder/prism:skills/stack-nextjs",
+    "farzanmrz/meta-dev:skills/create-agent",
+    "farzanmrz/meta-dev:skills/create-hook",
+    "farzanmrz/meta-dev:skills/improve-agent",
+    "farzanmrz/meta-dev:skills/improve-instructions",
+    "farzanmrz/meta-dev:skills/retire-agent",
+    "farzanmrz/meta-dev:skills/review-agent",
+    "farzanmrz/meta-dev:skills/review-instructions",
+    "farzanmrz/meta-dev:skills/revise-agents-md",
+    "farzanmrz/meta-dev:skills/setup-instructions",
+    "farzanmrz/meta-dev:skills/update-agent",
+    "farzanmrz/meta-dev:skills/update-instructions",
+    "jpantsjoha/ai-native-developer-experience:skills/adk-expert",
+    "jpantsjoha/ai-native-developer-experience:skills/operating-model-bootstrap",
+    "jpantsjoha/ai-native-developer-experience:skills/sitrep",
+    "jpantsjoha/ai-native-developer-experience:skills/the-architect",
+    "frankieramirez/mana:skills/attune",
+    "frankieramirez/mana:skills/cast",
+    "frankieramirez/mana:skills/conjure",
+    "frankieramirez/mana:skills/portal",
+    "frankieramirez/mana:skills/scry",
+    "frankieramirez/mana:skills/setup-mana",
+    "frankieramirez/mana:skills/sift",
+    "frankieramirez/mana:skills/ultima",
+    "aictrl-dev/skills:skills/create-issue",
+    "aictrl-dev/skills:skills/implement-code-change",
+    "shimo4228/akc-cycle:skills/context-sync",
+    "shimo4228/akc-cycle:skills/harness-boundary",
+    "shimo4228/akc-cycle:skills/repo-asset-stocktake",
+    "evanklem/evanflow:skills/evanflow",
+    "evanklem/evanflow:skills/evanflow-coder-overseer",
+    "recusive/orbit-plugin:skills/web-design-guidelines",
+    "rishav1305/dbt-toolkit:skills/dbt",
+    "apurvbazari/claude-plugins:lens/skills/engine",
+    "apurvbazari/claude-plugins:handoff/skills/save",
+    "heffrey/hordev:skills/debugging-in-a-horde",
+    "heffrey/hordev:skills/decomposing-for-hordes",
+    "heffrey/hordev:skills/dispatching-hordes",
+    "heffrey/hordev:skills/horde-qa",
+    "heffrey/hordev:skills/improving-hordev",
+    "heffrey/hordev:skills/rapid-spec",
+    "heffrey/hordev:skills/reconciling-horde-output",
+    "heffrey/hordev:skills/using-hordev",
+    "heffrey/hordev:skills/writing-tdds"
+  ],
+  "excluded": [
+    {
+      "id": "ennio-datatide/ultrapowers-dev:skills/express-patterns",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ennio-datatide/ultrapowers-dev:skills/frontend-design",
+      "reason": "readme-explicitly-identifies-derived-third-party-skill"
+    },
+    {
+      "id": "ennio-datatide/ultrapowers-dev:skills/react-best-practices",
+      "reason": "readme-explicitly-identifies-derived-third-party-skill"
+    },
+    {
+      "id": "ennio-datatide/ultrapowers-dev:skills/web-design-guidelines",
+      "reason": "readme-explicitly-identifies-derived-third-party-skill"
+    },
+    {
+      "id": "techygarg/lattice:skills/architecture",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "architecture-refiner"
+      ]
+    },
+    {
+      "id": "techygarg/lattice:skills/refiners-update",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "lattice-init",
+        "refiners-update"
+      ]
+    },
+    {
+      "id": "debabsah/superstack:skills/superstack-execute",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/superstack-mint.sh"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "debabsah/superstack:skills/superstack-smith",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "hooks/test-front-doors.sh",
+        ".claude-plugin/plugin.json",
+        ".claude-plugin/marketplace.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "sergicoder/prism:skills/stack-nextjs",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "farzanmrz/meta-dev:skills/create-agent",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/core.md",
+        "standards/agent.md",
+        "standards/agent.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "farzanmrz/meta-dev:skills/create-hook",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/core.md",
+        "standards/hook.md",
+        "hooks/hooks.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "farzanmrz/meta-dev:skills/improve-agent",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/core.md",
+        "standards/agent.md",
+        "standards/core.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "farzanmrz/meta-dev:skills/improve-instructions",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/core.md",
+        "standards/instruction-files.md",
+        "standards/instruction-files.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "farzanmrz/meta-dev:skills/retire-agent",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/agent.md",
+        "standards/core.md",
+        "standards/agent.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "farzanmrz/meta-dev:skills/review-agent",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/core.md",
+        "standards/agent.md",
+        "standards/agent.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "farzanmrz/meta-dev:skills/review-instructions",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/core.md",
+        "standards/instruction-files.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "farzanmrz/meta-dev:skills/revise-agents-md",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/core.md",
+        "standards/instruction-files.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "farzanmrz/meta-dev:skills/setup-instructions",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/core.md",
+        "standards/instruction-files.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "farzanmrz/meta-dev:skills/update-agent",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/core.md",
+        "standards/agent.md",
+        "standards/core.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "farzanmrz/meta-dev:skills/update-instructions",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/core.md",
+        "standards/instruction-files.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "jpantsjoha/ai-native-developer-experience:skills/adk-expert",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "adversarial-gate"
+      ]
+    },
+    {
+      "id": "jpantsjoha/ai-native-developer-experience:skills/operating-model-bootstrap",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/VISION.md",
+        "docs/ROADMAP.md",
+        "docs/STATUS.md",
+        "docs/STATUS.md",
+        "docs/VISION.md",
+        "docs/ROADMAP.md",
+        "docs/STATUS.md",
+        "docs/STATUS.md",
+        "docs/VISION.md",
+        "docs/ROADMAP.md",
+        "docs/STATUS.md",
+        "docs/STATUS.md",
+        "docs/VISION.md",
+        "docs/ROADMAP.md",
+        "docs/STATUS.md",
+        "docs/STATUS.md"
+      ],
+      "agents": [],
+      "skills": [
+        "governance-guardrail",
+        "release-manager"
+      ]
+    },
+    {
+      "id": "jpantsjoha/ai-native-developer-experience:skills/sitrep",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/ROADMAP.md",
+        "docs/ROADMAP.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "jpantsjoha/ai-native-developer-experience:skills/the-architect",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "adversarial-gate"
+      ]
+    },
+    {
+      "id": "frankieramirez/mana:skills/attune",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "frankieramirez/mana:skills/cast",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "frankieramirez/mana:skills/conjure",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "frankieramirez/mana:skills/portal",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "frankieramirez/mana:skills/scry",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "frankieramirez/mana:skills/setup-mana",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md"
+      ],
+      "agents": [],
+      "skills": [
+        "attune"
+      ]
+    },
+    {
+      "id": "frankieramirez/mana:skills/sift",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/triage-labels.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "frankieramirez/mana:skills/ultima",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/agents/issue-tracker.md",
+        "docs/agents/issue-tracker.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "aictrl-dev/skills:skills/create-issue",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/spec-review/reference/contract-impact.md",
+        "skills/spec-review/reference/contract-impact.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "aictrl-dev/skills:skills/implement-code-change",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "create-workflow"
+      ]
+    },
+    {
+      "id": "shimo4228/akc-cycle:skills/context-sync",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/skill-health/scripts/url_liveness.py",
+        "skills/skill-health/scripts/url_liveness.py"
+      ],
+      "agents": [],
+      "skills": [
+        "adr-writer",
+        "adr-writer"
+      ]
+    },
+    {
+      "id": "shimo4228/akc-cycle:skills/harness-boundary",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/common/akc-cycle.md",
+        "rules/common/akc-cycle.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "shimo4228/akc-cycle:skills/repo-asset-stocktake",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "evanklem/evanflow:skills/evanflow",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/skills-audit.md",
+        "docs/skills-audit.md"
+      ],
+      "agents": [],
+      "skills": [
+        "evanflow-go",
+        "evanflow-compact",
+        "evanflow-go"
+      ]
+    },
+    {
+      "id": "evanklem/evanflow:skills/evanflow-coder-overseer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/evanflow-tdd/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "recusive/orbit-plugin:skills/web-design-guidelines",
+      "reason": "source-frontmatter-attributes-known-different-owner",
+      "author": "vercel"
+    },
+    {
+      "id": "rishav1305/dbt-toolkit:skills/dbt",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "dbt-setup"
+      ]
+    },
+    {
+      "id": "apurvbazari/claude-plugins:lens/skills/engine",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "apurvbazari/claude-plugins:handoff/skills/save",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude/rules/ask-user-question-guard.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "heffrey/hordev:skills/debugging-in-a-horde",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".hordev/run-log.md",
+        ".hordev/run-log.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "heffrey/hordev:skills/decomposing-for-hordes",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".hordev/run-log.md",
+        ".hordev/run-log.md"
+      ],
+      "agents": [],
+      "skills": [
+        "dispatching-hordes"
+      ]
+    },
+    {
+      "id": "heffrey/hordev:skills/dispatching-hordes",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".hordev/run-log.md"
+      ],
+      "agents": [],
+      "skills": [
+        "assumption-ledger",
+        "reconciling-horde-output"
+      ]
+    },
+    {
+      "id": "heffrey/hordev:skills/horde-qa",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".hordev/run-log.md",
+        ".hordev/run-log.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "heffrey/hordev:skills/improving-hordev",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/version.sh",
+        ".hordev/run-log.md",
+        ".hordev/run-log.md",
+        "tests/amendments-location.test.sh"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "heffrey/hordev:skills/rapid-spec",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "writing-tdds",
+        "writing-tdds"
+      ]
+    },
+    {
+      "id": "heffrey/hordev:skills/reconciling-horde-output",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".hordev/run-log.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "heffrey/hordev:skills/using-hordev",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".hordev/run-log.md",
+        "hooks/reflect.sh",
+        ".hordev/run-log.md"
+      ],
+      "agents": [],
+      "skills": [
+        "decomposing-for-hordes",
+        "reconciling-horde-output",
+        "horde-qa",
+        "horde-qa"
+      ]
+    },
+    {
+      "id": "heffrey/hordev:skills/writing-tdds",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "decomposing-for-hordes"
+      ]
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Final source, author and package checks; original task skills only. Held candidates are decisions, not new suppression/block rules.",
+  "reviewed": 545,
+  "approvedCount": 293
+}

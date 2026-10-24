@@ -1,0 +1,1587 @@
+{
+  "generatedAt": "2026-10-24T19:42:00.457Z",
+  "reviewSha256": "31820048dbfeb443907e2537ff2c1ad064661990a936ecc915b2156c977a446b",
+  "excludeRepos": [
+    "tde6541/blue-collar-governance-plugin",
+    "yuchi-chang/no-cape"
+  ],
+  "excludeIds": [
+    "wisermethod/wiser:skills/Build Concepts",
+    "wisermethod/wiser:skills/Build Voice",
+    "wisermethod/wiser:skills/Categorize Content",
+    "wisermethod/wiser:skills/Classifier Trial",
+    "wisermethod/wiser:skills/Cloudflare Pages",
+    "wisermethod/wiser:skills/Connect Account",
+    "wisermethod/wiser:skills/Connection Troubleshooter",
+    "wisermethod/wiser:skills/Connector Author",
+    "wisermethod/wiser:skills/Content Author",
+    "wisermethod/wiser:skills/Create Presentation",
+    "wisermethod/wiser:skills/Data Analysis",
+    "wisermethod/wiser:skills/Deep Research",
+    "wisermethod/wiser:skills/Design System",
+    "wisermethod/wiser:skills/Designer",
+    "wisermethod/wiser:skills/External Research",
+    "wisermethod/wiser:skills/Funnel Design",
+    "wisermethod/wiser:skills/Headshot Normalizer",
+    "wisermethod/wiser:skills/Housekeeping",
+    "wisermethod/wiser:skills/Knowledge Curation",
+    "wisermethod/wiser:skills/Knowledge Map",
+    "wisermethod/wiser:skills/Knowledge Recall",
+    "wisermethod/wiser:skills/Knowledge Set Onboarding",
+    "wisermethod/wiser:skills/List Hygiene",
+    "wisermethod/wiser:skills/Marketing Page Design",
+    "wisermethod/wiser:skills/Media Generator",
+    "wisermethod/wiser:skills/Onboard Plugin Root",
+    "wisermethod/wiser:skills/Onboard Root",
+    "wisermethod/wiser:skills/Play Author",
+    "wisermethod/wiser:skills/Playbook Author",
+    "wisermethod/wiser:skills/Proposal Author",
+    "wisermethod/wiser:skills/Scope Plugin Bench",
+    "wisermethod/wiser:skills/SEO Assets",
+    "wisermethod/wiser:skills/Set Up Connectors",
+    "wisermethod/wiser:skills/Site Author",
+    "wisermethod/wiser:skills/Speech Writing",
+    "wisermethod/wiser:skills/Transcript Summary",
+    "wisermethod/wiser:skills/Typography Design",
+    "wisermethod/wiser:skills/Visualizer",
+    "wisermethod/wiser:skills/Zone Publisher",
+    "tde6541/blue-collar-governance-plugin:skills/chain",
+    "tde6541/blue-collar-governance-plugin:skills/fire-break",
+    "tde6541/blue-collar-governance-plugin:skills/prevention-record",
+    "tde6541/blue-collar-governance-plugin:skills/walk",
+    "tde6541/blue-collar-governance-plugin:skills/work-order-posture",
+    "chrisrackstallion/pitchd-rails-cursor-plugin:skills/brainstorming-rails-omakase",
+    "chrisrackstallion/pitchd-rails-cursor-plugin:skills/executing-pitchd-rails-plan",
+    "chrisrackstallion/pitchd-rails-cursor-plugin:skills/maintaining-primitives",
+    "chrisrackstallion/pitchd-rails-cursor-plugin:skills/running-rubocop",
+    "chrisrackstallion/pitchd-rails-cursor-plugin:skills/writing-jobs",
+    "chrisrackstallion/pitchd-rails-cursor-plugin:skills/writing-pitchd-rails-plans",
+    "asodevapp/skills:skills/app-store-connect-mcp",
+    "asodevapp/skills:skills/asodev-public-api",
+    "app-vitals/shipwright:plugins/shipwright/skills/agent-admin",
+    "app-vitals/shipwright:plugins/shipwright/skills/error-scan",
+    "app-vitals/shipwright:plugins/shipwright/skills/investigate-cron",
+    "app-vitals/shipwright:plugins/shipwright/skills/learning-capture",
+    "app-vitals/shipwright:plugins/shipwright/skills/test-debt",
+    "jasgujral/mokata-oss:src/mokata/skills/docsync",
+    "michaelycjo/specseal:skills/agent-contract",
+    "michaelycjo/specseal:skills/code-review",
+    "michaelycjo/specseal:skills/commit-pr-convention",
+    "michaelycjo/specseal:skills/implement",
+    "michaelycjo/specseal:skills/legacy-parity",
+    "michaelycjo/specseal:skills/parity-setup",
+    "michaelycjo/specseal:skills/settle",
+    "michaelycjo/specseal:skills/verify",
+    "michaelycjo/specseal:skills/writing-style",
+    "the01geek/prflow:skills/create-issue",
+    "kucherenko/gangsta:skills/audit-review",
+    "kucherenko/gangsta:skills/laundering",
+    "kucherenko/gangsta:skills/reconnaissance",
+    "kucherenko/gangsta:skills/the-hit",
+    "kucherenko/gangsta:skills/the-ledger",
+    "kucherenko/gangsta:skills/the-sit-down",
+    "kucherenko/gangsta:skills/using-gangsta",
+    "johncegom/johncegom-skills:plugins/minh-toolkit/skills/bootstrap-eagd-pattern",
+    "karimmneimneh/ease:ease-os/skills/ease-setup",
+    "kotaroyamame/formal-agent-contracts:skills/define-contract",
+    "kotaroyamame/formal-agent-contracts:skills/generate-db-schema",
+    "kotaroyamame/formal-agent-contracts:skills/integrated-workflow",
+    "kotaroyamame/formal-agent-contracts:skills/verify-spec",
+    "ice-ice-bear/harnesskit:skills/prd",
+    "ice-ice-bear/harnesskit:skills/status",
+    "ice-ice-bear/harnesskit:skills/worktree",
+    "jarbon/carbon-free:skills/carbon-pro",
+    "redhuntlabs/wizard:skills/building-a-discipline-spell",
+    "redhuntlabs/wizard:skills/building-a-spell",
+    "redhuntlabs/wizard:skills/chaining-spells",
+    "redhuntlabs/wizard:skills/inferring-a-spell-from-examples",
+    "redhuntlabs/wizard:skills/intuitive-interviewing",
+    "redhuntlabs/wizard:skills/pressure-testing-a-spell",
+    "redhuntlabs/wizard:skills/using-wizard"
+  ],
+  "excluded": [
+    {
+      "id": "wisermethod/wiser:skills/Build Concepts",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Build Voice",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/user-root.md",
+        "standards/user-root.md",
+        "standards/conventions.md",
+        "standards/user-root.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/user-root.md",
+        "standards/user-root.md",
+        "standards/conventions.md",
+        "standards/user-root.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Categorize Content",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Classifier Trial",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/primitives.md",
+        "tools/lib/classifier/README.md",
+        "standards/user-root.md",
+        "standards/primitives.md",
+        "hooks/AGENTS.md",
+        "gateway/SETUP.md",
+        "tools/lib/classifier/README.md",
+        "standards/user-root.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Cloudflare Pages",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/pages-functions/TOOL.md",
+        "standards/conventions.md",
+        "connectors/cloudflare/auth.md",
+        "connectors/cloudflare/CONNECTOR.md",
+        "connectors/cloudflare/auth.md",
+        "tools/pages-functions/TOOL.md",
+        "experts/Webmaster/EXPERT.md",
+        "connectors/cloudflare/CONNECTOR.md",
+        "connectors/cloudflare/auth.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Connect Account",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "gateway/SETUP.md",
+        "connectors/AGENTS.md",
+        "gateway/SETUP.md",
+        "connectors/AGENTS.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Connection Troubleshooter",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "gateway/SETUP.md",
+        "gateway/SETUP.md",
+        "gateway/SETUP.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Connector Author",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/primitives.md",
+        "standards/script-contract.md",
+        "standards/playbook.md",
+        "standards/script-contract.md",
+        "standards/primitives.md",
+        "standards/script-contract.md",
+        "gateway/AGENTS.md",
+        "gateway/providers/AGENTS.md",
+        "standards/playbook.md",
+        "standards/script-contract.md",
+        "gateway/test/agreement-baseline.json",
+        "gateway/AGENTS.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Content Author",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Create Presentation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "skills/Illustrator/drawing.md",
+        "skills/Illustrator/drawing.md",
+        "skills/Illustrator/drawing.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "skills/Illustrator/drawing.md",
+        "skills/Illustrator/drawing.md",
+        "skills/Illustrator/drawing.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Data Analysis",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Deep Research",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Design System",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Designer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/External Research",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "connectors/tinyfish/CONNECTOR.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Funnel Design",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Headshot Normalizer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "connectors/google-vision/CONNECTOR.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Housekeeping",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/user-root.md",
+        "standards/user-root.md",
+        "standards/plugin-root.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/user-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/user-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/user-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/user-root.md",
+        "standards/user-root.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/user-root.md",
+        "standards/primitives.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/conventions.md",
+        "standards/user-root.md",
+        "standards/user-root.md",
+        "standards/plugin-root.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/user-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/user-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/user-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/user-root.md",
+        "standards/user-root.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/user-root.md",
+        "standards/primitives.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Knowledge Curation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/wiki-schemas.md",
+        "tools/knowledge-memory/references/schemas.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/wiki-schemas.md",
+        "tools/knowledge-memory/references/schemas.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Knowledge Map",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Knowledge Recall",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/schemas.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/schemas.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Knowledge Set Onboarding",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/templates/set.yaml",
+        "tools/knowledge-memory/references/wiki-schemas.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/wiki-schemas.md",
+        "tools/knowledge-memory/references/schemas.md",
+        "tools/knowledge-memory/references/backends.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/templates/set.yaml",
+        "tools/knowledge-memory/references/wiki-schemas.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/wiki-schemas.md",
+        "tools/knowledge-memory/references/schemas.md",
+        "tools/knowledge-memory/references/backends.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md",
+        "tools/knowledge-memory/references/backends.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/List Hygiene",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Marketing Page Design",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Media Generator",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Onboard Plugin Root",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "system/templates/AGENTS.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md",
+        "standards/plugin-root.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Onboard Root",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/user-root.md",
+        "standards/user-root.md",
+        "standards/user-root.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/user-root.md",
+        "standards/user-root.md",
+        "system/templates/AGENTS.md",
+        "standards/user-root.md",
+        "standards/user-root.md",
+        "system/templates/AGENTS.md",
+        "system/templates/AGENTS.md",
+        "system/templates/AGENTS.md",
+        "standards/user-root.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/user-root.md",
+        "standards/user-root.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Play Author",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/instruction-quality.md",
+        "standards/instruction-quality.md",
+        "standards/primitives.md",
+        "standards/primitives.md",
+        "standards/play.md",
+        "standards/play.md",
+        "standards/user-root.md",
+        "standards/instruction-quality.md",
+        "standards/primitives.md",
+        "standards/instruction-quality.md",
+        "standards/primitives.md",
+        "standards/primitives.md",
+        "standards/instruction-quality.md",
+        "standards/instruction-quality.md",
+        "standards/primitives.md",
+        "standards/primitives.md",
+        "standards/play.md",
+        "standards/play.md",
+        "standards/user-root.md",
+        "standards/instruction-quality.md",
+        "standards/primitives.md",
+        "standards/instruction-quality.md",
+        "standards/primitives.md",
+        "standards/primitives.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Playbook Author",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/instruction-quality.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/user-root.md",
+        "standards/playbook.md",
+        "standards/conventions.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/instruction-quality.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/user-root.md",
+        "standards/playbook.md",
+        "standards/conventions.md",
+        "standards/playbook.md",
+        "standards/playbook.md",
+        "standards/playbook.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Proposal Author",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Scope Plugin Bench",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/primitives.md",
+        "standards/conventions.md",
+        "standards/primitives.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/SEO Assets",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/playbook.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "experts/Webmaster/seo-readings.md",
+        "experts/Webmaster/seo-readings.md",
+        "experts/Webmaster/seo-readings.md",
+        "standards/conventions.md",
+        "experts/Webmaster/ahrefs-browser.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/playbook.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Set Up Connectors",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/primitives.md",
+        "standards/primitives.md",
+        "gateway/SETUP.md",
+        "gateway/server.js",
+        "gateway/server.js",
+        "gateway/server.js",
+        "gateway/SETUP.md",
+        "gateway/SETUP.md",
+        "gateway/server.js",
+        "gateway/SETUP.md",
+        "gateway/providers/default.json",
+        "gateway/SETUP.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Site Author",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Speech Writing",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Transcript Summary",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/instruction-quality.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Typography Design",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/instruction-quality.md",
+        "standards/instruction-quality.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Visualizer",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "wisermethod/wiser:skills/Zone Publisher",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "connectors/cloudflare/auth.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md",
+        "standards/conventions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "tde6541/blue-collar-governance-plugin:skills/chain",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/render-skill.js"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "tde6541/blue-collar-governance-plugin:skills/fire-break",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/render-skill.js"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "tde6541/blue-collar-governance-plugin:skills/prevention-record",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/render-skill.js"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "tde6541/blue-collar-governance-plugin:skills/walk",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "scripts/render-skill.js",
+        "scripts/render-skill.js"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "tde6541/blue-collar-governance-plugin:skills/work-order-posture",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        ".claude/settings.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chrisrackstallion/pitchd-rails-cursor-plugin:skills/brainstorming-rails-omakase",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/pitchd-rails-query.md",
+        "agents/pitchd-rails-query.md",
+        "skills/rails-omakase-compass/SKILL.md",
+        "skills/referencing-unofficial-37signals-guide/SKILL.md",
+        "skills/referencing-rails-guides/SKILL.md",
+        "agents/pitchd-rails-query.md",
+        "skills/rails-omakase-compass/SKILL.md",
+        "skills/writing-pitchd-rails-plans/SKILL.md",
+        "skills/implementing-pitchd-rails/SKILL.md",
+        "agents/pitchd-rails-query.md",
+        "agents/pitchd-rails-query.md",
+        "skills/rails-omakase-compass/SKILL.md",
+        "skills/referencing-unofficial-37signals-guide/SKILL.md",
+        "skills/referencing-rails-guides/SKILL.md",
+        "agents/pitchd-rails-query.md",
+        "skills/rails-omakase-compass/SKILL.md",
+        "skills/writing-pitchd-rails-plans/SKILL.md",
+        "skills/implementing-pitchd-rails/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chrisrackstallion/pitchd-rails-cursor-plugin:skills/executing-pitchd-rails-plan",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/implementing-pitchd-rails/SKILL.md",
+        "agents/pitchd-rails-implementor.md",
+        "skills/reviewing-pitchd-rails/SKILL.md",
+        "skills/implementing-pitchd-rails/SKILL.md",
+        "agents/pitchd-rails-implementor.md",
+        "agents/pitchd-rails-reviewer.md",
+        "agents/pitchd-rails-primitives-maintainer.md",
+        "skills/implementing-pitchd-rails/SKILL.md",
+        "agents/pitchd-rails-implementor.md",
+        "skills/reviewing-pitchd-rails/SKILL.md",
+        "skills/implementing-pitchd-rails/SKILL.md",
+        "agents/pitchd-rails-implementor.md",
+        "agents/pitchd-rails-reviewer.md",
+        "agents/pitchd-rails-primitives-maintainer.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chrisrackstallion/pitchd-rails-cursor-plugin:skills/maintaining-primitives",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/bootstrapping-primitives/SKILL.md",
+        "agents/pitchd-rails-primitives-maintainer.md",
+        "skills/bootstrapping-primitives/SKILL.md",
+        "agents/pitchd-rails-primitives-maintainer.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chrisrackstallion/pitchd-rails-cursor-plugin:skills/running-rubocop",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "chrisrackstallion/pitchd-rails-cursor-plugin:skills/writing-jobs",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/writing-tests/references/support-specs.md",
+        "skills/writing-tests/references/support-specs.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "chrisrackstallion/pitchd-rails-cursor-plugin:skills/writing-pitchd-rails-plans",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/writing-tests/SKILL.md",
+        "skills/rails-omakase-compass/SKILL.md",
+        "skills/writing-hotwire/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/rails-omakase-compass/SKILL.md",
+        "skills/writing-models/SKILL.md",
+        "skills/writing-routes/SKILL.md",
+        "skills/writing-controllers/SKILL.md",
+        "skills/writing-policies/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/writing-hotwire/SKILL.md",
+        "skills/writing-views/SKILL.md",
+        "skills/writing-css-tailwind/SKILL.md",
+        "skills/writing-javascript/SKILL.md",
+        "skills/writing-i18n/SKILL.md",
+        "skills/writing-mailers/SKILL.md",
+        "skills/writing-jobs/SKILL.md",
+        "skills/writing-migrations/SKILL.md",
+        "skills/writing-naming-conventions/SKILL.md",
+        "skills/running-rubocop/SKILL.md",
+        "skills/referencing-unofficial-37signals-guide/SKILL.md",
+        "skills/referencing-rails-guides/SKILL.md",
+        "skills/writing-views/SKILL.md",
+        "skills/writing-hotwire/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/rails-omakase-compass/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/writing-hotwire/SKILL.md",
+        "agents/pitchd-rails-reviewer.md",
+        "skills/reviewing-pitchd-rails/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/rails-omakase-compass/SKILL.md",
+        "skills/writing-hotwire/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/rails-omakase-compass/SKILL.md",
+        "skills/writing-models/SKILL.md",
+        "skills/writing-routes/SKILL.md",
+        "skills/writing-controllers/SKILL.md",
+        "skills/writing-policies/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/writing-hotwire/SKILL.md",
+        "skills/writing-views/SKILL.md",
+        "skills/writing-css-tailwind/SKILL.md",
+        "skills/writing-javascript/SKILL.md",
+        "skills/writing-i18n/SKILL.md",
+        "skills/writing-mailers/SKILL.md",
+        "skills/writing-jobs/SKILL.md",
+        "skills/writing-migrations/SKILL.md",
+        "skills/writing-naming-conventions/SKILL.md",
+        "skills/running-rubocop/SKILL.md",
+        "skills/referencing-unofficial-37signals-guide/SKILL.md",
+        "skills/referencing-rails-guides/SKILL.md",
+        "skills/writing-views/SKILL.md",
+        "skills/writing-hotwire/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/rails-omakase-compass/SKILL.md",
+        "skills/writing-tests/SKILL.md",
+        "skills/writing-hotwire/SKILL.md",
+        "agents/pitchd-rails-reviewer.md",
+        "skills/reviewing-pitchd-rails/SKILL.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "asodevapp/skills:skills/app-store-connect-mcp",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/aso-dev-local-mcp.md",
+        "tools/asodev-public-api.md",
+        "tools/aso-dev-local-mcp.md",
+        "tools/asodev-public-api.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "asodevapp/skills:skills/asodev-public-api",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "tools/asodev-public-api.md",
+        "tools/asodev-public-api.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "app-vitals/shipwright:plugins/shipwright/skills/agent-admin",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "admin/openapi.json",
+        "admin/openapi.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "app-vitals/shipwright:plugins/shipwright/skills/error-scan",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/configuration.md",
+        "docs/configuration.md"
+      ],
+      "agents": [],
+      "skills": [
+        "error-fix"
+      ]
+    },
+    {
+      "id": "app-vitals/shipwright:plugins/shipwright/skills/investigate-cron",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/observability.md",
+        "plugins/shipwright/skills/error-scan/SKILL.md",
+        "docs/observability.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "app-vitals/shipwright:plugins/shipwright/skills/learning-capture",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "app-vitals/shipwright:plugins/shipwright/skills/test-debt",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/test-readiness/test-readiness-plan.md",
+        "docs/test-readiness/test-readiness-plan.md",
+        "docs/test-readiness/test-readiness-plan.md",
+        "docs/test-readiness/test-readiness-plan.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "jasgujral/mokata-oss:src/mokata/skills/docsync",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/getting-started.md",
+        "docs/getting-started.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "michaelycjo/specseal:skills/agent-contract",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/commit-review-gate-spec.md",
+        "docs/the-commit-gate-inside-git.md",
+        "docs/the-review-record.md",
+        "docs/commit-review-gate-spec.md",
+        "docs/the-commit-gate-inside-git.md",
+        "docs/the-review-record.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "michaelycjo/specseal:skills/code-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/the-review-record.md",
+        "templates/sdd-round.md",
+        "docs/the-review-record.md",
+        "templates/config.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "michaelycjo/specseal:skills/commit-pr-convention",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/verify/orchestration.md",
+        "seal/config.md",
+        "templates/config.md",
+        "templates/config.md",
+        "skills/verify/orchestration.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "michaelycjo/specseal:skills/implement",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/agent-contract/SKILL.md",
+        "skills/settle/SKILL.md",
+        "docs/the-review-record.md",
+        "docs/the-review-record.md",
+        "skills/verify/SKILL.md",
+        "docs/the-review-record.md",
+        "skills/settle/SKILL.md",
+        "docs/the-review-record.md",
+        "agents/framer.md",
+        "agents/smith.md",
+        "skills/settle/SKILL.md",
+        "docs/the-review-record.md",
+        "docs/the-review-record.md",
+        "docs/the-record-layout.md",
+        "skills/code-review/orchestration.md",
+        "skills/agent-contract/SKILL.md",
+        "templates/config.md",
+        "seal/config.md",
+        "skills/settle/SKILL.md",
+        "templates/config.md",
+        "templates/sdd-guarantee.md",
+        "docs/the-review-record.md",
+        "seal/follow-up.md",
+        "docs/the-review-record.md",
+        "seal/follow-up.md",
+        "skills/verify/SKILL.md",
+        "hooks/question-gate.py",
+        "docs/the-review-record.md",
+        "skills/settle/SKILL.md",
+        "templates/sdd-routing.md",
+        "templates/sdd-spec.md",
+        "docs/the-review-record.md",
+        "templates/sdd-plan.md",
+        "templates/sdd-questions.md",
+        "templates/sdd-overview.md",
+        "templates/sdd-phase.md",
+        "agents/framer.md",
+        "agents/smith.md",
+        "skills/settle/SKILL.md",
+        "docs/the-review-record.md",
+        "docs/the-review-record.md",
+        "docs/the-record-layout.md",
+        "seal/follow-up.md",
+        "skills/code-review/orchestration.md",
+        "seal/follow-up.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "michaelycjo/specseal:skills/legacy-parity",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/the-review-record.md",
+        "skills/implement/orchestration.md",
+        "templates/parity.md",
+        "docs/the-review-record.md",
+        "skills/implement/orchestration.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "michaelycjo/specseal:skills/parity-setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/parity.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "michaelycjo/specseal:skills/settle",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/the-review-record.md",
+        "docs/the-review-record.md",
+        "docs/release-checklist.md",
+        "docs/one-root-by-lifetime.md",
+        "seal/config.md",
+        "docs/the-review-record.md",
+        ".github/scripts/rules.py",
+        "docs/release-checklist.md",
+        "templates/config.md",
+        "docs/one-root-by-lifetime.md",
+        "seal/config.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "michaelycjo/specseal:skills/verify",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/the-review-record.md",
+        "docs/the-review-record.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "michaelycjo/specseal:skills/writing-style",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/implement/SKILL.md",
+        "skills/implement/SKILL.md",
+        "tests/test_one_word_one_meaning.py",
+        "seal/specs/1792449518-settle-squashes-specs-into-docs-in-place/spec.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "the01geek/prflow:skills/create-issue",
+      "reason": "marketing-link-or-forwarding-alias-not-an-independent-skill"
+    },
+    {
+      "id": "kucherenko/gangsta:skills/audit-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [
+        "the-inspector"
+      ],
+      "skills": []
+    },
+    {
+      "id": "kucherenko/gangsta:skills/laundering",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "the-consigliere",
+        "audit-review",
+        "the-ledger"
+      ]
+    },
+    {
+      "id": "kucherenko/gangsta:skills/reconnaissance",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/gangsta/constitution.md",
+        "docs/gangsta/constitution.md"
+      ],
+      "agents": [],
+      "skills": [
+        "the-grilling",
+        "the-sit-down"
+      ]
+    },
+    {
+      "id": "kucherenko/gangsta:skills/the-hit",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "the-capo",
+        "the-capo",
+        "laundering"
+      ]
+    },
+    {
+      "id": "kucherenko/gangsta:skills/the-ledger",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/gangsta/constitution.md",
+        "docs/gangsta/constitution.md",
+        "docs/gangsta/constitution.md",
+        "docs/gangsta/constitution.md",
+        "docs/gangsta/constitution.md",
+        "docs/gangsta/constitution.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "kucherenko/gangsta:skills/the-sit-down",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "the-consigliere",
+        "resource-development"
+      ]
+    },
+    {
+      "id": "kucherenko/gangsta:skills/using-gangsta",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/the-sit-down/SKILL.md",
+        "skills/the-hit/SKILL.md",
+        "skills/the-sit-down/SKILL.md",
+        "skills/the-hit/SKILL.md"
+      ],
+      "agents": [],
+      "skills": [
+        "reconnaissance",
+        "the-consigliere",
+        "interrogation-debugging",
+        "the-consigliere",
+        "reconnaissance"
+      ]
+    },
+    {
+      "id": "johncegom/johncegom-skills:plugins/minh-toolkit/skills/bootstrap-eagd-pattern",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/execute-advise-grade-dream.md",
+        "docs/eagd-log.md",
+        "docs/execute-advise-grade-dream.md",
+        "docs/eagd-log.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "karimmneimneh/ease:ease-os/skills/ease-setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "new-project-setup"
+      ]
+    },
+    {
+      "id": "kotaroyamame/formal-agent-contracts:skills/define-contract",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "kotaroyamame/formal-agent-contracts:skills/generate-db-schema",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "kotaroyamame/formal-agent-contracts:skills/integrated-workflow",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/import-natural-spec/SKILL.md",
+        "skills/define-contract/SKILL.md",
+        "skills/verify-spec/SKILL.md",
+        "skills/smt-verify/SKILL.md",
+        "skills/generate-db-schema/SKILL.md",
+        "skills/route-models/SKILL.md",
+        "skills/generate-code/SKILL.md",
+        "skills/export-human-spec/SKILL.md",
+        "skills/formal-methods-guide/SKILL.md",
+        "skills/import-natural-spec/SKILL.md",
+        "skills/define-contract/SKILL.md",
+        "skills/verify-spec/SKILL.md",
+        "skills/smt-verify/SKILL.md",
+        "skills/generate-db-schema/SKILL.md",
+        "skills/route-models/SKILL.md",
+        "skills/generate-code/SKILL.md",
+        "skills/export-human-spec/SKILL.md",
+        "skills/formal-methods-guide/SKILL.md"
+      ],
+      "agents": [],
+      "skills": [
+        "import-natural-spec",
+        "formal-methods-guide"
+      ]
+    },
+    {
+      "id": "kotaroyamame/formal-agent-contracts:skills/verify-spec",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "ice-ice-bear/harnesskit:skills/prd",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/feature_list.json",
+        "docs/feature_list.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "ice-ice-bear/harnesskit:skills/status",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/feature_list.json",
+        "docs/feature_list.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "ice-ice-bear/harnesskit:skills/worktree",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/feature_list.json",
+        "docs/feature_list.json",
+        "docs/feature_list.json",
+        "docs/feature_list.json",
+        "docs/feature_list.json",
+        "docs/feature_list.json",
+        "docs/feature_list.json",
+        "docs/feature_list.json",
+        "docs/feature_list.json",
+        "docs/feature_list.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "jarbon/carbon-free:skills/carbon-pro",
+      "reason": "marketing-link-or-forwarding-alias-not-an-independent-skill"
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/building-a-discipline-spell",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/building-a-spell/examples/example-discipline.md",
+        "skills/building-a-spell/examples/example-discipline.md"
+      ],
+      "agents": [],
+      "skills": [
+        "pressure-testing-a-spell"
+      ]
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/building-a-spell",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/spell-tester.md",
+        "templates/spell-template.md",
+        "agents/spell-tester.md"
+      ],
+      "agents": [
+        "spell-tester"
+      ],
+      "skills": [
+        "inferring-a-spell-from-examples",
+        "intuitive-interviewing"
+      ]
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/chaining-spells",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "templates/spell-template-chained.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/inferring-a-spell-from-examples",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "docs/capturing-chats.md",
+        "docs/capturing-chats.md",
+        "templates/spell-template.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/intuitive-interviewing",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/building-a-spell/interview-questions.md",
+        "skills/building-a-spell/interview-questions.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/pressure-testing-a-spell",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "agents/spell-tester.md",
+        "agents/spell-tester.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "redhuntlabs/wizard:skills/using-wizard",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "spells/work/writing-a-status-update/SKILL.md"
+      ],
+      "agents": [],
+      "skills": [
+        "building-a-spell",
+        "discovering-spells"
+      ]
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Hold no-cape as explicitly distilled upstream skills, governance-runtime-only skills, marketing links and command forwarding aliases. Retain original standalone task skills only.",
+  "reviewed": 473,
+  "approvedCount": 168
+}
