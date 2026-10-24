@@ -1,0 +1,1947 @@
+{
+  "generatedAt": "2026-10-24T19:50:36.202Z",
+  "wave": "wave7",
+  "addedSkills": [
+    {
+      "id": "saketlab/seqout-skills:skills/seqout-assess-dataset",
+      "name": "seqout-assess-dataset",
+      "repo": "saketlab/seqout-skills",
+      "path": "skills/seqout-assess-dataset/SKILL.md",
+      "sha": "bf0fd7f57fbca8a7db914eb77235626815fe2426",
+      "pinned": {
+        "repo_slug": "saketlab/seqout-skills",
+        "skill_md_path": "skills/seqout-assess-dataset/SKILL.md",
+        "repo_commit_sha": "07cee952a039152e109624125b0ade0f505337d8",
+        "skill_tree_sha": "377a1e813eae18d5a9e96679c17c4029072ead13",
+        "skill_md_sha": "bf0fd7f57fbca8a7db914eb77235626815fe2426",
+        "install_target_name": "seqout-assess-dataset"
+      }
+    },
+    {
+      "id": "saketlab/seqout-skills:skills/seqout-build-cohort",
+      "name": "seqout-build-cohort",
+      "repo": "saketlab/seqout-skills",
+      "path": "skills/seqout-build-cohort/SKILL.md",
+      "sha": "349bd69ef609bd7dbc137f0b7fcd26747a01ed19",
+      "pinned": {
+        "repo_slug": "saketlab/seqout-skills",
+        "skill_md_path": "skills/seqout-build-cohort/SKILL.md",
+        "repo_commit_sha": "07cee952a039152e109624125b0ade0f505337d8",
+        "skill_tree_sha": "7a3174377f7fde60af181d81229f5008c10a5c34",
+        "skill_md_sha": "349bd69ef609bd7dbc137f0b7fcd26747a01ed19",
+        "install_target_name": "seqout-build-cohort"
+      }
+    },
+    {
+      "id": "saketlab/seqout-skills:skills/seqout-find-datasets",
+      "name": "seqout-find-datasets",
+      "repo": "saketlab/seqout-skills",
+      "path": "skills/seqout-find-datasets/SKILL.md",
+      "sha": "7e6bf68cc6a9bd889c4402b994eb2562a4c0966c",
+      "pinned": {
+        "repo_slug": "saketlab/seqout-skills",
+        "skill_md_path": "skills/seqout-find-datasets/SKILL.md",
+        "repo_commit_sha": "07cee952a039152e109624125b0ade0f505337d8",
+        "skill_tree_sha": "411a55b8cdda8d7884d8348b0e8d69c96474ae36",
+        "skill_md_sha": "7e6bf68cc6a9bd889c4402b994eb2562a4c0966c",
+        "install_target_name": "seqout-find-datasets"
+      }
+    },
+    {
+      "id": "saketlab/seqout-skills:skills/seqout-papers-authors",
+      "name": "seqout-papers-authors",
+      "repo": "saketlab/seqout-skills",
+      "path": "skills/seqout-papers-authors/SKILL.md",
+      "sha": "a6370796177252c9cdae1910f345004e375a5804",
+      "pinned": {
+        "repo_slug": "saketlab/seqout-skills",
+        "skill_md_path": "skills/seqout-papers-authors/SKILL.md",
+        "repo_commit_sha": "07cee952a039152e109624125b0ade0f505337d8",
+        "skill_tree_sha": "96e5d47c8ee753e9fb1cdc219a0709b29a26c6fc",
+        "skill_md_sha": "a6370796177252c9cdae1910f345004e375a5804",
+        "install_target_name": "seqout-papers-authors"
+      }
+    },
+    {
+      "id": "saketlab/seqout-skills:skills/seqout-resolve-accessions",
+      "name": "seqout-resolve-accessions",
+      "repo": "saketlab/seqout-skills",
+      "path": "skills/seqout-resolve-accessions/SKILL.md",
+      "sha": "37e9220681a6cd09ae06d7fa1e2617304ee798bf",
+      "pinned": {
+        "repo_slug": "saketlab/seqout-skills",
+        "skill_md_path": "skills/seqout-resolve-accessions/SKILL.md",
+        "repo_commit_sha": "07cee952a039152e109624125b0ade0f505337d8",
+        "skill_tree_sha": "d10b33af8cf1ee3e6fe0f65d001a18f5146c1a33",
+        "skill_md_sha": "37e9220681a6cd09ae06d7fa1e2617304ee798bf",
+        "install_target_name": "seqout-resolve-accessions"
+      }
+    },
+    {
+      "id": "tbhbooks/tbh-skill:skills/help",
+      "name": "help",
+      "repo": "tbhbooks/tbh-skill",
+      "path": "skills/help/SKILL.md",
+      "sha": "94d9c87fa4791da7569ab06c329a806c57649c8e",
+      "pinned": {
+        "repo_slug": "tbhbooks/tbh-skill",
+        "skill_md_path": "skills/help/SKILL.md",
+        "repo_commit_sha": "b6c00aef845550a7a8af24543776bf7ecad2810f",
+        "skill_tree_sha": "bbf15fd7eaed1d273352a45cee76b5f9e9ab6f00",
+        "skill_md_sha": "94d9c87fa4791da7569ab06c329a806c57649c8e",
+        "install_target_name": "help"
+      }
+    },
+    {
+      "id": "techwolf-ai/ai-first-toolkit:plugins/ai-firstify/skills/ai-firstify",
+      "name": "ai-firstify",
+      "repo": "techwolf-ai/ai-first-toolkit",
+      "path": "plugins/ai-firstify/skills/ai-firstify/SKILL.md",
+      "sha": "52965004d5ca976d08225796554e72e3e0049011",
+      "pinned": {
+        "repo_slug": "techwolf-ai/ai-first-toolkit",
+        "skill_md_path": "plugins/ai-firstify/skills/ai-firstify/SKILL.md",
+        "repo_commit_sha": "2ee78415674eaaead2082a55691b68ffb1003e87",
+        "skill_tree_sha": "7a6a7df9e1bab2a228e273eb259043d06471a6f2",
+        "skill_md_sha": "52965004d5ca976d08225796554e72e3e0049011",
+        "install_target_name": "ai-firstify"
+      }
+    },
+    {
+      "id": "techwolf-ai/ai-first-toolkit:plugins/content-studio/skills/analyze-performance",
+      "name": "analyze-performance",
+      "repo": "techwolf-ai/ai-first-toolkit",
+      "path": "plugins/content-studio/skills/analyze-performance/SKILL.md",
+      "sha": "a62082cf64f237ac9789a408a016625f2ecd8d66",
+      "pinned": {
+        "repo_slug": "techwolf-ai/ai-first-toolkit",
+        "skill_md_path": "plugins/content-studio/skills/analyze-performance/SKILL.md",
+        "repo_commit_sha": "2ee78415674eaaead2082a55691b68ffb1003e87",
+        "skill_tree_sha": "2eeea19c744d1417613224d988b95ee83e1c670b",
+        "skill_md_sha": "a62082cf64f237ac9789a408a016625f2ecd8d66",
+        "install_target_name": "analyze-performance"
+      }
+    },
+    {
+      "id": "techwolf-ai/ai-first-toolkit:plugins/content-studio/skills/brainstorm-opinion",
+      "name": "brainstorm-opinion",
+      "repo": "techwolf-ai/ai-first-toolkit",
+      "path": "plugins/content-studio/skills/brainstorm-opinion/SKILL.md",
+      "sha": "6df2d6ea00d5e9d056d10a30b22bf62ccba5e46d",
+      "pinned": {
+        "repo_slug": "techwolf-ai/ai-first-toolkit",
+        "skill_md_path": "plugins/content-studio/skills/brainstorm-opinion/SKILL.md",
+        "repo_commit_sha": "2ee78415674eaaead2082a55691b68ffb1003e87",
+        "skill_tree_sha": "105b42c8ff9686e6841428f830f1109d8e67a45d",
+        "skill_md_sha": "6df2d6ea00d5e9d056d10a30b22bf62ccba5e46d",
+        "install_target_name": "brainstorm-opinion"
+      }
+    },
+    {
+      "id": "techwolf-ai/ai-first-toolkit:plugins/content-studio/skills/setup-content-studio",
+      "name": "setup-content-studio",
+      "repo": "techwolf-ai/ai-first-toolkit",
+      "path": "plugins/content-studio/skills/setup-content-studio/SKILL.md",
+      "sha": "39dea6192a1b699c513dd2cb41924da927787a1b",
+      "pinned": {
+        "repo_slug": "techwolf-ai/ai-first-toolkit",
+        "skill_md_path": "plugins/content-studio/skills/setup-content-studio/SKILL.md",
+        "repo_commit_sha": "2ee78415674eaaead2082a55691b68ffb1003e87",
+        "skill_tree_sha": "67263a7c1459cf0fdacf52d3c025e6fe0b6ab4fd",
+        "skill_md_sha": "39dea6192a1b699c513dd2cb41924da927787a1b",
+        "install_target_name": "setup-content-studio"
+      }
+    },
+    {
+      "id": "techwolf-ai/ai-first-toolkit:plugins/ai-adoption/skills/task-profile",
+      "name": "task-profile",
+      "repo": "techwolf-ai/ai-first-toolkit",
+      "path": "plugins/ai-adoption/skills/task-profile/SKILL.md",
+      "sha": "b8a42316bd5721fea6587ca9830020e8f035c324",
+      "pinned": {
+        "repo_slug": "techwolf-ai/ai-first-toolkit",
+        "skill_md_path": "plugins/ai-adoption/skills/task-profile/SKILL.md",
+        "repo_commit_sha": "2ee78415674eaaead2082a55691b68ffb1003e87",
+        "skill_tree_sha": "5c9d74458f21586da7050e336a088042161cd2db",
+        "skill_md_sha": "b8a42316bd5721fea6587ca9830020e8f035c324",
+        "install_target_name": "task-profile"
+      }
+    },
+    {
+      "id": "user-intuition/skills:plugins/user-intuition-research/skills/analyze-completed-study",
+      "name": "analyze-completed-study",
+      "repo": "user-intuition/skills",
+      "path": "plugins/user-intuition-research/skills/analyze-completed-study/SKILL.md",
+      "sha": "94d1e6d2174f844a75308f93b27c26b3fc010399",
+      "pinned": {
+        "repo_slug": "user-intuition/skills",
+        "skill_md_path": "plugins/user-intuition-research/skills/analyze-completed-study/SKILL.md",
+        "repo_commit_sha": "59f6fe17b64f5b250a5778b48ef1a4de562d114d",
+        "skill_tree_sha": "f3b2024b46326b4ad67c419223fcd1a24178a783",
+        "skill_md_sha": "94d1e6d2174f844a75308f93b27c26b3fc010399",
+        "install_target_name": "analyze-completed-study"
+      }
+    },
+    {
+      "id": "user-intuition/skills:plugins/user-intuition-research/skills/curate-interview-quality",
+      "name": "curate-interview-quality",
+      "repo": "user-intuition/skills",
+      "path": "plugins/user-intuition-research/skills/curate-interview-quality/SKILL.md",
+      "sha": "256a6016df2e52c57e4ae99317bc0ba1293f3720",
+      "pinned": {
+        "repo_slug": "user-intuition/skills",
+        "skill_md_path": "plugins/user-intuition-research/skills/curate-interview-quality/SKILL.md",
+        "repo_commit_sha": "59f6fe17b64f5b250a5778b48ef1a4de562d114d",
+        "skill_tree_sha": "09273c4eb84a3d2ce076e23c6ed948ab314769cf",
+        "skill_md_sha": "256a6016df2e52c57e4ae99317bc0ba1293f3720",
+        "install_target_name": "curate-interview-quality"
+      }
+    },
+    {
+      "id": "user-intuition/skills:plugins/user-intuition-research/skills/monitor-fielding",
+      "name": "monitor-fielding",
+      "repo": "user-intuition/skills",
+      "path": "plugins/user-intuition-research/skills/monitor-fielding/SKILL.md",
+      "sha": "0c9224760ae7c6e73203db2b6ca01396accc8615",
+      "pinned": {
+        "repo_slug": "user-intuition/skills",
+        "skill_md_path": "plugins/user-intuition-research/skills/monitor-fielding/SKILL.md",
+        "repo_commit_sha": "59f6fe17b64f5b250a5778b48ef1a4de562d114d",
+        "skill_tree_sha": "2fbe5bc3f3c45d78f75a7a348de87c8de355815b",
+        "skill_md_sha": "0c9224760ae7c6e73203db2b6ca01396accc8615",
+        "install_target_name": "monitor-fielding"
+      }
+    },
+    {
+      "id": "user-intuition/skills:plugins/user-intuition-research/skills/retrieve-study-results",
+      "name": "retrieve-study-results",
+      "repo": "user-intuition/skills",
+      "path": "plugins/user-intuition-research/skills/retrieve-study-results/SKILL.md",
+      "sha": "e31a7bb91769fd610123fb8180b80bb5e4d615ec",
+      "pinned": {
+        "repo_slug": "user-intuition/skills",
+        "skill_md_path": "plugins/user-intuition-research/skills/retrieve-study-results/SKILL.md",
+        "repo_commit_sha": "59f6fe17b64f5b250a5778b48ef1a4de562d114d",
+        "skill_tree_sha": "38b457a7a440dd8c493c728fd88555f85c43556a",
+        "skill_md_sha": "e31a7bb91769fd610123fb8180b80bb5e4d615ec",
+        "install_target_name": "retrieve-study-results"
+      }
+    },
+    {
+      "id": "user-intuition/skills:plugins/user-intuition-research/skills/search-research",
+      "name": "search-research",
+      "repo": "user-intuition/skills",
+      "path": "plugins/user-intuition-research/skills/search-research/SKILL.md",
+      "sha": "5dbfa14193d2a427165aeab103e19188e6954fcf",
+      "pinned": {
+        "repo_slug": "user-intuition/skills",
+        "skill_md_path": "plugins/user-intuition-research/skills/search-research/SKILL.md",
+        "repo_commit_sha": "59f6fe17b64f5b250a5778b48ef1a4de562d114d",
+        "skill_tree_sha": "b957c5459a260c4656aa73238f73959123fb57d5",
+        "skill_md_sha": "5dbfa14193d2a427165aeab103e19188e6954fcf",
+        "install_target_name": "search-research"
+      }
+    },
+    {
+      "id": "adsagents/adsagent-ai-skills:skills/adsagent-notifications",
+      "name": "adsagent-notifications",
+      "repo": "adsagents/adsagent-ai-skills",
+      "path": "skills/adsagent-notifications/SKILL.md",
+      "sha": "4e694df5d091df3e58d72e624d6c6652d8e6d3a6",
+      "pinned": {
+        "repo_slug": "adsagents/adsagent-ai-skills",
+        "skill_md_path": "skills/adsagent-notifications/SKILL.md",
+        "repo_commit_sha": "1b3158582a7f36ea505986bb868d2eb5d6d87621",
+        "skill_tree_sha": "ec3b52a97f67dc5d2e75ee01ac590fbc94cad3f7",
+        "skill_md_sha": "4e694df5d091df3e58d72e624d6c6652d8e6d3a6",
+        "install_target_name": "adsagent-notifications"
+      }
+    },
+    {
+      "id": "adsagents/adsagent-ai-skills:skills/adsagent-reliability",
+      "name": "adsagent-reliability",
+      "repo": "adsagents/adsagent-ai-skills",
+      "path": "skills/adsagent-reliability/SKILL.md",
+      "sha": "f973943fb7574c77b4248efda566a51bcf6f94f3",
+      "pinned": {
+        "repo_slug": "adsagents/adsagent-ai-skills",
+        "skill_md_path": "skills/adsagent-reliability/SKILL.md",
+        "repo_commit_sha": "1b3158582a7f36ea505986bb868d2eb5d6d87621",
+        "skill_tree_sha": "943244d0d6575de697cf266fde7ab8522eb926ab",
+        "skill_md_sha": "f973943fb7574c77b4248efda566a51bcf6f94f3",
+        "install_target_name": "adsagent-reliability"
+      }
+    },
+    {
+      "id": "adsagents/adsagent-ai-skills:skills/adsagent-router",
+      "name": "adsagent-router",
+      "repo": "adsagents/adsagent-ai-skills",
+      "path": "skills/adsagent-router/SKILL.md",
+      "sha": "0f6734bed72a5813f319ec62680ba509d724b967",
+      "pinned": {
+        "repo_slug": "adsagents/adsagent-ai-skills",
+        "skill_md_path": "skills/adsagent-router/SKILL.md",
+        "repo_commit_sha": "1b3158582a7f36ea505986bb868d2eb5d6d87621",
+        "skill_tree_sha": "dbc35d8fe0fee1d72c478c5d2f5081b0234a0642",
+        "skill_md_sha": "0f6734bed72a5813f319ec62680ba509d724b967",
+        "install_target_name": "adsagent-router"
+      }
+    },
+    {
+      "id": "adsagents/adsagent-ai-skills:skills/adsagent-setup",
+      "name": "adsagent-setup",
+      "repo": "adsagents/adsagent-ai-skills",
+      "path": "skills/adsagent-setup/SKILL.md",
+      "sha": "54e8277b65696f6e802ebd6b5891cda3fc1a384b",
+      "pinned": {
+        "repo_slug": "adsagents/adsagent-ai-skills",
+        "skill_md_path": "skills/adsagent-setup/SKILL.md",
+        "repo_commit_sha": "1b3158582a7f36ea505986bb868d2eb5d6d87621",
+        "skill_tree_sha": "cefb2752cd397bdfb191b776c70d3047829e139d",
+        "skill_md_sha": "54e8277b65696f6e802ebd6b5891cda3fc1a384b",
+        "install_target_name": "adsagent-setup"
+      }
+    },
+    {
+      "id": "adsagents/adsagent-ai-skills:skills/agent-scheduled-tasks",
+      "name": "agent-scheduled-tasks",
+      "repo": "adsagents/adsagent-ai-skills",
+      "path": "skills/agent-scheduled-tasks/SKILL.md",
+      "sha": "111596a138d431749200e10fcb96c0396d5d59eb",
+      "pinned": {
+        "repo_slug": "adsagents/adsagent-ai-skills",
+        "skill_md_path": "skills/agent-scheduled-tasks/SKILL.md",
+        "repo_commit_sha": "1b3158582a7f36ea505986bb868d2eb5d6d87621",
+        "skill_tree_sha": "b3c75a470bd71c21f55c25ec9ded5e622616263f",
+        "skill_md_sha": "111596a138d431749200e10fcb96c0396d5d59eb",
+        "install_target_name": "agent-scheduled-tasks"
+      }
+    },
+    {
+      "id": "adsagents/adsagent-ai-skills:skills/google-ads-insights",
+      "name": "google-ads-insights",
+      "repo": "adsagents/adsagent-ai-skills",
+      "path": "skills/google-ads-insights/SKILL.md",
+      "sha": "a50d47d638b7b151890c8391926824da8897c755",
+      "pinned": {
+        "repo_slug": "adsagents/adsagent-ai-skills",
+        "skill_md_path": "skills/google-ads-insights/SKILL.md",
+        "repo_commit_sha": "1b3158582a7f36ea505986bb868d2eb5d6d87621",
+        "skill_tree_sha": "9cf752fff049ceae88bbd6a52e8cf6576466b5a9",
+        "skill_md_sha": "a50d47d638b7b151890c8391926824da8897c755",
+        "install_target_name": "google-ads-insights"
+      }
+    },
+    {
+      "id": "adsagents/adsagent-ai-skills:skills/meta-copy",
+      "name": "meta-copy",
+      "repo": "adsagents/adsagent-ai-skills",
+      "path": "skills/meta-copy/SKILL.md",
+      "sha": "97bfacaa711bdb44b12c5e15588e67034329e875",
+      "pinned": {
+        "repo_slug": "adsagents/adsagent-ai-skills",
+        "skill_md_path": "skills/meta-copy/SKILL.md",
+        "repo_commit_sha": "1b3158582a7f36ea505986bb868d2eb5d6d87621",
+        "skill_tree_sha": "4758f252791a322b4e696bebaf0618f6a4383068",
+        "skill_md_sha": "97bfacaa711bdb44b12c5e15588e67034329e875",
+        "install_target_name": "meta-copy"
+      }
+    },
+    {
+      "id": "adsagents/adsagent-ai-skills:skills/meta-insights",
+      "name": "meta-insights",
+      "repo": "adsagents/adsagent-ai-skills",
+      "path": "skills/meta-insights/SKILL.md",
+      "sha": "2ac596bc7d5fcb87e3bd9119d9262149dd177c2d",
+      "pinned": {
+        "repo_slug": "adsagents/adsagent-ai-skills",
+        "skill_md_path": "skills/meta-insights/SKILL.md",
+        "repo_commit_sha": "1b3158582a7f36ea505986bb868d2eb5d6d87621",
+        "skill_tree_sha": "3492b31c4c47a9a9527e75fa5fbbbd56b3ae5285",
+        "skill_md_sha": "2ac596bc7d5fcb87e3bd9119d9262149dd177c2d",
+        "install_target_name": "meta-insights"
+      }
+    },
+    {
+      "id": "adsagents/adsagent-ai-skills:skills/tiktok-insights",
+      "name": "tiktok-insights",
+      "repo": "adsagents/adsagent-ai-skills",
+      "path": "skills/tiktok-insights/SKILL.md",
+      "sha": "a6278407b1c94ce0d72ff2d0ea7f98062412c27d",
+      "pinned": {
+        "repo_slug": "adsagents/adsagent-ai-skills",
+        "skill_md_path": "skills/tiktok-insights/SKILL.md",
+        "repo_commit_sha": "1b3158582a7f36ea505986bb868d2eb5d6d87621",
+        "skill_tree_sha": "84a70d3ecdb25e453eb66bb5d0461a7e820abb74",
+        "skill_md_sha": "a6278407b1c94ce0d72ff2d0ea7f98062412c27d",
+        "install_target_name": "tiktok-insights"
+      }
+    },
+    {
+      "id": "bugbug-io/agent-plugin:skills/bugbug-context-discovering",
+      "name": "bugbug-context-discovering",
+      "repo": "bugbug-io/agent-plugin",
+      "path": "skills/bugbug-context-discovering/SKILL.md",
+      "sha": "ad22bbc3e7f86cd4cd96a8e5672366634dcb9348",
+      "pinned": {
+        "repo_slug": "bugbug-io/agent-plugin",
+        "skill_md_path": "skills/bugbug-context-discovering/SKILL.md",
+        "repo_commit_sha": "959ce36b9ac9b0f374bd211ef245682ffefe0cd9",
+        "skill_tree_sha": "d0c0b0e73fb594ec15c583768dd3dd836983ec83",
+        "skill_md_sha": "ad22bbc3e7f86cd4cd96a8e5672366634dcb9348",
+        "install_target_name": "bugbug-context-discovering"
+      }
+    },
+    {
+      "id": "credibledata/credible-plugin:skills/malloy-analysis-pitfalls",
+      "name": "malloy-analysis-pitfalls",
+      "repo": "credibledata/credible-plugin",
+      "path": "skills/malloy-analysis-pitfalls/SKILL.md",
+      "sha": "e5dd42f25832bd25a19a5286250a1a194917565f",
+      "pinned": {
+        "repo_slug": "credibledata/credible-plugin",
+        "skill_md_path": "skills/malloy-analysis-pitfalls/SKILL.md",
+        "repo_commit_sha": "1b28b4e7e17d180d8d5931105e83633c159fc75f",
+        "skill_tree_sha": "b7563e8d5d82342c6b0fd9c4db554ea59bfb4c32",
+        "skill_md_sha": "e5dd42f25832bd25a19a5286250a1a194917565f",
+        "install_target_name": "malloy-analysis-pitfalls"
+      }
+    },
+    {
+      "id": "credibledata/credible-plugin:skills/malloy-charts",
+      "name": "malloy-charts",
+      "repo": "credibledata/credible-plugin",
+      "path": "skills/malloy-charts/SKILL.md",
+      "sha": "bcb513622c5a18bb780ce351a132de64897eeffa",
+      "pinned": {
+        "repo_slug": "credibledata/credible-plugin",
+        "skill_md_path": "skills/malloy-charts/SKILL.md",
+        "repo_commit_sha": "1b28b4e7e17d180d8d5931105e83633c159fc75f",
+        "skill_tree_sha": "7139606902688acdf69581a70ca329f0a530afe8",
+        "skill_md_sha": "bcb513622c5a18bb780ce351a132de64897eeffa",
+        "install_target_name": "malloy-charts"
+      }
+    },
+    {
+      "id": "credibledata/credible-plugin:skills/malloy-gotchas-queries",
+      "name": "malloy-gotchas-queries",
+      "repo": "credibledata/credible-plugin",
+      "path": "skills/malloy-gotchas-queries/SKILL.md",
+      "sha": "6af261a47190e57de85992cbdcc240cef80f594f",
+      "pinned": {
+        "repo_slug": "credibledata/credible-plugin",
+        "skill_md_path": "skills/malloy-gotchas-queries/SKILL.md",
+        "repo_commit_sha": "1b28b4e7e17d180d8d5931105e83633c159fc75f",
+        "skill_tree_sha": "ade4563997dfb65a675057e7e236de1ec2e3097b",
+        "skill_md_sha": "6af261a47190e57de85992cbdcc240cef80f594f",
+        "install_target_name": "malloy-gotchas-queries"
+      }
+    },
+    {
+      "id": "credibledata/credible-plugin:skills/malloy-gotchas-rendering",
+      "name": "malloy-gotchas-rendering",
+      "repo": "credibledata/credible-plugin",
+      "path": "skills/malloy-gotchas-rendering/SKILL.md",
+      "sha": "d386d6dff30a0f92a55612531a334b1255aa0702",
+      "pinned": {
+        "repo_slug": "credibledata/credible-plugin",
+        "skill_md_path": "skills/malloy-gotchas-rendering/SKILL.md",
+        "repo_commit_sha": "1b28b4e7e17d180d8d5931105e83633c159fc75f",
+        "skill_tree_sha": "945a10cd7a3cbb7b3cdc66549307e864e7f38e22",
+        "skill_md_sha": "d386d6dff30a0f92a55612531a334b1255aa0702",
+        "install_target_name": "malloy-gotchas-rendering"
+      }
+    },
+    {
+      "id": "credibledata/credible-plugin:skills/malloy-patterns",
+      "name": "malloy-patterns",
+      "repo": "credibledata/credible-plugin",
+      "path": "skills/malloy-patterns/SKILL.md",
+      "sha": "712ae8219830e4a8b71cec5f86bc3377886fe4f3",
+      "pinned": {
+        "repo_slug": "credibledata/credible-plugin",
+        "skill_md_path": "skills/malloy-patterns/SKILL.md",
+        "repo_commit_sha": "1b28b4e7e17d180d8d5931105e83633c159fc75f",
+        "skill_tree_sha": "8c1286e0699243487f38469b1be323db012a708b",
+        "skill_md_sha": "712ae8219830e4a8b71cec5f86bc3377886fe4f3",
+        "install_target_name": "malloy-patterns"
+      }
+    },
+    {
+      "id": "credibledata/credible-plugin:skills/malloy-phrase-detection",
+      "name": "malloy-phrase-detection",
+      "repo": "credibledata/credible-plugin",
+      "path": "skills/malloy-phrase-detection/SKILL.md",
+      "sha": "0b4359bcdb9b36dd83afef72395d081364d731d1",
+      "pinned": {
+        "repo_slug": "credibledata/credible-plugin",
+        "skill_md_path": "skills/malloy-phrase-detection/SKILL.md",
+        "repo_commit_sha": "1b28b4e7e17d180d8d5931105e83633c159fc75f",
+        "skill_tree_sha": "bc7e1de417f588ce2640f64e0edc5afe52100848",
+        "skill_md_sha": "0b4359bcdb9b36dd83afef72395d081364d731d1",
+        "install_target_name": "malloy-phrase-detection"
+      }
+    },
+    {
+      "id": "credibledata/credible-plugin:skills/malloy-queries",
+      "name": "malloy-queries",
+      "repo": "credibledata/credible-plugin",
+      "path": "skills/malloy-queries/SKILL.md",
+      "sha": "993cde9eff53b845bd86f66e8f0989b03785eaaa",
+      "pinned": {
+        "repo_slug": "credibledata/credible-plugin",
+        "skill_md_path": "skills/malloy-queries/SKILL.md",
+        "repo_commit_sha": "1b28b4e7e17d180d8d5931105e83633c159fc75f",
+        "skill_tree_sha": "86de501ae7681ee868f3cea6413912e951e44ae6",
+        "skill_md_sha": "993cde9eff53b845bd86f66e8f0989b03785eaaa",
+        "install_target_name": "malloy-queries"
+      }
+    },
+    {
+      "id": "fluidform-ai/fluiddocs-deck-builder:skills/deck-all-hands",
+      "name": "deck-all-hands",
+      "repo": "fluidform-ai/fluiddocs-deck-builder",
+      "path": "skills/deck-all-hands/SKILL.md",
+      "sha": "e3e07892a5f0da0472ce6a646ddeb96c679e6cff",
+      "pinned": {
+        "repo_slug": "FluidForm-ai/fluiddocs-deck-builder",
+        "skill_md_path": "skills/deck-all-hands/SKILL.md",
+        "repo_commit_sha": "cf389f8694b01e8d55350afb5497b1961283b5c7",
+        "skill_tree_sha": "91857be2e16118a33a9ebc0aa9f8136a8d6ea69f",
+        "skill_md_sha": "e3e07892a5f0da0472ce6a646ddeb96c679e6cff",
+        "install_target_name": "deck-all-hands"
+      }
+    },
+    {
+      "id": "fluidform-ai/fluiddocs-deck-builder:skills/deck-critique-lite",
+      "name": "deck-critique-lite",
+      "repo": "fluidform-ai/fluiddocs-deck-builder",
+      "path": "skills/deck-critique-lite/SKILL.md",
+      "sha": "6dc97a23e3689e20eec11c9b0a4c3c669e0300d4",
+      "pinned": {
+        "repo_slug": "FluidForm-ai/fluiddocs-deck-builder",
+        "skill_md_path": "skills/deck-critique-lite/SKILL.md",
+        "repo_commit_sha": "cf389f8694b01e8d55350afb5497b1961283b5c7",
+        "skill_tree_sha": "045ad0a83dfa45bc7df08f206e4c15fccf6ddc26",
+        "skill_md_sha": "6dc97a23e3689e20eec11c9b0a4c3c669e0300d4",
+        "install_target_name": "deck-critique-lite"
+      }
+    },
+    {
+      "id": "fluidform-ai/fluiddocs-deck-builder:skills/deck-keynote",
+      "name": "deck-keynote",
+      "repo": "fluidform-ai/fluiddocs-deck-builder",
+      "path": "skills/deck-keynote/SKILL.md",
+      "sha": "e6286fb33f0bef67ca47f1453159026d08713bec",
+      "pinned": {
+        "repo_slug": "FluidForm-ai/fluiddocs-deck-builder",
+        "skill_md_path": "skills/deck-keynote/SKILL.md",
+        "repo_commit_sha": "cf389f8694b01e8d55350afb5497b1961283b5c7",
+        "skill_tree_sha": "effc07f72d81256f5f81fd3cd6eca19ebc1d5b08",
+        "skill_md_sha": "e6286fb33f0bef67ca47f1453159026d08713bec",
+        "install_target_name": "deck-keynote"
+      }
+    },
+    {
+      "id": "fluidform-ai/fluiddocs-deck-builder:skills/deck-launch",
+      "name": "deck-launch",
+      "repo": "fluidform-ai/fluiddocs-deck-builder",
+      "path": "skills/deck-launch/SKILL.md",
+      "sha": "6b642b2312ee9f547dab54f6fd9dbfa554272d3c",
+      "pinned": {
+        "repo_slug": "FluidForm-ai/fluiddocs-deck-builder",
+        "skill_md_path": "skills/deck-launch/SKILL.md",
+        "repo_commit_sha": "cf389f8694b01e8d55350afb5497b1961283b5c7",
+        "skill_tree_sha": "d004efd5bb46c2930d134b128c8f2b9248b38fd3",
+        "skill_md_sha": "6b642b2312ee9f547dab54f6fd9dbfa554272d3c",
+        "install_target_name": "deck-launch"
+      }
+    },
+    {
+      "id": "fluidform-ai/fluiddocs-deck-builder:skills/deck-sales",
+      "name": "deck-sales",
+      "repo": "fluidform-ai/fluiddocs-deck-builder",
+      "path": "skills/deck-sales/SKILL.md",
+      "sha": "4f9215c17094884cd64fc46a933aa1d4a72dd266",
+      "pinned": {
+        "repo_slug": "FluidForm-ai/fluiddocs-deck-builder",
+        "skill_md_path": "skills/deck-sales/SKILL.md",
+        "repo_commit_sha": "cf389f8694b01e8d55350afb5497b1961283b5c7",
+        "skill_tree_sha": "bb7416fe55b794f35245c96f963b4f735b8c84d2",
+        "skill_md_sha": "4f9215c17094884cd64fc46a933aa1d4a72dd266",
+        "install_target_name": "deck-sales"
+      }
+    },
+    {
+      "id": "fullenrich/fullenrich-skills:skills/full-crm",
+      "name": "full-crm",
+      "repo": "fullenrich/fullenrich-skills",
+      "path": "skills/full-crm/SKILL.md",
+      "sha": "636dad6ccc5299c2db1afc0197710282e9d37ec6",
+      "pinned": {
+        "repo_slug": "FullEnrich/fullenrich-skills",
+        "skill_md_path": "skills/full-crm/SKILL.md",
+        "repo_commit_sha": "5c727120c6ca6ef89d3b17dbd6916b1bee73fdcb",
+        "skill_tree_sha": "08f0e712619a8dc6adb96f8d47b5cfd577ce611d",
+        "skill_md_sha": "636dad6ccc5299c2db1afc0197710282e9d37ec6",
+        "install_target_name": "full-crm"
+      }
+    },
+    {
+      "id": "fullenrich/fullenrich-skills:skills/full-csv",
+      "name": "full-csv",
+      "repo": "fullenrich/fullenrich-skills",
+      "path": "skills/full-csv/SKILL.md",
+      "sha": "76f14fd93dc18987772c0bba79182c05b072a87b",
+      "pinned": {
+        "repo_slug": "FullEnrich/fullenrich-skills",
+        "skill_md_path": "skills/full-csv/SKILL.md",
+        "repo_commit_sha": "5c727120c6ca6ef89d3b17dbd6916b1bee73fdcb",
+        "skill_tree_sha": "72ea1861c5b088f6b8e6518f1174cd3c4eb59a06",
+        "skill_md_sha": "76f14fd93dc18987772c0bba79182c05b072a87b",
+        "install_target_name": "full-csv"
+      }
+    },
+    {
+      "id": "fullenrich/fullenrich-skills:skills/full-lookalike",
+      "name": "full-lookalike",
+      "repo": "fullenrich/fullenrich-skills",
+      "path": "skills/full-lookalike/SKILL.md",
+      "sha": "0c9f6de43b2ca320ef8bdd36a8b49ca5ea48cc1a",
+      "pinned": {
+        "repo_slug": "FullEnrich/fullenrich-skills",
+        "skill_md_path": "skills/full-lookalike/SKILL.md",
+        "repo_commit_sha": "5c727120c6ca6ef89d3b17dbd6916b1bee73fdcb",
+        "skill_tree_sha": "701d2f69dd14da565dbba3f1a3882be6127cff74",
+        "skill_md_sha": "0c9f6de43b2ca320ef8bdd36a8b49ca5ea48cc1a",
+        "install_target_name": "full-lookalike"
+      }
+    },
+    {
+      "id": "fullenrich/fullenrich-skills:skills/full-meeting",
+      "name": "full-meeting",
+      "repo": "fullenrich/fullenrich-skills",
+      "path": "skills/full-meeting/SKILL.md",
+      "sha": "af86d6f3d9053262f267f6776dbb265eafaaa78a",
+      "pinned": {
+        "repo_slug": "FullEnrich/fullenrich-skills",
+        "skill_md_path": "skills/full-meeting/SKILL.md",
+        "repo_commit_sha": "5c727120c6ca6ef89d3b17dbd6916b1bee73fdcb",
+        "skill_tree_sha": "cecc4db4dd8c0a07eaef27c9b49ed609c3cca862",
+        "skill_md_sha": "af86d6f3d9053262f267f6776dbb265eafaaa78a",
+        "install_target_name": "full-meeting"
+      }
+    },
+    {
+      "id": "fullenrich/fullenrich-skills:skills/full-org",
+      "name": "full-org",
+      "repo": "fullenrich/fullenrich-skills",
+      "path": "skills/full-org/SKILL.md",
+      "sha": "55e7cd363d7036747525abe7849c40cceed1ea00",
+      "pinned": {
+        "repo_slug": "FullEnrich/fullenrich-skills",
+        "skill_md_path": "skills/full-org/SKILL.md",
+        "repo_commit_sha": "5c727120c6ca6ef89d3b17dbd6916b1bee73fdcb",
+        "skill_tree_sha": "030b15ac62db27b914311a9fadd1729fd9544dc1",
+        "skill_md_sha": "55e7cd363d7036747525abe7849c40cceed1ea00",
+        "install_target_name": "full-org"
+      }
+    },
+    {
+      "id": "fullenrich/fullenrich-skills:skills/full-outreach",
+      "name": "full-outreach",
+      "repo": "fullenrich/fullenrich-skills",
+      "path": "skills/full-outreach/SKILL.md",
+      "sha": "6bcad54ba1c39befdc2c6dfb87e458f0c55580b6",
+      "pinned": {
+        "repo_slug": "FullEnrich/fullenrich-skills",
+        "skill_md_path": "skills/full-outreach/SKILL.md",
+        "repo_commit_sha": "5c727120c6ca6ef89d3b17dbd6916b1bee73fdcb",
+        "skill_tree_sha": "734fa826974306ae78927993eb983be499f44398",
+        "skill_md_sha": "6bcad54ba1c39befdc2c6dfb87e458f0c55580b6",
+        "install_target_name": "full-outreach"
+      }
+    },
+    {
+      "id": "fullenrich/fullenrich-skills:skills/full-prospecting",
+      "name": "full-prospecting",
+      "repo": "fullenrich/fullenrich-skills",
+      "path": "skills/full-prospecting/SKILL.md",
+      "sha": "e5559fef2d0ad7e250d88172e22cf2fbbb937bf7",
+      "pinned": {
+        "repo_slug": "FullEnrich/fullenrich-skills",
+        "skill_md_path": "skills/full-prospecting/SKILL.md",
+        "repo_commit_sha": "5c727120c6ca6ef89d3b17dbd6916b1bee73fdcb",
+        "skill_tree_sha": "6b0469a56121b3ff1312044710a6ade92394ea6f",
+        "skill_md_sha": "e5559fef2d0ad7e250d88172e22cf2fbbb937bf7",
+        "install_target_name": "full-prospecting"
+      }
+    },
+    {
+      "id": "fullenrich/fullenrich-skills:skills/full-sequence",
+      "name": "full-sequence",
+      "repo": "fullenrich/fullenrich-skills",
+      "path": "skills/full-sequence/SKILL.md",
+      "sha": "056ddde9ad6fb339cf7dc892a40e42de3c870b1c",
+      "pinned": {
+        "repo_slug": "FullEnrich/fullenrich-skills",
+        "skill_md_path": "skills/full-sequence/SKILL.md",
+        "repo_commit_sha": "5c727120c6ca6ef89d3b17dbd6916b1bee73fdcb",
+        "skill_tree_sha": "1857aaa30a6dab2201aaac6885782045c39b7c57",
+        "skill_md_sha": "056ddde9ad6fb339cf7dc892a40e42de3c870b1c",
+        "install_target_name": "full-sequence"
+      }
+    },
+    {
+      "id": "fullenrich/fullenrich-skills:skills/full-talent",
+      "name": "full-talent",
+      "repo": "fullenrich/fullenrich-skills",
+      "path": "skills/full-talent/SKILL.md",
+      "sha": "3e28274f5d613b1ac30f4c9a1cbc19542c76dd25",
+      "pinned": {
+        "repo_slug": "FullEnrich/fullenrich-skills",
+        "skill_md_path": "skills/full-talent/SKILL.md",
+        "repo_commit_sha": "5c727120c6ca6ef89d3b17dbd6916b1bee73fdcb",
+        "skill_tree_sha": "461274f5d78797bf0d5aed9ec94cc1b36e1d78bd",
+        "skill_md_sha": "3e28274f5d613b1ac30f4c9a1cbc19542c76dd25",
+        "install_target_name": "full-talent"
+      }
+    },
+    {
+      "id": "genaya-app/genaya-claude-plugins:plugins/genaya/skills/genaya-call-check",
+      "name": "genaya-call-check",
+      "repo": "genaya-app/genaya-claude-plugins",
+      "path": "plugins/genaya/skills/genaya-call-check/SKILL.md",
+      "sha": "795f3af00b1a0c6d9c4eb5d27efc41fbe03bca43",
+      "pinned": {
+        "repo_slug": "genaya-app/genaya-claude-plugins",
+        "skill_md_path": "plugins/genaya/skills/genaya-call-check/SKILL.md",
+        "repo_commit_sha": "2c5c71ac70aac2dbd61295ae708ec9a11892ab97",
+        "skill_tree_sha": "99c515f15b94d95b27bc663f7217529aa6846bb1",
+        "skill_md_sha": "795f3af00b1a0c6d9c4eb5d27efc41fbe03bca43",
+        "install_target_name": "genaya-call-check"
+      }
+    },
+    {
+      "id": "genaya-app/genaya-claude-plugins:plugins/genaya/skills/genaya-client-lookup",
+      "name": "genaya-client-lookup",
+      "repo": "genaya-app/genaya-claude-plugins",
+      "path": "plugins/genaya/skills/genaya-client-lookup/SKILL.md",
+      "sha": "bd67207a0294e7a24c44147dad7f4bb63e416c0c",
+      "pinned": {
+        "repo_slug": "genaya-app/genaya-claude-plugins",
+        "skill_md_path": "plugins/genaya/skills/genaya-client-lookup/SKILL.md",
+        "repo_commit_sha": "2c5c71ac70aac2dbd61295ae708ec9a11892ab97",
+        "skill_tree_sha": "df4564524d3242e6d0c3ac789401b10e9895e8c4",
+        "skill_md_sha": "bd67207a0294e7a24c44147dad7f4bb63e416c0c",
+        "install_target_name": "genaya-client-lookup"
+      }
+    },
+    {
+      "id": "genaya-app/genaya-claude-plugins:plugins/genaya/skills/genaya-daily-briefing",
+      "name": "genaya-daily-briefing",
+      "repo": "genaya-app/genaya-claude-plugins",
+      "path": "plugins/genaya/skills/genaya-daily-briefing/SKILL.md",
+      "sha": "60cebd34b5ad56f54f91545d4c0ac73524a67288",
+      "pinned": {
+        "repo_slug": "genaya-app/genaya-claude-plugins",
+        "skill_md_path": "plugins/genaya/skills/genaya-daily-briefing/SKILL.md",
+        "repo_commit_sha": "2c5c71ac70aac2dbd61295ae708ec9a11892ab97",
+        "skill_tree_sha": "0656f84c7983087c291b6f1f373a5eef74cc3400",
+        "skill_md_sha": "60cebd34b5ad56f54f91545d4c0ac73524a67288",
+        "install_target_name": "genaya-daily-briefing"
+      }
+    },
+    {
+      "id": "genaya-app/genaya-claude-plugins:plugins/genaya/skills/genaya-how-counted",
+      "name": "genaya-how-counted",
+      "repo": "genaya-app/genaya-claude-plugins",
+      "path": "plugins/genaya/skills/genaya-how-counted/SKILL.md",
+      "sha": "5a1185bc69b59ab862ea3dea2927110f666382f1",
+      "pinned": {
+        "repo_slug": "genaya-app/genaya-claude-plugins",
+        "skill_md_path": "plugins/genaya/skills/genaya-how-counted/SKILL.md",
+        "repo_commit_sha": "2c5c71ac70aac2dbd61295ae708ec9a11892ab97",
+        "skill_tree_sha": "f4f8680e7004fc680389fb7c823e52fe454ceae7",
+        "skill_md_sha": "5a1185bc69b59ab862ea3dea2927110f666382f1",
+        "install_target_name": "genaya-how-counted"
+      }
+    },
+    {
+      "id": "genaya-app/genaya-claude-plugins:plugins/genaya/skills/genaya-make-a-change",
+      "name": "genaya-make-a-change",
+      "repo": "genaya-app/genaya-claude-plugins",
+      "path": "plugins/genaya/skills/genaya-make-a-change/SKILL.md",
+      "sha": "ca6bf9f20f1d03b91a42bdd620afb9b8ab807fc3",
+      "pinned": {
+        "repo_slug": "genaya-app/genaya-claude-plugins",
+        "skill_md_path": "plugins/genaya/skills/genaya-make-a-change/SKILL.md",
+        "repo_commit_sha": "2c5c71ac70aac2dbd61295ae708ec9a11892ab97",
+        "skill_tree_sha": "1bda104f9e3ab72a50680bb3eb8348f536b88316",
+        "skill_md_sha": "ca6bf9f20f1d03b91a42bdd620afb9b8ab807fc3",
+        "install_target_name": "genaya-make-a-change"
+      }
+    },
+    {
+      "id": "genaya-app/genaya-claude-plugins:plugins/genaya/skills/genaya-money-check",
+      "name": "genaya-money-check",
+      "repo": "genaya-app/genaya-claude-plugins",
+      "path": "plugins/genaya/skills/genaya-money-check/SKILL.md",
+      "sha": "45d572f37bd44d7e69557274ff58584109faf903",
+      "pinned": {
+        "repo_slug": "genaya-app/genaya-claude-plugins",
+        "skill_md_path": "plugins/genaya/skills/genaya-money-check/SKILL.md",
+        "repo_commit_sha": "2c5c71ac70aac2dbd61295ae708ec9a11892ab97",
+        "skill_tree_sha": "379356aa02e0345285772a5d61e8178d5e0c5467",
+        "skill_md_sha": "45d572f37bd44d7e69557274ff58584109faf903",
+        "install_target_name": "genaya-money-check"
+      }
+    },
+    {
+      "id": "genaya-app/genaya-claude-plugins:plugins/genaya/skills/genaya-open-invoices",
+      "name": "genaya-open-invoices",
+      "repo": "genaya-app/genaya-claude-plugins",
+      "path": "plugins/genaya/skills/genaya-open-invoices/SKILL.md",
+      "sha": "9859a5d76ed2bc23074c7e832d885da775a5ad1a",
+      "pinned": {
+        "repo_slug": "genaya-app/genaya-claude-plugins",
+        "skill_md_path": "plugins/genaya/skills/genaya-open-invoices/SKILL.md",
+        "repo_commit_sha": "2c5c71ac70aac2dbd61295ae708ec9a11892ab97",
+        "skill_tree_sha": "b2504cd9a15275c2f781abda3eacffa6ff561c20",
+        "skill_md_sha": "9859a5d76ed2bc23074c7e832d885da775a5ad1a",
+        "install_target_name": "genaya-open-invoices"
+      }
+    },
+    {
+      "id": "genaya-app/genaya-claude-plugins:plugins/genaya/skills/genaya-schedule-lookup",
+      "name": "genaya-schedule-lookup",
+      "repo": "genaya-app/genaya-claude-plugins",
+      "path": "plugins/genaya/skills/genaya-schedule-lookup/SKILL.md",
+      "sha": "cd9f42bfaf3c7cc2681996b5a593125b976fb18b",
+      "pinned": {
+        "repo_slug": "genaya-app/genaya-claude-plugins",
+        "skill_md_path": "plugins/genaya/skills/genaya-schedule-lookup/SKILL.md",
+        "repo_commit_sha": "2c5c71ac70aac2dbd61295ae708ec9a11892ab97",
+        "skill_tree_sha": "d7e380453df05cc4954788cbc13e201f27937289",
+        "skill_md_sha": "cd9f42bfaf3c7cc2681996b5a593125b976fb18b",
+        "install_target_name": "genaya-schedule-lookup"
+      }
+    },
+    {
+      "id": "genaya-app/genaya-claude-plugins:plugins/genaya/skills/genaya-team-check",
+      "name": "genaya-team-check",
+      "repo": "genaya-app/genaya-claude-plugins",
+      "path": "plugins/genaya/skills/genaya-team-check/SKILL.md",
+      "sha": "e3d2d0f0f7de014d13f3a42b0f4000fc81d2149b",
+      "pinned": {
+        "repo_slug": "genaya-app/genaya-claude-plugins",
+        "skill_md_path": "plugins/genaya/skills/genaya-team-check/SKILL.md",
+        "repo_commit_sha": "2c5c71ac70aac2dbd61295ae708ec9a11892ab97",
+        "skill_tree_sha": "3c265ee34cd1d2d93c6c0c5c6259289a60131f47",
+        "skill_md_sha": "e3d2d0f0f7de014d13f3a42b0f4000fc81d2149b",
+        "install_target_name": "genaya-team-check"
+      }
+    },
+    {
+      "id": "hopkin-ai/claude-plugin:skills/hopkin-chatgpt-ads",
+      "name": "hopkin-chatgpt-ads",
+      "repo": "hopkin-ai/claude-plugin",
+      "path": "skills/hopkin-chatgpt-ads/SKILL.md",
+      "sha": "411f3d5c7476276b4b27ec45573895872e684b49",
+      "pinned": {
+        "repo_slug": "hopkin-ai/claude-plugin",
+        "skill_md_path": "skills/hopkin-chatgpt-ads/SKILL.md",
+        "repo_commit_sha": "bdb6acc5c78d90bea5ec9729718cef06b19323d3",
+        "skill_tree_sha": "be44a0118218ac03ca53e7527a71ea49a25ee9c0",
+        "skill_md_sha": "411f3d5c7476276b4b27ec45573895872e684b49",
+        "install_target_name": "hopkin-chatgpt-ads"
+      }
+    },
+    {
+      "id": "hopkin-ai/claude-plugin:skills/hopkin-google-ads",
+      "name": "hopkin-google-ads",
+      "repo": "hopkin-ai/claude-plugin",
+      "path": "skills/hopkin-google-ads/SKILL.md",
+      "sha": "f2711760a4d8ac81150c3fbf877ff1a813b16e8f",
+      "pinned": {
+        "repo_slug": "hopkin-ai/claude-plugin",
+        "skill_md_path": "skills/hopkin-google-ads/SKILL.md",
+        "repo_commit_sha": "bdb6acc5c78d90bea5ec9729718cef06b19323d3",
+        "skill_tree_sha": "a513c7b1b5c3d258e89e414a4133b0646910ad95",
+        "skill_md_sha": "f2711760a4d8ac81150c3fbf877ff1a813b16e8f",
+        "install_target_name": "hopkin-google-ads"
+      }
+    },
+    {
+      "id": "hopkin-ai/claude-plugin:skills/hopkin-google-analytics",
+      "name": "hopkin-google-analytics",
+      "repo": "hopkin-ai/claude-plugin",
+      "path": "skills/hopkin-google-analytics/SKILL.md",
+      "sha": "595655bb8a926e550a32a5b93ce394d37124cda3",
+      "pinned": {
+        "repo_slug": "hopkin-ai/claude-plugin",
+        "skill_md_path": "skills/hopkin-google-analytics/SKILL.md",
+        "repo_commit_sha": "bdb6acc5c78d90bea5ec9729718cef06b19323d3",
+        "skill_tree_sha": "43b923563f062b7a3487fb33ff8159721a7fa6bd",
+        "skill_md_sha": "595655bb8a926e550a32a5b93ce394d37124cda3",
+        "install_target_name": "hopkin-google-analytics"
+      }
+    },
+    {
+      "id": "hopkin-ai/claude-plugin:skills/hopkin-google-search-console",
+      "name": "hopkin-google-search-console",
+      "repo": "hopkin-ai/claude-plugin",
+      "path": "skills/hopkin-google-search-console/SKILL.md",
+      "sha": "599e0be63b05aaec0ec86ca41d30f085dd5e4eb7",
+      "pinned": {
+        "repo_slug": "hopkin-ai/claude-plugin",
+        "skill_md_path": "skills/hopkin-google-search-console/SKILL.md",
+        "repo_commit_sha": "bdb6acc5c78d90bea5ec9729718cef06b19323d3",
+        "skill_tree_sha": "c8a562694709258e592fb56366868c3add6af2ba",
+        "skill_md_sha": "599e0be63b05aaec0ec86ca41d30f085dd5e4eb7",
+        "install_target_name": "hopkin-google-search-console"
+      }
+    },
+    {
+      "id": "hopkin-ai/claude-plugin:skills/hopkin-linkedin-ads",
+      "name": "hopkin-linkedin-ads",
+      "repo": "hopkin-ai/claude-plugin",
+      "path": "skills/hopkin-linkedin-ads/SKILL.md",
+      "sha": "0d4d85ac59a3069f37b76b544f5c58c888403a4d",
+      "pinned": {
+        "repo_slug": "hopkin-ai/claude-plugin",
+        "skill_md_path": "skills/hopkin-linkedin-ads/SKILL.md",
+        "repo_commit_sha": "bdb6acc5c78d90bea5ec9729718cef06b19323d3",
+        "skill_tree_sha": "ee78577e3bc196d45c335a378f7ed1579de64241",
+        "skill_md_sha": "0d4d85ac59a3069f37b76b544f5c58c888403a4d",
+        "install_target_name": "hopkin-linkedin-ads"
+      }
+    },
+    {
+      "id": "hopkin-ai/claude-plugin:skills/hopkin-mailchimp",
+      "name": "hopkin-mailchimp",
+      "repo": "hopkin-ai/claude-plugin",
+      "path": "skills/hopkin-mailchimp/SKILL.md",
+      "sha": "6e5754ffb0d6664ca15706515b32e9cb38a37bd1",
+      "pinned": {
+        "repo_slug": "hopkin-ai/claude-plugin",
+        "skill_md_path": "skills/hopkin-mailchimp/SKILL.md",
+        "repo_commit_sha": "bdb6acc5c78d90bea5ec9729718cef06b19323d3",
+        "skill_tree_sha": "0c9073ce998839b283ece6a3a74d370cabe3f606",
+        "skill_md_sha": "6e5754ffb0d6664ca15706515b32e9cb38a37bd1",
+        "install_target_name": "hopkin-mailchimp"
+      }
+    },
+    {
+      "id": "hopkin-ai/claude-plugin:skills/hopkin-meta-ads",
+      "name": "hopkin-meta-ads",
+      "repo": "hopkin-ai/claude-plugin",
+      "path": "skills/hopkin-meta-ads/SKILL.md",
+      "sha": "fdaef0e8ebc449467a8c579cacc5fbb4e41c36ae",
+      "pinned": {
+        "repo_slug": "hopkin-ai/claude-plugin",
+        "skill_md_path": "skills/hopkin-meta-ads/SKILL.md",
+        "repo_commit_sha": "bdb6acc5c78d90bea5ec9729718cef06b19323d3",
+        "skill_tree_sha": "87f79a7f55b35c159d4dc77bb61ef9f3afa6ffda",
+        "skill_md_sha": "fdaef0e8ebc449467a8c579cacc5fbb4e41c36ae",
+        "install_target_name": "hopkin-meta-ads"
+      }
+    },
+    {
+      "id": "hopkin-ai/claude-plugin:skills/hopkin-reddit-ads",
+      "name": "hopkin-reddit-ads",
+      "repo": "hopkin-ai/claude-plugin",
+      "path": "skills/hopkin-reddit-ads/SKILL.md",
+      "sha": "e79fb95e4e7c1cdb401bf411cbcb73e240196ee6",
+      "pinned": {
+        "repo_slug": "hopkin-ai/claude-plugin",
+        "skill_md_path": "skills/hopkin-reddit-ads/SKILL.md",
+        "repo_commit_sha": "bdb6acc5c78d90bea5ec9729718cef06b19323d3",
+        "skill_tree_sha": "f9572bc6f407c98ddc9a0496084b85e3a305bc3d",
+        "skill_md_sha": "e79fb95e4e7c1cdb401bf411cbcb73e240196ee6",
+        "install_target_name": "hopkin-reddit-ads"
+      }
+    },
+    {
+      "id": "hopkin-ai/claude-plugin:skills/hopkin-tiktok-ads",
+      "name": "hopkin-tiktok-ads",
+      "repo": "hopkin-ai/claude-plugin",
+      "path": "skills/hopkin-tiktok-ads/SKILL.md",
+      "sha": "cb86b90864b5c5a580d311ed93132e524429c176",
+      "pinned": {
+        "repo_slug": "hopkin-ai/claude-plugin",
+        "skill_md_path": "skills/hopkin-tiktok-ads/SKILL.md",
+        "repo_commit_sha": "bdb6acc5c78d90bea5ec9729718cef06b19323d3",
+        "skill_tree_sha": "dc8f73a6524f58f2e3a48ec702937c69f3c4dcce",
+        "skill_md_sha": "cb86b90864b5c5a580d311ed93132e524429c176",
+        "install_target_name": "hopkin-tiktok-ads"
+      }
+    },
+    {
+      "id": "indie-technologies/found-claude-plugin:skills/accountant-packet",
+      "name": "accountant-packet",
+      "repo": "indie-technologies/found-claude-plugin",
+      "path": "skills/accountant-packet/SKILL.md",
+      "sha": "ddb291c30afe06fde21a9b97ad2dd9745baa615a",
+      "pinned": {
+        "repo_slug": "indie-technologies/found-claude-plugin",
+        "skill_md_path": "skills/accountant-packet/SKILL.md",
+        "repo_commit_sha": "78fdfc5f7c0ddd3a9b44b593386dd923b21b7bc6",
+        "skill_tree_sha": "4200bc57690a13f6fb1147e268f14842b4d44fe0",
+        "skill_md_sha": "ddb291c30afe06fde21a9b97ad2dd9745baa615a",
+        "install_target_name": "accountant-packet"
+      }
+    },
+    {
+      "id": "indie-technologies/found-claude-plugin:skills/cash-snapshot",
+      "name": "cash-snapshot",
+      "repo": "indie-technologies/found-claude-plugin",
+      "path": "skills/cash-snapshot/SKILL.md",
+      "sha": "e04dc53d0c36367b524448dfee555d8bd242ec5b",
+      "pinned": {
+        "repo_slug": "indie-technologies/found-claude-plugin",
+        "skill_md_path": "skills/cash-snapshot/SKILL.md",
+        "repo_commit_sha": "78fdfc5f7c0ddd3a9b44b593386dd923b21b7bc6",
+        "skill_tree_sha": "ab40c7459d98c7cfdca8daa0c70e004dcd6a0e0f",
+        "skill_md_sha": "e04dc53d0c36367b524448dfee555d8bd242ec5b",
+        "install_target_name": "cash-snapshot"
+      }
+    },
+    {
+      "id": "indie-technologies/found-claude-plugin:skills/export-transactions",
+      "name": "export-transactions",
+      "repo": "indie-technologies/found-claude-plugin",
+      "path": "skills/export-transactions/SKILL.md",
+      "sha": "f38b81eb0082f2ed2af1903ed63ed6c2bcc1a775",
+      "pinned": {
+        "repo_slug": "indie-technologies/found-claude-plugin",
+        "skill_md_path": "skills/export-transactions/SKILL.md",
+        "repo_commit_sha": "78fdfc5f7c0ddd3a9b44b593386dd923b21b7bc6",
+        "skill_tree_sha": "4cd58029595c59dee8a2eba64ea5bb2fe26072a0",
+        "skill_md_sha": "f38b81eb0082f2ed2af1903ed63ed6c2bcc1a775",
+        "install_target_name": "export-transactions"
+      }
+    },
+    {
+      "id": "indie-technologies/found-claude-plugin:skills/find-transactions",
+      "name": "find-transactions",
+      "repo": "indie-technologies/found-claude-plugin",
+      "path": "skills/find-transactions/SKILL.md",
+      "sha": "868ba1c5028906b29c30f4dde7c571954a9ea8e4",
+      "pinned": {
+        "repo_slug": "indie-technologies/found-claude-plugin",
+        "skill_md_path": "skills/find-transactions/SKILL.md",
+        "repo_commit_sha": "78fdfc5f7c0ddd3a9b44b593386dd923b21b7bc6",
+        "skill_tree_sha": "9b3a3c3eb4d8bf18aac04ad8f91e78b45e205256",
+        "skill_md_sha": "868ba1c5028906b29c30f4dde7c571954a9ea8e4",
+        "install_target_name": "find-transactions"
+      }
+    },
+    {
+      "id": "indie-technologies/found-claude-plugin:skills/getting-started",
+      "name": "getting-started",
+      "repo": "indie-technologies/found-claude-plugin",
+      "path": "skills/getting-started/SKILL.md",
+      "sha": "fbd3bcbc525bbb9c81609a8e0e0ca9178ff1ad78",
+      "pinned": {
+        "repo_slug": "indie-technologies/found-claude-plugin",
+        "skill_md_path": "skills/getting-started/SKILL.md",
+        "repo_commit_sha": "78fdfc5f7c0ddd3a9b44b593386dd923b21b7bc6",
+        "skill_tree_sha": "38bb9bae354e279e72ee71ee9211fb2f239f61db",
+        "skill_md_sha": "fbd3bcbc525bbb9c81609a8e0e0ca9178ff1ad78",
+        "install_target_name": "getting-started"
+      }
+    },
+    {
+      "id": "indie-technologies/found-claude-plugin:skills/month-end-close",
+      "name": "month-end-close",
+      "repo": "indie-technologies/found-claude-plugin",
+      "path": "skills/month-end-close/SKILL.md",
+      "sha": "3b82893c74adc8e99a2eb4d25450f6288d706363",
+      "pinned": {
+        "repo_slug": "indie-technologies/found-claude-plugin",
+        "skill_md_path": "skills/month-end-close/SKILL.md",
+        "repo_commit_sha": "78fdfc5f7c0ddd3a9b44b593386dd923b21b7bc6",
+        "skill_tree_sha": "a7f7c42408a5ad11970d0b13a61a07bbba75b6cf",
+        "skill_md_sha": "3b82893c74adc8e99a2eb4d25450f6288d706363",
+        "install_target_name": "month-end-close"
+      }
+    },
+    {
+      "id": "indie-technologies/found-claude-plugin:skills/profit-loss-and-taxes",
+      "name": "profit-loss-and-taxes",
+      "repo": "indie-technologies/found-claude-plugin",
+      "path": "skills/profit-loss-and-taxes/SKILL.md",
+      "sha": "630e150cb4c14913c5d41a40b118e382535fe3dc",
+      "pinned": {
+        "repo_slug": "indie-technologies/found-claude-plugin",
+        "skill_md_path": "skills/profit-loss-and-taxes/SKILL.md",
+        "repo_commit_sha": "78fdfc5f7c0ddd3a9b44b593386dd923b21b7bc6",
+        "skill_tree_sha": "2864ecac9ae5aab72a91ef910c466d614682e4e1",
+        "skill_md_sha": "630e150cb4c14913c5d41a40b118e382535fe3dc",
+        "install_target_name": "profit-loss-and-taxes"
+      }
+    },
+    {
+      "id": "indie-technologies/found-claude-plugin:skills/reconcile",
+      "name": "reconcile",
+      "repo": "indie-technologies/found-claude-plugin",
+      "path": "skills/reconcile/SKILL.md",
+      "sha": "96d86b762f562e078fe3a47f3f13838c3040d2df",
+      "pinned": {
+        "repo_slug": "indie-technologies/found-claude-plugin",
+        "skill_md_path": "skills/reconcile/SKILL.md",
+        "repo_commit_sha": "78fdfc5f7c0ddd3a9b44b593386dd923b21b7bc6",
+        "skill_tree_sha": "e67c2b03087bcd1bc855f2cba64c66d31267c728",
+        "skill_md_sha": "96d86b762f562e078fe3a47f3f13838c3040d2df",
+        "install_target_name": "reconcile"
+      }
+    },
+    {
+      "id": "indie-technologies/found-claude-plugin:skills/unpaid-invoices",
+      "name": "unpaid-invoices",
+      "repo": "indie-technologies/found-claude-plugin",
+      "path": "skills/unpaid-invoices/SKILL.md",
+      "sha": "4df2403509f145cf53084d6753b7c8f424c1ab0e",
+      "pinned": {
+        "repo_slug": "indie-technologies/found-claude-plugin",
+        "skill_md_path": "skills/unpaid-invoices/SKILL.md",
+        "repo_commit_sha": "78fdfc5f7c0ddd3a9b44b593386dd923b21b7bc6",
+        "skill_tree_sha": "314702e4f750660cf59c76126a441a15969731e1",
+        "skill_md_sha": "4df2403509f145cf53084d6753b7c8f424c1ab0e",
+        "install_target_name": "unpaid-invoices"
+      }
+    },
+    {
+      "id": "koloskus/jotbook:skills/jotbook-init",
+      "name": "jotbook-init",
+      "repo": "koloskus/jotbook",
+      "path": "skills/jotbook-init/SKILL.md",
+      "sha": "925be71879ead719529d2a28c32ea9acc308a7ba",
+      "pinned": {
+        "repo_slug": "koloskus/jotbook",
+        "skill_md_path": "skills/jotbook-init/SKILL.md",
+        "repo_commit_sha": "42ffefd00bc405ecc2b2945e99d9f2dedc86a868",
+        "skill_tree_sha": "70e8f7d1b1343e5337191a764f4d611342c0e4a4",
+        "skill_md_sha": "925be71879ead719529d2a28c32ea9acc308a7ba",
+        "install_target_name": "jotbook-init"
+      }
+    },
+    {
+      "id": "koloskus/jotbook:skills/jotbook-stage",
+      "name": "jotbook-stage",
+      "repo": "koloskus/jotbook",
+      "path": "skills/jotbook-stage/SKILL.md",
+      "sha": "95a31a45caeb7a1cf16eb296b35d1e21231583e8",
+      "pinned": {
+        "repo_slug": "koloskus/jotbook",
+        "skill_md_path": "skills/jotbook-stage/SKILL.md",
+        "repo_commit_sha": "42ffefd00bc405ecc2b2945e99d9f2dedc86a868",
+        "skill_tree_sha": "6c8acfa2d7d349683459de2625bd77cec4c4c71b",
+        "skill_md_sha": "95a31a45caeb7a1cf16eb296b35d1e21231583e8",
+        "install_target_name": "jotbook-stage"
+      }
+    },
+    {
+      "id": "koloskus/jotbook:skills/jotbook-template",
+      "name": "jotbook-template",
+      "repo": "koloskus/jotbook",
+      "path": "skills/jotbook-template/SKILL.md",
+      "sha": "5b44ab871d23e52338add64caf481f58dda16c8a",
+      "pinned": {
+        "repo_slug": "koloskus/jotbook",
+        "skill_md_path": "skills/jotbook-template/SKILL.md",
+        "repo_commit_sha": "42ffefd00bc405ecc2b2945e99d9f2dedc86a868",
+        "skill_tree_sha": "96d32f9a9a2f3e0dacc9b48da8df5fc94ea1da48",
+        "skill_md_sha": "5b44ab871d23e52338add64caf481f58dda16c8a",
+        "install_target_name": "jotbook-template"
+      }
+    },
+    {
+      "id": "leadmagic/leadmagic-claude-plugin:skills/account-research",
+      "name": "account-research",
+      "repo": "leadmagic/leadmagic-claude-plugin",
+      "path": "skills/account-research/SKILL.md",
+      "sha": "a63f635fb017ec3b151aec8a7d2106f742ea6358",
+      "pinned": {
+        "repo_slug": "LeadMagic/leadmagic-claude-plugin",
+        "skill_md_path": "skills/account-research/SKILL.md",
+        "repo_commit_sha": "854c2eed590eb536bc8e6e58a122161248cc380c",
+        "skill_tree_sha": "cb2fcf2b1df07367754fbe0b6045248027e5d638",
+        "skill_md_sha": "a63f635fb017ec3b151aec8a7d2106f742ea6358",
+        "install_target_name": "account-research"
+      }
+    },
+    {
+      "id": "leadmagic/leadmagic-claude-plugin:skills/bulk-enrichment",
+      "name": "bulk-enrichment",
+      "repo": "leadmagic/leadmagic-claude-plugin",
+      "path": "skills/bulk-enrichment/SKILL.md",
+      "sha": "ee2fcab6ce7bc40e42464c64285f12b7f3e44859",
+      "pinned": {
+        "repo_slug": "LeadMagic/leadmagic-claude-plugin",
+        "skill_md_path": "skills/bulk-enrichment/SKILL.md",
+        "repo_commit_sha": "854c2eed590eb536bc8e6e58a122161248cc380c",
+        "skill_tree_sha": "88da96ffba7c7f12c092dde9005fdd549de8bbc4",
+        "skill_md_sha": "ee2fcab6ce7bc40e42464c64285f12b7f3e44859",
+        "install_target_name": "bulk-enrichment"
+      }
+    },
+    {
+      "id": "leadmagic/leadmagic-claude-plugin:skills/contact-lookup",
+      "name": "contact-lookup",
+      "repo": "leadmagic/leadmagic-claude-plugin",
+      "path": "skills/contact-lookup/SKILL.md",
+      "sha": "1a4dc5d3fa81603270f68cc89b06ef54fd3a2955",
+      "pinned": {
+        "repo_slug": "LeadMagic/leadmagic-claude-plugin",
+        "skill_md_path": "skills/contact-lookup/SKILL.md",
+        "repo_commit_sha": "854c2eed590eb536bc8e6e58a122161248cc380c",
+        "skill_tree_sha": "b101a11dfc66b82897fce7e2f221dbd393838a91",
+        "skill_md_sha": "1a4dc5d3fa81603270f68cc89b06ef54fd3a2955",
+        "install_target_name": "contact-lookup"
+      }
+    },
+    {
+      "id": "leadmagic/leadmagic-claude-plugin:skills/credit-guard",
+      "name": "credit-guard",
+      "repo": "leadmagic/leadmagic-claude-plugin",
+      "path": "skills/credit-guard/SKILL.md",
+      "sha": "cf85df7c9e365c7d9c88a3d0d903079adafb1a9c",
+      "pinned": {
+        "repo_slug": "LeadMagic/leadmagic-claude-plugin",
+        "skill_md_path": "skills/credit-guard/SKILL.md",
+        "repo_commit_sha": "854c2eed590eb536bc8e6e58a122161248cc380c",
+        "skill_tree_sha": "9e89d67519636aa515cff410729f9ab313f5c31f",
+        "skill_md_sha": "cf85df7c9e365c7d9c88a3d0d903079adafb1a9c",
+        "install_target_name": "credit-guard"
+      }
+    },
+    {
+      "id": "leadmagic/leadmagic-claude-plugin:skills/decision-makers",
+      "name": "decision-makers",
+      "repo": "leadmagic/leadmagic-claude-plugin",
+      "path": "skills/decision-makers/SKILL.md",
+      "sha": "caa4ef90c4c1a7743417a4764b0f53bb17c93308",
+      "pinned": {
+        "repo_slug": "LeadMagic/leadmagic-claude-plugin",
+        "skill_md_path": "skills/decision-makers/SKILL.md",
+        "repo_commit_sha": "854c2eed590eb536bc8e6e58a122161248cc380c",
+        "skill_tree_sha": "c50c27b47c8c2b3f9483a49fecda5241dde0571a",
+        "skill_md_sha": "caa4ef90c4c1a7743417a4764b0f53bb17c93308",
+        "install_target_name": "decision-makers"
+      }
+    },
+    {
+      "id": "leadmagic/leadmagic-claude-plugin:skills/get-started",
+      "name": "get-started",
+      "repo": "leadmagic/leadmagic-claude-plugin",
+      "path": "skills/get-started/SKILL.md",
+      "sha": "84986c135b0f312f50bf346382f3d09d667792d8",
+      "pinned": {
+        "repo_slug": "LeadMagic/leadmagic-claude-plugin",
+        "skill_md_path": "skills/get-started/SKILL.md",
+        "repo_commit_sha": "854c2eed590eb536bc8e6e58a122161248cc380c",
+        "skill_tree_sha": "c3db05adc2a7ecf5e2dcac28a177f20115c69764",
+        "skill_md_sha": "84986c135b0f312f50bf346382f3d09d667792d8",
+        "install_target_name": "get-started"
+      }
+    },
+    {
+      "id": "leadmagic/leadmagic-claude-plugin:skills/hiring-intent",
+      "name": "hiring-intent",
+      "repo": "leadmagic/leadmagic-claude-plugin",
+      "path": "skills/hiring-intent/SKILL.md",
+      "sha": "ea39331b7e926ee30278b56bc7d0ec0187529cde",
+      "pinned": {
+        "repo_slug": "LeadMagic/leadmagic-claude-plugin",
+        "skill_md_path": "skills/hiring-intent/SKILL.md",
+        "repo_commit_sha": "854c2eed590eb536bc8e6e58a122161248cc380c",
+        "skill_tree_sha": "d7b1aae6edf6b882c686b5b0e6206e273960706f",
+        "skill_md_sha": "ea39331b7e926ee30278b56bc7d0ec0187529cde",
+        "install_target_name": "hiring-intent"
+      }
+    },
+    {
+      "id": "leadmagic/leadmagic-claude-plugin:skills/market-search",
+      "name": "market-search",
+      "repo": "leadmagic/leadmagic-claude-plugin",
+      "path": "skills/market-search/SKILL.md",
+      "sha": "b00313babeb4b26c7cca5f0e2157eceac9b5c420",
+      "pinned": {
+        "repo_slug": "LeadMagic/leadmagic-claude-plugin",
+        "skill_md_path": "skills/market-search/SKILL.md",
+        "repo_commit_sha": "854c2eed590eb536bc8e6e58a122161248cc380c",
+        "skill_tree_sha": "e69ca4f205c204b558ca81c55e8ecd457d3f7a4c",
+        "skill_md_sha": "b00313babeb4b26c7cca5f0e2157eceac9b5c420",
+        "install_target_name": "market-search"
+      }
+    },
+    {
+      "id": "metalbear-co/skills:skills/mirrord-chaos",
+      "name": "mirrord-chaos",
+      "repo": "metalbear-co/skills",
+      "path": "skills/mirrord-chaos/SKILL.md",
+      "sha": "764f6322793e77190a21b6e2f1f1d9982e89d6d0",
+      "pinned": {
+        "repo_slug": "metalbear-co/skills",
+        "skill_md_path": "skills/mirrord-chaos/SKILL.md",
+        "repo_commit_sha": "ff44181162fe6e76e503781a6d20bbdb4bbbcc5c",
+        "skill_tree_sha": "85a91d06b21e9f1764445bec0cff7dc35b886734",
+        "skill_md_sha": "764f6322793e77190a21b6e2f1f1d9982e89d6d0",
+        "install_target_name": "mirrord-chaos"
+      }
+    },
+    {
+      "id": "metalbear-co/skills:skills/mirrord-config",
+      "name": "mirrord-config",
+      "repo": "metalbear-co/skills",
+      "path": "skills/mirrord-config/SKILL.md",
+      "sha": "5754bdbe64e029054f26b160f00ad3a90a654dec",
+      "pinned": {
+        "repo_slug": "metalbear-co/skills",
+        "skill_md_path": "skills/mirrord-config/SKILL.md",
+        "repo_commit_sha": "ff44181162fe6e76e503781a6d20bbdb4bbbcc5c",
+        "skill_tree_sha": "2a270d4bf88c54569a5d9d83979fae5bda369e85",
+        "skill_md_sha": "5754bdbe64e029054f26b160f00ad3a90a654dec",
+        "install_target_name": "mirrord-config"
+      }
+    },
+    {
+      "id": "metalbear-co/skills:skills/mirrord-kafka",
+      "name": "mirrord-kafka",
+      "repo": "metalbear-co/skills",
+      "path": "skills/mirrord-kafka/SKILL.md",
+      "sha": "4bc80c3e0f78993a4814d6aa399d1ea7cddc7f58",
+      "pinned": {
+        "repo_slug": "metalbear-co/skills",
+        "skill_md_path": "skills/mirrord-kafka/SKILL.md",
+        "repo_commit_sha": "ff44181162fe6e76e503781a6d20bbdb4bbbcc5c",
+        "skill_tree_sha": "e9c7faaa83d3528fbffc48f34dcb7cf3cda778d2",
+        "skill_md_sha": "4bc80c3e0f78993a4814d6aa399d1ea7cddc7f58",
+        "install_target_name": "mirrord-kafka"
+      }
+    },
+    {
+      "id": "metalbear-co/skills:skills/mirrord-operator",
+      "name": "mirrord-operator",
+      "repo": "metalbear-co/skills",
+      "path": "skills/mirrord-operator/SKILL.md",
+      "sha": "db515091b3a70292fbee031893184a55c0830504",
+      "pinned": {
+        "repo_slug": "metalbear-co/skills",
+        "skill_md_path": "skills/mirrord-operator/SKILL.md",
+        "repo_commit_sha": "ff44181162fe6e76e503781a6d20bbdb4bbbcc5c",
+        "skill_tree_sha": "7027574541df71bce5e0403a9c3ef0b1361221af",
+        "skill_md_sha": "db515091b3a70292fbee031893184a55c0830504",
+        "install_target_name": "mirrord-operator"
+      }
+    },
+    {
+      "id": "metalbear-co/skills:skills/mirrord-quickstart",
+      "name": "mirrord-quickstart",
+      "repo": "metalbear-co/skills",
+      "path": "skills/mirrord-quickstart/SKILL.md",
+      "sha": "7982c66ae2a9163a9bebd9d855866cd576a873f0",
+      "pinned": {
+        "repo_slug": "metalbear-co/skills",
+        "skill_md_path": "skills/mirrord-quickstart/SKILL.md",
+        "repo_commit_sha": "ff44181162fe6e76e503781a6d20bbdb4bbbcc5c",
+        "skill_tree_sha": "b883805bf4f0f65189041a52acaba6fe9b3f9086",
+        "skill_md_sha": "7982c66ae2a9163a9bebd9d855866cd576a873f0",
+        "install_target_name": "mirrord-quickstart"
+      }
+    },
+    {
+      "id": "metalbear-co/skills:skills/mirrord-temporal",
+      "name": "mirrord-temporal",
+      "repo": "metalbear-co/skills",
+      "path": "skills/mirrord-temporal/SKILL.md",
+      "sha": "14197a90df02223d9498d99d1b7b3b9916e85567",
+      "pinned": {
+        "repo_slug": "metalbear-co/skills",
+        "skill_md_path": "skills/mirrord-temporal/SKILL.md",
+        "repo_commit_sha": "ff44181162fe6e76e503781a6d20bbdb4bbbcc5c",
+        "skill_tree_sha": "5657e76d593a249c99f0f95d4034d3ada8dcce69",
+        "skill_md_sha": "14197a90df02223d9498d99d1b7b3b9916e85567",
+        "install_target_name": "mirrord-temporal"
+      }
+    },
+    {
+      "id": "metalbear-co/skills:skills/mirrord-up",
+      "name": "mirrord-up",
+      "repo": "metalbear-co/skills",
+      "path": "skills/mirrord-up/SKILL.md",
+      "sha": "2bd74488e50367ce2930ac9bd779c256c96ca226",
+      "pinned": {
+        "repo_slug": "metalbear-co/skills",
+        "skill_md_path": "skills/mirrord-up/SKILL.md",
+        "repo_commit_sha": "ff44181162fe6e76e503781a6d20bbdb4bbbcc5c",
+        "skill_tree_sha": "c76ed5fde02bdcc0e50d5cc0aa6e5ea99bd4b84d",
+        "skill_md_sha": "2bd74488e50367ce2930ac9bd779c256c96ca226",
+        "install_target_name": "mirrord-up"
+      }
+    },
+    {
+      "id": "nowistay/claude:skills/calendar-revenue",
+      "name": "calendar-revenue",
+      "repo": "nowistay/claude",
+      "path": "skills/calendar-revenue/SKILL.md",
+      "sha": "a87e2cdb001a59fdd5d1ebe4a5cffeb0a9ebc961",
+      "pinned": {
+        "repo_slug": "Nowistay/claude",
+        "skill_md_path": "skills/calendar-revenue/SKILL.md",
+        "repo_commit_sha": "e233bd45478e57ddf122877025e3be70c0ac38d0",
+        "skill_tree_sha": "a4ad11d8193b43cfea56ff40243e1d0436ce1c7d",
+        "skill_md_sha": "a87e2cdb001a59fdd5d1ebe4a5cffeb0a9ebc961",
+        "install_target_name": "calendar-revenue"
+      }
+    },
+    {
+      "id": "nowistay/claude:skills/daily-brief",
+      "name": "daily-brief",
+      "repo": "nowistay/claude",
+      "path": "skills/daily-brief/SKILL.md",
+      "sha": "e7f9df9f747668dacefa5d8a8b34e3abebc2acf8",
+      "pinned": {
+        "repo_slug": "Nowistay/claude",
+        "skill_md_path": "skills/daily-brief/SKILL.md",
+        "repo_commit_sha": "e233bd45478e57ddf122877025e3be70c0ac38d0",
+        "skill_tree_sha": "3a565908738e29f4c63bb06fbf76f51f7174dd3e",
+        "skill_md_sha": "e7f9df9f747668dacefa5d8a8b34e3abebc2acf8",
+        "install_target_name": "daily-brief"
+      }
+    },
+    {
+      "id": "nowistay/claude:skills/direct-bookings",
+      "name": "direct-bookings",
+      "repo": "nowistay/claude",
+      "path": "skills/direct-bookings/SKILL.md",
+      "sha": "4fc6e7ee6d6647c3b74f66cdea9051d7ec031ebc",
+      "pinned": {
+        "repo_slug": "Nowistay/claude",
+        "skill_md_path": "skills/direct-bookings/SKILL.md",
+        "repo_commit_sha": "e233bd45478e57ddf122877025e3be70c0ac38d0",
+        "skill_tree_sha": "91f1ac7806a7ba7f80a2a1cbe89339d96db513a9",
+        "skill_md_sha": "4fc6e7ee6d6647c3b74f66cdea9051d7ec031ebc",
+        "install_target_name": "direct-bookings"
+      }
+    },
+    {
+      "id": "nowistay/claude:skills/guest-messaging",
+      "name": "guest-messaging",
+      "repo": "nowistay/claude",
+      "path": "skills/guest-messaging/SKILL.md",
+      "sha": "b9fd5ec5bd4a069f79b8c88c1024ac8e26fdc225",
+      "pinned": {
+        "repo_slug": "Nowistay/claude",
+        "skill_md_path": "skills/guest-messaging/SKILL.md",
+        "repo_commit_sha": "e233bd45478e57ddf122877025e3be70c0ac38d0",
+        "skill_tree_sha": "457359a8f71bbdd8e83c5dfdda9f365d54305591",
+        "skill_md_sha": "b9fd5ec5bd4a069f79b8c88c1024ac8e26fdc225",
+        "install_target_name": "guest-messaging"
+      }
+    },
+    {
+      "id": "nowistay/claude:skills/guest-records",
+      "name": "guest-records",
+      "repo": "nowistay/claude",
+      "path": "skills/guest-records/SKILL.md",
+      "sha": "529e041a20e102b5de4fd4802dab8f7072ee627a",
+      "pinned": {
+        "repo_slug": "Nowistay/claude",
+        "skill_md_path": "skills/guest-records/SKILL.md",
+        "repo_commit_sha": "e233bd45478e57ddf122877025e3be70c0ac38d0",
+        "skill_tree_sha": "70f68d3bc30d96da092430ce3e9f3802dd79e93a",
+        "skill_md_sha": "529e041a20e102b5de4fd4802dab8f7072ee627a",
+        "install_target_name": "guest-records"
+      }
+    },
+    {
+      "id": "nowistay/claude:skills/portfolio-reporting",
+      "name": "portfolio-reporting",
+      "repo": "nowistay/claude",
+      "path": "skills/portfolio-reporting/SKILL.md",
+      "sha": "7b4eee228dc20b72362abbeec8059aaa61a86c07",
+      "pinned": {
+        "repo_slug": "Nowistay/claude",
+        "skill_md_path": "skills/portfolio-reporting/SKILL.md",
+        "repo_commit_sha": "e233bd45478e57ddf122877025e3be70c0ac38d0",
+        "skill_tree_sha": "2bf36f74e76661ef304678a9f5129e68a9c4ef84",
+        "skill_md_sha": "7b4eee228dc20b72362abbeec8059aaa61a86c07",
+        "install_target_name": "portfolio-reporting"
+      }
+    },
+    {
+      "id": "nowistay/claude:skills/property-knowledge",
+      "name": "property-knowledge",
+      "repo": "nowistay/claude",
+      "path": "skills/property-knowledge/SKILL.md",
+      "sha": "308ddff488a8da4f13d702962549076ffa9d4e60",
+      "pinned": {
+        "repo_slug": "Nowistay/claude",
+        "skill_md_path": "skills/property-knowledge/SKILL.md",
+        "repo_commit_sha": "e233bd45478e57ddf122877025e3be70c0ac38d0",
+        "skill_tree_sha": "e39bee63c807792b4d73409ff3f76a520417e739",
+        "skill_md_sha": "308ddff488a8da4f13d702962549076ffa9d4e60",
+        "install_target_name": "property-knowledge"
+      }
+    },
+    {
+      "id": "nowistay/claude:skills/team-operations",
+      "name": "team-operations",
+      "repo": "nowistay/claude",
+      "path": "skills/team-operations/SKILL.md",
+      "sha": "4669c684b8c70999245002df53bcdc089417c651",
+      "pinned": {
+        "repo_slug": "Nowistay/claude",
+        "skill_md_path": "skills/team-operations/SKILL.md",
+        "repo_commit_sha": "e233bd45478e57ddf122877025e3be70c0ac38d0",
+        "skill_tree_sha": "ebab258c4e790d16726a6dc3f4aadc7627bccb2c",
+        "skill_md_sha": "4669c684b8c70999245002df53bcdc089417c651",
+        "install_target_name": "team-operations"
+      }
+    },
+    {
+      "id": "nowistay/claude:skills/welcome-guide",
+      "name": "welcome-guide",
+      "repo": "nowistay/claude",
+      "path": "skills/welcome-guide/SKILL.md",
+      "sha": "2b991ffae57a49d13cddc18cc19a94f189c80e94",
+      "pinned": {
+        "repo_slug": "Nowistay/claude",
+        "skill_md_path": "skills/welcome-guide/SKILL.md",
+        "repo_commit_sha": "e233bd45478e57ddf122877025e3be70c0ac38d0",
+        "skill_tree_sha": "d6ada7a40947a2b7b98a196a4ba057ffd2eb71c3",
+        "skill_md_sha": "2b991ffae57a49d13cddc18cc19a94f189c80e94",
+        "install_target_name": "welcome-guide"
+      }
+    },
+    {
+      "id": "popety/popety-io-claude-plugin:plugins/popety/skills/feasibility-snapshot",
+      "name": "feasibility-snapshot",
+      "repo": "popety/popety-io-claude-plugin",
+      "path": "plugins/popety/skills/feasibility-snapshot/SKILL.md",
+      "sha": "cb20c28a10e0d063951f1f5eec381b57d4d2997c",
+      "pinned": {
+        "repo_slug": "Popety/popety-io-claude-plugin",
+        "skill_md_path": "plugins/popety/skills/feasibility-snapshot/SKILL.md",
+        "repo_commit_sha": "c9c06b7b90917eb4c605f84dc324e817b03c84ca",
+        "skill_tree_sha": "ffe342832448438d01e3fa5b3984fa93c2a5dba0",
+        "skill_md_sha": "cb20c28a10e0d063951f1f5eec381b57d4d2997c",
+        "install_target_name": "feasibility-snapshot"
+      }
+    },
+    {
+      "id": "popety/popety-io-claude-plugin:plugins/popety/skills/find-development-sites",
+      "name": "find-development-sites",
+      "repo": "popety/popety-io-claude-plugin",
+      "path": "plugins/popety/skills/find-development-sites/SKILL.md",
+      "sha": "1e0cd2716a5aef8e75209dfd15849d39777ae51e",
+      "pinned": {
+        "repo_slug": "Popety/popety-io-claude-plugin",
+        "skill_md_path": "plugins/popety/skills/find-development-sites/SKILL.md",
+        "repo_commit_sha": "c9c06b7b90917eb4c605f84dc324e817b03c84ca",
+        "skill_tree_sha": "bb1cd0b3a8ee8a4dc76d3db715bd48e186f35e08",
+        "skill_md_sha": "1e0cd2716a5aef8e75209dfd15849d39777ae51e",
+        "install_target_name": "find-development-sites"
+      }
+    },
+    {
+      "id": "popety/popety-io-claude-plugin:plugins/popety/skills/investment-yield",
+      "name": "investment-yield",
+      "repo": "popety/popety-io-claude-plugin",
+      "path": "plugins/popety/skills/investment-yield/SKILL.md",
+      "sha": "b454941cc2b216451a43e90aeafc2a28d04a9d20",
+      "pinned": {
+        "repo_slug": "Popety/popety-io-claude-plugin",
+        "skill_md_path": "plugins/popety/skills/investment-yield/SKILL.md",
+        "repo_commit_sha": "c9c06b7b90917eb4c605f84dc324e817b03c84ca",
+        "skill_tree_sha": "b296049206f8dd8661f9e8141403a071433f7963",
+        "skill_md_sha": "b454941cc2b216451a43e90aeafc2a28d04a9d20",
+        "install_target_name": "investment-yield"
+      }
+    },
+    {
+      "id": "popety/popety-io-claude-plugin:plugins/popety/skills/listing-hunter",
+      "name": "listing-hunter",
+      "repo": "popety/popety-io-claude-plugin",
+      "path": "plugins/popety/skills/listing-hunter/SKILL.md",
+      "sha": "bc85610e62efec3426e4165386a50d571aecfcb8",
+      "pinned": {
+        "repo_slug": "Popety/popety-io-claude-plugin",
+        "skill_md_path": "plugins/popety/skills/listing-hunter/SKILL.md",
+        "repo_commit_sha": "c9c06b7b90917eb4c605f84dc324e817b03c84ca",
+        "skill_tree_sha": "b9d3fa0be0cf6ec54dbde6e033b83ef8dcd7a904",
+        "skill_md_sha": "bc85610e62efec3426e4165386a50d571aecfcb8",
+        "install_target_name": "listing-hunter"
+      }
+    },
+    {
+      "id": "popety/popety-io-claude-plugin:plugins/popety/skills/neighborhood-profile",
+      "name": "neighborhood-profile",
+      "repo": "popety/popety-io-claude-plugin",
+      "path": "plugins/popety/skills/neighborhood-profile/SKILL.md",
+      "sha": "50e5c3507fcb4be833fb637273b515d91e4b9329",
+      "pinned": {
+        "repo_slug": "Popety/popety-io-claude-plugin",
+        "skill_md_path": "plugins/popety/skills/neighborhood-profile/SKILL.md",
+        "repo_commit_sha": "c9c06b7b90917eb4c605f84dc324e817b03c84ca",
+        "skill_tree_sha": "0ad880628f696ad2bc5f73b6773d711ba4652c66",
+        "skill_md_sha": "50e5c3507fcb4be833fb637273b515d91e4b9329",
+        "install_target_name": "neighborhood-profile"
+      }
+    },
+    {
+      "id": "popety/popety-io-claude-plugin:plugins/popety/skills/parcel-report",
+      "name": "parcel-report",
+      "repo": "popety/popety-io-claude-plugin",
+      "path": "plugins/popety/skills/parcel-report/SKILL.md",
+      "sha": "25415d7b9f3167151235ace74d2e5e8a21d3aad2",
+      "pinned": {
+        "repo_slug": "Popety/popety-io-claude-plugin",
+        "skill_md_path": "plugins/popety/skills/parcel-report/SKILL.md",
+        "repo_commit_sha": "c9c06b7b90917eb4c605f84dc324e817b03c84ca",
+        "skill_tree_sha": "feb72011b8f30cb41abaf6f3516a8ec769dfc44c",
+        "skill_md_sha": "25415d7b9f3167151235ace74d2e5e8a21d3aad2",
+        "install_target_name": "parcel-report"
+      }
+    },
+    {
+      "id": "popety/popety-io-claude-plugin:plugins/popety/skills/purchase-market-overview",
+      "name": "purchase-market-overview",
+      "repo": "popety/popety-io-claude-plugin",
+      "path": "plugins/popety/skills/purchase-market-overview/SKILL.md",
+      "sha": "80556461d15d1e70ad45d9ca1029812f130cea8a",
+      "pinned": {
+        "repo_slug": "Popety/popety-io-claude-plugin",
+        "skill_md_path": "plugins/popety/skills/purchase-market-overview/SKILL.md",
+        "repo_commit_sha": "c9c06b7b90917eb4c605f84dc324e817b03c84ca",
+        "skill_tree_sha": "adfa51657f5f7a64d41b14ccbdc7c88d7a083c64",
+        "skill_md_sha": "80556461d15d1e70ad45d9ca1029812f130cea8a",
+        "install_target_name": "purchase-market-overview"
+      }
+    },
+    {
+      "id": "popety/popety-io-claude-plugin:plugins/popety/skills/rental-market-overview",
+      "name": "rental-market-overview",
+      "repo": "popety/popety-io-claude-plugin",
+      "path": "plugins/popety/skills/rental-market-overview/SKILL.md",
+      "sha": "c7cd59438768f0752f0a8ce34d95970c55503c91",
+      "pinned": {
+        "repo_slug": "Popety/popety-io-claude-plugin",
+        "skill_md_path": "plugins/popety/skills/rental-market-overview/SKILL.md",
+        "repo_commit_sha": "c9c06b7b90917eb4c605f84dc324e817b03c84ca",
+        "skill_tree_sha": "f7da2e434b7b182722f20764cc702ac898ce0c94",
+        "skill_md_sha": "c7cd59438768f0752f0a8ce34d95970c55503c91",
+        "install_target_name": "rental-market-overview"
+      }
+    },
+    {
+      "id": "popety/popety-io-claude-plugin:plugins/popety/skills/value-estimate",
+      "name": "value-estimate",
+      "repo": "popety/popety-io-claude-plugin",
+      "path": "plugins/popety/skills/value-estimate/SKILL.md",
+      "sha": "c34b71ab9ee8f618c9f75ae2027f92e69fe9a0fc",
+      "pinned": {
+        "repo_slug": "Popety/popety-io-claude-plugin",
+        "skill_md_path": "plugins/popety/skills/value-estimate/SKILL.md",
+        "repo_commit_sha": "c9c06b7b90917eb4c605f84dc324e817b03c84ca",
+        "skill_tree_sha": "216c2a4955be4ef5b20255b7823e5bfcd739045b",
+        "skill_md_sha": "c34b71ab9ee8f618c9f75ae2027f92e69fe9a0fc",
+        "install_target_name": "value-estimate"
+      }
+    },
+    {
+      "id": "sonarsource/sonarqube-agent-plugins:skills/sonar-analyze",
+      "name": "sonar-analyze",
+      "repo": "sonarsource/sonarqube-agent-plugins",
+      "path": "skills/sonar-analyze/SKILL.md",
+      "sha": "2317667308362f7987bb0718313263c684fa069d",
+      "pinned": {
+        "repo_slug": "SonarSource/sonarqube-agent-plugins",
+        "skill_md_path": "skills/sonar-analyze/SKILL.md",
+        "repo_commit_sha": "926e5f067ff932d535151e70b1894d22ee298629",
+        "skill_tree_sha": "a95af4004caf8b53f9f69446860e3478af755eb6",
+        "skill_md_sha": "2317667308362f7987bb0718313263c684fa069d",
+        "install_target_name": "sonar-analyze"
+      }
+    },
+    {
+      "id": "sonarsource/sonarqube-agent-plugins:skills/sonar-coverage",
+      "name": "sonar-coverage",
+      "repo": "sonarsource/sonarqube-agent-plugins",
+      "path": "skills/sonar-coverage/SKILL.md",
+      "sha": "21eaaf391a7a0d44bc90500f68c8e680122ef4ad",
+      "pinned": {
+        "repo_slug": "SonarSource/sonarqube-agent-plugins",
+        "skill_md_path": "skills/sonar-coverage/SKILL.md",
+        "repo_commit_sha": "926e5f067ff932d535151e70b1894d22ee298629",
+        "skill_tree_sha": "40697c3c7d94d7e8f49b99d7c4ee5d77b5d5398b",
+        "skill_md_sha": "21eaaf391a7a0d44bc90500f68c8e680122ef4ad",
+        "install_target_name": "sonar-coverage"
+      }
+    },
+    {
+      "id": "sonarsource/sonarqube-agent-plugins:skills/sonar-dependency-risks",
+      "name": "sonar-dependency-risks",
+      "repo": "sonarsource/sonarqube-agent-plugins",
+      "path": "skills/sonar-dependency-risks/SKILL.md",
+      "sha": "715d578a94fe539c34ff390c71453050b49f5bf8",
+      "pinned": {
+        "repo_slug": "SonarSource/sonarqube-agent-plugins",
+        "skill_md_path": "skills/sonar-dependency-risks/SKILL.md",
+        "repo_commit_sha": "926e5f067ff932d535151e70b1894d22ee298629",
+        "skill_tree_sha": "cfe9b695b65afb8b2dffff55d12ad243ac8d7865",
+        "skill_md_sha": "715d578a94fe539c34ff390c71453050b49f5bf8",
+        "install_target_name": "sonar-dependency-risks"
+      }
+    },
+    {
+      "id": "sonarsource/sonarqube-agent-plugins:skills/sonar-duplication",
+      "name": "sonar-duplication",
+      "repo": "sonarsource/sonarqube-agent-plugins",
+      "path": "skills/sonar-duplication/SKILL.md",
+      "sha": "30b2c47e1361ea491b127997da11640d9e0cad95",
+      "pinned": {
+        "repo_slug": "SonarSource/sonarqube-agent-plugins",
+        "skill_md_path": "skills/sonar-duplication/SKILL.md",
+        "repo_commit_sha": "926e5f067ff932d535151e70b1894d22ee298629",
+        "skill_tree_sha": "a486a9965b01e2fb45ffa39c1fd64b74c2f8fa3e",
+        "skill_md_sha": "30b2c47e1361ea491b127997da11640d9e0cad95",
+        "install_target_name": "sonar-duplication"
+      }
+    },
+    {
+      "id": "sonarsource/sonarqube-agent-plugins:skills/sonar-fix-issue",
+      "name": "sonar-fix-issue",
+      "repo": "sonarsource/sonarqube-agent-plugins",
+      "path": "skills/sonar-fix-issue/SKILL.md",
+      "sha": "168ed1bef7d438910496a4696a4b28b0f4c22374",
+      "pinned": {
+        "repo_slug": "SonarSource/sonarqube-agent-plugins",
+        "skill_md_path": "skills/sonar-fix-issue/SKILL.md",
+        "repo_commit_sha": "926e5f067ff932d535151e70b1894d22ee298629",
+        "skill_tree_sha": "dd1e8d6b491a5e09078f0c9520f4bc9762f30f04",
+        "skill_md_sha": "168ed1bef7d438910496a4696a4b28b0f4c22374",
+        "install_target_name": "sonar-fix-issue"
+      }
+    },
+    {
+      "id": "sonarsource/sonarqube-agent-plugins:skills/sonar-list-issues",
+      "name": "sonar-list-issues",
+      "repo": "sonarsource/sonarqube-agent-plugins",
+      "path": "skills/sonar-list-issues/SKILL.md",
+      "sha": "27f76f27a2895c2b5b42aeeea0c4da7413d4e182",
+      "pinned": {
+        "repo_slug": "SonarSource/sonarqube-agent-plugins",
+        "skill_md_path": "skills/sonar-list-issues/SKILL.md",
+        "repo_commit_sha": "926e5f067ff932d535151e70b1894d22ee298629",
+        "skill_tree_sha": "c586cd60339af9bbf54c77f01ea3ce00e66d7782",
+        "skill_md_sha": "27f76f27a2895c2b5b42aeeea0c4da7413d4e182",
+        "install_target_name": "sonar-list-issues"
+      }
+    },
+    {
+      "id": "sonarsource/sonarqube-agent-plugins:skills/sonar-list-projects",
+      "name": "sonar-list-projects",
+      "repo": "sonarsource/sonarqube-agent-plugins",
+      "path": "skills/sonar-list-projects/SKILL.md",
+      "sha": "b547a5ceed3117b71ce5df6d846cd750eb33dc60",
+      "pinned": {
+        "repo_slug": "SonarSource/sonarqube-agent-plugins",
+        "skill_md_path": "skills/sonar-list-projects/SKILL.md",
+        "repo_commit_sha": "926e5f067ff932d535151e70b1894d22ee298629",
+        "skill_tree_sha": "da2bc01c480b5302652d65f8d0f72e7a4d8e20af",
+        "skill_md_sha": "b547a5ceed3117b71ce5df6d846cd750eb33dc60",
+        "install_target_name": "sonar-list-projects"
+      }
+    },
+    {
+      "id": "sonarsource/sonarqube-agent-plugins:skills/sonar-quality-gate",
+      "name": "sonar-quality-gate",
+      "repo": "sonarsource/sonarqube-agent-plugins",
+      "path": "skills/sonar-quality-gate/SKILL.md",
+      "sha": "54895583d5a5b0f0a9471ccbf549cff4ef809e03",
+      "pinned": {
+        "repo_slug": "SonarSource/sonarqube-agent-plugins",
+        "skill_md_path": "skills/sonar-quality-gate/SKILL.md",
+        "repo_commit_sha": "926e5f067ff932d535151e70b1894d22ee298629",
+        "skill_tree_sha": "0802f3d62dae8374675d397c5f65499a55e2a82b",
+        "skill_md_sha": "54895583d5a5b0f0a9471ccbf549cff4ef809e03",
+        "install_target_name": "sonar-quality-gate"
+      }
+    },
+    {
+      "id": "swirlai/swirl-claude-plugin:skills/connector",
+      "name": "connector",
+      "repo": "swirlai/swirl-claude-plugin",
+      "path": "skills/connector/SKILL.md",
+      "sha": "daf4f6c1b24cff9342519f12f04cab1a2f36ed11",
+      "pinned": {
+        "repo_slug": "swirlai/swirl-claude-plugin",
+        "skill_md_path": "skills/connector/SKILL.md",
+        "repo_commit_sha": "59fdbbbd164ee89826f3b5553965b5808a199e9b",
+        "skill_tree_sha": "c2eefbd3ed1dbd518380612cf626fceb86ec35c3",
+        "skill_md_sha": "daf4f6c1b24cff9342519f12f04cab1a2f36ed11",
+        "install_target_name": "connector"
+      }
+    },
+    {
+      "id": "swirlai/swirl-claude-plugin:skills/install",
+      "name": "install",
+      "repo": "swirlai/swirl-claude-plugin",
+      "path": "skills/install/SKILL.md",
+      "sha": "b7d47b126e720d39b7497ca7cd2a483c8cd3792d",
+      "pinned": {
+        "repo_slug": "swirlai/swirl-claude-plugin",
+        "skill_md_path": "skills/install/SKILL.md",
+        "repo_commit_sha": "59fdbbbd164ee89826f3b5553965b5808a199e9b",
+        "skill_tree_sha": "23a48c439ec76bf51e1ce280ee1b019de00a225e",
+        "skill_md_sha": "b7d47b126e720d39b7497ca7cd2a483c8cd3792d",
+        "install_target_name": "install"
+      }
+    },
+    {
+      "id": "swirlai/swirl-claude-plugin:skills/mcp",
+      "name": "mcp",
+      "repo": "swirlai/swirl-claude-plugin",
+      "path": "skills/mcp/SKILL.md",
+      "sha": "ca0b386e40612b8f9ea538d8da42ad52edd5ffa8",
+      "pinned": {
+        "repo_slug": "swirlai/swirl-claude-plugin",
+        "skill_md_path": "skills/mcp/SKILL.md",
+        "repo_commit_sha": "59fdbbbd164ee89826f3b5553965b5808a199e9b",
+        "skill_tree_sha": "e29ce91034ca1ed03943714e9d57bd4526ba1418",
+        "skill_md_sha": "ca0b386e40612b8f9ea538d8da42ad52edd5ffa8",
+        "install_target_name": "mcp"
+      }
+    },
+    {
+      "id": "swirlai/swirl-claude-plugin:skills/migrate",
+      "name": "migrate",
+      "repo": "swirlai/swirl-claude-plugin",
+      "path": "skills/migrate/SKILL.md",
+      "sha": "e510b6d53ad00fc6e019638595d0c2aa1dd2798f",
+      "pinned": {
+        "repo_slug": "swirlai/swirl-claude-plugin",
+        "skill_md_path": "skills/migrate/SKILL.md",
+        "repo_commit_sha": "59fdbbbd164ee89826f3b5553965b5808a199e9b",
+        "skill_tree_sha": "cfbad475e2d2425dff3c4f59b447f397f877ea6c",
+        "skill_md_sha": "e510b6d53ad00fc6e019638595d0c2aa1dd2798f",
+        "install_target_name": "migrate"
+      }
+    },
+    {
+      "id": "swirlai/swirl-claude-plugin:skills/provider",
+      "name": "provider",
+      "repo": "swirlai/swirl-claude-plugin",
+      "path": "skills/provider/SKILL.md",
+      "sha": "5cdac1164a5f0e1938f24461a8d5b01da285ab82",
+      "pinned": {
+        "repo_slug": "swirlai/swirl-claude-plugin",
+        "skill_md_path": "skills/provider/SKILL.md",
+        "repo_commit_sha": "59fdbbbd164ee89826f3b5553965b5808a199e9b",
+        "skill_tree_sha": "d617b4add37cceb71d5f1e0b4ee2484e6eaf0f85",
+        "skill_md_sha": "5cdac1164a5f0e1938f24461a8d5b01da285ab82",
+        "install_target_name": "provider"
+      }
+    },
+    {
+      "id": "swirlai/swirl-claude-plugin:skills/rag",
+      "name": "rag",
+      "repo": "swirlai/swirl-claude-plugin",
+      "path": "skills/rag/SKILL.md",
+      "sha": "5d5aedab4cc70f59b0489ac5db182c61e6b88d0d",
+      "pinned": {
+        "repo_slug": "swirlai/swirl-claude-plugin",
+        "skill_md_path": "skills/rag/SKILL.md",
+        "repo_commit_sha": "59fdbbbd164ee89826f3b5553965b5808a199e9b",
+        "skill_tree_sha": "73763e3e17705f13176a560c679881d62a5b9a9c",
+        "skill_md_sha": "5d5aedab4cc70f59b0489ac5db182c61e6b88d0d",
+        "install_target_name": "rag"
+      }
+    },
+    {
+      "id": "swirlai/swirl-claude-plugin:skills/railway",
+      "name": "railway",
+      "repo": "swirlai/swirl-claude-plugin",
+      "path": "skills/railway/SKILL.md",
+      "sha": "17d95ba698a3f293b5093e6e428d5f222fec1fc0",
+      "pinned": {
+        "repo_slug": "swirlai/swirl-claude-plugin",
+        "skill_md_path": "skills/railway/SKILL.md",
+        "repo_commit_sha": "59fdbbbd164ee89826f3b5553965b5808a199e9b",
+        "skill_tree_sha": "1dd07a094b20c3d4720bc28f003b00c94f8cfc77",
+        "skill_md_sha": "17d95ba698a3f293b5093e6e428d5f222fec1fc0",
+        "install_target_name": "railway"
+      }
+    },
+    {
+      "id": "swirlai/swirl-claude-plugin:skills/start",
+      "name": "start",
+      "repo": "swirlai/swirl-claude-plugin",
+      "path": "skills/start/SKILL.md",
+      "sha": "dc26c74765bf463faeaa2c470d4e0248d441168f",
+      "pinned": {
+        "repo_slug": "swirlai/swirl-claude-plugin",
+        "skill_md_path": "skills/start/SKILL.md",
+        "repo_commit_sha": "59fdbbbd164ee89826f3b5553965b5808a199e9b",
+        "skill_tree_sha": "e3ba302be9cabb3215090bfc53305b10576a01ad",
+        "skill_md_sha": "dc26c74765bf463faeaa2c470d4e0248d441168f",
+        "install_target_name": "start"
+      }
+    },
+    {
+      "id": "swirlai/swirl-claude-plugin:skills/troubleshoot",
+      "name": "troubleshoot",
+      "repo": "swirlai/swirl-claude-plugin",
+      "path": "skills/troubleshoot/SKILL.md",
+      "sha": "2fa223c0b5bde1a10124ac6deb83303df7bf1603",
+      "pinned": {
+        "repo_slug": "swirlai/swirl-claude-plugin",
+        "skill_md_path": "skills/troubleshoot/SKILL.md",
+        "repo_commit_sha": "59fdbbbd164ee89826f3b5553965b5808a199e9b",
+        "skill_tree_sha": "15b9d1494b9008a675c44507eb7210dcd72cd068",
+        "skill_md_sha": "2fa223c0b5bde1a10124ac6deb83303df7bf1603",
+        "install_target_name": "troubleshoot"
+      }
+    },
+    {
+      "id": "tanainc/tana-plugin:skills/add-to-meeting",
+      "name": "add-to-meeting",
+      "repo": "tanainc/tana-plugin",
+      "path": "skills/add-to-meeting/SKILL.md",
+      "sha": "1fd4db76e6e151165553e9162208e1cb24f1da47",
+      "pinned": {
+        "repo_slug": "tanainc/tana-plugin",
+        "skill_md_path": "skills/add-to-meeting/SKILL.md",
+        "repo_commit_sha": "133f6b54b7c389dacd82b6520d2fe43563573ff3",
+        "skill_tree_sha": "774071e85051dbe7e06290e51de6087a2e3ccf1b",
+        "skill_md_sha": "1fd4db76e6e151165553e9162208e1cb24f1da47",
+        "install_target_name": "add-to-meeting"
+      }
+    },
+    {
+      "id": "tanainc/tana-plugin:skills/ask-tana",
+      "name": "ask-tana",
+      "repo": "tanainc/tana-plugin",
+      "path": "skills/ask-tana/SKILL.md",
+      "sha": "1e7769bd5f9b2f27f086436328f566f3edce6590",
+      "pinned": {
+        "repo_slug": "tanainc/tana-plugin",
+        "skill_md_path": "skills/ask-tana/SKILL.md",
+        "repo_commit_sha": "133f6b54b7c389dacd82b6520d2fe43563573ff3",
+        "skill_tree_sha": "eede9341a28d5aa761ccd128a0cb193f7b814c3a",
+        "skill_md_sha": "1e7769bd5f9b2f27f086436328f566f3edce6590",
+        "install_target_name": "ask-tana"
+      }
+    }
+  ],
+  "pinnedCount": 129,
+  "cutoverValidationPassed": true,
+  "baselinePreserved": 55289,
+  "productionDataChanged": false,
+  "combinedCrawlRun": false,
+  "published": false
+}

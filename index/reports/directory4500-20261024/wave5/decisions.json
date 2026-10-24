@@ -1,0 +1,421 @@
+{
+  "generatedAt": "2026-10-24T19:41:08.241Z",
+  "reviewSha256": "f7f501aa1b16752fe8331ec3a8555ff8d3fcdc188377155391b5014ea14fc748",
+  "excludeRepos": [],
+  "excludeIds": [
+    "clamp-sh/analytics-skills:skills/bayesian-experiment-reader",
+    "eodhistoricaldata/eodhd-claude-skills:skills/eodhd-api",
+    "honeydew-ai/honeydew-ai-coding-agents-plugins:skills/attribute-creation",
+    "honeydew-ai/honeydew-ai-coding-agents-plugins:skills/domain-creation",
+    "honeydew-ai/honeydew-ai-coding-agents-plugins:skills/entity-creation",
+    "honeydew-ai/honeydew-ai-coding-agents-plugins:skills/metric-creation",
+    "honeydew-ai/honeydew-ai-coding-agents-plugins:skills/relation-creation",
+    "parallel-web/parallel-agent-skills:skills/result",
+    "parallel-web/parallel-agent-skills:skills/status",
+    "auroralabs-loci/loci-claude:skills/help",
+    "auroralabs-loci/loci-claude:skills/init",
+    "cashflow-tech/plugin:skills/setup",
+    "controller-ai/controllerai-claude-plugin:skills/controllerai-node-config",
+    "major-technology/cli:plugins/major-build/skills/agent-builder",
+    "major-technology/cli:plugins/major-build/skills/app-builder",
+    "major-technology/cli:plugins/major-build/skills/debug-issue",
+    "major-technology/cli:plugins/major-build/skills/using-apps",
+    "major-technology/cli:plugins/major-build/skills/using-frontend-data-table",
+    "major-technology/cli:plugins/major-build/skills/workflow-builder",
+    "pydantic/skills:skills/logfire-evals",
+    "pydantic/skills:skills/logfire-infrastructure",
+    "pydantic/skills:skills/logfire-setup",
+    "trysonar/skills:skills/rank-tracking",
+    "uniformdev/agent-skills:skills/uniform-automations",
+    "alwaysmeticulous/skills:skills/meticulous-cli",
+    "alwaysmeticulous/skills:skills/meticulous-fix",
+    "alwaysmeticulous/skills:skills/meticulous-increase-coverage",
+    "alwaysmeticulous/skills:skills/meticulous-review",
+    "alwaysmeticulous/skills:skills/meticulous-test",
+    "alwaysmeticulous/skills:skills/meticulous-use-session-data",
+    "alwaysmeticulous/skills:skills/meticulous-zero-diff-task",
+    "crowdstrike/foundry-skills:skills/api-integrations",
+    "crowdstrike/foundry-skills:skills/debugging-workflows",
+    "crowdstrike/foundry-skills:skills/e2e-testing",
+    "crowdstrike/foundry-skills:skills/functions-development",
+    "crowdstrike/foundry-skills:skills/functions-falcon-api",
+    "crowdstrike/foundry-skills:skills/security-patterns",
+    "dreambaseai/skills:skills/dreambase-skill-creator/assets/skill-template",
+    "icons8/agent-skills:skills/ui-polish"
+  ],
+  "excluded": [
+    {
+      "id": "clamp-sh/analytics-skills:skills/bayesian-experiment-reader",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "experiment-result-reader",
+        "experiment-result-reader",
+        "analytics-profile-setup"
+      ]
+    },
+    {
+      "id": "eodhistoricaldata/eodhd-claude-skills:skills/eodhd-api",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "registry/capabilities.json"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "honeydew-ai/honeydew-ai-coding-agents-plugins:skills/attribute-creation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "validation"
+      ]
+    },
+    {
+      "id": "honeydew-ai/honeydew-ai-coding-agents-plugins:skills/domain-creation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "validation"
+      ]
+    },
+    {
+      "id": "honeydew-ai/honeydew-ai-coding-agents-plugins:skills/entity-creation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "validation",
+        "relation-creation"
+      ]
+    },
+    {
+      "id": "honeydew-ai/honeydew-ai-coding-agents-plugins:skills/metric-creation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "validation"
+      ]
+    },
+    {
+      "id": "honeydew-ai/honeydew-ai-coding-agents-plugins:skills/relation-creation",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "validation"
+      ]
+    },
+    {
+      "id": "parallel-web/parallel-agent-skills:skills/result",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "parallel-cli-setup"
+      ]
+    },
+    {
+      "id": "parallel-web/parallel-agent-skills:skills/status",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "parallel-cli-setup"
+      ]
+    },
+    {
+      "id": "auroralabs-loci/loci-claude:skills/help",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "init",
+        "memory-report",
+        "init"
+      ]
+    },
+    {
+      "id": "auroralabs-loci/loci-claude:skills/init",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup"
+      ]
+    },
+    {
+      "id": "cashflow-tech/plugin:skills/setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "recap"
+      ]
+    },
+    {
+      "id": "controller-ai/controllerai-claude-plugin:skills/controllerai-node-config",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "controllerai-expressions"
+      ]
+    },
+    {
+      "id": "major-technology/cli:plugins/major-build/skills/agent-builder",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "workflow-builder"
+      ]
+    },
+    {
+      "id": "major-technology/cli:plugins/major-build/skills/app-builder",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "new-project",
+        "debug-issue",
+        "workflow-builder",
+        "using-connectors"
+      ]
+    },
+    {
+      "id": "major-technology/cli:plugins/major-build/skills/debug-issue",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "app-builder"
+      ]
+    },
+    {
+      "id": "major-technology/cli:plugins/major-build/skills/using-apps",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "app-builder",
+        "app-builder",
+        "agent-builder",
+        "workflow-builder"
+      ]
+    },
+    {
+      "id": "major-technology/cli:plugins/major-build/skills/using-frontend-data-table",
+      "reason": "plugin-root-or-external-package-dependency"
+    },
+    {
+      "id": "major-technology/cli:plugins/major-build/skills/workflow-builder",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "using-apps"
+      ]
+    },
+    {
+      "id": "pydantic/skills:skills/logfire-evals",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/logfire-instrumentation/references/auth.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "pydantic/skills:skills/logfire-infrastructure",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/logfire-instrumentation/references/auth.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "pydantic/skills:skills/logfire-setup",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "skills/logfire-instrumentation/references/auth.md",
+        "skills/logfire-instrumentation/SKILL.md",
+        "skills/logfire-frontend/SKILL.md",
+        "skills/logfire-infrastructure/SKILL.md",
+        "skills/logfire-evals/SKILL.md",
+        "skills/logfire-query/SKILL.md",
+        "skills/logfire-ui/SKILL.md",
+        "skills/logfire-gateway/SKILL.md",
+        "skills/logfire-coding-agents/SKILL.md",
+        "skills/logfire-instrumentation/references/auth.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "trysonar/skills:skills/rank-tracking",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "keyword-research"
+      ]
+    },
+    {
+      "id": "uniformdev/agent-skills:skills/uniform-automations",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "uniform-sdk"
+      ]
+    },
+    {
+      "id": "alwaysmeticulous/skills:skills/meticulous-cli",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "meticulous-cli-update"
+      ]
+    },
+    {
+      "id": "alwaysmeticulous/skills:skills/meticulous-fix",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "meticulous-cli-update"
+      ]
+    },
+    {
+      "id": "alwaysmeticulous/skills:skills/meticulous-increase-coverage",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "meticulous-cli-update"
+      ]
+    },
+    {
+      "id": "alwaysmeticulous/skills:skills/meticulous-review",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "meticulous-cli-update"
+      ]
+    },
+    {
+      "id": "alwaysmeticulous/skills:skills/meticulous-test",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "meticulous-cli-update"
+      ]
+    },
+    {
+      "id": "alwaysmeticulous/skills:skills/meticulous-use-session-data",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "meticulous-cli-update"
+      ]
+    },
+    {
+      "id": "alwaysmeticulous/skills:skills/meticulous-zero-diff-task",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "meticulous-cli-update"
+      ]
+    },
+    {
+      "id": "crowdstrike/foundry-skills:skills/api-integrations",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "use-cases/http-actions.md",
+        "use-cases/greynoise-deep-dive.md",
+        "use-cases/custom-soar-actions.md"
+      ],
+      "agents": [],
+      "skills": [
+        "development-workflow"
+      ]
+    },
+    {
+      "id": "crowdstrike/foundry-skills:skills/debugging-workflows",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "development-workflow"
+      ]
+    },
+    {
+      "id": "crowdstrike/foundry-skills:skills/e2e-testing",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "development-workflow"
+      ]
+    },
+    {
+      "id": "crowdstrike/foundry-skills:skills/functions-development",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "use-cases/python-functions.md",
+        "use-cases/logscale-ingestion.md",
+        "use-cases/api-pagination.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "crowdstrike/foundry-skills:skills/functions-falcon-api",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "use-cases/python-functions.md"
+      ],
+      "agents": [],
+      "skills": [
+        "development-workflow"
+      ]
+    },
+    {
+      "id": "crowdstrike/foundry-skills:skills/security-patterns",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "development-workflow"
+      ]
+    },
+    {
+      "id": "dreambaseai/skills:skills/dreambase-skill-creator/assets/skill-template",
+      "reason": "evaluation-template-or-embedded-asset-not-a-library-skill"
+    },
+    {
+      "id": "icons8/agent-skills:skills/ui-polish",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "design-tokens"
+      ]
+    }
+  ],
+  "approvedScope": "Source-verified recommended rows reviewed by repository and functional purpose; exact-path coverage only. No featured status, new broad trust roles, combined crawl or publication.",
+  "reviewNotes": "Final template and package-scope check on vendor skills. Embedded skill-template fixtures are not admissions. MCP/CLI prerequisites are disclosed; missing local companions remain held.",
+  "reviewed": 488,
+  "approvedCount": 267
+}

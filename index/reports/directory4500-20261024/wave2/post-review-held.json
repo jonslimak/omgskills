@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-10-24T19:40:44.944Z",
+  "held": [
+    {
+      "id": "signalpilot-labs/signalpilot-plugin:skills/signalpilot",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "dbt-workflow",
+        "sql-workflow"
+      ]
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-legacy",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/legacy.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-spring4d",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/architecture.md",
+        "rules/architecture.md"
+      ],
+      "agents": [],
+      "skills": []
+    },
+    {
+      "id": "adrianosantostreina/delphi-dev:skills/delphi-standards",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [
+        "rules/naming.md",
+        "rules/architecture.md",
+        "rules/forbidden.md",
+        "rules/security.md",
+        "rules/legacy.md",
+        "rules/testing.md"
+      ],
+      "agents": [],
+      "skills": []
+    }
+  ],
+  "baselineRemoved": 0,
+  "skillLevelBlockAdded": false,
+  "reason": "Companion skill dependency; exact-path coverage withdrawn in this isolated campaign only"
+}

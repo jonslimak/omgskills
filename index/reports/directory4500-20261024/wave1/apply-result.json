@@ -1,0 +1,1919 @@
+{
+  "generatedAt": "2026-10-24T19:31:35.678Z",
+  "wave": "wave1",
+  "addedSkills": [
+    {
+      "id": "proyecto26/system-design-skills:skills/api-design",
+      "name": "api-design",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/api-design/SKILL.md",
+      "sha": "d10cdd18f86b1235fc60d573e721fceb5c5bb97f",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/api-design/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "d21ef3cc1eee53c97e85be886ac14cae54b2df56",
+        "skill_md_sha": "d10cdd18f86b1235fc60d573e721fceb5c5bb97f",
+        "install_target_name": "api-design"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/architecture-diagram",
+      "name": "architecture-diagram",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/architecture-diagram/SKILL.md",
+      "sha": "8b3fe2ece3bac6168b7964e11bcbf1a874943b7b",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/architecture-diagram/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "fea483ded548f51be60f051d5f21634e0e1f55f1",
+        "skill_md_sha": "8b3fe2ece3bac6168b7964e11bcbf1a874943b7b",
+        "install_target_name": "architecture-diagram"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/back-of-the-envelope",
+      "name": "back-of-the-envelope",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/back-of-the-envelope/SKILL.md",
+      "sha": "29b900d243a880d559ec418570e86afdb0a4a31c",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/back-of-the-envelope/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "f746fec439d8cba74979bcd7271a794f60336828",
+        "skill_md_sha": "29b900d243a880d559ec418570e86afdb0a4a31c",
+        "install_target_name": "back-of-the-envelope"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/blob-store",
+      "name": "blob-store",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/blob-store/SKILL.md",
+      "sha": "802f5bf0f94cc4a165d2b6346ed89e28c09ca2d4",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/blob-store/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "1a1eb452df399b9320a02b2b895bd2b12d0cfbc9",
+        "skill_md_sha": "802f5bf0f94cc4a165d2b6346ed89e28c09ca2d4",
+        "install_target_name": "blob-store"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/caching",
+      "name": "caching",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/caching/SKILL.md",
+      "sha": "73d5d0575ca394c1b8f34c4e594c90ce6a9fbe30",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/caching/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "1bd9ab4ffb90b5269f3921ad6bd0fabd5aababac",
+        "skill_md_sha": "73d5d0575ca394c1b8f34c4e594c90ce6a9fbe30",
+        "install_target_name": "caching"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/consistency-coordination",
+      "name": "consistency-coordination",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/consistency-coordination/SKILL.md",
+      "sha": "1278a1a1804c089402ee18a8e08335d5568d8b13",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/consistency-coordination/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "0b14378da79c052953815e35294bfcb5b08607e3",
+        "skill_md_sha": "1278a1a1804c089402ee18a8e08335d5568d8b13",
+        "install_target_name": "consistency-coordination"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/content-delivery",
+      "name": "content-delivery",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/content-delivery/SKILL.md",
+      "sha": "d5c7ba98f2bfb7b56dbe34fdc3fe880a7e4e55a2",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/content-delivery/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "98f91e946f8e8a8dbedd843237d8fab899577f87",
+        "skill_md_sha": "d5c7ba98f2bfb7b56dbe34fdc3fe880a7e4e55a2",
+        "install_target_name": "content-delivery"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/data-storage",
+      "name": "data-storage",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/data-storage/SKILL.md",
+      "sha": "3870322739414b7e02d487088d24b4b35eb074e5",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/data-storage/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "1d41a3663dde0505a7053c2fc2e32c2036e6a308",
+        "skill_md_sha": "3870322739414b7e02d487088d24b4b35eb074e5",
+        "install_target_name": "data-storage"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/distributed-logging",
+      "name": "distributed-logging",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/distributed-logging/SKILL.md",
+      "sha": "9949c5370f9e82c6a8fe6d6e3d8801010eea4aab",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/distributed-logging/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "7abbcbe798cf4cf263f27f479ce52273e0014e18",
+        "skill_md_sha": "9949c5370f9e82c6a8fe6d6e3d8801010eea4aab",
+        "install_target_name": "distributed-logging"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/distributed-search",
+      "name": "distributed-search",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/distributed-search/SKILL.md",
+      "sha": "6d19192bf3e6fc8532cde3364f2cdbf6c930c1ba",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/distributed-search/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "35d9ca91acf3632bb79e88247d3e55621140091c",
+        "skill_md_sha": "6d19192bf3e6fc8532cde3364f2cdbf6c930c1ba",
+        "install_target_name": "distributed-search"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/dns",
+      "name": "dns",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/dns/SKILL.md",
+      "sha": "279236ae9bc7a1737a4e1eaf46a70820f9690d76",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/dns/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "2a19f877b149ef3387b679517deb0085da1c3115",
+        "skill_md_sha": "279236ae9bc7a1737a4e1eaf46a70820f9690d76",
+        "install_target_name": "dns"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/load-balancing",
+      "name": "load-balancing",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/load-balancing/SKILL.md",
+      "sha": "cf6d159d756fedf25ff34a088b0d836e21f3b972",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/load-balancing/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "655708e6c2a21673825fb7530baa2c4165f69b48",
+        "skill_md_sha": "cf6d159d756fedf25ff34a088b0d836e21f3b972",
+        "install_target_name": "load-balancing"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/messaging-streaming",
+      "name": "messaging-streaming",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/messaging-streaming/SKILL.md",
+      "sha": "98673f3cd71a4885de74952f7dc55021e3c89c24",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/messaging-streaming/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "04a99b0aa0e36e248b096010605c39c2cf396593",
+        "skill_md_sha": "98673f3cd71a4885de74952f7dc55021e3c89c24",
+        "install_target_name": "messaging-streaming"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/requirements-scoping",
+      "name": "requirements-scoping",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/requirements-scoping/SKILL.md",
+      "sha": "7c000e2ee38c0120bd0c9e3c3c7de043e335484c",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/requirements-scoping/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "ad00421bb1616dc14c21845ed57d8bbd2d1b3ee7",
+        "skill_md_sha": "7c000e2ee38c0120bd0c9e3c3c7de043e335484c",
+        "install_target_name": "requirements-scoping"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/resilience-failure",
+      "name": "resilience-failure",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/resilience-failure/SKILL.md",
+      "sha": "e70cbf89eed06f6951fc310504b58923f99ba768",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/resilience-failure/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "8e2ed90abf84d4ff3c3dd7f6330159e14df2a143",
+        "skill_md_sha": "e70cbf89eed06f6951fc310504b58923f99ba768",
+        "install_target_name": "resilience-failure"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/scaling-evolution",
+      "name": "scaling-evolution",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/scaling-evolution/SKILL.md",
+      "sha": "76e2cdd9cf9ae4265acf2a2e9d526af43603fd4e",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/scaling-evolution/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "44d082786add255b5f3ef38ba5188a03b7898e95",
+        "skill_md_sha": "76e2cdd9cf9ae4265acf2a2e9d526af43603fd4e",
+        "install_target_name": "scaling-evolution"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/sequencer",
+      "name": "sequencer",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/sequencer/SKILL.md",
+      "sha": "a71ac2076e44319b82e354e27e8295f9dc076930",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/sequencer/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "2c77356947a91de4943dc2e7bace30c21ffb1486",
+        "skill_md_sha": "a71ac2076e44319b82e354e27e8295f9dc076930",
+        "install_target_name": "sequencer"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/sharded-counters",
+      "name": "sharded-counters",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/sharded-counters/SKILL.md",
+      "sha": "efe1b66d5dfbc2585832db58584e7111259dbd52",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/sharded-counters/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "7f37fd2052ebe26f57dad773b051e12d10ae4062",
+        "skill_md_sha": "efe1b66d5dfbc2585832db58584e7111259dbd52",
+        "install_target_name": "sharded-counters"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/system-design",
+      "name": "system-design",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/system-design/SKILL.md",
+      "sha": "8e9a14ee1a7810c53c87d78ccb19830da9bc89b7",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/system-design/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "7e5cd61a2698c0b148ecad9ff049d7ca666e42eb",
+        "skill_md_sha": "8e9a14ee1a7810c53c87d78ccb19830da9bc89b7",
+        "install_target_name": "system-design"
+      }
+    },
+    {
+      "id": "proyecto26/system-design-skills:skills/task-scheduling",
+      "name": "task-scheduling",
+      "repo": "proyecto26/system-design-skills",
+      "path": "skills/task-scheduling/SKILL.md",
+      "sha": "2ebf4479e2a674637f9c7f05b7ed0b870a1cc25c",
+      "pinned": {
+        "repo_slug": "proyecto26/system-design-skills",
+        "skill_md_path": "skills/task-scheduling/SKILL.md",
+        "repo_commit_sha": "a70772efb956e8c9b78ef5b7538dee00cc3b9263",
+        "skill_tree_sha": "8f33938504fb03e20e7c1cde8208fe405209c167",
+        "skill_md_sha": "2ebf4479e2a674637f9c7f05b7ed0b870a1cc25c",
+        "install_target_name": "task-scheduling"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/visual-taste/anti-slop",
+      "name": "anti-slop",
+      "repo": "vectorlabau/skills",
+      "path": "skills/visual-taste/anti-slop/SKILL.md",
+      "sha": "594259d76da6ba981b5e3d256167176b3c808d1a",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/visual-taste/anti-slop/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "5a177cce1be5c0f7d87aaab6e93d414ff25ffa2a",
+        "skill_md_sha": "594259d76da6ba981b5e3d256167176b3c808d1a",
+        "install_target_name": "anti-slop"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/visual-taste/colour-palette",
+      "name": "colour-palette",
+      "repo": "vectorlabau/skills",
+      "path": "skills/visual-taste/colour-palette/SKILL.md",
+      "sha": "58e2cd472185da026f25a7a90630a266c52a56af",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/visual-taste/colour-palette/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "53d5173949b8fee31770a919bbf9d81f7a653e84",
+        "skill_md_sha": "58e2cd472185da026f25a7a90630a266c52a56af",
+        "install_target_name": "colour-palette"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/interaction/defaults",
+      "name": "defaults",
+      "repo": "vectorlabau/skills",
+      "path": "skills/interaction/defaults/SKILL.md",
+      "sha": "25773dd2bd473c1323059e01a51eb3c591af0d26",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/interaction/defaults/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "adc77aa7bcd12d82e4fbd0938ca001e9cf67ef37",
+        "skill_md_sha": "25773dd2bd473c1323059e01a51eb3c591af0d26",
+        "install_target_name": "defaults"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/feedback/empty-states",
+      "name": "empty-states",
+      "repo": "vectorlabau/skills",
+      "path": "skills/feedback/empty-states/SKILL.md",
+      "sha": "dbba0aab18162067a8eeb18c06b581e09bab8989",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/feedback/empty-states/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "12a8ac7de12e31109826ac9881c9ea599f73c35a",
+        "skill_md_sha": "dbba0aab18162067a8eeb18c06b581e09bab8989",
+        "install_target_name": "empty-states"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/voice/errors",
+      "name": "errors",
+      "repo": "vectorlabau/skills",
+      "path": "skills/voice/errors/SKILL.md",
+      "sha": "a440b1394ac1634051249ad2fccfafe1c04b971a",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/voice/errors/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "774a9b026911afbbd6a4b2dff1ae471d17be1c06",
+        "skill_md_sha": "a440b1394ac1634051249ad2fccfafe1c04b971a",
+        "install_target_name": "errors"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/interaction/forms",
+      "name": "forms",
+      "repo": "vectorlabau/skills",
+      "path": "skills/interaction/forms/SKILL.md",
+      "sha": "8cd883629aa0f57d997f010a1e2b5a5400bfa44a",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/interaction/forms/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "4742e3248de1f70dd9f068eb0bad889d81c20b4b",
+        "skill_md_sha": "8cd883629aa0f57d997f010a1e2b5a5400bfa44a",
+        "install_target_name": "forms"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/interaction/icon-buttons",
+      "name": "icon-buttons",
+      "repo": "vectorlabau/skills",
+      "path": "skills/interaction/icon-buttons/SKILL.md",
+      "sha": "956b08a54a447c0f6d12755eefd33572459a6b1f",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/interaction/icon-buttons/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "03abdc5581bef9a0d7a04c2b93be1ebe2ec8371e",
+        "skill_md_sha": "956b08a54a447c0f6d12755eefd33572459a6b1f",
+        "install_target_name": "icon-buttons"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/interaction/keyboard",
+      "name": "keyboard",
+      "repo": "vectorlabau/skills",
+      "path": "skills/interaction/keyboard/SKILL.md",
+      "sha": "8cef86c7902cb2711aad47f4317518e939ca38bd",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/interaction/keyboard/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "318f4f80e3387195036024fae35b452c937b7f51",
+        "skill_md_sha": "8cef86c7902cb2711aad47f4317518e939ca38bd",
+        "install_target_name": "keyboard"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/voice/labels",
+      "name": "labels",
+      "repo": "vectorlabau/skills",
+      "path": "skills/voice/labels/SKILL.md",
+      "sha": "c96ae6acf1160e9030966cbb07f143a7076d8763",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/voice/labels/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "d8b7670ec859dc26d7bd6589ec67a15a088671c4",
+        "skill_md_sha": "c96ae6acf1160e9030966cbb07f143a7076d8763",
+        "install_target_name": "labels"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/feedback/loaders",
+      "name": "loaders",
+      "repo": "vectorlabau/skills",
+      "path": "skills/feedback/loaders/SKILL.md",
+      "sha": "dd4fcf841e2fc77ab2ec0483555a3edc6f826a18",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/feedback/loaders/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "0ebeb20c2739c24ea5c40c1a96f1529ff2d14e13",
+        "skill_md_sha": "dd4fcf841e2fc77ab2ec0483555a3edc6f826a18",
+        "install_target_name": "loaders"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/animation/motion",
+      "name": "motion",
+      "repo": "vectorlabau/skills",
+      "path": "skills/animation/motion/SKILL.md",
+      "sha": "028695fedd9f0951d290677e80640512abb0d368",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/animation/motion/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "703e1b46dbc8a1f4c68209c9578257e25b483a0c",
+        "skill_md_sha": "028695fedd9f0951d290677e80640512abb0d368",
+        "install_target_name": "motion"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/animation/reduced-motion",
+      "name": "reduced-motion",
+      "repo": "vectorlabau/skills",
+      "path": "skills/animation/reduced-motion/SKILL.md",
+      "sha": "1b2535953df26a2d811b6a9f6c4186a9b62e2af5",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/animation/reduced-motion/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "1c34abc701bd902bf943c392c60420d4bc37f2ae",
+        "skill_md_sha": "1b2535953df26a2d811b6a9f6c4186a9b62e2af5",
+        "install_target_name": "reduced-motion"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/visual-taste/spacing",
+      "name": "spacing",
+      "repo": "vectorlabau/skills",
+      "path": "skills/visual-taste/spacing/SKILL.md",
+      "sha": "217105873875373fc0d700cd01d8611a086a320c",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/visual-taste/spacing/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "91f5afe3e3f10043c0da1e23382e3661bcef67ca",
+        "skill_md_sha": "217105873875373fc0d700cd01d8611a086a320c",
+        "install_target_name": "spacing"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/interaction/surfaces",
+      "name": "surfaces",
+      "repo": "vectorlabau/skills",
+      "path": "skills/interaction/surfaces/SKILL.md",
+      "sha": "fe790d96f03788eb44053fb0ff1ac46b1b7d71fa",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/interaction/surfaces/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "786957b718827698b9bb8058da09da3c06797828",
+        "skill_md_sha": "fe790d96f03788eb44053fb0ff1ac46b1b7d71fa",
+        "install_target_name": "surfaces"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/animation/transitions",
+      "name": "transitions",
+      "repo": "vectorlabau/skills",
+      "path": "skills/animation/transitions/SKILL.md",
+      "sha": "7787693b4d70fec0a2bfe180dfc49a8a8c4a8f85",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/animation/transitions/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "66187af29866f41b8c0afe09cb65e8d1474d476d",
+        "skill_md_sha": "7787693b4d70fec0a2bfe180dfc49a8a8c4a8f85",
+        "install_target_name": "transitions"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/visual-taste/typography",
+      "name": "typography",
+      "repo": "vectorlabau/skills",
+      "path": "skills/visual-taste/typography/SKILL.md",
+      "sha": "263b9b47080b98e06a58a4af84d1a9e7b797cf2e",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/visual-taste/typography/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "c26dff4b4a67c08f148a1c70406edffcd71caa3e",
+        "skill_md_sha": "263b9b47080b98e06a58a4af84d1a9e7b797cf2e",
+        "install_target_name": "typography"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/voice/verbs",
+      "name": "verbs",
+      "repo": "vectorlabau/skills",
+      "path": "skills/voice/verbs/SKILL.md",
+      "sha": "f99c0ae685194466a195aa797ab9a242e52c25b9",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/voice/verbs/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "9d4b22f24d2c48cd280175a4370da22dc418a1eb",
+        "skill_md_sha": "f99c0ae685194466a195aa797ab9a242e52c25b9",
+        "install_target_name": "verbs"
+      }
+    },
+    {
+      "id": "vectorlabau/skills:skills/visual-taste/viewports",
+      "name": "viewports",
+      "repo": "vectorlabau/skills",
+      "path": "skills/visual-taste/viewports/SKILL.md",
+      "sha": "c2eb09d8311d0289d1d0be0ba9a6b6279766f4a7",
+      "pinned": {
+        "repo_slug": "VectorLabAU/skills",
+        "skill_md_path": "skills/visual-taste/viewports/SKILL.md",
+        "repo_commit_sha": "0756cc951658d4b65ec6ac5a4269d03025a6da37",
+        "skill_tree_sha": "67cbd65e5b7fb3db6d4826216c810b3a49e6b183",
+        "skill_md_sha": "c2eb09d8311d0289d1d0be0ba9a6b6279766f4a7",
+        "install_target_name": "viewports"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/change-management",
+      "name": "change-management",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/change-management/SKILL.md",
+      "sha": "a00fc15622dd0b1beebbcb449e940b53c5459a96",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/change-management/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "af403fd1d3414baec46858e23a5bd451c30e07da",
+        "skill_md_sha": "a00fc15622dd0b1beebbcb449e940b53c5459a96",
+        "install_target_name": "change-management"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/client-deliverables",
+      "name": "client-deliverables",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/client-deliverables/SKILL.md",
+      "sha": "5c7367083beb6861aeb16e8b607f7c72ece97256",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/client-deliverables/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "45c8cb7a5d3655febb96bb84e8ed0788fca18188",
+        "skill_md_sha": "5c7367083beb6861aeb16e8b607f7c72ece97256",
+        "install_target_name": "client-deliverables"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/due-diligence",
+      "name": "due-diligence",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/due-diligence/SKILL.md",
+      "sha": "b94f6eadbd76d9e8fd8f978d4b90161ddc68e041",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/due-diligence/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "54369ad0c95326630b2382ee91708c307e1e052d",
+        "skill_md_sha": "b94f6eadbd76d9e8fd8f978d4b90161ddc68e041",
+        "install_target_name": "due-diligence"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/engagement-pricing",
+      "name": "engagement-pricing",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/engagement-pricing/SKILL.md",
+      "sha": "3ad17fe3d2045dfc40a7cace684d6d625b4a581e",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/engagement-pricing/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "54d676b40ba7dca290663fb5b85c2d33ab4917f5",
+        "skill_md_sha": "3ad17fe3d2045dfc40a7cace684d6d625b4a581e",
+        "install_target_name": "engagement-pricing"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/engagement-setup",
+      "name": "engagement-setup",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/engagement-setup/SKILL.md",
+      "sha": "f9cbd64ee2fc8671d07b3e38542e0115aad4e453",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/engagement-setup/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "394dfa2b81b4ab1d4160c997903a47010e70881b",
+        "skill_md_sha": "f9cbd64ee2fc8671d07b3e38542e0115aad4e453",
+        "install_target_name": "engagement-setup"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/financial-modeling",
+      "name": "financial-modeling",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/financial-modeling/SKILL.md",
+      "sha": "074ec9c62cb509f130f6df06ad2fa921b3deb3f7",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/financial-modeling/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "9289fad0f8306aeaf5f342bebd32e1cde36ada4e",
+        "skill_md_sha": "074ec9c62cb509f130f6df06ad2fa921b3deb3f7",
+        "install_target_name": "financial-modeling"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/implementation-planning",
+      "name": "implementation-planning",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/implementation-planning/SKILL.md",
+      "sha": "abb38571f669bb2e55a5d39707b868ad09ad3faa",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/implementation-planning/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "fe03af53dc70bfaa11ff7b84a3ab10d8ce2fe2db",
+        "skill_md_sha": "abb38571f669bb2e55a5d39707b868ad09ad3faa",
+        "install_target_name": "implementation-planning"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/org-design",
+      "name": "org-design",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/org-design/SKILL.md",
+      "sha": "1d68d1b856533d1222b6d547a6cb72944cc623c3",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/org-design/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "b1bac6152a84434abd3879b3397f3e462e1d51bb",
+        "skill_md_sha": "1d68d1b856533d1222b6d547a6cb72944cc623c3",
+        "install_target_name": "org-design"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/process-excellence",
+      "name": "process-excellence",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/process-excellence/SKILL.md",
+      "sha": "14c493f5dd92848e612e63935b940b15f0f0fec7",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/process-excellence/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "4036009ab33c74bc2c5c096ccd4879a811e951bd",
+        "skill_md_sha": "14c493f5dd92848e612e63935b940b15f0f0fec7",
+        "install_target_name": "process-excellence"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/project-closeout",
+      "name": "project-closeout",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/project-closeout/SKILL.md",
+      "sha": "5fb556285868021f3157440823ba6bf8ad46abb3",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/project-closeout/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "a2e54a3252b6b07be6a5bf53a64c41a4c84d0b0a",
+        "skill_md_sha": "5fb556285868021f3157440823ba6bf8ad46abb3",
+        "install_target_name": "project-closeout"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/project-governance",
+      "name": "project-governance",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/project-governance/SKILL.md",
+      "sha": "6bdf29b18b62d62aad5174880513b193330590fc",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/project-governance/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "65326a757b93506bb23db8308fc3b625a06f194e",
+        "skill_md_sha": "6bdf29b18b62d62aad5174880513b193330590fc",
+        "install_target_name": "project-governance"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/proposal-development",
+      "name": "proposal-development",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/proposal-development/SKILL.md",
+      "sha": "0a257bef135b8e0ccceac8877337a873b25578e0",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/proposal-development/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "fed9984e0431a749e9d45c68891baa759d209021",
+        "skill_md_sha": "0a257bef135b8e0ccceac8877337a873b25578e0",
+        "install_target_name": "proposal-development"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/strategic-analysis",
+      "name": "strategic-analysis",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/strategic-analysis/SKILL.md",
+      "sha": "d4f388e896f506205c43f7eda5d970b90b5ce9e7",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/strategic-analysis/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "fd7d2af407953850a5b126ac7c846dc5d3acc364",
+        "skill_md_sha": "d4f388e896f506205c43f7eda5d970b90b5ce9e7",
+        "install_target_name": "strategic-analysis"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/thought-leadership",
+      "name": "thought-leadership",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/thought-leadership/SKILL.md",
+      "sha": "2a53e4daa59cc8976e53f2fda52eb818bc5d0502",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/thought-leadership/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "0b0a26e697c1f19234d2672d8b9b15f8792bb2e1",
+        "skill_md_sha": "2a53e4daa59cc8976e53f2fda52eb818bc5d0502",
+        "install_target_name": "thought-leadership"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/workshop-facilitation",
+      "name": "workshop-facilitation",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/workshop-facilitation/SKILL.md",
+      "sha": "5f660dce0d835bd674911887c0b327c8e6046093",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/workshop-facilitation/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "954b8495d15bbf06714014932c0e62fc120cb66d",
+        "skill_md_sha": "5f660dce0d835bd674911887c0b327c8e6046093",
+        "install_target_name": "workshop-facilitation"
+      }
+    },
+    {
+      "id": "anotb/management-consulting-plugin:skills/writing-style",
+      "name": "writing-style",
+      "repo": "anotb/management-consulting-plugin",
+      "path": "skills/writing-style/SKILL.md",
+      "sha": "025bdc3a5a18a5720488685cad214babac00a74e",
+      "pinned": {
+        "repo_slug": "anotb/management-consulting-plugin",
+        "skill_md_path": "skills/writing-style/SKILL.md",
+        "repo_commit_sha": "40ffcc54721553ea8b3efb34451163dfa0fbc6f0",
+        "skill_tree_sha": "5fa0d55d757e1eb89d052b2e27657330e70b6cf6",
+        "skill_md_sha": "025bdc3a5a18a5720488685cad214babac00a74e",
+        "install_target_name": "writing-style"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-build",
+      "name": "go-build",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-build/SKILL.md",
+      "sha": "5c9aa426a5bbac50d5a26d01d90e4dc687a0c2fe",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-build/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "7b1a16097b6972d8312067bffbc63d1b4237dd27",
+        "skill_md_sha": "5c9aa426a5bbac50d5a26d01d90e4dc687a0c2fe",
+        "install_target_name": "go-build"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-concurrency",
+      "name": "go-concurrency",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-concurrency/SKILL.md",
+      "sha": "427def0e330b3f6dc8107b6cea23f1afc126b250",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-concurrency/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "c29a1e1b8722c1bf0f1f8ea935f028dcdd496016",
+        "skill_md_sha": "427def0e330b3f6dc8107b6cea23f1afc126b250",
+        "install_target_name": "go-concurrency"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-data",
+      "name": "go-data",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-data/SKILL.md",
+      "sha": "03b13b456780d4d6fe011224531c1cc3eb6d706d",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-data/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "3a84ec849759cfbd9da0af1c472e16905ce82725",
+        "skill_md_sha": "03b13b456780d4d6fe011224531c1cc3eb6d706d",
+        "install_target_name": "go-data"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-debugging",
+      "name": "go-debugging",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-debugging/SKILL.md",
+      "sha": "462de7d36fa743903cc3202c1c86284c2019b306",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-debugging/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "bcb2c494b5875fb4687ef45cd990f57b3fd18e85",
+        "skill_md_sha": "462de7d36fa743903cc3202c1c86284c2019b306",
+        "install_target_name": "go-debugging"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-design",
+      "name": "go-design",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-design/SKILL.md",
+      "sha": "dc27f232f6b42dffed6b05dd4287dfe28fc47ef7",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-design/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "8f99cd3652a0d01fc3ec18091ce6737fec4af78a",
+        "skill_md_sha": "dc27f232f6b42dffed6b05dd4287dfe28fc47ef7",
+        "install_target_name": "go-design"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-grpc",
+      "name": "go-grpc",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-grpc/SKILL.md",
+      "sha": "2e0622bc23de2c6c34a64351ff073cc66e4a422f",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-grpc/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "726d6555d99da017d18ffdccdded411e90965cb6",
+        "skill_md_sha": "2e0622bc23de2c6c34a64351ff073cc66e4a422f",
+        "install_target_name": "go-grpc"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-http",
+      "name": "go-http",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-http/SKILL.md",
+      "sha": "051e56dede57babfb74c2b61c97d1690842d9ae4",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-http/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "242e2c07b94bb5fa58342a3a0999ab74299a6a4a",
+        "skill_md_sha": "051e56dede57babfb74c2b61c97d1690842d9ae4",
+        "install_target_name": "go-http"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-idiomatic",
+      "name": "go-idiomatic",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-idiomatic/SKILL.md",
+      "sha": "e878acb9198ea836c0f9ac98f4eca4c313216bcb",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-idiomatic/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "88f020025b8e4968f52af14c08551ac8618d3010",
+        "skill_md_sha": "e878acb9198ea836c0f9ac98f4eca4c313216bcb",
+        "install_target_name": "go-idiomatic"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-implement",
+      "name": "go-implement",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-implement/SKILL.md",
+      "sha": "8e464e1b9f53644ea4be7588de1f5be6855fd817",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-implement/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "ab187d2107e7a9c6308f0a85a7e33b66139bc406",
+        "skill_md_sha": "8e464e1b9f53644ea4be7588de1f5be6855fd817",
+        "install_target_name": "go-implement"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-integration-testing",
+      "name": "go-integration-testing",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-integration-testing/SKILL.md",
+      "sha": "961047a77bce0faccda6e7a06983ab34967732c2",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-integration-testing/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "a426e58f1c6a52f1ffcf2d0145ceda87acb520ba",
+        "skill_md_sha": "961047a77bce0faccda6e7a06983ab34967732c2",
+        "install_target_name": "go-integration-testing"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-integrations",
+      "name": "go-integrations",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-integrations/SKILL.md",
+      "sha": "662e0f99bad9179e212ec6d85bc3b4f666151512",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-integrations/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "c8adbcf65d8f5e80e513c07eb718c27b087b08f5",
+        "skill_md_sha": "662e0f99bad9179e212ec6d85bc3b4f666151512",
+        "install_target_name": "go-integrations"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-observability",
+      "name": "go-observability",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-observability/SKILL.md",
+      "sha": "3d0f9ff1c00f4c3ff95699678b5dd4bc8ce27064",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-observability/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "e7219d814a981088a02f97e544edcc4404e34630",
+        "skill_md_sha": "3d0f9ff1c00f4c3ff95699678b5dd4bc8ce27064",
+        "install_target_name": "go-observability"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-performance",
+      "name": "go-performance",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-performance/SKILL.md",
+      "sha": "81664a5ff0da9550360b2b9ea6913610f8a67d95",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-performance/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "c98dc043f20f1760d3e829837c60fa93d508475e",
+        "skill_md_sha": "81664a5ff0da9550360b2b9ea6913610f8a67d95",
+        "install_target_name": "go-performance"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-security",
+      "name": "go-security",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-security/SKILL.md",
+      "sha": "acdd30c8f09f661db6d29b3d7ef7d08d6ca847fa",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-security/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "8c94cd878cd84b9da8eae88009bf20c072699e0d",
+        "skill_md_sha": "acdd30c8f09f661db6d29b3d7ef7d08d6ca847fa",
+        "install_target_name": "go-security"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-service",
+      "name": "go-service",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-service/SKILL.md",
+      "sha": "41f3b1ab7800b19bac9fe6e5e50bed345326b4ed",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-service/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "3c0bb32802e3ce8e2b3e6ca3b1b5f816ecef1a3d",
+        "skill_md_sha": "41f3b1ab7800b19bac9fe6e5e50bed345326b4ed",
+        "install_target_name": "go-service"
+      }
+    },
+    {
+      "id": "dankosik/golang-backend-skills:skills/go-testing",
+      "name": "go-testing",
+      "repo": "dankosik/golang-backend-skills",
+      "path": "skills/go-testing/SKILL.md",
+      "sha": "c47803afc57ad46563ebc45d06d1672d13b36785",
+      "pinned": {
+        "repo_slug": "Dankosik/golang-backend-skills",
+        "skill_md_path": "skills/go-testing/SKILL.md",
+        "repo_commit_sha": "3467b8e5f6e5aa3eb05d38f47fa6e85290c568f8",
+        "skill_tree_sha": "36a801768a0026679b60377e4fab02f12b1282d9",
+        "skill_md_sha": "c47803afc57ad46563ebc45d06d1672d13b36785",
+        "install_target_name": "go-testing"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-build",
+      "name": "rust-build",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-build/SKILL.md",
+      "sha": "8d0bdaea359b999eff737f08989ee13999bb79dd",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-build/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "0130552ff9db6d393c8056a98b860101af008bff",
+        "skill_md_sha": "8d0bdaea359b999eff737f08989ee13999bb79dd",
+        "install_target_name": "rust-build"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-cli-interface",
+      "name": "rust-cli-interface",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-cli-interface/SKILL.md",
+      "sha": "74e1b9c84872e4982fb69f486a263b7d5a6ab0bc",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-cli-interface/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "9026ac9543eb1a6fe7008bf1cb9c33e0e3504827",
+        "skill_md_sha": "74e1b9c84872e4982fb69f486a263b7d5a6ab0bc",
+        "install_target_name": "rust-cli-interface"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-cli-testing",
+      "name": "rust-cli-testing",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-cli-testing/SKILL.md",
+      "sha": "1d2c54be0ba6539bb61c04ccdb7c3e29c68400dd",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-cli-testing/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "9a12c315b37303ba4437626b87083ee989c11344",
+        "skill_md_sha": "1d2c54be0ba6539bb61c04ccdb7c3e29c68400dd",
+        "install_target_name": "rust-cli-testing"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-concurrency",
+      "name": "rust-concurrency",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-concurrency/SKILL.md",
+      "sha": "3cd2a17d372bd736b683314cbac351fa8bd44b1f",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-concurrency/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "a71c5179b1ca7d793b4743019bac7740a8a5de46",
+        "skill_md_sha": "3cd2a17d372bd736b683314cbac351fa8bd44b1f",
+        "install_target_name": "rust-concurrency"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-debugging",
+      "name": "rust-debugging",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-debugging/SKILL.md",
+      "sha": "bf9afc3d8d1c1d20107d7dc296e93e8bb956963f",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-debugging/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "867967ff1c73d81746d5552a3d7d1a4bc90ccd9a",
+        "skill_md_sha": "bf9afc3d8d1c1d20107d7dc296e93e8bb956963f",
+        "install_target_name": "rust-debugging"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-design",
+      "name": "rust-design",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-design/SKILL.md",
+      "sha": "2a0a35ee5267c8bd40a650d8488700e9ac45e57a",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-design/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "75cf240bde6cd33684eed77e2ba80cd5b6e6420c",
+        "skill_md_sha": "2a0a35ee5267c8bd40a650d8488700e9ac45e57a",
+        "install_target_name": "rust-design"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-distribution",
+      "name": "rust-distribution",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-distribution/SKILL.md",
+      "sha": "69a09e0d99128fa7ed794f60117aa1c7bf67728d",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-distribution/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "a908116db7da24f9d283a65a6aa4665f8e0f5159",
+        "skill_md_sha": "69a09e0d99128fa7ed794f60117aa1c7bf67728d",
+        "install_target_name": "rust-distribution"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-errors",
+      "name": "rust-errors",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-errors/SKILL.md",
+      "sha": "1556ba4dfbe642f70f7d6c03209712e87373810e",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-errors/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "e1fce544d7a062607043637889a60b9fd57de372",
+        "skill_md_sha": "1556ba4dfbe642f70f7d6c03209712e87373810e",
+        "install_target_name": "rust-errors"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-filesystem",
+      "name": "rust-filesystem",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-filesystem/SKILL.md",
+      "sha": "7e36b22c47a82f61013ad765a24064d35290911b",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-filesystem/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "baefe96bdeb8aa421abdbe8d6381a9a0643d1cc5",
+        "skill_md_sha": "7e36b22c47a82f61013ad765a24064d35290911b",
+        "install_target_name": "rust-filesystem"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-idiomatic",
+      "name": "rust-idiomatic",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-idiomatic/SKILL.md",
+      "sha": "130b61ac0d952265cd3b382f9ad3b1f5619c672a",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-idiomatic/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "36fe6ec30a0410bcd6df91be500d0592d347c6d9",
+        "skill_md_sha": "130b61ac0d952265cd3b382f9ad3b1f5619c672a",
+        "install_target_name": "rust-idiomatic"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-implement",
+      "name": "rust-implement",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-implement/SKILL.md",
+      "sha": "6541db5f44a5c67fac2fffe744f0781aa0685199",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-implement/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "f6dd4f4396de21fd3008a7350818eff9bf8b25d6",
+        "skill_md_sha": "6541db5f44a5c67fac2fffe744f0781aa0685199",
+        "install_target_name": "rust-implement"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-io",
+      "name": "rust-io",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-io/SKILL.md",
+      "sha": "2affb75cdb7fee741361cfc1525892ce40c37474",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-io/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "066f7d0ab83ccfd82b613cb21c5b39532a8df050",
+        "skill_md_sha": "2affb75cdb7fee741361cfc1525892ce40c37474",
+        "install_target_name": "rust-io"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-memory",
+      "name": "rust-memory",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-memory/SKILL.md",
+      "sha": "e4eff0177fd8b5266ab19fbd3835101468c758c2",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-memory/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "802f297fad91e62e2bafd36d93befd489a8de135",
+        "skill_md_sha": "e4eff0177fd8b5266ab19fbd3835101468c758c2",
+        "install_target_name": "rust-memory"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-performance",
+      "name": "rust-performance",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-performance/SKILL.md",
+      "sha": "f329b33bf8f763de0e20b8b5991fbc26bed2e09a",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-performance/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "7ea89c44168ecfa175f4d8749bd1b625ba1f05f5",
+        "skill_md_sha": "f329b33bf8f763de0e20b8b5991fbc26bed2e09a",
+        "install_target_name": "rust-performance"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-processes",
+      "name": "rust-processes",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-processes/SKILL.md",
+      "sha": "332544e6be75551c72b1dd3711ded1ffa50e98f8",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-processes/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "22ac8220e312799e6f69ff8effd1ac5f27ea6068",
+        "skill_md_sha": "332544e6be75551c72b1dd3711ded1ffa50e98f8",
+        "install_target_name": "rust-processes"
+      }
+    },
+    {
+      "id": "dankosik/rust-cli-skills:skills/rust-testing",
+      "name": "rust-testing",
+      "repo": "dankosik/rust-cli-skills",
+      "path": "skills/rust-testing/SKILL.md",
+      "sha": "0b8cbe52f14436d6c8027174b77316ac2754d331",
+      "pinned": {
+        "repo_slug": "Dankosik/rust-cli-skills",
+        "skill_md_path": "skills/rust-testing/SKILL.md",
+        "repo_commit_sha": "aafca337dece65f312faaecd0fe9ee1c81f755df",
+        "skill_tree_sha": "20c2db49f534c2b7b8bc9b6a374c59d9c9e89ef6",
+        "skill_md_sha": "0b8cbe52f14436d6c8027174b77316ac2754d331",
+        "install_target_name": "rust-testing"
+      }
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/90-day-plan-builder",
+      "name": "90-day-plan-builder",
+      "repo": "adimango/ai-adoption-playbook",
+      "path": "skills/90-day-plan-builder/SKILL.md",
+      "sha": "05aa387900df0bcec4c6ab048dc55b379471c208",
+      "pinned": {
+        "repo_slug": "adimango/ai-adoption-playbook",
+        "skill_md_path": "skills/90-day-plan-builder/SKILL.md",
+        "repo_commit_sha": "935f5ba2e12676ec00cd1c3a1cc739ad73c8aceb",
+        "skill_tree_sha": "d2aeff464c490668754b3526cd4b825bfa3d594c",
+        "skill_md_sha": "05aa387900df0bcec4c6ab048dc55b379471c208",
+        "install_target_name": "90-day-plan-builder"
+      }
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/adoption-scorecard",
+      "name": "adoption-scorecard",
+      "repo": "adimango/ai-adoption-playbook",
+      "path": "skills/adoption-scorecard/SKILL.md",
+      "sha": "9297597b275983f59e3d2981c10405bb907d6920",
+      "pinned": {
+        "repo_slug": "adimango/ai-adoption-playbook",
+        "skill_md_path": "skills/adoption-scorecard/SKILL.md",
+        "repo_commit_sha": "935f5ba2e12676ec00cd1c3a1cc739ad73c8aceb",
+        "skill_tree_sha": "43463d6b8052322a53ca715693a8227c365fd81e",
+        "skill_md_sha": "9297597b275983f59e3d2981c10405bb907d6920",
+        "install_target_name": "adoption-scorecard"
+      }
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/board-narrative-coach",
+      "name": "board-narrative-coach",
+      "repo": "adimango/ai-adoption-playbook",
+      "path": "skills/board-narrative-coach/SKILL.md",
+      "sha": "c01d30267e70b7d66e00b9f65a8f481ecebe45e5",
+      "pinned": {
+        "repo_slug": "adimango/ai-adoption-playbook",
+        "skill_md_path": "skills/board-narrative-coach/SKILL.md",
+        "repo_commit_sha": "935f5ba2e12676ec00cd1c3a1cc739ad73c8aceb",
+        "skill_tree_sha": "6f9e2769f617345a93d34c3151fe4c4b6ab337f5",
+        "skill_md_sha": "c01d30267e70b7d66e00b9f65a8f481ecebe45e5",
+        "install_target_name": "board-narrative-coach"
+      }
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/data-readiness-check",
+      "name": "data-readiness-check",
+      "repo": "adimango/ai-adoption-playbook",
+      "path": "skills/data-readiness-check/SKILL.md",
+      "sha": "4a1b42572a4bce6e434a047ad10f621a7e5762b3",
+      "pinned": {
+        "repo_slug": "adimango/ai-adoption-playbook",
+        "skill_md_path": "skills/data-readiness-check/SKILL.md",
+        "repo_commit_sha": "935f5ba2e12676ec00cd1c3a1cc739ad73c8aceb",
+        "skill_tree_sha": "1ae277459150e13f9f5d065395161bfeba772ba1",
+        "skill_md_sha": "4a1b42572a4bce6e434a047ad10f621a7e5762b3",
+        "install_target_name": "data-readiness-check"
+      }
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/first-use-case-picker",
+      "name": "first-use-case-picker",
+      "repo": "adimango/ai-adoption-playbook",
+      "path": "skills/first-use-case-picker/SKILL.md",
+      "sha": "ffe11149db8369fd1368e4284e9225f6139ffc1e",
+      "pinned": {
+        "repo_slug": "adimango/ai-adoption-playbook",
+        "skill_md_path": "skills/first-use-case-picker/SKILL.md",
+        "repo_commit_sha": "935f5ba2e12676ec00cd1c3a1cc739ad73c8aceb",
+        "skill_tree_sha": "29d5866eb18283d9fc74c03afbc79fb2971f9f6f",
+        "skill_md_sha": "ffe11149db8369fd1368e4284e9225f6139ffc1e",
+        "install_target_name": "first-use-case-picker"
+      }
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/full-adoption-cycle",
+      "name": "full-adoption-cycle",
+      "repo": "adimango/ai-adoption-playbook",
+      "path": "skills/full-adoption-cycle/SKILL.md",
+      "sha": "8668ad8f07bc811aebba834dfc068b80f5189b0e",
+      "pinned": {
+        "repo_slug": "adimango/ai-adoption-playbook",
+        "skill_md_path": "skills/full-adoption-cycle/SKILL.md",
+        "repo_commit_sha": "935f5ba2e12676ec00cd1c3a1cc739ad73c8aceb",
+        "skill_tree_sha": "ace39ead7566850198af3696193d925c23efb77d",
+        "skill_md_sha": "8668ad8f07bc811aebba834dfc068b80f5189b0e",
+        "install_target_name": "full-adoption-cycle"
+      }
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/tool-stack-audit",
+      "name": "tool-stack-audit",
+      "repo": "adimango/ai-adoption-playbook",
+      "path": "skills/tool-stack-audit/SKILL.md",
+      "sha": "808de4501ff68c2afa927cf0309b75ae2d362667",
+      "pinned": {
+        "repo_slug": "adimango/ai-adoption-playbook",
+        "skill_md_path": "skills/tool-stack-audit/SKILL.md",
+        "repo_commit_sha": "935f5ba2e12676ec00cd1c3a1cc739ad73c8aceb",
+        "skill_tree_sha": "9a5a9690342bf6fd58aabfe69a7156f79c148830",
+        "skill_md_sha": "808de4501ff68c2afa927cf0309b75ae2d362667",
+        "install_target_name": "tool-stack-audit"
+      }
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/using-playbook",
+      "name": "using-playbook",
+      "repo": "adimango/ai-adoption-playbook",
+      "path": "skills/using-playbook/SKILL.md",
+      "sha": "0d5be924161645109149109c64f0af74f867583b",
+      "pinned": {
+        "repo_slug": "adimango/ai-adoption-playbook",
+        "skill_md_path": "skills/using-playbook/SKILL.md",
+        "repo_commit_sha": "935f5ba2e12676ec00cd1c3a1cc739ad73c8aceb",
+        "skill_tree_sha": "fd6106bfc1170b5ee2cc9cb9c6daad49682e562b",
+        "skill_md_sha": "0d5be924161645109149109c64f0af74f867583b",
+        "install_target_name": "using-playbook"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/fastify-observability",
+      "name": "fastify-observability",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/fastify-observability/SKILL.md",
+      "sha": "5bc814a7ff033c9f1298d03b233c16dedea77b98",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/fastify-observability/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "300a6b8e6ac2e47662ae201aceda700187ca8c10",
+        "skill_md_sha": "5bc814a7ff033c9f1298d03b233c16dedea77b98",
+        "install_target_name": "fastify-observability"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/fastify-plugins",
+      "name": "fastify-plugins",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/fastify-plugins/SKILL.md",
+      "sha": "15ea937bf588f909088160267ca7e5875046caf7",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/fastify-plugins/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "66d61ac042c4e98168d256be5d79fa5b9d5dc970",
+        "skill_md_sha": "15ea937bf588f909088160267ca7e5875046caf7",
+        "install_target_name": "fastify-plugins"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/fastify-routes",
+      "name": "fastify-routes",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/fastify-routes/SKILL.md",
+      "sha": "2e77787defbc4fc8f3bc20b27f0c9dc4caf94c77",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/fastify-routes/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "80f22b610c8eb2cb1a1f0a4e5df1bb5a6109e042",
+        "skill_md_sha": "2e77787defbc4fc8f3bc20b27f0c9dc4caf94c77",
+        "install_target_name": "fastify-routes"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/fastify-security",
+      "name": "fastify-security",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/fastify-security/SKILL.md",
+      "sha": "56f15f84414cc6591dc990e6660323fce2320504",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/fastify-security/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "2fa270035131be7f25efb289c4849aa29db674f2",
+        "skill_md_sha": "56f15f84414cc6591dc990e6660323fce2320504",
+        "install_target_name": "fastify-security"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/fastify-testing",
+      "name": "fastify-testing",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/fastify-testing/SKILL.md",
+      "sha": "33021a3be624cc726031e7f8bc5cf0ea5d1fa906",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/fastify-testing/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "ba23d9595e23409a0b92a34e23285863ab1ef9de",
+        "skill_md_sha": "33021a3be624cc726031e7f8bc5cf0ea5d1fa906",
+        "install_target_name": "fastify-testing"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/typescript-async",
+      "name": "typescript-async",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/typescript-async/SKILL.md",
+      "sha": "5eaaa935a9964b1455357b199bff37dec2bb1b6e",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/typescript-async/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "13d8667540a345d9016fafe4dcb3559768eba794",
+        "skill_md_sha": "5eaaa935a9964b1455357b199bff37dec2bb1b6e",
+        "install_target_name": "typescript-async"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/typescript-build",
+      "name": "typescript-build",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/typescript-build/SKILL.md",
+      "sha": "f72057eac86576e95dbd339cc129815418e5341d",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/typescript-build/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "9ed04126679fa568aa8f895fb885e824259f1159",
+        "skill_md_sha": "f72057eac86576e95dbd339cc129815418e5341d",
+        "install_target_name": "typescript-build"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/typescript-data",
+      "name": "typescript-data",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/typescript-data/SKILL.md",
+      "sha": "c14bbdd2fe50f14898d47cf2a6a1a75db607c849",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/typescript-data/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "87fa86b9173d8cd000af85c2ef551b1249ead24b",
+        "skill_md_sha": "c14bbdd2fe50f14898d47cf2a6a1a75db607c849",
+        "install_target_name": "typescript-data"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/typescript-debugging",
+      "name": "typescript-debugging",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/typescript-debugging/SKILL.md",
+      "sha": "af6dd9fddb71c12271731bdb4ac9649dfe8362fb",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/typescript-debugging/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "f841379b7bd481555b5277d9e83a8d6721c29947",
+        "skill_md_sha": "af6dd9fddb71c12271731bdb4ac9649dfe8362fb",
+        "install_target_name": "typescript-debugging"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/typescript-design",
+      "name": "typescript-design",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/typescript-design/SKILL.md",
+      "sha": "d2aa68b285f47d6a56f2aa92acc8c8c34a066373",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/typescript-design/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "54c18594d0a843903f513bf1bf89620774fb78a6",
+        "skill_md_sha": "d2aa68b285f47d6a56f2aa92acc8c8c34a066373",
+        "install_target_name": "typescript-design"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/typescript-idiomatic",
+      "name": "typescript-idiomatic",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/typescript-idiomatic/SKILL.md",
+      "sha": "303991ef5283f20efd27bae2ead2ea3f59bca7e9",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/typescript-idiomatic/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "e327ab350cf767d5a81a87124c2490e6be11b543",
+        "skill_md_sha": "303991ef5283f20efd27bae2ead2ea3f59bca7e9",
+        "install_target_name": "typescript-idiomatic"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/typescript-implement",
+      "name": "typescript-implement",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/typescript-implement/SKILL.md",
+      "sha": "4335c8300393f262f38c1c6b3cf5182895c34d00",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/typescript-implement/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "a45ac97802986c9ee0bc98f781e1299a567b2a61",
+        "skill_md_sha": "4335c8300393f262f38c1c6b3cf5182895c34d00",
+        "install_target_name": "typescript-implement"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/typescript-integrations",
+      "name": "typescript-integrations",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/typescript-integrations/SKILL.md",
+      "sha": "d385e6a44d0faa82bfa7620c027166834ca74c44",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/typescript-integrations/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "d1d40bce7379df9184731837449568fbb45f545a",
+        "skill_md_sha": "d385e6a44d0faa82bfa7620c027166834ca74c44",
+        "install_target_name": "typescript-integrations"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/typescript-performance",
+      "name": "typescript-performance",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/typescript-performance/SKILL.md",
+      "sha": "a3c5e67feaf47b20f376840c20d29b43f4a4bfd5",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/typescript-performance/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "eb21881be925af0621bf75d54c6f8340aebe33f0",
+        "skill_md_sha": "a3c5e67feaf47b20f376840c20d29b43f4a4bfd5",
+        "install_target_name": "typescript-performance"
+      }
+    },
+    {
+      "id": "dankosik/fastify-backend-skills:skills/typescript-unit-testing",
+      "name": "typescript-unit-testing",
+      "repo": "dankosik/fastify-backend-skills",
+      "path": "skills/typescript-unit-testing/SKILL.md",
+      "sha": "5faffd5c820148c47f0be4e753371fa8cd79cb93",
+      "pinned": {
+        "repo_slug": "Dankosik/fastify-backend-skills",
+        "skill_md_path": "skills/typescript-unit-testing/SKILL.md",
+        "repo_commit_sha": "f932062c09d06f6d34e0af4878f71aca274c2e47",
+        "skill_tree_sha": "ecedd004801670bcb4224127a344122db451b3d2",
+        "skill_md_sha": "5faffd5c820148c47f0be4e753371fa8cd79cb93",
+        "install_target_name": "typescript-unit-testing"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/java-build",
+      "name": "java-build",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/java-build/SKILL.md",
+      "sha": "fee96323db6f201e4e89215bc0728fc7c728f73f",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/java-build/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "aefb141790c7ef1a37ba53bd968629f0a13129ee",
+        "skill_md_sha": "fee96323db6f201e4e89215bc0728fc7c728f73f",
+        "install_target_name": "java-build"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/java-concurrency",
+      "name": "java-concurrency",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/java-concurrency/SKILL.md",
+      "sha": "9324f800df38cfb7f47492310b319f591e57e103",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/java-concurrency/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "1a4fbc457ab2969f7aac00f5a3bcad6044ddef9c",
+        "skill_md_sha": "9324f800df38cfb7f47492310b319f591e57e103",
+        "install_target_name": "java-concurrency"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/java-debugging",
+      "name": "java-debugging",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/java-debugging/SKILL.md",
+      "sha": "1ef6c11b72fc3b3cd5beafbebeaf06a2dd40bd22",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/java-debugging/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "2cd039ee3ec5620c0832e68293e637173d8dddf6",
+        "skill_md_sha": "1ef6c11b72fc3b3cd5beafbebeaf06a2dd40bd22",
+        "install_target_name": "java-debugging"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/java-design",
+      "name": "java-design",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/java-design/SKILL.md",
+      "sha": "404cb8eecd906d65a2bea2a70fe2b6438877b6f9",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/java-design/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "f0ec7acf6eff40eeb85f0c58259abb7b14138e7b",
+        "skill_md_sha": "404cb8eecd906d65a2bea2a70fe2b6438877b6f9",
+        "install_target_name": "java-design"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/java-idiomatic",
+      "name": "java-idiomatic",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/java-idiomatic/SKILL.md",
+      "sha": "e183958ee43f3fcfce6b55d0156694f33f613c0b",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/java-idiomatic/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "62d0eaef64d4e415b80e83208fe5b0bbe149660c",
+        "skill_md_sha": "e183958ee43f3fcfce6b55d0156694f33f613c0b",
+        "install_target_name": "java-idiomatic"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/java-implement",
+      "name": "java-implement",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/java-implement/SKILL.md",
+      "sha": "8400497ba4a76ff8d4e5e21ef7c15b6a8c5094f9",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/java-implement/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "58a3f713b266376e0b5e6f39c8c162b8d29e4887",
+        "skill_md_sha": "8400497ba4a76ff8d4e5e21ef7c15b6a8c5094f9",
+        "install_target_name": "java-implement"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/java-performance",
+      "name": "java-performance",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/java-performance/SKILL.md",
+      "sha": "8dfedadbdc4fa1b586a684178743260520043ae7",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/java-performance/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "9216b88f257ab0741764ae647ce5e073393f9056",
+        "skill_md_sha": "8dfedadbdc4fa1b586a684178743260520043ae7",
+        "install_target_name": "java-performance"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/java-unit-testing",
+      "name": "java-unit-testing",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/java-unit-testing/SKILL.md",
+      "sha": "7f15c436033e989e7323ec5ae446eac47679d54a",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/java-unit-testing/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "c8aa5c5a4b6b40b99e120ab61f0e78be0338c017",
+        "skill_md_sha": "7f15c436033e989e7323ec5ae446eac47679d54a",
+        "install_target_name": "java-unit-testing"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/spring-boot",
+      "name": "spring-boot",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/spring-boot/SKILL.md",
+      "sha": "df54b6f4acaf85ac60ba4e2ed0fabadeaaa6c15c",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/spring-boot/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "396a2df6e311b5799e55802dd9458f954bc26e57",
+        "skill_md_sha": "df54b6f4acaf85ac60ba4e2ed0fabadeaaa6c15c",
+        "install_target_name": "spring-boot"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/spring-data",
+      "name": "spring-data",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/spring-data/SKILL.md",
+      "sha": "dad64dd09947be8c1832cc46a04c44dea1c3339f",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/spring-data/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "bcf940a92972b1987477fc2629e143faf491645a",
+        "skill_md_sha": "dad64dd09947be8c1832cc46a04c44dea1c3339f",
+        "install_target_name": "spring-data"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/spring-integrations",
+      "name": "spring-integrations",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/spring-integrations/SKILL.md",
+      "sha": "f09692c13ca9b6575b1798ef7a7c253fe23a5ac0",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/spring-integrations/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "9c89c7b32df30b7bea08bc728cf02d1b7364b6b0",
+        "skill_md_sha": "f09692c13ca9b6575b1798ef7a7c253fe23a5ac0",
+        "install_target_name": "spring-integrations"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/spring-observability",
+      "name": "spring-observability",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/spring-observability/SKILL.md",
+      "sha": "2573456047adc9473da9f67202d32d695656e973",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/spring-observability/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "7356e839653a41aaa51a96d65cfa4e3a8920cc68",
+        "skill_md_sha": "2573456047adc9473da9f67202d32d695656e973",
+        "install_target_name": "spring-observability"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/spring-security",
+      "name": "spring-security",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/spring-security/SKILL.md",
+      "sha": "04329deed32171b628a89b5b10ca4955a50d21d7",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/spring-security/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "d4d17e1cbd6ff44e2020bc30943453484be78a85",
+        "skill_md_sha": "04329deed32171b628a89b5b10ca4955a50d21d7",
+        "install_target_name": "spring-security"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/spring-testing",
+      "name": "spring-testing",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/spring-testing/SKILL.md",
+      "sha": "08e410d456450930647538652518f5a6dbfabe03",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/spring-testing/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "8418c79fbe83e497f5f8cee298e536a944e9012d",
+        "skill_md_sha": "08e410d456450930647538652518f5a6dbfabe03",
+        "install_target_name": "spring-testing"
+      }
+    },
+    {
+      "id": "dankosik/java-backend-skills:skills/spring-web",
+      "name": "spring-web",
+      "repo": "dankosik/java-backend-skills",
+      "path": "skills/spring-web/SKILL.md",
+      "sha": "d0f793dda89bd4ecf0cfde2784dce3f383125e80",
+      "pinned": {
+        "repo_slug": "Dankosik/java-backend-skills",
+        "skill_md_path": "skills/spring-web/SKILL.md",
+        "repo_commit_sha": "e16e8a2ee4969286c51c66949a0f4858c6314366",
+        "skill_tree_sha": "a29384eefc20209ba281d7c9c095fb062bf5a98f",
+        "skill_md_sha": "d0f793dda89bd4ecf0cfde2784dce3f383125e80",
+        "install_target_name": "spring-web"
+      }
+    }
+  ],
+  "pinnedCount": 124,
+  "cutoverValidationPassed": true,
+  "baselinePreserved": 55289,
+  "productionDataChanged": false,
+  "combinedCrawlRun": false,
+  "published": false,
+  "postReviewHeld": [
+    {
+      "id": "proyecto26/system-design-skills:skills/service-decomposition",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "messaging-streaming"
+      ]
+    },
+    {
+      "id": "vectorlabau/skills:skills/interaction/page-patterns",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "surfaces"
+      ]
+    },
+    {
+      "id": "vectorlabau/skills:skills/audit/ux-audit",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "setup-ui-ux-skills"
+      ]
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/fluency-assessment",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "blocker-diagnosis"
+      ]
+    },
+    {
+      "id": "adimango/ai-adoption-playbook:skills/reporting-readiness-assessment",
+      "reason": "companion-files-or-named-agents-outside-skill-package",
+      "paths": [],
+      "agents": [],
+      "skills": [
+        "fluency-assessment"
+      ]
+    }
+  ]
+}
