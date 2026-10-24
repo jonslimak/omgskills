@@ -5,6 +5,37 @@ import Testing
 
 @MainActor
 struct CatalogInstallModelTests {
+    @Test(arguments: [CatalogInstallService.Result.installed, .alreadyInstalled, .conflict,
+                      .needsGit, .unavailable, .failed("Private error /Users/example/secret")])
+    func trackingRecordsOneApprovedOutcomeWithoutPrivateData(_ result: CatalogInstallService.Result) async {
+        var events: [ConnectedAppEvent] = []
+        let model = CatalogInstallModel(service: FlowStub(installResult: result),
+            coordinator: UpdateInstallCoordinator(), track: { events.append($0) })
+        model.receive(link())
+        model.receive(link())
+        await model.operation?.value
+        #expect(events == [.install(.requested, agent: .codex)])
+        model.install()
+        model.install()
+        await model.operation?.value
+        #expect(events == [.install(.requested, agent: .codex), .install(.approved, agent: .codex),
+                           .installResult(result, agent: .codex)])
+        model.install()
+        #expect(await model.close())
+        #expect(events.count == 3)
+    }
+
+    @Test func trackingCancellationDoesNotClaimAnInstallOrEmitTwice() async {
+        var events: [ConnectedAppEvent] = []
+        let model = CatalogInstallModel(service: FlowStub(), coordinator: UpdateInstallCoordinator(),
+            track: { events.append($0) })
+        model.receive(link())
+        await model.operation?.value
+        #expect(await model.close())
+        #expect(await model.close())
+        #expect(events == [.install(.requested, agent: .codex), .install(.cancelled, agent: .codex)])
+    }
+
     @Test func onlySuccessfulInstallationSchedulesOneInventoryReport() async {
         for result: CatalogInstallService.Result in [.installed, .alreadyInstalled, .conflict, .needsGit, .unavailable, .failed("Fixture failure")] {
             let service = FlowStub(installResult: result)

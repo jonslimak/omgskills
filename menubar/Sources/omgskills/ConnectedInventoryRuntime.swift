@@ -12,6 +12,7 @@ final class ConnectedInventoryRuntime {
     @ObservationIgnored private let authorizer: any BrowserPairingAuthorizing
     @ObservationIgnored private let automation: Automation?
     @ObservationIgnored private let callbackScheme: String
+    @ObservationIgnored private let track: ConnectedAppEvent.Track
     @ObservationIgnored private var startup: Task<Void, Never>?
     @ObservationIgnored private var operation: Task<Void, Never>?
     @ObservationIgnored private var hourly: Task<Void, Never>?
@@ -28,7 +29,10 @@ final class ConnectedInventoryRuntime {
             guard let self else { return .cancelled }
             let current = session
             let outcome = await connection.requestScheduledInventoryReport()
-            if current == session, outcome == .reconnectRequired { stopAutomation() }
+            if current == session {
+                if let event = ConnectedAppEvent.inventoryResult(outcome) { track(event) }
+                if outcome == .reconnectRequired { stopAutomation() }
+            }
             return outcome
         }
 
@@ -58,17 +62,19 @@ final class ConnectedInventoryRuntime {
     }
 
     init(connection: DeviceConnectionModel, authorizer: any BrowserPairingAuthorizing,
-         callbackScheme: String = BrowserPairing.connectedTestCallbackScheme, automation: Automation? = nil) {
+         callbackScheme: String = BrowserPairing.connectedTestCallbackScheme, automation: Automation? = nil,
+         track: @escaping ConnectedAppEvent.Track = { _ in }) {
         self.connection = connection
         self.authorizer = authorizer
         self.automation = automation
         self.callbackScheme = callbackScheme
+        self.track = track
     }
 
     @discardableResult
     func start() -> Task<Void, Never> {
         if let startup { return startup }
-        let task = beginInitial { [connection] in connection.restore() }
+        let task = beginInitial(action: .restore) { [connection] in connection.restore() }
         startup = task
         return task
     }
@@ -83,7 +89,7 @@ final class ConnectedInventoryRuntime {
 
     @discardableResult
     func connect(deviceName: String) -> Task<Void, Never> {
-        beginInitial { [connection] in
+        beginInitial(action: .connect) { [connection] in
             connection.connectWithBrowser(deviceName: deviceName, installations: [], replacingExisting: true)
         }
     }
@@ -105,7 +111,7 @@ final class ConnectedInventoryRuntime {
 
     @discardableResult
     func disconnect() -> Task<Void, Never> {
-        transition(initial: false) { [connection] in connection.disconnect() }
+        transition(initial: false, action: .disconnect) { [connection] in connection.disconnect() }
     }
 
     @discardableResult
@@ -127,11 +133,13 @@ final class ConnectedInventoryRuntime {
 
     func stop() async { await cancel().value }
 
-    private func beginInitial(_ begin: @escaping @MainActor () -> Task<Void, Never>) -> Task<Void, Never> {
-        transition(initial: true, begin: begin)
+    private func beginInitial(action: ConnectedAppEvent.ConnectionAction,
+                              _ begin: @escaping @MainActor () -> Task<Void, Never>) -> Task<Void, Never> {
+        transition(initial: true, action: action, begin: begin)
     }
 
-    private func transition(initial: Bool, begin: @escaping @MainActor () -> Task<Void, Never>) -> Task<Void, Never> {
+    private func transition(initial: Bool, action: ConnectedAppEvent.ConnectionAction,
+                            begin: @escaping @MainActor () -> Task<Void, Never>) -> Task<Void, Never> {
         let current = invalidateSession()
         let previous = operation
         connection.cancelCurrentOperation()
@@ -146,6 +154,10 @@ final class ConnectedInventoryRuntime {
             guard current == session else { return }
             await begin().value
             guard current == session else { return }
+            if let event = ConnectedAppEvent.connectionResult(connection.state, action: action,
+                hasWarning: connection.disconnectWarning != nil) { track(event) }
+            if initial, let outcome = connection.lastReportOutcome,
+               let event = ConnectedAppEvent.inventoryResult(outcome) { track(event) }
             initializing = false
             guard automation != nil, case .connected = connection.state,
                   let outcome = connection.lastReportOutcome else { stopAutomation(); return }
@@ -163,7 +175,10 @@ final class ConnectedInventoryRuntime {
         guard current == session, let automation else { return }
         scheduler.start()
         do { stopWatching = try automation.watch { [weak self] in self?.trigger(changed: true, session: current) } }
-        catch { watchWarning = "Folder monitoring unavailable. Resync and hourly checks remain available." }
+        catch {
+            watchWarning = "Folder monitoring unavailable. Resync and hourly checks remain available."
+            track(.watcherUnavailable)
+        }
         stopWake = automation.wake { [weak self] in self?.trigger(changed: false, session: current) }
         hourly = Task { @MainActor [weak self, sleep = automation.sleep] in
             while !Task.isCancelled {

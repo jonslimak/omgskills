@@ -121,24 +121,26 @@ final class CatalogInstallWindowController: NSObject, NSWindowDelegate, NSMenuIt
     #endif
 
     convenience init(candidate: CatalogCandidateRuntime.Configuration, coordinator: UpdateInstallCoordinator) {
+        let track = Analytics.connectedTracker(profile: candidate.profile)
         let installer = CatalogSkillInstaller(managedInstaller: ManagedSkillInstaller(
             managedRoot: candidate.managedRoot, pathAnchor: candidate.home), filesystemPaths: candidate.paths)
         let service = CatalogInstallFlowService(records: CatalogInstallRecordClient(catalogCandidate: candidate),
             installer: CatalogInstallService(installer: installer))
-        self.init(model: CatalogInstallModel(service: service, coordinator: coordinator, client: .product),
+        self.init(model: CatalogInstallModel(service: service, coordinator: coordinator, client: .product, track: track),
             website: candidate.profile.website)
         if let connected = candidate.connected {
             let authorizer = WebAuthenticationSession(anchorProvider: { [weak self] in self?.window },
                 onReturn: { [weak self] in self?.showStatus() })
             do {
                 let runtime = try connected.makeRuntime(paths: candidate.paths, authorizer: authorizer,
-                    coordinator: coordinator, automation: .live(paths: candidate.paths))
+                    coordinator: coordinator, automation: .live(paths: candidate.paths), track: track)
                 connectedRuntime = runtime
                 runtime.observeInstalls(in: model)
                 window.contentView = NSHostingView(rootView: CatalogInstallView(model: model,
                     close: { [weak self] in self?.closeRequest() }, connection: runtime.connection, inventoryRuntime: runtime))
                 runtime.start()
             } catch {
+                track(.setupFailed)
                 window.contentView = NSHostingView(rootView: CatalogInstallView(model: model,
                     close: { [weak self] in self?.closeRequest() },
                     connectionSetupError: CatalogInstallView.connectionSetupFailureMessage))

@@ -35,6 +35,7 @@ final class CatalogInstallModel {
     let client: CatalogInstallRequest.Client
     let appName: String
     @ObservationIgnored var onInstalled: @MainActor () -> Void
+    @ObservationIgnored private let track: ConnectedAppEvent.Track
     @ObservationIgnored private let service: any CatalogInstallFlowServing
     @ObservationIgnored private let coordinator: UpdateInstallCoordinator
     @ObservationIgnored private var activity: UpdateInstallCoordinator.ActivityToken?
@@ -42,12 +43,14 @@ final class CatalogInstallModel {
     @ObservationIgnored private(set) var operation: Task<Void, Never>?
 
     init(service: any CatalogInstallFlowServing, coordinator: UpdateInstallCoordinator, client: CatalogInstallRequest.Client = .f1,
-         appName: String? = nil, onInstalled: @escaping @MainActor () -> Void = {}) {
+         appName: String? = nil, onInstalled: @escaping @MainActor () -> Void = {},
+         track: @escaping ConnectedAppEvent.Track = { _ in }) {
         self.service = service
         self.coordinator = coordinator
         self.client = client
         self.appName = appName ?? (client == .product ? "OMGSkills Candidate" : "OMGSkills F1 Test")
         self.onInstalled = onInstalled
+        self.track = track
     }
 
     var canCheckForAppUpdates: Bool { !ownsRequest && !appUpdateActive && !coordinator.isBusy && !appReplacementBlocksRequest }
@@ -106,6 +109,7 @@ final class CatalogInstallModel {
             return
         }
         request = incoming
+        track(.install(.requested, agent: incoming.target))
         record = nil
         destination = nil
         result = nil
@@ -138,6 +142,7 @@ final class CatalogInstallModel {
 
     func install() {
         guard phase == .confirm, let approved = record, let incoming = request else { return }
+        track(.install(.approved, agent: incoming.target))
         guard !appReplacementBlocksRequest else {
             finish(.failed("An app update is waiting. Retry after the app restarts."))
             return
@@ -184,6 +189,7 @@ final class CatalogInstallModel {
 
     func close() async -> Bool {
         guard canClose else { return false }
+        if ownsRequest { track(.install(.cancelled, agent: request?.target)) }
         phase = .cancelling
         operationID = nil
         let pending = operation
@@ -204,6 +210,7 @@ final class CatalogInstallModel {
     private func isCurrent(_ id: UUID) -> Bool { operationID == id && !Task.isCancelled }
 
     private func finish(_ result: CatalogInstallService.Result, message: String? = nil) {
+        track(.installResult(result, agent: request?.target))
         self.result = result
         phase = .result
         notice = ""
