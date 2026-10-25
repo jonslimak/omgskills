@@ -55,6 +55,22 @@ test("invalid complete policy writes nothing", () => {
   if (!result.ok) assert.match(result.errors.join("\n"), /invalid-handle/);
 });
 
+test("company metadata survives staged save JSON without changing creator trust", () => {
+  for (const isCompany of [true, false]) {
+    const loaded = fixture();
+    const before = structuredClone(loaded.raw.creators);
+    const replacement = structuredClone(loaded.raw.collections) as PolicySources["collections"];
+    replacement.authorOverrides!.openai.isCompany = isCompany;
+    const result = prepareEditoolPolicySave({ loaded, replacements: { collections: replacement }, catalogContext });
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      const saved = JSON.parse(JSON.stringify(result.entries[0].value));
+      assert.equal(saved.authorOverrides.openai.isCompany, isCompany);
+    }
+    assert.deepEqual(loaded.raw.creators, before);
+  }
+});
+
 test("creator save preserves exact path coverage and rejects malformed allowlists", () => {
   const creator = { handle: "openai", roles: ["vendor" as const], watch: true, featured: true,
     skillCoverage: "selected" as const, skillRepos: ["openai/codex"], skillPaths: ["openai/codex#skills/review/SKILL.md"] };

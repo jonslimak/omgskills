@@ -1,6 +1,6 @@
 import type { CreatorDisplay } from "./model";
 
-// Keep the browse grouping aligned with the Mac app's companyCollectionIds.
+// Legacy manifests omit isCompany. Keep their fallback aligned with the Mac app.
 const companyHandles = new Set([
   "anthropics", "automattic", "browser-use", "clickhouse", "cloudflare", "cursor",
   "everyinc", "expo", "facebook", "firebase", "firecrawl", "flutter", "getsentry",
@@ -10,15 +10,15 @@ const companyHandles = new Set([
   "stripe", "supabase", "trailofbits", "vercel", "vercel-labs", "warpdotdev",
 ]);
 
-export function isCompany(handle: string) {
-  return companyHandles.has(handle.toLowerCase());
+export function isCompany(handle: string, classification?: boolean) {
+  return classification ?? companyHandles.has(handle.toLowerCase());
 }
 
 export function discoveryCreatorGroups(items: CreatorDisplay[]) {
   const sorted = [...items].sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
   return {
-    companies: sorted.filter(item => isCompany(item.handle)),
-    creators: sorted.filter(item => !isCompany(item.handle)),
+    companies: sorted.filter(item => isCompany(item.handle, item.isCompany)),
+    creators: sorted.filter(item => !isCompany(item.handle, item.isCompany)),
   };
 }
 

@@ -14,6 +14,16 @@ const source = { version: 1, profiles: { anthropics: { description: "Official sk
   ] } } };
 const json = (value: unknown) => new Response(JSON.stringify(value), { headers: { "content-type": "application/json" } });
 
+test("the planned creator expansion loads beyond the old count and byte limits", async () => {
+  const profiles = Object.fromEntries(Array.from({ length: 675 }, (_, i) => [`creator-${i}`, { description: "d".repeat(500), rankings: [] }]));
+  const value = { version: 1, profiles };
+  assert.ok(Buffer.byteLength(JSON.stringify(value)) > 250_000);
+  const loaded = await createCreatorProfileLoader(async () => json(value))();
+  assert.equal(Object.keys(loaded).length, 675);
+  assert.equal(Object.keys(parseCreatorProfiles({ version: 1, profiles: Object.fromEntries(Array.from({ length: 1000 }, (_, i) => [`creator-${i}`, {}])) })).length, 1000);
+  assert.throws(() => parseCreatorProfiles({ version: 1, profiles: Object.fromEntries(Array.from({ length: 1001 }, (_, i) => [`creator-${i}`, {}])) }), /too large/);
+});
+
 test("creator banner renders published totals and rank labels without best skill or ranking counts", () => {
   const profile = parseCreatorProfiles(source).anthropics;
   const html = renderToStaticMarkup(createElement(CreatorProfileText, { profile }));
@@ -131,7 +141,7 @@ test("failed or oversized summaries can retry without blocking the ordinary skil
   const loader = createCreatorProfileLoader(async () => ++reads === 1 ? new Response("Missing", { status: 404 }) : json(source));
   await assert.rejects(loader(), /unavailable/);
   assert.equal((await loader()).anthropics.skillCount, 395);
-  const oversized = createCreatorProfileLoader(async () => new Response(" ".repeat(250_001), { headers: { "content-type": "application/json" } }));
+  const oversized = createCreatorProfileLoader(async () => new Response(" ".repeat(1_000_001), { headers: { "content-type": "application/json" } }));
   await assert.rejects(oversized(), /too large/);
   const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   const banner = app.slice(app.indexOf('<header className="ua-creator-banner">'), app.indexOf('</header>', app.indexOf('<header className="ua-creator-banner">')));

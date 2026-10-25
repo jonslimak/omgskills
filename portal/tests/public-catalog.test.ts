@@ -62,6 +62,27 @@ test("published collections stay separate from Mac Discover search categories", 
   assert.throws(() => parseCollections({ collections: [{}] }));
 });
 
+test("company metadata decodes true, false, and absent without inferring trust", () => {
+  for (const isCompany of [true, false, undefined]) {
+    const entry = { ...collections.collections[0], ...(isCompany === undefined ? {} : { isCompany }) };
+    const parsed = parseCollections({ collections: [entry] }).creators[0];
+    assert.equal(parsed.isCompany, isCompany);
+    assert.equal(Object.hasOwn(parsed, "isCompany"), isCompany !== undefined);
+  }
+  for (const isCompany of ["true", 1, null]) {
+    assert.throws(() => parseCollections({ collections: [{ ...collections.collections[0], isCompany }] }), /classification/);
+  }
+});
+
+test("expanded featured catalog fits while collection input stays bounded", () => {
+  const make = (count: number) => ({ collections: Array.from({ length: count }, (_, i) => ({
+    ...collections.collections[0], id: `author-creator-${i}`, authorHandle: `creator-${i}`,
+  })) });
+  assert.equal(parseCollections(make(693)).creators.length, 693);
+  assert.equal(parseCollections(make(1000)).creators.length, 1000);
+  assert.throws(() => parseCollections(make(1001)), /invalid collections/);
+});
+
 test("collection cards receive their published image without changing their content", () => {
   const imageUrl = "https://omgskills.com/images/collections/documents.webp?v=123456abcdef";
   const source = { collections: [{ ...collections.collections[1], imageUrl }] };

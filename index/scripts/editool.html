@@ -460,6 +460,11 @@ function renderCollections() {
         <h3 class="author-collection-title">@${esc(handle)}</h3>
       </div>
       <div class="bar">
+        <label>Type <select data-f="isCompany" aria-label="Profile type for ${esc(handle)}">
+          <option value="" ${o.isCompany === undefined ? "selected" : ""}>Automatic</option>
+          <option value="false" ${o.isCompany === false ? "selected" : ""}>Creator</option>
+          <option value="true" ${o.isCompany === true ? "selected" : ""}>Company</option>
+        </select></label>
         <input data-f="subtitle" placeholder="subtitle" value="${esc(o.subtitle ?? "")}" size="28">
         <input data-f="description" placeholder="description" value="${esc(o.description ?? "")}" size="52">
         <input data-f="xUrl" placeholder="https://x.com/handle" value="${esc(o.xUrl ?? "")}" size="34">
@@ -531,10 +536,7 @@ $("col-list").addEventListener("input", (e) => {
   const colPanel = e.target.closest("[data-col-panel]");
   if (authorPanel) {
     const handle = authorPanel.dataset.authorPanel;
-    state.collections.authorOverrides = state.collections.authorOverrides ?? {};
-    const o = state.collections.authorOverrides[handle] ?? {};
-    o[field] = e.target.value || undefined;
-    state.collections.authorOverrides[handle] = o;
+    setAuthorOverrideField(handle, field, e.target.value);
   } else if (colPanel) {
     const collection = state.collections.collections[Number(colPanel.dataset.colPanel)];
     collection[field] = e.target.value;
@@ -846,6 +848,14 @@ function overrideFor(handle) {
   const key = Object.keys(state.collections.authorOverrides).find((k) => variants.includes(k.toLowerCase())) ?? handle;
   state.collections.authorOverrides[key] = state.collections.authorOverrides[key] ?? {};
   return state.collections.authorOverrides[key];
+}
+
+function setAuthorOverrideField(handle, field, value) {
+  const override = overrideFor(handle);
+  if (field === "isCompany") {
+    if (value === "") delete override.isCompany;
+    else override.isCompany = value === "true";
+  } else override[field] = value || undefined;
 }
 
 function registryEntryFor(handle) {

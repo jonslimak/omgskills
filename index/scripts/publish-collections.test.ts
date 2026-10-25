@@ -43,6 +43,44 @@ test("featured creators come from the creator registry", () => {
   assert.deepEqual(asset.collections.map((collection) => collection.githubUrl), ["https://github.com/OldHandle"]);
 });
 
+test("optional company classification is preserved without changing registry trust", () => {
+  const registry: CreatorRegistrySource = {
+    creators: [{ handle: "NewHandle", roles: ["creator"], watch: true, featured: true, aliases: ["OldHandle"] }],
+  };
+  const before = structuredClone(registry);
+  for (const isCompany of [true, false, undefined]) {
+    const source = { authorOverrides: { oldhandle: { ...(isCompany === undefined ? {} : { isCompany }) } }, collections: [] };
+    validateSource(source, registry, skills);
+    const entry = buildCollectionsAsset(source, registry, skills).collections[0];
+    assert.equal(entry.isCompany, isCompany);
+    assert.equal(Object.hasOwn(entry, "isCompany"), isCompany !== undefined);
+    assert.equal(entry.authorHandle, "OldHandle");
+  }
+  assert.deepEqual(registry, before);
+});
+
+test("an explicit complete company portfolio is not truncated to the default five highlights", () => {
+  const portfolio = Array.from({ length: 12 }, (_, index) => ({
+    id: `company/skills:skill-${index}`,
+    name: `Skill ${index}`,
+    description: `Workflow ${index}`,
+    author_handle: "Company",
+    stars: index,
+  }));
+  const ids = portfolio.map(skill => skill.id);
+  const source = {
+    authorOverrides: { company: { isCompany: true, featuredSkillIds: ids } },
+    collections: [],
+  };
+  const registry: CreatorRegistrySource = {
+    creators: [{ handle: "Company", roles: ["creator"], watch: true, featured: true }],
+  };
+  validateSource(source, registry, portfolio);
+  const collection = buildCollectionsAsset(source, registry, portfolio).collections[0];
+  assert.equal(collection.isCompany, true);
+  assert.deepEqual(collection.featuredSkillIds, ids);
+});
+
 test("an empty featured registry produces no author collections", () => {
   const source = { version: 1, authorOverrides: {}, collections: [] };
   const registry: CreatorRegistrySource = { creators: [] };

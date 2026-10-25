@@ -247,45 +247,6 @@ struct ContentView: View {
     private let tweetDescriptionFont: Font = .body
     private let toolbarSources: [Source] = [.installed, .available]
     private let friendShareText = "I use omgskills.com to find skills and it doesn't suck"
-    private let companyCollectionIds: Set<String> = [
-        "author-anthropics",
-        "author-automattic",
-        "author-browser-use",
-        "author-clickhouse",
-        "author-cloudflare",
-        "author-cursor",
-        "author-everyinc",
-        "author-expo",
-        "author-facebook",
-        "author-firebase",
-        "author-firecrawl",
-        "author-flutter",
-        "author-getsentry",
-        "author-github",
-        "author-google-gemini",
-        "author-google-labs-code",
-        "author-googleworkspace",
-        "author-heygen-com",
-        "author-higgsfield-ai",
-        "author-huggingface",
-        "author-langchain-ai",
-        "author-lobehub",
-        "author-microsoft",
-        "author-n8n-io",
-        "author-nousresearch",
-        "author-openai",
-        "author-paperclipai",
-        "author-posthog",
-        "author-pytorch",
-        "author-react",
-        "author-shadcn",
-        "author-stripe",
-        "author-supabase",
-        "author-trailofbits",
-        "author-vercel",
-        "author-vercel-labs",
-        "author-warpdotdev"
-    ]
 
     private let starterSearchGroups: [(String, [StarterSearch])] = [
         ("Design + Apps", [
@@ -436,11 +397,11 @@ struct ContentView: View {
             return store.collections
         case .creators:
             return store.collections.filter {
-                $0.type == .author && !companyCollectionIds.contains($0.id)
+                $0.type == .author && !$0.isCompanyForPresentation
             }.sortedByTitle()
         case .companies:
             return store.collections.filter {
-                companyCollectionIds.contains($0.id)
+                $0.isCompanyForPresentation
             }.sortedByTitle()
         }
     }

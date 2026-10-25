@@ -84,6 +84,7 @@ export type CreatorDisplay = {
   name: string;
   tagline: string;
   avatar?: string;
+  isCompany?: boolean;
 };
 export type CatalogDisplay = {
   skills: CatalogSummary[];

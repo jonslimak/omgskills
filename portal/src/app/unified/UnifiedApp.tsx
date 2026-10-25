@@ -642,7 +642,7 @@ export function UnifiedApp({
   ) {
     if (!supportsView(view)) return null;
     const active = !nav.query && (view === "creators"
-      ? (nav.view === "creators" && nav.id === id) || (nav.view === "creator" && isCompany(nav.id) === (id === "companies"))
+      ? (nav.view === "creators" && nav.id === id) || (nav.view === "creator" && isCompany(nav.id, creator?.isCompany) === (id === "companies"))
       : nav.view === view && (!id || nav.id === id));
     return (
       <button
@@ -1272,7 +1272,7 @@ export function UnifiedApp({
                     ] as const).filter(([view]) => supportsView(view)).map(([view, label, Icon, heading, id]) => <button type="button" key={`${view}:${id}`}
                       className={`ua-nav-item${heading ? " ua-drawer-section" : ""}`}
                       aria-current={(view === "creators"
-                        ? (nav.view === view && nav.id === id) || (nav.view === "creator" && isCompany(nav.id) === (id === "companies"))
+                        ? (nav.view === view && nav.id === id) || (nav.view === "creator" && isCompany(nav.id, creator?.isCompany) === (id === "companies"))
                         : nav.view === view || (view === "sets" && nav.view === "set") || (view === "collections" && nav.view === "collection")) && !nav.query ? "page" : undefined}
                       onClick={() => go(view, id)}><Icon /><span>{label}</span></button>)}
                   </nav>

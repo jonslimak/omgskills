@@ -55,6 +55,7 @@ export type SourceCollection = {
 export type AuthorOverride = {
   title?: string;
   subtitle?: string;
+  isCompany?: boolean;
   imageUrl?: string | null;
   xUrl?: string | null;
   featuredSkillIds?: string[];

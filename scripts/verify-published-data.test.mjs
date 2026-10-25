@@ -312,6 +312,25 @@ test("warns without blocking when a collection references a missing track skill"
   assert.equal(JSON.parse(result.stdout).staleCollectionReferenceCount, 1);
 });
 
+test("author company metadata is optional boolean and collection count remains bounded", () => {
+  const entry = { id: "author-owner", type: "author", title: "Owner", subtitle: "Skills", authorHandle: "owner", featuredSkillIds: ["owner/repo:one"] };
+  const verify = (entries) => verifyFixture({ skills: [skill("owner/repo:one", shaA)], shaHistory: history(undefined),
+    collections: { version: 1, generatedAt: "2026-10-25T00:00:00.000Z", collections: entries } });
+  for (const isCompany of [true, false, undefined]) {
+    const result = verify([{ ...entry, ...(isCompany === undefined ? {} : { isCompany }) }]);
+    assert.equal(result.status, 0, result.stderr);
+  }
+  for (const isCompany of [null, "true", 1]) {
+    const result = verify([{ ...entry, isCompany }]);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /invalid isCompany/);
+  }
+  assert.equal(verify(Array.from({ length: 693 }, (_, i) => ({ ...entry, id: `author-owner-${i}` }))).status, 0);
+  const tooMany = verify(Array.from({ length: 1001 }, (_, i) => ({ ...entry, id: `author-owner-${i}` })));
+  assert.notEqual(tooMany.status, 0);
+  assert.match(tooMany.stderr, /limit of 1000/);
+});
+
 test("rejects malformed collections assets", async (t) => {
   const cases = [
     {

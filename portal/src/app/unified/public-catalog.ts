@@ -88,7 +88,7 @@ function parseSkill(value: unknown): CatalogSummary {
 }
 export function parseCollections(value: unknown): CatalogDisplay {
   const source = record(value);
-  if (!Array.isArray(source.collections) || source.collections.length > 500) throw new Error("The catalog returned invalid collections.");
+  if (!Array.isArray(source.collections) || source.collections.length > 1000) throw new Error("The catalog returned invalid collections.");
   const catalog = emptyCatalog();
   for (const value of source.collections) {
     const item = record(value);
@@ -97,7 +97,9 @@ export function parseCollections(value: unknown): CatalogDisplay {
     if (item.type === "author") {
       const author = text(item.authorHandle);
       if (!handle(author)) throw new Error("The catalog returned an invalid creator.");
-      catalog.creators.push({ handle: author, name, tagline: optionalText(item.subtitle) || optionalText(item.description), avatar: avatar(author) });
+      if (item.isCompany !== undefined && typeof item.isCompany !== "boolean") throw new Error("The catalog returned an invalid creator classification.");
+      catalog.creators.push({ handle: author, name, tagline: optionalText(item.subtitle) || optionalText(item.description), avatar: avatar(author),
+        ...(item.isCompany === undefined ? {} : { isCompany: item.isCompany }) });
     } else if (item.type === "topic") {
       const skillIds = [...new Set(strings(item.skillIds ?? item.featuredSkillIds ?? []))];
       if (skillIds.length > 1000) throw new Error("This collection is too large to display.");

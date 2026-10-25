@@ -42,6 +42,7 @@ export function creatorProfilesSummary(collections, authors, generatedAt) {
       ).slice(0, 3).map(([category, badge]) => ({ category, rank: badge.rank, value: badge.value.replace(/\u2b50/g, "stars") })),
     };
   }
+  if (Object.keys(profiles).length > 1000) throw new Error("Creator summary exceeds the profile limit.");
   return { version: 1, generatedAt, profiles };
 }
 
@@ -71,7 +72,7 @@ export async function buildCreatorProfiles({ siteDir, outputPath }) {
   const [collections, authors] = await Promise.all([asset(collectionSource, "collections"), asset(authorSource, "authorLeaderboards")]);
   const summary = creatorProfilesSummary(collections, authors, authorSource.manifest.generatedAt);
   const json = JSON.stringify(summary) + "\n";
-  if (Buffer.byteLength(json) > 250_000) throw new Error("Creator summary exceeds its size budget.");
+  if (Buffer.byteLength(json) > 1_000_000) throw new Error("Creator summary exceeds its size budget.");
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, json);
   return { profiles: Object.keys(summary.profiles).length, bytes: Buffer.byteLength(json) };

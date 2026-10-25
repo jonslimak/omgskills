@@ -29,7 +29,7 @@ export function parseCreatorProfiles(value: unknown): SummaryMap {
   const envelope = value as Record<string, unknown>;
   if (envelope.version !== 1 || !envelope.profiles || typeof envelope.profiles !== "object" || Array.isArray(envelope.profiles)) throw new Error("Invalid creator summary.");
   const entries = Object.entries(envelope.profiles);
-  if (entries.length > 500) throw new Error("Creator summary is too large.");
+  if (entries.length > 1000) throw new Error("Creator summary is too large.");
   const result: SummaryMap = Object.create(null);
   for (const [handle, source] of entries) {
     if (!/^[a-z0-9][a-z0-9-]{0,99}$/.test(handle) || !source || typeof source !== "object" || Array.isArray(source)) throw new Error("Invalid creator profile.");
@@ -68,7 +68,7 @@ export function createCreatorProfileLoader(fetcher: typeof fetch = (input, init)
           const { done, value } = await reader.read();
           if (done) break;
           size += value.byteLength;
-          if (size > 250_000) { await reader.cancel(); throw new Error("Creator summary is too large."); }
+          if (size > 1_000_000) { await reader.cancel(); throw new Error("Creator summary is too large."); }
           chunks.push(value);
         }
       } finally { reader.releaseLock(); }

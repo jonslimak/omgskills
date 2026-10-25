@@ -220,6 +220,9 @@ if (collections) {
   if (!Array.isArray(data.collections)) {
     fail("collections.collections must be an array");
   }
+  if (data.collections.length > 1000) {
+    fail("collections.collections exceeds the supported limit of 1000");
+  }
 
   const collectionIds = new Set();
   for (const entry of data.collections) {
@@ -244,6 +247,9 @@ if (collections) {
     }
     if (entry.type === "author" && (typeof entry.authorHandle !== "string" || !entry.authorHandle)) {
       fail(`author collection is missing authorHandle: ${entry.id}`);
+    }
+    if (entry.type === "author" && entry.isCompany !== undefined && typeof entry.isCompany !== "boolean") {
+      fail(`author collection has invalid isCompany: ${entry.id}`);
     }
     if (entry.type === "topic" && !Array.isArray(entry.skillIds)) {
       fail(`topic collection is missing skillIds: ${entry.id}`);

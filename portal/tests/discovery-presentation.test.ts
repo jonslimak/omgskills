@@ -11,8 +11,8 @@ const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.
 const styles = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
 
 test("company grouping matches the Mac app for every published profile", () => {
-  const mac = readFileSync(new URL("../../menubar/Sources/omgskills/ContentView.swift", import.meta.url), "utf8");
-  const block = mac.match(/private let companyCollectionIds: Set<String> = \[([\s\S]*?)\]/)?.[1];
+  const mac = readFileSync(new URL("../../menubar/Sources/omgskills/SkillCollection.swift", import.meta.url), "utf8");
+  const block = mac.match(/private static let legacyCompanyCollectionIds: Set<String> = \[([\s\S]*?)\]/)?.[1];
   assert.ok(block);
   const companies = new Set([...block.matchAll(/"author-([^"]+)"/g)].map(match => match[1]));
   const profiles = JSON.parse(readFileSync(new URL("../public/creator-profiles.json", import.meta.url), "utf8"));
@@ -35,6 +35,23 @@ test("company and creator lists are separate, alphabetical and do not mutate met
   assert.equal(groups.companies.length + groups.creators.length, items.length);
   assert.deepEqual(items, before);
   assert.deepEqual(discoveryCreatorGroups([]), { companies: [], creators: [] });
+});
+
+test("explicit company metadata overrides legacy names and keeps navigation classification consistent", () => {
+  const items: CreatorDisplay[] = [
+    { handle: "newco", name: "New Company", tagline: "", isCompany: true },
+    { handle: "openai", name: "Explicit Creator", tagline: "", isCompany: false },
+    { handle: "vercel", name: "Legacy Company", tagline: "" },
+  ];
+  const before = structuredClone(items);
+  const groups = discoveryCreatorGroups(items);
+  assert.deepEqual(groups.companies.map(item => item.handle), ["vercel", "newco"]);
+  assert.deepEqual(groups.creators.map(item => item.handle), ["openai"]);
+  assert.equal(isCompany("newco", true), true);
+  assert.equal(isCompany("openai", false), false);
+  assert.equal(isCompany("openai"), true);
+  assert.deepEqual(items, before);
+  assert.equal((source.match(/isCompany\(nav.id, creator\?\.isCompany\)/g) ?? []).length, 2);
 });
 
 test("company browse links stay public, retain their group and need no skill search", () => {

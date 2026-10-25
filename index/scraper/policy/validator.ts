@@ -343,6 +343,15 @@ function validateCollections(loaded: LoadedPolicySources, issues: PolicyIssue[])
             issues,
           );
         }
+        if (override.isCompany !== undefined && typeof override.isCompany !== "boolean") {
+          issues.push(issue(loaded, {
+            code: "invalid-author-company-classification",
+            source: "collections",
+            location: `/authorOverrides/${handle}/isCompany`,
+            scope: "editorial",
+            message: `Author override ${handle} isCompany must be a boolean when provided.`,
+          }));
+        }
         if (override.xUrl !== undefined && override.xUrl !== null && !isValidXProfileUrl(override.xUrl)) {
           issues.push(issue(loaded, {
             code: "invalid-x-profile-url",

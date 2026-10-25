@@ -40,6 +40,18 @@ test("missing stats remain absent, zero totals remain zero, and unsafe links are
   assert.throws(() => creatorProfilesSummary({ collections: [collections.collections[0], collections.collections[0]] }, [], "date"), /duplicate/);
 });
 
+test("planned 675-profile expansion fits the bounded summary contract", () => {
+  const make = count => ({ collections: Array.from({ length: count }, (_, i) => ({
+    type: "author", authorHandle: `creator-${i}`, description: "d".repeat(500),
+  })) });
+  const summary = creatorProfilesSummary(make(675), [], "2026-10-25T00:00:00Z");
+  const bytes = Buffer.byteLength(JSON.stringify(summary));
+  assert.equal(Object.keys(summary.profiles).length, 675);
+  assert.ok(bytes > 250_000 && bytes < 1_000_000);
+  assert.equal(Object.keys(creatorProfilesSummary(make(1000), [], "date").profiles).length, 1000);
+  assert.throws(() => creatorProfilesSummary(make(1001), [], "date"), /profile limit/);
+});
+
 test("build reads only small metadata plus author stats, verifies source hashes and honors the summary budget", async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), "creator-summary-"));
   try {
@@ -61,7 +73,7 @@ test("build reads only small metadata plus author stats, verifies source hashes 
     await writeFile(path.join(directory, manifest.authorLeaderboards.path), "[]");
     await assert.rejects(buildCreatorProfiles({ siteDir, outputPath }), /integrity/);
     manifest.authorLeaderboards = await descriptor("author-leaderboards", authors);
-    manifest.collections = await descriptor("collections", { collections: [{ ...collections.collections[0], description: "x".repeat(250_000) }] });
+    manifest.collections = await descriptor("collections", { collections: [{ ...collections.collections[0], description: "x".repeat(1_000_000) }] });
     await writeFile(path.join(directory, "manifest.json"), JSON.stringify(manifest));
     await assert.rejects(buildCreatorProfiles({ siteDir, outputPath }), /size budget/);
     assert.equal(JSON.parse(await readFile(outputPath, "utf8")).profiles.anthropics.description, "Official skills for documents.");

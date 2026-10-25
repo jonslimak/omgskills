@@ -49,6 +49,22 @@ test("accepts a valid complete policy", () => {
   assert.deepEqual(validatePolicy(fixture(), catalogContext), []);
 });
 
+test("company presentation is optional boolean metadata, independent of vendor trust", () => {
+  for (const value of [true, false, undefined]) {
+    const loaded = fixture({ creators: { creators: [{ handle: "openai", roles: ["creator"], watch: true, featured: true }] } });
+    (loaded.raw.collections as PolicySources["collections"]).authorOverrides!.openai.isCompany = value;
+    assert.deepEqual(validatePolicy(loaded, catalogContext), []);
+  }
+  for (const value of [null, "true", 1, {}]) {
+    const loaded = fixture();
+    const collections = loaded.raw.collections as { authorOverrides: Record<string, Record<string, unknown>> };
+    collections.authorOverrides.openai.isCompany = value;
+    const issue = validatePolicy(loaded, catalogContext).find(entry => entry.code === "invalid-author-company-classification");
+    assert.ok(issue);
+    assert.equal(issue.scope, "editorial");
+  }
+});
+
 test("validates author X profile URLs", () => {
   const valid = fixture({
     collections: {

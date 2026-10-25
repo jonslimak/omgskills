@@ -50,6 +50,7 @@ type SkillCollection = {
   title: string;
   subtitle: string;
   authorHandle?: string;
+  isCompany?: boolean;
   imageUrl?: string | null;
   githubUrl?: string | null;
   xUrl?: string | null;
@@ -236,6 +237,7 @@ export function buildCollectionsAsset(source: CollectionsSource, registry: Creat
       title: override.title ?? titleFromHandle(catalogHandle),
       subtitle: override.subtitle ?? `Skills by @${catalogHandle}`,
       authorHandle: catalogHandle,
+      ...(override.isCompany === undefined ? {} : { isCompany: override.isCompany }),
       imageUrl: override.imageUrl ?? null,
       githubUrl: githubProfileUrl(entry.handle),
       xUrl: override.xUrl ?? null,
