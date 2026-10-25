@@ -1296199,7 +1296199,12 @@
     "publisher_repo": "thoughtspot/thoughtspot-agent-skills",
     "upstream_repo": null,
     "provenance_type": "original",
-    "author_confidence": "high"
+    "author_confidence": "high",
+    "repo_slug": "thoughtspot/thoughtspot-agent-skills",
+    "skill_md_path": "agents/claude/ts-coach-model/SKILL.md",
+    "repo_commit_sha": "f6632697ecdfc76de6568f0d99f736ec4c4de3e3",
+    "skill_tree_sha": "13a21e567d8add498da535ee9255c84103f1af57",
+    "install_target_name": "ts-coach-model"
   },
   {
     "id": "thoughtspot/thoughtspot-agent-skills:ts-convert-from-snowflake-sv",
@@ -1296217,7 +1296222,12 @@
     "publisher_repo": "thoughtspot/thoughtspot-agent-skills",
     "upstream_repo": null,
     "provenance_type": "original",
-    "author_confidence": "high"
+    "author_confidence": "high",
+    "repo_slug": "thoughtspot/thoughtspot-agent-skills",
+    "skill_md_path": "agents/claude/ts-convert-from-snowflake-sv/SKILL.md",
+    "repo_commit_sha": "7d5aa38075b8521efd0af0bfaa724fad1e9e7d74",
+    "skill_tree_sha": "8d995dda848c1fcee9ab4233222923a9a7ebe271",
+    "install_target_name": "ts-convert-from-snowflake-sv"
   },
   {
     "id": "thoughtspot/thoughtspot-agent-skills:ts-object-answer-promote",
@@ -1296235,7 +1296245,12 @@
     "publisher_repo": "thoughtspot/thoughtspot-agent-skills",
     "upstream_repo": null,
     "provenance_type": "original",
-    "author_confidence": "high"
+    "author_confidence": "high",
+    "repo_slug": "thoughtspot/thoughtspot-agent-skills",
+    "skill_md_path": "agents/claude/ts-object-answer-promote/SKILL.md",
+    "repo_commit_sha": "26a8612a9f26445461e4876e1d58165e9c60aa52",
+    "skill_tree_sha": "ebe539268288aa0558d9808fba6bc0e10ed7b9dc",
+    "install_target_name": "ts-object-answer-promote"
   },
   {
     "id": "thrawn01/claude-dotfiles:blueprint-create",

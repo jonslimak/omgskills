@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-25T20:22:51.614Z",
+  "track": "v2",
+  "sourceCommit": "b3e233cf752e0f780a32272898fdd83f543ccf94",
+  "policyDigest": "sha256:7f8a4db29521be5ee7ce83ba8a489482783e0c15d7e830e14b81c69e9dd1af8c",
+  "baseline": {
+    "manifestGeneratedAt": "2026-10-25T19:32:48.747Z",
+    "skillsCount": 58289,
+    "collectionsCount": 295,
+    "membershipCount": 3320
+  },
+  "proposed": {
+    "manifestGeneratedAt": "2026-10-25T20:22:38.511Z",
+    "skillsCount": 58289,
+    "collectionsCount": 295,
+    "membershipCount": 3320
+  },
+  "skills": {
+    "addedCount": 0,
+    "removedCount": 0,
+    "removalThreshold": 500,
+    "addedSample": [],
+    "removedSample": []
+  },
+  "collections": {
+    "addedIds": [],
+    "removedIds": [],
+    "removedMembershipCount": 0,
+    "removedMembershipPercent": 0
+  },
+  "assets": {
+    "addedKeys": [],
+    "removedKeys": [],
+    "authorizedRemovedKeys": []
+  },
+  "override": {
+    "enabled": false,
+    "reason": null
+  },
+  "issues": [],
+  "blocked": false
+}

@@ -1,6 +1,7 @@
 # ThoughtSpot Pinned Install Repair
 
-Status: verified locally only. Publication and deployment have not been performed.
+Initial repair: verified locally. Publication preparation is recorded separately
+below; production deployment status belongs to the guarded workflow receipt.
 
 ## Scope
 
@@ -56,3 +57,27 @@ cutover/publication checks before any separately approved publish.
 
 No production data, hosted assets, app binaries, updater files, or shared dirty
 checkout were changed by this local repair.
+
+## Data-Only Publication Preparation
+
+`publication-rehearsal.json` records the separately approved local preparation
+from `b3e233cf`. The verified three-entry overlay was applied to both current
+published catalog inputs. The unchanged published signals and repository
+membership passed `validateCutoverOutputs`, then the normal promotion and v2 /
+Crawl 4 publishers generated the candidate assets.
+
+Both tracks retain all 58,289 skills and all 295 collections. Only the three
+reviewed skills' install coordinates change; names, descriptions, content hashes,
+quality tiers and all other records remain unchanged. The Crawl 4 search closure
+was regenerated through its normal builder. Other manifest asset references are
+unchanged. Both publication-impact reports pass without an override and both
+published-data verifiers pass with no stale collection references.
+
+Historical assets pruned by the local publishers were restored unchanged from
+the reviewed baseline so this publication removes no existing asset files.
+No full crawl, discovery, refresh, or client release is part of this operation.
+The preparation reports are not themselves proof of a live production deploy.
+
+Before the data commit, the complete 556-test shadow guard suite and 27
+published-data/manual-deployment tests passed. `git diff --check` passed and
+there were no deleted files in the candidate change.

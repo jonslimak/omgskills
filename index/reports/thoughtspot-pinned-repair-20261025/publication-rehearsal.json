@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "status": "verified-local-publication-only",
+  "generatedAt": "2026-10-25T20:22:38.511Z",
+  "sourceCommit": "b3e233cf752e0f780a32272898fdd83f543ccf94",
+  "summary": {
+    "cutoverSkillCount": 58289,
+    "promotedSkillCount": 58289,
+    "filteredTotal": 0,
+    "filteredCatalogCount": 0,
+    "filteredRepackagedCount": 0
+  },
+  "tracks": {
+    "v2": {
+      "skillCount": 58289,
+      "changedSkillCount": 3,
+      "changes": [
+        {
+          "id": "thoughtspot/thoughtspot-agent-skills:ts-coach-model",
+          "fields": [
+            "install_target_name",
+            "repo_commit_sha",
+            "repo_slug",
+            "skill_md_path",
+            "skill_tree_sha"
+          ]
+        },
+        {
+          "id": "thoughtspot/thoughtspot-agent-skills:ts-convert-from-snowflake-sv",
+          "fields": [
+            "install_target_name",
+            "repo_commit_sha",
+            "repo_slug",
+            "skill_md_path",
+            "skill_tree_sha"
+          ]
+        },
+        {
+          "id": "thoughtspot/thoughtspot-agent-skills:ts-object-answer-promote",
+          "fields": [
+            "install_target_name",
+            "repo_commit_sha",
+            "repo_slug",
+            "skill_md_path",
+            "skill_tree_sha"
+          ]
+        }
+      ],
+      "skills": {
+        "path": "skills-1288abfcc6d4.json",
+        "sha256": "1288abfcc6d4b2206383ed2094a4fc7b59d68a7db569d3f99a4b085694efb2f3",
+        "bytes": 94954597
+      },
+      "searchCatalog": null,
+      "collections": {
+        "path": "collections-8a88cc95cd16.json",
+        "sha256": "8a88cc95cd16baf09acc3abb712ab5ff5525fd55d8408ae7516a073361b5e259",
+        "bytes": 345992
+      },
+      "addedSkills": 0,
+      "removedSkills": 0,
+      "removedCollectionMemberships": 0,
+      "impactPassed": true,
+      "publishedDataVerificationPassed": true
+    },
+    "crawl4": {
+      "skillCount": 58289,
+      "changedSkillCount": 3,
+      "changes": [
+        {
+          "id": "thoughtspot/thoughtspot-agent-skills:ts-coach-model",
+          "fields": [
+            "install_target_name",
+            "repo_commit_sha",
+            "repo_slug",
+            "skill_md_path",
+            "skill_tree_sha"
+          ]
+        },
+        {
+          "id": "thoughtspot/thoughtspot-agent-skills:ts-convert-from-snowflake-sv",
+          "fields": [
+            "install_target_name",
+            "repo_commit_sha",
+            "repo_slug",
+            "skill_md_path",
+            "skill_tree_sha"
+          ]
+        },
+        {
+          "id": "thoughtspot/thoughtspot-agent-skills:ts-object-answer-promote",
+          "fields": [
+            "install_target_name",
+            "repo_commit_sha",
+            "repo_slug",
+            "skill_md_path",
+            "skill_tree_sha"
+          ]
+        }
+      ],
+      "skills": {
+        "path": "skills-6941f4fa3da9.json",
+        "sha256": "6941f4fa3da91a1eeb69798a993d2ce8ade02a8ccf909398ff3440a441955dbd",
+        "bytes": 96851622
+      },
+      "searchCatalog": {
+        "path": "search-catalog-a966bad47282.json",
+        "sha256": "a966bad47282e549aba58667159eb3c4c6d659e0227c4763e399b5b769b6643c",
+        "bytes": 662
+      },
+      "collections": {
+        "path": "collections-8a88cc95cd16.json",
+        "sha256": "8a88cc95cd16baf09acc3abb712ab5ff5525fd55d8408ae7516a073361b5e259",
+        "bytes": 345992
+      },
+      "addedSkills": 0,
+      "removedSkills": 0,
+      "removedCollectionMemberships": 0,
+      "impactPassed": true,
+      "publishedDataVerificationPassed": true
+    }
+  },
+  "fullCrawlRun": false,
+  "deployed": false,
+  "noOverrideUsed": true
+}
