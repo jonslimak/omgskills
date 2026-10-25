@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "status": "verified-local-only",
+  "verifiedAt": "2026-10-25T20:14:10.014Z",
+  "sourceCommit": "f65456479b2852085b642ea24436dc03f5d2c248",
+  "baselineSha256": "8527a4c45141d142d5bc5c08dfe05634160399db4dc9833f8eef4b3a93c9e943",
+  "skillCountBefore": 58289,
+  "skillCountAfter": 58289,
+  "changedSkillCount": 3,
+  "changed": [
+    {
+      "id": "thoughtspot/thoughtspot-agent-skills:ts-coach-model",
+      "changedFields": [
+        "install_target_name",
+        "repo_commit_sha",
+        "repo_slug",
+        "skill_md_path",
+        "skill_tree_sha"
+      ]
+    },
+    {
+      "id": "thoughtspot/thoughtspot-agent-skills:ts-convert-from-snowflake-sv",
+      "changedFields": [
+        "install_target_name",
+        "repo_commit_sha",
+        "repo_slug",
+        "skill_md_path",
+        "skill_tree_sha"
+      ]
+    },
+    {
+      "id": "thoughtspot/thoughtspot-agent-skills:ts-object-answer-promote",
+      "changedFields": [
+        "install_target_name",
+        "repo_commit_sha",
+        "repo_slug",
+        "skill_md_path",
+        "skill_tree_sha"
+      ]
+    }
+  ],
+  "unchangedOtherSkillCount": 58286,
+  "structuralSkillValidationFailures": 0,
+  "independentGitHubVerification": [
+    {
+      "id": "thoughtspot/thoughtspot-agent-skills:ts-coach-model",
+      "commitVerified": true,
+      "packageTreeVerified": true,
+      "sourceBlobVerified": true,
+      "sourceBytes": 40227
+    },
+    {
+      "id": "thoughtspot/thoughtspot-agent-skills:ts-convert-from-snowflake-sv",
+      "commitVerified": true,
+      "packageTreeVerified": true,
+      "sourceBlobVerified": true,
+      "sourceBytes": 36158
+    },
+    {
+      "id": "thoughtspot/thoughtspot-agent-skills:ts-object-answer-promote",
+      "commitVerified": true,
+      "packageTreeVerified": true,
+      "sourceBlobVerified": true,
+      "sourceBytes": 31784
+    }
+  ],
+  "focusedTestsPassed": 32,
+  "typecheckPassed": true,
+  "productionFilesChanged": false,
+  "fullCrawlRun": false,
+  "published": false,
+  "deployed": false
+}
