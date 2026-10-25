@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-10-25T11:55:44.406Z",
+  "baseCommit": "4bb4ef732e950ee7729a2cd314958af97fb97a62",
+  "rehearsalCommit": "22e53d0c8bcaa7b65d4a029b64cd17db755fbf64",
+  "status": "verified-before-commit",
+  "skills": 58289,
+  "added": 3000,
+  "removed": 0,
+  "unchangedExistingRecords": 55289,
+  "pinnedAdditionsVerified": 3000,
+  "regressionTestsPassed": 62,
+  "steps": [
+    {
+      "name": "policy",
+      "exitCode": 0
+    },
+    {
+      "name": "verify-v2",
+      "exitCode": 0
+    },
+    {
+      "name": "impact-v2",
+      "exitCode": 0
+    },
+    {
+      "name": "verify-crawl4",
+      "exitCode": 0
+    },
+    {
+      "name": "impact-crawl4",
+      "exitCode": 0
+    },
+    {
+      "name": "regression-tests",
+      "exitCode": 0
+    },
+    {
+      "name": "impact-promotion-tests",
+      "exitCode": 0
+    },
+    {
+      "name": "diff-check",
+      "exitCode": 0
+    }
+  ],
+  "generatedFilesTransferredByteForByte": true,
+  "changedScope": "generated catalog data and verification reports only",
+  "pushed": false,
+  "deployed": false
+}

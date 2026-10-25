@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-24T23:09:05.577Z",
+  "track": "crawl4",
+  "sourceCommit": "22e53d0c8bcaa7b65d4a029b64cd17db755fbf64",
+  "policyDigest": "sha256:d82246764c9c1ff123b6932b67445482a845108c8c5090ae271c37f0ee727a71",
+  "baseline": {
+    "manifestGeneratedAt": "2026-10-24T14:27:26.589Z",
+    "skillsCount": 55289,
+    "collectionsCount": 92,
+    "membershipCount": 933
+  },
+  "proposed": {
+    "manifestGeneratedAt": "2026-10-24T22:53:05.205Z",
+    "skillsCount": 58289,
+    "collectionsCount": 92,
+    "membershipCount": 933
+  },
+  "skills": {
+    "addedCount": 3000,
+    "removedCount": 0,
+    "removalThreshold": 500,
+    "addedSample": [
+      "abderrahimghazali/drupal-boost:skills/caching-strategy",
+      "abderrahimghazali/drupal-boost:skills/config-management",
+      "abderrahimghazali/drupal-boost:skills/contrib-publishing",
+      "abderrahimghazali/drupal-boost:skills/ddev-workflow",
+      "abderrahimghazali/drupal-boost:skills/deployment",
+      "abderrahimghazali/drupal-boost:skills/drupal-security",
+      "abderrahimghazali/drupal-boost:skills/migrate-api",
+      "abderrahimghazali/drupal-boost:skills/module-scaffold",
+      "abderrahimghazali/drupal-boost:skills/quality-testing",
+      "abderrahimghazali/drupal-boost:skills/recipes-api",
+      "abderrahimghazali/drupal-boost:skills/rest-jsonapi",
+      "abderrahimghazali/drupal-boost:skills/theme-development",
+      "abderrahimghazali/drupal-boost:skills/workspaces",
+      "abhisekjha/pith:skills/pith",
+      "abhisekjha/pith:skills/pith-arch",
+      "abhisekjha/pith:skills/pith-commit",
+      "abhisekjha/pith:skills/pith-debug",
+      "abhisekjha/pith:skills/pith-install",
+      "abhisekjha/pith:skills/pith-plan",
+      "abhisekjha/pith:skills/pith-review"
+    ],
+    "removedSample": []
+  },
+  "collections": {
+    "addedIds": [],
+    "removedIds": [],
+    "removedMembershipCount": 0,
+    "removedMembershipPercent": 0
+  },
+  "assets": {
+    "addedKeys": [],
+    "removedKeys": [],
+    "authorizedRemovedKeys": []
+  },
+  "override": {
+    "enabled": false,
+    "reason": null
+  },
+  "issues": [],
+  "blocked": false
+}

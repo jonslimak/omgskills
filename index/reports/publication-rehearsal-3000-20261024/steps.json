@@ -1,0 +1,216 @@
+[
+  {
+    "label": "01-policy",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scripts/validate-policy.ts",
+      "--profile",
+      "scheduled-data"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 0.9464026250000006
+  },
+  {
+    "label": "02-baseline-v2",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scripts/publication-impact.ts",
+      "snapshot",
+      "--track",
+      "v2",
+      "--output",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/reports/publication-rehearsal-3000-20261024/baseline.v2.json"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 0.6210707499999999
+  },
+  {
+    "label": "02-baseline-crawl4",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scripts/publication-impact.ts",
+      "snapshot",
+      "--track",
+      "crawl4",
+      "--output",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/reports/publication-rehearsal-3000-20261024/baseline.crawl4.json"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 0.5125929159999996
+  },
+  {
+    "label": "03-promote",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scraper/new-crawl/promote-cutover.ts"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 1.1786390000000002
+  },
+  {
+    "label": "04-overlays",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scraper/content/build-overlays.ts"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 0.5893587499999994
+  },
+  {
+    "label": "05-trending-leaderboard",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scraper/content/build-trending-leaderboard.ts"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 0.4306668749999999
+  },
+  {
+    "label": "06-author-leaderboards",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scraper/content/build-author-leaderboards.ts"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 0.546302667
+  },
+  {
+    "label": "07-leaderboard-view-data",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scraper/content/build-leaderboard-view-data.ts"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 0.159954334
+  },
+  {
+    "label": "08-publish-v2",
+    "command": "bash",
+    "args": [
+      "scripts/publish-data.sh"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024",
+    "exitCode": 0,
+    "seconds": 1.9218114160000004
+  },
+  {
+    "label": "09-publish-crawl4",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "scripts/publish-crawl4-data.mjs"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024",
+    "exitCode": 0,
+    "seconds": 8.718219874999999
+  },
+  {
+    "label": "10-sha-history",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scripts/publish-sha-history.ts"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 0.9769711670000033
+  },
+  {
+    "label": "11-equivalence",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scripts/publish-skill-equivalence.ts"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 0.13360979199999928
+  },
+  {
+    "label": "12-verify-v2",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "scripts/verify-published-data.mjs"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024",
+    "exitCode": 0,
+    "seconds": 0.5531114999999991
+  },
+  {
+    "label": "13-impact-v2",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scripts/publication-impact.ts",
+      "check",
+      "--track",
+      "v2",
+      "--baseline",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/reports/publication-rehearsal-3000-20261024/baseline.v2.json",
+      "--json",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/reports/publication-rehearsal-3000-20261024/impact.v2.json",
+      "--markdown",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/reports/publication-rehearsal-3000-20261024/impact.v2.md"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 0.6409323750000003
+  },
+  {
+    "label": "12-verify-crawl4",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "scripts/verify-published-data.mjs"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024",
+    "exitCode": 0,
+    "seconds": 1.9374466250000004
+  },
+  {
+    "label": "13-impact-crawl4",
+    "command": "/usr/local/bin/node",
+    "args": [
+      "--import",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/node_modules/tsx/dist/loader.mjs",
+      "scripts/publication-impact.ts",
+      "check",
+      "--track",
+      "crawl4",
+      "--baseline",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/reports/publication-rehearsal-3000-20261024/baseline.crawl4.json",
+      "--json",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/reports/publication-rehearsal-3000-20261024/impact.crawl4.json",
+      "--markdown",
+      "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index/reports/publication-rehearsal-3000-20261024/impact.crawl4.md"
+    ],
+    "cwd": "/private/tmp/omgskills-publication-3000-rehearsal-20261024/index",
+    "exitCode": 0,
+    "seconds": 0.5623481659999998
+  }
+]
