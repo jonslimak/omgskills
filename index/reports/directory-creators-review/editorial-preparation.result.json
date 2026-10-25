@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "status": "prepared-locally-not-published",
+  "newCompanyProfiles": 203,
+  "fullSkillReferences": 2387,
+  "githubLinkedXProfiles": 88,
+  "xProfilesOmitted": 115,
+  "existingCollectionsPreserved": 92,
+  "totalAuthorProfiles": 277,
+  "totalCollections": 295,
+  "collectionBytes": 284623,
+  "creatorSummaryBytes": 96632,
+  "sourceOnly": true,
+  "published": false,
+  "deployed": false,
+  "checks": {
+    "allProfileSkillsIncluded": true,
+    "existingProfilesAndTopicsUnchanged": true,
+    "creatorRolesWatchAndCoverageUnchanged": true,
+    "allNewProfilesGroupAsCompanies": true,
+    "compactRegistryFormatPreserved": true,
+    "liveDataSourceAndHostedAssetsUnchanged": true
+  },
+  "resultingSources": {
+    "seeds/creators.json": "10196d482e501f13d852a3b66a5311c1ec6bb6e70c053d8af2166d7ca605e6b8",
+    "curations/collections.json": "c9f40cbaf1f326cdd43560a14221317a9162d9b571975b521c97e3b13d66f933"
+  },
+  "verifiedAt": "2026-10-25",
+  "tests": {
+    "editorialPolicyAndPublish": 70,
+    "webCompatibilityAndDataVerifier": 83,
+    "indexTypecheck": "passed",
+    "strictPolicyValidation": "0 findings",
+    "diffWhitespace": "passed",
+    "fullMacAppBuild": "not run; prior full-build verification was blocked by the missing dependency lockfile"
+  },
+  "sources": {
+    "preparation": "editorial-preparation.json",
+    "review": "review.json",
+    "shortlist": "company-shortlist.json"
+  }
+}

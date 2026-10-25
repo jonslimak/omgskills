@@ -1,0 +1,3164 @@
+{
+  "version": 1,
+  "status": "approved-for-local-preparation-only",
+  "preparedAt": "2026-10-25",
+  "sourceCommit": "2619ff069c8c0e10cda9bc888d1c658a6e11f8f0",
+  "sourceDigests": {
+    "index/skills.json": "8527a4c45141d142d5bc5c08dfe05634160399db4dc9833f8eef4b3a93c9e943",
+    "index/seeds/creators.json": "cb93b8fbcda5822fea9bfc2392ffcafeb8fd1ec66d943746e9f9830f6d2dc314",
+    "index/curations/collections.json": "4fb9092ada70d864e2cc8d06cea4ffd34452e981df5ee290ec00fb7d2a6575ae",
+    "index/reports/directory-creators-review/review.json": "74a8f20b6ed50a22cc2cc0601473a2aec1f56c441b930ec35a82bf9c214210f0"
+  },
+  "scope": "Prepare local source data only. No publish, deploy, crawl, commit, push, trust-role changes, or expanded repository/path coverage.",
+  "summary": {
+    "newFeaturedCompanies": 203,
+    "fullPublishedSkillCount": 2387,
+    "githubLinkedXProfiles": 88,
+    "xProfilesIntentionallyOmitted": 115,
+    "existingFeaturedProfilesPreserved": 74,
+    "expectedTotalFeaturedProfiles": 277,
+    "expectedTotalCollections": 295
+  },
+  "rules": [
+    "Read exact allPublishedSkillIds for every handle from the hashed review.json; never select a top-N subset.",
+    "Preserve all existing creator fields except featured=false becomes featured=true for the approved handles.",
+    "Preserve existing author overrides, topic collections, catalog skills and hosted assets.",
+    "Use existing Editool policy validation and guarded transaction for the source update.",
+    "Social URLs are links declared by the corresponding GitHub profile; they are not independently authenticated X identities."
+  ],
+  "companies": [
+    {
+      "handle": "docker",
+      "title": "Docker",
+      "subtitle": "Containers and deployment",
+      "description": "Skills for Docker builds, Compose, container debugging, and agent configuration.",
+      "isCompany": true,
+      "xUrl": "https://x.com/docker",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 11,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/docker",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "GoogleCloudPlatform",
+      "title": "Google Cloud",
+      "subtitle": "Google Cloud operations",
+      "description": "Skills for Google Cloud workloads, Kubernetes operations, and data-platform workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 37,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/GoogleCloudPlatform",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "awslabs",
+      "title": "AWS Labs",
+      "subtitle": "AWS application development",
+      "description": "Skills for building, deploying, and operating applications on AWS.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 28,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/awslabs",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "appwrite",
+      "title": "Appwrite",
+      "subtitle": "Appwrite application development",
+      "description": "Skills for Appwrite SDKs, command-line tools, and application integration.",
+      "isCompany": true,
+      "xUrl": "https://x.com/appwrite",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 11,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/appwrite",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "buildkite",
+      "title": "Buildkite",
+      "subtitle": "Buildkite delivery workflows",
+      "description": "Skills for configuring Buildkite pipelines, agents, caching, and delivery tooling.",
+      "isCompany": true,
+      "xUrl": "https://x.com/buildkite",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/buildkite",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "render-oss",
+      "title": "Render",
+      "subtitle": "Render cloud deployment",
+      "description": "Skills for deploying, debugging, and operating services and background workers on Render.",
+      "isCompany": true,
+      "xUrl": "https://x.com/render",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 21,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/render-oss",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "ngrok",
+      "title": "ngrok",
+      "subtitle": "Secure tunnels and access",
+      "description": "Skills for exposing local services, configuring ngrok, and managing endpoint access.",
+      "isCompany": true,
+      "xUrl": "https://x.com/ngrokhq",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 9,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/ngrok",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "inngest",
+      "title": "Inngest",
+      "subtitle": "Durable workflows and agents",
+      "description": "Skills for Inngest workflows, durable agents, APIs, and application integration.",
+      "isCompany": true,
+      "xUrl": "https://x.com/inngest",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 16,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/inngest",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "val-town",
+      "title": "Val Town",
+      "subtitle": "Val Town application building",
+      "description": "Skills for building Val Town applications with storage, scheduled jobs, email, and client-side code.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 11,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/val-town",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "hostinger",
+      "title": "Hostinger International",
+      "subtitle": "Hosting and website operations",
+      "description": "Skills for Hostinger hosting audits, domain connections, deployment, and WordPress maintenance.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/hostinger",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "wix",
+      "title": "Wix.com",
+      "subtitle": "Wix application development",
+      "description": "Skills for Wix APIs, headless sites, applications, and frontend integration.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 8,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/wix",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "catalystbyzoho",
+      "title": "Catalyst by Zoho",
+      "subtitle": "Catalyst cloud application development",
+      "description": "Skills for Catalyst project setup, databases, SDKs, and cloud application workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/CatalystByZoho",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 9,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/catalystbyzoho",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "Kong",
+      "title": "Kong",
+      "subtitle": "API gateways and operations",
+      "description": "Skills for configuring Kong gateways, managing declarative infrastructure, and working with Kong APIs.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 22,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Kong",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "ory",
+      "title": "Ory",
+      "subtitle": "Identity and authentication workflows",
+      "description": "Skills for Ory authentication, identity integrations, and local development.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 9,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/ory",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "DuendeSoftware",
+      "title": "Duende Software",
+      "subtitle": "ASP.NET identity and authorization",
+      "description": "Skills for ASP.NET Core authentication, authorization, identity security, and Duende integrations.",
+      "isCompany": true,
+      "xUrl": "https://x.com/duendeidentity",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 23,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/DuendeSoftware",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "twilio",
+      "title": "Twilio",
+      "subtitle": "Messaging and communication workflows",
+      "description": "Skills for Twilio and SendGrid integration, email delivery, account configuration, and troubleshooting.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 56,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/twilio",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "slackapi",
+      "title": "Slack",
+      "subtitle": "Slack application development",
+      "description": "Skills for Slack APIs, Block Kit interfaces, app creation, testing, and deployment.",
+      "isCompany": true,
+      "xUrl": "https://x.com/slackapi",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 8,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/slackapi",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "GitbookIO",
+      "title": "GitBook",
+      "subtitle": "GitBook documentation and integrations",
+      "description": "Skills for GitBook integrations, documentation tooling, and OpenAPI authoring.",
+      "isCompany": true,
+      "xUrl": "https://x.com/GitBookIO",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/GitbookIO",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "mintlify",
+      "title": "Mintlify",
+      "subtitle": "Mintlify documentation development",
+      "description": "Skills for building and maintaining documentation sites with Mintlify.",
+      "isCompany": true,
+      "xUrl": "https://x.com/mintlify",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/mintlify",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "nodesource",
+      "title": "NodeSource",
+      "subtitle": "Node.js diagnostics and operations",
+      "description": "Skills for investigating Node.js memory, tracing, dependencies, and runtime issues with NodeSource tooling.",
+      "isCompany": true,
+      "xUrl": "https://x.com/NodeSource",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 20,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/nodesource",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "metalbear-co",
+      "title": "MetalBear",
+      "subtitle": "Kubernetes development with mirrord",
+      "description": "Skills for configuring mirrord, running integration workflows, and developing against Kubernetes environments.",
+      "isCompany": true,
+      "xUrl": "https://x.com/metalbear",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 8,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/metalbear-co",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "VeryGoodOpenSource",
+      "title": "Very Good Ventures",
+      "subtitle": "Flutter development and quality",
+      "description": "Skills for Flutter architecture, accessibility, animations, project setup, and SDK upgrades.",
+      "isCompany": true,
+      "xUrl": "https://x.com/vgventures",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 15,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/VeryGoodOpenSource",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "TheQtCompanyRnD",
+      "title": "Qt",
+      "subtitle": "Qt application development",
+      "description": "Skills for Qt interfaces, CMake projects, C++ review, documentation, and design integration.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 12,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/TheQtCompanyRnD",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "vaadin",
+      "title": "Vaadin",
+      "subtitle": "Vaadin interfaces and themes",
+      "description": "Skills for Vaadin form layouts and application theme configuration.",
+      "isCompany": true,
+      "xUrl": "https://x.com/vaadin",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/vaadin",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "UI5",
+      "title": "UI5",
+      "subtitle": "SAP UI5 application quality",
+      "description": "Skills for diagnosing and fixing UI5 bootstrap, rendering, dependency, and application issues.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 28,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/UI5",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Cloud, deployment and developer platforms"
+      }
+    },
+    {
+      "handle": "pydantic",
+      "title": "Pydantic",
+      "subtitle": "Python validation and observability",
+      "description": "Skills for Pydantic validation, AI agents, Logfire instrumentation, and telemetry workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/pydantic",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 17,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/pydantic",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "redis",
+      "title": "Redis",
+      "subtitle": "Redis development and operations",
+      "description": "Skills for Redis data modeling, connections, clustering, observability, and AI integrations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 12,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/redis",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "neondatabase",
+      "title": "Neon",
+      "subtitle": "Neon Postgres development",
+      "description": "Skills for Neon Postgres setup, application integration, database operations, and related developer tools.",
+      "isCompany": true,
+      "xUrl": "https://x.com/neondatabase",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 24,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/neondatabase",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "planetscale",
+      "title": "PlanetScale",
+      "subtitle": "Database operations and review",
+      "description": "Skills for PlanetScale database assessment, configuration, performance review, and operational workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/PlanetScale",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 28,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/planetscale",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "qdrant",
+      "title": "Qdrant",
+      "subtitle": "Vector search development",
+      "description": "Skills for Qdrant deployment, SDKs, monitoring, search performance, and model migrations.",
+      "isCompany": true,
+      "xUrl": "https://x.com/qdrant_engine",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 24,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/qdrant",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "elastic",
+      "title": "Elastic",
+      "subtitle": "Elasticsearch development and operations",
+      "description": "Skills for Elasticsearch queries, ingestion, access controls, auditing, and platform operations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 39,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/elastic",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "cockroachdb",
+      "title": "CockroachDB",
+      "subtitle": "CockroachDB queries and migrations",
+      "description": "Skills for CockroachDB SQL and database migration, replication, and verification workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/cockroachdb",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "pinecone-io",
+      "title": "Pinecone",
+      "subtitle": "Pinecone search and assistants",
+      "description": "Skills for Pinecone indexes, search, assistants, command-line tools, and application integration.",
+      "isCompany": true,
+      "xUrl": "https://x.com/pinecone",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 17,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/pinecone-io",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "zilliztech",
+      "title": "Zilliz",
+      "subtitle": "Vector databases and memory",
+      "description": "Skills for Milvus, Zilliz services, vector search, and agent memory workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/zilliz_universe",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 23,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/zilliztech",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "opensearch-project",
+      "title": "OpenSearch",
+      "subtitle": "Search applications and analytics",
+      "description": "Skills for OpenSearch applications, cloud deployment, observability, and query workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/opensearch-project",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "confluentinc",
+      "title": "Confluent Inc.",
+      "subtitle": "Kafka and streaming workflows",
+      "description": "Skills for Confluent Cloud, Kafka clients, Flink SQL, change-data capture, and streaming operations.",
+      "isCompany": true,
+      "xUrl": "https://x.com/confluentinc",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 10,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/confluentinc",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "astronomer",
+      "title": "Astronomer",
+      "subtitle": "Airflow and data orchestration",
+      "description": "Skills for Apache Airflow operations, data workflows, plugins, and troubleshooting with Astronomer tooling.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 40,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/astronomer",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "datahub-project",
+      "title": "DataHub",
+      "subtitle": "Metadata discovery and governance",
+      "description": "Skills for DataHub search, lineage, data quality, setup, and metadata workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 10,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/datahub-project",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "atlanhq",
+      "title": "Atlan Pte Ltd.",
+      "subtitle": "Atlan metadata and development",
+      "description": "Skills for Atlan catalog search, developer tooling, application scaffolding, and metadata integrations.",
+      "isCompany": true,
+      "xUrl": "https://x.com/atlanhq",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 10,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/atlanhq",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "Alation",
+      "title": "Alation",
+      "subtitle": "Data discovery and governance",
+      "description": "Skills for exploring, querying, configuring, and curating data through Alation.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Alation",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "holistics",
+      "title": "Holistics",
+      "subtitle": "Holistics analytics and dashboards",
+      "description": "Skills for Holistics data analysis, visualization, queries, and dashboard development.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 11,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/holistics",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "thoughtspot",
+      "title": "ThoughtSpot",
+      "subtitle": "ThoughtSpot analytics and integration",
+      "description": "Skills for ThoughtSpot developer APIs, embedded analytics, data modeling, and platform guidance.",
+      "isCompany": true,
+      "xUrl": "https://x.com/thoughtspot",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/thoughtspot",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "rilldata",
+      "title": "Rill",
+      "subtitle": "Rill analytics and dashboards",
+      "description": "Skills for Rill data exploration, analytics configuration, and dashboard workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/rilldata",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/rilldata",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "spiceai",
+      "title": "Spice.ai",
+      "subtitle": "SQL acceleration and applications",
+      "description": "Skills for Spice.ai data acceleration, caching, queries, and application configuration.",
+      "isCompany": true,
+      "xUrl": "https://x.com/spice_ai",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 16,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/spiceai",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "pixeltable",
+      "title": "Pixeltable",
+      "subtitle": "Multimodal AI application development",
+      "description": "Skills for building Pixeltable applications with data tables, computed columns, models, and service endpoints.",
+      "isCompany": true,
+      "xUrl": "https://x.com/pixeltablehq",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/pixeltable",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "preset-io",
+      "title": "Preset",
+      "subtitle": "Preset analytics command line",
+      "description": "Skills for Preset command-line workflows, analytics automation, and Superset-related operations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/preset-io",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "datarobot-oss",
+      "title": "DataRobot",
+      "subtitle": "DataRobot machine learning workflows",
+      "description": "Skills for DataRobot model development, platform integration, and machine learning operations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 14,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/datarobot-oss",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "mlflow",
+      "title": "MLflow",
+      "subtitle": "AI evaluation and observability",
+      "description": "Skills for evaluating agents, inspecting MLflow traces, debugging behavior, and building scorers.",
+      "isCompany": true,
+      "xUrl": "https://x.com/MLflow",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 12,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/mlflow",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "gopigment",
+      "title": "Pigment",
+      "subtitle": "Pigment planning and modeling",
+      "description": "Skills for Pigment data modeling, planning applications, analysis, and reporting workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 35,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/gopigment",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "amplitude",
+      "title": "Amplitude",
+      "subtitle": "Product analytics and instrumentation",
+      "description": "Skills for Amplitude event tracking, product analysis, instrumentation, and account insights.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 37,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/amplitude",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Databases, data engineering and analytics"
+      }
+    },
+    {
+      "handle": "grafana",
+      "title": "Grafana Labs",
+      "subtitle": "Grafana observability and operations",
+      "description": "Skills for Grafana queries, dashboards, monitoring, cloud tools, and observability workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/grafana",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 54,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/grafana",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "Dynatrace",
+      "title": "Dynatrace",
+      "subtitle": "Dynatrace monitoring and analysis",
+      "description": "Skills for Dynatrace alerting, queries, dashboards, notebooks, and operational investigation.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 31,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Dynatrace",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "BetterStackHQ",
+      "title": "Better Stack",
+      "subtitle": "Monitoring logs and alerts",
+      "description": "Skills for Better Stack queries, charts, alerting, connections, and monitoring workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/BetterStackHQ",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 16,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/BetterStackHQ",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "honeycombio",
+      "title": "Honeycomb",
+      "subtitle": "Trace verification and debugging",
+      "description": "Skills for locating and inspecting recent Honeycomb traces during application testing.",
+      "isCompany": true,
+      "xUrl": "https://x.com/honeycombio",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/honeycombio",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "newrelic",
+      "title": "New Relic",
+      "subtitle": "Application performance investigation",
+      "description": "Skills for investigating application errors, latency, throughput, and transactions with New Relic.",
+      "isCompany": true,
+      "xUrl": "https://x.com/newrelic",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/newrelic",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "groundcover-com",
+      "title": "groundcover",
+      "subtitle": "Kubernetes observability queries",
+      "description": "Skills for discovering groundcover telemetry and building operational queries.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/groundcover-com",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "incident-io",
+      "title": "incident.io",
+      "subtitle": "Incident response and context",
+      "description": "Skills for incident.io incidents, architecture context, extensions, and operational troubleshooting.",
+      "isCompany": true,
+      "xUrl": "https://x.com/incident_io",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 8,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/incident-io",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "Rootly-AI-Labs",
+      "title": "Rootly",
+      "subtitle": "Incident investigation and reliability",
+      "description": "Skills for Rootly incident workflows, operational investigation, and reliability tooling.",
+      "isCompany": true,
+      "xUrl": "https://x.com/rootlyhq",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 17,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Rootly-AI-Labs",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "semgrep",
+      "title": "Semgrep",
+      "subtitle": "Code and AI security",
+      "description": "Skills for secure coding, LLM application security, Semgrep analysis, and security-rule workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/semgrep",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/semgrep",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "SonarSource",
+      "title": "Sonar",
+      "subtitle": "Code quality and security",
+      "description": "Skills for SonarQube analysis, coverage, duplication, dependency risks, and issue remediation.",
+      "isCompany": true,
+      "xUrl": "https://x.com/SonarSource",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 8,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/SonarSource",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "CrowdStrike",
+      "title": "CrowdStrike",
+      "subtitle": "Security investigation and operations",
+      "description": "Skills for CrowdStrike security workflows and investigation through its published integrations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/CrowdStrike",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "zscaler",
+      "title": "Zscaler, Inc.",
+      "subtitle": "Network and cloud security",
+      "description": "Skills for Zscaler connectivity troubleshooting, policy investigation, and security operations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 36,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/zscaler",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "armosec",
+      "title": "ARMO",
+      "subtitle": "Cloud runtime security operations",
+      "description": "Skills for ARMO runtime incidents, vulnerabilities, integrations, cloud accounts, and security configuration.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 14,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/armosec",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "descope",
+      "title": "Descope",
+      "subtitle": "Authentication and identity integration",
+      "description": "Skills for building and managing authentication workflows with Descope.",
+      "isCompany": true,
+      "xUrl": "https://x.com/descopeinc",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/descope",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "jfrog",
+      "title": "JFrog Ltd.",
+      "subtitle": "Software supply chain operations",
+      "description": "Skills for JFrog command-line tools, platform APIs, and software supply chain integrations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/jfrog",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "cypress-io",
+      "title": "Cypress.io",
+      "subtitle": "Cypress testing and debugging",
+      "description": "Skills for Cypress test development, debugging, and automated testing workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/Cypress_io",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/cypress-io",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "checkly",
+      "title": "Checkly",
+      "subtitle": "Synthetic monitoring and testing",
+      "description": "Skills for Checkly monitoring checks and Playwright-based testing workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/checklyHQ",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/checkly",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "stackhawk",
+      "title": "StackHawk, Inc.",
+      "subtitle": "Application security testing",
+      "description": "Skills for StackHawk APIs, security reporting, and HawkScan workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/stackhawk",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/stackhawk",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "1Password",
+      "title": "1Password",
+      "subtitle": "Developer secrets and environments",
+      "description": "Skills for managing 1Password Developer Environments, environment variables, secrets, and credentials.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/1Password",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "42Crunch-AI",
+      "title": "42Crunch-AI",
+      "subtitle": "API specification and security",
+      "description": "Skills for generating OpenAPI specifications from application code and API collections.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/42Crunch-AI",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "dequelabs",
+      "title": "Deque",
+      "subtitle": "Accessibility testing and remediation",
+      "description": "Skills for accessibility analysis and remediation using Deque tooling and guidance.",
+      "isCompany": true,
+      "xUrl": "https://x.com/dequesystems",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/dequelabs",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "pactflow",
+      "title": "PactFlow",
+      "subtitle": "API contracts and specifications",
+      "description": "Skills for API contract testing, OpenAPI generation, specification parsing, and coverage checks.",
+      "isCompany": true,
+      "xUrl": "https://x.com/smartbear",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/pactflow",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "testdino-hq",
+      "title": "TestDino",
+      "subtitle": "Playwright testing and diagnostics",
+      "description": "Skills for Playwright test development, CI workflows, test diagnostics, and TestDino integration.",
+      "isCompany": true,
+      "xUrl": "https://x.com/testdinohq",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 10,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/testdino-hq",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "kobiton",
+      "title": "Kobiton Inc.",
+      "subtitle": "Mobile test execution workflows",
+      "description": "Skills for creating and monitoring Kobiton mobile test runs from existing test cases.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/kobiton",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Observability, security and testing"
+      }
+    },
+    {
+      "handle": "remotion-dev",
+      "title": "Remotion",
+      "subtitle": "Programmatic video creation",
+      "description": "Skills for creating, editing, rendering, and maintaining videos with Remotion.",
+      "isCompany": true,
+      "xUrl": "https://x.com/remotion",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 42,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/remotion-dev",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "figma",
+      "title": "Figma",
+      "subtitle": "Design and development workflows",
+      "description": "Skills for Figma design generation, diagrams, code connections, specifications, and implementation workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 15,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/figma",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "canva-sdks",
+      "title": "Canva",
+      "subtitle": "Canva design and automation",
+      "description": "Skills for branded Canva presentations and command-line design workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/canva-sdks",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "krea-ai",
+      "title": "Krea",
+      "subtitle": "AI media generation workflows",
+      "description": "Skills for choosing models and preparing image, video, editing, and enhancement work with Krea.",
+      "isCompany": true,
+      "xUrl": "https://x.com/krea_ai",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/krea-ai",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "meshy-dev",
+      "title": "Meshy AI",
+      "subtitle": "AI generated 3D assets",
+      "description": "Skills for creating and editing 3D models, textures, rigging, animation, and printable assets with Meshy.",
+      "isCompany": true,
+      "xUrl": "https://x.com/MeshyAI",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/meshy-dev",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "icons8",
+      "title": "Icons8",
+      "subtitle": "Design assets and interfaces",
+      "description": "Skills for Icons8 assets, interface design, design tokens, and illustration workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 9,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/icons8",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "cloudinary-devs",
+      "title": "Cloudinary Developers",
+      "subtitle": "Media delivery and transformations",
+      "description": "Skills for Cloudinary setup, documentation, media transformations, and application integration.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/cloudinary-devs",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "handsontable",
+      "title": "Handsontable",
+      "subtitle": "Data grids and spreadsheets",
+      "description": "Skills for Handsontable data grids, custom editors, and HyperFormula spreadsheet calculations.",
+      "isCompany": true,
+      "xUrl": "https://x.com/handsontable",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/handsontable",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "DevExpress",
+      "title": "Developer Express Inc.",
+      "subtitle": "Application interfaces and components",
+      "description": "Skills for building interfaces and configuring DevExpress application components.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 20,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/DevExpress",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "playcanvas",
+      "title": "PlayCanvas",
+      "subtitle": "Web graphics and games",
+      "description": "Skills for PlayCanvas scenes, effects, lighting, application structure, and graphics workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/playcanvas",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 16,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/playcanvas",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "Unity-Technologies",
+      "title": "Unity Technologies",
+      "subtitle": "Unity game development",
+      "description": "Skills for Unity game construction, rendering, audio, editor tools, and platform integrations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 40,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Unity-Technologies",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "EpicGames",
+      "title": "Epic Games",
+      "subtitle": "Unreal Engine development",
+      "description": "Skills for Unreal Engine workflows, MCP integration, and AI-callable toolsets.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/EpicGames",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "meta-quest",
+      "title": "Meta Quest",
+      "subtitle": "Quest and Horizon development",
+      "description": "Skills for Meta Quest, Horizon OS, VR interfaces, Android porting, and WebXR workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 30,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/meta-quest",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "bitmovin",
+      "title": "Bitmovin",
+      "subtitle": "Video encoding and observability",
+      "description": "Skills for Bitmovin live and on-demand encoding, playback telemetry, and troubleshooting.",
+      "isCompany": true,
+      "xUrl": "https://x.com/bitmovin",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/bitmovin",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "twelvelabs-io",
+      "title": "Twelve Labs Inc.",
+      "subtitle": "Video understanding and search",
+      "description": "Skills for Twelve Labs media assets, analysis, embeddings, and video or image search.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 10,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/twelvelabs-io",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "velt-js",
+      "title": "Velt",
+      "subtitle": "Collaborative application development",
+      "description": "Skills for installing and configuring Velt collaboration features in web applications.",
+      "isCompany": true,
+      "xUrl": "https://x.com/veltjs",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 25,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/velt-js",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "mobbin",
+      "title": "Mobbin",
+      "subtitle": "Interface research and redesign",
+      "description": "Skills for Mobbin design research, interface redesign, and clear product writing.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/mobbin",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Design, media, games and frontend"
+      }
+    },
+    {
+      "handle": "apify",
+      "title": "Apify",
+      "subtitle": "Web scraping and automation",
+      "description": "Skills for building Apify Actors, converting projects, defining output schemas, and extracting web data.",
+      "isCompany": true,
+      "xUrl": "https://x.com/apify",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 30,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/apify",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "brightdata",
+      "title": "Bright Data",
+      "subtitle": "Web data extraction workflows",
+      "description": "Skills for Bright Data setup, scraping, command-line tools, and MCP integrations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 15,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/brightdata",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "exa-labs",
+      "title": "Exa",
+      "subtitle": "Search and research workflows",
+      "description": "Skills for Exa search, multi-step research, enrichment, and structured web-data tasks.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/exa-labs",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "parallel-web",
+      "title": "Parallel Web Systems",
+      "subtitle": "Web research and enrichment",
+      "description": "Skills for Parallel APIs, research workflows, data enrichment, and service integration.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 16,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/parallel-web",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "Nimbleway",
+      "title": "Nimble",
+      "subtitle": "Web data and monitoring",
+      "description": "Skills for Nimble web data, brand monitoring, launch monitoring, and search intelligence.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Nimbleway",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "diffbot",
+      "title": "Diffbot",
+      "subtitle": "Structured web knowledge",
+      "description": "Skills for working with Diffbot extraction and structured web-data workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/diffbot",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 10,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/diffbot",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "youdotcom-oss",
+      "title": "You.com",
+      "subtitle": "Search and research integrations",
+      "description": "Skills for You.com APIs, research, financial-data tools, and application integration.",
+      "isCompany": true,
+      "xUrl": "https://x.com/youdotcom",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/youdotcom-oss",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "Unstructured-IO",
+      "title": "Unstructured",
+      "subtitle": "Document ingestion and search",
+      "description": "Skills for connecting sources, managing content, and searching with Unstructured.",
+      "isCompany": true,
+      "xUrl": "https://x.com/UnstructuredIO",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Unstructured-IO",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "zytedata",
+      "title": "Zyte",
+      "subtitle": "Structured page data extraction",
+      "description": "Skills for extracting structured information from locally saved web pages with Zyte.",
+      "isCompany": true,
+      "xUrl": "https://x.com/ZyteData",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/zytedata",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "CerebriumAI",
+      "title": "Cerebrium",
+      "subtitle": "Serverless compute and deployment",
+      "description": "Skills for Cerebrium deployments, compute configuration, endpoints, scaling, and runtime investigation.",
+      "isCompany": true,
+      "xUrl": "https://x.com/cerebriumai",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/CerebriumAI",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "blaxel-ai",
+      "title": "Blaxel",
+      "subtitle": "Cloud sandboxes and agents",
+      "description": "Skills for Blaxel sandboxes, agent deployment, serverless workloads, and supporting infrastructure.",
+      "isCompany": true,
+      "xUrl": "https://x.com/blaxelAI",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/blaxel-ai",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "olostep",
+      "title": "Olostep Dev - web scraping, crawling, and search API for AI",
+      "subtitle": "Web scraping and crawling",
+      "description": "Skills for Olostep web extraction, crawling, search, and research automation.",
+      "isCompany": true,
+      "xUrl": "https://x.com/olostep",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 13,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/olostep",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "voxel51",
+      "title": "Voxel51",
+      "subtitle": "Visual AI dataset workflows",
+      "description": "Skills for FiftyOne datasets, curation, imports, exports, and visual application testing.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 15,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/voxel51",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Web research, extraction and AI infrastructure"
+      }
+    },
+    {
+      "handle": "HubSpot",
+      "title": "HubSpot",
+      "subtitle": "CRM and sales workflows",
+      "description": "Skills for HubSpot contact lookup, call preparation, follow-up, daily briefs, and CRM tasks.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 9,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/HubSpot",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "salesforce",
+      "title": "Salesforce",
+      "subtitle": "Salesforce customer operations",
+      "description": "Skills for Salesforce account context, sales activity, customer follow-up, and CRM workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 30,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/salesforce",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "intercom",
+      "title": "Intercom",
+      "subtitle": "Customer support and insights",
+      "description": "Skills for Intercom customer context, analysis, CLI setup, and messenger integration.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 4,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/intercom",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "customerio",
+      "title": "Customer.io",
+      "subtitle": "Customer messaging and automation",
+      "description": "Skills for Customer.io customer messaging and connected marketing workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/customerio",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/customerio",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "mondaycom",
+      "title": "monday.com",
+      "subtitle": "CRM analysis and automation",
+      "description": "Skills for monday.com activity analysis, CRM automation, forecasting, and data maintenance.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 14,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/mondaycom",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "apolloio",
+      "title": "Apollo",
+      "subtitle": "Prospecting and sales analysis",
+      "description": "Skills for Apollo prospecting, lead enrichment, sequence workflows, and sales analytics.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/apolloio",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "hunter-io",
+      "title": "Hunter",
+      "subtitle": "Contact discovery and outreach",
+      "description": "Skills for Hunter company research, contact discovery, enrichment, and email sequences.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 13,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/hunter-io",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "lusha-oss",
+      "title": "Lusha",
+      "subtitle": "Contact enrichment and prospecting",
+      "description": "Skills for Lusha contact research, prospecting, enrichment, and outreach preparation.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 9,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/lusha-oss",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "Zoominfo",
+      "title": "ZoomInfo",
+      "subtitle": "Account intelligence and sales",
+      "description": "Skills for ZoomInfo account research, relationship analysis, pipeline work, and sales handoffs.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 35,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Zoominfo",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "getcrossbeam",
+      "title": "Crossbeam",
+      "subtitle": "Partner ecosystems and selling",
+      "description": "Skills for Crossbeam integrations, ecosystem prospecting, account research, and co-selling.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 10,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/getcrossbeam",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "rocketreach",
+      "title": "RocketReach",
+      "subtitle": "Contact research and enrichment",
+      "description": "Skills for RocketReach contact discovery, company research, and enrichment workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/rocketreach",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "LeadMagic",
+      "title": "LeadMagic",
+      "subtitle": "Sales research and enrichment",
+      "description": "Skills for LeadMagic company research, contact lookup, enrichment, and usage controls.",
+      "isCompany": true,
+      "xUrl": "https://x.com/leadmagichq",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 8,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/LeadMagic",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "Leadfeeder",
+      "title": "Leadfeeder",
+      "subtitle": "Website visitors and prospecting",
+      "description": "Skills for Leadfeeder visitor analysis, pipeline preparation, and outreach workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Leadfeeder",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "ArrowsHQ",
+      "title": "Arrows",
+      "subtitle": "CRM hygiene and follow-up",
+      "description": "Skills for Arrows CRM reviews, deal follow-up, daily briefs, and meeting preparation.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 8,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/ArrowsHQ",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "knocklabs",
+      "title": "Knock",
+      "subtitle": "Application notification workflows",
+      "description": "Skills for Knock notifications, lifecycle messaging, in-app interfaces, and migration.",
+      "isCompany": true,
+      "xUrl": "https://x.com/knocklabs",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/knocklabs",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "CRM, sales and customer operations"
+      }
+    },
+    {
+      "handle": "ActiveCampaign",
+      "title": "ActiveCampaign",
+      "subtitle": "Campaigns and marketing automation",
+      "description": "Skills for ActiveCampaign automations, campaign planning, contacts, CRM, and deliverability.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/ActiveCampaign",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "Adspirer",
+      "title": "Adspirer",
+      "subtitle": "Advertising operations and analysis",
+      "description": "Skills for Adspirer campaign operations, competitor research, dashboards, and conversion tracking.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 16,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Adspirer",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "adzviserllc",
+      "title": "Adzviser",
+      "subtitle": "Connected marketing data reporting",
+      "description": "Skills for reporting across marketing, analytics, ecommerce, and CRM data through Adzviser.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/adzviserllc",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "arcads-ai",
+      "title": "Arcads",
+      "subtitle": "AI advertising creative production",
+      "description": "Skills for Arcads ad creation, creative development, product campaigns, and video workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 16,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/arcads-ai",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "AppFollow",
+      "title": "AppFollow",
+      "subtitle": "App store performance analysis",
+      "description": "Skills for AppFollow app-store analysis, keyword performance, and competitor research.",
+      "isCompany": true,
+      "xUrl": "https://x.com/AppFollowIO",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/AppFollow",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "apptweak",
+      "title": "AppTweak",
+      "subtitle": "App analytics dashboard building",
+      "description": "Skills for creating dashboards grounded in AppTweak data and connected business sources.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/apptweak",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "asodevapp",
+      "title": "ASO.dev",
+      "subtitle": "App store optimization workflows",
+      "description": "Skills for ASO.dev app analytics, keyword research, store optimization, and advertising intelligence.",
+      "isCompany": true,
+      "xUrl": "https://x.com/asodevapp",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 25,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/asodevapp",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "seranking",
+      "title": "SE Ranking",
+      "subtitle": "SEO research and reporting",
+      "description": "Skills for SE Ranking search visibility, local SEO, reporting, and campaign planning.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/seranking",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "seranking-planable",
+      "title": "Planable",
+      "subtitle": "Social content planning",
+      "description": "Skills for Planable content calendars, performance analysis, draft preparation, and reporting.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/seranking-planable",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "botify-hq",
+      "title": "Botify",
+      "subtitle": "Technical SEO data workflows",
+      "description": "Skills for Botify MCP tools, SEO data queries, and bulk analysis.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/botify-hq",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "windsor-ai",
+      "title": "Windsor.ai",
+      "subtitle": "Connected business data workflows",
+      "description": "Skills for combining Windsor.ai marketing, CRM, ecommerce, and analytics sources.",
+      "isCompany": true,
+      "xUrl": "https://x.com/windsor_ai",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 32,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/windsor-ai",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "supermetrics-public",
+      "title": "Supermetrics",
+      "subtitle": "Marketing performance analysis",
+      "description": "Skills for Supermetrics marketing analysis, demand generation, ecommerce, and performance reporting.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/supermetrics-public",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "Dataslayer-AI",
+      "title": "Dataslayer",
+      "subtitle": "Marketing data and reporting",
+      "description": "Skills for Dataslayer marketing data integration, analysis, and reporting workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Dataslayer-AI",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "fullstorydev",
+      "title": "Fullstory",
+      "subtitle": "Digital experience analysis",
+      "description": "Skills for Fullstory session review, friction analysis, comparisons, and interface context.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 14,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/fullstorydev",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "Noibu",
+      "title": "Noibu",
+      "subtitle": "Website experience and checkout",
+      "description": "Skills for Noibu traffic analysis, accessibility reviews, checkout analysis, and website investigation.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Noibu",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "taboola",
+      "title": "Taboola",
+      "subtitle": "Advertising campaigns and reporting",
+      "description": "Skills for Taboola account discovery, campaign management, optimization, and performance reporting.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/taboola",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "unbounce",
+      "title": "Unbounce",
+      "subtitle": "Landing page authoring",
+      "description": "Skills for Unbounce page creation and feedback through its MCP tools.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/unbounce",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "uniformdev",
+      "title": "uniform",
+      "subtitle": "Composable content and experiences",
+      "description": "Skills for Uniform content models, experiences, forms, personalization, and integrations.",
+      "isCompany": true,
+      "xUrl": "https://x.com/uniformdev",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 8,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/uniformdev",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "humanmade",
+      "title": "Human Made",
+      "subtitle": "WordPress growth and operations",
+      "description": "Skills for Human Made WordPress workflows, content planning, campaigns, and site analysis.",
+      "isCompany": true,
+      "xUrl": "https://x.com/humanmadeltd",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 13,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/humanmade",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "Upload-Post",
+      "title": "Upload-post",
+      "subtitle": "Social publishing and analytics",
+      "description": "Skills for Upload-Post media publishing, comments, queues, and performance analysis.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 9,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Upload-Post",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "posteverywhere",
+      "title": "PostEverywhere",
+      "subtitle": "Multichannel social publishing",
+      "description": "Skills for PostEverywhere client management, brand voice, approvals, and social posting.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 15,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/posteverywhere",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "SynthFlowAI",
+      "title": "Synthflow",
+      "subtitle": "Voice agent quality review",
+      "description": "Skills for Synthflow agent prompts and call-quality review.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/SynthFlowAI",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Marketing, content and growth"
+      }
+    },
+    {
+      "handle": "RevenueCat",
+      "title": "RevenueCat",
+      "subtitle": "Subscriptions and application revenue",
+      "description": "Skills for RevenueCat project setup, subscription integration, analytics, and revenue workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/revenuecat",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 24,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/RevenueCat",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "paypal",
+      "title": "PayPal",
+      "subtitle": "Payments and checkout integration",
+      "description": "Skills for PayPal checkout, subscriptions, payment integrations, and implementation guidance.",
+      "isCompany": true,
+      "xUrl": "https://x.com/PayPalDev",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/paypal",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "airwallex",
+      "title": "Airwallex",
+      "subtitle": "Payments integration and operations",
+      "description": "Skills for Airwallex payment interfaces, onboarding, verification, and card integration.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/airwallex",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "mercadopago",
+      "title": "Mercado Pago",
+      "subtitle": "Payment integration and webhooks",
+      "description": "Skills for Mercado Pago integration reviews, security checks, and webhooks.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/mercadopago",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "sumup",
+      "title": "SumUp",
+      "subtitle": "Checkout development and testing",
+      "description": "Skills for SumUp checkout integration, debugging, testing, and MCP workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/sumup",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "intuit",
+      "title": "Intuit",
+      "subtitle": "QuickBooks applications and finance",
+      "description": "Skills for Intuit developer integrations, QuickBooks applications, invoicing, and payroll analysis.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 11,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/intuit",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "Workday",
+      "title": "Workday",
+      "subtitle": "Workday employee workflows",
+      "description": "Skills for Workday data presentation, employee workflows, onboarding, and tool integration.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Workday",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "dropbox",
+      "title": "Dropbox",
+      "subtitle": "File discovery and organization",
+      "description": "Skills for finding, inspecting, collecting, organizing, and cleaning up Dropbox content.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/dropbox",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "Airtable",
+      "title": "Airtable",
+      "subtitle": "Airtable data and operations",
+      "description": "Skills for Airtable command-line tools, filters, application data, and business workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 8,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Airtable",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "atlassian",
+      "title": "Atlassian",
+      "subtitle": "Forge apps and collaboration",
+      "description": "Skills for Atlassian Forge apps, debugging, reviews, and Jira-to-Confluence reporting.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/atlassian",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "zapier",
+      "title": "Zapier",
+      "subtitle": "Connected automation workflows",
+      "description": "Skills for discovering Zapier actions, onboarding, running automations, and checking integrations.",
+      "isCompany": true,
+      "xUrl": "https://x.com/zapier",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 4,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/zapier",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "PandaDoc",
+      "title": "PandaDoc",
+      "subtitle": "Documents and approval workflows",
+      "description": "Skills for PandaDoc templates, approvals, contracts, engagement tracking, and document follow-up.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 10,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/PandaDoc",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "carta",
+      "title": "Carta",
+      "subtitle": "Equity and compensation workflows",
+      "description": "Skills for Carta equity records, compensation analysis, issuance, vesting, and related workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 36,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/carta",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "Datarails",
+      "title": "Datarails",
+      "subtitle": "Financial planning and reporting",
+      "description": "Skills for Datarails financial analysis, planning, and reporting workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 20,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Datarails",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "Morningstar",
+      "title": "Morningstar",
+      "subtitle": "Investment data and research",
+      "description": "Skills for Morningstar data discovery, fund screening, comparisons, and research summaries.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Morningstar",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "Bigdata-com",
+      "title": "Bigdata.com",
+      "subtitle": "Financial research and intelligence",
+      "description": "Skills for Bigdata.com company, security, sector, economic, and market research.",
+      "isCompany": true,
+      "xUrl": "https://x.com/bigdatadotcom",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 28,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Bigdata-com",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "kensho-technologies",
+      "title": "Kensho",
+      "subtitle": "Company earnings research",
+      "description": "Skills for preparing company earnings previews using transcript, market, and industry context.",
+      "isCompany": true,
+      "xUrl": "https://x.com/kensho",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/kensho-technologies",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "privco",
+      "title": "PrivCo",
+      "subtitle": "Private company data research",
+      "description": "Skills for PrivCo company and people research, valuations, funding, and data queries.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/privco",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "circlefin",
+      "title": "Circle Internet Financial, LLC.",
+      "subtitle": "Agent wallets and payments",
+      "description": "Skills for Circle agent wallets, spending policies, funding, payments, and transfers.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 16,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/circlefin",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "remoteoss",
+      "title": "Remote",
+      "subtitle": "Global workforce integrations",
+      "description": "Skills for Remote APIs, authentication, forms, webhooks, payroll, and workforce integrations.",
+      "isCompany": true,
+      "xUrl": "https://x.com/remote",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/remoteoss",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "grnhse",
+      "title": "Greenhouse",
+      "subtitle": "Recruiting and candidate workflows",
+      "description": "Skills for Greenhouse candidate reviews, status checks, recruiting briefs, and platform configuration.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 9,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/grnhse",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "ukg",
+      "title": "UKG",
+      "subtitle": "Employee directory and leave",
+      "description": "Skills for UKG employee directory queries, time-off requests, and leave workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/ukg",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "bonusly",
+      "title": "Bonusly",
+      "subtitle": "Recognition and team insights",
+      "description": "Skills for Bonusly recognition, team discovery, incentives, and administrative analysis.",
+      "isCompany": true,
+      "xUrl": "https://x.com/bonusly",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 18,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/bonusly",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Payments, finance, documents and business operations"
+      }
+    },
+    {
+      "handle": "adaptyteam",
+      "title": "Adapty",
+      "subtitle": "Mobile subscription advertising analysis",
+      "description": "Skills for Apple Search Ads operations and analysis through the Adapty CLI.",
+      "isCompany": true,
+      "xUrl": "https://x.com/adapty",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 1,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/adaptyteam",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "Scandit",
+      "title": "Scandit",
+      "subtitle": "Barcode and mobile SDKs",
+      "description": "Skills for Scandit barcode capture and related SDK integration across mobile and web platforms.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 86,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Scandit",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "EodHistoricalData",
+      "title": "EODHD",
+      "subtitle": "Market data and research",
+      "description": "Skills for EODHD company analysis, comparisons, market screening, and economic data.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/EodHistoricalData",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "agentmail-to",
+      "title": "AgentMail",
+      "subtitle": "Email infrastructure for agents",
+      "description": "Skills for AgentMail email architecture, command-line tools, APIs, and agent integrations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/agentmail-to",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "oracle",
+      "title": "Oracle",
+      "subtitle": "Oracle application development",
+      "description": "Skills for Oracle and NetSuite application integration, secure coding, documentation, and deployment workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/OracleOSS",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 10,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/oracle",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "SAP",
+      "title": "SAP",
+      "subtitle": "SAP design and theming",
+      "description": "Skills for SAP design tokens and UI Theme Designer workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/SAPOpenSource",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/SAP",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "ringcentral",
+      "title": "RingCentral, Inc.",
+      "subtitle": "Communication platform workflows",
+      "description": "Skills for RingCentral communication APIs and connected platform operations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 16,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/ringcentral",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "monta-app",
+      "title": "Monta",
+      "subtitle": "Charging infrastructure integrations",
+      "description": "Skills for Monta APIs, charging operations, and integration setup.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/monta-app",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "formio",
+      "title": "Form.io",
+      "subtitle": "Forms and API development",
+      "description": "Skills for Form.io APIs and MCP integration setup.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/formio",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "urbanairship",
+      "title": "Airship",
+      "subtitle": "Airship mobile integration",
+      "description": "Skills for Airship mobile SDKs, message-center interfaces, and custom native views.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/urbanairship",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "vaisala-xweather",
+      "title": "Xweather",
+      "subtitle": "Weather APIs and mapping",
+      "description": "Skills for Xweather weather data, maps, and web or native SDK integrations.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/vaisala-xweather",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "xsolla",
+      "title": "Xsolla",
+      "subtitle": "Game commerce integration",
+      "description": "Skills for Xsolla merchant setup and headless checkout implementation.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/xsolla",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "ABTdomain",
+      "title": "ABTdomain",
+      "subtitle": "Domain intelligence and research",
+      "description": "Skills for ABTdomain domain research and domain-lifecycle intelligence workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/Abtdomain",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 9,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/ABTdomain",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "Additional product and industry specialists"
+      }
+    },
+    {
+      "handle": "amzn",
+      "title": "Amazon",
+      "subtitle": "Amazon seller operations",
+      "description": "Skills for Amazon inventory, seller analytics, financial close, compliance, and support workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/amzn",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "Accoil",
+      "title": "Accoil",
+      "subtitle": "Product tracking and instrumentation",
+      "description": "Skills for auditing analytics tracking, planning events, and preparing instrumentation guidance.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Accoil",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "allium-labs",
+      "title": "Allium",
+      "subtitle": "Onchain data and research",
+      "description": "Skills for Allium onchain investigations, market analysis, data matching, and dashboards.",
+      "isCompany": true,
+      "xUrl": "https://x.com/AlliumLabs",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 11,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/allium-labs",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "altertable-ai",
+      "title": "Altertable",
+      "subtitle": "Analytics and data applications",
+      "description": "Skills for Altertable product analysis, dashboards, data applications, and instrumentation.",
+      "isCompany": true,
+      "xUrl": "https://x.com/altertableai",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 13,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/altertable-ai",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "anysiteio",
+      "title": "Anysite",
+      "subtitle": "Web intelligence and prospecting",
+      "description": "Skills for Anysite competitor intelligence, company research, CRM enrichment, and prospecting.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 18,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/anysiteio",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "blackrock",
+      "title": "BlackRock",
+      "subtitle": "Advisor research and portfolios",
+      "description": "Skills for BlackRock Advisor Center research, portfolio review, and advisor workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/AladdinbyBLK",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/blackrock",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "costory-io",
+      "title": "Costory",
+      "subtitle": "Cloud cost analysis",
+      "description": "Skills for Costory BigQuery cost investigation, dashboards, reports, and configuration.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/costory-io",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "daloopa",
+      "title": "Daloopa",
+      "subtitle": "Financial models and research",
+      "description": "Skills for Daloopa company analysis, financial modeling, valuation, and earnings research.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 16,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/daloopa",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "firetiger-oss",
+      "title": "Firetiger",
+      "subtitle": "Production observability and investigation",
+      "description": "Skills for Firetiger instrumentation, queries, investigations, agents, and deployment monitoring.",
+      "isCompany": true,
+      "xUrl": "https://x.com/usefiretiger",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/firetiger-oss",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "FullEnrich",
+      "title": "FullEnrich",
+      "subtitle": "Contact enrichment and outreach",
+      "description": "Skills for FullEnrich contact and company enrichment, CRM workflows, and prospecting.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 9,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/FullEnrich",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "getdeck-io",
+      "title": "Deck",
+      "subtitle": "Product discovery and planning",
+      "description": "Skills for Deck competitor analysis, customer feedback, initiative briefs, and prioritization.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/getdeck-io",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "gleanwork",
+      "title": "Glean",
+      "subtitle": "Enterprise search and context",
+      "description": "Skills for Glean codebase context, documentation, expert discovery, and meeting preparation.",
+      "isCompany": true,
+      "xUrl": "https://x.com/glean",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 16,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/gleanwork",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "growthxai",
+      "title": "GrowthX",
+      "subtitle": "Growth workflows and automation",
+      "description": "Skills for GrowthX Output workflows, SDK development, credential configuration, and automation.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 42,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/growthxai",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "incubyte",
+      "title": "Incubyte",
+      "subtitle": "Software engineering practices",
+      "description": "Skills for Incubyte architecture, code review, clean code, browser testing, and AI-assisted development.",
+      "isCompany": true,
+      "xUrl": "https://x.com/Incubyte_co",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 19,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/incubyte",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "junipersquare-public",
+      "title": "Juniper Square",
+      "subtitle": "Investment entity and reporting",
+      "description": "Skills for Juniper Square investment entities, investor summaries, reports, and offering activity.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/junipersquare-public",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "launchnotes",
+      "title": "LaunchNotes",
+      "subtitle": "Product announcements and roadmaps",
+      "description": "Skills for LaunchNotes announcements, changelog imports, roadmap updates, and release communication.",
+      "isCompany": true,
+      "xUrl": "https://x.com/launchnotes",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 8,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/launchnotes",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "masthead-data",
+      "title": "Masthead Data",
+      "subtitle": "Data observability and costs",
+      "description": "Skills for Masthead data incident triage, asset priorities, BigQuery costs, and savings analysis.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 6,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/masthead-data",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "OleanderHQ",
+      "title": "Oleander",
+      "subtitle": "Data lakes and processing",
+      "description": "Skills for Oleander lake catalogs, data queries, Polars, Spark, and lineage workflows.",
+      "isCompany": true,
+      "xUrl": "https://x.com/OleanderHQ",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/OleanderHQ",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "Pupfish-LLC",
+      "title": "Pupfish",
+      "subtitle": "Qlik analytics and quality",
+      "description": "Skills for Qlik data models, expressions, deployment, naming, and data quality checks.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 14,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Pupfish-LLC",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "starburstlabs",
+      "title": "Wealthbox",
+      "subtitle": "Wealthbox client operations",
+      "description": "Skills for Wealthbox client meetings, service requests, onboarding, and advisory documentation.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/starburstlabs",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "tanainc",
+      "title": "Tana",
+      "subtitle": "Knowledge and meeting workflows",
+      "description": "Skills for Tana meetings, tasks, knowledge retrieval, scheduling, and follow-through.",
+      "isCompany": true,
+      "xUrl": "https://x.com/tana_inc",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 9,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/tanainc",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "Unleash",
+      "title": "Unleash",
+      "subtitle": "Feature flag operations",
+      "description": "Skills for Unleash feature-flag workflows and migration from GitLab flags.",
+      "isCompany": true,
+      "xUrl": "https://x.com/getunleash",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 2,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/Unleash",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "zocks-communications",
+      "title": "Zocks",
+      "subtitle": "Financial advisor client workflows",
+      "description": "Skills for Zocks client reviews, meeting preparation, relationship analysis, and advisor follow-up.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 7,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/zocks-communications",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "zuora",
+      "title": "Zuora",
+      "subtitle": "Subscription commerce and pricing",
+      "description": "Skills for Zuora pricing design, commerce configuration, and acceptance-test preparation.",
+      "isCompany": true,
+      "xUrl": "https://x.com/zuora",
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 3,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/zuora",
+        "xProfileSource": "GitHub repositoryOwner twitterUsername field",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "eon-io",
+      "title": "Eon",
+      "subtitle": "Cloud backup and recovery",
+      "description": "Skills for Eon cloud onboarding, backup policies, cost analysis, and recovery workflows.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 5,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/eon-io",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    },
+    {
+      "handle": "honeydew-ai",
+      "title": "Honeydew",
+      "subtitle": "Analytics models and queries",
+      "description": "Skills for Honeydew context, data-model exploration, queries, validation, and workspace branches.",
+      "isCompany": true,
+      "skillSelection": "all-current-policy-eligible-published-author-skills",
+      "expectedSkillCount": 8,
+      "evidence": {
+        "githubProfileUrl": "https://github.com/honeydew-ai",
+        "xProfileSource": "No GitHub-linked X handle; intentionally omitted",
+        "checkedAt": "2026-10-25",
+        "category": "More worthwhile specialist companies"
+      }
+    }
+  ]
+}
