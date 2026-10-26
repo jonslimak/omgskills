@@ -3,7 +3,6 @@ import {
   useMemo,
   useRef,
   useState,
-  Fragment,
   type ComponentProps,
   type ReactNode,
 } from "react";
@@ -460,7 +459,9 @@ export function UnifiedApp({
   const [installOpen, setInstallOpen] = useState(false);
   // Long descriptions start as their "Use when" summary.
   const [descriptionOpen, setDescriptionOpen] = useState(false);
-  useEffect(() => { setInstallOpen(false); setDescriptionOpen(false); }, [nav.selected]);
+  // Per-Mac scan history stays behind "Show history" at the bottom of the panel.
+  const [historyOpen, setHistoryOpen] = useState(false);
+  useEffect(() => { setInstallOpen(false); setDescriptionOpen(false); setHistoryOpen(false); }, [nav.selected]);
   const [showHidden, setShowHidden] = useState(false);
   const [collectionPageIndex, setCollectionPageIndex] = useState(0);
   const [expandedSearchScope, setExpandedSearchScope] = useState<string | null>(null);
@@ -776,9 +777,6 @@ export function UnifiedApp({
 
   function renderRow(skill: SkillDisplay, rank?: number, compact = false) {
     const canSelect = editing && !!skill.installed;
-    const inventories = skill.installed?.sourceSkills.map(installation => ({
-      id: installation.id, summary: inventorySummary(installation),
-    })) ?? [];
     return (
       <div
         key={skill.key}
@@ -842,12 +840,6 @@ export function UnifiedApp({
                   </>
                 : skill.description || "No description available"}
             </span>
-            {inventories.map(({ id, summary }) => summary && <Fragment key={id}>
-              <span className="ua-row-description" title={`${summary.location} - ${summary.report}`}>
-                {summary.location} - {summary.report}
-              </span>
-              {summary.latestReport && <span className="ua-row-description" title={summary.latestReport}>{summary.latestReport}</span>}
-            </Fragment>)}
           </span>
         </button>
         {!compact && !discovery && !nav.query && (
@@ -1942,15 +1934,6 @@ export function UnifiedApp({
                       <span>Observed on</span>
                       <strong>{detail.installed.sources.join(", ")}</strong>
                     </div>
-                    {selectedInstallations.map(installation => {
-                      const inventory = inventorySummary(installation);
-                      return inventory && <div key={installation.id} className="ua-installation">
-                        <div><span>Mac / agent</span><strong>{inventory.location}</strong></div>
-                        <p>{inventory.report}</p>
-                        {inventory.latestReport && <p>{inventory.latestReport}</p>}
-                        {installation.installationFolder && <div><span>Folder</span><strong>{installation.installationFolder}</strong></div>}
-                      </div>;
-                    })}
                     {(!readOnlyAccount || management) && <div className="ua-set-chips">
                       {data.sets
                         .filter((set) => isMember(set, detail.installed!))
@@ -1992,6 +1975,27 @@ export function UnifiedApp({
                           <ChevronRight />
                         </button>
                       ))}
+                  </section>
+                )}
+                {selectedInstallations.some(installation => inventorySummary(installation)) && (
+                  <section className="ua-detail-history">
+                    <button
+                      type="button"
+                      className="ua-link"
+                      aria-expanded={historyOpen}
+                      onClick={() => setHistoryOpen(open => !open)}
+                    >
+                      {historyOpen ? "Hide history" : "Show history"}
+                    </button>
+                    {historyOpen && selectedInstallations.map(installation => {
+                      const inventory = inventorySummary(installation);
+                      return inventory && <div key={installation.id} className="ua-installation">
+                        <div><span>Mac / agent</span><strong>{inventory.location}</strong></div>
+                        <p>{inventory.report}</p>
+                        {inventory.latestReport && <p>{inventory.latestReport}</p>}
+                        {installation.installationFolder && <div><span>Folder</span><strong>{installation.installationFolder}</strong></div>}
+                      </div>;
+                    })}
                   </section>
                 )}
                 </>}

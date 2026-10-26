@@ -277,22 +277,18 @@ test("rendered My skills and Set rows retain missing history separately from lat
       onCreateSet: noOp, onMembership: noOp, onVisibility: noOp, retry: noOp }));
     const mine = render();
     assert.equal([...mine.matchAll(/aria-label="Open Removal fixture"/g)].length, 1);
-    assert.match(mine, /Not found on last scan/);
-    assert.match(mine, /Last seen/);
-    assert.match(mine, /Latest scan incomplete/);
-    assert.match(mine, /Last known - not observed in latest report/);
-    assert.match(mine, /Unknown Mac/);
+    // Scan history stays out of the rows; the skill panel shows it behind "Show history".
+    assert.doesNotMatch(mine, /Not found on last scan|Last seen|Latest scan incomplete|not observed in latest report|Unknown Mac/);
     const set = render({ ...initialNavigation, view: "set", id: "saved-set" });
     assert.equal([...set.matchAll(/aria-label="Open Removal fixture"/g)].length, 1);
-    assert.match(set, /Not found on last scan/);
+    assert.doesNotMatch(set, /Not found on last scan/);
     const management: UnifiedManagement = { busy: false, blocked: true, notice: "", create: noOp, add: noOp,
       favorite: noOp, rename: noOp, access: noOp, visibility: noOp, remove: noOp, reorder: noOp,
       moderate: noOp, copyLink: noOp, dialog: () => null,
       detail: { set: data.sets[0], state: "ready", error: "", retry: noOp } };
     const managedSet = render({ ...initialNavigation, view: "set", id: "saved-set" }, management);
     assert.equal([...managedSet.matchAll(/aria-label="Open Saved snapshot"/g)].length, 1);
-    assert.match(managedSet, /Not found on last scan/);
-    assert.match(managedSet, /Latest scan incomplete/);
+    assert.doesNotMatch(managedSet, /Not found on last scan|Latest scan incomplete/);
     const selected = render({ ...initialNavigation, selected: "synced:missing-id" });
     assert.match(selected, /aria-label="Open Removal fixture" aria-expanded="true"/);
     const existingLink = render({ ...initialNavigation, selected: "synced:other-mac" });
