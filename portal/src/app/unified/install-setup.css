@@ -8,7 +8,10 @@
 .ua-install-setup h3 { font-size: 16px; margin: 0 0 12px; }
 .ua-install-setup h4 { font-size: 14px; margin: 0 0 12px; }
 .ua-install-setup p { font-size: 13px; line-height: 1.5; margin: 12px 0; color: var(--ua-body); }
-.ua-install-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.ua-install-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ua-install-buttons select { border: 1px solid var(--ua-line); border-radius: 6px; padding: 6px 10px; color: var(--ua-body); background: var(--ua-chip); max-width: 100%; }
+.ua-install-setup .ua-install-setup-link { display: block; margin-top: 10px; font-size: 13px; }
+.ua-install-setup p[role="status"]:empty { display: none; }
 .ua-install-setup .ua-f1-install { font-size: 13px; text-align: left; line-height: 1.4; background: var(--ua-chip); }
 .ua-install-help { border-top: 1px solid var(--ua-line); margin-top: 16px; padding-top: 16px; }
 .ua-install-setup .ua-install-version { color: var(--ua-muted); }

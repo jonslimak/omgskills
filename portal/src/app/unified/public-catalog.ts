@@ -73,6 +73,11 @@ function collectionImage(value: unknown, id: string): string | undefined {
     return url.href;
   } catch { return; }
 }
+// Only a plain one-line clone command is offered for copying.
+function installCommand(value: unknown) {
+  const command = optionalText(value);
+  return command && command.length <= 500 && command.startsWith("git clone https://github.com/") && !/[\x00-\x1f\x7f]/.test(command) ? command : undefined;
+}
 function parseSkill(value: unknown): CatalogSummary {
   const skill = record(value);
   const id = text(skill.id), name = text(skill.name), author = text(skill.author_handle);
@@ -83,6 +88,7 @@ function parseSkill(value: unknown): CatalogSummary {
     id, name, author, description: text(skill.description), githubUrl: safeGithub(skill.github_url),
     skillMDPath: optionalText(skill.skill_md_path) || undefined,
     hasPinnedInstall: skill.pinned_install != null || skill.repo_commit_sha != null || skill.skill_tree_sha != null,
+    installCommand: installCommand(skill.install_cmd),
     stars: skill.stars as number | undefined, tags: strings(skill.tags ?? []), avatar: author ? avatar(author) : undefined,
   };
 }
