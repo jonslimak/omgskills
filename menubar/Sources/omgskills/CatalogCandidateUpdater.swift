@@ -1,7 +1,8 @@
 #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
 import Foundation
+import Observation
 
-@MainActor
+@MainActor @Observable
 final class CatalogCandidateUpdater {
     enum Phase { case idle, checking, restartRequired }
     private(set) var phase: Phase = .idle

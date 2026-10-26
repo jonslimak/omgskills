@@ -11,22 +11,19 @@ struct ConnectedInventoryView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             switch model.state {
-            case .connected(let info):
-                Text(info.accountLabel).font(.headline).textSelection(.enabled)
-                Text(Self.reportMessage(model.reportStatus)).font(.callout).textSelection(.enabled)
+            case .connected:
+                if let count = Self.reportedCount(model.reportStatus) {
+                    Text("\(count) Skills").font(.body)
+                }
+                if let attention = Self.reportAttention(model.reportStatus) {
+                    Text(attention).font(.callout).textSelection(.enabled)
+                }
                 if let checked = model.lastInventoryCheckedAt {
-                    Text("Last checked " + checked.formatted(date: .abbreviated, time: .shortened)).font(.caption)
+                    Text("Last " + checked.formatted(date: .abbreviated, time: .shortened))
+                        .font(.caption).foregroundStyle(.tertiary).padding(.top, 8)
                 }
                 if let warning = runtime?.watchWarning { Text(warning).font(.caption).foregroundStyle(.secondary) }
-                HStack {
-                    Button("Resync", systemImage: "arrow.clockwise") {
-                        if let runtime { runtime.resync() } else { model.requestInventoryReport() }
-                    }
-                        .disabled(model.reportStatus == .reporting)
-                    Button("Disconnect", systemImage: "person.crop.circle.badge.minus") {
-                        if let runtime { runtime.disconnect() } else { model.disconnect() }
-                    }
-                }
+                HStack(spacing: 8) { inventoryActions }.buttonStyle(.bordered)
             case .authorizing, .exchanging, .storingCredential, .syncing:
                 HStack {
                     ProgressView().controlSize(.small)
@@ -52,6 +49,31 @@ struct ConnectedInventoryView: View {
                 Text(warning).font(.caption).foregroundStyle(.secondary)
             }
         }.frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder private var inventoryActions: some View {
+        Button {
+            if let runtime { runtime.resync() } else { model.requestInventoryReport() }
+        } label: { Text("Resync").frame(maxWidth: .infinity) }
+        .disabled(model.reportStatus == .reporting)
+        Button {
+            if let runtime { runtime.disconnect() } else { model.disconnect() }
+        } label: { Text("Disconnect").frame(maxWidth: .infinity) }
+    }
+
+    static func reportedCount(_ status: DeviceConnectionModel.ReportStatus) -> Int? {
+        guard case .reported(let result, _) = status else { return nil }
+        return result.syncedSkillCount
+    }
+
+    static func reportAttention(_ status: DeviceConnectionModel.ReportStatus) -> String? {
+        if case .reported(let result, let issues) = status {
+            if issues > 0 { return "Partial inventory reported. \(issues) scan issues need attention. Resync to retry." }
+            if result.reportVersion == 3 && result.complete != true { return reportMessage(status) }
+            if let missing = result.missingSkillCount, missing > 0 { return "\(missing) newly not found on last scan." }
+            return nil
+        }
+        return reportMessage(status)
     }
 
     static func reportMessage(_ status: DeviceConnectionModel.ReportStatus) -> String {

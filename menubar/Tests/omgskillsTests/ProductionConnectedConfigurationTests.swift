@@ -15,8 +15,8 @@ struct ProductionConnectedConfigurationTests {
             Issue.record("Packaged settings did not enable the compiled production runtime"); return
         }
         #expect(configuration.profile == .production)
-        #expect(info["CFBundleShortVersionString"] as? String == "0.0.25")
-        #expect(info["CFBundleVersion"] as? String == "25")
+        #expect(info["CFBundleShortVersionString"] as? String == "0.0.27")
+        #expect(info["CFBundleVersion"] as? String == "27")
         let connected = try #require(configuration.connected)
         #expect(connected.connectURL.absoluteString == "https://omgskills.com/app/connect?inventory=3")
         #expect(connected.uploadURL.absoluteString == "https://omgskills.com/api/portal/sync-upload")
