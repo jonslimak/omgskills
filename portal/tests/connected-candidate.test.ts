@@ -629,8 +629,8 @@ test("real shared candidate screens render inventory history and hide editing/se
       ...props, nav: { ...initialNavigation, view },
     }));
     const skills = render("all");
-    assert.match(skills, /Mac A/); assert.match(skills, /Mac B/); assert.match(skills, /Unknown Mac/);
-    assert.match(skills, /Not found on last scan/); assert.match(skills, /Latest scan incomplete/);
+    // Scan history stays out of the rows; the skill panel shows it behind "Show history".
+    assert.doesNotMatch(skills, /Mac A|Mac B|Unknown Mac|Not found on last scan|Latest scan incomplete/);
     assert.match(skills, /aria-label="Refresh account"/);
     assert.doesNotMatch(skills, /Add to favorites|Create set|aria-label="Favorites"/);
     const profile = render("profile");
