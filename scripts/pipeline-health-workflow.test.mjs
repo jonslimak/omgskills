@@ -20,6 +20,13 @@ test("health deploy always joins the shared writer queue", () => {
   assert.doesNotMatch(workflow, /check-active-data-writers\.mjs/);
 });
 
+test("health deployment has time for guarded draft and production verification", () => {
+  const deployHealth = workflow.slice(workflow.indexOf("\n  deploy-health:"));
+  assert.match(deployHealth, /timeout-minutes: 45/);
+  assert.match(workflow, /health:\n[\s\S]*?timeout-minutes: 30/);
+  assert.match(workflow, /cron: "30 \*\/3 \* \* \*"/);
+});
+
 test("generated health replaces the restored live snapshot before build", () => {
   const prepare = workflow.indexOf("name: Prepare release assets for Netlify deploy");
   const download = workflow.indexOf("name: Download generated health snapshot");
