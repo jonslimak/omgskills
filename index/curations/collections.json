@@ -1,6 +1,619 @@
 {
   "version": 1,
   "authorOverrides": {
+    "deanpeters": {
+      "title": "Dean Peters",
+      "subtitle": "Product strategy and discovery",
+      "description": "Product management workflows for discovery, positioning, prioritization, roadmaps, and product leadership.",
+      "isCompany": false,
+      "featuredSkillIds": [
+        "deanpeters/product-manager-skills:acquisition-channel-advisor",
+        "deanpeters/product-manager-skills:ai-shaped-readiness-advisor",
+        "deanpeters/product-manager-skills:altitude-horizon-framework",
+        "deanpeters/product-manager-skills:business-health-diagnostic",
+        "deanpeters/product-manager-skills:company-research",
+        "deanpeters/product-manager-skills:context-engineering-advisor",
+        "deanpeters/product-manager-skills:customer-journey-map",
+        "deanpeters/product-manager-skills:customer-journey-mapping-workshop",
+        "deanpeters/product-manager-skills:director-readiness-advisor",
+        "deanpeters/product-manager-skills:discovery-interview-prep",
+        "deanpeters/product-manager-skills:discovery-process",
+        "deanpeters/product-manager-skills:eol-message",
+        "deanpeters/product-manager-skills:epic-breakdown-advisor",
+        "deanpeters/product-manager-skills:epic-hypothesis",
+        "deanpeters/product-manager-skills:executive-onboarding-playbook",
+        "deanpeters/product-manager-skills:feature-investment-advisor",
+        "deanpeters/product-manager-skills:finance-based-pricing-advisor",
+        "deanpeters/product-manager-skills:finance-metrics-quickref",
+        "deanpeters/product-manager-skills:jobs-to-be-done",
+        "deanpeters/product-manager-skills:lean-ux-canvas",
+        "deanpeters/product-manager-skills:opportunity-solution-tree",
+        "deanpeters/product-manager-skills:pestel-analysis",
+        "deanpeters/product-manager-skills:pol-probe",
+        "deanpeters/product-manager-skills:pol-probe-advisor",
+        "deanpeters/product-manager-skills:positioning-statement",
+        "deanpeters/product-manager-skills:positioning-workshop",
+        "deanpeters/product-manager-skills:prd-development",
+        "deanpeters/product-manager-skills:press-release",
+        "deanpeters/product-manager-skills:prioritization-advisor",
+        "deanpeters/product-manager-skills:problem-framing-canvas",
+        "deanpeters/product-manager-skills:problem-statement",
+        "deanpeters/product-manager-skills:product-sense-interview-answer",
+        "deanpeters/product-manager-skills:product-strategy-session",
+        "deanpeters/product-manager-skills:proto-persona",
+        "deanpeters/product-manager-skills:recommendation-canvas",
+        "deanpeters/product-manager-skills:roadmap-planning",
+        "deanpeters/product-manager-skills:saas-economics-efficiency-metrics",
+        "deanpeters/product-manager-skills:saas-revenue-growth-metrics",
+        "deanpeters/product-manager-skills:skill-authoring-workflow",
+        "deanpeters/product-manager-skills:storyboard",
+        "deanpeters/product-manager-skills:tam-sam-som-calculator",
+        "deanpeters/product-manager-skills:user-story",
+        "deanpeters/product-manager-skills:user-story-mapping",
+        "deanpeters/product-manager-skills:user-story-mapping-workshop",
+        "deanpeters/product-manager-skills:user-story-splitting",
+        "deanpeters/product-manager-skills:vp-cpo-readiness-advisor",
+        "deanpeters/product-manager-skills:workshop-facilitation"
+      ],
+      "xUrl": "https://x.com/deanpeters"
+    },
+    "greensock": {
+      "title": "GSAP",
+      "subtitle": "Animation and motion engineering",
+      "description": "First-party GSAP skills for timelines, ScrollTrigger, framework integration, and animation performance.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "greensock/gsap-skills:skills/gsap-core",
+        "greensock/gsap-skills:skills/gsap-frameworks",
+        "greensock/gsap-skills:skills/gsap-performance",
+        "greensock/gsap-skills:skills/gsap-plugins",
+        "greensock/gsap-skills:skills/gsap-react",
+        "greensock/gsap-skills:skills/gsap-scrolltrigger",
+        "greensock/gsap-skills:skills/gsap-timeline",
+        "greensock/gsap-skills:skills/gsap-utils"
+      ],
+      "xUrl": "https://x.com/GreenSock"
+    },
+    "tavily-ai": {
+      "title": "Tavily",
+      "subtitle": "Web search and research",
+      "description": "First-party skills for web search, content extraction, site crawling, and research with Tavily.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "tavily-ai/skills:tavily-best-practices",
+        "tavily-ai/skills:tavily-cli",
+        "tavily-ai/skills:tavily-crawl",
+        "tavily-ai/skills:tavily-dynamic-search",
+        "tavily-ai/skills:tavily-extract",
+        "tavily-ai/skills:tavily-map",
+        "tavily-ai/skills:tavily-research",
+        "tavily-ai/skills:tavily-search"
+      ],
+      "xUrl": "https://x.com/tavilyai"
+    },
+    "egonex-ai": {
+      "title": "Egonex AI",
+      "subtitle": "Codebase understanding and architecture",
+      "description": "Understand Anything skills for exploring codebase graphs, explaining architecture, and analyzing changes.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "egonex-ai/understand-anything:understand",
+        "egonex-ai/understand-anything:understand-chat",
+        "egonex-ai/understand-anything:understand-dashboard",
+        "egonex-ai/understand-anything:understand-diff",
+        "egonex-ai/understand-anything:understand-domain",
+        "egonex-ai/understand-anything:understand-explain",
+        "egonex-ai/understand-anything:understand-figma",
+        "egonex-ai/understand-anything:understand-knowledge",
+        "egonex-ai/understand-anything:understand-onboard"
+      ],
+      "xUrl": "https://x.com/EgonexAI"
+    },
+    "lllllllama": {
+      "title": "Chengkun Rao",
+      "subtitle": "Reproducible AI research workflows",
+      "description": "RigorPilot skills for research reproduction, experiment setup, debugging, and auditable results.",
+      "isCompany": false,
+      "featuredSkillIds": [
+        "lllllllama/rigorpilot-skills:ai-research-explore",
+        "lllllllama/rigorpilot-skills:ai-research-reproduction",
+        "lllllllama/rigorpilot-skills:analyze-project",
+        "lllllllama/rigorpilot-skills:env-and-assets-bootstrap",
+        "lllllllama/rigorpilot-skills:explore-code",
+        "lllllllama/rigorpilot-skills:explore-run",
+        "lllllllama/rigorpilot-skills:minimal-run-and-audit",
+        "lllllllama/rigorpilot-skills:paper-context-resolver",
+        "lllllllama/rigorpilot-skills:repo-intake-and-plan",
+        "lllllllama/rigorpilot-skills:run-train",
+        "lllllllama/rigorpilot-skills:safe-debug"
+      ]
+    },
+    "muend": {
+      "title": "muend",
+      "subtitle": "Geospatial analysis and evidence",
+      "description": "GeoAI skills for spatial analysis, data pipelines, cartography, and checking whether geographic claims are supported.",
+      "isCompany": false,
+      "featuredSkillIds": [
+        "muend/geoai-skills:skills/arcgis-pro-automation",
+        "muend/geoai-skills:skills/cartography-geoviz",
+        "muend/geoai-skills:skills/change-detection",
+        "muend/geoai-skills:skills/geo-data-engineering",
+        "muend/geoai-skills:skills/mcda-suitability-analysis",
+        "muend/geoai-skills:skills/ml-experiment-standards",
+        "muend/geoai-skills:skills/movement-trajectory",
+        "muend/geoai-skills:skills/network-accessibility-analysis",
+        "muend/geoai-skills:skills/point-cloud-lidar",
+        "muend/geoai-skills:skills/postgis-spatial-sql",
+        "muend/geoai-skills:skills/spatial-statistics",
+        "muend/geoai-skills:skills/swe-devops-standards",
+        "muend/geoai-skills:skills/terrain-hydrology"
+      ]
+    },
+    "nidrissi": {
+      "title": "Najib Idrissi",
+      "subtitle": "Mathematical research and verification",
+      "description": "Mathbox workflows for mathematical research, proof review, computation checks, literature verification, and manuscript review.",
+      "isCompany": false,
+      "featuredSkillIds": [
+        "nidrissi/mathbox:skills/computation-audit",
+        "nidrissi/mathbox:skills/literature-check",
+        "nidrissi/mathbox:skills/manuscript-integrate",
+        "nidrissi/mathbox:skills/proof-audit",
+        "nidrissi/mathbox:skills/proofread-math",
+        "nidrissi/mathbox:skills/referee",
+        "nidrissi/mathbox:skills/research-attempt",
+        "nidrissi/mathbox:skills/research-init",
+        "nidrissi/mathbox:skills/research-retrospective",
+        "nidrissi/mathbox:skills/research-state"
+      ]
+    },
+    "zakariaf": {
+      "title": "Zakaria Fatahi",
+      "subtitle": "Flutter engineering and testing",
+      "description": "Flutter workflows for architecture, state management, accessibility, persistence, testing, and release preparation.",
+      "isCompany": false,
+      "featuredSkillIds": [
+        "zakariaf/flutter-skills:skills/accessibility-as-code",
+        "zakariaf/flutter-skills:skills/adaptive-layout",
+        "zakariaf/flutter-skills:skills/ads-and-iap-monetization",
+        "zakariaf/flutter-skills:skills/app-startup-and-bootstrap",
+        "zakariaf/flutter-skills:skills/codegen-and-toolchain",
+        "zakariaf/flutter-skills:skills/custom-canvas-and-gestures",
+        "zakariaf/flutter-skills:skills/dart3-idioms-and-coding-standards",
+        "zakariaf/flutter-skills:skills/dartdoc-conventions",
+        "zakariaf/flutter-skills:skills/data-export-and-restore",
+        "zakariaf/flutter-skills:skills/dependency-hygiene",
+        "zakariaf/flutter-skills:skills/design-system-structure",
+        "zakariaf/flutter-skills:skills/error-handling-typed-results",
+        "zakariaf/flutter-skills:skills/flutter-architecture",
+        "zakariaf/flutter-skills:skills/flutter-conventions-index",
+        "zakariaf/flutter-skills:skills/flutter-performance",
+        "zakariaf/flutter-skills:skills/forms-and-input",
+        "zakariaf/flutter-skills:skills/lint-and-style-config",
+        "zakariaf/flutter-skills:skills/local-notifications-scheduler",
+        "zakariaf/flutter-skills:skills/motion-and-haptics",
+        "zakariaf/flutter-skills:skills/naming-conventions",
+        "zakariaf/flutter-skills:skills/navigation-and-routing",
+        "zakariaf/flutter-skills:skills/persistence-drift",
+        "zakariaf/flutter-skills:skills/project-structure-and-packages",
+        "zakariaf/flutter-skills:skills/release-and-store-shipping",
+        "zakariaf/flutter-skills:skills/run-codegen",
+        "zakariaf/flutter-skills:skills/run-goldens-rebaseline",
+        "zakariaf/flutter-skills:skills/run-migration",
+        "zakariaf/flutter-skills:skills/scaffold-feature-module",
+        "zakariaf/flutter-skills:skills/seeded-determinism-and-golden-vectors",
+        "zakariaf/flutter-skills:skills/service-boundary-and-native",
+        "zakariaf/flutter-skills:skills/state-management-riverpod",
+        "zakariaf/flutter-skills:skills/testing-strategy",
+        "zakariaf/flutter-skills:skills/ui-states-and-feedback",
+        "zakariaf/flutter-skills:skills/value-objects-money-and-units",
+        "zakariaf/flutter-skills:skills/widget-composition",
+        "zakariaf/flutter-skills:skills/widget-golden-and-a11y-testing"
+      ]
+    },
+    "surendranb": {
+      "title": "surendranb",
+      "subtitle": "Clear technical and business writing",
+      "description": "Writing workflows for plain language, technical documentation, business communication, and established style conventions.",
+      "isCompany": false,
+      "featuredSkillIds": [
+        "surendranb/writing-skills:skills/asd-ste100",
+        "surendranb/writing-skills:skills/business-writing",
+        "surendranb/writing-skills:skills/corporate-communication",
+        "surendranb/writing-skills:skills/google-dev-docs",
+        "surendranb/writing-skills:skills/gov-uk-style",
+        "surendranb/writing-skills:skills/journalism-ap",
+        "surendranb/writing-skills:skills/orwells-rules",
+        "surendranb/writing-skills:skills/plain-language",
+        "surendranb/writing-skills:skills/scott-adams"
+      ],
+      "xUrl": "https://x.com/surendranb"
+    },
+    "angular": {
+      "title": "Angular",
+      "subtitle": "Angular application development workflows",
+      "description": "First-party Angular skills for application development, architecture, scaffolding, and framework-specific engineering tasks.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "angular/angular:adev-writing-guide",
+        "angular/angular:angular-developer",
+        "angular/angular:reference-compiler-cli",
+        "angular/angular:reference-core",
+        "angular/angular:reference-signal-forms",
+        "angular/skills:angular-developer",
+        "angular/skills:angular-new-app"
+      ],
+      "xUrl": "https://x.com/angular"
+    },
+    "JimLiu": {
+      "title": "Jim Liu / Baoyu",
+      "subtitle": "Visual design and publishing",
+      "description": "Baoyu skills for illustration, presentations, visual design, and publishing workflows with AI agents.",
+      "isCompany": false,
+      "featuredSkillIds": [
+        "jimliu/baoyu-design:baoyu-design",
+        "jimliu/baoyu-design:release-skills",
+        "jimliu/baoyu-skills:baoyu-article-illustrator",
+        "jimliu/baoyu-skills:baoyu-comic",
+        "jimliu/baoyu-skills:baoyu-compress-image",
+        "jimliu/baoyu-skills:baoyu-cover-image",
+        "jimliu/baoyu-skills:baoyu-danger-gemini-web",
+        "jimliu/baoyu-skills:baoyu-danger-x-to-markdown",
+        "jimliu/baoyu-skills:baoyu-diagram",
+        "jimliu/baoyu-skills:baoyu-electron-extract",
+        "jimliu/baoyu-skills:baoyu-format-markdown",
+        "jimliu/baoyu-skills:baoyu-image-cards",
+        "jimliu/baoyu-skills:baoyu-image-gen",
+        "jimliu/baoyu-skills:baoyu-imagine",
+        "jimliu/baoyu-skills:baoyu-infographic",
+        "jimliu/baoyu-skills:baoyu-markdown-to-html",
+        "jimliu/baoyu-skills:baoyu-post-to-wechat",
+        "jimliu/baoyu-skills:baoyu-post-to-weibo",
+        "jimliu/baoyu-skills:baoyu-post-to-x",
+        "jimliu/baoyu-skills:baoyu-slide-deck",
+        "jimliu/baoyu-skills:baoyu-translate",
+        "jimliu/baoyu-skills:baoyu-url-to-markdown",
+        "jimliu/baoyu-skills:baoyu-wechat-summary",
+        "jimliu/baoyu-skills:baoyu-xhs-images",
+        "jimliu/baoyu-skills:baoyu-youtube-transcript",
+        "jimliu/baoyu-skills:release-skills"
+      ],
+      "xUrl": "https://x.com/dotey"
+    },
+    "solana-foundation": {
+      "title": "Solana Foundation",
+      "subtitle": "Solana development and testing",
+      "description": "First-party Solana guidance for application development, programs, testing, and deployment workflows.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "solana-foundation/solana-dev-skill:solana-dev"
+      ],
+      "xUrl": "https://x.com/SolanaFndn"
+    },
+    "sveltejs": {
+      "title": "Svelte",
+      "subtitle": "Svelte development and performance",
+      "description": "First-party Svelte skills for writing components, using framework documentation, and investigating performance.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "sveltejs/ai-tools:svelte-code-writer",
+        "sveltejs/ai-tools:svelte-core-bestpractices",
+        "sveltejs/svelte:performance-investigation"
+      ]
+    },
+    "ChromeDevTools": {
+      "title": "Chrome DevTools",
+      "subtitle": "Browser debugging and performance",
+      "description": "First-party Chrome DevTools skills for browser automation, accessibility, memory diagnostics, and performance analysis.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "chromedevtools/chrome-devtools-mcp:a11y-debugging",
+        "chromedevtools/chrome-devtools-mcp:chrome-devtools",
+        "chromedevtools/chrome-devtools-mcp:chrome-devtools-cli",
+        "chromedevtools/chrome-devtools-mcp:debug-optimize-lcp",
+        "chromedevtools/chrome-devtools-mcp:memory-leak-debugging",
+        "chromedevtools/chrome-devtools-mcp:troubleshooting",
+        "chromedevtools/devtools-frontend:devtools-imports"
+      ]
+    },
+    "payloadcms": {
+      "title": "Payload",
+      "subtitle": "CMS development and migration",
+      "description": "First-party Payload skills for content modeling, access control, hooks, APIs, and CMS migration.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "payloadcms/payload:.claude/skills/generate-translations",
+        "payloadcms/payload:payload",
+        "payloadcms/skills:cms-migration",
+        "payloadcms/skills:payload"
+      ],
+      "xUrl": "https://x.com/payloadcms"
+    },
+    "chakra-ui": {
+      "title": "Chakra UI",
+      "subtitle": "Accessible React interface engineering",
+      "description": "First-party Chakra UI skills for building interfaces, migrating versions, and reviewing component implementations.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "chakra-ui/chakra-ui:chakra-ui-builder",
+        "chakra-ui/chakra-ui:chakra-ui-migrate",
+        "chakra-ui/chakra-ui:chakra-ui-refactor"
+      ],
+      "xUrl": "https://x.com/chakra_ui"
+    },
+    "heroui-inc": {
+      "title": "HeroUI",
+      "subtitle": "React and native interfaces",
+      "description": "First-party HeroUI guidance for React, React Native, component usage, and version migration.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "heroui-inc/heroui:heroui-migration",
+        "heroui-inc/heroui:heroui-native",
+        "heroui-inc/heroui:heroui-react"
+      ],
+      "xUrl": "https://x.com/hero_ui"
+    },
+    "usestrix": {
+      "title": "Strix",
+      "subtitle": "Application security testing workflows",
+      "description": "First-party Strix workflows for authorized application security testing, vulnerability investigation, and CI security checks.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "usestrix/strix:api-security-testing",
+        "usestrix/strix:application-security-testing",
+        "usestrix/strix:ci-security-scanning-with-strix",
+        "usestrix/strix:find-security-vulnerabilities-in-code",
+        "usestrix/strix:fix-security-vulnerabilities-with-strix",
+        "usestrix/strix:managed-pentesting-with-strix",
+        "usestrix/strix:owasp-top-10-testing",
+        "usestrix/strix:penetration-testing-with-strix",
+        "usestrix/strix:web-app-penetration-testing"
+      ],
+      "xUrl": "https://x.com/strix_ai"
+    },
+    "resend": {
+      "title": "Resend",
+      "subtitle": "Email development and delivery",
+      "description": "First-party Resend skills for email APIs, agent inboxes, React Email, command-line workflows, and deliverability.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "resend/email-skills:email-best-practices",
+        "resend/react-email:react-email",
+        "resend/resend-cli:resend-cli",
+        "resend/resend-skills:agent-email-inbox",
+        "resend/resend-skills:email-best-practices",
+        "resend/resend-skills:react-email",
+        "resend/resend-skills:resend",
+        "resend/resend-skills:resend-cli"
+      ],
+      "xUrl": "https://x.com/resend"
+    },
+    "apollographql": {
+      "title": "Apollo GraphQL",
+      "subtitle": "GraphQL development across platforms",
+      "description": "First-party Apollo skills for GraphQL clients, servers, federation, connectors, and mobile applications.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "apollographql/apollo-client:apollo-client",
+        "apollographql/skills:apollo-client",
+        "apollographql/skills:apollo-connectors",
+        "apollographql/skills:apollo-ios",
+        "apollographql/skills:apollo-kotlin",
+        "apollographql/skills:apollo-mcp-server",
+        "apollographql/skills:apollo-router",
+        "apollographql/skills:apollo-router-plugin-creator",
+        "apollographql/skills:apollo-server",
+        "apollographql/skills:graphql-operations",
+        "apollographql/skills:rover",
+        "apollographql/skills:rust-best-practices",
+        "apollographql/skills:skill-creator",
+        "apollographql/skills:skills/apollo-client",
+        "apollographql/skills:skills/apollo-federation",
+        "apollographql/skills:skills/graphql-schema"
+      ],
+      "xUrl": "https://x.com/apollographql"
+    },
+    "Arize-ai": {
+      "title": "Arize AI",
+      "subtitle": "AI observability and evaluation",
+      "description": "First-party Arize and Phoenix workflows for tracing, evaluations, datasets, experiments, and prompt improvement.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "arize-ai/arize-skills:arize-admin",
+        "arize-ai/arize-skills:arize-ai-provider-integration",
+        "arize-ai/arize-skills:arize-annotation",
+        "arize-ai/arize-skills:arize-compliance-audit",
+        "arize-ai/arize-skills:arize-dataset",
+        "arize-ai/arize-skills:arize-evaluator",
+        "arize-ai/arize-skills:arize-experiment",
+        "arize-ai/arize-skills:arize-instrumentation",
+        "arize-ai/arize-skills:arize-link",
+        "arize-ai/arize-skills:arize-prompt-optimization",
+        "arize-ai/arize-skills:arize-prompts",
+        "arize-ai/arize-skills:arize-trace",
+        "arize-ai/phoenix:phoenix-cli",
+        "arize-ai/phoenix:phoenix-evals",
+        "arize-ai/phoenix:phoenix-tracing"
+      ],
+      "xUrl": "https://x.com/arizeai"
+    },
+    "marimo-team": {
+      "title": "marimo",
+      "subtitle": "Python notebooks and research",
+      "description": "First-party marimo skills for live notebooks, data work, research demonstrations, and notebook tooling.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "marimo-team/marimo-pair",
+        "marimo-team/marimo-pair:retro-marimo-pair",
+        "marimo-team/marimo:marimo-pair",
+        "marimo-team/skills:add-molab-badge",
+        "marimo-team/skills:auto-paper-demo",
+        "marimo-team/skills:implement-paper",
+        "marimo-team/skills:implement-paper-auto",
+        "marimo-team/skills:jupyter-to-marimo",
+        "marimo-team/skills:marimo-batch",
+        "marimo-team/skills:marimo-notebook",
+        "marimo-team/skills:streamlit-to-marimo",
+        "marimo-team/skills:wasm-compatibility"
+      ],
+      "xUrl": "https://x.com/marimo_io"
+    },
+    "android": {
+      "title": "Android",
+      "subtitle": "Android development and security",
+      "description": "First-party Android skills for adaptive layouts, platform tooling, application security, and device features.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "android/skills:adaptive",
+        "android/skills:android-cli",
+        "android/skills:android-intent-security",
+        "android/skills:appfunctions",
+        "android/skills:edge-to-edge",
+        "android/skills:migrate-xml-views-to-jetpack-compose",
+        "android/skills:navigation-3",
+        "android/skills:play-billing-library-version-upgrade",
+        "android/skills:r8-analyzer",
+        "android/skills:styles",
+        "android/skills:testing-setup"
+      ],
+      "xUrl": "https://x.com/AndroidDev"
+    },
+    "slavingia": {
+      "title": "Sahil Lavingia",
+      "subtitle": "Practical entrepreneurship and growth",
+      "description": "Skills based on The Minimalist Entrepreneur for validating ideas, finding customers, pricing, marketing, and sustainable growth.",
+      "isCompany": false,
+      "featuredSkillIds": [
+        "slavingia/skills:company-values",
+        "slavingia/skills:find-community",
+        "slavingia/skills:first-customers",
+        "slavingia/skills:grow-sustainably",
+        "slavingia/skills:marketing-plan",
+        "slavingia/skills:minimalist-review",
+        "slavingia/skills:mvp",
+        "slavingia/skills:pricing",
+        "slavingia/skills:processize",
+        "slavingia/skills:validate-idea"
+      ],
+      "xUrl": "https://x.com/shl"
+    },
+    "DietrichGebert": {
+      "title": "Dietrich Gebert",
+      "subtitle": "Focused coding and review",
+      "description": "Ponytail skills for scoped implementation, code review, technical-debt tracking, and concise engineering communication.",
+      "isCompany": false,
+      "featuredSkillIds": [
+        "dietrichgebert/ponytail:ponytail",
+        "dietrichgebert/ponytail:ponytail-audit",
+        "dietrichgebert/ponytail:ponytail-debt",
+        "dietrichgebert/ponytail:ponytail-gain",
+        "dietrichgebert/ponytail:ponytail-help",
+        "dietrichgebert/ponytail:ponytail-review"
+      ]
+    },
+    "zarazhangrui": {
+      "title": "Zara Zhang",
+      "subtitle": "Presentations and codebase education",
+      "description": "Skills for creating HTML presentations and turning codebases into interactive educational material.",
+      "isCompany": false,
+      "featuredSkillIds": [
+        "zarazhangrui/codebase-to-course",
+        "zarazhangrui/frontend-slides:frontend-slides"
+      ],
+      "xUrl": "https://x.com/zarazhangrui"
+    },
+    "autonnel": {
+      "title": "Autonnel",
+      "subtitle": "Sales funnels and conversion",
+      "description": "Skills for conversion audits, funnel planning, upsell flows, server-side tracking, and choosing funnel infrastructure.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "autonnel/autonnel-skills:funnel-platform-picker",
+        "autonnel/autonnel-skills:landing-page-conversion-audit",
+        "autonnel/autonnel-skills:post-purchase-upsell-flow",
+        "autonnel/autonnel-skills:sales-funnel-blueprint",
+        "autonnel/autonnel-skills:self-hosted-funnel-launch",
+        "autonnel/autonnel-skills:server-side-conversion-tracking"
+      ]
+    },
+    "oxc-project": {
+      "title": "Oxc",
+      "subtitle": "JavaScript tooling and migration",
+      "description": "First-party Oxc workflows for migrating JavaScript and TypeScript projects to Oxlint and Oxfmt.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "oxc-project/oxc:migrate-oxfmt",
+        "oxc-project/oxc:migrate-oxlint"
+      ]
+    },
+    "bmad-code-org": {
+      "title": "BMad",
+      "subtitle": "Structured software delivery workflows",
+      "description": "BMad Method skills for requirements, planning, architecture, implementation, review, and iterative software delivery.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "bmad-code-org/bmad-method:bmad",
+        "bmad-code-org/bmad-method:bmad-advanced-elicitation",
+        "bmad-code-org/bmad-method:bmad-agent-analyst",
+        "bmad-code-org/bmad-method:bmad-agent-architect",
+        "bmad-code-org/bmad-method:bmad-agent-dev",
+        "bmad-code-org/bmad-method:bmad-agent-pm",
+        "bmad-code-org/bmad-method:bmad-agent-ux-designer",
+        "bmad-code-org/bmad-method:bmad-architecture",
+        "bmad-code-org/bmad-method:bmad-brainstorming",
+        "bmad-code-org/bmad-method:bmad-build",
+        "bmad-code-org/bmad-method:bmad-build-auto",
+        "bmad-code-org/bmad-method:bmad-code-review",
+        "bmad-code-org/bmad-method:bmad-correct-course",
+        "bmad-code-org/bmad-method:bmad-create-epics-and-stories",
+        "bmad-code-org/bmad-method:bmad-customize",
+        "bmad-code-org/bmad-method:bmad-deep-recon",
+        "bmad-code-org/bmad-method:bmad-eval",
+        "bmad-code-org/bmad-method:bmad-forge-idea",
+        "bmad-code-org/BMAD-METHOD:bmad-help",
+        "bmad-code-org/bmad-method:bmad-party-mode",
+        "bmad-code-org/bmad-method:bmad-prd",
+        "bmad-code-org/bmad-method:bmad-prfaq",
+        "bmad-code-org/bmad-method:bmad-product-brief",
+        "bmad-code-org/bmad-method:bmad-project-context",
+        "bmad-code-org/bmad-method:bmad-qa-generate-e2e-tests",
+        "bmad-code-org/bmad-method:bmad-retrospective",
+        "bmad-code-org/bmad-method:bmad-review",
+        "bmad-code-org/bmad-method:bmad-spec",
+        "bmad-code-org/bmad-method:bmad-sprint-planning",
+        "bmad-code-org/bmad-method:bmad-ticket",
+        "bmad-code-org/bmad-method:bmad-toolsmith",
+        "bmad-code-org/bmad-method:bmad-ux",
+        "bmad-code-org/bmad-method:bmad-walkthrough",
+        "bmad-code-org/bmad-method:bmod-core-tools",
+        "bmad-code-org/bmad-method:bmod-method",
+        "bmad-code-org/bmad-method:bmod-toolsmith"
+      ]
+    },
+    "Fission-AI": {
+      "title": "OpenSpec / Fission AI",
+      "subtitle": "Specification driven development workflows",
+      "description": "OpenSpec skills for proposing changes, developing specifications, implementing tasks, and archiving completed work.",
+      "isCompany": true,
+      "featuredSkillIds": [
+        "fission-ai/openspec:draft-openspec-docs",
+        "fission-ai/openspec:openspec-apply-change",
+        "fission-ai/openspec:openspec-archive-change",
+        "fission-ai/openspec:openspec-bulk-archive-change",
+        "fission-ai/openspec:openspec-continue-change",
+        "fission-ai/openspec:openspec-explore",
+        "fission-ai/openspec:openspec-ff-change",
+        "fission-ai/openspec:openspec-new-change",
+        "fission-ai/openspec:openspec-onboard",
+        "fission-ai/openspec:openspec-propose",
+        "fission-ai/openspec:openspec-sync-specs",
+        "fission-ai/openspec:openspec-update-change",
+        "fission-ai/openspec:openspec-verify-change",
+        "fission-ai/openspec:release-openspec",
+        "fission-ai/openspec:verify-openspec-docs",
+        "fission-ai/openspec:write-openspec-docs"
+      ]
+    },
     "openai": {
       "title": "OpenAI",
       "subtitle": "Codex developer tools",

@@ -1,0 +1,318 @@
+{
+  "version": 1,
+  "reviewedAt": "2026-10-26",
+  "status": "local-prepared-not-published",
+  "sourceCommit": "d07dacefd28569a146c0743c330a0f5924b81007",
+  "approvedProfileCount": 30,
+  "existingWatchEntriesFeatured": 12,
+  "newRegistryEntries": 18,
+  "featuredBefore": 277,
+  "featuredAfter": 307,
+  "portfolioRecords": 354,
+  "githubSuppliedXLinks": 19,
+  "scope": {
+    "existingCatalogOnly": true,
+    "trustRolesPreserved": true,
+    "crawlCoveragePreserved": true,
+    "heldCandidatesModified": false,
+    "skillIdsRewritten": false,
+    "catalogWritten": false,
+    "siteAssetsWritten": false,
+    "crawlRun": false,
+    "published": false,
+    "deployed": false,
+    "committed": false
+  },
+  "verifiedRenamedRecord": {
+    "id": "resend/email-skills:email-best-practices",
+    "requestedRepo": "resend/email-skills",
+    "canonicalRepo": "resend/email-best-practices",
+    "evidenceUrl": "https://api.github.com/repos/resend/email-skills",
+    "note": "GitHub resolves to the same Resend-owned repository; retain the stable ID and existing catalog metadata."
+  },
+  "verification": {
+    "strictPolicyFindings": 0,
+    "focusedTestsPassed": 48,
+    "typecheck": "passed",
+    "collectionImagesVerified": 18,
+    "collectionsBefore": 295,
+    "collectionsAfter": 325,
+    "existingCollectionsUnchanged": 295,
+    "liveTracks": [
+      {
+        "track": "v2",
+        "generatedAt": "2026-10-26T13:16:22Z",
+        "skillCount": 58289,
+        "selectedRecords": 354,
+        "missing": 0
+      },
+      {
+        "track": "crawl4",
+        "generatedAt": "2026-10-26T12:56:53.997Z",
+        "skillCount": 58289,
+        "selectedRecords": 354,
+        "missing": 0
+      }
+    ],
+    "missingExplicitPaths": [
+      {
+        "handle": "JimLiu",
+        "count": 2,
+        "note": "Existing optional catalog metadata gap, not changed in this editorial slice."
+      },
+      {
+        "handle": "apollographql",
+        "count": 4,
+        "note": "Existing optional catalog metadata gap, not changed in this editorial slice."
+      }
+    ],
+    "diffCheck": "passed"
+  },
+  "profiles": [
+    {
+      "handle": "deanpeters",
+      "previouslyWatched": true,
+      "recordCount": 47,
+      "xUrl": "https://x.com/deanpeters",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/deanpeters"
+    },
+    {
+      "handle": "greensock",
+      "previouslyWatched": true,
+      "recordCount": 8,
+      "xUrl": "https://x.com/GreenSock",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/greensock"
+    },
+    {
+      "handle": "tavily-ai",
+      "previouslyWatched": true,
+      "recordCount": 8,
+      "xUrl": "https://x.com/tavilyai",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/tavily-ai"
+    },
+    {
+      "handle": "egonex-ai",
+      "previouslyWatched": true,
+      "recordCount": 9,
+      "xUrl": "https://x.com/EgonexAI",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/egonex-ai"
+    },
+    {
+      "handle": "lllllllama",
+      "previouslyWatched": true,
+      "recordCount": 11,
+      "xUrl": null,
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/lllllllama"
+    },
+    {
+      "handle": "muend",
+      "previouslyWatched": true,
+      "recordCount": 13,
+      "xUrl": null,
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/muend"
+    },
+    {
+      "handle": "nidrissi",
+      "previouslyWatched": true,
+      "recordCount": 10,
+      "xUrl": null,
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/nidrissi"
+    },
+    {
+      "handle": "zakariaf",
+      "previouslyWatched": true,
+      "recordCount": 36,
+      "xUrl": null,
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/zakariaf"
+    },
+    {
+      "handle": "surendranb",
+      "previouslyWatched": true,
+      "recordCount": 9,
+      "xUrl": "https://x.com/surendranb",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/surendranb"
+    },
+    {
+      "handle": "angular",
+      "previouslyWatched": true,
+      "recordCount": 7,
+      "xUrl": "https://x.com/angular",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/angular"
+    },
+    {
+      "handle": "JimLiu",
+      "previouslyWatched": true,
+      "recordCount": 26,
+      "xUrl": "https://x.com/dotey",
+      "missingExplicitPathCount": 2,
+      "githubProfile": "https://github.com/JimLiu"
+    },
+    {
+      "handle": "solana-foundation",
+      "previouslyWatched": true,
+      "recordCount": 1,
+      "xUrl": "https://x.com/SolanaFndn",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/solana-foundation"
+    },
+    {
+      "handle": "sveltejs",
+      "previouslyWatched": false,
+      "recordCount": 3,
+      "xUrl": null,
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/sveltejs"
+    },
+    {
+      "handle": "ChromeDevTools",
+      "previouslyWatched": false,
+      "recordCount": 7,
+      "xUrl": null,
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/ChromeDevTools"
+    },
+    {
+      "handle": "payloadcms",
+      "previouslyWatched": false,
+      "recordCount": 4,
+      "xUrl": "https://x.com/payloadcms",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/payloadcms"
+    },
+    {
+      "handle": "chakra-ui",
+      "previouslyWatched": false,
+      "recordCount": 3,
+      "xUrl": "https://x.com/chakra_ui",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/chakra-ui"
+    },
+    {
+      "handle": "heroui-inc",
+      "previouslyWatched": false,
+      "recordCount": 3,
+      "xUrl": "https://x.com/hero_ui",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/heroui-inc"
+    },
+    {
+      "handle": "usestrix",
+      "previouslyWatched": false,
+      "recordCount": 9,
+      "xUrl": "https://x.com/strix_ai",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/usestrix"
+    },
+    {
+      "handle": "resend",
+      "previouslyWatched": false,
+      "recordCount": 8,
+      "xUrl": "https://x.com/resend",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/resend"
+    },
+    {
+      "handle": "apollographql",
+      "previouslyWatched": false,
+      "recordCount": 16,
+      "xUrl": "https://x.com/apollographql",
+      "missingExplicitPathCount": 4,
+      "githubProfile": "https://github.com/apollographql"
+    },
+    {
+      "handle": "Arize-ai",
+      "previouslyWatched": false,
+      "recordCount": 15,
+      "xUrl": "https://x.com/arizeai",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/Arize-ai"
+    },
+    {
+      "handle": "marimo-team",
+      "previouslyWatched": false,
+      "recordCount": 12,
+      "xUrl": "https://x.com/marimo_io",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/marimo-team"
+    },
+    {
+      "handle": "android",
+      "previouslyWatched": false,
+      "recordCount": 11,
+      "xUrl": "https://x.com/AndroidDev",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/android"
+    },
+    {
+      "handle": "slavingia",
+      "previouslyWatched": false,
+      "recordCount": 10,
+      "xUrl": "https://x.com/shl",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/slavingia"
+    },
+    {
+      "handle": "DietrichGebert",
+      "previouslyWatched": false,
+      "recordCount": 6,
+      "xUrl": null,
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/DietrichGebert"
+    },
+    {
+      "handle": "zarazhangrui",
+      "previouslyWatched": false,
+      "recordCount": 2,
+      "xUrl": "https://x.com/zarazhangrui",
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/zarazhangrui"
+    },
+    {
+      "handle": "autonnel",
+      "previouslyWatched": false,
+      "recordCount": 6,
+      "xUrl": null,
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/autonnel"
+    },
+    {
+      "handle": "oxc-project",
+      "previouslyWatched": false,
+      "recordCount": 2,
+      "xUrl": null,
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/oxc-project"
+    },
+    {
+      "handle": "bmad-code-org",
+      "previouslyWatched": false,
+      "recordCount": 36,
+      "xUrl": null,
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/bmad-code-org"
+    },
+    {
+      "handle": "Fission-AI",
+      "previouslyWatched": false,
+      "recordCount": 16,
+      "xUrl": null,
+      "missingExplicitPathCount": 0,
+      "githubProfile": "https://github.com/Fission-AI"
+    }
+  ],
+  "sourceHashes": {
+    "index/seeds/creators.json": "35042c75f44a9d2467fc491f195d637adf8961fd76b3189d6908ca6084976a5c",
+    "index/curations/collections.json": "63f2e123d81a9926d2f53a92cb68ae68ecb4d8595221c96cb0b7fa3ff20903bd",
+    "index/skills.json": "6f4c31c2c20fc22bd0201805ea69dee5e2a0754b5f07bcc92511e0116c957ca5"
+  }
+}
