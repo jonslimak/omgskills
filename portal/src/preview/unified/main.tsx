@@ -20,11 +20,14 @@ import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog } from "../../app/unified/use-public-catalog";
 import { previewInstallClient } from "../../app/unified/public-install";
 import { f2Cases, f2CaseNavigation, f2NavigationSearch, readF2CaseKey } from "./f2-install";
-import { createPreviewInstallStore, PublicInstallSetup } from "./PublicInstallSetup";
+import { createPreviewCatalogStore, createPreviewInstallStore, PublicInstallSetup } from "./PublicInstallSetup";
+import { CatalogInstallSetup } from "../../app/unified/CatalogInstallSetup";
 
 const installClient = import.meta.env.DEV ? previewInstallClient(import.meta.env.DEV,
   import.meta.env.VITE_NEWMAC_F1, import.meta.env.VITE_NEWMAC_SETUP_TEST, location.hostname) : null;
 const installPreviewEnabled = installClient !== null;
+// The plain preview shows production's install card, as signed-in users see it.
+const catalogStore = createPreviewCatalogStore();
 
 const catalog = makeCatalog();
 const publicClient = new PublicCatalogClient();
@@ -138,7 +141,10 @@ function Preview() {
       signedIn={signedIn}
       publicInstallAction={installClient ? (skill, detailReady) => <PublicInstallSetup
         key={`${skill.catalogId}:${f2CaseKey}`} skill={skill} detailReady={detailReady && liveCatalog}
-        caseKey={f2CaseKey} returnRoute={`${base}${previewSearch(nav)}`} store={installStore!} client={installClient} /> : undefined}
+        caseKey={f2CaseKey} returnRoute={`${base}${previewSearch(nav)}`} store={installStore!} client={installClient} />
+        : (skill, detailReady) => <CatalogInstallSetup key={skill.key} skill={skill} detailReady={detailReady && liveCatalog}
+          store={catalogStore} returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} />}
+      onInstallCancel={() => catalogStore.clear()}
       onSession={session}
       state={
         scenario === "loading" || scenario === "error" ? scenario : "ready"
