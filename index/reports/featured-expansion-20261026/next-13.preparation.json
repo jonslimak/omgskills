@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "reviewedAt": "2026-10-26",
+  "status": "local-prepared-not-committed-or-published",
+  "sourceCommit": "c16da84ca12c14343cc595802101390be3666f25",
+  "previousBatchCommit": "c16da84ca12c14343cc595802101390be3666f25",
+  "approvedProfileCount": 13,
+  "existingWatchEntriesFeatured": 6,
+  "newRegistryEntries": 7,
+  "portfolioRecords": 213,
+  "githubSuppliedXLinks": 8,
+  "cumulativePrepared": {
+    "profiles": 43,
+    "portfolioRecords": 567,
+    "featuredAccountsIfPublished": 320
+  },
+  "scope": {
+    "existingCatalogOnly": true,
+    "allCurrentEligibleRecordsIncluded": true,
+    "previousBatchPreserved": true,
+    "trustRolesPreserved": true,
+    "crawlCoveragePreserved": true,
+    "remainingSevenUnchanged": [
+      "larksuite",
+      "nextlevelbuilder",
+      "triggerdotdev",
+      "mastra-ai",
+      "max-sixty",
+      "get-convex",
+      "shadcn-ui"
+    ],
+    "skillIdsRewritten": false,
+    "catalogWritten": false,
+    "siteAssetsWritten": false,
+    "crawlRun": false,
+    "committed": false,
+    "pushed": false,
+    "published": false,
+    "deployed": false
+  },
+  "verification": {
+    "strictPolicyFindings": 0,
+    "focusedTestsPassed": 48,
+    "typecheck": "passed",
+    "collectionImagesVerified": 18,
+    "collectionsBefore": 325,
+    "collectionsAfter": 338,
+    "existingCollectionsUnchanged": 325,
+    "liveTracks": [
+      {
+        "track": "v2",
+        "generatedAt": "2026-10-26T13:16:22Z",
+        "skillCount": 58289,
+        "selectedRecords": 213,
+        "missing": 0
+      },
+      {
+        "track": "crawl4",
+        "generatedAt": "2026-10-26T12:56:53.997Z",
+        "skillCount": 58289,
+        "selectedRecords": 213,
+        "missing": 0
+      }
+    ],
+    "diffCheck": "passed",
+    "installationsTested": false
+  },
+  "knownLimitations": {
+    "missingExplicitPathRecords": 117,
+    "note": "Existing optional catalog metadata gaps remain unchanged. Source review and live-ID existence are not install validation.",
+    "exactPathCoverage": [
+      {
+        "handle": "thejefflarson",
+        "existingProfileRecords": 52,
+        "approvedCrawlPaths": 51,
+        "coverageChanged": false
+      },
+      {
+        "handle": "tinyfish-io",
+        "existingProfileRecords": 7,
+        "approvedCrawlPaths": 6,
+        "coverageChanged": false
+      }
+    ],
+    "omittedXLink": {
+      "handle": "mcp-use",
+      "reason": "GitHub profile supplies a personal handle; no verified organization-branded X link was established, so none was guessed."
+    }
+  },
+  "profiles": [
+    {
+      "handle": "jeffallan",
+      "previouslyWatched": true,
+      "recordCount": 83,
+      "missingExplicitPathCount": 65,
+      "existingCoverage": "all",
+      "approvedExactPaths": null,
+      "recordsMatchingExistingCoverage": 18,
+      "xUrl": "https://x.com/j3ffallan"
+    },
+    {
+      "handle": "conorluddy",
+      "previouslyWatched": true,
+      "recordCount": 9,
+      "missingExplicitPathCount": 8,
+      "existingCoverage": null,
+      "approvedExactPaths": null,
+      "recordsMatchingExistingCoverage": null,
+      "xUrl": null
+    },
+    {
+      "handle": "browser-act",
+      "previouslyWatched": true,
+      "recordCount": 17,
+      "missingExplicitPathCount": 16,
+      "existingCoverage": null,
+      "approvedExactPaths": null,
+      "recordsMatchingExistingCoverage": null,
+      "xUrl": "https://x.com/browseract"
+    },
+    {
+      "handle": "thejefflarson",
+      "previouslyWatched": true,
+      "recordCount": 52,
+      "missingExplicitPathCount": 0,
+      "existingCoverage": "selected",
+      "approvedExactPaths": 51,
+      "recordsMatchingExistingCoverage": 51,
+      "xUrl": null
+    },
+    {
+      "handle": "supermemoryai",
+      "previouslyWatched": true,
+      "recordCount": 6,
+      "missingExplicitPathCount": 4,
+      "existingCoverage": null,
+      "approvedExactPaths": null,
+      "recordsMatchingExistingCoverage": null,
+      "xUrl": "https://x.com/supermemoryai"
+    },
+    {
+      "handle": "tinyfish-io",
+      "previouslyWatched": true,
+      "recordCount": 7,
+      "missingExplicitPathCount": 0,
+      "existingCoverage": "selected",
+      "approvedExactPaths": 6,
+      "recordsMatchingExistingCoverage": 6,
+      "xUrl": "https://x.com/tiny_fish"
+    },
+    {
+      "handle": "mcp-use",
+      "previouslyWatched": false,
+      "recordCount": 5,
+      "missingExplicitPathCount": 0,
+      "existingCoverage": null,
+      "approvedExactPaths": null,
+      "recordsMatchingExistingCoverage": null,
+      "xUrl": null
+    },
+    {
+      "handle": "cathrynlavery",
+      "previouslyWatched": false,
+      "recordCount": 3,
+      "missingExplicitPathCount": 2,
+      "existingCoverage": null,
+      "approvedExactPaths": null,
+      "recordsMatchingExistingCoverage": null,
+      "xUrl": "https://x.com/cathrynlavery"
+    },
+    {
+      "handle": "cocoindex-io",
+      "previouslyWatched": false,
+      "recordCount": 4,
+      "missingExplicitPathCount": 2,
+      "existingCoverage": null,
+      "approvedExactPaths": null,
+      "recordsMatchingExistingCoverage": null,
+      "xUrl": "https://x.com/cocoindex_io"
+    },
+    {
+      "handle": "abpframework",
+      "previouslyWatched": false,
+      "recordCount": 18,
+      "missingExplicitPathCount": 17,
+      "existingCoverage": null,
+      "approvedExactPaths": null,
+      "recordsMatchingExistingCoverage": null,
+      "xUrl": null
+    },
+    {
+      "handle": "redpanda-data",
+      "previouslyWatched": false,
+      "recordCount": 3,
+      "missingExplicitPathCount": 1,
+      "existingCoverage": null,
+      "approvedExactPaths": null,
+      "recordsMatchingExistingCoverage": null,
+      "xUrl": "https://x.com/redpandadata"
+    },
+    {
+      "handle": "coleam00",
+      "previouslyWatched": false,
+      "recordCount": 4,
+      "missingExplicitPathCount": 1,
+      "existingCoverage": null,
+      "approvedExactPaths": null,
+      "recordsMatchingExistingCoverage": null,
+      "xUrl": null
+    },
+    {
+      "handle": "snarktank",
+      "previouslyWatched": false,
+      "recordCount": 2,
+      "missingExplicitPathCount": 1,
+      "existingCoverage": null,
+      "approvedExactPaths": null,
+      "recordsMatchingExistingCoverage": null,
+      "xUrl": "https://x.com/ryancarson"
+    }
+  ],
+  "sourceHashes": {
+    "index/seeds/creators.json": "b75d2d1f51772e426b737585c08368875e8d0c3c3869aab6f3fb9c0628c9fdf0",
+    "index/curations/collections.json": "9e91618f70d928f5e8f884ee768c8606b0dcfe8ad810aa8d5777bcb629f00d58",
+    "index/skills.json": "6f4c31c2c20fc22bd0201805ea69dee5e2a0754b5f07bcc92511e0116c957ca5"
+  }
+}
