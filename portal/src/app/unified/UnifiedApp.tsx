@@ -108,7 +108,7 @@ import type { UnifiedManagement } from "./management";
 import { publicPageRequest, publicSorts, type PublicSort } from "./public-paging";
 import { CreatorSocialLinks, CreatorProfileDetails } from "./CreatorProfileDetails";
 import { discoveryCreatorGroups, featuredProfiles, isCompany } from "./discovery-presentation";
-import { descriptionParagraphs } from "./description-paragraphs";
+import { descriptionParagraphs, descriptionSummary, whenLead } from "./description-paragraphs";
 import { Avatar } from "./Avatar";
 import { DataPage } from "./DataPage";
 import { SkillReadme } from "./SkillReadme";
@@ -147,6 +147,12 @@ type Props = {
   initialNotice?: string;
   supportedAccountViews?: readonly View[];
 };
+
+// Semi-bolds the "Use when ..." lead-in so the reader sees when to use the skill first.
+function DescriptionParagraph({ text }: { text: string }) {
+  const lead = whenLead(text);
+  return lead ? <><strong className="ua-when-lead">{lead}</strong>{text.slice(lead.length)}</> : <>{text}</>;
+}
 
 function IconButton({
   label,
@@ -452,7 +458,9 @@ export function UnifiedApp({
   const [notice, setNotice] = useState(initialNotice);
   // The agent picker opens from the Install button and closes when another skill is shown.
   const [installOpen, setInstallOpen] = useState(false);
-  useEffect(() => setInstallOpen(false), [nav.selected]);
+  // Long descriptions start as their "Use when" summary.
+  const [descriptionOpen, setDescriptionOpen] = useState(false);
+  useEffect(() => { setInstallOpen(false); setDescriptionOpen(false); }, [nav.selected]);
   const [showHidden, setShowHidden] = useState(false);
   const [collectionPageIndex, setCollectionPageIndex] = useState(0);
   const [expandedSearchScope, setExpandedSearchScope] = useState<string | null>(null);
@@ -495,6 +503,7 @@ export function UnifiedApp({
   // List rows already carry the name and avatar; only the direct-link placeholder (no author) waits.
   const detailHeadingKnown = !!detail && !(panelPending && !detail.author);
   const detailParagraphs = detail ? descriptionParagraphs(detail.description) : [];
+  const detailSummary = detail ? descriptionSummary(detail.description) : null;
   const relatedSkills = detail?.author
     ? library
         .filter((skill) => skill.author === detail.author && skill.catalogId !== detail.catalogId)
@@ -1911,9 +1920,19 @@ export function UnifiedApp({
                   </>
                 ) : <>
                 <div className="ua-description">
-                  {(detailParagraphs.length ? detailParagraphs : ["No description available."]).map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
+                  {(detailSummary && !descriptionOpen ? [detailSummary] : detailParagraphs.length ? detailParagraphs : ["No description available."]).map((paragraph, index) => (
+                    <p key={index}><DescriptionParagraph text={paragraph} /></p>
                   ))}
+                  {detailSummary && (
+                    <button
+                      type="button"
+                      className="ua-link ua-description-toggle"
+                      aria-expanded={descriptionOpen}
+                      onClick={() => setDescriptionOpen(open => !open)}
+                    >
+                      {descriptionOpen ? "Show less" : "Show more"}
+                    </button>
+                  )}
                 </div>
                 <SkillReadme skill={detail} />
                 {detail.installed && (
