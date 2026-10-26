@@ -1,5 +1,6 @@
 import type { SocialHit } from "./social.js";
 import { extractExactSkillRefs, type XGitHubSkillRef } from "../x-skill-mapping.js";
+import { createCheckedXFetch } from "./x-search-response.js";
 
 const GITHUB_URL_RE = /https?:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)/g;
 const DEFAULT_MIN_LIKES = 50;
@@ -131,7 +132,10 @@ async function createScraper() {
   if (!authToken || !ct0) return null;
 
   const { ErrorRateLimitStrategy, Scraper, SearchMode } = await import("@the-convocation/twitter-scraper");
-  const scraper = new Scraper({ rateLimitStrategy: new ErrorRateLimitStrategy() });
+  const scraper = new Scraper({
+    rateLimitStrategy: new ErrorRateLimitStrategy(),
+    fetch: createCheckedXFetch(),
+  });
   await scraper.setCookies([
     `auth_token=${authToken}; Domain=x.com; Path=/; Secure; HttpOnly`,
     `ct0=${ct0}; Domain=x.com; Path=/; Secure`,
