@@ -8,7 +8,7 @@ import { inspectionRecipe } from './prepare-catalog-candidate.mjs';
 import { assemblePackage } from './prepare-newmac-setup-test.mjs';
 
 const repository = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-export const release = Object.freeze({ version: '0.0.26', build: '26' });
+export const release = Object.freeze({ version: '0.0.27', build: '27' });
 export const website = 'https://omgskills.com/app/';
 export const updateFeed = 'https://omgskills.com/updates/connected/appcast.xml';
 
@@ -48,7 +48,7 @@ export function recipe(publicKey) {
       'scripts/prepare-connected-production.test.mjs', 'menubar/Info.plist',
       'menubar/Tests/omgskillsTests/ProductionConnectedConfigurationTests.swift'],
     additionalLimitations: [
-      'Production 0.0.26 (26), Apple silicon, macOS 14+. Unsigned and not distributable.',
+      'Production 0.0.27 (27), Apple silicon, macOS 14+. Unsigned and not distributable.',
       'Preparation preserves the existing production account/inventory activation; no gate changes.',
       'Separate opt-in connected update channel; existing public appcast and downloads are unchanged.',
       'Existing production public update key only; no private keys or signing in this stage.',

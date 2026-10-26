@@ -1,5 +1,6 @@
 #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
 import Foundation
+import Observation
 import Testing
 @testable import omgskills
 
@@ -327,6 +328,24 @@ struct CatalogInstallModelTests {
         #expect(await model.close())
         model.install()
         #expect(await service.installCount == 0)
+    }
+
+    @Test(arguments: [false, true])
+    func updateCompletionNotifiesObserversWhileOptionsAreOpen(_ failed: Bool) async {
+        let model = CatalogInstallModel(service: FlowStub(), coordinator: UpdateInstallCoordinator(), client: .product)
+        let updater = CatalogCandidateUpdater(model: model) {}
+        updater.check()
+        #expect(!updater.canCheck)
+        await confirmation("Options observes update-check completion") { changed in
+            withObservationTracking {
+                _ = updater.canCheck
+            } onChange: {
+                changed()
+            }
+            updater.finish(failed: failed)
+        }
+        #expect(updater.canCheck)
+        #expect(!model.appUpdateActive)
     }
 
     @Test func candidateUpdaterBlocksRequestsAndCannotInterruptAnySkillPhase() async {
