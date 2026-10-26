@@ -22,6 +22,8 @@ export function setAccessSummary(set: PortalSet) {
 export type CatalogSummary = {
   skillMDPath?: string;
   hasPinnedInstall?: boolean;
+  /** Manual install command from the full catalog record (list summaries omit it). */
+  installCommand?: string;
   id: string;
   name: string;
   description: string;
@@ -293,6 +295,7 @@ export function skillDisplays(data: PortalData, catalog: CatalogDisplay) {
       githubUrl: skill.githubUrl,
       stars: publicSkill?.stars,
       tags: publicSkill?.tags || [],
+      installCommand: publicSkill?.installCommand,
       installed: skill,
     };
   });
@@ -325,7 +328,7 @@ export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[], catalog: 
       description: publicSkill?.description || item.description || installed?.description || "",
       githubUrl: publicSkill?.githubUrl || item.githubUrl || installed?.githubUrl || null,
       author: publicSkill?.author || installed?.author || "", tags: publicSkill?.tags || [],
-      avatar: publicSkill?.avatar || installed?.avatar, stars: publicSkill?.stars,
+      avatar: publicSkill?.avatar || installed?.avatar, stars: publicSkill?.stars, installCommand: publicSkill?.installCommand,
       installed: installation && (installation.inventoryVersion === 2 || installation.inventoryVersion === 3 || installation.deviceId != null)
         ? groupSyncedSkills([installation])[0] : installed?.installed };
   });

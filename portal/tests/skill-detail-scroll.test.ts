@@ -13,7 +13,7 @@ test("skill identity and actions stay in the header above the scroll region", ()
   assert.match(header, /<Dialog\.Title>\{detail\.name\}<\/Dialog\.Title>/);
   assert.match(header, /label="Close skill details"/);
   assert.match(header, /className="ua-detail-actions"/);
-  assert.match(header, /label="Copy source link"/);
+  assert.match(header, /label="Share skill"/);
   assert.doesNotMatch(header, /className="ua-description"/);
   const content = source.slice(body, source.indexOf("</Dialog.Content>", body));
   assert.match(content, /role="region" aria-label="Skill content" tabIndex=\{0\}/);

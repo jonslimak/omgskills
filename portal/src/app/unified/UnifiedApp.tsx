@@ -32,6 +32,7 @@ import {
   Code,
   Compass,
   Copy,
+  Download,
   FileText,
   FileSearch,
   Folder,
@@ -60,6 +61,7 @@ import {
   SearchX,
   Server,
   Shapes,
+  Share,
   ShieldCheck,
   Smartphone,
   PanelsTopLeft,
@@ -92,6 +94,7 @@ import {
   setAccessSummary,
   starCount,
   agentKind,
+  catalogSkillPath,
   discoverCollectionPage,
   inventorySummary,
   type CatalogDisplay,
@@ -138,6 +141,8 @@ type Props = {
   management?: UnifiedManagement;
   accountPages?: (view: View, theme: string) => ReactNode;
   publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
+  /** Clears a saved install request when the user cancels from the Install button. */
+  onInstallCancel?: () => void;
   /** Shown once on arrival, e.g. after a broken address fell back to Discover. */
   initialNotice?: string;
   supportedAccountViews?: readonly View[];
@@ -428,6 +433,7 @@ export function UnifiedApp({
   management,
   accountPages,
   publicInstallAction,
+  onInstallCancel,
   supportedAccountViews,
   initialNotice = "",
 }: Props) {
@@ -444,6 +450,9 @@ export function UnifiedApp({
   const [actionSkills, setActionSkills] = useState<SkillDisplay[]>([]);
   const [setName, setSetName] = useState("");
   const [notice, setNotice] = useState(initialNotice);
+  // The agent picker opens from the Install button and closes when another skill is shown.
+  const [installOpen, setInstallOpen] = useState(false);
+  useEffect(() => setInstallOpen(false), [nav.selected]);
   const [showHidden, setShowHidden] = useState(false);
   const [collectionPageIndex, setCollectionPageIndex] = useState(0);
   const [expandedSearchScope, setExpandedSearchScope] = useState<string | null>(null);
@@ -613,6 +622,30 @@ export function UnifiedApp({
       setNotice("Source link copied");
     } catch {
       setNotice("Could not copy the link. Open the source instead.");
+    }
+  }
+  async function copyInstall(skill: SkillDisplay) {
+    if (!skill.installCommand) return;
+    try {
+      await navigator.clipboard.writeText(skill.installCommand);
+      setNotice("Install command copied");
+    } catch {
+      setNotice("Could not copy the install command.");
+    }
+  }
+  async function share(skill: SkillDisplay) {
+    if (!skill.catalogId) return;
+    const path = catalogSkillPath(skill.catalogId) ?? `?view=discover&skill=${encodeURIComponent(`catalog:${skill.catalogId}`)}`;
+    const url = new URL(`/app/${path}`, window.location.origin).href;
+    if (navigator.share) {
+      try { await navigator.share({ title: `${skill.name} | omgskills`, url }); return; }
+      catch (error) { if (error instanceof DOMException && error.name === "AbortError") return; }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setNotice("Skill link copied");
+    } catch {
+      setNotice("Could not copy the link.");
     }
   }
   const search = (mobile = false) => (
@@ -1774,6 +1807,18 @@ export function UnifiedApp({
                               {starCount(detail.stars)}
                             </span>
                           )}
+                          {detail.githubUrl && (
+                            <a
+                              className="ua-detail-source"
+                              href={detail.githubUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              aria-label="View source on GitHub"
+                              title="View source on GitHub"
+                            >
+                              <span className="ua-creator-github-mark" aria-hidden="true" />
+                            </a>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1781,22 +1826,39 @@ export function UnifiedApp({
                 </div>
                 {!panelPending && <>
                 <div className="ua-detail-actions">
-                  {detail.githubUrl ? (
-                    <a
-                      className="ua-pill ua-primary"
-                      href={detail.githubUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      View source <ArrowUpRight />
-                    </a>
-                  ) : (
+                  {signedIn && publicInstallAction && detail.catalogId && !detail.installed?.isLocalOnly && (
+                    installOpen ? (
+                      <button
+                        type="button"
+                        className="ua-pill ua-detail-copy"
+                        aria-expanded
+                        onClick={() => { setInstallOpen(false); onInstallCancel?.(); }}
+                      >
+                        Cancel <X />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="ua-pill ua-primary"
+                        aria-expanded={false}
+                        onClick={() => setInstallOpen(true)}
+                      >
+                        Install <Download />
+                      </button>
+                    )
+                  )}
+                  {detail.installCommand ? (
+                    <button type="button" className="ua-pill ua-detail-copy" aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
+                      Copy <Copy />
+                    </button>
+                  ) : !(signedIn && publicInstallAction && detail.catalogId) && (
                     <span className="ua-pill">
                       {detail.installed?.isLocalOnly && <Lock />}
                       {detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Local skill" : "Source unavailable"}
                     </span>
                   )}
-                  {(!readOnlyAccount || management) && signedIn && (detail.installed || (management && detail.catalogId)) && (
+                  <span className="ua-detail-icons">
+                  {(!readOnlyAccount || management) && signedIn && (detail.installed || detail.catalogId) && (
                     <>
                       <IconButton
                         label={
@@ -1819,15 +1881,21 @@ export function UnifiedApp({
                       </IconButton>
                     </>
                   )}
-                  {detail.githubUrl && (
-                    <IconButton
-                      label="Copy source link"
-                      onClick={() => void copySource(detail)}
-                    >
-                      <Copy />
+                  {detail.catalogId && !detail.installed?.isLocalOnly && (
+                    <IconButton label="Share skill" onClick={() => void share(detail)}>
+                      <Share />
                     </IconButton>
                   )}
+                  </span>
+                  {!signedIn && (
+                    <button type="button" className="ua-pill ua-primary ua-detail-signin" onClick={signIn}>
+                      Sign in to manage skills
+                    </button>
+                  )}
                 </div>
+                {installOpen && selected && signedIn && (
+                  <div className="ua-install-card">{publicInstallAction?.(selected, !detailPending)}</div>
+                )}
                 {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}
                 </>}
                 </div>
@@ -1883,7 +1951,6 @@ export function UnifiedApp({
                     </div>}
                   </section>
                 )}
-                {selected && publicInstallAction?.(selected, !detailPending)}
                 {detail.publicUrl && (
                   <a className="ua-link" href={detail.publicUrl} target="_blank" rel="noreferrer">
                     View public skill page <ArrowUpRight />

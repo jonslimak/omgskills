@@ -1,3 +1,4 @@
+import { CatalogInstallIntentStore } from "../../app/unified/catalog-install-intent";
 import type { SkillDisplay } from "../../app/unified/model";
 import { InstallIntentStore } from "../../app/unified/install-intent";
 import { type InstallClient } from "../../app/unified/public-install";
@@ -8,6 +9,11 @@ export { refreshInstallSkill } from "../../app/unified/PublicInstallSetup";
 
 export function createPreviewInstallStore(client: InstallClient = "f1") {
   return new InstallIntentStore(() => window.sessionStorage, client);
+}
+
+/** The production install card's store, for the plain preview's signed-in state. */
+export function createPreviewCatalogStore() {
+  return new CatalogInstallIntentStore(() => window.sessionStorage, "production");
 }
 
 export function PublicInstallSetup({ skill, detailReady, caseKey, returnRoute, store, client = "f1" }: {

@@ -1807,15 +1807,73 @@
   width: 12px;
   height: 12px;
 }
+.ua-detail-source {
+  display: inline-flex;
+  color: var(--ua-muted);
+}
+.ua-detail-source .ua-creator-github-mark {
+  width: 12px;
+  height: 12px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .ua-detail-source:hover {
+    color: var(--ua-ink);
+  }
+}
 .ua-detail-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 .ua-detail-actions .ua-pill {
   min-height: 32px;
+  padding: 0 12px;
+}
+/* The icons wrap as one group, onto a second row when the panel is narrow. */
+.ua-detail-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ua-detail-icons:empty {
+  display: none;
+}
+.ua-detail-actions .ua-detail-copy {
+  color: var(--ua-muted);
+}
+.ua-detail-signin {
+  margin-left: auto;
+}
+.ua-install-card {
+  /* Sits 8px under the buttons that open it (the header's own gap is 16px). */
+  margin-top: -8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--ua-chip);
+  max-height: 50vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* Install sits beside the agent picker at the same height, as a pill. */
+.ua-install-card .ua-install-buttons .ua-f1-install {
+  min-height: 30px;
   padding: 0 14px;
+  border-radius: 999px;
+  line-height: 30px;
+}
+.ua-install-card .ua-install-buttons .ua-f1-install svg {
+  width: 16px;
+  height: 16px;
+}
+.ua-install-card .ua-install-setup {
+  border-top: 0;
+  padding-top: 0;
+  margin: 0;
+}
+.ua-install-card .ua-install-buttons select,
+.ua-install-card .ua-install-setup .ua-f1-install:not(.ua-primary) {
+  background: var(--ua-bg);
 }
 .ua-detail-meta .ua-link {
   font-size: 11px;

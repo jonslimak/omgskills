@@ -142,6 +142,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
       : catalogStore ? (skill, detailReady) => <CatalogInstallSetup key={skill.key}
         skill={skill} detailReady={detailReady} store={catalogStore}
         returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} /> : undefined)}
+    onInstallCancel={() => catalogStore?.clear()}
     readOnlyAccount
     initialNotice={unknownEntry ? "That page wasn't found, so here's Discover." : ""}
     supportedAccountViews={composition?.supportedAccountViews}
