@@ -141,6 +141,8 @@ type Props = {
   management?: UnifiedManagement;
   accountPages?: (view: View, theme: string) => ReactNode;
   publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
+  /** Clears a saved install request when the user cancels from the Install button. */
+  onInstallCancel?: () => void;
   /** Shown once on arrival, e.g. after a broken address fell back to Discover. */
   initialNotice?: string;
   supportedAccountViews?: readonly View[];
@@ -431,6 +433,7 @@ export function UnifiedApp({
   management,
   accountPages,
   publicInstallAction,
+  onInstallCancel,
   supportedAccountViews,
   initialNotice = "",
 }: Props) {
@@ -1824,14 +1827,25 @@ export function UnifiedApp({
                 {!panelPending && <>
                 <div className="ua-detail-actions">
                   {signedIn && publicInstallAction && detail.catalogId && !detail.installed?.isLocalOnly && (
-                    <button
-                      type="button"
-                      className="ua-pill ua-primary"
-                      aria-expanded={installOpen}
-                      onClick={() => setInstallOpen(open => !open)}
-                    >
-                      Install <Download />
-                    </button>
+                    installOpen ? (
+                      <button
+                        type="button"
+                        className="ua-pill ua-detail-copy"
+                        aria-expanded
+                        onClick={() => { setInstallOpen(false); onInstallCancel?.(); }}
+                      >
+                        Cancel <X />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="ua-pill ua-primary"
+                        aria-expanded={false}
+                        onClick={() => setInstallOpen(true)}
+                      >
+                        Install <Download />
+                      </button>
+                    )
                   )}
                   {detail.installCommand ? (
                     <button type="button" className="ua-pill ua-detail-copy" aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>

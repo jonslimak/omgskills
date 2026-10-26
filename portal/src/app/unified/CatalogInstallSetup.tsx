@@ -49,13 +49,15 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
   return <div aria-busy={busy}>
     <div className="ua-install-buttons">
       {picker}
-      {ready ? <button type="button" className="ua-f1-install ua-primary" disabled={!action.href}
-        onClick={() => session.open(skill)}><Download /> Install</button>
-        : <button type="button" className="ua-f1-install ua-primary" disabled={!action.href || busy || state.restartRequired}
-          onClick={() => void session.retry()}><RefreshCw /> {busy ? "Checking details..." : "Try opening again"}</button>}
+      <div className="ua-install-confirm">
+        {ready ? <button type="button" className="ua-f1-install ua-primary" disabled={!action.href}
+          onClick={() => session.open(skill)}>Confirm installation <Download /></button>
+          : <button type="button" className="ua-f1-install ua-primary" disabled={!action.href || busy || state.restartRequired}
+            onClick={() => void session.retry()}><RefreshCw /> {busy ? "Checking details..." : "Try opening again"}</button>}
+        {state.phase !== "setup" && <button type="button" className="ua-link ua-install-setup-link" disabled={!action.href || busy || state.restartRequired}
+          onClick={() => session.showSetup(skill)}>Set up skill management</button>}
+      </div>
     </div>
-    {state.phase !== "setup" && <button type="button" className="ua-link ua-install-setup-link" disabled={!action.href || busy || state.restartRequired}
-      onClick={() => session.showSetup(skill)}>Set up {appName}</button>}
     <p role="status">{!action.href ? action.reason : state.message}</p>
     {state.phase === "setup" && <div className="ua-install-help">
       <h4>Mac setup</h4>
@@ -67,7 +69,7 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
           <li>Double-click <strong>{productionDownload.filename}</strong> in Finder to unzip it.</li>
           <li>Quit OMGSkills if it is running. Move <strong>{productionDownload.app}</strong> into <strong>Applications</strong>.</li>
           <li>Open <strong>{productionDownload.app}</strong> from <strong>Applications</strong>. If macOS asks, choose <strong>Open</strong>.</li>
-          <li>Return here and choose <strong>Try opening again</strong>, then <strong>Install</strong>. Confirm installation in the app.</li>
+          <li>Return here and choose <strong>Try opening again</strong>, then <strong>Confirm installation</strong>. Confirm installation in the app.</li>
         </ol>
         <a href={productionDownload.checksumURL} rel="noreferrer">SHA-256 checksum</a>
       </> : download ? <>
@@ -78,14 +80,14 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
           <li>Inside the disposable VM, double-click <strong>{download.filename}</strong> in Finder to extract it.</li>
           <li>Using Finder, drag <strong>{download.app}</strong> into <strong>~/Applications</strong> (the Applications folder in your home folder). Do not open it from Downloads or the extracted folder.</li>
           <li>Open <strong>{download.app}</strong> from <strong>~/Applications</strong>. If macOS asks, choose <strong>Open</strong>.</li>
-          <li>Return here and choose <strong>Try opening again</strong>, then <strong>Install</strong>.</li>
+          <li>Return here and choose <strong>Try opening again</strong>, then <strong>Confirm installation</strong>.</li>
         </ol>
       </> : <>
         <button type="button" className="ua-f1-install" disabled aria-describedby={downloadId}><Download /> Download for Mac</button>
         <p id={downloadId}>{store.client === "candidate"
         ? "A signed candidate download is not available yet. Test only in a disposable Mac VM; do not replace your normal app."
         : "A compatible test download is not available. Use the prepared OMGSkills F1 Test build."}</p>
-        {store.client === "candidate" && <p>Once the candidate is available, open it in the test VM, return to this page, choose <strong>Try opening again</strong>, then <strong>Install</strong>. The app asks for approval.</p>}
+        {store.client === "candidate" && <p>Once the candidate is available, open it in the test VM, return to this page, choose <strong>Try opening again</strong>, then <strong>Confirm installation</strong>. The app asks for approval.</p>}
       </>}
     </div>}
     {!store.persistent && <p role="note">This browser cannot save setup. Keep this page open.</p>}

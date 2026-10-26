@@ -144,6 +144,7 @@ function Preview() {
         caseKey={f2CaseKey} returnRoute={`${base}${previewSearch(nav)}`} store={installStore!} client={installClient} />
         : (skill, detailReady) => <CatalogInstallSetup key={skill.key} skill={skill} detailReady={detailReady && liveCatalog}
           store={catalogStore} returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} />}
+      onInstallCancel={() => catalogStore.clear()}
       onSession={session}
       state={
         scenario === "loading" || scenario === "error" ? scenario : "ready"
