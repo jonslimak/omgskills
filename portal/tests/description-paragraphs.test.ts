@@ -57,8 +57,31 @@ test("paragraph formatting is confined to the detail description and preserves i
   assert.ok(source.includes('const detailParagraphs = detail ? descriptionParagraphs(detail.description) : [];'));
   assert.ok(source.includes('<div className="ua-description">'));
   assert.ok(source.includes('detailParagraphs.length ? detailParagraphs : ["No description available."]'));
-  assert.ok(source.includes('<p key={index}>{paragraph}</p>'));
+  assert.ok(source.includes('<p key={index}><DescriptionParagraph text={paragraph} /></p>'));
   assert.ok(source.includes('skill.description || "No description available"'));
   const styles = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
   assert.match(styles, /\.ua-description > p \+ p\s*\{\s*margin-top: 12px/);
+});
+
+test("long descriptions summarize to their Use when sentence, short ones stay whole", async () => {
+  const { descriptionSummary } = await import("../src/app/unified/description-paragraphs");
+  const fastapi = "FastAPI best practices and conventions. Use when working with FastAPI APIs, Pydantic models, dependencies, streaming responses including Server-Sent Events (SSE), and serving frontend apps. Keeps FastAPI code clean and up to date with the latest features and patterns.";
+  assert.equal(descriptionSummary(fastapi), "Use when working with FastAPI APIs, Pydantic models, dependencies, streaming responses including Server-Sent Events (SSE), and serving frontend apps.");
+  assert.equal(descriptionSummary("Use when writing a PR body."), null);
+  assert.equal(descriptionSummary(`${"A single long sentence without a break ".repeat(8)}`), null);
+  const phrases = "Launch GStack Browser — AI-controlled Chromium with the sidebar extension baked in. Use when asked to \"open gstack browser\", \"launch browser\", \"connect chrome\", \"open chrome\", or \"control my browser\". Opens a headed window you can watch.";
+  assert.equal(descriptionSummary(phrases), "Launch GStack Browser — AI-controlled Chromium with the sidebar extension baked in.");
+  const none = "Orchestrates git interactive rebases programmatically through GIT_SEQUENCE_EDITOR and edit+amend patterns. Supports squash, reword, drop, fixup, edit, and reorder operations without requiring stdin interaction. Handles conflicts gracefully.";
+  assert.equal(descriptionSummary(none), "Orchestrates git interactive rebases programmatically through GIT_SEQUENCE_EDITOR and edit+amend patterns.");
+  const negative = "Review frontend code under web/ when the user explicitly requests a review or audit of a change. Do not use for implementation-only requests or backend code. Use for PRs, branches and pasted diffs that need a careful look.";
+  assert.equal(descriptionSummary(negative), "Use for PRs, branches and pasted diffs that need a careful look.");
+});
+
+test("the Use when lead-in is found for semi-bold, but not in negative or plain sentences", async () => {
+  const { whenLead } = await import("../src/app/unified/description-paragraphs");
+  assert.equal(whenLead("Use when working with FastAPI APIs."), "Use when");
+  assert.equal(whenLead("This skill should be used when designing interfaces."), "This skill should be used when");
+  assert.equal(whenLead("Use this skill any time a .pptx file is involved."), "Use this skill any time");
+  assert.equal(whenLead("Do not use when the task is small."), "");
+  assert.equal(whenLead("FastAPI best practices and conventions."), "");
 });
