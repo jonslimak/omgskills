@@ -2010,6 +2010,10 @@
   color: var(--ua-ink);
   text-align: right;
 }
+.ua-detail-history {
+  font-size: 12px;
+  color: var(--ua-body);
+}
 .ua-installation {
   border-top: 1px solid var(--ua-line);
   padding-top: 10px;
