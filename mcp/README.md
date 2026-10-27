@@ -14,11 +14,10 @@ IDs are case-insensitive and accept the web app's `catalog:` prefix. Author hand
 
 ## Data Sources
 
-Default remote sources:
+Default remote sources, the same as the hosted server at `https://omgskills.com/mcp`, tried newest first:
 
-- `https://omgskills.com/data/manifest.json`
-- skills JSON from that manifest
-- trending JSON from that manifest
+- `https://omgskills.com/data/crawl4/manifest.json`, then the `v2` and root manifests if it is unavailable
+- the compact search index and skill details from that manifest, plus its trending data
 - `https://raw.githubusercontent.com/jonslimak/omgskills/main/index/gold-basket.json`
 
 Local repo sources:
@@ -34,6 +33,9 @@ Override with environment variables:
 - `OMGSKILLS_GOLD_BASKET_PATH`
 - `OMGSKILLS_MANIFEST_URL`
 - `OMGSKILLS_GOLD_BASKET_URL`
+
+Each local file override works independently. Unset sources use the selected
+manifest and curated URL; setting all three file paths keeps loading offline.
 
 ## Tools
 
