@@ -2,7 +2,7 @@ import type { CatalogDisplay, Navigation } from "./model";
 
 // Document title and head metadata for the app (urls.md step 2, item 4).
 const viewTitles: Partial<Record<Navigation["view"], string>> = {
-  all: "My skills", favorites: "Favorites", sets: "Sets", discover: "Discover", data: "Data",
+  all: "My skills", favorites: "Favorites", sets: "Sets", discover: "Discover", data: "Data", developers: "Developers & Agents",
   top: "Trending skills", collections: "Collections", agents: "Agents", devices: "Devices",
   profile: "Profile", github: "GitHub sources", mcp: "MCP server",
 };

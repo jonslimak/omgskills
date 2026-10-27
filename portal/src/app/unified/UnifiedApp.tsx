@@ -110,6 +110,8 @@ import { discoveryCreatorGroups, featuredProfiles, isCompany } from "./discovery
 import { descriptionParagraphs, descriptionSummary, whenLead } from "./description-paragraphs";
 import { Avatar } from "./Avatar";
 import { DataPage } from "./DataPage";
+import { DevelopersPage } from "./DevelopersPage";
+import { SiteFooter } from "./SiteFooter";
 import { SkillReadme } from "./SkillReadme";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
@@ -537,13 +539,14 @@ export function UnifiedApp({
   const matchingLibrary = publicStatus ? remoteRows : library.filter((skill) => matchesSearch(skill, nav.query));
   const privateSearch = readOnlyAccount && !discovery;
   const dataPage = nav.view === "data" && !nav.query.trim();
-  const publicList = !!publicStatus && !dataPage && (isDiscovery(nav.view) || (!privateSearch && !!nav.query.trim()));
+  const developersPage = nav.view === "developers" && !nav.query.trim();
+  const publicList = !!publicStatus && !dataPage && !developersPage && (isDiscovery(nav.view) || (!privateSearch && !!nav.query.trim()));
   const setPage = !!management && ["set", "favorites"].includes(nav.view);
   const progressiveDiscover = publicList && nav.view === "discover" && !nav.query.trim();
   const metadataOnly = !nav.query.trim() && ["creators", "collections"].includes(nav.view);
   const publicListState = metadataOnly ? publicStatus?.metadata ?? publicStatus?.list : publicStatus?.list;
   const publicListError = metadataOnly ? publicStatus?.metadataError : publicStatus?.error;
-  const listState = dataPage || progressiveDiscover ? "ready" : publicList ? publicListState : setPage && state === "ready" ? management.detail.state : state;
+  const listState = dataPage || developersPage || progressiveDiscover ? "ready" : publicList ? publicListState : setPage && state === "ready" ? management.detail.state : state;
   const canManage = !!management && !management.blocked && !management.busy;
   const editableSet = activeSet?.role === "owner" && !activeSet.hidden && !activeSet.isFavorites;
   const scopeKey = `${nav.view}:${nav.id}:${nav.query}:${nav.source}:${signedIn}`;
@@ -1083,6 +1086,7 @@ export function UnifiedApp({
     sets: "sets",
     discover: "Discover",
     data: "Data",
+    developers: "Developers & Agents",
     top: publicStatus ? "Trending skills" : "Top this week",
     creators: nav.id === "companies" ? "Companies" : "Creators",
     collections: "Collections",
@@ -1520,6 +1524,8 @@ export function UnifiedApp({
                     ) : rows(matchingLibrary)}
                   </section>
                 </div>
+              ) : developersPage ? (
+                <DevelopersPage />
               ) : dataPage ? (
                 <DataPage creators={catalog.creators} onCreator={handle => go("creator", handle)} onSkill={skill => open({
                   key: `catalog:${skill.id}`, catalogId: skill.id, name: skill.name, author: skill.authorHandle,
@@ -1560,6 +1566,7 @@ export function UnifiedApp({
                     <SectionHeading title="Categories" />
                     {CategoryList({})}
                   </section>
+                  <SiteFooter />
                 </>
               ) : nav.view === "collections" ? (
                 CollectionCards({})
