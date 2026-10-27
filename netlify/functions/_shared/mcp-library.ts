@@ -1,4 +1,5 @@
 import { OmgskillsLibrary } from "../../../mcp/src/library.js";
+import { catalogTracks } from "../../../mcp/src/catalog-tracks.js";
 
 export type McpCatalogTrack = {
   name: string;
@@ -35,11 +36,8 @@ export type McpLibraryLoader = {
   };
 };
 
-export const productionMcpTracks: McpCatalogTrack[] = [
-  { name: "crawl4", manifestUrl: "https://omgskills.com/data/crawl4/manifest.json" },
-  { name: "v2", manifestUrl: "https://omgskills.com/data/v2/manifest.json" },
-  { name: "root", manifestUrl: "https://omgskills.com/data/manifest.json" }
-];
+// Defined with the MCP package so npm and hosted read the same catalogs in the same order.
+export const productionMcpTracks: McpCatalogTrack[] = catalogTracks;
 
 export function createMcpLibraryLoader(options: McpLibraryLoaderOptions = {}): McpLibraryLoader {
   const tracks = options.tracks ?? productionMcpTracks;

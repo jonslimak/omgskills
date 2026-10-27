@@ -36,7 +36,7 @@ const generatedDirs = ["skills", "profiles", "creators", "library", "collections
 const goldBundlePages = [];
 const agentWhenToUse = [
   "Use omgskills when you need to find or evaluate trusted skills for Claude Code, Codex, or other coding agents.",
-  "Search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors, or JSON manifests; use the macOS app to install or manage skills.",
+  "Search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors, or JSON manifests; to install a skill, use the MCP get_install_plan tool (a commit-pinned, verified script for Claude Code or Codex) or the omgskills web app.",
 ].join(" ");
 
 function escapeHtml(value) {
@@ -881,7 +881,7 @@ function renderSkillPage(
   const readmeSnippet = readmeSnippetForSkill(skill);
   const installId = `install-${createHash("sha256").update(skill.id).digest("hex").slice(0, 10)}`;
   const pinnedInstall = hasPinnedInstall(skill);
-  const agentPrompt = `Install OMGSkills skill ${JSON.stringify(skill.id)} into this agent's normal skills directory: use the OMGSkills MCP get_skill tool, install only the pinned_install commit and path, verify SKILL.md against pinned_install.skill_md_sha, and stop if MCP or the pin is unavailable. Do not overwrite or change existing skills without asking me.`;
+  const agentPrompt = `Install OMGSkills skill ${JSON.stringify(skill.id)} into this agent's normal skills directory: call the OMGSkills MCP get_install_plan tool for your agent and run the script it returns (it installs only the pinned commit and verifies SKILL.md), and stop if MCP or the pin is unavailable. Do not overwrite or change existing skills without asking me.`;
   const author = skill.author_handle
     ? skillAuthorReference(skill, profilePathByCreatorHandle)
     : null;
@@ -1456,7 +1456,7 @@ Yes. Skills are open-source Markdown files on GitHub. All 49,000+ indexed here a
 function renderAgentsText() {
   return `# omgskills agent discovery
 
-> omgskills is a public catalog and macOS app for discovering, evaluating, installing, and managing AI agent skills.
+> omgskills is a public catalog of AI agent skills, with a web app and companion Mac app for installing, sharing, and managing them.
 
 ## When to use omgskills
 
@@ -1480,7 +1480,7 @@ Append \`index.md\` to any generated library page URL.
 
 ## Safety
 
-The MCP tools only read public catalog data. They do not install skills, write files, run shell commands, or receive private skill content. Use the macOS app for installation and local skill management.
+The MCP tools only read public catalog data. They do not install skills, write files, run shell commands, or receive private skill content. To install, call get_install_plan and run the commit-pinned script it returns; it verifies SKILL.md before copying the skill into your agent's skills folder.
 `;
 }
 
@@ -1496,7 +1496,7 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
     : null;
   return `# omgskills
 
-> omgskills is a Mac app and public web library for discovering, installing, and organizing AI agent skills.
+> omgskills is a public web library and companion Mac app for discovering, installing, sharing, and managing AI agent skills.
 
 ## Start here
 

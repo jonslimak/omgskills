@@ -4,13 +4,14 @@ import { resolve } from "node:path";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import type { Express, Request, Response } from "express";
-import { defaultLibraryPaths, OmgskillsLibrary } from "./library.js";
+import { loadDefaultCatalog } from "./catalog-tracks.js";
+import type { CatalogReader } from "./catalog-reader.js";
 import { createOmgskillsServer } from "./server.js";
 
 const defaultHost = "127.0.0.1";
 const defaultPort = 3000;
 
-export function createOmgskillsHttpApp(library: OmgskillsLibrary): Express {
+export function createOmgskillsHttpApp(library: CatalogReader): Express {
   const app = createMcpExpressApp({ host: defaultHost });
 
   app.post("/mcp", async (request, response) => {
@@ -53,7 +54,7 @@ async function main() {
   }
 
   const port = parsePort(process.env.OMGSKILLS_MCP_PORT);
-  const library = await OmgskillsLibrary.load({ ...defaultLibraryPaths(), ranking: true });
+  const library = await loadDefaultCatalog();
   const app = createOmgskillsHttpApp(library);
   app.listen(port, host, () => {
     console.log(`omgskills MCP development server: http://${host}:${port}/mcp`);
