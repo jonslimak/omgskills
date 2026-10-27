@@ -115,7 +115,7 @@ test("related skills skip the skill itself and its copies", async context => {
   const mcp = await client(context);
   const related = await mcp.callTool({ name: "related_skills", arguments: { id: "twostraws/swiftui-agent-skill:swiftui-pro" } });
   assert.deepEqual(ids(related.structuredContent), ["yusufkaran/swiftui-autotest-skill"]);
-  assert.equal((await mcp.callTool({ name: "related_skills", arguments: { id: "nope/x:y" } })).isError, true);
+  assert.deepEqual((await mcp.callTool({ name: "related_skills", arguments: { id: "nope/x:y" } })).structuredContent, { found: false, count: 0, skills: [] });
 });
 
 test("get_skill_content reads SKILL.md at the pinned commit and checks its hash", async context => {
@@ -135,4 +135,36 @@ test("get_skill_content reads SKILL.md at the pinned commit and checks its hash"
   assert.equal(head.ref, "HEAD"); assert.equal(head.pinned, false); assert.equal(head.verified, false);
   const none = await mcp.callTool({ name: "get_skill_content", arguments: { id: "anthropics/skills:pdf" } });
   assert.equal(none.isError, true); assert.match(text(none), /no recorded SKILL\.md location/);
+});
+
+test("0.2.1: consistent not-found, unscored alternatives, clear long-query errors and a short get_skill text", async context => {
+  const mcp = await client(context);
+  const missing = await mcp.callTool({ name: "related_skills", arguments: { id: "nope/x:y" } });
+  assert.equal(missing.isError, undefined);
+  assert.deepEqual(missing.structuredContent, { found: false, count: 0, skills: [] });
+  assert.match(text(missing), /No skill with ID nope\/x:y/);
+  const plan = (await mcp.callTool({ name: "get_install_plan", arguments: { id: "affaan-m/ecc:react-performance" } })).structuredContent as Record<string, any>;
+  assert.ok(plan.alternatives.length && plan.alternatives.every((row: object) => !("score" in row)));
+  const long = await mcp.callTool({ name: "search_skills", arguments: { query: "x".repeat(2000) } });
+  assert.equal(long.isError, true);
+  assert.match(text(long), /query is too long/);
+  assert.doesNotMatch(text(long), /paging|cursor/i);
+  const wide = await mcp.callTool({ name: "search_skills", arguments: { query: "中".repeat(400) } });
+  assert.equal(wide.isError, true);
+  assert.match(text(wide), /query is too long/);
+  assert.doesNotMatch(text(wide), /invalid_cursor/);
+  const { tools } = await mcp.listTools();
+  const query = (tools.find(tool => tool.name === "search_skills")!.inputSchema.properties as Record<string, { type?: string }>).query;
+  assert.equal(query.type, "string");
+  const skill = await mcp.callTool({ name: "get_skill", arguments: { id: "twostraws/swiftui-agent-skill:swiftui-pro" } });
+  assert.doesNotMatch(text(skill), /^\{/);
+  assert.match(text(skill), /Pinned to twostraws\/swiftui-agent-skill@a{12}\. Read it with get_skill_content/);
+  assert.ok((skill.structuredContent as { skill: { install: unknown } }).skill.install);
+});
+
+test("the npm package reads the same catalog tracks as the hosted server, newest first", async () => {
+  const { catalogTracks } = await import("../src/catalog-tracks.js");
+  const { productionMcpTracks } = await import("../../netlify/functions/_shared/mcp-library.js");
+  assert.equal(productionMcpTracks, catalogTracks);
+  assert.deepEqual(catalogTracks.map(track => track.name), ["crawl4", "v2", "root"]);
 });

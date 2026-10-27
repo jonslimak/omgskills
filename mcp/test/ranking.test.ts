@@ -109,7 +109,7 @@ test("ranked pages traverse the full matching set under all sorts and filters", 
   assert.throws(() => l.searchRankedPage({ ...options, page: { cursor: l.searchPage({ query: "design", limit: 20, page: {} }).page.nextCursor! } }), /different arguments/);
   assert.deepEqual(l.searchRankedPage({ ...options, query: "DESIGN design", page: { cursor } }), l.searchRankedPage({ ...options, page: { cursor } }));
   assert.throws(() => library(skills, "changed").searchRankedPage({ ...options, page: { cursor } }), /catalog changed/i);
-  assert.throws(() => l.searchRankedPage({ ...options, query: "\u4e2d".repeat(400) }), /Invalid paging/);
+  assert.throws(() => l.searchRankedPage({ ...options, query: "\u4e2d".repeat(400) }), /query is too long/);
   assert.throws(() => OmgskillsLibrary.fromData({ skills, trending: [], goldBasket: [] }, "fixture").searchRankedPage(options), /Ranking/);
   const previousPolicy = preparePage("fixture", "search_skills", { query: "design", limit: 20, page: {} },
     { policy: "web-v1:normalization-1:collection-origin-v1", terms: ["design"], exactQuery: "" });

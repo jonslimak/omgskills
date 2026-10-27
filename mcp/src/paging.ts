@@ -38,7 +38,9 @@ export function validatePageOptions(tool: string, options: PageOptions & Partial
     || (options.query !== undefined && (typeof options.query !== "string" || Buffer.byteLength(options.query) > 1024))
     || [options.author, options.tag].some(value => value !== undefined && (typeof value !== "string" || value.length > 100))
     || (options.minStars !== undefined && (!Number.isSafeInteger(options.minStars) || options.minStars < 0)))
-    fail(`Invalid paging arguments: limit must be 1-100, sort one of ${catalogSorts.join(", ")}${tool === "list_trending" ? " (list_trending sorts by trending only)" : ""}, and page either {} or {cursor}.`);
+    fail(options.query !== undefined && typeof options.query === "string" && Buffer.byteLength(options.query) > 1024
+      ? "query is too long (over 1,024 bytes); use a few keywords or a short task description."
+      : `Invalid paging arguments: limit must be 1-100, sort one of ${catalogSorts.join(", ")}${tool === "list_trending" ? " (list_trending sorts by trending only)" : ""}, and page either {} or {cursor}.`);
 }
 
 export function preparePage(version: string | undefined, tool: string, options: PageOptions & Partial<SearchOptions>, ranking?: { policy: string; terms: string[]; exactQuery: string }): PageContext {

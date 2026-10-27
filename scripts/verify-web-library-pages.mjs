@@ -661,7 +661,7 @@ async function verifyLocalRootFile(file) {
   if (file.path === "/agents.md") {
     assertIncludes(contents, "## When to use omgskills", filePath);
     assertIncludes(contents, "read-only MCP endpoint", filePath);
-    assertIncludes(contents, "use the macOS app to install or manage skills", filePath);
+    assertIncludes(contents, "to install a skill, use the MCP get_install_plan tool", filePath);
     assertIncludes(contents, `${publicOrigin}/developers/index.md`, filePath);
     assertIncludes(contents, `${publicOrigin}/.well-known/ai-catalog.json`, filePath);
   }
@@ -976,7 +976,7 @@ async function verifyLiveRootFile(file) {
     }
     assertIncludes(contents, "## When to use omgskills", url);
     assertIncludes(contents, "read-only MCP endpoint", url);
-    assertIncludes(contents, "use the macOS app to install or manage skills", url);
+    assertIncludes(contents, "to install a skill, use the MCP get_install_plan tool", url);
     assertIncludes(contents, `${publicOrigin}/developers/index.md`, url);
     assertIncludes(contents, `${publicOrigin}/.well-known/ai-catalog.json`, url);
   }

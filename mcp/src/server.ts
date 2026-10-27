@@ -7,7 +7,7 @@ import type { RankedSearchOptions } from "./search-ranking.js";
 import { installAgents, installFolderName, installScopes, installScript, installScripts, pinnedInstallFor } from "./install.js";
 import { readSkillContent, SkillContentError } from "./content.js";
 
-export const serverVersion = "0.2.0";
+export const serverVersion = "0.2.1";
 
 const toolAnnotations = {
   readOnlyHint: true,
@@ -60,7 +60,8 @@ const skillListOutputSchema = z.object({
   skills: z.array(skillResultSchema),
   page: pageSchema.optional(),
   search: searchNoteSchema.optional(),
-  missing: z.array(z.string()).optional()
+  missing: z.array(z.string()).optional(),
+  found: z.boolean().optional().describe("related_skills: false when the given ID is not in the catalog.")
 });
 
 const limitArg = (max = 100) => z.number().int().min(1).max(max).default(defaultLimit).describe("Maximum number of skills to return.");
@@ -70,8 +71,12 @@ const pageArg = z.object({ cursor: z.string().optional() }).strict().optional()
   .describe("Paging: omit or {} for the first page, then {cursor: page.nextCursor} with otherwise unchanged arguments.");
 const sortArg = z.enum(catalogSorts).optional().describe("Sort matching skills. Defaults to relevance.");
 
+const tooLongQuery = "query is too long (over 1,000 characters or 1,024 bytes); use a few keywords or a short task description";
 const searchInput = z.object({
-  query: z.string().default("").describe("Keywords or a short task description. Typos are corrected; an empty query lists trending skills."),
+  // The byte limit matches the paging validator, so long CJK or emoji queries fail here with a
+  // normal input error instead of a paging error.
+  query: z.string().max(1000, tooLongQuery).refine(query => Buffer.byteLength(query) <= 1024, tooLongQuery).default("")
+    .describe("Keywords or a short task description. Typos are corrected; an empty query lists trending skills."),
   limit: limitArg(),
   author: z.string().optional().describe("GitHub author handle, case-insensitive, with or without @."),
   tag: z.string().optional().describe("Exact catalog tag, matched case-insensitively."),
@@ -148,7 +153,7 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
       const rawSkill = await library.getSkill(id);
       if (!rawSkill) return result({ found: false, skill: null }, await notFoundText(library, id));
       const skill = publicSkill(rawSkill, { withScore: false, withInstall: true });
-      return result({ found: true, skill }, JSON.stringify(skill));
+      return result({ found: true, skill }, skillText(skill));
     }
   );
 
@@ -226,14 +231,15 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
     "related_skills",
     {
       title: "Related skills",
-      description: "Find other skills for the same job as a given skill, most popular first. Useful when a skill is discovery_only and you need a pinned alternative.",
+      description: "Find other skills for the same job as a given skill: closest matches first, with more popular skills ahead among similar matches. Useful when a skill is discovery_only and you need a pinned alternative.",
       inputSchema: z.object({ id: idArg, limit: limitArg(20).default(5), summary: summaryArg }).strict(),
       outputSchema: skillListOutputSchema,
       annotations: toolAnnotations
     },
     async ({ id, limit, summary }) => {
       const related = await library.relatedSkills?.(id, limit);
-      if (!related) return errorResult("not_found", `No skill with ID ${id}. Use search_skills to find one.`);
+      // Not found is a normal result, the same as get_skill, get_install_plan and get_skill_content.
+      if (!related) return result({ found: false, count: 0, skills: [] }, await notFoundText(library, id));
       const skills = summary ? related : (await Promise.all(related.map(skill => library.getSkill(skill.id)))).flatMap(skill => skill ? [skill] : []);
       return listOutput(skills, summary);
     }
@@ -376,7 +382,12 @@ function publicSkill(skill: SkillResult, options: { withScore?: boolean; withIns
 async function pinnedAlternatives(library: CatalogReader, id: string) {
   const related = (await library.relatedSkills?.(id, 8)) ?? [];
   const full = await Promise.all(related.map(skill => library.getSkill(skill.id)));
-  return full.flatMap(skill => skill && pinnedInstallFor(skill) ? [summarySkill(skill)] : []).slice(0, 3);
+  // A direct lookup has no query, so these rows carry no score.
+  return full.flatMap(skill => {
+    if (!skill || !pinnedInstallFor(skill)) return [];
+    const { score: _score, ...row } = summarySkill(skill);
+    return [row];
+  }).slice(0, 3);
 }
 
 async function notFoundText(library: CatalogReader, id: string) {
@@ -395,6 +406,17 @@ async function notFoundText(library: CatalogReader, id: string) {
 function sharedPrefix(a: string, b: string) { let i = 0; while (i < a.length && a[i] === b[i]) i++; return i; }
 
 const compactNumber = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+/** get_skill's readable summary; structuredContent carries every field, including install scripts. */
+function skillText(skill: PublicSkill) {
+  const pin = skill.pinned_install;
+  return [
+    row(skill).slice(2),
+    skill.github_url ? `Source: ${skill.github_url}${skill.skill_md_path ? ` (${skill.skill_md_path})` : ""}` : "",
+    pin ? `Pinned to ${pin.repo}@${pin.commit_sha.slice(0, 12)}. Read it with get_skill_content; install with get_install_plan (claude_code or codex).`
+      : "discovery_only: no pinned commit, so don't install it from github_url. Use related_skills to find a pinned alternative.",
+  ].filter(Boolean).join("\n");
+}
+
 function row(skill: PublicSkill) {
   const description = (skill.description ?? "").replace(/\s+/g, " ").trim();
   const short = description.length > 160 ? `${description.slice(0, 157).trimEnd()}...` : description;
