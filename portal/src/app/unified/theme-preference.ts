@@ -3,15 +3,15 @@
 export const themeStorageKey = "omgskills-theme";
 export type Theme = "light" | "dark";
 
-export function storedTheme(storage: Pick<Storage, "getItem"> | undefined = globalThis.localStorage): Theme {
+export function storedTheme(storage?: Pick<Storage, "getItem">): Theme {
   try {
-    const value = storage?.getItem(themeStorageKey);
+    const value = (storage ?? globalThis.localStorage)?.getItem(themeStorageKey);
     return value === "dark" ? "dark" : "light";
   } catch {
     return "light";
   }
 }
 
-export function saveTheme(theme: Theme, storage: Pick<Storage, "setItem"> | undefined = globalThis.localStorage) {
-  try { storage?.setItem(themeStorageKey, theme); } catch { /* The theme still works for this visit. */ }
+export function saveTheme(theme: Theme, storage?: Pick<Storage, "setItem">) {
+  try { (storage ?? globalThis.localStorage)?.setItem(themeStorageKey, theme); } catch { /* The theme still works for this visit. */ }
 }
