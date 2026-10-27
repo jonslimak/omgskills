@@ -57,20 +57,31 @@ export function installFolderName(skill: SkillResult, pin: PinnedInstall): strin
 /**
  * A POSIX shell script that fetches exactly the pinned commit, checks SKILL.md against the
  * catalog hash, and copies the skill folder into the agent's skills directory. It never
- * overwrites an existing folder and leaves nothing in /tmp.
+ * overwrites an existing destination and cleans temporary files on failure or exit.
  */
 export function installScript(pin: PinnedInstall, name: string, agent: InstallAgent, scope: InstallScope) {
   const destination = `${skillRoots[agent][scope]}/${name}`;
+  const root = skillRoots[agent][scope].replace(/^~/, "$HOME");
   const steps = [
-    `test ! -e ${destination} || { echo "${destination} already exists; remove it first to reinstall." >&2; exit 1; }`,
+    `destination="${root}/${name}"`,
+    `test ! -e "$destination" && test ! -L "$destination" || { echo "$destination already exists; remove it first to reinstall." >&2; exit 1; }`,
+    `tmp=""; marker=""`,
+    // Only remove an unfinished destination if our unique ownership marker remains.
+    `cleanup() {\n  status=$?\n  trap - 0 HUP INT TERM\n  if [ -n "$marker" ] && [ ! -L "$destination" ] && [ -f "$marker" ]; then rm -rf "$destination" || :; fi\n  if [ -n "$tmp" ]; then rm -rf "$tmp" || :; fi\n  exit "$status"\n}`,
+    `trap cleanup 0`,
+    `trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM`,
     `tmp="$(mktemp -d)"`,
     `git -C "$tmp" init -q`,
     `git -C "$tmp" fetch -q --depth 1 https://github.com/${pin.repo}.git ${pin.commit_sha}`,
     `git -C "$tmp" checkout -q FETCH_HEAD`,
-    `test "$(git -C "$tmp" rev-parse HEAD:${pin.path}/SKILL.md)" = ${pin.skill_md_sha} || { echo "SKILL.md does not match the catalog; not installing." >&2; rm -rf "$tmp"; exit 1; }`,
-    `mkdir -p ${skillRoots[agent][scope]}`,
-    `cp -R "$tmp/${pin.path}" ${destination}`,
-    `rm -rf "$tmp"`
+    `test "$(git -C "$tmp" rev-parse HEAD:${pin.path}/SKILL.md)" = ${pin.skill_md_sha} || { echo "SKILL.md does not match the catalog; not installing." >&2; exit 1; }`,
+    `mkdir -p "${root}"`,
+    `mkdir "$destination" || { echo "$destination already exists; not installing." >&2; exit 1; }`,
+    `marker="$destination/.omgskills-install-\${tmp##*/}"`,
+    `: > "$marker"`,
+    `cp -R "$tmp/${pin.path}/." "$destination/"`,
+    `rm "$marker"`,
+    `marker=""`
   ];
   return { destination, steps, script: ["set -e", ...steps].join("\n") };
 }

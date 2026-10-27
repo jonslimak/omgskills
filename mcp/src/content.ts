@@ -17,6 +17,49 @@ export type SkillContent = {
 
 export class SkillContentError extends Error {}
 
+const largeFileMessage = "SKILL.md is unusually large; not returning it.";
+const redirectMessage = "GitHub redirected somewhere unexpected; not reading it.";
+const unavailableMessage = "GitHub could not be reached. Try again shortly.";
+
+function allowedUrl(url: URL) {
+  return url.origin === "https://raw.githubusercontent.com" && !url.username && !url.password;
+}
+
+async function cancel(response: Response) {
+  await response.body?.cancel().catch(() => {});
+}
+
+async function boundedBytes(response: Response, controller: AbortController) {
+  if (Number(response.headers.get("content-length")) > maxSkillMdBytes) {
+    await cancel(response);
+    controller.abort();
+    throw new SkillContentError(largeFileMessage);
+  }
+  if (!response.body) return new Uint8Array();
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > maxSkillMdBytes) throw new SkillContentError(largeFileMessage);
+      chunks.push(value);
+    }
+    const bytes = new Uint8Array(size);
+    let offset = 0;
+    for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+    return bytes;
+  } catch (error) {
+    controller.abort();
+    await reader.cancel().catch(() => {});
+    throw error instanceof SkillContentError ? error : new SkillContentError(unavailableMessage);
+  } finally {
+    reader.releaseLock();
+  }
+}
+
 /** Reads SKILL.md from GitHub at the pinned commit (or HEAD) and checks it against the catalog hash. */
 export async function readSkillContent(skill: SkillResult, maxChars: number, fetcher: typeof fetch = fetch): Promise<SkillContent> {
   const pin = pinnedInstallFor(skill);
@@ -24,22 +67,37 @@ export async function readSkillContent(skill: SkillResult, maxChars: number, fet
   const parts = skillMdParts(skill.skill_md_path);
   if (!repo || !parts) throw new SkillContentError("This skill has no recorded SKILL.md location, so its text can't be read.");
   const ref = pin?.commit_sha ?? "HEAD";
-  const url = `https://raw.githubusercontent.com/${repo}/${ref}/${parts.map(encodeURIComponent).join("/")}`;
+  let url = new URL(`https://raw.githubusercontent.com/${repo}/${ref}/${parts.map(encodeURIComponent).join("/")}`);
+  const controller = new AbortController();
+  const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(8_000)]);
   let response: Response;
   try {
-    response = await fetcher(url, { redirect: "follow", credentials: "omit", signal: AbortSignal.timeout(8_000),
-      headers: { Accept: "text/plain", "User-Agent": "omgskills-mcp" } });
-  } catch {
-    throw new SkillContentError("GitHub could not be reached. Try again shortly.");
+    for (let redirects = 0; ; redirects++) {
+      response = await fetcher(url.toString(), { redirect: "manual", credentials: "omit", signal,
+        headers: { Accept: "text/plain", "User-Agent": "omgskills-mcp" } });
+      if (response.url && !allowedUrl(new URL(response.url))) {
+        await cancel(response);
+        throw new SkillContentError(redirectMessage);
+      }
+      if (![301, 302, 303, 307, 308].includes(response.status)) break;
+      const location = response.headers.get("location");
+      await cancel(response);
+      if (!location || redirects >= 3) throw new SkillContentError(redirectMessage);
+      const next = new URL(location, url);
+      if (!allowedUrl(next)) throw new SkillContentError(redirectMessage);
+      url = next;
+    }
+  } catch (error) {
+    controller.abort();
+    throw error instanceof SkillContentError ? error : new SkillContentError(unavailableMessage);
   }
-  if (response.url && new URL(response.url).hostname !== "raw.githubusercontent.com") {
-    await response.body?.cancel();
-    throw new SkillContentError("GitHub redirected somewhere unexpected; not reading it.");
+  if (!response.ok) {
+    await cancel(response);
+    controller.abort();
+    if (response.status === 404) throw new SkillContentError(pin ? "SKILL.md is missing at the pinned commit." : "SKILL.md is no longer at its recorded path on the default branch.");
+    throw new SkillContentError(`GitHub returned ${response.status}. Try again shortly.`);
   }
-  if (response.status === 404) throw new SkillContentError(pin ? "SKILL.md is missing at the pinned commit." : "SKILL.md is no longer at its recorded path on the default branch.");
-  if (!response.ok) throw new SkillContentError(`GitHub returned ${response.status}. Try again shortly.`);
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  if (bytes.byteLength > maxSkillMdBytes) throw new SkillContentError("SKILL.md is unusually large; not returning it.");
+  const bytes = await boundedBytes(response, controller);
   const text = new TextDecoder().decode(bytes);
   return {
     id: skill.id,

@@ -81,8 +81,8 @@ test("get_skill returns install scripts for pinned skills and no query score", a
   const pinned = (await mcp.callTool({ name: "get_skill", arguments: { id: "catalog:twostraws/swiftui-agent-skill:swiftui-pro" } })).structuredContent as { skill: Record<string, any> };
   assert.equal(pinned.skill.install_status, "pinned");
   assert.equal("score" in pinned.skill, false);
-  assert.match(pinned.skill.install.claude_code, /~\/\.claude\/skills\/swiftui-pro/);
-  assert.match(pinned.skill.install.codex, /~\/\.codex\/skills\/swiftui-pro/);
+  assert.match(pinned.skill.install.claude_code, /\$HOME\/\.claude\/skills\/swiftui-pro/);
+  assert.match(pinned.skill.install.codex, /\$HOME\/\.codex\/skills\/swiftui-pro/);
   const missing = await mcp.callTool({ name: "get_skill", arguments: { id: "twostraws/swiftui-agent-skill:swiftui-prp" } });
   assert.deepEqual(missing.structuredContent, { found: false, skill: null });
   assert.match(text(missing), /Did you mean: .*swiftui-pro/);
@@ -95,7 +95,8 @@ test("install plans pin the commit, verify SKILL.md and never overwrite or use /
   assert.equal(plan.destination, ".codex/skills/swiftui-pro");
   assert.match(plan.script, new RegExp(`fetch -q --depth 1 https://github.com/twostraws/swiftui-agent-skill.git ${commit}`));
   assert.match(plan.script, new RegExp(`rev-parse HEAD:swiftui-pro/SKILL.md\\)" = ${mdSha}`));
-  assert.match(plan.script, /test ! -e \.codex\/skills\/swiftui-pro/);
+  assert.match(plan.script, /destination="\.codex\/skills\/swiftui-pro"/);
+  assert.match(plan.script, /test ! -e "\$destination" && test ! -L "\$destination"/);
   assert.doesNotMatch(plan.script, /\/tmp\/|ln -s/);
   const unpinned = (await mcp.callTool({ name: "get_install_plan", arguments: { id: "affaan-m/ecc:react-performance" } })).structuredContent as Record<string, any>;
   assert.equal(unpinned.installable, false);

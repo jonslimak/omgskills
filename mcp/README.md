@@ -122,9 +122,10 @@ alternative to a `discovery_only` skill.
 
 Commit-pinned install steps for one agent and scope. The script fetches exactly
 `pinned_install.commit_sha`, checks SKILL.md against `skill_md_sha`, refuses to
-overwrite an existing folder, and copies the skill into `~/.claude/skills`,
+overwrite an existing destination (including symlinks), and copies the skill into `~/.claude/skills`,
 `~/.codex/skills` (user scope) or `.claude/skills`, `.codex/skills` (project scope).
 For `discovery_only` skills it explains why and suggests pinned alternatives.
+Temporary files and incomplete installs are cleaned up on failure or interruption.
 
 ```json
 {
@@ -138,6 +139,9 @@ For `discovery_only` skills it explains why and suggests pinned alternatives.
 
 The skill's SKILL.md, read from GitHub at the pinned commit (or the default branch,
 flagged, for `discovery_only` skills) and checked against the catalog hash.
+Downloads stop at 256 KiB, share an eight-second timeout, and follow at most three
+redirects, only within GitHub's HTTPS raw-content host. Verification uses the full
+download before `max_chars` limits the displayed text.
 
 ```json
 {
