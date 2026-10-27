@@ -28,8 +28,16 @@ export async function lockDevicePairingAccount(client: PoolClient, userId: strin
   );
 }
 
+export async function lockDeviceReconnectKey(client: PoolClient, keyHash: string) {
+  // Take this after the account lock and before device row locks on both paths.
+  await client.query(
+    "SELECT pg_advisory_xact_lock(hashtextextended('omgskills:device-reconnect:' || $1::text, 0))",
+    [keyHash]
+  );
+}
+
 export async function findReconnectDevice(client: PoolClient, userId: string, keyHash: string) {
-  // Key ownership changes are serialized by lockDevicePairingAccount.
+  // Account and reconnect-key locks serialize ownership changes across accounts.
   // A row lock here could deadlock a binding collision with another device's auth.
   const result = await client.query<{ id: string }>(
     `SELECT id FROM device_tokens
@@ -67,6 +75,7 @@ export async function bindDeviceReconnectKey(pool: Pool, req: Request, key: unkn
     const actor = await requireDeviceToken(req, client, "sync:write", now);
     await client.query("BEGIN");
     await lockDevicePairingAccount(client, actor.userId);
+    await lockDeviceReconnectKey(client, keyHash);
     const device = await requireDeviceToken(req, client, "sync:write", now);
     const current = await client.query<{ reconnect_key_hash: string | null }>(
       "SELECT reconnect_key_hash FROM device_tokens WHERE id = $1", [device.deviceId]
@@ -79,6 +88,7 @@ export async function bindDeviceReconnectKey(pool: Pool, req: Request, key: unkn
     if (ownerId !== null && ownerId !== device.deviceId) {
       throw new DeviceReconnectError(409, "Reconnect key is already bound to another connection");
     }
+    await releaseMovedDevice(client, device.userId, keyHash, now);
     await client.query("UPDATE device_tokens SET reconnect_key_hash = $2 WHERE id = $1",
       [device.deviceId, keyHash]);
     await client.query("COMMIT");
