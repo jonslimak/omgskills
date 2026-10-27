@@ -16,6 +16,7 @@ import { stageNetlifyDbMigrations } from "./stage-netlify-db-migrations.mjs";
 import { appDomainRedirects } from "./portal-redirects.mjs";
 import { verifyPortalBuildEnv } from "./portal-build-env.mjs";
 import { takeoverPilotEnabled, writeTakeoverPilot } from "./takeover-pages.mjs";
+import { stagePublicAnimations } from "./stage-public-animations.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.join(repoRoot, "site");
@@ -114,6 +115,7 @@ async function main() {
   await rm(outputDir, { recursive: true, force: true });
   await mkdir(outputDir, { recursive: true });
   await cp(siteDir, outputDir, { recursive: true });
+  await stagePublicAnimations(repoRoot, outputDir);
   for (const track of ["", "v2", "crawl4"]) {
     const dataDir = path.join(outputDir, "data", track);
     const manifestPath = path.join(dataDir, "manifest.json");
