@@ -1,7 +1,8 @@
 // Static-page takeover pilot (urls.md step 2, item 3). Switched on by the reviewed
 // production setting takeoverPilotEnabled (config/production-features.json), or locally
 // by PORTAL_TAKEOVER_PILOT=1; PORTAL_TAKEOVER_PILOT=0 forces it off. It adds the app to
-// one creator page and one skill page. With the switch off, the build output is unchanged.
+// the homepage (which becomes Discover), one creator page and one skill page. With the
+// switch off, the build output is unchanged.
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -11,6 +12,7 @@ export const takeoverPilotEnabled = (env = process.env, features = {}) =>
 // Page URL -> static page it is built from. The skill page keeps its source's canonical
 // (/skills/...) so the new address is not a competing duplicate during the pilot.
 export const takeoverPilotPages = [
+  { url: "/", source: "/" },
   { url: "/library/anthropics/", source: "/library/anthropics/" },
   { url: "/library/anthropics/skills/skills/frontend-design/", source: "/skills/anthropics/skills/skills/frontend-design/" },
 ];

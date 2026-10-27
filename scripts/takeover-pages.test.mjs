@@ -31,7 +31,7 @@ test("a static page keeps its content and metadata, gains the app, and marks its
   assert.throws(() => appShellTags("<html></html>"), /entry script not found/);
 });
 
-test("the pilot writes only the two pilot pages from their static sources", async t => {
+test("the pilot writes only the pilot pages from their static sources", async t => {
   const out = await mkdtemp(path.join(os.tmpdir(), "takeover-pilot-"));
   t.after(() => rm(out, { recursive: true, force: true }));
   await mkdir(path.join(out, "app"), { recursive: true });
