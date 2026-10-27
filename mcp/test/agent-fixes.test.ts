@@ -88,6 +88,13 @@ test("get_skill returns install scripts for pinned skills and no query score", a
   assert.match(text(missing), /Did you mean: .*swiftui-pro/);
 });
 
+test("rejects oversized collections before schema validation", async context => {
+  const mcp = await client(context);
+  const result = await mcp.callTool({ name: "get_skills", arguments: { ids: Array(1000).fill("invalid") } });
+  assert.equal(result.isError, true);
+  assert.match(text(result), /maximum of 128 elements/);
+});
+
 test("install plans pin the commit, verify SKILL.md and never overwrite or use /tmp paths", async context => {
   const mcp = await client(context);
   const plan = (await mcp.callTool({ name: "get_install_plan", arguments: { id: "twostraws/swiftui-agent-skill:swiftui-pro", agent: "codex", scope: "project" } })).structuredContent as Record<string, any>;
