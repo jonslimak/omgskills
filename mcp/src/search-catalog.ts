@@ -192,6 +192,11 @@ export class SearchCatalogReader implements CatalogReader {
     return row ? (await this.hydrate([row]))[0] : undefined;
   }
   searchSkills(options: SearchOptions) { return this.hydrate(this.index.searchSkills(options)); }
+  async searchWithNote(options: SearchOptions) {
+    const result = this.index.searchWithNote(options);
+    return { ...result, skills: await this.hydrate(result.skills) };
+  }
+  relatedSkills(id: string, limit?: number) { return this.index.relatedSkills(id, limit); }
   listTrending(limit?: number) { return this.hydrate(this.index.listTrending(limit)); }
   // Curated rows retain the curated record, even when their ID also exists in the catalog.
   listGoldBasket(limit?: number) { return this.index.listGoldBasket(limit); }
@@ -210,6 +215,8 @@ export class SearchCatalogReader implements CatalogReader {
     return {
       getSkill: id => index.getSkill(id),
       searchSkills: options => index.searchSkills(options),
+      searchWithNote: options => index.searchWithNote(options),
+      relatedSkills: (id, limit) => index.relatedSkills(id, limit),
       listTrending: limit => index.listTrending(limit),
       listGoldBasket: limit => index.listGoldBasket(limit),
       listByAuthor: (author, limit) => index.listByAuthor(author, limit),

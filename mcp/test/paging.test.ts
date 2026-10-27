@@ -26,7 +26,7 @@ function reference(sort: CatalogSort, input = data.skills) {
   return input.slice().sort((a, b) => {
     const i = data.skills.findIndex(row => row.id === a.id), j = data.skills.findIndex(row => row.id === b.id);
     if (sort === "relevance") {
-      const score = (row: Skill, index: number) => 4 + Math.max(0, 10 - (257 - index) / 50) + Math.log10((row.stars ?? 0) + 1);
+      const score = (row: Skill, index: number) => 4 + Math.max(0, 10 - (257 - index) / 50) + 6 * Math.log10((row.stars ?? 0) + 1);
       return score(b, j) - score(a, i) || (b.stars ?? 0) - (a.stars ?? 0) || i - j;
     }
     return (sort === "trending" ? j - i
@@ -58,7 +58,10 @@ test("all sorts page beyond 100 without duplicate or omitted IDs, including one-
   }
   for (const limit of [1, 20, 30, 100]) assert.deepEqual(walk(options => l.listTrendingPage({ limit: options.limit, page: options.page }), "trending", limit), ids(data.skills.slice().reverse()));
   assert.deepEqual(l.searchPage({ query: "workflow", limit: 30, page: {} }).skills, l.searchSkills({ query: "workflow", limit: 30 }));
-  assert.equal(l.searchPage({ query: "", page: {} }).page.total, 0);
+  // An empty search lists trending skills instead of nothing.
+  const empty = l.searchPage({ query: "", page: {} });
+  assert.equal(empty.page.total, 257);
+  assert.deepEqual(empty.search, { showing_trending: true });
   assert.equal(l.searchPage({ query: "no-match", page: {} }).page.nextCursor, null);
   const selected = data.skills.filter(row => row.tags?.includes("even") && row.stars! >= 5);
   const filtered = l.searchPage({ query: "WORKFLOW", author: "OWNER", tag: "EVEN", minStars: 5, sort: "name", limit: 100, page: {} });
@@ -121,20 +124,25 @@ async function connected(context: { after: (fn: () => unknown) => void }, reader
   context.after(async () => { await client.close(); await server.close(); });
   return client;
 }
-test("paging is advertised only by opt-in servers; legacy six-tool responses remain identical", async context => {
+test("paging servers page by default and return the same skills as unpaged servers", async context => {
   const l = library(), old = await connected(context, l, false), candidate = await connected(context, l, true);
   const baselineTools = await old.listTools(), candidateTools = await candidate.listTools();
   assert.deepEqual(baselineTools.tools.map(t => t.name), candidateTools.tools.map(t => t.name));
   assert.equal("page" in baselineTools.tools[0].inputSchema.properties!, false);
   assert.equal("page" in candidateTools.tools[0].inputSchema.properties!, true);
-  for (const [name, args] of [["search_skills", { query: "workflow" }], ["list_by_author", { author: "Owner" }], ["list_trending", {}],
-    ["list_gold_basket", {}], ["get_skill", { id: data.skills[0].id }], ["get_skills", { ids: [data.skills[0].id, "missing"] }]] as [string, object][]) {
+  for (const [name, args] of [["search_skills", { query: "workflow" }], ["list_by_author", { author: "Owner" }], ["list_trending", {}]] as [string, object][]) {
+    const paged = (await candidate.callTool({ name, arguments: args as never })).structuredContent as unknown as SkillPage;
+    const unpaged = (await old.callTool({ name, arguments: args as never })).structuredContent as unknown as SkillPage;
+    assert.deepEqual(paged.skills, unpaged.skills, name);
+    assert.equal(paged.page.total, 257, name); assert.equal(unpaged.page, undefined, name);
+  }
+  for (const [name, args] of [["list_gold_basket", {}], ["get_skill", { id: data.skills[0].id }], ["get_skills", { ids: [data.skills[0].id, "missing"] }]] as [string, object][]) {
     assert.deepEqual(await candidate.callTool({ name, arguments: args as never }), await old.callTool({ name, arguments: args as never }), name);
   }
-  const request = { name: "search_skills", arguments: { query: "workflow", limit: 30, sort: "stars", page: {} } };
+  const request = { name: "search_skills", arguments: { query: "workflow", limit: 30, sort: "stars", page: {}, summary: false } };
   const first = await candidate.callTool(request), content = first.structuredContent as unknown as { count: number } & SkillPage;
   assert.equal(content.page.total, 257); assert.equal(content.count, 30); assert.equal(first.isError, undefined);
-  assert.deepEqual(JSON.parse((first.content as { text: string }[])[0].text), JSON.parse(JSON.stringify(content)));
+  assert.match((first.content as { text: string }[])[0].text, /^30 skills of 257:/);
   assert.equal((content.skills[0] as unknown as { install_status: string }).install_status, "pinned");
   const second = await candidate.callTool({ ...request, arguments: { ...request.arguments, page: { cursor: content.page.nextCursor! } } });
   assert.deepEqual(ids((second.structuredContent as unknown as SkillPage).skills), ids(reference("stars").slice(30, 60)));
@@ -149,12 +157,16 @@ test("paging is advertised only by opt-in servers; legacy six-tool responses rem
     const next = await candidate.callTool({ name, arguments: { ...args, page: { cursor: firstPage.page.nextCursor! } } });
     assert.equal(next.isError, undefined); assert.deepEqual(ids((next.structuredContent as unknown as SkillPage).skills), expected.slice(100, 200));
   }
-  for (const args of [{ query: "workflow", sort: "stars" }, { ...request.arguments, extra: "not-allowed" }, { ...request.arguments, page: { cursor: "bad" } }]) {
-    const result = await candidate.callTool({ name: "search_skills", arguments: args });
-    assert.equal(result.isError, true);
-    assert.deepEqual(JSON.parse((result.content as { text: string }[])[0].text), { error: { code: "invalid_cursor", message: "Invalid paging request or cursor." } });
-    assert.equal(result.structuredContent, undefined);
-  }
+  // sort no longer needs page; unknown arguments are rejected by the schema; bad cursors say what to do.
+  assert.equal((await candidate.callTool({ name: "search_skills", arguments: { query: "workflow", sort: "stars" } })).isError, undefined);
+  const extra = await candidate.callTool({ name: "search_skills", arguments: { ...request.arguments, extra: "not-allowed" } });
+  assert.equal(extra.isError, true); assert.match(JSON.stringify(extra.content), /extra/);
+  const bad = await candidate.callTool({ name: "search_skills", arguments: { ...request.arguments, page: { cursor: "bad" } } });
+  assert.equal(bad.isError, true); assert.equal(bad.structuredContent, undefined);
+  assert.deepEqual(JSON.parse((bad.content as { text: string }[])[0].text).error.code, "invalid_cursor");
+  assert.match(JSON.parse((bad.content as { text: string }[])[0].text).error.message, /Start again with page: \{\}/);
+  const changed = await candidate.callTool({ name: "search_skills", arguments: { ...request.arguments, limit: 20, page: { cursor: content.page.nextCursor! } } });
+  assert.match(JSON.parse((changed.content as { text: string }[])[0].text).error.message, /different arguments/);
   const unsupported: CatalogReader = { getSkill: l.getSkill.bind(l), searchSkills: l.searchSkills.bind(l), listTrending: l.listTrending.bind(l),
     listGoldBasket: l.listGoldBasket.bind(l), listByAuthor: l.listByAuthor.bind(l), getStats: l.getStats.bind(l) };
   const missing = await connected(context, unsupported, true);
@@ -183,7 +195,7 @@ test("corrupt detail shards are availability errors, not successful empty pages"
   const f = catalogFixture(context), compact = await loadCatalogReader(f.url, f.options) as SearchCatalogReader;
   const client = await connected(context, compact, true);
   for (const url of f.files.keys()) if (url.includes("/skill-details-")) f.files.set(url, Buffer.from("[]"));
-  const response = await client.callTool({ name: "search_skills", arguments: { query: "swift", page: {} } });
+  const response = await client.callTool({ name: "search_skills", arguments: { query: "swift", page: {}, summary: false } });
   assert.equal(response.isError, true); assert.match(JSON.stringify(response.content), /catalog_unavailable/);
   assert.equal(response.structuredContent, undefined);
 });

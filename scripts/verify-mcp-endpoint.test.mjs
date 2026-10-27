@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { verifyMcpEndpoint } from "./verify-mcp-endpoint.mjs";
 
-const tools = ["search_skills", "get_skill", "get_skills", "list_trending", "list_gold_basket", "list_by_author"]
+const tools = ["search_skills", "get_skill", "get_skills", "list_trending", "list_gold_basket", "list_by_author",
+  "related_skills", "get_install_plan", "get_skill_content"]
   .map((name) => ({
     name,
-    annotations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false }
+    annotations: { readOnlyHint: true, openWorldHint: name === "get_skill_content", destructiveHint: false }
   }));
 
 function mockFetch({ badTools = false, nullAuthorRank = false, badBatch = false } = {}) {

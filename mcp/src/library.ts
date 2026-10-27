@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { resolve } from "node:path";
-import { compareOptional, compareText, dateKey, nameKey, pageInfo, PagingError, preparePage, validCount,
-  validatePageOptions, type CatalogSort, type PageOptions, type PagedSearchOptions, type SkillPage } from "./paging.js";
+import { compareOptional, compareText, dateKey, defaultLimit, nameKey, pageInfo, PagingError, preparePage, validCount,
+  validatePageOptions, type CatalogSort, type PageOptions, type PagedSearchOptions, type SearchNote, type SkillPage } from "./paging.js";
 import { collectionLikeIds } from "./search-ranking-policy.mjs";
 import { rankedRequest, rankingIdentity, SearchRankingIndex, type RankedSearchOptions } from "./search-ranking.js";
 
@@ -96,13 +96,28 @@ type SearchEntry = {
   tags: string[];
   stars: number;
   signal: number;
+  /** Name with only letters and digits, for exact-name matches such as "swift ui" and "SwiftUI". */
+  nameKey: string;
 };
+type Match = { entry: SearchEntry; score: number };
+type Matches = { list: Match[]; note?: SearchNote };
 
 const searchFieldWeights = [12, 10, 8, 6, 4, 2];
+// Popularity weight per decade of GitHub stars; strong enough that a 6k-star skill outranks a
+// 20-star one with the same name match, but not one that matches the query much better.
+const starWeight = 6;
+const exactNameBonus = 20;
+// Words a task description adds around the skill it needs ("help me make my app faster").
+const genericNameWords = new Set(["skill", "skills", "agent", "agents", "claude", "codex", "code", "pro", "expert", "helper", "tools", "tool", "the"]);
+const fillerWords = new Set(["a", "an", "and", "the", "to", "for", "of", "in", "on", "with", "my", "me", "i", "we", "our",
+  "it", "is", "be", "can", "you", "please", "help", "make", "want", "need", "how", "do", "that", "this", "some", "using", "use"]);
 
 export class OmgskillsLibrary {
   private readonly data: LoadedLibrary;
   private readonly skillsById = new Map<string, Skill>();
+  private readonly idsByLowerId = new Map<string, string>();
+  private readonly entriesById = new Map<string, SearchEntry>();
+  private vocabulary?: Map<string, number>;
   private readonly trendingById = new Map<string, TrendingEntry>();
   private readonly goldById = new Map<string, GoldBasketEntry>();
   private readonly entries: SearchEntry[];
@@ -114,6 +129,9 @@ export class OmgskillsLibrary {
     for (const skill of this.data.skills) this.skillsById.set(skill.id, skill);
     for (const entry of data.trending) this.trendingById.set(entry.id, entry);
     for (const entry of data.goldBasket) this.goldById.set(entry.id, entry);
+    for (const id of [...this.skillsById.keys(), ...this.goldById.keys()]) {
+      if (!this.idsByLowerId.has(id.toLowerCase())) this.idsByLowerId.set(id.toLowerCase(), id);
+    }
 
     this.entries = this.data.skills.map((skill) => ({
       skill,
@@ -121,9 +139,11 @@ export class OmgskillsLibrary {
       author: normalize(skill.author_handle),
       tags: (skill.tags ?? []).map(normalize),
       stars: skill.stars ?? 0,
-      signal: this.signalScore(skill)
+      signal: this.signalScore(skill),
+      nameKey: compactKey(skill.name)
     }));
     for (const entry of this.entries) {
+      this.entriesById.set(entry.skill.id, entry);
       const list = this.entriesByAuthor.get(entry.author);
       if (list) list.push(entry);
       else this.entriesByAuthor.set(entry.author, [entry]);
@@ -179,40 +199,132 @@ export class OmgskillsLibrary {
     };
   }
 
+  /** Accepts IDs in any letter case and the web app's catalog: prefix. */
+  canonicalId(id: string): string | undefined {
+    const trimmed = id.trim().replace(/^catalog:/i, "");
+    if (this.skillsById.has(trimmed) || this.goldById.has(trimmed)) return trimmed;
+    return this.idsByLowerId.get(trimmed.toLowerCase());
+  }
+
   getSkill(id: string): SkillResult | undefined {
-    const skill = this.skillsById.get(id) ?? this.goldById.get(id);
+    const canonical = this.canonicalId(id);
+    const skill = canonical ? this.skillsById.get(canonical) ?? this.goldById.get(canonical) : undefined;
     return skill ? this.enrich(skill, 0) : undefined;
   }
 
   searchSkills(options: SearchOptions): SkillResult[] {
-    return this.matches(options)
+    return this.searchWithNote(options).skills;
+  }
+
+  /** Search results plus how the query was interpreted (typo fix, partial match or trending). */
+  searchWithNote(options: SearchOptions): { skills: SkillResult[]; note?: SearchNote } {
+    const { list, note } = this.matches(options);
+    return { note, skills: list.sort(compareRelevance).slice(0, clampLimit(options.limit))
+      .map(({ entry, score }) => this.enrich(entry.skill, score)) };
+  }
+
+  private matches(options: SearchOptions): Matches {
+    const terms = normalize(options.query).split(" ").filter(Boolean);
+    const filters = {
+      author: options.author ? authorKey(options.author) : undefined,
+      tag: options.tag ? normalize(options.tag) : undefined,
+      minStars: options.minStars ?? 0
+    };
+    // An empty search shows what is trending rather than nothing.
+    if (terms.length === 0 && !filters.author && !filters.tag && filters.minStars === 0) {
+      return { list: this.trendingMatches(), note: { showing_trending: true } };
+    }
+    const strict = this.strictMatches(terms, filters);
+    if (strict.length || terms.length === 0) return { list: strict };
+    const corrected = this.correctTerms(terms);
+    if (corrected) {
+      const fixed = this.strictMatches(corrected, filters);
+      if (fixed.length) return { list: fixed, note: { did_you_mean: corrected.join(" ") } };
+    }
+    const partial = this.partialMatches(terms, filters);
+    return { list: partial, note: partial.length ? { partial_match: true } : undefined };
+  }
+
+  private candidates(filters: { author?: string; tag?: string; minStars: number }) {
+    const pool = filters.author ? this.entriesByAuthor.get(filters.author) ?? [] : this.entries;
+    // !(a < b), not a >= b: records with a missing or invalid star count stay listed.
+    return pool.filter(entry => (!filters.tag || entry.tags.includes(filters.tag)) && !(entry.stars < filters.minStars));
+  }
+
+  private strictMatches(terms: string[], filters: { author?: string; tag?: string; minStars: number }): Match[] {
+    const joined = terms.length > 1 ? [terms.join("")] : undefined;
+    const name = compactKey(terms.join(""));
+    const matches: Match[] = [];
+    for (const entry of this.candidates(filters)) {
+      if (terms.length === 0) { matches.push({ entry, score: entry.signal }); continue; }
+      // "swift ui" also matches "swiftui".
+      let score = Math.max(textScore(entry, terms), joined ? textScore(entry, joined) : 0);
+      if (score <= 0) continue;
+      if (name && entry.nameKey === name) score += exactNameBonus;
+      matches.push({ entry, score });
+    }
+    return matches;
+  }
+
+  /** Skills matching some of the words, best coverage first, for task-like queries. */
+  private partialMatches(terms: string[], filters: { author?: string; tag?: string; minStars: number }): Match[] {
+    const meaningful = terms.filter(term => !fillerWords.has(term));
+    if (!meaningful.length) return [];
+    const matches: Match[] = [];
+    for (const entry of this.candidates(filters)) {
+      let score = entry.signal, matched = 0;
+      for (const term of meaningful) {
+        let hit = false;
+        for (let index = 0; index < entry.fields.length; index++) {
+          if (entry.fields[index].includes(term)) { score += searchFieldWeights[index]; hit = true; }
+        }
+        if (hit) matched++;
+      }
+      if (matched) matches.push({ entry, score: score + matched * 50 });
+    }
+    return matches;
+  }
+
+  /** Replaces unknown words with the closest catalog word (within one or two edits). */
+  private correctTerms(terms: string[]): string[] | undefined {
+    const vocabulary = this.vocabulary ??= buildVocabulary(this.entries);
+    let changed = false;
+    const corrected = terms.map(term => {
+      if (term.length < 4 || vocabulary.has(term)) return term;
+      const maxEdits = term.length <= 5 ? 1 : 2;
+      let best: string | undefined, bestEdits = maxEdits + 1, bestCount = 0;
+      for (const [word, count] of vocabulary) {
+        if (Math.abs(word.length - term.length) > maxEdits) continue;
+        const edits = editDistance(term, word, maxEdits);
+        if (edits < bestEdits || (edits === bestEdits && count > bestCount)) { best = word; bestEdits = edits; bestCount = count; }
+      }
+      if (!best || bestEdits > maxEdits) return term;
+      changed = true;
+      return best;
+    });
+    return changed ? corrected : undefined;
+  }
+
+  /** Other skills for the same job: matches on the skill's name words, most popular first. */
+  relatedSkills(id: string, limit?: number): SkillResult[] | undefined {
+    const canonical = this.canonicalId(id), base = canonical ? this.entriesById.get(canonical) : undefined;
+    if (!base) return undefined;
+    const words = [...new Set(base.fields[0].split(/[^\p{L}\p{N}]+/u))].filter(word => word.length >= 3 && !genericNameWords.has(word));
+    if (!words.length) return [];
+    const author = base.author;
+    return this.partialMatches(words, { minStars: 0 })
+      // Skip the skill itself and its copies under the same author (case or path variants).
+      .filter(({ entry }) => entry !== base && !(entry.author === author && entry.nameKey === base.nameKey))
       .sort(compareRelevance)
-      .slice(0, clampLimit(options.limit))
+      .slice(0, clampLimit(limit))
       .map(({ entry, score }) => this.enrich(entry.skill, score));
   }
 
-  private matches(options: SearchOptions): { entry: SearchEntry; score: number }[] {
-    const query = normalize(options.query);
-    const terms = query.split(" ").filter(Boolean);
-    const author = options.author ? normalize(options.author) : undefined;
-    const tag = options.tag ? normalize(options.tag) : undefined;
-    const minStars = options.minStars ?? 0;
-
-    if (terms.length === 0 && !author && !tag && minStars === 0) {
-      return [];
-    }
-
-    const candidates = author ? this.entriesByAuthor.get(author) ?? [] : this.entries;
-    const matches: { entry: SearchEntry; score: number }[] = [];
-    for (const entry of candidates) {
-      if (tag && !entry.tags.includes(tag)) continue;
-      if (entry.stars < minStars) continue;
-      const score = terms.length === 0 ? entry.signal : textScore(entry, terms);
-      if (terms.length > 0 && score <= 0) continue;
-      matches.push({ entry, score });
-    }
-
-    return matches;
+  private trendingMatches(): Match[] {
+    return this.data.trending.flatMap(row => {
+      const entry = this.entriesById.get(row.id);
+      return entry ? [{ entry, score: Math.max(0, 100 - (row.trending_rank ?? 1000) / 10) }] : [];
+    });
   }
 
   searchPage(options: PagedSearchOptions): SkillPage {
@@ -227,7 +339,7 @@ export class OmgskillsLibrary {
       { policy: rankingIdentity, terms: request.tokens, exactQuery: this.skillsById.has(request.query) ? request.query : "" });
     if (!this.ranking) throw new PagingError("ranking_not_supported");
     if (!request.tokens.length) {
-      const matches = this.matches({ ...options, query: "", author: request.author });
+      const matches = this.matches({ ...options, query: "", author: request.author }).list;
       const page = pageInfo(context, matches.length);
       return { page, skills: this.sortMatches(matches, context.sort).slice(context.offset, context.offset + context.limit).map(({ entry, score }) => this.enrich(entry.skill, score)) };
     }
@@ -248,11 +360,12 @@ export class OmgskillsLibrary {
   }
 
   private matchPage(options: PagedSearchOptions, tool: string): SkillPage {
-    const context = preparePage(this.version, tool, options), matches = this.matches(options);
+    const context = preparePage(this.version, tool, options), { list: matches, note } = this.matches(options);
     for (const { entry } of matches) assertRank(this.trendingById.get(entry.skill.id)?.trending_rank ?? this.goldById.get(entry.skill.id)?.trending_rank);
     const page = pageInfo(context, matches.length);
     const sorted = this.sortMatches(matches, context.sort);
-    return { page, skills: sorted.slice(context.offset, context.offset + context.limit).map(({ entry, score }) => this.enrich(entry.skill, score)) };
+    return { page, ...(note ? { search: note } : {}),
+      skills: sorted.slice(context.offset, context.offset + context.limit).map(({ entry, score }) => this.enrich(entry.skill, score)) };
   }
 
   private sortMatches<T extends { entry: Pick<SearchEntry, "skill" | "stars">; score: number }>(matches: T[], sort: CatalogSort) {
@@ -323,7 +436,7 @@ export class OmgskillsLibrary {
   }
 
   private signalScore(skill: Skill): number {
-    return this.signalScoreById(skill.id) + Math.log10((skill.stars ?? 0) + 1);
+    return this.signalScoreById(skill.id) + starWeight * Math.log10((skill.stars ?? 0) + 1);
   }
 
   private signalScoreById(id: string): number {
@@ -448,9 +561,42 @@ function manifestVersion(manifest: Manifest | undefined, goldBasket: GoldBasketE
 function normalize(value: unknown): string {
   return String(value ?? "").toLowerCase().trim();
 }
+/** GitHub handles are matched case-insensitively, with or without a leading @. */
+export function authorKey(value: unknown): string {
+  return normalize(value).replace(/^@/, "");
+}
+function compactKey(value: unknown): string {
+  return normalize(value).replace(/[^\p{L}\p{N}]+/gu, "");
+}
+
+function buildVocabulary(entries: SearchEntry[]) {
+  const words = new Map<string, number>();
+  for (const entry of entries) {
+    for (const text of [entry.fields[0], ...entry.tags]) {
+      for (const word of text.split(/[^\p{L}\p{N}]+/u)) if (word.length >= 3) words.set(word, (words.get(word) ?? 0) + 1);
+    }
+  }
+  return words;
+}
+
+/** Levenshtein distance, giving up once it exceeds max. */
+function editDistance(a: string, b: string, max: number): number {
+  let previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+  for (let i = 1; i <= a.length; i++) {
+    const current = [i];
+    let rowMin = i;
+    for (let j = 1; j <= b.length; j++) {
+      current[j] = Math.min(previous[j] + 1, current[j - 1] + 1, previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      rowMin = Math.min(rowMin, current[j]);
+    }
+    if (rowMin > max) return max + 1;
+    previous = current;
+  }
+  return previous[b.length];
+}
 
 function clampLimit(limit: number | undefined): number {
-  if (!Number.isFinite(limit ?? 0) || limit === undefined) return 20;
+  if (!Number.isFinite(limit ?? 0) || limit === undefined) return defaultLimit;
   return Math.max(1, Math.min(100, Math.floor(limit)));
 }
 

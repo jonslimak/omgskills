@@ -68,13 +68,14 @@ function responseFor(path, options = {}, features = disabledFeatures) {
       return Response.json({ jsonrpc: "2.0", id: request.id, result: { serverInfo: { name: "omgskills" } } });
     }
     if (request.method === "tools/list") {
-      const annotations = { readOnlyHint: true, openWorldHint: false, destructiveHint: false };
       return Response.json({
         jsonrpc: "2.0",
         id: request.id,
         result: {
-          tools: ["search_skills", "get_skill", "get_skills", "list_trending", "list_gold_basket", "list_by_author"]
-            .map((name) => ({ name, annotations, ...(features.catalogSearchEnabled ? {
+          tools: ["search_skills", "get_skill", "get_skills", "list_trending", "list_gold_basket", "list_by_author",
+            "related_skills", "get_install_plan", "get_skill_content"]
+            .map((name) => ({ name, annotations: { readOnlyHint: true, openWorldHint: name === "get_skill_content", destructiveHint: false },
+              ...(features.catalogSearchEnabled ? {
               inputSchema: { properties: {
                 page: { type: "object" },
                 ...(name === "search_skills" ? { ranking: { const: "web-v1" } } : {}),

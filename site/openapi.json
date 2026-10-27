@@ -114,7 +114,7 @@
       "post": {
         "operationId": "mcpEndpoint",
         "summary": "Hosted MCP server (Streamable HTTP)",
-        "description": "Public, read-only Model Context Protocol endpoint speaking JSON-RPC 2.0 over Streamable HTTP. Connect any MCP client to this URL. Available tools: search_skills, get_skill, list_trending, list_gold_basket, list_by_author. The tools only read public catalog data; they do not install skills, write files, or run commands. Also available as the omgskills-mcp package on npm for local use.",
+        "description": "Public, read-only Model Context Protocol endpoint speaking JSON-RPC 2.0 over Streamable HTTP. Connect any MCP client to this URL. Available tools: search_skills, get_skill, get_skills, list_trending, list_gold_basket, list_by_author, related_skills, get_install_plan, get_skill_content. The tools only read public catalog data (and SKILL.md from GitHub for get_skill_content); they do not install skills, write files, or run commands. get_install_plan returns a script for the agent to run. Also available as the omgskills-mcp package on npm for local use.",
         "requestBody": {
           "required": true,
           "content": {

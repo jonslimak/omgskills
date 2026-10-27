@@ -13,7 +13,7 @@
       "data": {
         "name": "omgskills",
         "description": "Search and inspect the public omgskills agent skill catalog.",
-        "version": "0.1.1",
+        "version": "0.2.0",
         "endpoint": "https://omgskills.com/mcp",
         "transport": "streamable-http",
         "authentication": "none",
@@ -21,11 +21,15 @@
         "tools": [
           {
             "name": "search_skills",
-            "description": "Search skills by keyword with optional author, tag, and minimum-star filters."
+            "description": "Search skills by keywords or a short task, with typo correction and optional author, tag and minimum-star filters."
           },
           {
             "name": "get_skill",
-            "description": "Get one skill by its exact stable catalog ID."
+            "description": "Get one skill by ID, with install status, a pinned install plan and per-agent install scripts."
+          },
+          {
+            "name": "get_skills",
+            "description": "Get up to 30 skills by ID in one read, listing any that were not found."
           },
           {
             "name": "list_trending",
@@ -37,7 +41,19 @@
           },
           {
             "name": "list_by_author",
-            "description": "List skills published by an exact GitHub author handle."
+            "description": "List skills published by a GitHub author handle."
+          },
+          {
+            "name": "related_skills",
+            "description": "Find other skills for the same job, useful for pinned alternatives."
+          },
+          {
+            "name": "get_install_plan",
+            "description": "Get commit-pinned install steps for Claude Code or Codex that verify SKILL.md."
+          },
+          {
+            "name": "get_skill_content",
+            "description": "Read a skill's SKILL.md from GitHub at its pinned commit and check it against the catalog hash."
           }
         ]
       },
@@ -52,17 +68,22 @@
       "capabilities": [
         "search_skills",
         "get_skill",
+        "get_skills",
         "list_trending",
         "list_gold_basket",
-        "list_by_author"
+        "list_by_author",
+        "related_skills",
+        "get_install_plan",
+        "get_skill_content"
       ],
       "representativeQueries": [
         "find a SwiftUI skill",
+        "install a skill for React performance in Codex",
         "show the current trending agent skills",
         "list curated skills from trusted sources",
         "find skills published by Anthropic"
       ],
-      "version": "0.1.1",
+      "version": "0.2.0",
       "metadata": {
         "documentationUrl": "https://omgskills.com/developers/",
         "healthUrl": "https://omgskills.com/mcp/health",

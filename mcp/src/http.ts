@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import type { Express, Request, Response } from "express";
-import { OmgskillsLibrary } from "./library.js";
+import { defaultLibraryPaths, OmgskillsLibrary } from "./library.js";
 import { createOmgskillsServer } from "./server.js";
 
 const defaultHost = "127.0.0.1";
@@ -14,7 +14,7 @@ export function createOmgskillsHttpApp(library: OmgskillsLibrary): Express {
   const app = createMcpExpressApp({ host: defaultHost });
 
   app.post("/mcp", async (request, response) => {
-    const server = createOmgskillsServer(library);
+    const server = createOmgskillsServer(library, { paging: true, ranking: true });
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       enableJsonResponse: true
@@ -53,7 +53,7 @@ async function main() {
   }
 
   const port = parsePort(process.env.OMGSKILLS_MCP_PORT);
-  const library = await OmgskillsLibrary.load();
+  const library = await OmgskillsLibrary.load({ ...defaultLibraryPaths(), ranking: true });
   const app = createOmgskillsHttpApp(library);
   app.listen(port, host, () => {
     console.log(`omgskills MCP development server: http://${host}:${port}/mcp`);

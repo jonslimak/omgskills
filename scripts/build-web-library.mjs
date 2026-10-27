@@ -1060,7 +1060,7 @@ function renderDevelopersPage() {
       <h2>Connect to the live catalog</h2>
       <p>The hosted server is public, read-only, and requires no authentication. Add this server URL to an MCP client:</p>
       <div class="install-box"><pre class="install"><code>${origin}/mcp</code></pre></div>
-      <p>Available tools: <code>search_skills</code>, <code>get_skill</code>, <code>list_trending</code>, <code>list_gold_basket</code>, and <code>list_by_author</code>.</p>
+      <p>Available tools: <code>search_skills</code>, <code>get_skill</code>, <code>get_skills</code>, <code>list_trending</code>, <code>list_gold_basket</code>, <code>list_by_author</code>, <code>related_skills</code>, <code>get_install_plan</code>, and <code>get_skill_content</code>.</p>
     </div>
 
     <div class="section">
@@ -1331,7 +1331,7 @@ ${agentWhenToUse}
 - Authentication: none
 - Access: read-only
 
-Available tools: \`search_skills\`, \`get_skill\`, \`list_trending\`, \`list_gold_basket\`, and \`list_by_author\`.
+Available tools: \`search_skills\`, \`get_skill\`, \`get_skills\`, \`list_trending\`, \`list_gold_basket\`, \`list_by_author\`, \`related_skills\`, \`get_install_plan\`, and \`get_skill_content\`.
 
 ## Local MCP
 
