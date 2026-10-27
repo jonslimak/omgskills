@@ -92,6 +92,11 @@ test("entry reads clean paths, old ?view= links and legacy path routes", () => {
   assert.equal(staticPageAddress("/", "/app/"), true);
   assert.equal(staticPageAddress("/", "/"), false);
   assert.equal(staticPageAddress("/library/anthropics/", "/app/"), true);
+  // The taken-over developers page keeps /developers/; in the app it is /app/developers/.
+  assert.deepEqual(entryNavigation("/developers/", "", "/app/"), nav({ view: "developers" }));
+  assert.deepEqual(entryNavigation("/app/developers/", "", "/app/"), nav({ view: "developers" }));
+  assert.equal(staticPageAddress("/developers/", "/app/"), true);
+  assert.equal(publicNavigationPath(nav({ view: "developers" })), "developers/");
 });
 
 test("signed-out public entries rewrite old links without rewriting private destinations", () => {

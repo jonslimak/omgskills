@@ -102,6 +102,7 @@ export type View =
   | "sets"
   | "discover"
   | "data"
+  | "developers"
   | "top"
   | "creators"
   | "collections"
@@ -120,6 +121,7 @@ const views: View[] = [
   "sets",
   "discover",
   "data",
+  "developers",
   "top",
   "creators",
   "collections",
@@ -223,6 +225,7 @@ export function publicNavigationPath(nav: Navigation): string | null {
   if (nav.selected) return nav.selected.startsWith("catalog:") ? catalogSkillPath(nav.selected.slice(8)) : null;
   if (nav.query && nav.view !== "discover") return null;
   let path: string | null = null;
+  if (nav.view === "developers") return nav.id || nav.query ? null : "developers/";
   if (nav.view === "discover") path = nav.id ? null : "library/";
   else if (nav.view === "creators") path = nav.id === "companies" ? "library/companies/" : nav.id ? null : "library/creators/";
   else if (nav.view === "top" || nav.view === "data" || nav.view === "collections") path = nav.id ? null : `library/${librarySections[nav.view]}/`;
@@ -237,6 +240,7 @@ export function publicNavigationPath(nav: Navigation): string | null {
 }
 
 export function parsePublicNavigationPath(relative: string, search: string): Navigation | null {
+  if (relative === "developers" || relative === "developers/") return { ...initialNavigation, view: "developers" };
   if (relative !== "library" && !relative.startsWith("library/")) return null;
   const parts = relative.slice("library".length).replace(/^\//, "").replace(/\/$/, "");
   let segments: string[];
@@ -270,6 +274,7 @@ export function isDiscovery(view: View) {
   return [
     "discover",
     "data",
+    "developers",
     "top",
     "creators",
     "collections",
