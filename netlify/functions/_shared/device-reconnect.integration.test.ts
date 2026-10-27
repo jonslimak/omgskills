@@ -298,6 +298,99 @@ test("a disconnected Mac's inventory is hidden until the same account reconnects
   });
 });
 
+test("binding an older connection moves the Mac without touching other Macs or its new inventory", async () => {
+  await withSchema(async pool => {
+    const first = await user(pool), second = await user(pool);
+    const moving = await pair(pool, first, key), staying = await pair(pool, first, otherKey);
+    const older = await pair(pool, second);
+    await upload(pool, moving.credential, null);
+    await upload(pool, staying.credential, null);
+    await upload(pool, older.credential, null);
+    const retained = (await rows(pool, "synced_skills")).filter(row => row.device_id !== moving.deviceId);
+    await bindDeviceReconnectKey(pool, request(older.credential), key);
+    await assert.rejects(requireDeviceActor(pool, request(moving.credential), "sync:write"), status(401));
+    assert.equal((await requireDeviceActor(pool, request(staying.credential), "sync:write")).userId, first);
+    assert.equal((await requireDeviceActor(pool, request(older.credential), "sync:write")).userId, second);
+    assert.deepEqual(await rows(pool, "synced_skills"), retained);
+    const devices = await rows(pool, "device_tokens");
+    assert.equal(devices.find(row => row.id === moving.deviceId).reconnect_key_hash, null);
+    assert.equal(devices.find(row => row.id === older.deviceId).reconnect_key_hash, hashReconnectKey(key));
+  });
+});
+
+test("a failed cross-account binding restores the old connection and inventory", async () => {
+  await withSchema(async pool => {
+    const first = await user(pool), second = await user(pool);
+    const moving = await pair(pool, first, key), older = await pair(pool, second);
+    await upload(pool, moving.credential, null);
+    const before = await snapshot(pool), inventory = await rows(pool, "synced_skills");
+    await pool.query(`CREATE FUNCTION reject_move_binding() RETURNS trigger LANGUAGE plpgsql AS $$
+      BEGIN RAISE EXCEPTION 'Synthetic moved binding failure'; END $$;
+      CREATE TRIGGER reject_move_binding BEFORE UPDATE OF reconnect_key_hash ON device_tokens
+      FOR EACH ROW WHEN (NEW.id = '${older.deviceId}'::uuid AND NEW.reconnect_key_hash IS NOT NULL)
+      EXECUTE FUNCTION reject_move_binding()`);
+    await assert.rejects(bindDeviceReconnectKey(pool, request(older.credential), key), /Synthetic moved binding failure/);
+    assert.deepEqual(await snapshot(pool), before);
+    assert.deepEqual(await rows(pool, "synced_skills"), inventory);
+    assert.equal((await requireDeviceActor(pool, request(moving.credential), "sync:write")).userId, first);
+  });
+});
+
+for (const mode of ["exchanges", "bindings", "mixed"] as const) {
+  test(`cross-account ${mode} serialize the same reconnect key and leave only one active owner`, { timeout: 10_000 }, async () => {
+    await withSchema(async pool => {
+      const first = await user(pool), second = await user(pool);
+      const olderFirst = mode === "exchanges" ? null : await pair(pool, first);
+      const olderSecond = mode === "bindings" ? await pair(pool, second) : null;
+      const firstCode = olderFirst ? null : await issuePairingCode(pool, first, { codeChallenge: null });
+      const secondCode = olderSecond ? null : await issuePairingCode(pool, second, { codeChallenge: null });
+      const pids: number[] = [];
+      const observedPool = { connect: async () => {
+        const client = await pool.connect();
+        pids.push((await client.query("SELECT pg_backend_pid() AS pid")).rows[0].pid);
+        return client;
+      } } as unknown as Pool;
+      const locker = await pool.connect();
+      let outcome: Promise<PromiseSettledResult<{ deviceId: string }>[]> | undefined;
+      try {
+        await locker.query("BEGIN");
+        await locker.query("SELECT pg_advisory_xact_lock(hashtextextended('omgskills:device-reconnect:' || $1::text, 0))",
+          [hashReconnectKey(key)]);
+        const exchange = (code: string) => exchangePairingCode(observedPool, {
+          pairingCode: code, deviceName: "Concurrent move", codeVerifier: null, reconnectKey: key
+        });
+        let settled = false;
+        outcome = Promise.allSettled([
+          olderFirst ? bindDeviceReconnectKey(observedPool, request(olderFirst.credential), key) : exchange(firstCode!.code),
+          olderSecond ? bindDeviceReconnectKey(observedPool, request(olderSecond.credential), key) : exchange(secondCode!.code)
+        ]).then(results => { settled = true; return results; });
+        let waiting = false;
+        for (let attempt = 0; attempt < 150; attempt++) {
+          if (pids.length === 2) {
+            const locks = await pool.query("SELECT count(*)::int AS count FROM pg_stat_activity WHERE pid = ANY($1::int[]) AND wait_event_type = 'Lock' AND wait_event = 'advisory'", [pids]);
+            if (locks.rows[0].count === 2) { waiting = true; break; }
+          }
+          if (settled) break;
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        assert.equal(waiting, true, "Both ownership changes must wait on the shared per-Mac lock");
+        await locker.query("COMMIT");
+        const results = await outcome;
+        assert.ok(results.every(result => result.status === "fulfilled"), JSON.stringify(results));
+        const devices = await rows(pool, "device_tokens");
+        const owners = devices.filter(row => row.reconnect_key_hash === hashReconnectKey(key));
+        assert.equal(owners.length, 1);
+        assert.equal(owners[0].revoked_at, null);
+        assert.equal(devices.filter(row => row.revoked_at === null).length, 1);
+      } finally {
+        await locker.query("ROLLBACK");
+        locker.release();
+        if (outcome) await outcome;
+      }
+    });
+  });
+}
+
 test("concurrent approvals reuse one logical Mac; concurrent replay still succeeds only once", async () => {
   await withSchema(async pool => {
     const owner = await user(pool);

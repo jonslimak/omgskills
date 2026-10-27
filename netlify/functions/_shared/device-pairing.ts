@@ -10,7 +10,7 @@ import {
   normalizeDeviceScopes,
   type DeviceScope
 } from "./device-auth.js";
-import { findReconnectDevice, hashReconnectKey, lockDevicePairingAccount, releaseMovedDevice } from "./device-reconnect.js";
+import { findReconnectDevice, hashReconnectKey, lockDevicePairingAccount, lockDeviceReconnectKey, releaseMovedDevice } from "./device-reconnect.js";
 
 export const PAIRING_CODE_TTL_MS = 10 * 60 * 1000;
 export const DEVICE_CREDENTIAL_TTL_MS = 365 * 24 * 60 * 60 * 1000;
@@ -147,7 +147,10 @@ export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) 
     }
 
     await lockDevicePairingAccount(client, pairing.user_id);
-    if (reconnectHash !== null) await releaseMovedDevice(client, pairing.user_id, reconnectHash, now);
+    if (reconnectHash !== null) {
+      await lockDeviceReconnectKey(client, reconnectHash);
+      await releaseMovedDevice(client, pairing.user_id, reconnectHash, now);
+    }
     const reconnectDeviceId = reconnectHash === null ? null
       : await findReconnectDevice(client, pairing.user_id, reconnectHash);
     const deviceCount = await client.query<{ count: string }>(
