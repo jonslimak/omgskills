@@ -39,6 +39,25 @@ export async function findReconnectDevice(client: PoolClient, userId: string, ke
   return result.rows[0]?.id ?? null;
 }
 
+/**
+ * A Mac's reconnect key is per Mac, not per account. Seeing it under another
+ * account means the Mac moved: revoke the old connection and delete the old
+ * account's copy of that Mac's inventory. Same-account reconnects never get here.
+ */
+export async function releaseMovedDevice(client: PoolClient, userId: string, keyHash: string, now: Date) {
+  // Waits for an in-flight upload holding the old device row, then sees its rows.
+  const moved = await client.query<{ id: string }>(
+    `UPDATE device_tokens SET revoked_at = COALESCE(revoked_at, $3), reconnect_key_hash = NULL
+     WHERE user_id <> $1 AND reconnect_key_hash = $2 RETURNING id`,
+    [userId, keyHash, now]
+  );
+  const deviceIds = moved.rows.map(row => row.id);
+  if (deviceIds.length) {
+    await client.query("DELETE FROM synced_skills WHERE device_id = ANY($1::uuid[])", [deviceIds]);
+  }
+  return deviceIds;
+}
+
 export async function bindDeviceReconnectKey(pool: Pool, req: Request, key: unknown, now = new Date()) {
   const keyHash = hashReconnectKey(key);
   const client = await pool.connect();

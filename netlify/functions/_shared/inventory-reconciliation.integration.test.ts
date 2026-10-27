@@ -304,7 +304,8 @@ test("v3 inventory uses one latest completed report per device, including null l
     const before = await snapshot(pool);
     const read = await readSyncInventory(pool, owner, 3, later(4));
     assert.equal(read.inventoryVersion, 3);
-    assert.equal(read.skills.length, 4);
+    assert.equal(read.skills.length, 3);
+    assert.ok(read.skills.every(row => row.deviceId !== b.id), "A revoked Mac's rows are hidden");
     assert.ok(read.skills.every(row => row.id !== before.synced_skills.find(skill => skill.user_id === other)?.id));
     assert.equal(read.devices?.length, 4);
     assert.ok(!read.devices?.some(row => row.id === foreign.id));
@@ -326,14 +327,13 @@ test("v3 inventory uses one latest completed report per device, including null l
     assert.equal(claude.isCurrent, true);
     assert.equal(codex.installationFolder, "same");
     assert.equal(claude.installationFolder, "same");
-    assert.equal(read.skills.find(row => row.deviceId === b.id)?.isCurrent, true);
     const unknown = read.skills.find(row => row.deviceId === null)!;
     assert.equal(unknown.installationFolder, "unknown-mac");
     assert.equal(unknown.isCurrent, false);
     assert.deepEqual((await readSyncInventory(pool, owner, 1, later(4))).skills, []);
     const v2 = await readSyncInventory(pool, owner, 2, later(4));
     assert.equal(v2.inventoryVersion, 2);
-    assert.equal(v2.skills.length, 2);
+    assert.equal(v2.skills.length, 1);
     assert.ok(v2.skills.every(row => row.isCurrent));
     assert.ok(v2.devices?.every(row => !Object.hasOwn(row, "scanCoverage")));
     const otherRead = await readSyncInventory(pool, other, 3, later(4));
