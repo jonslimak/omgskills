@@ -709,7 +709,7 @@ function verifyGuideHtml(html, label) {
   if (!questions.get("Are skills safe?")?.includes("Skills are instructions, not code")) {
     throw new Error(`${label} did not contain the visible skills safety answer in FAQPage JSON-LD`);
   }
-  if (!questions.get("Are skills free?")?.includes("All 49,000+ indexed here are free.")) {
+  if (!questions.get("Are skills free?")?.includes("All 58,000+ indexed here are free.")) {
     throw new Error(`${label} did not contain the visible free-skills answer in FAQPage JSON-LD`);
   }
 }
@@ -719,7 +719,7 @@ function verifyGuideMarkdown(markdown, label) {
   assertIncludes(markdown, "## Are skills safe?", label);
   assertIncludes(markdown, "Skills are instructions, not code", label);
   assertIncludes(markdown, "## Are skills free?", label);
-  assertIncludes(markdown, "All 49,000+ indexed here are free.", label);
+  assertIncludes(markdown, "All 58,000+ indexed here are free.", label);
   assertIncludes(markdown, `${publicOrigin}/guide/`, label);
 }
 
