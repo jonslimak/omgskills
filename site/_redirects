@@ -8,3 +8,6 @@
 /api/v1 /developers/ 302
 /library /app/library/ 302
 /library/ /app/library/ 302
+# The old /home landing page is now the homepage; ads keep their query string.
+/home / 301!
+/home/ / 301!

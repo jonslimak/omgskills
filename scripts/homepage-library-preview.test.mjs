@@ -101,10 +101,11 @@ test("rejects reordered homepage links", () => {
   );
 });
 
-test("the combined Netlify build refreshes static cards before artifact verification", async () => {
+test("the combined Netlify build refreshes homepage content before artifact verification", async () => {
   const source = await readFile(new URL("./build-netlify-site.mjs", import.meta.url), "utf8");
   const copyIndex = source.indexOf("await cp(siteDir, outputDir");
-  const refreshIndex = source.indexOf("await refreshHomepageLibraryPreview");
+  // The landing page's collections, skill pills and top skills (home-preview-content.mjs).
+  const refreshIndex = source.indexOf("await refreshHomePreview");
   const verifyIndex = source.indexOf("await verifyWebLibraryDeployArtifacts");
   assert.ok(copyIndex >= 0);
   assert.ok(refreshIndex > copyIndex);

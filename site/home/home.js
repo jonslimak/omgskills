@@ -24,11 +24,22 @@
     syncAnimation();
   }
   themeButton.hidden = false;
+  // One theme key shared with the web app; links into the library carry the theme shown here,
+  // including a system dark mode the visitor never toggled.
+  const saveTheme = () => {
+    try { localStorage.setItem('omgskills-theme', theme()); } catch { /* Theme still works for this visit. */ }
+  };
   themeButton.addEventListener('click', () => {
     root.dataset.theme = theme() === 'dark' ? 'light' : 'dark';
-    try { localStorage.setItem('omgskills-home-theme', root.dataset.theme); } catch { /* Theme still works for this visit. */ }
+    saveTheme();
     syncTheme();
   });
+  document.addEventListener('click', event => {
+    if (event.target.closest?.('a[href^="/app"]')) saveTheme();
+  }, true);
+  document.addEventListener('submit', event => {
+    if (event.target.getAttribute?.('action')?.startsWith('/app')) saveTheme();
+  }, true);
   themePreference.addEventListener('change', syncTheme);
   syncTheme();
   new IntersectionObserver(([entry]) => {

@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { runInNewContext } from 'node:vm';
-import { renderHomeContent, replaceHomeContent, refreshHomePreview, skillLink } from './home-preview-content.mjs';
+import { homepageCollectionPaths, renderHomeContent, replaceHomeContent, refreshHomePreview, skillLink } from './home-preview-content.mjs';
 
 const ids = ['the-goat-list', 'elite-ui-design', 'build-ios-apps', 'starter-pack', 'design-essentials', 'video-motion-graphics'];
 const collections = ids.map(id => ({id, type: 'topic', title: id, subtitle: 'Useful skills', featuredSkillIds: ['author/repo:skill']}));
@@ -65,6 +65,11 @@ test('renders six real collection destinations and at most ten ranked skills', (
   assert.match(sections.collections, /\/collections\/build-ios-apps\//);
   assert.match(sections.suggestions, /aria-hidden="true" inert/);
   assert.equal(skillLink('author/repo:path/skill'), '/app/?view=discover&skill=catalog%3Aauthor%2Frepo%3Apath%2Fskill');
+  // Published static skill pages are preferred, so the homepage's links are crawlable.
+  assert.equal(skillLink('author/repo:skill', {'author/repo:skill': '/skills/author/repo/skill/'}), '/skills/author/repo/skill/');
+  for (const unsafe of ['https://evil.test/', '/skills/../x/', '/other/x/', '/skills/x']) {
+    assert.equal(skillLink('a/b:c', {'a/b:c': unsafe}), '/app/?view=discover&skill=catalog%3Aa%2Fb%3Ac');
+  }
 });
 
 test('escapes source copy and rejects invalid ranking data', () => {
@@ -86,30 +91,31 @@ test('marker refresh is repeatable and refuses missing or duplicate markers', ()
   assert.throws(() => replaceHomeContent(template + '<!-- home:rankings:start -->', sections));
 });
 
-test('resolves the manifest and only writes the new home page', async () => {
+test('resolves the manifest and fills the homepage', async () => {
   const dir = await mkdtemp(path.join(tmpdir(), 'home-preview-test-'));
   try {
     await mkdir(path.join(dir, 'data/v2'), {recursive: true});
-    await mkdir(path.join(dir, 'home'));
-    await writeFile(path.join(dir, 'index.html'), 'EXISTING HOMEPAGE');
-    await writeFile(path.join(dir, 'home/index.html'), template);
+    await writeFile(path.join(dir, 'index.html'), template);
+    await writeFile(path.join(dir, 'catalog-skill-urls.json'), JSON.stringify({skills: {'author/repo:skill-0': '/skills/author/repo/skill-0/'}}));
     const manifest = {collections: {path: 'collections-abc.json'}, leaderboardViewData: {path: 'leaderboard-view-data-123abc.json'}};
     await writeFile(path.join(dir, 'data/v2/manifest.json'), JSON.stringify(manifest));
     await writeFile(path.join(dir, 'data/v2/collections-abc.json'), JSON.stringify({collections}));
     await writeFile(path.join(dir, 'data/v2/leaderboard-view-data-123abc.json'), JSON.stringify(data));
     await refreshHomePreview({siteDir: dir});
-    assert.match(await readFile(path.join(dir, 'home/index.html'), 'utf8'), /class="rank-row"/);
-    assert.equal(await readFile(path.join(dir, 'index.html'), 'utf8'), 'EXISTING HOMEPAGE');
+    const html = await readFile(path.join(dir, 'index.html'), 'utf8');
+    assert.match(html, /class="rank-row" href="\/skills\/author\/repo\/skill-0\/"/);
+    assert.equal(homepageCollectionPaths(html).length, 6);
     manifest.leaderboardViewData.path = '../private.json';
     await writeFile(path.join(dir, 'data/v2/manifest.json'), JSON.stringify(manifest));
     await assert.rejects(refreshHomePreview({siteDir: dir}), /Invalid leaderboard/);
   } finally { await rm(dir, {recursive: true, force: true}); }
 });
 
-test('page remains isolated, unindexed, and free of prototype dependencies', async () => {
-  const html = await readFile(new URL('../site/home/index.html', import.meta.url), 'utf8');
+test('homepage is indexable and free of prototype dependencies', async () => {
+  const html = await readFile(new URL('../site/index.html', import.meta.url), 'utf8');
   const js = await readFile(new URL('../site/home/home.js', import.meta.url), 'utf8');
-  assert.match(html, /name="robots" content="noindex, nofollow"/);
+  assert.doesNotMatch(html, /name="robots"/);
+  assert.match(html, /<link rel="canonical" href="https:\/\/omgskills.com\/">/);
   assert.ok(!/support\.js|image-slot|<sc-if|DCLogic|\{\{/.test(html));
   assert.ok(!/fetch\(|author-leaderboards-|skills-.*\.json/.test(js));
   assert.match(html, /action="\/app\/"/);
@@ -118,10 +124,11 @@ test('page remains isolated, unindexed, and free of prototype dependencies', asy
 });
 
 test('library links open the app and follow the theme control in the header', async () => {
-  const html = await readFile(new URL('../site/home/index.html', import.meta.url), 'utf8');
+  const html = await readFile(new URL('../site/index.html', import.meta.url), 'utf8');
   const links = [...html.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>(?:Skill library|Explore the library)<\/a>/g)];
-  assert.equal(links.length, 5);
+  assert.equal(links.length, 4);
   for (const link of links) assert.equal(link[1], '/app/');
+  assert.match(html, /<a href="\/app\/">Discover<\/a>/);
   const themeIndex = html.indexOf('id="theme-toggle"');
   const libraryIndex = html.indexOf('class="library-link"');
   assert.ok(themeIndex >= 0 && libraryIndex > themeIndex);
@@ -136,18 +143,19 @@ test('landing artwork matches the demo green in light and dark themes', async ()
 });
 
 test('data refresh preserves the handoff layout and static feature artwork', async () => {
-  const html = await readFile(new URL('../site/home/index.html', import.meta.url), 'utf8');
+  const html = await readFile(new URL('../site/index.html', import.meta.url), 'utf8');
   const refreshed = replaceHomeContent(html, renderHomeContent(collections, data));
   const withoutGeneratedContent = value => value.replace(
     /(<!-- home:(suggestions|collections|rankings):start -->)[\s\S]*?(<!-- home:\2:end -->)/g,
     '$1$3',
   );
   assert.equal(withoutGeneratedContent(refreshed), withoutGeneratedContent(html));
-  assert.match(refreshed, /Your skills, every agent/);
+  assert.match(refreshed, /Your team's skills, every agent/);
   const sectionTitles = [...refreshed.matchAll(/<h2\b[^>]*>([\s\S]*?)<\/h2>/g)];
-  assert.equal(sectionTitles.length, 8);
+  assert.equal(sectionTitles.filter(([tag]) => !tag.includes('site-footer') && !/<h2>(Library|Developers|Company)<\/h2>/.test(tag)).length, 7);
   for (const [, title] of sectionTitles) assert.match(title, /^[A-Z]/);
-  assert.match(refreshed, /<h1 id="hero-title">find &amp; manage<br>trusted skills<\/h1>/);
+  assert.match(refreshed, /<h1 id="hero-title">share skills<br>with your team<\/h1>/);
+  assert.doesNotMatch(refreshed, /mac-section|Download for macOS/);
   assert.match(refreshed, /Example design team set/);
   assert.match(refreshed, /<div class="demo-footer">keep updated<span class="switch" aria-hidden="true"><\/span><\/div>/);
 });

@@ -9,10 +9,10 @@ export function unknownAppAddress(pathname: string, base: string) {
     && parseRoute(pathname, "", base).page === "missing";
 }
 
-/** A static page the app took over keeps its own address: the homepage, /developers/ or
- * /library/... (app.omgskills.com serves the app itself at "/", with base "/".) */
+/** A static page the app took over keeps its own address: /developers/ or /library/...
+ * (app.omgskills.com serves the app itself at "/", with base "/".) */
 export function staticPageAddress(pathname: string, base: string) {
-  return ((pathname === "/" || pathname === "/developers/") && base === "/app/") || pathname.startsWith("/library/");
+  return (pathname === "/developers/" && base === "/app/") || pathname.startsWith("/library/");
 }
 
 // Keep previously shared /app/groups/:id links working in the unified shell.
@@ -23,8 +23,6 @@ export function entryNavigation(pathname: string, search: string, base: string):
   // A static library or developers page taken over by the app keeps its root address.
   const root = pathname.startsWith("/library/") || pathname === "/developers/" ? parsePublicNavigationPath(pathname.slice(1), search) : null;
   if (root) return root;
-  // The taken-over homepage is Discover.
-  if (pathname === "/" && base === "/app/") return { ...initialNavigation, view: "discover" };
   const route = parseRoute(pathname, search, base);
   if (route.page === "detail") return { ...initialNavigation, view: "set", id: route.groupId! };
   if (route.page === "agents") return { ...initialNavigation, view: "agents" };

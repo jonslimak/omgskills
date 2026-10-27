@@ -7,10 +7,7 @@ import {
   catalogSkillUrlsFilename,
   legacyCatalogSkillRedirects,
 } from "./web-library-skill-urls.mjs";
-import {
-  homepageLibraryPaths,
-  verifyHomepageLibraryPreview,
-} from "./homepage-library-preview.mjs";
+import { homepageCollectionPaths } from "./home-preview-content.mjs";
 import { assertIndexStateMatchesSitemap } from "./web-library-index-verification.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
@@ -20,7 +17,8 @@ const publicOrigin = (process.env.PUBLIC_ORIGIN || origin).replace(/\/$/, "");
 const isLive = process.argv.includes("--live");
 const liveFetchAttempts = 3;
 const livePageHtmlByPath = new Map();
-const dynamicLocalPaths = new Set(["/mcp", "/mcp/health"]);
+// Served by functions or by the app build, which is copied into the site after this check.
+const dynamicLocalPaths = new Set(["/mcp", "/mcp/health", "/app/"]);
 
 const editorialCollections = JSON.parse(
   await readFile(path.join(repoRoot, "index", "curations", "collections.json"), "utf8"),
@@ -818,13 +816,20 @@ async function verifyLocalGeneratedRedirects() {
   assertIncludes(contents, "/library/openai  /library/openai/  301", filePath);
 }
 
-async function verifyLocalHomepageLibraryPreview() {
+// The landing page links into the static library through its featured collections.
+function verifyHomepageCollections(html, label) {
+  const paths = homepageCollectionPaths(html);
+  if (paths.length < 6) throw new Error(`${label} must link to its six featured collections; found ${paths.length}`);
+  return paths;
+}
+
+async function verifyLocalHomepage() {
   const filePath = path.join(siteDir, "index.html");
   if (!(await fileExists(filePath))) {
     throw new Error(`Missing homepage: ${filePath}`);
   }
   const html = await readFile(filePath, "utf8");
-  verifyHomepageLibraryPreview(html, filePath);
+  const collectionPaths = verifyHomepageCollections(html, filePath);
   verifyHomepageTrustMetadata(html, filePath);
   assertIncludes(html, '<a href="/developers/">Developer resources</a>', filePath);
   for (const requiredPath of ["/about/", "/banner.webp", "/images/guide/share.png"]) {
@@ -837,9 +842,9 @@ async function verifyLocalHomepageLibraryPreview() {
   assertIncludes(aboutHtml, '<link rel="canonical" href="https://omgskills.com/about/">', aboutPath);
   assertIncludes(aboutHtml, "<h1>About omgskills</h1>", aboutPath);
   assertIncludes(aboutHtml, '<a href="/developers/">developer resources</a>', aboutPath);
-  for (const urlPath of homepageLibraryPaths) {
+  for (const urlPath of collectionPaths) {
     if (!(await localUrlExists(urlPath))) {
-      throw new Error(`${filePath} linked to a missing profile page: ${urlPath}`);
+      throw new Error(`${filePath} linked to a missing collection page: ${urlPath}`);
     }
   }
 }
@@ -878,14 +883,14 @@ async function verifyLivePage(page) {
   assertIncludes(markdown, page.canonical, markdownUrl);
 }
 
-async function verifyLiveHomepageLibraryPreview() {
+async function verifyLiveHomepage() {
   const url = `${origin}/`;
   const response = await fetchLive(url, { redirect: "manual" });
   if (response.status !== 200) {
     throw new Error(`${url} returned ${response.status}, expected 200`);
   }
   const html = await response.text();
-  verifyHomepageLibraryPreview(html, url);
+  verifyHomepageCollections(html, url);
   verifyHomepageTrustMetadata(html, url);
   assertIncludes(html, '<a href="/developers/">Developer resources</a>', url);
   await verifyLiveInternalLinks(html, url);
@@ -1057,7 +1062,7 @@ async function verifyLiveNotFound(urlPath) {
 
 async function main() {
   if (isLive) {
-    await verifyLiveHomepageLibraryPreview();
+    await verifyLiveHomepage();
     await verifyLiveGuide();
     for (const page of pages) await verifyLivePage(page);
     for (const file of rootFiles) await verifyLiveRootFile(file);
@@ -1080,7 +1085,7 @@ async function main() {
   }
 
   for (const page of pages) await verifyLocalPage(page);
-  await verifyLocalHomepageLibraryPreview();
+  await verifyLocalHomepage();
   await verifyLocalGuide();
   for (const file of rootFiles) await verifyLocalRootFile(file);
   await verifyLocalCatalogSkillUrls();

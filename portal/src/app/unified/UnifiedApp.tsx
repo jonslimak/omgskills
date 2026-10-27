@@ -112,6 +112,7 @@ import { Avatar } from "./Avatar";
 import { DataPage } from "./DataPage";
 import { DevelopersPage } from "./DevelopersPage";
 import { SiteFooter } from "./SiteFooter";
+import { saveTheme, storedTheme, type Theme } from "./theme-preference";
 import { SkillReadme } from "./SkillReadme";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
@@ -446,7 +447,8 @@ export function UnifiedApp({
 }: Props) {
   const supportsView = (view: View) => !supportedAccountViews || isDiscovery(view) || supportedAccountViews.includes(view);
   const [rail, setRail] = useState(false);
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState<Theme>(() => storedTheme());
+  useEffect(() => saveTheme(theme), [theme]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerNavigating = useRef(false);
   const [editing, setEditing] = useState(false);

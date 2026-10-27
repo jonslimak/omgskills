@@ -3,23 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>omgskills - find and install skills for Claude Code and Codex</title>
-  <meta name="description" content="Search 49,000+ agent skills from trusted creators, read their docs, and install them in Claude Code and Codex. Open web library with a free companion Mac app.">
+  <title>omgskills - share agent skills with your team (Claude Code &amp; Codex)</title>
+  <meta name="description" content="Put your team's agent skills in one place. Share a set once, and everyone's Claude Code and Codex stay in sync. Free, with an open library of 49,000+ skills.">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://omgskills.com/">
   <link rel="alternate" type="application/ai-catalog+json" href="/.well-known/ai-catalog.json">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="omgskills">
-  <meta property="og:title" content="omgskills - find and install skills for Claude Code and Codex">
-  <meta property="og:description" content="Search 49,000+ agent skills from trusted creators, read their docs, and install them in Claude Code and Codex. Open web library with a free companion Mac app.">
+  <meta property="og:title" content="omgskills - share agent skills with your team (Claude Code &amp; Codex)">
+  <meta property="og:description" content="Put your team's agent skills in one place. Share a set once, and everyone's Claude Code and Codex stay in sync. Free, with an open library of 49,000+ skills.">
   <meta property="og:url" content="https://omgskills.com/">
   <meta property="og:image" content="https://omgskills.com/images/guide/share.png?v=20260822">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="omgskills skills library social preview">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="omgskills - find and install skills for Claude Code and Codex">
-  <meta name="twitter:description" content="Search 49,000+ agent skills from trusted creators, read their docs, and install them in Claude Code and Codex. Open web library with a free companion Mac app.">
+  <meta name="twitter:title" content="omgskills - share agent skills with your team (Claude Code &amp; Codex)">
+  <meta name="twitter:description" content="Put your team's agent skills in one place. Share a set once, and everyone's Claude Code and Codex stay in sync. Free, with an open library of 49,000+ skills.">
   <meta name="twitter:image" content="https://omgskills.com/images/guide/share.png?v=20260822">
   <meta name="twitter:image:alt" content="omgskills skills library social preview">
   <script type="application/ld+json">
@@ -114,223 +114,139 @@
     })(window,document,'script','https://bzrcdn.openai.com/sdk/oaiq.min.js');
   </script>
   <!-- End OpenAI Ads Measurement Pixel -->
-  <style>
-    :root { color-scheme: light; }
-    body { margin: 0; background: #ffffff; color: #0d0d0d; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    main { max-width: 880px; margin: 0 auto; padding: 56px 24px 0; }
-    .home-intro h1 { margin: 0; font-size: clamp(32px, 6vw, 52px); line-height: 1.1; letter-spacing: -0.02em; }
-    .home-intro p { margin: 16px 0 0; max-width: 56ch; color: #6b7280; font-size: 17px; line-height: 1.5; }
-    .home-search { display: flex; gap: 8px; margin-top: 28px; }
-    .home-search input { flex: 1; min-width: 0; padding: 12px 14px; border: 1px solid #d1d5db; border-radius: 10px; font: inherit; }
-    .home-search button, .home-actions a { padding: 12px 18px; border: 0; border-radius: 10px; background: #0d0d0d; color: #ffffff; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
-    .home-actions { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 20px; }
-    .home-actions a.secondary { background: none; color: #0d0d0d; padding: 0; }
-    .library-preview { margin-top: 56px; }
-    .library-preview h2 { margin: 0 0 16px; font-size: 22px; }
-    .library-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
-    .library-profile-card { display: block; padding: 16px; border: 1px solid #e5e7eb; border-radius: 12px; color: inherit; text-decoration: none; }
-    .library-profile-card:hover { border-color: #9ca3af; }
-    .library-profile-heading { display: flex; gap: 10px; align-items: center; }
-    .library-profile-heading h3 { margin: 0; font-size: 15px; }
-    .library-profile-image { display: grid; place-items: center; width: 32px; height: 32px; flex: none; overflow: hidden; border-radius: 8px; background: #f3f4f6; }
-    .library-profile-image img { grid-area: 1 / 1; width: 100%; height: 100%; object-fit: cover; }
-    .library-profile-image > span { grid-area: 1 / 1; }
-    .library-profile-subtitle, .library-profile-description { margin: 8px 0 0; color: #6b7280; font-size: 13px; line-height: 1.45; }
-    .library-preview-more { display: inline-block; margin-top: 16px; color: #0d0d0d; font-weight: 600; }
-  </style>
+  <script src="/home/theme.js"></script>
+  <link rel="stylesheet" href="/home/home.css">
+  <script src="/home/home.js?v=3" defer></script>
 </head>
 <body>
-  <main>
-    <section class="home-intro" aria-labelledby="home-title">
-      <h1 id="home-title">Find and install the best skills for Claude Code and Codex</h1>
-      <p>Search 49,000+ skills from trusted creators on GitHub and X, read their docs, and install them in one click. Free, and no account needed to browse.</p>
-      <form class="home-search" action="/app/" method="get" role="search">
-        <input type="hidden" name="view" value="discover">
-        <input type="search" name="q" placeholder="Search skills" aria-label="Search skills">
-        <button type="submit">Search</button>
-      </form>
-      <div class="home-actions">
-        <a href="/app/" data-humblytics="Home Open Library">Open the library</a>
-        <a class="secondary" href="/home/" data-humblytics="Home Get Mac App"><span class="apple-icon" aria-hidden="true">&#63743;</span> Get the Mac app</a>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="nav">
+    <a class="eyes" href="/" aria-label="omgskills home">&#128064;</a>
+    <nav aria-label="Main navigation">
+      <button class="icon-button" id="theme-toggle" aria-label="Switch to dark mode" title="Switch to dark mode" hidden><svg aria-hidden="true"><use href="/home/icons.svg#sun"></use></svg></button>
+      <a class="library-link" href="/app/" data-humblytics="Home Nav Library">Skill library</a>
+      <a class="button small" href="/app/" data-humblytics="Home Nav Sign In">Sign in</a>
+    </nav>
+  </header>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-text">
+      <h1 id="hero-title">share skills<br>with your team</h1>
+      <p class="hero-copy">Put your team's agent skills in one place. Share a set once, and everyone's Claude Code and Codex stay in sync.</p>
+      <div class="actions hero-actions"><a class="button" href="/app/?view=sets" data-humblytics="Home Hero Create Team Set">Create a team set</a><a class="button secondary" href="/app/" data-humblytics="Home Hero Explore Library">Explore the library</a></div>
+      </div>
+      <div class="hero-visual">
+        <iframe id="library-animation" src="/home/animation.html" title="Illustration of discovering, organizing, and sharing skills" width="470" height="540" scrolling="no"></iframe>
       </div>
     </section>
 
-    <section class="library-preview" aria-labelledby="library-preview-title">
-      <h2 id="library-preview-title">Skills by trusted creators</h2>
-      <div class="library-preview-grid" id="library-preview-grid">
-        <!-- homepage-library-preview:start -->
-        <a class="library-profile-card" href="/library/anthropics/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/anthropics.png?size=128" alt="Anthropic profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Anthropic</h3>
-          </div>
-          <p class="library-profile-subtitle">Official Claude skills</p>
-          <p class="library-profile-description">Official skills for documents, frontend work, testing, and Claude API tasks.</p>
-        </a>
-        <a class="library-profile-card" href="/library/openai/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/openai.png?size=128" alt="OpenAI profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>OpenAI</h3>
-          </div>
-          <p class="library-profile-subtitle">Codex developer tools</p>
-          <p class="library-profile-description">OpenAI skills for code review, pull requests, testing, and Codex extensions.</p>
-        </a>
-        <a class="library-profile-card" href="/library/shadcn/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/shadcn.png?size=128" alt="shadcn profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>shadcn</h3>
-          </div>
-          <p class="library-profile-subtitle">Interface component systems</p>
-          <p class="library-profile-description">Tools for building and improving clean, consistent frontend interfaces.</p>
-        </a>
-        <a class="library-profile-card" href="/library/github/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/github.png?size=128" alt="GitHub profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>GitHub</h3>
-          </div>
-          <p class="library-profile-subtitle">Developer platform tooling</p>
-          <p class="library-profile-description">Skills for specifications, governance, repositories, and developer operations.</p>
-        </a>
-        <a class="library-profile-card" href="/library/mattpocock/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/mattpocock.png?size=128" alt="Matt Pocock profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Matt Pocock</h3>
-          </div>
-          <p class="library-profile-subtitle">Practical TypeScript education</p>
-          <p class="library-profile-description">Practical skills for diagnosis, prototyping, TDD, planning, and interface design.</p>
-        </a>
-        <a class="library-profile-card" href="/library/google-gemini/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/google-gemini.png?size=128" alt="Google Gemini profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Google Gemini</h3>
-          </div>
-          <p class="library-profile-subtitle">Gemini developer tools</p>
-          <p class="library-profile-description">Gemini skills for reviews, documentation, CI, and issue handling.</p>
-        </a>
-        <a class="library-profile-card" href="/library/simonw/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/simonw.png?size=128" alt="Simon Willison profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Simon Willison</h3>
-          </div>
-          <p class="library-profile-subtitle">Data and AI research</p>
-          <p class="library-profile-description">Research-driven tools for data systems, agents, and practical experimentation.</p>
-        </a>
-        <a class="library-profile-card" href="/library/microsoft/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/microsoft.png?size=128" alt="Microsoft profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Microsoft</h3>
-          </div>
-          <p class="library-profile-subtitle">Open source engineering</p>
-          <p class="library-profile-description">Engineering skills for accessibility, pipelines, agents, and developer tooling.</p>
-        </a>
-        <a class="library-profile-card" href="/library/addyosmani/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/addyosmani.png?size=128" alt="Addy Osmani profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Addy Osmani</h3>
-          </div>
-          <p class="library-profile-subtitle">Web performance engineering</p>
-          <p class="library-profile-description">Skills for performance, planning, quality, migrations, and frontend execution.</p>
-        </a>
-        <a class="library-profile-card" href="/library/stripe/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/stripe.png?size=128" alt="Stripe profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Stripe</h3>
-          </div>
-          <p class="library-profile-subtitle">Payments infrastructure tools</p>
-          <p class="library-profile-description">Stripe skills for payments, integrations, upgrades, and AI commerce.</p>
-        </a>
-        <a class="library-profile-card" href="/library/steipete/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/steipete.png?size=128" alt="Peter Steinberger profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Peter Steinberger</h3>
-          </div>
-          <p class="library-profile-subtitle">Personal automation tools</p>
-          <p class="library-profile-description">Practical agent tools for everyday applications, research, and development.</p>
-        </a>
-        <a class="library-profile-card" href="/library/huggingface/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/huggingface.png?size=128" alt="Hugging Face profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Hugging Face</h3>
-          </div>
-          <p class="library-profile-subtitle">Open model development</p>
-          <p class="library-profile-description">Skills for models, datasets, evaluations, training, and community tooling.</p>
-        </a>
-        <a class="library-profile-card" href="/library/antfu/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/antfu.png?size=128" alt="Anthony Fu profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Anthony Fu</h3>
-          </div>
-          <p class="library-profile-subtitle">Vue ecosystem tooling</p>
-          <p class="library-profile-description">Open-source skills for Vue, Vite, Nuxt, and modern web development.</p>
-        </a>
-        <a class="library-profile-card" href="/library/supabase/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/supabase.png?size=128" alt="Supabase profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Supabase</h3>
-          </div>
-          <p class="library-profile-subtitle">Postgres app development</p>
-          <p class="library-profile-description">Supabase skills for SQL, Studio testing, interfaces, and telemetry.</p>
-        </a>
-        <a class="library-profile-card" href="/library/obra/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/obra.png?size=128" alt="Jesse Vincent (obra) profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Jesse Vincent (obra)</h3>
-          </div>
-          <p class="library-profile-subtitle">Agentic engineering practices</p>
-          <p class="library-profile-description">Skills for debugging, reviews, planning, testing, and parallel execution.</p>
-        </a>
-        <a class="library-profile-card" href="/library/vercel-labs/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/vercel-labs.png?size=128" alt="Vercel Labs profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Vercel Labs</h3>
-          </div>
-          <p class="library-profile-subtitle">Experimental agent tools</p>
-          <p class="library-profile-description">Experimental tools for agent browsers, deployment, and application development.</p>
-        </a>
-        <a class="library-profile-card" href="/library/kepano/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/kepano.png?size=128" alt="Steph Ango (kepano) profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Steph Ango (kepano)</h3>
-          </div>
-          <p class="library-profile-subtitle">Knowledge management tools</p>
-          <p class="library-profile-description">Thoughtful tools for notes, Markdown, canvases, and personal knowledge.</p>
-        </a>
-        <a class="library-profile-card" href="/library/garrytan/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://github.com/garrytan.png?size=128" alt="Garry Tan profile image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Garry Tan</h3>
-          </div>
-          <p class="library-profile-subtitle">Founder execution systems</p>
-          <p class="library-profile-description">GStack tools for planning, research, benchmarking, and founder-led execution.</p>
-        </a>
-        <a class="library-profile-card" href="/collections/build-ios-apps/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://omgskills.com/images/collections/build-ios-apps.webp?v=2568d3588edb" alt="Best iOS Skills collection image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Best iOS Skills</h3>
-          </div>
-          <p class="library-profile-subtitle">Pixel perfect, and performant apps </p>
-          <p class="library-profile-description">Follow apples best practices when shipping native iOS apps.</p>
-        </a>
-        <a class="library-profile-card" href="/collections/elite-ui-design/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://omgskills.com/images/collections/elite-ui-design.webp?v=8192d765758c" alt="Best Design Skills collection image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Best Design Skills</h3>
-          </div>
-          <p class="library-profile-subtitle">What worldclass designers are using</p>
-          <p class="library-profile-description">A compact set of skills for stronger results and design quality.</p>
-        </a>
-        <a class="library-profile-card" href="/collections/the-goat-list/">
-          <div class="library-profile-heading">
-            <span class="library-profile-image"><span aria-hidden="true">&#128064;</span><img src="https://omgskills.com/images/collections/the-goat-list.webp?v=51657bb109a0" alt="Best Skills collection image" loading="lazy" decoding="async" onerror="this.remove()"></span>
-            <h3>Best Skills</h3>
-          </div>
-          <p class="library-profile-subtitle">The skills that re-define how we work with ai</p>
-          <p class="library-profile-description">Some of the most used skills across many categories. </p>
-        </a>
-        <!-- homepage-library-preview:end -->
+    <section class="slab search-section" aria-labelledby="search-title">
+      <div class="section-inner">
+        <h2 id="search-title">Find skills worth sharing</h2>
+        <p class="section-copy">49,000+ skills from creators you trust. Find one, add it to a set.</p>
+        <form class="search" action="/app/" method="get" role="search" data-humblytics="Home Search">
+          <input type="hidden" name="view" value="discover">
+          <svg aria-hidden="true"><use href="/home/icons.svg#search"></use></svg>
+          <label class="sr-only" for="skill-query">Search skills, tools or creators</label>
+          <input id="skill-query" name="q" type="search" placeholder="search skills, tools or creators" required maxlength="200">
+          <button class="icon-button" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="/home/icons.svg#arrow-right"></use></svg></button>
+        </form>
+        <div class="suggestion-window" aria-label="Suggested skills">
+          <!-- home:suggestions:start -->
+<div class="suggestion-track"><div class="suggestion-set"><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Agarrytan%2Fgstack"><img class="avatar" src="https://github.com/garrytan.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>gstack</span><span class="handle">@garrytan</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Amattpocock%2Fskills%3Agrill-me"><img class="avatar" src="https://github.com/mattpocock.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>grill-me</span><span class="handle">@mattpocock</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Amattpocock%2Fskills%3Adesign-an-interface"><img class="avatar" src="https://github.com/mattpocock.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>design-an-interface</span><span class="handle">@mattpocock</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Ablader%2Fhumanizer"><img class="avatar" src="https://github.com/blader.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>humanizer</span><span class="handle">@blader</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Acoreyhaines31%2Fmarketingskills%3Acustomer-research"><img class="avatar" src="https://github.com/coreyhaines31.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>customer-research</span><span class="handle">@coreyhaines31</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Acoreyhaines31%2Fmarketingskills%3Amarketing-ideas"><img class="avatar" src="https://github.com/coreyhaines31.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>marketing-ideas</span><span class="handle">@coreyhaines31</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Acoreyhaines31%2Fmarketingskills%3Askills%2Fad-creative"><img class="avatar" src="https://github.com/coreyhaines31.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>ad-creative</span><span class="handle">@coreyhaines31</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Amvanhorn%2Flast30days-skill"><img class="avatar" src="https://github.com/mvanhorn.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>last30days-skill</span><span class="handle">@mvanhorn</span></a></div><div class="suggestion-set" aria-hidden="true" inert><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Agarrytan%2Fgstack"><img class="avatar" src="https://github.com/garrytan.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>gstack</span><span class="handle">@garrytan</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Amattpocock%2Fskills%3Agrill-me"><img class="avatar" src="https://github.com/mattpocock.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>grill-me</span><span class="handle">@mattpocock</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Amattpocock%2Fskills%3Adesign-an-interface"><img class="avatar" src="https://github.com/mattpocock.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>design-an-interface</span><span class="handle">@mattpocock</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Ablader%2Fhumanizer"><img class="avatar" src="https://github.com/blader.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>humanizer</span><span class="handle">@blader</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Acoreyhaines31%2Fmarketingskills%3Acustomer-research"><img class="avatar" src="https://github.com/coreyhaines31.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>customer-research</span><span class="handle">@coreyhaines31</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Acoreyhaines31%2Fmarketingskills%3Amarketing-ideas"><img class="avatar" src="https://github.com/coreyhaines31.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>marketing-ideas</span><span class="handle">@coreyhaines31</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Acoreyhaines31%2Fmarketingskills%3Askills%2Fad-creative"><img class="avatar" src="https://github.com/coreyhaines31.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>ad-creative</span><span class="handle">@coreyhaines31</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Amvanhorn%2Flast30days-skill"><img class="avatar" src="https://github.com/mvanhorn.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>last30days-skill</span><span class="handle">@mvanhorn</span></a></div></div>
+<div class="suggestion-track"><div class="suggestion-set"><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Adavidondrej%2Fskills%3Aeffective-agent-skills"><img class="avatar" src="https://github.com/davidondrej.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>effective-agent-skills</span><span class="handle">@davidondrej</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Aanthropics%2Fskills%3Askills%2Ffrontend-design"><img class="avatar" src="https://github.com/anthropics.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>frontend-design</span><span class="handle">@anthropics</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Atwostraws%2Fswiftui-agent-skill%3Aswiftui-pro"><img class="avatar" src="https://github.com/twostraws.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>swiftui-pro</span><span class="handle">@twostraws</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Aanthropics%2Fskills%3Acanvas-design"><img class="avatar" src="https://github.com/anthropics.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>canvas-design</span><span class="handle">@anthropics</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Apbakaus%2Fimpeccable%3Aimpeccable"><img class="avatar" src="https://github.com/pbakaus.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>impeccable</span><span class="handle">@pbakaus</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Avercel%2Fexamples%3Aweb-design-guidelines"><img class="avatar" src="https://github.com/vercel.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>web-design-guidelines</span><span class="handle">@vercel</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Aemilkowalski%2Fskill%3Aemil-design-eng"><img class="avatar" src="https://github.com/emilkowalski.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>emil-design-eng</span><span class="handle">@emilkowalski</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Aibelick%2Fui-skills%3Abaseline-ui"><img class="avatar" src="https://github.com/ibelick.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>baseline-ui</span><span class="handle">@ibelick</span></a></div><div class="suggestion-set" aria-hidden="true" inert><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Adavidondrej%2Fskills%3Aeffective-agent-skills"><img class="avatar" src="https://github.com/davidondrej.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>effective-agent-skills</span><span class="handle">@davidondrej</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Aanthropics%2Fskills%3Askills%2Ffrontend-design"><img class="avatar" src="https://github.com/anthropics.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>frontend-design</span><span class="handle">@anthropics</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Atwostraws%2Fswiftui-agent-skill%3Aswiftui-pro"><img class="avatar" src="https://github.com/twostraws.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>swiftui-pro</span><span class="handle">@twostraws</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Aanthropics%2Fskills%3Acanvas-design"><img class="avatar" src="https://github.com/anthropics.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>canvas-design</span><span class="handle">@anthropics</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Apbakaus%2Fimpeccable%3Aimpeccable"><img class="avatar" src="https://github.com/pbakaus.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>impeccable</span><span class="handle">@pbakaus</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Avercel%2Fexamples%3Aweb-design-guidelines"><img class="avatar" src="https://github.com/vercel.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>web-design-guidelines</span><span class="handle">@vercel</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Aemilkowalski%2Fskill%3Aemil-design-eng"><img class="avatar" src="https://github.com/emilkowalski.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>emil-design-eng</span><span class="handle">@emilkowalski</span></a><a class="skill-pill" href="/app/?view=discover&amp;skill=catalog%3Aibelick%2Fui-skills%3Abaseline-ui"><img class="avatar" src="https://github.com/ibelick.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span>baseline-ui</span><span class="handle">@ibelick</span></a></div></div>
+        <!-- home:suggestions:end -->
+        </div>
+        <a class="button" href="/app/" data-humblytics="Home Search Explore Library">Explore the library</a>
       </div>
-      <a class="library-preview-more" href="/skills/">See all skills</a>
     </section>
+
+    <section class="section team-section" aria-labelledby="team-title">
+      <h2 id="team-title">A shared skill set</h2>
+      <p class="section-copy">From your library to your team's agents. No zip files, no Slack threads, no "which version do you have?"</p>
+      <div class="steps">
+        <article><h3>1. Create a set</h3><p>Bring the skills for a project or team together. Pick a name, add skills, and choose who can see it.</p><div class="step-demo" aria-label="Example set: design team, invite only"><span class="gh-mark" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></span><strong>design team</strong><span class="tag">Invite only</span></div></article>
+        <article><h3>2. Invite your team</h3><p>Add teammates by email, or share one link. Everyone gets the same skills, at the same version.</p><div class="step-demo" aria-label="Example invitation"><span class="avatar initial" aria-hidden="true">M</span><span>maya@example.com</span><span class="demo-action green">Invite</span></div></article>
+        <article><h3>3. Use it together</h3><p>Install the set in Claude Code or Codex. When the set changes, everyone stays up to date.</p><div class="step-demo" aria-label="Example shared set with three skills"><svg aria-hidden="true"><use href="/home/icons.svg#check"></use></svg><strong>3 skills</strong><span class="demo-action dark">Open set</span></div></article>
+      </div>
+      <p class="footnote">Public, invite only, or just for you. You control access to every set.</p>
+      <div class="actions section-actions"><a class="button" href="/app/?view=sets" data-humblytics="Home Steps Create Set">Create your first set</a></div>
+    </section>
+
+    <section class="section wide" aria-labelledby="features-title">
+      <h2 id="features-title">One library, every agent</h2>
+      <div class="features">
+        <article class="feature">
+          <div><h3>Keep your skills <br>together</h3><p>See what's installed on every Mac and agent, in one place. Find what you need without digging through folders.</p></div>
+          <div class="feature-demo library-demo" aria-label="Example skill library">
+            <div class="demo-heading"><div><strong>your library</strong><span class="muted">Skills for the way you work</span></div></div>
+            <div class="demo-skill"><img class="avatar" src="https://github.com/anthropics.png?size=72" alt="" width="32" height="32" loading="lazy"><span>frontend-design</span><small>Claude</small></div>
+            <div class="demo-skill"><img class="avatar" src="https://github.com/mattpocock.png?size=72" alt="" width="32" height="32" loading="lazy"><span>code-review</span><small>Codex</small></div>
+            <div class="demo-skill"><img class="avatar" src="https://github.com/twostraws.png?size=72" alt="" width="32" height="32" loading="lazy"><span>swiftui-pro</span><small>Claude</small></div>
+            <div class="demo-footer"><span class="status-dot"></span>All in one place</div>
+          </div>
+          <a class="text-link" href="/app/?view=all">Open your library <svg aria-hidden="true"><use href="/home/icons.svg#arrow-right"></use></svg></a>
+        </article>
+        <article class="feature">
+          <div><h3>Create sets and <br>invite your team</h3><p>Public, invite only, or only me. Share one link, and when you update a set, your team gets the change.</p></div>
+          <div class="feature-demo" aria-label="Example design team set">
+            <div class="demo-heading"><div><strong>design team</strong><span class="muted">3 skills</span></div><span class="tag"><svg aria-hidden="true"><use href="/home/icons.svg#lock"></use></svg>invite only</span></div>
+            <div class="demo-skill highlighted"><img class="avatar" src="https://github.com/anthropics.png?size=72" alt="" width="32" height="32" loading="lazy"><span>frontend-design</span><small class="badge">added</small></div>
+            <div class="demo-skill"><img class="avatar" src="https://github.com/emilkowalski.png?size=72" alt="" width="32" height="32" loading="lazy"><span>web-animations</span></div>
+            <div class="demo-skill"><img class="avatar" src="https://github.com/coreyhaines31.png?size=72" alt="" width="32" height="32" loading="lazy"><span>brand-voice</span></div>
+            <div class="demo-footer">keep updated<span class="switch" aria-hidden="true"></span></div>
+          </div>
+          <div class="visibility-tags"><span>public</span><span>invite only</span><span>only me</span></div>
+          <a class="text-link" href="/app/?view=sets">Create a set <svg aria-hidden="true"><use href="/home/icons.svg#arrow-right"></use></svg></a>
+        </article>
+        <article class="feature mcp-feature">
+          <div><h3>Agents take care <br>of it with MCP</h3><p>Let your agent find, read and install skills itself through a public, read-only MCP server. No account needed.</p></div>
+          <div class="copy-rows">
+            <div class="copy-row"><code>https://omgskills.com/mcp</code><button class="icon-button" data-copy="https://omgskills.com/mcp" aria-label="Copy MCP server URL" title="Copy MCP server URL" hidden><svg aria-hidden="true"><use href="/home/icons.svg#copy"></use></svg></button></div>
+            <div class="copy-row"><code>npx -y omgskills-mcp</code><button class="icon-button" data-copy="npx -y omgskills-mcp" aria-label="Copy MCP command" title="Copy MCP command" hidden><svg aria-hidden="true"><use href="/home/icons.svg#copy"></use></svg></button></div>
+            <div class="tool-tags"><code>search_skills</code><code>get_skill_content</code><code>get_install_plan</code><code>related_skills</code></div>
+          </div>
+          <a class="text-link" href="/developers/">Developer docs <svg aria-hidden="true"><use href="/home/icons.svg#arrow-right"></use></svg></a>
+        </article>
+      </div>
+      <p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="slab spaced" aria-labelledby="collections-title"><div class="section-inner">
+      <h2 id="collections-title">Featured collections</h2>
+      <div class="collections">
+        <!-- home:collections:start -->
+<a class="collection" href="/collections/the-goat-list/"><div class="collection-top"><div class="avatar-stack"><img class="avatar" src="https://github.com/garrytan.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/mattpocock.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/blader.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"></div><h3>Most used skills</h3></div><p>The skills everyone is using</p></a>
+<a class="collection" href="/collections/elite-ui-design/"><div class="collection-top"><div class="avatar-stack"><img class="avatar" src="https://github.com/anthropics.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/pbakaus.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/vercel.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"></div><h3>Best Design Skills</h3></div><p>What worldclass designers are using</p></a>
+<a class="collection" href="/collections/build-ios-apps/"><div class="collection-top"><div class="avatar-stack"><img class="avatar" src="https://github.com/twostraws.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/coreyhaines31.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/dimillian.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"></div><h3>Best iOS Skills</h3></div><p>Pixel perfect, and performant apps</p></a>
+<a class="collection" href="/collections/starter-pack/"><div class="collection-top"><div class="avatar-stack"><img class="avatar" src="https://github.com/anthropics.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/obra.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/openai.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"></div><h3>Starter Skills</h3></div><p>Essential skills for a first setup</p></a>
+<a class="collection" href="/collections/design-essentials/"><div class="collection-top"><div class="avatar-stack"><img class="avatar" src="https://github.com/pbakaus.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/anthropics.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/leonxlnx.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"></div><h3>Skills for Designers</h3></div><p>UI, frontend, and product polish</p></a>
+<a class="collection" href="/collections/video-motion-graphics/"><div class="collection-top"><div class="avatar-stack"><img class="avatar" src="https://github.com/affaan-m.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/heygen-com.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><img class="avatar" src="https://github.com/greensock.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"></div><h3>Skills for Video &amp; Motion Graphics</h3></div><p>Videos, animations, &amp; motion design </p></a>
+        <!-- home:collections:end -->
+      </div>
+      <a class="button secondary" href="/app/?view=collections">See all collections</a>
+    </div></section>
+
+    <section class="section faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">Questions?</h2>
+      <details><summary>what is omgskills?</summary><p>A shared home for agent skills. Keep your skills in one library, group them into sets, and share them with your team. The open library helps you find good ones. New to skills? Read <a href="/guide/">the guide</a>.</p></details>
+      <details><summary>how much does it cost?</summary><p>Free. The library, sets, sharing, the MCP server and the companion Mac app cost nothing.</p></details>
+      <details><summary>which agents does it work with?</summary><p>Claude Code and Codex. The companion Mac app installs your skills and sets for both, and any agent that supports MCP can search the library.</p></details>
+      <details><summary>do my teammates need the Mac app?</summary><p>To install skills on their Mac, yes. To browse the library and join a set, no. The web works on its own.</p></details>
+      <details><summary>how do I share skills with my team?</summary><p>Create a set, add skills, and invite teammates by email or share its link. Everyone installs the same skills at the same version.</p></details>
+      <details><summary>can I keep a set private?</summary><p>Yes. Choose only-me access for a personal set, or invite-only access for specific people. You can change access from the set's page at any time.</p></details>
+    </section>
+
+    <section class="slab" aria-labelledby="top-title"><div class="section-inner">
+      <h2 id="top-title">Top skills this week</h2>
+      <p class="section-copy">From the latest trending snapshot. Install counts as reported by the source.</p>
+      <!-- home:rankings:start -->
+<ol class="ranking"><li><a class="rank-row" href="/app/?view=discover&amp;skill=catalog%3Aleonxlnx%2Ftaste-skill%3Aimage-to-code"><span class="rank">1</span><img class="avatar" src="https://github.com/leonxlnx.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span class="rank-info"><strong>image-to-code</strong><small>@leonxlnx</small></span><span class="count" aria-label="350194 reported installs">350.2K</span></a></li><li><a class="rank-row" href="/app/?view=discover&amp;skill=catalog%3Aleonxlnx%2Ftaste-skill%3Aimagegen-frontend-web"><span class="rank">2</span><img class="avatar" src="https://github.com/leonxlnx.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span class="rank-info"><strong>imagegen-frontend-web</strong><small>@leonxlnx</small></span><span class="count" aria-label="345811 reported installs">345.8K</span></a></li><li><a class="rank-row" href="/app/?view=discover&amp;skill=catalog%3Aprisma%2Fskills%3Aprisma-client-api"><span class="rank">3</span><img class="avatar" src="https://github.com/prisma.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span class="rank-info"><strong>prisma-client-api</strong><small>@prisma</small></span><span class="count" aria-label="345575 reported installs">345.6K</span></a></li><li><a class="rank-row" href="/app/?view=discover&amp;skill=catalog%3Aprisma%2Fskills%3Aprisma-database-setup"><span class="rank">4</span><img class="avatar" src="https://github.com/prisma.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span class="rank-info"><strong>prisma-database-setup</strong><small>@prisma</small></span><span class="count" aria-label="345508 reported installs">345.5K</span></a></li><li><a class="rank-row" href="/app/?view=discover&amp;skill=catalog%3Aprisma%2Fskills%3Aprisma-cli"><span class="rank">5</span><img class="avatar" src="https://github.com/prisma.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span class="rank-info"><strong>prisma-cli</strong><small>@prisma</small></span><span class="count" aria-label="343069 reported installs">343.1K</span></a></li><li><a class="rank-row" href="/app/?view=discover&amp;skill=catalog%3Alarksuite%2Fcli%3Alark-vc-agent"><span class="rank">6</span><img class="avatar" src="https://github.com/larksuite.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span class="rank-info"><strong>lark-vc-agent</strong><small>@larksuite</small></span><span class="count" aria-label="341769 reported installs">341.8K</span></a></li><li><a class="rank-row" href="/app/?view=discover&amp;skill=catalog%3Aheygen-com%2Fhyperframes%3Aembedded-captions"><span class="rank">7</span><img class="avatar" src="https://github.com/heygen-com.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span class="rank-info"><strong>embedded-captions</strong><small>@heygen-com</small></span><span class="count" aria-label="340071 reported installs">340.1K</span></a></li><li><a class="rank-row" href="/app/?view=discover&amp;skill=catalog%3Aleonxlnx%2Ftaste-skill%3Aimagegen-frontend-mobile"><span class="rank">8</span><img class="avatar" src="https://github.com/leonxlnx.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span class="rank-info"><strong>imagegen-frontend-mobile</strong><small>@leonxlnx</small></span><span class="count" aria-label="339772 reported installs">339.8K</span></a></li><li><a class="rank-row" href="/app/?view=discover&amp;skill=catalog%3Ajuliusbrussee%2Fcaveman%3Acavecrew"><span class="rank">9</span><img class="avatar" src="https://github.com/juliusbrussee.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span class="rank-info"><strong>cavecrew</strong><small>@juliusbrussee</small></span><span class="count" aria-label="339760 reported installs">339.8K</span></a></li><li><a class="rank-row" href="/app/?view=discover&amp;skill=catalog%3Amattpocock%2Fskills%3Ato-issues"><span class="rank">10</span><img class="avatar" src="https://github.com/mattpocock.png?size=72" alt="" width="36" height="36" loading="lazy" decoding="async"><span class="rank-info"><strong>to-issues</strong><small>@mattpocock</small></span><span class="count" aria-label="339097 reported installs">339.1K</span></a></li></ol><p class="updated">Updated <time datetime="2026-10-08">2026-10-08</time></p>
+        <!-- home:rankings:end -->
+      <a class="button secondary" href="/data/">See full leaderboard</a>
+    </div></section>
+
+    <section class="section closing" aria-labelledby="closing-title"><h2 id="closing-title">Your team's skills, every agent</h2><div class="actions"><a class="button" href="/app/?view=sets" data-humblytics="Home Closing Create Team Set">Create a team set</a><a class="button secondary" href="/app/" data-humblytics="Home Closing Explore Library">Explore the library</a></div></section>
   </main>
   <footer class="site-footer">
     <div class="site-footer-inner">
@@ -340,11 +256,10 @@
       </div>
       <div class="site-footer-col">
         <h2>Library</h2>
-        <a href="/">Discover</a>
+        <a href="/app/">Discover</a>
         <a href="/skills/">Skills</a>
         <a href="/guide/">Skills guide</a>
         <a href="/data/">Data</a>
-        <a href="/home/">Mac app</a>
       </div>
       <div class="site-footer-col">
         <h2>Developers</h2>
@@ -363,15 +278,5 @@
       </div>
     </div>
   </footer>
-  <style>
-    footer.site-footer { display: block; max-width: none; margin: 64px 0 0; padding: 0; border-top: 1px solid #e5e7eb; background: #ffffff; }
-    .site-footer-inner { display: grid; grid-template-columns: minmax(200px, 1.4fr) repeat(3, minmax(140px, 1fr)); gap: 24px; max-width: 880px; margin: 0 auto; padding: 36px 24px 44px; }
-    .site-footer-brand-logo { font-size: 22px; text-decoration: none; }
-    .site-footer-brand p { margin: 10px 0 0; max-width: 32ch; color: #6b7280; font-size: 13px; line-height: 1.5; font-weight: 400; }
-    .site-footer h2 { margin: 0 0 12px; color: #6b7280; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
-    .site-footer-col a { display: block; margin-bottom: 9px; color: #6b7280; font-size: 13px; font-weight: 400; text-decoration: none; }
-    .site-footer-col a:hover { color: #111111; }
-    @media (max-width: 720px) { .site-footer-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); } .site-footer-brand { grid-column: 1 / -1; } }
-  </style>
 </body>
 </html>

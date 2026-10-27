@@ -5,7 +5,7 @@ const site = "https://omgskills.com";
 
 export const siteFooterColumns = [
   { title: "Library", links: [
-    ["Skills", "/skills/"], ["Skills guide", "/guide/"], ["Data", "/data/"], ["Mac app", "/home/"],
+    ["Skills", "/skills/"], ["Skills guide", "/guide/"], ["Data", "/data/"],
   ] },
   { title: "Developers", links: [
     ["Developer resources", "/developers/"], ["API spec (OpenAPI)", "/openapi.json"],
