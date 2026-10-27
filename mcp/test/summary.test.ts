@@ -49,7 +49,7 @@ test("summary reads on the compact catalog load no detail shards and match full 
   }
   for (const [name, args] of calls) {
     const summary = await skills(client, name, { ...args, summary: true });
-    const full = await skills(client, name, args);
+    const full = await skills(client, name, { ...args, summary: false });
     assert.deepEqual(summary.skills.map(row => row.id), full.skills.map(row => row.id), name);
     assert.deepEqual(summary.skills, full.skills.map(listFieldsOf), name);
     assert.ok(full.skills.every(row => row.install_status === "pinned" || row.install_status === "discovery_only"), `${name} full rows keep install_status`);
@@ -73,7 +73,7 @@ test("readers without a summary view still return list fields only", async conte
   const f = catalogFixture(context, cleanRows);
   const client = await connected(context, f.legacy, false);
   const summary = await skills(client, "search_skills", { query: "swift", summary: true });
-  const full = await skills(client, "search_skills", { query: "swift" });
+  const full = await skills(client, "search_skills", { query: "swift", summary: false });
   assert.deepEqual(summary.skills, full.skills.map(listFieldsOf));
   assert.ok(full.skills.some(row => "install_cmd" in row));
 });

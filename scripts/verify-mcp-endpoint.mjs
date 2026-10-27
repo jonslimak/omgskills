@@ -9,8 +9,13 @@ const expectedTools = [
   "get_skills",
   "list_trending",
   "list_gold_basket",
-  "list_by_author"
+  "list_by_author",
+  "related_skills",
+  "get_install_plan",
+  "get_skill_content"
 ];
+// Only get_skill_content reads beyond the catalog (SKILL.md from GitHub).
+const openWorldTools = new Set(["get_skill_content"]);
 
 export async function verifyMcpEndpoint({
   origin = process.env.MCP_ORIGIN || process.env.PRODUCTION_ORIGIN || "https://omgskills.com",
@@ -55,7 +60,7 @@ export async function verifyMcpEndpoint({
     throw new Error(`${normalizedOrigin}/mcp returned an unexpected tool set`);
   }
   for (const tool of tools) {
-    if (tool.annotations?.readOnlyHint !== true || tool.annotations?.openWorldHint !== false || tool.annotations?.destructiveHint !== false) {
+    if (tool.annotations?.readOnlyHint !== true || tool.annotations?.openWorldHint !== openWorldTools.has(tool.name) || tool.annotations?.destructiveHint !== false) {
       throw new Error(`${normalizedOrigin}/mcp tool ${tool.name} has unsafe annotations`);
     }
   }

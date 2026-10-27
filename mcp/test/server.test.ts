@@ -78,14 +78,18 @@ test("tools expose complete read-only metadata and structured results", async (c
     "get_skills",
     "list_trending",
     "list_gold_basket",
-    "list_by_author"
+    "list_by_author",
+    "related_skills",
+    "get_install_plan",
+    "get_skill_content"
   ]);
 
   for (const tool of tools) {
     assert.ok(tool.title);
     assert.ok(tool.description);
     assert.equal(tool.annotations?.readOnlyHint, true);
-    assert.equal(tool.annotations?.openWorldHint, false);
+    // Only get_skill_content reads from outside the catalog (GitHub).
+    assert.equal(tool.annotations?.openWorldHint, tool.name === "get_skill_content");
     assert.equal(tool.annotations?.destructiveHint, false);
     assert.equal(tool.inputSchema.type, "object");
     assert.equal(tool.outputSchema?.type, "object");
@@ -93,7 +97,7 @@ test("tools expose complete read-only metadata and structured results", async (c
 
   const search = await client.callTool({
     name: "search_skills",
-    arguments: { query: "swift", limit: 5 }
+    arguments: { query: "swift", limit: 5, summary: false }
   });
   assert.equal(search.isError, undefined);
   assert.equal(search.structuredContent?.count, 1);
@@ -152,12 +156,12 @@ test("strict clients accept real catalog records without undeclared fields", asy
   });
 
   const calls = [
-    { name: "search_skills", arguments: { query: "swift" } },
+    { name: "search_skills", arguments: { query: "swift", summary: false } },
     { name: "get_skill", arguments: { id: skill.id } },
-    { name: "get_skills", arguments: { ids: [skill.id] } },
-    { name: "list_trending", arguments: {} },
-    { name: "list_gold_basket", arguments: {} },
-    { name: "list_by_author", arguments: { author: "anthropics" } }
+    { name: "get_skills", arguments: { ids: [skill.id], summary: false } },
+    { name: "list_trending", arguments: { summary: false } },
+    { name: "list_gold_basket", arguments: { summary: false } },
+    { name: "list_by_author", arguments: { author: "anthropics", summary: false } }
   ];
   for (const call of calls) {
     const response = await client.callTool(call);
@@ -220,7 +224,7 @@ test("local Streamable HTTP transport initializes and calls tools", async (conte
   context.after(() => client.close());
 
   const { tools } = await client.listTools();
-  assert.equal(tools.length, 6);
+  assert.equal(tools.length, 9);
 
   const result = await client.callTool({
     name: "list_trending",
@@ -250,7 +254,7 @@ test("published stdio entry point still exposes the shared tools", async (contex
   context.after(() => client.close());
 
   const { tools } = await client.listTools();
-  assert.equal(tools.length, 6);
+  assert.equal(tools.length, 9);
 
   const result = await client.callTool({
     name: "get_skill",

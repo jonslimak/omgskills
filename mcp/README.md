@@ -4,11 +4,13 @@ Read-only MCP server for agent access to the omgskills library.
 
 ## What It Does
 
-The server exposes the skill library as safe agent tools. Agents can search, inspect one skill, list trending skills, list curated gold-basket skills, and filter by author.
+The server exposes the skill library as safe agent tools. Agents can search, inspect one skill, read its SKILL.md, get a pinned install plan, find related skills, list trending and curated skills, and filter by author.
 
-It does not crawl, scrape, edit, install, or write files.
+It does not crawl, scrape, edit, install, or write files. `get_install_plan` returns a script for the agent to run; the server never runs it.
 
-Every tool returns JSON text for existing MCP clients and structured content for clients that support output schemas. Tool metadata marks every operation as read-only, non-destructive, and closed to external side effects.
+Every tool returns structured content (the full fields) plus a short text rendering, one line per skill. List tools return compact rows by default (`summary: true`, 10 results) and page automatically: each result reports `page.total` and a `page.nextCursor` to pass back as `page: {"cursor": ...}`. Tool metadata marks every operation as read-only and non-destructive; only `get_skill_content` reads outside the catalog (SKILL.md from GitHub).
+
+IDs are case-insensitive and accept the web app's `catalog:` prefix. Author handles accept a leading `@`.
 
 ## Data Sources
 
@@ -37,7 +39,9 @@ Override with environment variables:
 
 ### `search_skills`
 
-Search by keyword with optional filters.
+Search by keywords or a short task description, with optional filters. Typos are
+corrected (`search.did_you_mean`), task-like queries fall back to skills matching some
+of the words (`search.partial_match`), and an empty query lists trending skills.
 
 ```json
 {
@@ -51,7 +55,8 @@ Search by keyword with optional filters.
 
 ### `get_skill`
 
-Fetch one skill by stable ID.
+Fetch one skill by ID, with `install_status`, `pinned_install` and, for pinned skills,
+user-scope `install` scripts for Claude Code and Codex.
 
 ```json
 {
@@ -62,8 +67,7 @@ Fetch one skill by stable ID.
 ### `get_skills`
 
 Fetch up to 30 skills by stable ID in one read. Results keep the requested order;
-duplicate IDs are removed and missing skills are omitted. Uses the same public
-fields and pinned-install validation as `get_skill`.
+duplicate IDs are removed and IDs that were not found are listed in `missing`.
 
 ```json
 {
@@ -77,7 +81,7 @@ List trending skills.
 
 ```json
 {
-  "limit": 20
+  "limit": 10
 }
 ```
 
@@ -87,7 +91,7 @@ List curated gold-basket skills.
 
 ```json
 {
-  "limit": 20
+  "limit": 10
 }
 ```
 
@@ -98,7 +102,51 @@ List skills by GitHub author handle.
 ```json
 {
   "author": "anthropics",
-  "limit": 20
+  "limit": 10
+}
+```
+
+### `related_skills`
+
+Other skills for the same job, most popular first. Use it to find a pinned
+alternative to a `discovery_only` skill.
+
+```json
+{
+  "id": "affaan-m/ecc:react-performance",
+  "limit": 5
+}
+```
+
+### `get_install_plan`
+
+Commit-pinned install steps for one agent and scope. The script fetches exactly
+`pinned_install.commit_sha`, checks SKILL.md against `skill_md_sha`, refuses to
+overwrite an existing destination (including symlinks), and copies the skill into `~/.claude/skills`,
+`~/.codex/skills` (user scope) or `.claude/skills`, `.codex/skills` (project scope).
+For `discovery_only` skills it explains why and suggests pinned alternatives.
+Temporary files and incomplete installs are cleaned up on failure or interruption.
+
+```json
+{
+  "id": "anthropics/skills:pptx",
+  "agent": "codex",
+  "scope": "user"
+}
+```
+
+### `get_skill_content`
+
+The skill's SKILL.md, read from GitHub at the pinned commit (or the default branch,
+flagged, for `discovery_only` skills) and checked against the catalog hash.
+Downloads stop at 256 KiB, share an eight-second timeout, and follow at most three
+redirects, only within GitHub's HTTPS raw-content host. Verification uses the full
+download before `max_chars` limits the displayed text.
+
+```json
+{
+  "id": "anthropics/skills:pptx",
+  "max_chars": 12000
 }
 ```
 

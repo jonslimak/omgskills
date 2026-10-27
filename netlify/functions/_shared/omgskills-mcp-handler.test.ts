@@ -85,7 +85,10 @@ test("serves MCP initialization, tools, and structured results", async () => {
     "get_skills",
     "list_trending",
     "list_gold_basket",
-    "list_by_author"
+    "list_by_author",
+    "related_skills",
+    "get_install_plan",
+    "get_skill_content"
   ]);
   await toolsContext.finish();
 
@@ -109,13 +112,14 @@ test("batch lookup is a single bounded read with the same public projection", as
   const callContext = context();
   const response = await handler(rpcRequest({
     jsonrpc: "2.0", id: 1, method: "tools/call",
-    params: { name: "get_skills", arguments: { ids: ["missing/repo:skill", "example/skills:swift-review", "example/skills:swift-review"] } }
+    params: { name: "get_skills", arguments: { ids: ["missing/repo:skill", "example/skills:swift-review", "example/skills:swift-review"], summary: false } }
   }), callContext.value);
   const result = (await response.json()).result;
   assert.equal(loads, 1);
   assert.equal(result.structuredContent.count, 1);
   assert.equal(result.structuredContent.skills[0].id, "example/skills:swift-review");
   assert.equal(result.structuredContent.skills[0].install_status, "discovery_only");
+  assert.deepEqual(result.structuredContent.missing, ["missing/repo:skill"]);
   await callContext.finish();
   for (const ids of [[], Array(31).fill("example/skills:swift-review"), [""], ["x".repeat(501)]]) {
     const invalidContext = context();

@@ -49,7 +49,7 @@ export function DevelopersPage() {
       <Card icon={Globe} title="Hosted MCP (live catalog)">
         <CopyValue value={`${site}/mcp`} />
         <p>Public, read-only, no authentication. Available tools: <code>search_skills</code>, <code>get_skill</code>,{" "}
-          <code>list_trending</code>, <code>list_gold_basket</code>, and <code>list_by_author</code>.</p>
+          <code>get_install_plan</code>, <code>get_skill_content</code>, <code>related_skills</code>, and more.</p>
       </Card>
       <Card icon={Package} title="npm local MCP">
         <CopyValue value="npx -y omgskills-mcp" />

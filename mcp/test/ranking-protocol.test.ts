@@ -29,9 +29,12 @@ test("ranking is separately advertised and nonranked callers remain unchanged", 
   assert.equal(result.isError, undefined, JSON.stringify(result));
   const value = result.structuredContent as any;
   assert.equal(value.count, 1); assert.equal(value.page.total, 2);
-  assert.deepEqual(JSON.parse((result.content as { text: string }[])[0].text), JSON.parse(JSON.stringify(value)));
-  for (const bad of [{ query: "design", ranking: "web-v1" }, { ...args, unknown: true }, { ...args, author: "other", query: "@another design" },
-    { ...args, page: { cursor: "bad" } }, { ...args, query: "@" }]) {
+  assert.match((result.content as { text: string }[])[0].text, /^1 skill of 2:/);
+  // ranking no longer needs an explicit page.
+  assert.equal((await candidate.callTool({ name: "search_skills", arguments: { query: "design", ranking: "web-v1" } })).isError, undefined);
+  const unknown = await candidate.callTool({ name: "search_skills", arguments: { ...args, unknown: true } });
+  assert.equal(unknown.isError, true); assert.match(JSON.stringify(unknown.content), /unknown/);
+  for (const bad of [{ ...args, author: "other", query: "@another design" }, { ...args, page: { cursor: "bad" } }, { ...args, query: "@" }]) {
     const failed = await candidate.callTool({ name: "search_skills", arguments: bad });
     assert.equal(failed.isError, true); assert.match(JSON.stringify(failed.content), /invalid_cursor/);
   }
@@ -61,7 +64,7 @@ test("compact ranking hydrates only selected pages; missing/corrupt metadata is 
 
 test("unrelated shard or missing signals cannot become successful empty ranked results", async context => {
   const f = catalogFixture(context, rows, true), reader = await loadCatalogReader(f.url, { ...f.options, ranking: true });
-  const client = await connected(context, reader, true), args = { query: "design", ranking: "web-v1", page: {} };
+  const client = await connected(context, reader, true), args = { query: "design", ranking: "web-v1", page: {}, summary: false };
   for (const url of f.files.keys()) if (url.includes("skill-details-")) f.files.set(url, Buffer.from("[]"));
   assert.match(JSON.stringify((await client.callTool({ name: "search_skills", arguments: args })).content), /catalog_unavailable/);
   const next = catalogFixture(context, rows, true); next.files.delete(next.options.goldBasketUrl);
