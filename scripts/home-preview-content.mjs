@@ -10,11 +10,14 @@ const avatar = (handle, size = 72) => `https://github.com/${encodeURIComponent(h
 const img = handle => `<img class="avatar" src="${avatar(handle)}" alt="" width="36" height="36" loading="lazy" decoding="async">`;
 const topicOrder = ['the-goat-list', 'elite-ui-design', 'build-ios-apps', 'starter-pack', 'design-essentials', 'video-motion-graphics'];
 
-export function skillLink(id) {
+// A skill's static library page when one is published (crawlable), otherwise its app view.
+export function skillLink(id, publicPaths = {}) {
+  const path = publicPaths[id];
+  if (typeof path === 'string' && /^\/(skills|library)\/[^?#\\]+\/$/.test(path) && !path.includes('..')) return path;
   return `/app/?view=discover&skill=${encodeURIComponent(`catalog:${id}`)}`;
 }
 
-export function renderHomeContent(collections, data) {
+export function renderHomeContent(collections, data, publicPaths = {}) {
   if (!Array.isArray(collections) || !Array.isArray(data.topSkills) || !data.topSkills.length ||
       !Number.isFinite(Date.parse(data.generatedAt))) throw new Error('Missing home preview content');
   const topics = topicOrder.map(id => collections.find(row => row.type === 'topic' && row.id === id));
@@ -27,7 +30,7 @@ export function renderHomeContent(collections, data) {
     }
   }
   const date = new Date(data.generatedAt).toISOString().slice(0, 10);
-  const rankings = `<ol class="ranking">${rows.map((row, index) => `<li><a class="rank-row" href="${escapeHtml(skillLink(row.id))}"><span class="rank">${index + 1}</span>${img(row.authorHandle)}<span class="rank-info"><strong>${escapeHtml(row.name)}</strong><small>@${escapeHtml(row.authorHandle)}</small></span><span class="count" aria-label="${row.installs} reported installs">${compact(row.installs)}</span></a></li>`).join('')}</ol><p class="updated">Updated <time datetime="${date}">${date}</time></p>`;
+  const rankings = `<ol class="ranking">${rows.map((row, index) => `<li><a class="rank-row" href="${escapeHtml(skillLink(row.id, publicPaths))}"><span class="rank">${index + 1}</span>${img(row.authorHandle)}<span class="rank-info"><strong>${escapeHtml(row.name)}</strong><small>@${escapeHtml(row.authorHandle)}</small></span><span class="count" aria-label="${row.installs} reported installs">${compact(row.installs)}</span></a></li>`).join('')}</ol><p class="updated">Updated <time datetime="${date}">${date}</time></p>`;
   const collectionCards = topics.map(topic => {
     const authors = [...new Set((topic.featuredSkillIds ?? topic.skillIds ?? []).map(id => id.split('/')[0]))].slice(0, 3);
     return `<a class="collection" href="/collections/${encodeURIComponent(topic.id)}/"><div class="collection-top"><div class="avatar-stack">${authors.map(img).join('')}</div><h3>${escapeHtml(topic.title)}</h3></div><p>${escapeHtml(topic.subtitle || topic.description || '')}</p></a>`;
@@ -40,7 +43,7 @@ export function renderHomeContent(collections, data) {
       seen.add(id);
       const [repo, skill] = id.split(':');
       const name = (skill || repo).split('/').at(-1);
-      suggestions.push(`<a class="skill-pill" href="${escapeHtml(skillLink(id))}">${img(repo.split('/')[0])}<span>${escapeHtml(name)}</span><span class="handle">@${escapeHtml(repo.split('/')[0])}</span></a>`);
+      suggestions.push(`<a class="skill-pill" href="${escapeHtml(skillLink(id, publicPaths))}">${img(repo.split('/')[0])}<span>${escapeHtml(name)}</span><span class="handle">@${escapeHtml(repo.split('/')[0])}</span></a>`);
     }
   }
   const tracks = [suggestions.slice(0, 8), suggestions.slice(8)].map(links => `<div class="suggestion-track"><div class="suggestion-set">${links.join('')}</div><div class="suggestion-set" aria-hidden="true" inert>${links.join('')}</div></div>`).join('\n');
@@ -70,12 +73,31 @@ export async function refreshHomePreview({siteDir}) {
   }
   const collections = await loadHomepageCollections(siteDir);
   const data = JSON.parse(await readFile(path.join(dataDir, asset), 'utf8'));
-  const file = path.join(siteDir, 'home', 'index.html');
+  const publicPaths = await readPublicSkillPaths(siteDir);
+  const file = path.join(siteDir, 'index.html');
   const html = await readFile(file, 'utf8');
-  await writeFile(file, replaceHomeContent(html, renderHomeContent(collections, data)));
+  await writeFile(file, replaceHomeContent(html, renderHomeContent(collections, data, publicPaths)));
+}
+
+// Written by the web library build; absent in a bare site checkout.
+async function readPublicSkillPaths(siteDir) {
+  try {
+    const skills = JSON.parse(await readFile(path.join(siteDir, 'catalog-skill-urls.json'), 'utf8')).skills;
+    return skills && typeof skills === 'object' && !Array.isArray(skills) ? skills : {};
+  } catch (error) {
+    if (error.code === 'ENOENT') return {};
+    throw error;
+  }
+}
+
+/** Static library pages the homepage's featured collections link to. */
+export function homepageCollectionPaths(html) {
+  const from = html.indexOf('<!-- home:collections:start -->'), to = html.indexOf('<!-- home:collections:end -->');
+  if (from < 0 || to <= from) throw new Error('Homepage is missing its featured collections');
+  return [...html.slice(from, to).matchAll(/<a\b[^>]*\bhref="(\/collections\/[^"#?]+\/)"/g)].map(match => match[1]);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   await refreshHomePreview({siteDir: path.resolve(process.argv[2] || 'site')});
-  console.log('Refreshed /home/ with 6 collections and up to 10 ranked skills.');
+  console.log('Refreshed the homepage with 6 collections and up to 10 ranked skills.');
 }

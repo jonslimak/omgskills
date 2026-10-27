@@ -87,9 +87,8 @@ test("entry reads clean paths, old ?view= links and legacy path routes", () => {
   assert.deepEqual(entryNavigation("/library/anthropics/", "", "/app/"), nav({ view: "creator", id: "anthropics" }));
   assert.equal(entryNavigation("/library/anthropics/skills/skills/frontend-design/", "", "/app/").selected,
     "catalog:anthropics/skills:skills/frontend-design");
-  // The taken-over homepage is Discover and keeps "/"; app.omgskills.com's own root does not.
-  assert.deepEqual(entryNavigation("/", "", "/app/"), nav({ view: "discover" }));
-  assert.equal(staticPageAddress("/", "/app/"), true);
+  // The homepage is a static landing page, not taken over; app.omgskills.com's own root is the app.
+  assert.equal(staticPageAddress("/", "/app/"), false);
   assert.equal(staticPageAddress("/", "/"), false);
   assert.equal(staticPageAddress("/library/anthropics/", "/app/"), true);
   // The taken-over developers page keeps /developers/; in the app it is /app/developers/.

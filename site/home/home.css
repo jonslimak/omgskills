@@ -250,3 +250,13 @@ h2{letter-spacing:-.05em}
 /* Keep the animation tight to the subtitle above and the search card below. */
 .hero{padding-bottom:0}
 .search-section{margin-top:8px}
+/* The shared site footer on the landing page, in this page's tokens. */
+footer.site-footer{display:block;max-width:none;margin:0;padding:0;border-top:1px solid var(--hair)}
+.site-footer-inner{display:grid;grid-template-columns:minmax(200px,1.4fr) repeat(3,minmax(140px,1fr));gap:24px;max-width:1240px;margin:0 auto;padding:44px 20px 56px}
+.site-footer-brand-logo{font-size:30px}
+.site-footer-brand p{margin-top:12px;max-width:32ch;color:var(--muted);font-size:14px;line-height:1.5}
+.site-footer h2{margin-bottom:14px;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;line-height:1.2;letter-spacing:.05em;text-transform:uppercase}
+.site-footer-col a{display:block;margin-bottom:10px;color:var(--muted);font-size:14px}
+.site-footer-col a:hover{color:var(--ink);opacity:1}
+@media(max-width:720px){.site-footer-inner{grid-template-columns:repeat(2,minmax(0,1fr))}.site-footer-brand{grid-column:1/-1}}
+.section-actions{justify-content:flex-start;margin-top:32px}

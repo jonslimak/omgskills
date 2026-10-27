@@ -107,8 +107,9 @@ test("signed-out Mac downloads sit centered below Sign in and hide in the collap
   assert.ok(footer.includes('aria-label="Get the Mac app"'));
   assert.ok(footer.includes('title="Get the Mac app"'));
   assert.ok(footer.includes('<span className="ua-apple-mark" aria-hidden="true">&#63743;</span>'));
+  // The homepage no longer offers the Mac download (the old discovery app) directly.
   const home = readFileSync(new URL("../../site/index.html", import.meta.url), "utf8");
-  assert.ok(home.includes('<span class="apple-icon" aria-hidden="true">&#63743;</span>'));
+  assert.ok(!home.includes(`href="/downloads/omgskills-mac.dmg"`));
   assert.equal(source.includes('ua-public-actions'), false);
   const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
   assert.match(css, /\.ua-sidebar-bottom\s*\{[^}]*flex-direction: column;[^}]*align-items: flex-start;/);
