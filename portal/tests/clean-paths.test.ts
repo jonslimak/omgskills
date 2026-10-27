@@ -9,7 +9,7 @@ import {
   publicNavigationPath,
   type Navigation,
 } from "../src/app/unified/model";
-import { entryNavigation } from "../src/integration/unified/entry-navigation";
+import { entryNavigation, staticPageAddress } from "../src/integration/unified/entry-navigation";
 import { accountNavigation } from "../src/integration/unified/policy";
 
 const nav = (value: Partial<Navigation>): Navigation => ({ ...initialNavigation, view: "discover", ...value });
@@ -87,6 +87,11 @@ test("entry reads clean paths, old ?view= links and legacy path routes", () => {
   assert.deepEqual(entryNavigation("/library/anthropics/", "", "/app/"), nav({ view: "creator", id: "anthropics" }));
   assert.equal(entryNavigation("/library/anthropics/skills/skills/frontend-design/", "", "/app/").selected,
     "catalog:anthropics/skills:skills/frontend-design");
+  // The taken-over homepage is Discover and keeps "/"; app.omgskills.com's own root does not.
+  assert.deepEqual(entryNavigation("/", "", "/app/"), nav({ view: "discover" }));
+  assert.equal(staticPageAddress("/", "/app/"), true);
+  assert.equal(staticPageAddress("/", "/"), false);
+  assert.equal(staticPageAddress("/library/anthropics/", "/app/"), true);
 });
 
 test("signed-out public entries rewrite old links without rewriting private destinations", () => {

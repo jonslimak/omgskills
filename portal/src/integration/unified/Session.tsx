@@ -15,7 +15,7 @@ import { useManagement } from "./useManagement";
 import { DevicesPanel } from "../DevicesPanel";
 import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
 import { ProfilePanel } from "./ProfilePanel";
-import { entryNavigation, unknownAppAddress } from "./entry-navigation";
+import { entryNavigation, staticPageAddress, unknownAppAddress } from "./entry-navigation";
 import { renderPublicFirst } from "./public-first";
 import { announceAppReady } from "../../takeover";
 import { createPageMetadata, pageTitle } from "../../app/unified/page-metadata";
@@ -88,16 +88,16 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const current = address(nav);
   useEffect(() => {
     if (!(available || isDiscovery(requested.view))) return;
-    // A taken-over static page keeps its own /library/... address while it shows that view.
+    // A taken-over static page keeps its own address while it shows that view.
     const here = location.pathname + location.search;
-    const keep = location.pathname.startsWith("/library/")
+    const keep = staticPageAddress(location.pathname, base)
       && navigationLocation(entryNavigation(location.pathname, location.search, base), true) === navigationLocation(nav, true);
     history.replaceState({ nav }, "", keep ? here : current);
   }, [current, available, base, requested.view]);
   useEffect(() => {
     const pop = () => {
       const saved = (history.state as { nav?: Navigation } | null)?.nav;
-      const next = saved && (address(saved) === location.pathname + location.search || location.pathname.startsWith("/library/"))
+      const next = saved && (address(saved) === location.pathname + location.search || staticPageAddress(location.pathname, base))
         ? saved : entryNavigation(location.pathname, location.search, base);
       clearOtherIntent(next);
       setRequested(next);

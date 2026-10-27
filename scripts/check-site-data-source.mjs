@@ -2,8 +2,8 @@
 
 import { readFileSync } from "node:fs";
 
+// The homepage no longer loads leaderboards; it is taken over by the app.
 const pages = [
-  "site/index.html",
   "site/data/index.html",
 ];
 

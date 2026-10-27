@@ -51,7 +51,7 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
       {picker}
       <div className="ua-install-confirm">
         {ready ? <button type="button" className="ua-f1-install ua-primary" disabled={!action.href}
-          onClick={() => session.open(skill)}>Confirm installation <Download /></button>
+          onClick={() => session.open(skill)} data-humblytics="App Install Start">Confirm installation <Download /></button>
           : <button type="button" className="ua-f1-install ua-primary" disabled={!action.href || busy || state.restartRequired}
             onClick={() => void session.retry()}><RefreshCw /> {busy ? "Checking details..." : "Try opening again"}</button>}
         {state.phase !== "setup" && <button type="button" className="ua-link ua-install-setup-link" disabled={!action.href || busy || state.restartRequired}
@@ -63,7 +63,7 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
       <h4>Mac setup</h4>
       {productionDownload ? <>
         <p>OMGSkills {productionDownload.version}. Apple silicon Mac, macOS {productionDownload.minimumOS} or later.</p>
-        <a className="ua-f1-install" href={productionDownload.url} rel="noreferrer" aria-describedby={downloadId}><Download /> Download OMGSkills {productionDownload.version}</a>
+        <a className="ua-f1-install" href={productionDownload.url} rel="noreferrer" aria-describedby={downloadId} data-humblytics="App Setup Download"><Download /> Download OMGSkills {productionDownload.version}</a>
         <p>This opt-in version replaces your existing OMGSkills app. Your installed skills stay in their current folders.</p>
         <ol id={downloadId}>
           <li>Double-click <strong>{productionDownload.filename}</strong> in Finder to unzip it.</li>

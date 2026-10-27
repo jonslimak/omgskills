@@ -1252,6 +1252,7 @@ export function UnifiedApp({
                 type="button"
                 className="ua-pill ua-primary"
                 onClick={signIn}
+                data-humblytics="App Sign In"
               >
                 <User />
                 <span>Sign in</span>
@@ -1259,6 +1260,7 @@ export function UnifiedApp({
               {!publicInstallAction && <a
                 className="ua-sidebar-download"
                 href="/downloads/omgskills-mac.dmg"
+                data-humblytics="App Get Mac App"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Get the Mac app"
@@ -1318,6 +1320,7 @@ export function UnifiedApp({
                 type="button"
                 className="ua-pill ua-primary"
                 onClick={signIn}
+                data-humblytics="App Sign In"
               >
                 Sign in
               </button>
@@ -1889,7 +1892,7 @@ export function UnifiedApp({
                   )}
                   </span>
                   {!signedIn && (
-                    <button type="button" className="ua-pill ua-primary ua-detail-signin" onClick={signIn}>
+                    <button type="button" className="ua-pill ua-primary ua-detail-signin" onClick={signIn} data-humblytics="App Sign In">
                       Sign in to manage skills
                     </button>
                   )}
