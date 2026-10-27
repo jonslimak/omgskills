@@ -13,6 +13,7 @@ import { addGroupItemWithClient } from "./group-items.js";
 import { parsePresenceSkill, parseSyncSkill } from "./sync-skill.js";
 import { performSyncUpload } from "./sync-upload.js";
 import { readInventoryRevision } from "./inventory-reconciliation.js";
+import { readSyncInventory } from "./sync-inventory-read.js";
 
 const connectionString = process.env.AUTH_TEST_DATABASE_URL;
 if (!connectionString) throw new Error("AUTH_TEST_DATABASE_URL must name a disposable local test database");
@@ -233,8 +234,67 @@ test("different accounts/keys, no-key clients, lost keys and legacy inventory st
     await pair(pool, owner, key);
     assert.deepEqual(await rows(pool, "synced_skills"), legacyRows);
     assert.ok(legacyRows.every(row => row.device_id === null));
-    assert.equal((await requireDeviceActor(pool, request(b.credential), "sync:write")).userId, another);
+    // The same key back under the first account means the Mac moved back; the other account loses it.
+    await assert.rejects(requireDeviceActor(pool, request(b.credential), "sync:write"), status(401));
     assert.equal((await requireDeviceActor(pool, request(c.credential), "sync:write")).userId, owner);
+  });
+});
+
+test("a Mac moving to another account revokes the old connection and deletes only that Mac's old inventory", async () => {
+  await withSchema(async pool => {
+    const first = await user(pool), second = await user(pool);
+    const moving = await pair(pool, first, key), staying = await pair(pool, first, otherKey);
+    await upload(pool, moving.credential, null);
+    await upload(pool, staying.credential, null);
+    const movingRow = (await rows(pool, "synced_skills")).find(row => row.device_id === moving.deviceId);
+    const group = (await pool.query("INSERT INTO skill_groups(owner_user_id,name,slug) VALUES($1,'Moved Set',$2) RETURNING id",
+      [first, randomUUID()])).rows[0].id;
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await addGroupItemWithClient(client, group, { kind: "synced", syncedSkillId: movingRow.id, note: "Still here" }, {
+        kind: "release", source: { kind: "catalog", normalizedRoot: "skills/reconnect-fixture", catalogSkillId: "fixture/repository:reconnect-fixture" },
+        coordinates: { commitSha: "1".repeat(40), treeSha: "2".repeat(40), skillMdSha: "a".repeat(40) }, createdBy: "test"
+      });
+      await client.query("COMMIT");
+    } finally { client.release(); }
+
+    const moved = await pair(pool, second, key);
+    assert.notEqual(moved.deviceId, moving.deviceId);
+    await assert.rejects(requireDeviceActor(pool, request(moving.credential), "sync:write"), status(401));
+    const old = (await rows(pool, "device_tokens")).find(row => row.id === moving.deviceId);
+    assert.ok(old.revoked_at);
+    assert.equal(old.reconnect_key_hash, null);
+    assert.deepEqual((await rows(pool, "synced_skills")).map(row => row.device_id), [staying.deviceId]);
+    const [item] = await rows(pool, "skill_group_items");
+    assert.equal(item.synced_skill_id, null);
+    assert.equal(item.note, "Still here");
+    const firstView = await readSyncInventory(pool, first, 3);
+    assert.deepEqual(firstView.skills.map(row => row.deviceId), [staying.deviceId]);
+    assert.equal(firstView.devices?.find(device => device.id === moving.deviceId)?.status, "revoked");
+
+    await upload(pool, moved.credential, null);
+    assert.equal((await readSyncInventory(pool, second, 3)).skills.length, 1);
+    const back = await pair(pool, first, key);
+    assert.notEqual(back.deviceId, moving.deviceId);
+    await assert.rejects(requireDeviceActor(pool, request(moved.credential), "sync:write"), status(401));
+    assert.deepEqual((await readSyncInventory(pool, second, 3)).skills, []);
+    assert.equal((await requireDeviceActor(pool, request(staying.credential), "sync:write")).userId, first);
+  });
+});
+
+test("a disconnected Mac's inventory is hidden until the same account reconnects it", async () => {
+  await withSchema(async pool => {
+    const owner = await user(pool), first = await pair(pool, owner, key);
+    await upload(pool, first.credential, null);
+    const [row] = await rows(pool, "synced_skills");
+    for (const version of [2, 3] as const) assert.equal((await readSyncInventory(pool, owner, version)).skills.length, 1);
+    await revokePresentedDevice(pool, request(first.credential));
+    for (const version of [2, 3] as const) assert.deepEqual((await readSyncInventory(pool, owner, version)).skills, []);
+    assert.deepEqual(await rows(pool, "synced_skills"), [row]);
+    const second = await pair(pool, owner, key);
+    assert.equal(second.deviceId, first.deviceId);
+    assert.deepEqual((await readSyncInventory(pool, owner, 3)).skills.map(skill => skill.id), [row.id]);
   });
 });
 
