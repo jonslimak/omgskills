@@ -248,7 +248,8 @@ test("invalid credentials cannot mutate inventory; revocation keeps history and 
     }
     assert.deepEqual(await snapshot(pool, owner), before);
     const inventory = await readSyncInventory(pool, owner, 2);
-    assert.equal(inventory.skills.length, 1);
+    assert.equal(before.skills.length, 1, "Revocation keeps the stored rows for a reconnect");
+    assert.equal(inventory.skills.length, 0, "but the revoked Mac's skills are not listed");
     assert.equal(inventory.devices?.find((row) => row.id === a.id)?.status, "revoked");
     await assert.rejects(pool.query("DELETE FROM device_tokens WHERE id=$1", [a.id]), (error: unknown) => (error as { code: string }).code === "23503");
     await pool.query("DELETE FROM users WHERE id=$1", [owner]);
