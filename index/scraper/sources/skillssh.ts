@@ -177,14 +177,15 @@ async function fetchBoardEntries(
   pageRetryBaseDelayMs: number,
   requestTimeoutMs: number,
 ): Promise<{ entries: SkillsShEntry[]; total: number }> {
-  const first = await fetchPage(board, 1, pageRetryBaseDelayMs, requestTimeoutMs);
+  // skills.sh pages are zero-based; page 1 already skips the top 200 skills.
+  const first = await fetchPage(board, 0, pageRetryBaseDelayMs, requestTimeoutMs);
   const total = first.total ?? first.skills?.length ?? 0;
   const maxPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const targetPages = crawlAll
     ? maxPages
     : Math.max(1, Math.ceil((topLimit ?? DEFAULT_TOP_LIMIT) / PAGE_SIZE));
 
-  const pages = Array.from({ length: Math.min(targetPages, maxPages) - 1 }, (_, i) => i + 2);
+  const pages = Array.from({ length: Math.min(targetPages, maxPages) - 1 }, (_, i) => i + 1);
   const rest = await mapWithConcurrency(
     pages,
     pageConcurrency,
