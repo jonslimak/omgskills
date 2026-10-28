@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { appendFileSync, existsSync, readFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 function loadEnv(path = ".env") {
   if (!existsSync(path)) return;
@@ -51,6 +52,46 @@ function safeRate(numerator, denominator) {
   return denominator ? Number((numerator / denominator).toFixed(4)) : null;
 }
 
+// The landing page and public library entry points. /app/ may contain historical rows;
+// this release deliberately does not load its automatic tracker there.
+const webAppEntryPages = new Set(["/", "/developers/"]);
+export const webAppEvents = {
+  webSearches: "App Search",
+  webSkillOpens: "App Skill Open",
+  webCopyInstalls: "App Copy Install",
+  webInstallStarts: "App Install Start",
+  webSetupDownloads: "App Setup Download",
+  webSignIns: "App Sign In",
+  webGetMacAppClicks: "App Get Mac App",
+};
+
+export function isWebAppPage(row) {
+  const path = row.path ?? row.page ?? "";
+  return webAppEntryPages.has(path) || /^\/(?:app|library)(?:\/|$)/.test(path) || row.page_group === "app";
+}
+
+// The documented API supports limit, but not offset pagination.
+export async function breakdownRows(url, headers) {
+  const json = await fetchJson(`${url}&limit=50`, { headers });
+  return Array.isArray(json?.data) ? json.data : [];
+}
+
+export function webAppFunnel(pages, clicks) {
+  const funnel = { webVisitors: 0, webAppPageViews: 0 };
+  for (const row of pages) {
+    if ((row.path ?? row.page) === "/") funnel.webVisitors += Number(row.unique_visitors) || 0;
+    if (isWebAppPage(row)) funnel.webAppPageViews += Number(row.page_views) || 0;
+  }
+  for (const [key, target] of Object.entries(webAppEvents)) {
+    funnel[key] = clicks.flatMap((row) => row.top_targets ?? [row])
+      .filter((item) => item.target === target)
+      .reduce((total, item) => total + (Number(item.clicks) || 0), 0);
+  }
+  funnel.webSearchRate = safeRate(funnel.webSearches, funnel.webVisitors);
+  funnel.webSetupDownloadRate = safeRate(funnel.webSetupDownloads, funnel.webVisitors);
+  return funnel;
+}
+
 async function humblyticsMetrics() {
   const propertyId = requireEnv("HUMBLYTICS_PROPERTY_ID");
   const token = requireEnv("HUMBLYTICS_API_KEY");
@@ -60,10 +101,12 @@ async function humblyticsMetrics() {
   const base = `https://app.humblytics.com/api/external/v1/properties/${propertyId}`;
   const headers = { authorization: `Bearer ${token}` };
 
-  const [summary, traffic, clicks] = await Promise.all([
+  const [summary, traffic, clicks, pageRows, clickRows] = await Promise.all([
     fetchJson(`${base}/traffic/summary?${params}`, { headers }),
     fetchJson(`${base}/traffic/breakdown?${params}`, { headers }),
     fetchJson(`${base}/clicks/details?${params}&page=/`, { headers }),
+    breakdownRows(`${base}/pages/breakdown?${params}`, headers),
+    breakdownRows(`${base}/clicks/breakdown?${params}`, headers),
   ]);
 
   const sessions = Number(summary?.data?.sessions ?? summary?.data?.total_sessions ?? summary?.sessions ?? 0);
@@ -112,6 +155,9 @@ async function humblyticsMetrics() {
     paidXSessions: paidX.sessions,
     paidXPageViews: paidX.pageViews,
     paidXDownloadClicks: cta.paidXDownloads,
+    ...webAppFunnel(pageRows, clickRows),
+    webBreakdownPossiblyTruncated: pageRows.length >= 50 || clickRows.length >= 50,
+    webFunnelScope: "Up to 50 page and click rows. Visitors are homepage-only; event/visitor ratios are not cohort conversion rates. Direct /app/ tracking is off.",
   };
 }
 
@@ -150,7 +196,8 @@ async function telemetryMetrics() {
   const appID = requireEnv("TELEMETRYDECK_APP_ID");
   const dataSource = process.env.TELEMETRYDECK_DATASOURCE ?? "com.omgskills";
   const headers = { authorization: `Bearer ${token}`, "content-type": "application/json" };
-  const types = ["app.installed.v2", "app.launched", "skill.searched", "skill.opened", "skill.installed"];
+  const types = ["app.installed.v2", "app.launched", "skill.searched", "skill.opened", "skill.installed",
+    "connected.connection", "connected.inventory"];
   const counts = {};
 
   for (const type of types) {
@@ -168,6 +215,9 @@ async function telemetryMetrics() {
     searches: counts["skill.searched"] ?? 0,
     skillOpens: counts["skill.opened"] ?? 0,
     skillInstalls: counts["skill.installed"] ?? 0,
+    // These include failed outcomes, not just successful connections or syncs.
+    connectedConnectionEventUsers: counts["connected.connection"] ?? 0,
+    connectedInventoryEventUsers: counts["connected.inventory"] ?? 0,
     engagedUsersLowerBound: Math.max(
       counts["skill.searched"] ?? 0,
       counts["skill.opened"] ?? 0,
@@ -219,7 +269,7 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) main().catch((error) => {
   const payload = {
     status: "degraded",
     checkedAt: new Date().toISOString(),

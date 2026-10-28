@@ -113,6 +113,7 @@ import { DataPage } from "./DataPage";
 import { DevelopersPage } from "./DevelopersPage";
 import { SiteFooter } from "./SiteFooter";
 import { saveTheme, storedTheme, type Theme } from "./theme-preference";
+import { trackEvent } from "./analytics";
 import { SkillReadme } from "./SkillReadme";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
@@ -572,6 +573,11 @@ export function UnifiedApp({
   useEffect(() => {
     setSubmittedQuery(null);
   }, [nav.query, nav.view, nav.id, signedIn]);
+  // One event per public search session, not per keystroke.
+  const searching = isDiscovery(nav.view) && !!nav.query.trim();
+  useEffect(() => {
+    if (searching) trackEvent("App Search");
+  }, [searching]);
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 760px)");
     const change = () => {
@@ -605,6 +611,7 @@ export function UnifiedApp({
   function open(skill: SkillDisplay) {
     const trigger = document.activeElement as HTMLElement | null;
     if (!trigger?.closest(".ua-detail")) detailTrigger.current = trigger;
+    if (skill.key.startsWith("catalog:")) trackEvent("App Skill Open");
     navigate(openSkillNavigation(nav, skill));
   }
   function closeDetail() {
@@ -643,6 +650,7 @@ export function UnifiedApp({
     if (!skill.installCommand) return;
     try {
       await navigator.clipboard.writeText(skill.installCommand);
+      trackEvent("App Copy Install");
       setNotice("Install command copied");
     } catch {
       setNotice("Could not copy the install command.");
