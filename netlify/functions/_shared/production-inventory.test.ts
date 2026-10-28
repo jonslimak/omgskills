@@ -100,7 +100,7 @@ test("normal production endpoints retain disabled-policy and authenticated inven
   assert.equal(uploaded.headers.get("cache-control"), "no-store");
 });
 
-test("new production browser pairing is gated and metadata-only; legacy pairing stays unchanged", async () => {
+test("new production browser pairing is gated and may grant Set downloads; legacy pairing stays unchanged", async () => {
   const body = { state: "a".repeat(43), codeChallenge: "b".repeat(43), codeChallengeMethod: "S256",
     scopes: ["sync:write", "self:revoke"] };
   const path = "/api/portal/sync-pairing-code?inventory=3";
@@ -114,7 +114,14 @@ test("new production browser pairing is gated and metadata-only; legacy pairing 
   const approved = await portalSyncPairingCode(request(path, body), context, { ...deps, requireConnectedSync: guard("sync") });
   assert.equal(approved.status, 200);
   assert.match((await approved.json()).callbackUrl, /^omgskills:\/\/pair\?/);
-  assert.equal((await portalSyncPairingCode(request(path, { ...body, scopes: [...body.scopes, "content:read"] }), context,
+  const withSets = { ...body, scopes: [...body.scopes, "content:read"] };
+  assert.equal((await portalSyncPairingCode(request(path, withSets), context, { ...deps, requireConnectedSync: guard("sync"),
+    async issuePairingCode(_pool: Pool, _owner: string, input: Parameters<typeof import("./device-pairing.js").issuePairingCode>[2]) {
+      assert.deepEqual(input?.grantedScopes, withSets.scopes);
+      return { code: createPairingCode(), expiresAt: new Date(Date.now() + 60_000) };
+    } })).status, 200);
+  const { state: _state, codeChallenge: _challenge, codeChallengeMethod: _method, ...withoutBrowser } = withSets;
+  assert.equal((await portalSyncPairingCode(request(path, withoutBrowser), context,
     { ...deps, requireConnectedSync: guard("sync"), getPgPool: noStorage })).status, 400);
   assert.equal((await portalSyncPairingCode(request("/api/portal/sync-pairing-code", body), context, deps)).status, 200);
 });

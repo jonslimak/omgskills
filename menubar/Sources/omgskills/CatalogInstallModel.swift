@@ -85,7 +85,7 @@ final class CatalogInstallModel {
         default: return true
         }
     }
-    private var appReplacementBlocksRequest: Bool { appUpdateActive || coordinator.hasPendingInstall || coordinator.isAppReplacementActive }
+    var appReplacementBlocksRequest: Bool { appUpdateActive || coordinator.hasPendingInstall || coordinator.isAppReplacementActive }
 
     func receive(_ url: URL) {
         guard !appReplacementBlocksRequest else {

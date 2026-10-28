@@ -86,17 +86,20 @@ struct GroupSnapshotInstallSummary: Equatable, Sendable {
     let updatedCount: Int
     let removedCount: Int
     let skippedCount: Int
+    let alreadyInstalledCount: Int
 
     init(
         installedCount: Int,
         updatedCount: Int,
         removedCount: Int = 0,
-        skippedCount: Int
+        skippedCount: Int,
+        alreadyInstalledCount: Int = 0
     ) {
         self.installedCount = installedCount
         self.updatedCount = updatedCount
         self.removedCount = removedCount
         self.skippedCount = skippedCount
+        self.alreadyInstalledCount = alreadyInstalledCount
     }
 }
 
@@ -340,7 +343,8 @@ final class GroupSnapshotInstallModel {
                     installedCount: result.installedCount,
                     updatedCount: result.updatedCount,
                     removedCount: result.removedCount,
-                    skippedCount: result.metadataOnlyItems.count
+                    skippedCount: result.metadataOnlyItems.count,
+                    alreadyInstalledCount: result.alreadyPresentNames.count
                 ))
             } catch is CancellationError {
                 guard self?.activeAttemptID == attemptID else { return }

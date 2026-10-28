@@ -8,6 +8,7 @@ import type { SetCommand } from "../set-data";
 import type { MembershipCommand } from "../membership-data";
 import { SetPermissions } from "./SetPermissions";
 import { copySetLink, setLink } from "../../app/set-link";
+import { setInstallLink } from "../../app/set-install";
 import { navigationSearch, initialNavigation } from "../../app/unified/model";
 
 type Request =
@@ -20,12 +21,12 @@ type Request =
   | { kind: "favorite"; skill: SkillDisplay; add: boolean }
   | { kind: "remove"; set: PortalSet; skill: SkillDisplay };
 
-export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveMembership, detail, base, local }: {
+export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveMembership, detail, base, local, installEnabled = false }: {
   data: PortalData; mine: SkillDisplay[]; busy: boolean; blocked: boolean; scope: string;
   saveSet: (command: SetCommand) => Promise<{ groupId: string; refreshed: boolean }>;
   saveMembership: (command: MembershipCommand) => Promise<MembershipResult>;
   detail: UnifiedManagement["detail"];
-  base: string; local: boolean;
+  base: string; local: boolean; installEnabled?: boolean;
 }): UnifiedManagement {
   const [request, setRequest] = useState<Request | null>(null);
   const [name, setName] = useState("");
@@ -167,6 +168,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         .finally(() => { pending.current = false; });
     },
     copyLink,
+    installLink: set => setInstallLink(set.appDeepLink, installEnabled, local),
     dialog: theme => request?.kind === "access" ? <SetPermissions key={request.set.id} theme={theme} close={close}
       detail={detail} busy={busy} blocked={blocked} save={saveSet} copyLink={() => copyLink(detail.set ?? request.set)} copyNotice={notice} /> : request && <Modal theme={theme} close={close} title={
       request.kind === "moderate" ? request.set.hidden ? "Restore set?" : "Hide set?"
