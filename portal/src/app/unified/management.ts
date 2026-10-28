@@ -16,6 +16,8 @@ export type UnifiedManagement = {
   reorder: (set: PortalSet, itemId: string, offset: -1 | 1) => void;
   moderate: (set: PortalSet) => void;
   copyLink: (set: PortalSet) => void;
+  /** The companion's Set install link, or null while Mac Set installs are off. */
+  installLink?: (set: PortalSet) => string | null;
   dialog: (theme: string) => ReactNode;
   detail: { set: PortalSet | null; state: LoadState; error: string; retry: () => void;
     catalog?: { state: LoadState; note: string; retry: () => void } };

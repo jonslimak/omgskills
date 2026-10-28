@@ -16,6 +16,7 @@ struct CatalogInstallView: View {
     var connection: DeviceConnectionModel? = nil
     var inventoryRuntime: ConnectedInventoryRuntime? = nil
     var connectionSetupError: String? = nil
+    var setInstall: CompanionSetInstallController? = nil
 
     static let connectionSetupFailureMessage = "Account connection is unavailable. Skill installation is still available."
     static let panelWidth: CGFloat = 210
@@ -58,8 +59,16 @@ struct CatalogInstallView: View {
     private var statusContent: some View {
         Group {
             if model.phase != .idle { installContent }
-            else { accountContent }
+            else if let setInstall, setInstall.isActive {
+                CompanionSetInstallView(controller: setInstall, reconnect: reconnect)
+            } else { accountContent }
         }
+    }
+
+    /// Reconnecting re-pairs the same Mac, which also picks up newly granted scopes such as content:read.
+    private func reconnect() {
+        setInstall?.close()
+        inventoryRuntime?.connect(deviceName: Host.current().localizedName ?? "Mac")
     }
 
     private var accountContent: some View {
@@ -211,6 +220,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     private var authenticationAnchor: NSWindow?
     private var appUpdater: CatalogCandidateUpdater?
     private var connectedRuntime: ConnectedInventoryRuntime?
+    private var setInstall: CompanionSetInstallController?
 
     #if DEBUG
     convenience init(root: URL, website: URL, coordinator: UpdateInstallCoordinator,
@@ -257,12 +267,26 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
 
     convenience init(candidate: CatalogCandidateRuntime.Configuration, coordinator: UpdateInstallCoordinator) {
         let track = Analytics.connectedTracker(profile: candidate.profile)
-        let installer = CatalogSkillInstaller(managedInstaller: ManagedSkillInstaller(
-            managedRoot: candidate.managedRoot, pathAnchor: candidate.home), filesystemPaths: candidate.paths)
-        let service = CatalogInstallFlowService(records: CatalogInstallRecordClient(catalogCandidate: candidate),
-            installer: CatalogInstallService(installer: installer))
+        // One managed installer serializes single-skill and Set changes to the same destinations.
+        let managed = ManagedSkillInstaller(managedRoot: candidate.managedRoot, pathAnchor: candidate.home)
+        let records = CatalogInstallRecordClient(catalogCandidate: candidate)
+        let installer = CatalogSkillInstaller(managedInstaller: managed, filesystemPaths: candidate.paths)
+        let service = CatalogInstallFlowService(records: records, installer: CatalogInstallService(installer: installer))
         self.init(model: CatalogInstallModel(service: service, coordinator: coordinator, client: .product, track: track),
             website: candidate.profile.website)
+        if let connected = candidate.connected, AppRuntimeConfiguration.skillGroupsAuthSupported {
+            let sets = CompanionSetInstallController(
+                flow: GroupInstallFlowModel(credentialStore: DeviceCredentialStore(service: connected.keychainService),
+                    manifestAPI: DeviceGroupManifestAPI(uploadEndpoint: connected.uploadURL)),
+                availability: SkillGroupsFeatureAvailability(buildSupportsSkillGroups: true),
+                installer: managed,
+                packageLoader: GroupSkillPackageLoader(catalog: CatalogRecordRepositoryResolver(records: records),
+                    privateFetcher: DevicePrivateSkillPackageAPI(uploadEndpoint: connected.uploadURL)),
+                coordinator: coordinator, home: candidate.home,
+                requestIsBlocked: { [weak model] in model?.appReplacementBlocksRequest ?? true })
+            setInstall = sets
+            Task { await sets.refreshAvailability() }
+        }
         if let connected = candidate.connected {
             let authorizer = WebAuthenticationSession(anchorProvider: { [weak self] in self?.browserPresentationAnchor() },
                 onReturn: { [weak self] in self?.returnFromBrowser() })
@@ -271,6 +295,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
                     coordinator: coordinator, automation: .live(paths: candidate.paths), track: track)
                 connectedRuntime = runtime
                 runtime.observeInstalls(in: model)
+                setInstall?.onInstalled = { [weak runtime] in runtime?.installed() }
                 setContent(connection: runtime.connection, inventoryRuntime: runtime)
                 runtime.start()
             } catch {
@@ -314,7 +339,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
             showAppMenu: { [weak self] in self?.showAppMenu() }, showStatus: { [weak self] in self?.showStatus() },
             openWebsite: { [weak self] in self?.openWebsite() }, quit: { [weak self] in self?.quit() },
             appUpdater: appUpdater, resizePanel: { [weak self] in self?.resizePanel(to: $0) }, connection: connection,
-            inventoryRuntime: inventoryRuntime, connectionSetupError: connectionSetupError)
+            inventoryRuntime: inventoryRuntime, connectionSetupError: connectionSetupError, setInstall: setInstall)
     }
 
     private func browserPresentationAnchor() -> NSWindow? {
@@ -345,6 +370,16 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     func receive(_ url: URL) {
         if connectedRuntime != nil && url.absoluteString == "omgskills://connect" { showStatus(); return }
         if connectedRuntime?.receivePairingCallback(url) == true { showStatus(); return }
+        if GroupInstallDeepLink.route(from: url) != nil {
+            if model.appReplacementBlocksRequest {
+                model.receive(url)
+                showStatus()
+                return
+            }
+            // Set links never reach the single-skill installer; with the gates off they are dropped.
+            if model.phase == .idle, setInstall?.receive(url) == true { showStatus() }
+            return
+        }
         model.receive(url)
         showStatus()
     }
@@ -370,7 +405,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     }
     @objc private func openWebsite() { NSWorkspace.shared.open(website) }
     @objc private func quit() {
-        guard model.canClose else { return }
+        guard model.canClose, setInstall?.canClose ?? true else { return }
         NSApp.terminate(nil)
     }
     func configureUpdates(_ updater: CatalogCandidateUpdater) {

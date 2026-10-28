@@ -1,5 +1,5 @@
 import productionFeatures from "../../config/production-features.json";
-import { BASE_DEVICE_SCOPES, connectedInventoryDisclosure, normalPairingConsent,
+import { ALL_DEVICE_SCOPES, connectedInventoryDisclosure, normalPairingConsent,
   type PairingConsentPolicy } from "./browser-pairing";
 
 export function productionConnectedProfile(href: string, publishableKey: unknown, features = productionFeatures) {
@@ -14,7 +14,8 @@ export function productionInventoryConsent(enabled: boolean): PairingConsentPoli
   return {
     ...normalPairingConsent,
     parse: hash => enabled ? normalPairingConsent.parse(hash) : null,
-    scopes: () => BASE_DEVICE_SCOPES,
+    // content:read lets the companion download Sets shared with this account.
+    scopes: () => ALL_DEVICE_SCOPES,
     disclosure: connectedInventoryDisclosure,
     approvalPath: "/api/portal/sync-pairing-code?inventory=3",
   };
