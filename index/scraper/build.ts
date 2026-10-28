@@ -256,8 +256,9 @@ function writeAtomic(path: string, content: string) {
   renameSync(tmp, path);
 }
 
+// Unindented: the indented library passes GitHub's 100 MiB per-file limit.
 function stringifySkills(skills: Skill[]) {
-  return JSON.stringify(skills, null, 2) + "\n";
+  return JSON.stringify(skills) + "\n";
 }
 
 // SHA cache — stored separately from skills.json so it survives if skills.json is lost/corrupt.
