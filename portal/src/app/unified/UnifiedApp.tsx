@@ -257,6 +257,7 @@ function ManagedSetHeader({ set, skills, management, theme, headingActions }: {
   const access = setAccessSummary(set);
   const VisibilityIcon = set.visibility === "public" ? Globe : set.visibility === "restricted" ? Lock : User;
   const count = set.itemCount ?? set.items.length;
+  const installLink = set.isFavorites ? null : management.installLink?.(set) ?? null;
   const descriptions = {
     public: "Anyone with the link can view this set.",
     restricted: "Only you and people granted email access.",
@@ -299,6 +300,8 @@ function ManagedSetHeader({ set, skills, management, theme, headingActions }: {
       {editable && <>
         <button className="ua-pill ua-set-action" type="button" aria-label="Add skill" title="Add skill" disabled={disabled} onClick={() => management.add([], set)}><Plus /><span>Add skill</span></button>
       </>}
+      {installLink && !disabled && <a className="ua-pill ua-set-action" href={installLink} title="Install this Set with the OMGSkills Mac app">
+        <Download /><span>Install on Mac</span></a>}
       <IconButton label="Copy link" onClick={() => management.copyLink(set)}><Copy /></IconButton>
       {set.hidden && <span className="ua-muted">Hidden from other people</span>}
       {set.role === "owner" && !set.isFavorites && <Menu theme={theme} label="Set options" trigger={<IconButton label="Set options" disabled={disabled}><MoreHorizontal /></IconButton>}>

@@ -28,6 +28,7 @@ import { setupTestDistribution } from "../../app/unified/setup-test-distribution
 import { CatalogInstallIntentStore } from "../../app/unified/catalog-install-intent";
 import { CatalogInstallSetup } from "../../app/unified/CatalogInstallSetup";
 import { needsAnalyticsDocumentReload, startPublicAnalytics } from "../../app/unified/analytics";
+import { isFeatureEnabled } from "../../feature-flags";
 
 const publicClient = new PublicCatalogClient(undefined, undefined, undefined, import.meta.env.VITE_CATALOG_SEARCH_ENABLED === "1");
 publicClient.warm();
@@ -146,7 +147,9 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const management = useManagement({ data, mine: skillDisplays(data, publicData.catalog).mine,
     busy: snapshot.setSaving || snapshot.profileSaving, blocked: !!composition?.readOnly || !available || !snapshot.data || !!snapshot.error || snapshot.accessDenied,
     scope: `${nav.view}:${nav.id}:${nav.query}`, saveSet: account.saveSet, saveMembership: account.saveMembership,
-    detail: { ...detail, catalog: setCatalog }, base, local });
+    detail: { ...detail, catalog: setCatalog }, base, local,
+    // Follows skillGroupsAuthEnabled, like the companion's own Set gate.
+    installEnabled: isFeatureEnabled(import.meta.env.VITE_SKILLGROUPS_MAC_ENABLED) });
   return <UnifiedApp
     key={available ? accountKey : "public"}
     data={data} catalog={catalog} publicStatus={publicData.status}

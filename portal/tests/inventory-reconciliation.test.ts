@@ -289,6 +289,13 @@ test("rendered My skills and Set rows retain missing history separately from lat
     const managedSet = render({ ...initialNavigation, view: "set", id: "saved-set" }, management);
     assert.equal([...managedSet.matchAll(/aria-label="Open Saved snapshot"/g)].length, 1);
     assert.doesNotMatch(managedSet, /Not found on last scan|Latest scan incomplete/);
+    // The Mac install link appears only when the gate supplies one and the Set is not blocked.
+    const setNav = { ...initialNavigation, view: "set" as const, id: "saved-set" };
+    const appLink = "omgskills://group?url=https%3A%2F%2Fomgskills.com%2Fu%2Fowner%2Fsets%2Fsaved-set";
+    assert.match(render(setNav, { ...management, blocked: false, installLink: () => appLink }),
+      /<a class="ua-pill ua-set-action" href="omgskills:\/\/group\?url=https%3A%2F%2Fomgskills\.com%2Fu%2Fowner%2Fsets%2Fsaved-set"[^>]*>.*?Install on Mac/);
+    assert.doesNotMatch(render(setNav, { ...management, blocked: false, installLink: () => null }), /Install on Mac/);
+    assert.doesNotMatch(render(setNav, { ...management, installLink: () => appLink }), /Install on Mac/);
     const selected = render({ ...initialNavigation, selected: "synced:missing-id" });
     assert.match(selected, /aria-label="Open Removal fixture" aria-expanded="true"/);
     const existingLink = render({ ...initialNavigation, selected: "synced:other-mac" });
