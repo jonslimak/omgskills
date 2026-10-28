@@ -27,8 +27,8 @@ function sha256Hex(buffer) {
   return createHash("sha256").update(buffer).digest("hex");
 }
 
-function writeJsonAsset(prefix, value) {
-  const data = Buffer.from(`${JSON.stringify(value, null, 2)}\n`);
+function writeJsonAsset(prefix, value, { compact = false } = {}) {
+  const data = Buffer.from(`${compact ? JSON.stringify(value) : JSON.stringify(value, null, 2)}\n`);
   const hash = sha256Hex(data);
   const filename = `${prefix}-${hash.slice(0, 12)}.json`;
   writeFileSync(join(dataDir, filename), data);
@@ -74,7 +74,8 @@ const manifest = {
 const existingManifest = loadExistingManifest();
 
 mkdirSync(dataDir, { recursive: true });
-manifest.skills = writeJsonAsset("skills", skills);
+// Unindented: the indented skills file passes GitHub's 100 MiB per-file limit.
+manifest.skills = writeJsonAsset("skills", skills, { compact: true });
 manifest.trending = writeJsonAsset("trending", trending);
 
 if (existsSync(xTrendingPath)) {
