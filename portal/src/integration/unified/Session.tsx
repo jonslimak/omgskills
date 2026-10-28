@@ -27,6 +27,7 @@ import { PublicInstallSetup } from "../../app/unified/PublicInstallSetup";
 import { setupTestDistribution } from "../../app/unified/setup-test-distribution";
 import { CatalogInstallIntentStore } from "../../app/unified/catalog-install-intent";
 import { CatalogInstallSetup } from "../../app/unified/CatalogInstallSetup";
+import { needsAnalyticsDocumentReload, startPublicAnalytics } from "../../app/unified/analytics";
 
 const publicClient = new PublicCatalogClient(undefined, undefined, undefined, import.meta.env.VITE_CATALOG_SEARCH_ENABLED === "1");
 publicClient.warm();
@@ -77,12 +78,18 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const publicData = usePublicCatalog(publicClient, publicNavigation(nav), true);
   // On a static library page, swap the app in once its first public view has rendered.
   const listState = publicData.status.list;
+  useEffect(() => { startPublicAnalytics(); }, []);
   useEffect(() => { if (takeover && listState === "ready") announceAppReady(); }, [takeover, listState]);
   const navigate = (next: Navigation, replace = false) => {
     const safe = navigation(next, available);
     clearOtherIntent(safe);
+    const href = address(safe);
+    if (needsAnalyticsDocumentReload(href)) {
+      window.location[replace ? "replace" : "assign"](href);
+      return;
+    }
     // Keep the full view in history so Back restores the list behind a skill address.
-    history[replace ? "replaceState" : "pushState"]({ nav: safe }, "", address(safe));
+    history[replace ? "replaceState" : "pushState"]({ nav: safe }, "", href);
     setRequested(safe);
   };
   const current = address(nav);
@@ -92,10 +99,18 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     const here = location.pathname + location.search;
     const keep = staticPageAddress(location.pathname, base)
       && navigationLocation(entryNavigation(location.pathname, location.search, base), true) === navigationLocation(nav, true);
+    if (needsAnalyticsDocumentReload(keep ? here : current)) {
+      window.location.replace(keep ? here : current);
+      return;
+    }
     history.replaceState({ nav }, "", keep ? here : current);
   }, [current, available, base, requested.view]);
   useEffect(() => {
     const pop = () => {
+      if (needsAnalyticsDocumentReload(location.href)) {
+        window.location.reload();
+        return;
+      }
       const saved = (history.state as { nav?: Navigation } | null)?.nav;
       const next = saved && (address(saved) === location.pathname + location.search || staticPageAddress(location.pathname, base))
         ? saved : entryNavigation(location.pathname, location.search, base);
@@ -111,7 +126,8 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     setSessionError("");
     account.clear();
     const next = navigation(nav, false);
-    history.replaceState({ nav: next }, "", address(next));
+    // Clerk's redirect below crosses the privacy boundary after sign-out succeeds.
+    if (!needsAnalyticsDocumentReload(address(next))) history.replaceState({ nav: next }, "", address(next));
     setRequested(next);
     // Sign-in and sign-out returns keep the ?view= form; the page rewrites it on arrival.
     try { await clerk.signOut({ redirectUrl: `${base}${navigationSearch(next)}` }); }
