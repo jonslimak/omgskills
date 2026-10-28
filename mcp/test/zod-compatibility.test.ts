@@ -69,7 +69,7 @@ test("omitted arguments retain compact results, paging and install/content defau
     assert.notEqual(response.isError, true, name);
     const data = response.structuredContent as { count: number; skills: Record<string, unknown>[]; page?: { total: number } };
     assert.equal(data.count, 10, name);
-    assert.ok(data.skills.every(skill => !("install_status" in skill) && !("install_cmd" in skill)), name);
+    assert.ok(data.skills.every(skill => !("pinned_install" in skill) && !("install_cmd" in skill)), name);
     if (name !== "list_gold_basket") assert.equal(data.page?.total, 35, name);
   }
   const full = await client.callTool({ name: "search_skills", arguments: { query: "example", summary: false } });

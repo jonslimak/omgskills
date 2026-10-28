@@ -1,53 +1,18 @@
 import { createHash } from "node:crypto";
 import type { SkillResult } from "./library.js";
+import { githubRepo, pinnedInstallFor, safePart, skillMdParts, type PinnedInstall } from "./install-record.mjs";
 
-export type PinnedInstall = { repo: string; path: string; commit_sha: string; skill_md_sha: string; skill_tree_sha?: string };
+export { githubRepo, pinnedInstallFor, skillMdParts, type PinnedInstall };
 export const installAgents = ["claude_code", "codex"] as const;
 export const installScopes = ["user", "project"] as const;
 export type InstallAgent = typeof installAgents[number];
 export type InstallScope = typeof installScopes[number];
 
-const sha = /^[a-f0-9]{40}$/i;
-const safePart = /^[a-z0-9_.-]+$/i;
 // Where each agent reads skills, matching the Mac app's installer.
 const skillRoots: Record<InstallAgent, Record<InstallScope, string>> = {
   claude_code: { user: "~/.claude/skills", project: ".claude/skills" },
   codex: { user: "~/.codex/skills", project: ".codex/skills" },
 };
-
-/** The exact commit and folder to install from, or undefined when the record cannot be installed reproducibly. */
-export function pinnedInstallFor(skill: SkillResult): PinnedInstall | undefined {
-  const repo = githubRepo(skill.github_url);
-  if (!repo || !skill.skill_md_path || !skill.repo_commit_sha || !skill.skill_md_sha) return undefined;
-  if (!sha.test(skill.repo_commit_sha) || !sha.test(skill.skill_md_sha)) return undefined;
-  const pathParts = skillMdParts(skill.skill_md_path);
-  if (!pathParts || pathParts.length < 2) return undefined;
-  return {
-    repo,
-    path: pathParts.slice(0, -1).join("/"),
-    commit_sha: skill.repo_commit_sha.toLowerCase(),
-    skill_md_sha: skill.skill_md_sha.toLowerCase(),
-    ...(skill.skill_tree_sha && sha.test(skill.skill_tree_sha) ? { skill_tree_sha: skill.skill_tree_sha.toLowerCase() } : {})
-  };
-}
-
-/** owner/repo for a plain https://github.com/owner/repo URL. */
-export function githubRepo(url: string | undefined): string | undefined {
-  if (!url) return undefined;
-  let parsed: URL;
-  try { parsed = new URL(url); } catch { return undefined; }
-  const parts = parsed.pathname.split("/").filter(Boolean);
-  if (parsed.protocol !== "https:" || parsed.hostname !== "github.com" || parsed.username || parsed.password || parsed.port
-    || parts.length !== 2 || parsed.search || parsed.hash || !parts.every(part => safePart.test(part))) return undefined;
-  return parts.join("/");
-}
-
-/** Path segments of a SKILL.md path, or undefined if any segment is unsafe. */
-export function skillMdParts(path: string | undefined): string[] | undefined {
-  const parts = path?.split("/");
-  if (!parts || parts.at(-1) !== "SKILL.md") return undefined;
-  return parts.every(part => safePart.test(part) && part !== "." && part !== "..") ? parts : undefined;
-}
 
 export function installFolderName(skill: SkillResult, pin: PinnedInstall): string | undefined {
   const name = skill.install_target_name ?? pin.path.split("/").at(-1);
@@ -63,6 +28,8 @@ export function installScript(pin: PinnedInstall, name: string, agent: InstallAg
   const destination = `${skillRoots[agent][scope]}/${name}`;
   const root = skillRoots[agent][scope].replace(/^~/, "$HOME");
   const steps = [
+    // Run as one script: each step relies on the ones before it succeeding.
+    "set -e",
     `destination="${root}/${name}"`,
     `test ! -e "$destination" && test ! -L "$destination" || { echo "$destination already exists; remove it first to reinstall." >&2; exit 1; }`,
     `tmp=""; marker=""`,
@@ -83,7 +50,7 @@ export function installScript(pin: PinnedInstall, name: string, agent: InstallAg
     `rm "$marker"`,
     `marker=""`
   ];
-  return { destination, steps, script: ["set -e", ...steps].join("\n") };
+  return { destination, steps, script: steps.join("\n") };
 }
 
 /** User-scope install scripts for each agent, for a single full skill record. */

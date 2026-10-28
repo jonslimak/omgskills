@@ -281,7 +281,9 @@ test("library keeps only returnable fields and ranks with precomputed search dat
   });
 
   assert.equal("readme_snippet" in (library.getSkill("a/x:first") ?? {}), false);
-  assert.deepEqual(library.searchSkills({ query: "PDF" }).map((skill) => skill.id), ["a/x:first", "a/x:second"]);
-  assert.deepEqual(library.listByAuthor("ACME").map((skill) => skill.id), ["a/x:first", "a/x:second"]);
+  // Same repository, name and description: lists keep one copy, and the other is still found by ID.
+  assert.deepEqual(library.searchSkills({ query: "PDF" }).map((skill) => skill.id), ["a/x:first"]);
+  assert.deepEqual(library.listByAuthor("ACME").map((skill) => skill.id), ["a/x:first"]);
+  assert.equal(library.getSkill("a/x:second")?.id, "a/x:second");
   assert.deepEqual(library.searchSkills({ query: "", minStars: 100 }).map((skill) => skill.id), ["b/y:other"]);
 });

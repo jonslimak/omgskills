@@ -2,12 +2,13 @@ import { lstatSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import {
-  assetReference, descriptor, detailBucket, detailIndex, projectSearchSkill, searchCatalogLimits,
+  assetReference, descriptor, detailBucket, detailIndex, encodeInstallable, installablePayload, projectSearchSkill, searchCatalogLimits,
   searchPayload, rankingPayload, sha256, validateShard, verifyBytes,
 } from "../mcp/src/search-catalog-format.mjs";
+import { pinnedInstallFor } from "../mcp/src/install-record.mjs";
 import { collectionLikeIds, collectionOriginPolicy } from "../mcp/src/search-ranking-policy.mjs";
 
-export const searchAssetPattern = /^(?:search-catalog|search-skills|search-ranking|skill-detail-index|skill-details)-[a-f0-9]{12}\.json$/;
+export const searchAssetPattern = /^(?:search-catalog|search-skills|search-ranking|search-installable|skill-detail-index|skill-details)-[a-f0-9]{12}\.json$/;
 
 function readAsset(dataDir, ref, limit = Number.MAX_SAFE_INTEGER) {
   assetReference(ref, limit);
@@ -53,6 +54,10 @@ export function validateSearchCatalog(dataDir, manifest, { fullRecords = true } 
     const ranking = rankingPayload(readAsset(dataDir, desc.ranking, searchCatalogLimits.ranking), desc, new Set(search.skills.map(row => row.id)));
     if (source && !isDeepStrictEqual(ranking.collectionLikeIds, collectionLikeIds(source))) throw new Error("Ranking/source mismatch");
   }
+  if (desc.installable) {
+    const pinned = installablePayload(readAsset(dataDir, desc.installable, searchCatalogLimits.install), desc, search.skills);
+    if (source && source.some(skill => !!pinnedInstallFor(skill) !== pinned.has(skill.id))) throw new Error("Installable/source mismatch");
+  }
   for (const [key, expected] of buckets) {
     const shardRef = index.shards[key];
     const records = validateShard(readAsset(dataDir, shardRef, searchCatalogLimits.shard), key, expected);
@@ -60,7 +65,7 @@ export function validateSearchCatalog(dataDir, manifest, { fullRecords = true } 
       if (!isDeepStrictEqual(record, byId.get(id))) throw new Error(`Full catalog record changed: ${id}`);
     }
   }
-  return { descriptor: desc, paths: [ref.path, desc.sourceSkills.path, desc.search.path, desc.details.path, ...(desc.ranking ? [desc.ranking.path] : []), ...Object.values(index.shards).map(asset => asset.path)] };
+  return { descriptor: desc, paths: [ref.path, desc.sourceSkills.path, desc.search.path, desc.details.path, ...(desc.ranking ? [desc.ranking.path] : []), ...(desc.installable ? [desc.installable.path] : []), ...Object.values(index.shards).map(asset => asset.path)] };
 }
 
 export function buildSearchCatalog(dataDir, sourceRef, { generatedAt, previous, ranking = false } = {}) {
@@ -69,7 +74,7 @@ export function buildSearchCatalog(dataDir, sourceRef, { generatedAt, previous, 
     const raw = readAsset(dataDir, previous, searchCatalogLimits.metadata);
     const old = descriptor(raw, raw.sourceSkills);
     ranking ||= old.ranking !== undefined;
-    if (old.sourceSkills.sha256 === sourceRef.sha256 && old.sourceSkills.path === sourceRef.path && old.sourceSkills.bytes === sourceRef.bytes && (!ranking || old.ranking)) {
+    if (old.sourceSkills.sha256 === sourceRef.sha256 && old.sourceSkills.path === sourceRef.path && old.sourceSkills.bytes === sourceRef.bytes && (!ranking || old.ranking) && old.installable) {
       validateSearchCatalog(dataDir, { skills: sourceRef, searchCatalog: previous });
       return previous;
     }
@@ -92,6 +97,8 @@ export function buildSearchCatalog(dataDir, sourceRef, { generatedAt, previous, 
   desc.details = writeAsset(dataDir, "skill-detail-index", { schemaVersion: 1, sourceSkillsSha256: sourceRef.sha256, skillCount: rows.length, partition: "sha256-first-byte", shards }, searchCatalogLimits.metadata);
   if (ranking) desc.ranking = writeAsset(dataDir, "search-ranking", { schemaVersion: 1, policy: collectionOriginPolicy,
     sourceSkillsSha256: sourceRef.sha256, skillCount: skills.length, collectionLikeIds: collectionLikeIds(skills) }, searchCatalogLimits.ranking);
+  desc.installable = writeAsset(dataDir, "search-installable", { schemaVersion: 1, sourceSkillsSha256: sourceRef.sha256,
+    skillCount: skills.length, pinned: encodeInstallable(skills.map(skill => !!pinnedInstallFor(skill))) }, searchCatalogLimits.install);
   const ref = writeAsset(dataDir, "search-catalog", desc, searchCatalogLimits.metadata);
   validateSearchCatalog(dataDir, { skills: sourceRef, searchCatalog: ref });
   return ref;
