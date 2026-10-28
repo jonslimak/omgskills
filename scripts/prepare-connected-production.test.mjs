@@ -6,7 +6,7 @@ import { metadata, recipe, release, website, updateFeed } from './prepare-connec
 const key = Buffer.from(Array.from({ length: 32 }, (_, index) => index + 1)).toString('base64');
 
 test('production packaging preserves identity with production-only account and manual update settings', () => {
-  assert.deepEqual(release, { version: '0.0.27', build: '27' });
+  assert.deepEqual(release, { version: '0.0.28', build: '28' });
   const info = metadata(key);
   assert.equal(info.CFBundleIdentifier, 'com.jonslimak.omgskills');
   assert.equal(info.CFBundleDisplayName, 'OMGSkills');
@@ -22,7 +22,8 @@ test('production packaging preserves identity with production-only account and m
   assert.equal(info.SUPublicEDKey, key);
   assert.equal(info.OMGSkillsCatalogProductionUpdatePublicKey, key);
   for (const field of ['SUEnableAutomaticChecks', 'SUAutomaticallyUpdate', 'SUAllowsAutomaticUpdates',
-    'SUEnableSystemProfiling', 'OMGSkillsSkillGroupsAuthEnabled']) assert.equal(info[field], false);
+    'SUEnableSystemProfiling']) assert.equal(info[field], false);
+  assert.equal(info.OMGSkillsSkillGroupsAuthEnabled, true);
   assert.equal(info.SURequireSignedFeed, true);
   assert.equal(info.SUVerifyUpdateBeforeExtraction, true);
   assert.equal(info.LSMinimumSystemVersion, '14.0');
@@ -38,7 +39,7 @@ test('production recipe isolates outputs and rejects mixed endpoints, automatic 
   assert.ok(!value.buildArgs.includes('-DOMGSKILLS_CONNECTED_CANDIDATE'));
   assert.ok(value.requiredSymbols.includes('ConnectedInventoryRuntime'));
   for (const change of [{ SUFeedURL: 'https://omgskills.com/appcast.xml' },
-    { SUEnableAutomaticChecks: true }, { OMGSkillsConnectedCandidate: true },
+    { SUEnableAutomaticChecks: true }, { OMGSkillsConnectedCandidate: true }, { OMGSkillsSkillGroupsAuthEnabled: false },
     { OMGSkillsConnectedProductionConnectURL: 'https://other.invalid/' },
     { OMGSkillsConnectedProductionCredentialService: 'com.jonslimak.omgskills.catalog-candidate.inventory' }]) {
     assert.throws(() => value.validateMetadata({ ...value.plist, ...change }));
