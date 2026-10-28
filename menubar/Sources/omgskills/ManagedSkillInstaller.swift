@@ -109,17 +109,21 @@ struct ManagedGroupSnapshotInstallResult: Equatable, Sendable {
     let updatedCount: Int
     let removedCount: Int
     let metadataOnlyItems: [ManagedGroupMetadataOnlyItem]
+    /// Snapshot items left alone because another install already uses their name.
+    let alreadyPresentNames: [String]
 
     init(
         installedCount: Int,
         updatedCount: Int,
         removedCount: Int = 0,
-        metadataOnlyItems: [ManagedGroupMetadataOnlyItem]
+        metadataOnlyItems: [ManagedGroupMetadataOnlyItem],
+        alreadyPresentNames: [String] = []
     ) {
         self.installedCount = installedCount
         self.updatedCount = updatedCount
         self.removedCount = removedCount
         self.metadataOnlyItems = metadataOnlyItems
+        self.alreadyPresentNames = alreadyPresentNames
     }
 }
 
@@ -138,6 +142,7 @@ private struct PlannedGroupItem: Sendable {
 private struct GroupInstallPlan: Sendable {
     let installable: [PlannedGroupItem]
     let metadataOnly: [ManagedGroupMetadataOnlyItem]
+    let alreadyPresent: [String]
 }
 
 private struct StoredGroupItem: Sendable {
@@ -225,6 +230,7 @@ actor ManagedSkillInstaller {
         case invalidIdentifier
         case invalidTargetName
         case unmanagedTargetExists
+        case targetOwnedByAnotherInstall
         case invalidStoredPackage
         case invalidManagedActivation
         case invalidGroupManifest
@@ -243,6 +249,8 @@ actor ManagedSkillInstaller {
                 return "Managed install target name is unsafe"
             case .unmanagedTargetExists:
                 return "Install blocked because an unmanaged skill already uses this name"
+            case .targetOwnedByAnotherInstall:
+                return "Install blocked because another installation already uses this name"
             case .invalidStoredPackage:
                 return "Stored package does not match its validated release"
             case .invalidManagedActivation:
@@ -614,7 +622,8 @@ actor ManagedSkillInstaller {
                 installedCount: 0,
                 updatedCount: 0,
                 removedCount: 0,
-                metadataOnlyItems: plan.metadataOnly
+                metadataOnlyItems: plan.metadataOnly,
+                alreadyPresentNames: plan.alreadyPresent
             )
         }
 
@@ -664,7 +673,8 @@ actor ManagedSkillInstaller {
             installedCount: prepared.filter { $0.planned.previousActivation == nil }.count,
             updatedCount: prepared.filter { $0.planned.previousActivation != nil }.count,
             removedCount: removals.count,
-            metadataOnlyItems: plan.metadataOnly
+            metadataOnlyItems: plan.metadataOnly,
+            alreadyPresentNames: plan.alreadyPresent
         )
     }
 
@@ -883,7 +893,11 @@ actor ManagedSkillInstaller {
         let groupRoute = "/u/\(request.route.handle)/sets/\(request.route.groupSlug)"
         var installable: [PlannedGroupItem] = []
         var metadataOnly: [ManagedGroupMetadataOnlyItem] = []
+        var alreadyPresent: [String] = []
         var targetKeys = Set<String>()
+        // A first "Install this version" skips names another install already uses; it writes no
+        // subscription record, so nothing later expects those items. "Keep updated" still refuses.
+        let skipsOccupiedTargets = allowedExistingTargetKeys == nil && request.mode == .snapshot
 
         for item in manifest.items {
             switch item.installability {
@@ -926,14 +940,24 @@ actor ManagedSkillInstaller {
                     item.name,
                     isDirectory: true
                 )
-                let previousActivation = try existingManagedActivation(
-                    at: targetURL,
-                    fileManager: .default
-                )
+                let previousActivation: URL?
+                do {
+                    previousActivation = try existingManagedActivation(at: targetURL, fileManager: .default)
+                } catch InstallError.unmanagedTargetExists where skipsOccupiedTargets {
+                    alreadyPresent.append(item.name)
+                    continue
+                }
                 if previousActivation != nil,
                    let allowedExistingTargetKeys,
                    !allowedExistingTargetKeys.contains(collisionKey) {
                     throw InstallError.unmanagedTargetExists
+                }
+                // A first install may replace only this Set's own skills, never a single install or another Set's.
+                if let previousActivation, allowedExistingTargetKeys == nil,
+                   activationGroupId(previousActivation) != manifest.group.id {
+                    guard skipsOccupiedTargets else { throw InstallError.targetOwnedByAnotherInstall }
+                    alreadyPresent.append(item.name)
+                    continue
                 }
                 installable.append(PlannedGroupItem(
                     manifestItem: item,
@@ -944,7 +968,7 @@ actor ManagedSkillInstaller {
             }
         }
 
-        return GroupInstallPlan(installable: installable, metadataOnly: metadataOnly)
+        return GroupInstallPlan(installable: installable, metadataOnly: metadataOnly, alreadyPresent: alreadyPresent)
     }
 
     private func managedSourceValues(
@@ -1648,6 +1672,13 @@ actor ManagedSkillInstaller {
         let activation = destination.deletingLastPathComponent()
         try validateManagedActivation(activation, fileManager: fileManager)
         return activation
+    }
+
+    private func activationGroupId(_ activation: URL) -> String? {
+        guard let data = try? Data(contentsOf: activation.appendingPathComponent("provenance.json")),
+              let provenance = try? JSONDecoder().decode(SkillInstallProvenance.self, from: data)
+        else { return nil }
+        return provenance.groupId
     }
 
     private func validateManagedActivation(

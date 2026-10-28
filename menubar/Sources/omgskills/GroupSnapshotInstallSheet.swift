@@ -335,6 +335,9 @@ struct GroupSnapshotInstallSheet: View {
         if summary.skippedCount > 0 {
             parts.append("\(summary.skippedCount) skipped")
         }
+        if summary.alreadyInstalledCount > 0 {
+            parts.append("\(summary.alreadyInstalledCount) already installed")
+        }
         return parts.isEmpty ? "This version is installed." : parts.joined(separator: ", ").capitalized + "."
     }
 

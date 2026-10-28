@@ -608,13 +608,73 @@ struct ManagedGroupSnapshotInstallerTests {
 
         await #expect(throws: ManagedSkillInstaller.InstallError.unmanagedTargetExists) {
             try await fixture.installer().installGroupSnapshot(
-                fixture.request(manifest),
+                fixture.request(manifest, mode: .subscribed),
                 credential: fixture.credential,
                 packageLoader: loader
             )
         }
         #expect(await loader.loadedNames().isEmpty)
         #expect(try Data(contentsOf: target.appendingPathComponent("SKILL.md")) == Data("unmanaged".utf8))
+    }
+
+    @Test func subscribedInstallRefusesSkillsInstalledOutsideThisSetBeforeLoading() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let installer = fixture.installer()
+        _ = try await installer.install(fixture.singleRequest(name: "shared", releaseID: "single")) {
+            fixture.package
+        }
+        let before = try fixture.targetDestination("shared")
+        let loader = RecordingGroupPackageLoader(package: fixture.package)
+        let manifest = try fixture.manifest(items: [
+            fixture.installable(name: "shared", kind: "catalog", source: fixture.catalogSource())
+        ])
+
+        await #expect(throws: ManagedSkillInstaller.InstallError.targetOwnedByAnotherInstall) {
+            try await installer.installGroupSnapshot(
+                fixture.request(manifest, mode: .subscribed),
+                credential: fixture.credential,
+                packageLoader: loader
+            )
+        }
+        #expect(await loader.loadedNames().isEmpty)
+        #expect(try fixture.targetDestination("shared") == before)
+        #expect(SkillInstallProvenanceStore.read(
+            targetRoot: fixture.targetRoot,
+            targetName: "shared"
+        )?.releaseId == "single")
+    }
+
+    @Test func snapshotInstallSkipsSkillsAlreadyInstalledAnotherWay() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let installer = fixture.installer()
+        _ = try await installer.install(fixture.singleRequest(name: "shared", releaseID: "single")) {
+            fixture.package
+        }
+        let sharedBefore = try fixture.targetDestination("shared")
+        let unmanaged = fixture.targetRoot.appendingPathComponent("blocked", isDirectory: true)
+        try FileManager.default.createDirectory(at: unmanaged, withIntermediateDirectories: true)
+        try Data("unmanaged".utf8).write(to: unmanaged.appendingPathComponent("SKILL.md"))
+        let loader = RecordingGroupPackageLoader(package: fixture.package)
+        let manifest = try fixture.manifest(items: [
+            fixture.installable(name: "blocked", kind: "catalog", source: fixture.catalogSource()),
+            fixture.installable(name: "fresh", kind: "github", source: fixture.publicSource()),
+            fixture.installable(name: "shared", kind: "catalog", source: fixture.catalogSource())
+        ])
+
+        let result = try await installer.installGroupSnapshot(
+            fixture.request(manifest),
+            credential: fixture.credential,
+            packageLoader: loader
+        )
+
+        #expect(result.installedCount == 1)
+        #expect(result.alreadyPresentNames == ["blocked", "shared"])
+        #expect(await loader.loadedNames() == ["fresh"])
+        #expect(fixture.targetExists("fresh"))
+        #expect(try fixture.targetDestination("shared") == sharedBefore)
+        #expect(try Data(contentsOf: unmanaged.appendingPathComponent("SKILL.md")) == Data("unmanaged".utf8))
     }
 
     @Test func loaderFailureLeavesEveryActiveTargetUnchanged() async throws {
@@ -668,12 +728,14 @@ struct ManagedGroupSnapshotInstallerTests {
         let installer = fixture.installer { index, _ in
             if index == 2 { throw GroupTransactionTestFailure.injected }
         }
-        _ = try await installer.install(fixture.singleRequest(name: "first", releaseID: "old-first")) {
-            fixture.package
-        }
-        _ = try await installer.install(fixture.singleRequest(name: "third", releaseID: "old-third")) {
-            fixture.package
-        }
+        _ = try await fixture.installer().installGroupSnapshot(
+            fixture.request(fixture.manifest(revision: 6, items: [
+                fixture.installable(name: "first", kind: "catalog", source: fixture.catalogSource(), releaseID: "old-first"),
+                fixture.installable(name: "third", kind: "github", source: fixture.privateSource(), releaseID: "old-third")
+            ])),
+            credential: fixture.credential,
+            packageLoader: RecordingGroupPackageLoader(package: fixture.package)
+        )
         let firstBefore = try fixture.targetDestination("first")
         let thirdBefore = try fixture.targetDestination("third")
         let manifest = try fixture.manifest(items: [
