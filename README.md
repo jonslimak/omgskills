@@ -6,7 +6,7 @@
 
 A web library for finding, organizing and sharing Claude Code and Codex skills, with a companion Mac app for installation and connected inventory.
 
-Start at [omgskills.com/app/](https://omgskills.com/app/). Browse public skills without an account, organize Sets on the web, and choose a skill to open its Mac installation flow. The opt-in companion requires Apple silicon and macOS 14 or later; its download is available in the skill's setup panel. The older Mac app and its update feed remain available separately.
+Start at [omgskills.com/app/](https://omgskills.com/app/). Browse public skills without an account, organize Sets on the web, and choose a skill to open its Mac installation flow. [Download the Mac companion 0.0.27](https://omgskills.com/download) for Apple silicon and macOS 14 or later, or use the skill's setup panel. The [original Mac app](https://omgskills.com/downloads/omgskills-mac.dmg) and its update feed remain available separately. Existing users are not automatically upgraded.
 
 Connect the companion to your account to see installed skills by Mac and agent, including supported external installs. Sync keeps the installed-skills list up to date; it does not update skill files. Set installation and automatic skill updates are **coming soon**.
 

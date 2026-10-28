@@ -65,7 +65,7 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
       {productionDownload ? <>
         <p>OMGSkills {productionDownload.version}. Apple silicon Mac, macOS {productionDownload.minimumOS} or later.</p>
         <a className="ua-f1-install" href={productionDownload.url} rel="noreferrer" aria-describedby={downloadId} data-humblytics="App Setup Download"><Download /> Download OMGSkills {productionDownload.version}</a>
-        <p>This opt-in version replaces your existing OMGSkills app. Your installed skills stay in their current folders.</p>
+        <p>Installing this version manually replaces your existing OMGSkills app. Your installed skills stay in their current folders.</p>
         <ol id={downloadId}>
           <li>Double-click <strong>{productionDownload.filename}</strong> in Finder to unzip it.</li>
           <li>Quit OMGSkills if it is running. Move <strong>{productionDownload.app}</strong> into <strong>Applications</strong>.</li>

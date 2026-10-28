@@ -195,7 +195,7 @@ function addHumblytics(map, date, data) {
   for (const click of data.clicks?.data?.clicks ?? []) {
     const isDownload = click.target === "Hero Download Mac DMG" ||
       click.target === "Reviews Download Mac DMG" ||
-      click.secondary === "/downloads/omgskills-mac.dmg";
+      click.secondary === "/downloads/omgskills-mac.dmg" || click.secondary === "/download";
     if (!isDownload) continue;
     for (const utm of click.utm_breakdown ?? []) {
       const campaign = utm.utm_campaign && utm.utm_campaign !== "none" ? utm.utm_campaign : "unknown";

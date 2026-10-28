@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const origin = (process.env.PRODUCT_HEALTH_ORIGIN ?? "https://omgskills.com").replace(/\/$/, "");
+const defaultDownloadURL = "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.27/OMGSkills-Connected-0.0.27-27-arm64.zip";
 const minDownloadBytes = Number(process.env.MIN_DOWNLOAD_BYTES ?? 1_000_000);
 const minSkillsCount = Number(process.env.MIN_SKILLS_COUNT ?? 40_000);
 const minTrendingCount = Number(process.env.MIN_TRENDING_COUNT ?? 100);
@@ -201,8 +202,7 @@ async function checkRelease() {
   try {
     const redirect = await fetchWithRetry(absolute("/download"), { redirect: "manual" }, { retryStatuses: false });
     const location = redirect.headers.get("location") ?? "";
-    const redirectOk = [301, 302, 307, 308].includes(redirect.status) &&
-      location.includes("/downloads/omgskills-mac.dmg");
+    const redirectOk = redirect.status === 302 && location === defaultDownloadURL;
     details.redirectStatus = redirect.status;
     details.redirectLocation = location;
     if (!redirectOk) issues.push(`/download returned ${redirect.status} to ${location || "no location"}`);

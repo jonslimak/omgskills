@@ -312,6 +312,11 @@
   padding: 6px 7px;
   color: var(--ua-muted);
 }
+.ua-download-requirements {
+  display: block;
+  font-size: 11px;
+  line-height: 1.4;
+}
 .ua-apple-mark {
   flex: 0 0 16px;
   color: color-mix(in srgb, var(--ua-faint) 60%, #fff);

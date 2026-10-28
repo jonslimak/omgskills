@@ -125,7 +125,7 @@ async function humblyticsMetrics() {
     const secondary = String(click.secondary ?? "");
     const isDownload = target === "Hero Download Mac DMG" ||
       target === "Reviews Download Mac DMG" ||
-      secondary === "/downloads/omgskills-mac.dmg";
+      secondary === "/downloads/omgskills-mac.dmg" || secondary === "/download";
     if (!isDownload) continue;
 
     const clickCount = Number(click.clicks) || 0;
