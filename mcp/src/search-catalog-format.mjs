@@ -4,7 +4,7 @@ import { collectionOriginPolicy } from "./search-ranking-policy.mjs";
 export const searchFields = Object.freeze([
   "id", "name", "description", "github_url", "author_handle", "tags", "stars", "last_updated", "first_seen",
 ]);
-export const searchCatalogLimits = Object.freeze({ metadata: 256 * 1024, search: 64 * 1024 * 1024, shard: 4 * 1024 * 1024, ranking: 4 * 1024 * 1024 });
+export const searchCatalogLimits = Object.freeze({ metadata: 256 * 1024, search: 64 * 1024 * 1024, shard: 4 * 1024 * 1024, ranking: 4 * 1024 * 1024, install: 256 * 1024 });
 export const sha256 = bytes => createHash("sha256").update(bytes).digest("hex");
 export const detailBucket = id => sha256(Buffer.from(id, "utf8")).slice(0, 2);
 export const projectSearchSkill = skill => Object.fromEntries(searchFields.filter(key => skill[key] !== undefined).map(key => [key, skill[key]]));
@@ -34,6 +34,7 @@ export function descriptor(value, source) {
   assetReference(data.search, searchCatalogLimits.search);
   assetReference(data.details, searchCatalogLimits.metadata);
   if (data.ranking !== undefined) assetReference(data.ranking, searchCatalogLimits.ranking);
+  if (data.installable !== undefined) assetReference(data.installable, searchCatalogLimits.install);
   return data;
 }
 export function rankingPayload(value, source, ids) {
@@ -48,6 +49,23 @@ export function rankingPayload(value, source, ids) {
     previous = id;
   }
   return data;
+}
+/** One bit per search row, in search order: set when the record can be installed at a pinned commit. */
+export function encodeInstallable(flags) {
+  const bytes = new Uint8Array(Math.ceil(flags.length / 8));
+  flags.forEach((flag, i) => { if (flag) bytes[i >> 3] |= 1 << (i & 7); });
+  return Buffer.from(bytes).toString("base64");
+}
+/** Validated installable payload, decoded to the IDs of the given search rows. */
+export function installablePayload(value, source, rows) {
+  const data = object(value);
+  if (Object.keys(data).sort().join(",") !== "pinned,schemaVersion,skillCount,sourceSkillsSha256"
+    || data.schemaVersion !== 1 || data.sourceSkillsSha256 !== source.sourceSkills.sha256
+    || data.skillCount !== source.skillCount || rows.length !== data.skillCount || typeof data.pinned !== "string") throw new Error("Invalid installable payload");
+  const bytes = Buffer.from(data.pinned, "base64");
+  if (bytes.toString("base64") !== data.pinned || bytes.length !== Math.ceil(rows.length / 8)
+    || (rows.length % 8 && bytes[bytes.length - 1] >> (rows.length % 8))) throw new Error("Invalid installable payload");
+  return new Set(rows.filter((_, i) => bytes[i >> 3] & (1 << (i & 7))).map(row => row.id));
 }
 export function searchPayload(value, source) {
   const data = object(value);

@@ -44,6 +44,8 @@ manifest and curated URL; setting all three file paths keeps loading offline.
 Search by keywords or a short task description, with optional filters. Typos are
 corrected (`search.did_you_mean`), task-like queries fall back to skills matching some
 of the words (`search.partial_match`), and an empty query lists trending skills.
+Every row reports `install_status`; pass `installable: true` to get only skills that
+`get_install_plan` can install at a pinned, verified commit.
 
 ```json
 {
@@ -51,7 +53,8 @@ of the words (`search.partial_match`), and an empty query lists trending skills.
   "limit": 10,
   "author": "anthropics",
   "tag": "agent-skills",
-  "minStars": 100
+  "minStars": 100,
+  "installable": true
 }
 ```
 
@@ -89,7 +92,7 @@ List trending skills.
 
 ### `list_gold_basket`
 
-List curated gold-basket skills.
+List curated gold-basket skills, ordered by editorial score. Pages like the other lists.
 
 ```json
 {
@@ -110,13 +113,15 @@ List skills by GitHub author handle.
 
 ### `related_skills`
 
-Other skills for the same job, most popular first. Use it to find a pinned
-alternative to a `discovery_only` skill.
+Other skills for the same job: those sharing the most name words first, then the
+most-starred. Pass `installable: true` to find a pinned alternative to a
+`discovery_only` skill.
 
 ```json
 {
   "id": "affaan-m/ecc:react-performance",
-  "limit": 5
+  "limit": 5,
+  "installable": true
 }
 ```
 

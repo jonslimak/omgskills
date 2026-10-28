@@ -1,11 +1,13 @@
 export type RawSkill = Record<string, any> & { id: string };
 export type AssetReference = { path: string; sha256: string; bytes: number };
-export type SearchDescriptor = { schemaVersion: 1; generatedAt: string; sourceSkills: AssetReference; skillCount: number; search: AssetReference; details: AssetReference; ranking?: AssetReference };
+export type SearchDescriptor = { schemaVersion: 1; generatedAt: string; sourceSkills: AssetReference; skillCount: number; search: AssetReference; details: AssetReference; ranking?: AssetReference; installable?: AssetReference };
 export type RankingPayload = { schemaVersion: 1; policy: "collection-origin-v1"; sourceSkillsSha256: string; skillCount: number; collectionLikeIds: string[] };
 export type SearchPayload = { schemaVersion: 1; sourceSkillsSha256: string; skillCount: number; skills: RawSkill[] };
 export type DetailIndex = { schemaVersion: 1; sourceSkillsSha256: string; skillCount: number; partition: "sha256-first-byte"; shards: Record<string, AssetReference> };
 export const searchFields: readonly string[];
-export const searchCatalogLimits: Readonly<{ metadata: number; search: number; shard: number; ranking: number }>;
+export const searchCatalogLimits: Readonly<{ metadata: number; search: number; shard: number; ranking: number; install: number }>;
+export function encodeInstallable(flags: readonly boolean[]): string;
+export function installablePayload(value: unknown, source: SearchDescriptor, rows: readonly { id: string }[]): Set<string>;
 export function rankingPayload(value: unknown, source: SearchDescriptor, ids: ReadonlySet<string>): RankingPayload;
 export function sha256(bytes: Uint8Array): string;
 export function detailBucket(id: string): string;

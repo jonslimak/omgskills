@@ -12,13 +12,14 @@ export type SearchNote = { did_you_mean?: string; partial_match?: boolean; showi
 export type SkillPage = { skills: SkillResult[]; page: PageInfo; search?: SearchNote };
 /** Default page and list size: small enough to keep agent context lean. */
 export const defaultLimit = 10;
-export type PagingErrorCode = "invalid_cursor" | "catalog_snapshot_changed" | "paging_not_supported" | "ranking_not_supported" | "catalog_unavailable";
+export type PagingErrorCode = "invalid_cursor" | "catalog_snapshot_changed" | "paging_not_supported" | "ranking_not_supported" | "catalog_unavailable" | "installable_not_supported";
 const messages: Record<PagingErrorCode, string> = {
   invalid_cursor: "Invalid paging request or cursor.",
   catalog_snapshot_changed: "The catalog changed. Restart from the first page.",
   paging_not_supported: "Paging is not available on this reader.",
   ranking_not_supported: "Ranking is not available on this reader.",
   catalog_unavailable: "A complete catalog snapshot is temporarily unavailable.",
+  installable_not_supported: "This catalog does not record which skills are installable yet. Retry without installable, then check install_status with get_skill.",
 };
 export class PagingError extends Error {
   constructor(readonly code: PagingErrorCode, detail?: string) { super(detail ?? messages[code]); }
@@ -37,7 +38,8 @@ export function validatePageOptions(tool: string, options: PageOptions & Partial
     || (tool === "list_trending" && sort !== "trending")
     || (options.query !== undefined && (typeof options.query !== "string" || Buffer.byteLength(options.query) > 1024))
     || [options.author, options.tag].some(value => value !== undefined && (typeof value !== "string" || value.length > 100))
-    || (options.minStars !== undefined && (!Number.isSafeInteger(options.minStars) || options.minStars < 0)))
+    || (options.minStars !== undefined && (!Number.isSafeInteger(options.minStars) || options.minStars < 0))
+    || (options.installable !== undefined && typeof options.installable !== "boolean"))
     fail(options.query !== undefined && typeof options.query === "string" && Buffer.byteLength(options.query) > 1024
       ? "query is too long (over 1,024 bytes); use a few keywords or a short task description."
       : `Invalid paging arguments: limit must be 1-100, sort one of ${catalogSorts.join(", ")}${tool === "list_trending" ? " (list_trending sorts by trending only)" : ""}, and page either {} or {cursor}.`);
@@ -65,6 +67,8 @@ export function preparePage(version: string | undefined, tool: string, options: 
   const request = digest({ ordering: 1, tool,
     terms: normalized(options.query).split(" ").filter(Boolean), author: normalized(options.author),
     tag: normalized(options.tag), minStars: options.minStars ?? 0, limit, sort,
+    // Only when set, so cursors issued before the filter existed stay valid.
+    ...(options.installable ? { installable: true } : {}),
     ...(ranking ? { ranking: ranking.policy, terms: ranking.terms, exactQuery: ranking.exactQuery } : {}) });
   if (cursor && cursor.request !== request) fail("This cursor belongs to a request with different arguments. Repeat the original query, filters, limit and sort with page.cursor, or start again with page: {}.");
   if (cursor && cursor.snapshot !== snapshot) throw new PagingError("catalog_snapshot_changed");

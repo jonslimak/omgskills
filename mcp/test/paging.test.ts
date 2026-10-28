@@ -12,7 +12,7 @@ import { catalogFixture, rows } from "./search-catalog-fixture.js";
 
 const data: LoadedLibrary = {
   skills: Array.from({ length: 257 }, (_, i) => ({ ...rows[0], id: `owner/repo:item-${String(i).padStart(3, "0")}`,
-    name: `Tool ${i % 17}`, description: "workflow design", author_handle: "Owner", tags: [i % 2 ? "odd" : "even"],
+    name: `Tool ${i % 17}`, description: `workflow design ${i}`, author_handle: "Owner", tags: [i % 2 ? "odd" : "even"],
     stars: i % 13, first_seen: `2026-01-${String(i % 28 + 1).padStart(2, "0")}`,
     last_updated: `2026-02-${String(i % 28 + 1).padStart(2, "0")}T00:00:00Z` })),
   trending: Array.from({ length: 257 }, (_, i) => ({ id: `owner/repo:item-${String(i).padStart(3, "0")}`, trending_rank: 257 - i, installs: i * 10 })),
@@ -136,7 +136,9 @@ test("paging servers page by default and return the same skills as unpaged serve
     assert.deepEqual(paged.skills, unpaged.skills, name);
     assert.equal(paged.page.total, 257, name); assert.equal(unpaged.page, undefined, name);
   }
-  for (const [name, args] of [["list_gold_basket", {}], ["get_skill", { id: data.skills[0].id }], ["get_skills", { ids: [data.skills[0].id, "missing"] }]] as [string, object][]) {
+  const gold = (client: typeof candidate) => client.callTool({ name: "list_gold_basket", arguments: {} }).then(response => (response.structuredContent as unknown as SkillPage).skills);
+  assert.deepEqual(await gold(candidate), await gold(old), "list_gold_basket");
+  for (const [name, args] of [["get_skill", { id: data.skills[0].id }], ["get_skills", { ids: [data.skills[0].id, "missing"] }]] as [string, object][]) {
     assert.deepEqual(await candidate.callTool({ name, arguments: args as never }), await old.callTool({ name, arguments: args as never }), name);
   }
   const request = { name: "search_skills", arguments: { query: "workflow", limit: 30, sort: "stars", page: {}, summary: false } };

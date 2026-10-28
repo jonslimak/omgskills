@@ -1082,7 +1082,7 @@ function renderDevelopersPage() {
       <h2>Read without MCP</h2>
       <div class="grid">
         <a class="card" href="/agents.md"><h2>Agent guide</h2><p>When to use omgskills and the preferred machine-readable access paths.</p></a>
-        <a class="card" href="/data/manifest.json"><h2>Catalog manifest</h2><p>Current public data assets and hashes.</p></a>
+        <a class="card" href="/data/crawl4/manifest.json"><h2>Catalog manifest</h2><p>Current public data assets and hashes.</p></a>
         <a class="card" href="/.well-known/ai-catalog.json"><h2>AI catalog</h2><p>ARD discovery manifest for the hosted MCP server.</p></a>
         <a class="card" href="/skills/index.md"><h2>Markdown library</h2><p>Profiles, collections, and selected skill pages.</p></a>
         <a class="card" href="/llms-gold.txt"><h2>Curated export</h2><p>One-file export of the generated Gold library.</p></a>
@@ -1349,7 +1349,7 @@ ${markdownCodeBlock(`{
 
 - Agent guide: ${origin}/agents.md
 - Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
-- Catalog manifest: ${origin}/data/manifest.json
+- Catalog manifest: ${origin}/data/crawl4/manifest.json
 - Markdown library: ${origin}/skills/index.md
 - Curated Gold export: ${origin}/llms-gold.txt
 - Markdown convention: append \`index.md\` to a generated library page URL
@@ -1471,7 +1471,7 @@ ${agentWhenToUse}
 - Developer resources: ${origin}/developers/index.md
 - Markdown library: ${origin}/skills/index.md
 - Curated Gold export: ${origin}/llms-gold.txt
-- Public catalog manifest: ${origin}/data/manifest.json
+- Public catalog manifest: ${origin}/data/crawl4/manifest.json
 - Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
 
 ## Markdown mirrors
@@ -1515,7 +1515,7 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
 - MCP health: ${origin}/mcp/health
 - npm package: https://www.npmjs.com/package/omgskills-mcp
 - Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
-- Public catalog manifest: ${origin}/data/manifest.json
+- Public catalog manifest: ${origin}/data/crawl4/manifest.json
 
 ## When to use omgskills
 

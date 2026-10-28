@@ -4,7 +4,7 @@ import type { CatalogReader } from "./catalog-reader.js";
 import type { PageOptions, PagedSearchOptions, SkillPage } from "./paging.js";
 import type { RankedSearchOptions } from "./search-ranking.js";
 import {
-  assetReference, descriptor, detailBucket, detailIndex, object, searchCatalogLimits,
+  assetReference, descriptor, detailBucket, detailIndex, installablePayload, object, searchCatalogLimits,
   searchPayload, rankingPayload, validateShard, verifyBytes,
   type AssetReference, type DetailIndex, type RawSkill, type SearchDescriptor,
 } from "./search-catalog-format.mjs";
@@ -81,11 +81,11 @@ export class SearchCatalogReader implements CatalogReader {
   private readonly index: OmgskillsLibrary;
   private constructor(private readonly manifestUrl: string, private readonly desc: SearchDescriptor,
     private readonly details: DetailIndex, rows: RawSkill[], signalData: Awaited<ReturnType<typeof signals>>,
-    private readonly options: CatalogReadOptions, manifest: Manifest, collectionIds?: ReadonlySet<string>) {
+    private readonly options: CatalogReadOptions, manifest: Manifest, collectionIds?: ReadonlySet<string>, installableIds: ReadonlySet<string> | null = null) {
     this.version = signalData.complete ? version(manifest, signalData.goldBasket) : undefined;
     this.recordBudget = collectionIds === undefined ? 0 : Math.min(1024 * 1024, Math.floor((options.cacheBytes ?? 32 * 1024 * 1024) / 8));
     this.index = OmgskillsLibrary.fromData({ skills: rows as Skill[], trending: signalData.trending, goldBasket: signalData.goldBasket }, this.version,
-      { ranking: collectionIds !== undefined, collectionLikeIds: collectionIds });
+      { ranking: collectionIds !== undefined, collectionLikeIds: collectionIds, installableIds });
     for (const row of rows) {
       const bucket = detailBucket(row.id);
       if (!this.expected.has(bucket)) this.expected.set(bucket, new Map());
@@ -106,7 +106,10 @@ export class SearchCatalogReader implements CatalogReader {
     const rows = searchPayload(rawSearch, desc).skills;
     const collectionIds = options.ranking && desc.ranking ? new Set(rankingPayload(
       await json(assetUrl(manifestUrl, desc.ranking), fetcher, desc.ranking.bytes, desc.ranking), desc, new Set(rows.map(row => row.id))).collectionLikeIds) : undefined;
-    return new SearchCatalogReader(manifestUrl, desc, detailIndex(rawIndex, desc), rows, signalData, options, manifest, collectionIds);
+    // Catalogs published before the installable asset existed report install status as unknown.
+    const installableIds = desc.installable ? installablePayload(
+      await json(assetUrl(manifestUrl, desc.installable), fetcher, desc.installable.bytes, desc.installable), desc, rows) : null;
+    return new SearchCatalogReader(manifestUrl, desc, detailIndex(rawIndex, desc), rows, signalData, options, manifest, collectionIds, installableIds);
   }
   getStats() { return this.index.getStats(); }
   diagnostics() {
@@ -196,10 +199,11 @@ export class SearchCatalogReader implements CatalogReader {
     const result = this.index.searchWithNote(options);
     return { ...result, skills: await this.hydrate(result.skills) };
   }
-  relatedSkills(id: string, limit?: number) { return this.index.relatedSkills(id, limit); }
+  relatedSkills(id: string, limit?: number, installable?: boolean) { return this.index.relatedSkills(id, limit, installable); }
   listTrending(limit?: number) { return this.hydrate(this.index.listTrending(limit)); }
   // Curated rows retain the curated record, even when their ID also exists in the catalog.
   listGoldBasket(limit?: number) { return this.index.listGoldBasket(limit); }
+  listGoldBasketPage(options: Omit<PageOptions, "sort">) { return this.index.listGoldBasketPage(options); }
   listByAuthor(author: string, limit?: number) { return this.hydrate(this.index.listByAuthor(author, limit)); }
   private async hydratePage(result: SkillPage): Promise<SkillPage> {
     return { ...result, skills: await this.hydrate(result.skills) };
@@ -216,9 +220,10 @@ export class SearchCatalogReader implements CatalogReader {
       getSkill: id => index.getSkill(id),
       searchSkills: options => index.searchSkills(options),
       searchWithNote: options => index.searchWithNote(options),
-      relatedSkills: (id, limit) => index.relatedSkills(id, limit),
+      relatedSkills: (id, limit, installable) => index.relatedSkills(id, limit, installable),
       listTrending: limit => index.listTrending(limit),
       listGoldBasket: limit => index.listGoldBasket(limit),
+      listGoldBasketPage: options => index.listGoldBasketPage(options),
       listByAuthor: (author, limit) => index.listByAuthor(author, limit),
       searchPage: options => index.searchPage(options),
       searchRankedPage: options => index.searchRankedPage(options),

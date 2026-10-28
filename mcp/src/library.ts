@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { compareOptional, compareText, dateKey, defaultLimit, nameKey, pageInfo, PagingError, preparePage, validCount,
   validatePageOptions, type CatalogSort, type PageOptions, type PagedSearchOptions, type SearchNote, type SkillPage } from "./paging.js";
 import { collectionLikeIds } from "./search-ranking-policy.mjs";
+import { pinnedInstallFor } from "./install-record.mjs";
 import { rankedRequest, rankingIdentity, SearchRankingIndex, type RankedSearchOptions } from "./search-ranking.js";
 
 export type Skill = {
@@ -63,6 +64,8 @@ export type SearchOptions = {
   author?: string;
   tag?: string;
   minStars?: number;
+  /** Only skills that can be installed at a pinned, verified commit. */
+  installable?: boolean;
 };
 
 export type SkillResult = Skill & {
@@ -72,6 +75,7 @@ export type SkillResult = Skill & {
   gold_score?: number;
   niche?: string;
   niche_label?: string;
+  install_status?: "pinned" | "discovery_only";
 };
 
 export type LoadedLibrary = {
@@ -99,7 +103,11 @@ type SearchEntry = {
   /** Name with only letters and digits, for exact-name matches such as "swift ui" and "SwiftUI". */
   nameKey: string;
 };
-type Match = { entry: SearchEntry; score: number };
+type Match = { entry: SearchEntry; score: number; matched?: number; inName?: number };
+type Filters = { author?: string; tag?: string; minStars: number; installable?: boolean };
+/** IDs that can be installed at a pinned commit; null when the catalog does not record it. */
+type InstallableIds = ReadonlySet<string> | null;
+type LibraryOptions = { ranking?: boolean; collectionLikeIds?: ReadonlySet<string>; installableIds?: InstallableIds };
 type Matches = { list: Match[]; note?: SearchNote };
 
 const searchFieldWeights = [12, 10, 8, 6, 4, 2];
@@ -109,8 +117,17 @@ const starWeight = 6;
 const exactNameBonus = 20;
 // Words a task description adds around the skill it needs ("help me make my app faster").
 const genericNameWords = new Set(["skill", "skills", "agent", "agents", "claude", "codex", "code", "pro", "expert", "helper", "tools", "tool", "the"]);
-const fillerWords = new Set(["a", "an", "and", "the", "to", "for", "of", "in", "on", "with", "my", "me", "i", "we", "our",
+const fillerWords = new Set(["a", "an", "and", "the", "to", "for", "from", "of", "in", "on", "with", "my", "me", "i", "we", "our",
   "it", "is", "be", "can", "you", "please", "help", "make", "want", "need", "how", "do", "that", "this", "some", "using", "use"]);
+
+// Words people use for a file format whose skills are named after the format ("slides" for pptx).
+const synonymGroups = [
+  ["slides", "slide", "presentation", "presentations", "deck", "powerpoint", "pptx"],
+  ["spreadsheet", "spreadsheets", "excel", "xlsx"],
+];
+const synonyms = new Map(synonymGroups.flatMap(group => group.map(word => [word, group.filter(other => other !== word)] as const)));
+// A word in fewer catalog names than this may itself be a typo, so it can still be corrected.
+const knownWordCount = 3;
 
 export class OmgskillsLibrary {
   private readonly data: LoadedLibrary;
@@ -123,9 +140,20 @@ export class OmgskillsLibrary {
   private readonly entries: SearchEntry[];
   private readonly entriesByAuthor = new Map<string, SearchEntry[]>();
   private readonly ranking?: SearchRankingIndex;
+  private readonly installable: InstallableIds;
+  /** Collection or repackaged records, whose repository stars say little about the skill itself. */
+  private readonly collectionLike: ReadonlySet<string>;
+  /** Copies left out of lists and searches: same repository, name and description as a kept record. */
+  private readonly duplicates = new Set<string>();
+  /** Collection copies credited to an author who does not own the repository (a mirror). */
+  private readonly mirrors = new Set<string>();
 
-  private constructor(data: LoadedLibrary, readonly version?: string, options: { ranking?: boolean; collectionLikeIds?: ReadonlySet<string> } = {}) {
+  private constructor(data: LoadedLibrary, readonly version?: string, options: LibraryOptions = {}) {
     this.data = { ...data, skills: data.skills.map(slimSkill) };
+    // Full records carry their install fields; compact readers pass the published set (or null).
+    this.installable = options.installableIds !== undefined ? options.installableIds
+      : new Set(this.data.skills.filter(skill => pinnedInstallFor(skill)).map(skill => skill.id));
+    this.collectionLike = options.collectionLikeIds ?? new Set(collectionLikeIds(data.skills));
     for (const skill of this.data.skills) this.skillsById.set(skill.id, skill);
     for (const entry of data.trending) this.trendingById.set(entry.id, entry);
     for (const entry of data.goldBasket) this.goldById.set(entry.id, entry);
@@ -142,13 +170,32 @@ export class OmgskillsLibrary {
       signal: this.signalScore(skill),
       nameKey: compactKey(skill.name)
     }));
+    this.markCopies();
     for (const entry of this.entries) {
       this.entriesById.set(entry.skill.id, entry);
       const list = this.entriesByAuthor.get(entry.author);
       if (list) list.push(entry);
       else this.entriesByAuthor.set(entry.author, [entry]);
     }
-    if (options.ranking) this.ranking = new SearchRankingIndex(this.entries, options.collectionLikeIds ?? new Set(collectionLikeIds(data.skills)));
+    if (options.ranking) this.ranking = new SearchRankingIndex(this.entries, this.collectionLike, this.installable, id => this.duplicates.has(id), id => this.mirrors.has(id));
+  }
+
+  private markCopies() {
+    const groups = new Map<string, SearchEntry[]>();
+    for (const entry of this.entries) {
+      const owner = entry.skill.id.split("/")[0].toLowerCase();
+      if (this.collectionLike.has(entry.skill.id) && owner !== entry.author) this.mirrors.add(entry.skill.id);
+      const key = [entry.skill.id.split(":")[0].toLowerCase(), entry.nameKey, normalize(entry.skill.description)].join("\n");
+      const group = groups.get(key);
+      if (group) group.push(entry); else groups.set(key, [entry]);
+    }
+    // Keep the installable copy, then the most-starred, then the shortest (non-path) ID.
+    for (const group of groups.values()) {
+      if (group.length < 2) continue;
+      group.sort((a, b) => Number(this.installable?.has(b.skill.id) ?? 0) - Number(this.installable?.has(a.skill.id) ?? 0)
+        || b.stars - a.stars || a.skill.id.length - b.skill.id.length || compareText(a.skill.id, b.skill.id));
+      for (const copy of group.slice(1)) this.duplicates.add(copy.skill.id);
+    }
   }
 
   static async load(paths = defaultLibraryPaths()): Promise<OmgskillsLibrary> {
@@ -187,7 +234,7 @@ export class OmgskillsLibrary {
     return manifestVersion(manifest, goldBasket);
   }
 
-  static fromData(data: LoadedLibrary, version?: string, options: { ranking?: boolean; collectionLikeIds?: ReadonlySet<string> } = {}): OmgskillsLibrary {
+  static fromData(data: LoadedLibrary, version?: string, options: LibraryOptions = {}): OmgskillsLibrary {
     return new OmgskillsLibrary(data, version, options);
   }
 
@@ -225,18 +272,23 @@ export class OmgskillsLibrary {
 
   private matches(options: SearchOptions): Matches {
     const terms = normalize(options.query).split(" ").filter(Boolean);
-    const filters = {
+    const filters: Filters = {
       author: options.author ? authorKey(options.author) : undefined,
       tag: options.tag ? normalize(options.tag) : undefined,
-      minStars: options.minStars ?? 0
+      minStars: options.minStars ?? 0,
+      installable: options.installable || undefined
     };
     // An empty search shows what is trending rather than nothing.
-    if (terms.length === 0 && !filters.author && !filters.tag && filters.minStars === 0) {
+    if (terms.length === 0 && !filters.author && !filters.tag && filters.minStars === 0 && !filters.installable) {
       return { list: this.trendingMatches(), note: { showing_trending: true } };
     }
-    const strict = this.strictMatches(terms, filters);
+    // Filler words ("make", "from", "a") would match almost anything, so a task-like query
+    // must match its meaningful words; a query of only filler words keeps them all.
+    const meaningful = terms.filter(term => !fillerWords.has(term));
+    const required = meaningful.length ? meaningful : terms;
+    const strict = this.strictMatches(required, filters);
     if (strict.length || terms.length === 0) return { list: strict };
-    const corrected = this.correctTerms(terms);
+    const corrected = this.correctTerms(required);
     if (corrected) {
       const fixed = this.strictMatches(corrected, filters);
       if (fixed.length) return { list: fixed, note: { did_you_mean: corrected.join(" ") } };
@@ -245,13 +297,17 @@ export class OmgskillsLibrary {
     return { list: partial, note: partial.length ? { partial_match: true } : undefined };
   }
 
-  private candidates(filters: { author?: string; tag?: string; minStars: number }) {
+  private candidates(filters: Filters) {
+    const installable = filters.installable ? this.installable : undefined;
+    if (installable === null) throw new PagingError("installable_not_supported");
     const pool = filters.author ? this.entriesByAuthor.get(filters.author) ?? [] : this.entries;
     // !(a < b), not a >= b: records with a missing or invalid star count stay listed.
-    return pool.filter(entry => (!filters.tag || entry.tags.includes(filters.tag)) && !(entry.stars < filters.minStars));
+    return pool.filter(entry => (!filters.tag || entry.tags.includes(filters.tag)) && !(entry.stars < filters.minStars)
+      && (!installable || installable.has(entry.skill.id)) && !this.duplicates.has(entry.skill.id)
+      && !(filters.author && this.mirrors.has(entry.skill.id)));
   }
 
-  private strictMatches(terms: string[], filters: { author?: string; tag?: string; minStars: number }): Match[] {
+  private strictMatches(terms: string[], filters: Filters): Match[] {
     const joined = terms.length > 1 ? [terms.join("")] : undefined;
     const name = compactKey(terms.join(""));
     const matches: Match[] = [];
@@ -266,21 +322,29 @@ export class OmgskillsLibrary {
     return matches;
   }
 
-  /** Skills matching some of the words, best coverage first, for task-like queries. */
-  private partialMatches(terms: string[], filters: { author?: string; tag?: string; minStars: number }): Match[] {
-    const meaningful = terms.filter(term => !fillerWords.has(term));
+  /**
+   * Skills matching some of the words, best coverage first, for task-like queries. Words must
+   * start a word in the skill's text, so stray letters in a nonsense query match nothing.
+   */
+  private partialMatches(terms: string[], filters: Filters): Match[] {
+    const meaningful = terms.filter(term => !fillerWords.has(term) && term.length >= 3);
     if (!meaningful.length) return [];
     const matches: Match[] = [];
     for (const entry of this.candidates(filters)) {
-      let score = entry.signal, matched = 0;
+      let score = entry.signal, matched = 0, inName = 0;
       for (const term of meaningful) {
-        let hit = false;
-        for (let index = 0; index < entry.fields.length; index++) {
-          if (entry.fields[index].includes(term)) { score += searchFieldWeights[index]; hit = true; }
+        let hit = false, named = false;
+        const words: [string, number][] = [[term, 1], ...(synonyms.get(term) ?? []).map(other => [other, 0.5] as [string, number])];
+        for (const [word, weight] of words) {
+          for (let index = 0; index < entry.fields.length; index++) {
+            if (startsWord(entry.fields[index], word)) { score += searchFieldWeights[index] * weight; hit = true; if (index === 0) named = true; }
+          }
+          if (hit) break;
         }
         if (hit) matched++;
+        if (named) inName++;
       }
-      if (matched) matches.push({ entry, score: score + matched * 50 });
+      if (matched) matches.push({ entry, score: score + matched * 50, matched, inName });
     }
     return matches;
   }
@@ -290,11 +354,14 @@ export class OmgskillsLibrary {
     const vocabulary = this.vocabulary ??= buildVocabulary(this.entries);
     let changed = false;
     const corrected = terms.map(term => {
-      if (term.length < 4 || vocabulary.has(term)) return term;
+      const own = vocabulary.get(term) ?? 0;
+      if (term.length < 4 || own >= knownWordCount) return term;
+      // A rare word ("writting", in one skill name) only gives way to a clearly more common one.
+      const minCount = own ? Math.max(knownWordCount, own * 3) : 1;
       const maxEdits = term.length <= 5 ? 1 : 2;
       let best: string | undefined, bestEdits = maxEdits + 1, bestCount = 0;
       for (const [word, count] of vocabulary) {
-        if (Math.abs(word.length - term.length) > maxEdits) continue;
+        if (count < minCount || word === term || Math.abs(word.length - term.length) > maxEdits) continue;
         const edits = editDistance(term, word, maxEdits);
         if (edits < bestEdits || (edits === bestEdits && count > bestCount)) { best = word; bestEdits = edits; bestCount = count; }
       }
@@ -305,17 +372,17 @@ export class OmgskillsLibrary {
     return changed ? corrected : undefined;
   }
 
-  /** Other skills for the same job: matches on the skill's name words, most popular first. */
-  relatedSkills(id: string, limit?: number): SkillResult[] | undefined {
+  /** Other skills for the same job: most shared name words first (in their own name ahead of elsewhere), then most-starred. */
+  relatedSkills(id: string, limit?: number, installable?: boolean): SkillResult[] | undefined {
     const canonical = this.canonicalId(id), base = canonical ? this.entriesById.get(canonical) : undefined;
     if (!base) return undefined;
     const words = [...new Set(base.fields[0].split(/[^\p{L}\p{N}]+/u))].filter(word => word.length >= 3 && !genericNameWords.has(word));
     if (!words.length) return [];
     const author = base.author;
-    return this.partialMatches(words, { minStars: 0 })
+    return this.partialMatches(words, { minStars: 0, installable })
       // Skip the skill itself and its copies under the same author (case or path variants).
       .filter(({ entry }) => entry !== base && !(entry.author === author && entry.nameKey === base.nameKey))
-      .sort(compareRelevance)
+      .sort((a, b) => (b.matched ?? 0) - (a.matched ?? 0) || (b.inName ?? 0) - (a.inName ?? 0) || b.entry.stars - a.entry.stars || b.score - a.score)
       .slice(0, clampLimit(limit))
       .map(({ entry, score }) => this.enrich(entry.skill, score));
   }
@@ -409,11 +476,17 @@ export class OmgskillsLibrary {
   }
 
   listGoldBasket(limit?: number): SkillResult[] {
-    return this.data.goldBasket
-      .slice()
-      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
-      .slice(0, clampLimit(limit))
-      .map((entry) => this.enrich(entry, this.signalScoreById(entry.id)));
+    return this.goldRows().slice(0, clampLimit(limit)).map((entry) => this.enrich(entry, this.signalScoreById(entry.id)));
+  }
+
+  listGoldBasketPage(options: Omit<PageOptions, "sort">): SkillPage {
+    const context = preparePage(this.version, "list_gold_basket", options), rows = this.goldRows();
+    return { page: pageInfo(context, rows.length), skills: rows.slice(context.offset, context.offset + context.limit)
+      .map(entry => this.enrich(entry, this.signalScoreById(entry.id))) };
+  }
+
+  private goldRows() {
+    return this.data.goldBasket.slice().sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
   }
 
   listByAuthor(author: string, limit?: number): SkillResult[] {
@@ -431,12 +504,16 @@ export class OmgskillsLibrary {
       trending_rank: trending?.trending_rank ?? gold?.trending_rank ?? undefined,
       gold_score: gold?.score ?? undefined,
       niche: gold?.niche ?? undefined,
-      niche_label: gold?.niche_label ?? undefined
+      niche_label: gold?.niche_label ?? undefined,
+      ...(this.installable && this.skillsById.has(skill.id)
+        ? { install_status: this.installable.has(skill.id) ? "pinned" as const : "discovery_only" as const } : {})
     };
   }
 
   private signalScore(skill: Skill): number {
-    return this.signalScoreById(skill.id) + starWeight * Math.log10((skill.stars ?? 0) + 1);
+    // A collection's repository stars belong to the collection, not to each skill in it.
+    const stars = this.collectionLike.has(skill.id) ? 0 : skill.stars ?? 0;
+    return this.signalScoreById(skill.id) + starWeight * Math.log10(stars + 1);
   }
 
   private signalScoreById(id: string): number {
@@ -527,21 +604,30 @@ function optionalManifestAssetUrl(asset: ManifestAsset | undefined, baseUrl: str
 function textScore(entry: SearchEntry, terms: string[]): number {
   let score = entry.signal;
   for (const term of terms) {
-    let matched = false;
-    for (let index = 0; index < entry.fields.length; index++) {
-      const text = entry.fields[index];
-      const weight = searchFieldWeights[index];
-      if (text === term) {
-        score += weight * 3;
-        matched = true;
-      } else if (text.includes(term)) {
-        score += weight;
-        matched = true;
-      }
-    }
-    if (!matched) return 0;
+    // A synonym counts for half: "slides" finds pptx skills, after skills that say "slides".
+    const termScore = fieldScore(entry, term) || Math.max(0, ...(synonyms.get(term) ?? []).map(other => fieldScore(entry, other) / 2));
+    if (!termScore) return 0;
+    score += termScore;
   }
   return score;
+}
+
+function fieldScore(entry: SearchEntry, term: string): number {
+  let score = 0;
+  for (let index = 0; index < entry.fields.length; index++) {
+    const text = entry.fields[index];
+    if (text === term) score += searchFieldWeights[index] * 3;
+    else if (text.includes(term)) score += searchFieldWeights[index];
+  }
+  return score;
+}
+
+/** Whether term appears at the start of a word in text. */
+function startsWord(text: string, term: string): boolean {
+  for (let at = text.indexOf(term); at !== -1; at = text.indexOf(term, at + 1)) {
+    if (at === 0 || !/[\p{L}\p{N}]/u.test(text[at - 1])) return true;
+  }
+  return false;
 }
 
 export function slimSkill(skill: Skill): Skill {

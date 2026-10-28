@@ -49,7 +49,8 @@ export function rankedRequest(options: SearchOptions) {
 /** Reuse legacy text; only compatibility characters and app-store aliases need a copy. */
 export class SearchRankingIndex {
   private readonly documents: Document[];
-  constructor(entries: PreparedEntry[], collectionIds: ReadonlySet<string>) {
+  constructor(entries: PreparedEntry[], collectionIds: ReadonlySet<string>, private readonly installable: ReadonlySet<string> | null = null,
+    private readonly isCopy: (id: string) => boolean = () => false, private readonly isMirror: (id: string) => boolean = () => false) {
     this.documents = entries.map(entry => {
       const { skill } = entry;
       let fields = entry.fields;
@@ -80,12 +81,15 @@ export class SearchRankingIndex {
   }
   private candidates(options: SearchOptions, request: ReturnType<typeof rankedRequest>, validate?: (id: string) => void) {
     const { tokens, author } = request, tag = options.tag?.toLowerCase().trim();
+    const installable = options.installable ? this.installable : undefined;
+    if (installable === null) throw new PagingError("installable_not_supported");
     const prepared = tokens.map(token => ({ token, partial: token.length >= 3 || /[^\x00-\x7f]/.test(token) }));
     const all: Candidate[] = [], primary: Candidate[] = [];
     for (const document of this.documents) {
       const { skill } = document.entry;
       if ((author && document.entry.author !== author)
-        || (tag && !document.entry.tags.includes(tag)) || document.stars < (options.minStars ?? 0)) continue;
+        || (tag && !document.entry.tags.includes(tag)) || document.stars < (options.minStars ?? 0)
+        || (installable && !installable.has(skill.id)) || this.isCopy(skill.id) || (author && this.isMirror(skill.id))) continue;
       let matched = 0;
       for (const token of prepared) {
         for (let i = 0; i < document.fields.length; i++) {
