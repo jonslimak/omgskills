@@ -32,6 +32,7 @@ function fixture(t, track) {
   mkdirSync(join(root, "mcp", "src"), { recursive: true });
   cpSync(join(scripts, "..", "mcp", "src", "search-catalog-format.mjs"), join(root, "mcp", "src", "search-catalog-format.mjs"));
   cpSync(join(scripts, "..", "mcp", "src", "search-ranking-policy.mjs"), join(root, "mcp", "src", "search-ranking-policy.mjs"));
+  cpSync(join(scripts, "..", "mcp", "src", "install-record.mjs"), join(root, "mcp", "src", "install-record.mjs"));
   for (const name of ["publish-data.sh", "publish-crawl4-data.mjs", "publish-catalog-manifest.mjs", "search-catalog.mjs", "search-catalog-cli.mjs"]) {
     cpSync(join(scripts, name), join(root, "scripts", name));
   }

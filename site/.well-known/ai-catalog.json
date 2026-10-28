@@ -13,7 +13,7 @@
       "data": {
         "name": "omgskills",
         "description": "Search and inspect the public omgskills agent skill catalog.",
-        "version": "0.2.1",
+        "version": "0.2.2",
         "endpoint": "https://omgskills.com/mcp",
         "transport": "streamable-http",
         "authentication": "none",
@@ -83,7 +83,7 @@
         "list curated skills from trusted sources",
         "find skills published by Anthropic"
       ],
-      "version": "0.2.1",
+      "version": "0.2.2",
       "metadata": {
         "documentationUrl": "https://omgskills.com/developers/",
         "healthUrl": "https://omgskills.com/mcp/health",

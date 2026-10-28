@@ -52,8 +52,9 @@ test("search ranks popular exact matches first, fixes typos, handles tasks and e
   const typo = library.searchWithNote({ query: "reactt perfomance" });
   assert.equal(typo.note?.did_you_mean, "react performance");
   assert.equal(typo.skills[0].id, "affaan-m/ecc:react-performance");
+  // Filler words are not required, so the task's meaningful words match in full.
   const task = library.searchWithNote({ query: "help me make my react app faster" });
-  assert.equal(task.note?.partial_match, true);
+  assert.equal(task.note, undefined);
   assert.equal(task.skills[0].id, "affaan-m/ecc:react-performance");
   const empty = library.searchWithNote({ query: "" });
   assert.deepEqual(empty.note, { showing_trending: true });
@@ -66,8 +67,8 @@ test("lists are compact by default and page with totals", async context => {
   const search = await mcp.callTool({ name: "search_skills", arguments: { query: "swiftui" } });
   const value = search.structuredContent as { skills: Record<string, unknown>[]; page: { total: number } };
   assert.equal(value.page.total, 3);
-  assert.ok(value.skills.every(row => !("install_status" in row) && !("install_cmd" in row)));
-  assert.match(text(search), /^3 skills of 3:\n- twostraws\/swiftui-agent-skill:swiftui-pro \[6\.2K stars\]: Write modern SwiftUI apps\./);
+  assert.ok(value.skills.every(row => "install_status" in row && !("install_cmd" in row) && !("pinned_install" in row)));
+  assert.match(text(search), /^3 skills of 3:\n- twostraws\/swiftui-agent-skill:swiftui-pro \[6\.2K stars, pinned\]: Write modern SwiftUI apps\./);
   const typo = await mcp.callTool({ name: "search_skills", arguments: { query: "reactt perfomance" } });
   assert.deepEqual((typo.structuredContent as { search: unknown }).search, { did_you_mean: "react performance" });
   assert.match(text(typo), /showing results for "react performance"/);

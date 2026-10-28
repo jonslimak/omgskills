@@ -26,7 +26,8 @@ const sourceFiles = ['scripts/prepare-catalog-candidate-hosting.mjs', 'scripts/p
   'portal/src/candidate/distribution.json', 'portal/src/app/unified/CatalogInstallSetup.tsx', 'portal/tests/catalog-candidate.test.ts',
   'scripts/catalog-candidate-record.mts', 'netlify/functions/_shared/catalog-install-record.ts',
   'netlify/functions/_shared/mcp-library.ts', 'mcp/src/library.ts', 'mcp/src/paging.ts',
-  'mcp/src/search-ranking.ts', 'mcp/src/search-ranking-policy.mjs'];
+  'mcp/src/search-ranking.ts', 'mcp/src/search-ranking-policy.mjs', 'mcp/src/install-record.mjs',
+  'mcp/src/catalog-tracks.ts', 'mcp/src/search-catalog.ts', 'mcp/src/search-catalog-format.mjs'];
 const candidateAccountPaths = [
   '/api/portal/sync-pairing-code', '/api/portal/sync-exchange', '/api/portal/sync-upload',
   '/api/portal/synced-skills', '/api/portal/device-revoke', '/api/portal/devices',
@@ -46,7 +47,8 @@ export async function prepareCandidateFunction(root, options = {}) {
     bundle: true, platform: 'node', format: 'esm', target: 'node20', write: false, metafile: true });
   assert.deepEqual(Object.keys(result.metafile.inputs).sort(), ['scripts/catalog-candidate-record.mts',
     'netlify/functions/_shared/catalog-install-record.ts', 'netlify/functions/_shared/mcp-library.ts', 'mcp/src/library.ts',
-    'mcp/src/paging.ts', 'mcp/src/search-ranking.ts', 'mcp/src/search-ranking-policy.mjs'].sort(),
+    'mcp/src/paging.ts', 'mcp/src/search-ranking.ts', 'mcp/src/search-ranking-policy.mjs', 'mcp/src/install-record.mjs',
+    'mcp/src/catalog-tracks.ts', 'mcp/src/search-catalog.ts', 'mcp/src/search-catalog-format.mjs'].sort(),
   'Candidate record function must contain only the read-only handler and public catalog loader');
   const api = connected ? await build({ absWorkingDir: repo, entryPoints: ['scripts/connected-candidate-api.mts'],
     bundle: true, platform: 'node', format: 'esm', target: 'node20', packages: 'external', write: false, metafile: true }) : null;

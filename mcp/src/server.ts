@@ -7,7 +7,7 @@ import type { RankedSearchOptions } from "./search-ranking.js";
 import { installAgents, installFolderName, installScopes, installScript, installScripts, pinnedInstallFor } from "./install.js";
 import { readSkillContent, SkillContentError } from "./content.js";
 
-export const serverVersion = "0.2.1";
+export const serverVersion = "0.2.2";
 
 const toolAnnotations = {
   readOnlyHint: true,
@@ -36,7 +36,8 @@ const skillResultSchema = z.object({
   first_seen: z.string().optional(),
   skill_md_sha: z.string().optional(),
   skill_md_path: z.string().optional(),
-  install_status: z.enum(["pinned", "discovery_only"]).optional().describe("Present unless summary is true."),
+  install_status: z.enum(["pinned", "discovery_only"]).optional()
+    .describe("pinned: get_install_plan can install it at a verified commit. discovery_only: it cannot be installed reproducibly. Omitted only when the catalog does not record it."),
   pinned_install: pinnedInstallSchema.optional(),
   install: z.object({ claude_code: z.string(), codex: z.string() }).optional()
     .describe("get_skill only: user-scope install scripts pinned to commit_sha, for pinned skills."),
@@ -66,7 +67,8 @@ const skillListOutputSchema = z.object({
 
 const limitArg = (max = 100) => z.number().int().min(1).max(max).default(defaultLimit).describe("Maximum number of skills to return.");
 const summaryArg = z.boolean().default(true)
-  .describe("Default true: list fields only, without install metadata. Pass false for install_status and pinned_install, or call get_skill.");
+  .describe("Default true: list fields and install_status, without install metadata. Pass false for pinned_install, or call get_skill.");
+const installableArg = z.boolean().optional().describe("true: only skills that get_install_plan can install (pinned to a verified commit).");
 const pageArg = z.object({ cursor: z.string().optional() }).strict().optional()
   .describe("Paging: omit or {} for the first page, then {cursor: page.nextCursor} with otherwise unchanged arguments.");
 const sortArg = z.enum(catalogSorts).optional().describe("Sort matching skills. Defaults to relevance.");
@@ -75,12 +77,14 @@ const tooLongQuery = "query is too long (over 1,000 characters or 1,024 bytes); 
 const searchInput = z.object({
   // The byte limit matches the paging validator, so long CJK or emoji queries fail here with a
   // normal input error instead of a paging error.
-  query: z.string().max(1000, tooLongQuery).refine(query => Buffer.byteLength(query) <= 1024, tooLongQuery).default("")
+  // The byte check skips queries already over 1,000 characters so the error is reported once.
+  query: z.string().max(1000, tooLongQuery).refine(query => query.length > 1000 || Buffer.byteLength(query) <= 1024, tooLongQuery).default("")
     .describe("Keywords or a short task description. Typos are corrected; an empty query lists trending skills."),
   limit: limitArg(),
   author: z.string().optional().describe("GitHub author handle, case-insensitive, with or without @."),
   tag: z.string().optional().describe("Exact catalog tag, matched case-insensitively."),
   minStars: z.number().int().min(0).optional().describe("Minimum GitHub repository star count."),
+  installable: installableArg,
   summary: summaryArg
 });
 const authorInput = z.object({
@@ -89,6 +93,7 @@ const authorInput = z.object({
   summary: summaryArg
 });
 const trendingInput = z.object({ limit: limitArg(), summary: summaryArg });
+const goldInput = z.object({ limit: limitArg(), summary: summaryArg });
 const idArg = z.string().min(1).max(500).describe("Skill ID, such as anthropics/skills:pdf. Case-insensitive; a catalog: prefix is accepted.");
 
 type ServerOptions = { paging?: boolean; ranking?: boolean; fetcher?: typeof fetch };
@@ -105,7 +110,7 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
       maxToolInputElements: 128,
       instructions: [
         "Search and inspect the public omgskills catalog of agent skills for Claude Code and Codex. All tools are read-only.",
-        "Use search_skills for discovery (keywords or a short task), get_skill for one ID, list_by_author for a GitHub handle, and list_trending or list_gold_basket for popular and curated skills.",
+        "Use search_skills for discovery (keywords or a short task; pass installable: true for skills you can install), get_skill for one ID, list_by_author for a GitHub handle, and list_trending or list_gold_basket for popular and curated skills.",
         "Before installing, read the skill with get_skill_content, then call get_install_plan and run its script; it fetches the pinned commit and verifies SKILL.md.",
         "If install_status is discovery_only, do not install from github_url or install_cmd: use related_skills to find a pinned alternative, or report that this record cannot be installed reproducibly."
       ].join(" ")
@@ -119,7 +124,7 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
     "search_skills",
     {
       title: "Search skills",
-      description: "Search the omgskills catalog by keyword or short task description, with optional filters. Returns compact rows by default; only pinned records can be installed reproducibly.",
+      description: "Search the omgskills catalog by keyword or short task description, with optional filters. Returns compact rows with install_status by default; only pinned records can be installed reproducibly, and installable: true returns only those.",
       inputSchema: searchSchema.strict(),
       outputSchema: skillListOutputSchema,
       annotations: toolAnnotations
@@ -202,11 +207,15 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
     {
       title: "List curated skills",
       description: "List skills from the curated omgskills gold basket, ordered by editorial score.",
-      inputSchema: z.object({ limit: limitArg(), summary: summaryArg }).strict(),
+      inputSchema: (options.paging ? goldInput.extend({ page: pageArg }) : goldInput).strict(),
       outputSchema: skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async ({ limit, summary }) => listOutput(await library.listGoldBasket(limit), summary)
+    // Curated rows are complete records, so they never need the summary reader.
+    async (args: z.infer<typeof goldInput> & Partial<PageOptions>) => listResult(args, options.paging ? reader => {
+      if (!reader.listGoldBasketPage) throw new PagingError("paging_not_supported");
+      return reader.listGoldBasketPage(withPage(args) as PageOptions);
+    } : undefined, async reader => ({ skills: await reader.listGoldBasket(args.limit) }), library)
   );
 
   server.registerTool(
@@ -231,13 +240,15 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
     "related_skills",
     {
       title: "Related skills",
-      description: "Find other skills for the same job as a given skill: closest matches first, with more popular skills ahead among similar matches. Useful when a skill is discovery_only and you need a pinned alternative.",
-      inputSchema: z.object({ id: idArg, limit: limitArg(20).default(5), summary: summaryArg }).strict(),
+      description: "Find other skills for the same job as a given skill: those sharing the most name words first (in their own name ahead of only in the description), then most-starred. Pass installable: true when a skill is discovery_only and you need a pinned alternative.",
+      inputSchema: z.object({ id: idArg, limit: limitArg(20).default(5), installable: installableArg, summary: summaryArg }).strict(),
       outputSchema: skillListOutputSchema,
       annotations: toolAnnotations
     },
-    async ({ id, limit, summary }) => {
-      const related = await library.relatedSkills?.(id, limit);
+    async ({ id, limit, installable, summary }) => {
+      let related: SkillResult[] | undefined;
+      try { related = await library.relatedSkills?.(id, limit, installable); }
+      catch (error) { if (error instanceof PagingError) return errorResult(error.code, error.message); throw error; }
       // Not found is a normal result, the same as get_skill, get_install_plan and get_skill_content.
       if (!related) return result({ found: false, count: 0, skills: [] }, await notFoundText(library, id));
       const skills = summary ? related : (await Promise.all(related.map(skill => library.getSkill(skill.id)))).flatMap(skill => skill ? [skill] : []);
@@ -346,8 +357,13 @@ async function listResult(args: { summary?: boolean }, paged: ((reader: CatalogR
       }
     }
   }
-  const value = await unpaged(reader);
-  return listOutput(value.skills, args.summary, value.search ? { search: value.search } : {});
+  try {
+    const value = await unpaged(reader);
+    return listOutput(value.skills, args.summary, value.search ? { search: value.search } : {});
+  } catch (error) {
+    if (error instanceof PagingError) return errorResult(error.code, error.message);
+    throw error;
+  }
 }
 
 function listOutput(skills: SkillResult[], summary = true, extra: { page?: PageInfo; search?: SearchNote; missing?: string[] } = {}) {
@@ -380,7 +396,8 @@ function publicSkill(skill: SkillResult, options: { withScore?: boolean; withIns
 }
 
 async function pinnedAlternatives(library: CatalogReader, id: string) {
-  const related = (await library.relatedSkills?.(id, 8)) ?? [];
+  // Ask for installable matches when the catalog records them; otherwise check the closest few.
+  const related = (await (async () => library.relatedSkills?.(id, 3, true))().catch(() => library.relatedSkills?.(id, 8))) ?? [];
   const full = await Promise.all(related.map(skill => library.getSkill(skill.id)));
   // A direct lookup has no query, so these rows carry no score.
   return full.flatMap(skill => {

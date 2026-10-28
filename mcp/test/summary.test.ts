@@ -12,7 +12,8 @@ import type { Skill } from "../src/library.js";
 const cleanRows = rows.map(({ skill_md_sha, ...row }) => (skill_md_sha === null ? row : { ...row, skill_md_sha })) as Skill[];
 
 type Row = Record<string, unknown> & { id: string };
-const installFields = ["install_status", "pinned_install", "install_cmd", "skill_md_sha", "skill_md_path"];
+// Summary rows keep install_status (from the published installable set) but no install metadata.
+const detailFields = ["pinned_install", "install_cmd", "skill_md_sha", "skill_md_path"];
 
 async function connected(context: { after: (fn: () => unknown) => void }, reader: CatalogReader, paging: boolean) {
   const server = createOmgskillsServer(reader, { paging, ranking: paging }), client = new Client({ name: "summary-test", version: "1" });
@@ -25,7 +26,7 @@ async function skills(client: Client, name: string, args: Record<string, unknown
   assert.notEqual(response.isError, true, JSON.stringify(response.content));
   return (response.structuredContent as { skills: Row[]; page?: { nextCursor: string | null } });
 }
-const listFieldsOf = (row: Row) => Object.fromEntries(Object.entries(row).filter(([key]) => !installFields.includes(key)));
+const listFieldsOf = (row: Row) => Object.fromEntries(Object.entries(row).filter(([key]) => !detailFields.includes(key)));
 
 test("summary reads on the compact catalog load no detail shards and match full reads", async context => {
   const f = catalogFixture(context, cleanRows, true);
@@ -45,7 +46,8 @@ test("summary reads on the compact catalog load no detail shards and match full 
     const summary = await skills(client, name, { ...args, summary: true });
     assert.equal(compact.diagnostics().detailFetches, 0, `${name} summary fetched detail shards`);
     assert.ok(summary.skills.length > 0, name);
-    for (const row of summary.skills) for (const key of installFields) assert.equal(key in row, false, `${name} returned ${key}`);
+    for (const row of summary.skills) for (const key of detailFields) assert.equal(key in row, false, `${name} returned ${key}`);
+    if (name !== "get_skills") assert.ok(summary.skills.every(row => row.install_status === "pinned" || row.install_status === "discovery_only"), `${name} summary rows report install_status`);
   }
   for (const [name, args] of calls) {
     const summary = await skills(client, name, { ...args, summary: true });

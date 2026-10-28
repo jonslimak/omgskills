@@ -574,7 +574,7 @@ function verifyMetadata(html, page, label) {
     assertIncludes(html, `${publicOrigin}/mcp`, label);
     assertIncludes(html, "npx -y omgskills-mcp", label);
     assertIncludes(html, "https://www.npmjs.com/package/omgskills-mcp", label);
-    assertIncludes(html, "/data/manifest.json", label);
+    assertIncludes(html, "/data/crawl4/manifest.json", label);
     assertIncludes(html, "/.well-known/ai-catalog.json", label);
     assertIncludes(html, "/skills/index.md", label);
     assertIncludes(html, "The MCP tools only read public catalog data.", label);
