@@ -10,6 +10,7 @@ import {
 import { homepageCollectionPaths } from "./home-preview-content.mjs";
 import { assertIndexStateMatchesSitemap } from "./web-library-index-verification.mjs";
 import { defaultDownloadURL } from "./verify-production-deploy.mjs";
+import { createLiveLinkVerifier } from "./web-library-live-links.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
@@ -18,6 +19,7 @@ const publicOrigin = (process.env.PUBLIC_ORIGIN || origin).replace(/\/$/, "");
 const isLive = process.argv.includes("--live");
 const liveFetchAttempts = 3;
 const livePageHtmlByPath = new Map();
+const verifyLiveLinks = createLiveLinkVerifier({ origin, fetchLive });
 // Served by functions or by the app build, which is copied into the site after this check.
 const dynamicLocalPaths = new Set(["/mcp", "/mcp/health", "/app/"]);
 
@@ -438,12 +440,10 @@ async function verifyLocalMarkdownParity() {
 }
 
 async function verifyLiveInternalLinks(html, label) {
-  for (const href of internalLinks(html)) {
-    const response = await fetchLive(`${origin}${href}`, { redirect: "manual" });
-    if (![200, 301, 302, 308].includes(response.status)) {
-      throw new Error(`${label} linked to ${href}, which returned ${response.status}`);
-    }
-  }
+  await verifyLiveLinks(internalLinks(html), {
+    label,
+    acceptStatus: (status) => [200, 301, 302, 308].includes(status),
+  });
 }
 
 function verifyMetadata(html, page, label) {
@@ -1039,13 +1039,10 @@ function llmsUrls(text) {
 async function verifyLiveLlmsLinks() {
   const response = await fetchLive(`${origin}/llms.txt`, { redirect: "manual" });
   const text = await response.text();
-  for (const urlPath of llmsUrls(text)) {
-    const linkResponse = await fetchLive(`${origin}${urlPath}`, { redirect: "manual" });
-    if (urlPath === "/mcp" && linkResponse.status === 405) continue;
-    if (linkResponse.status !== 200) {
-      throw new Error(`${origin}/llms.txt linked to ${urlPath}, which returned ${linkResponse.status}`);
-    }
-  }
+  await verifyLiveLinks(llmsUrls(text), {
+    label: `${origin}/llms.txt`,
+    acceptStatus: (status, urlPath) => status === 200 || (urlPath === "/mcp" && status === 405),
+  });
 }
 
 async function verifyLiveRedirect(redirect) {
@@ -1074,13 +1071,23 @@ async function verifyLiveNotFound(urlPath) {
 
 async function main() {
   if (isLive) {
+    console.log(`[web-library] Checking homepage and guide at ${origin}`);
     await verifyLiveHomepage();
     await verifyLiveGuide();
-    for (const page of pages) await verifyLivePage(page);
-    for (const file of rootFiles) await verifyLiveRootFile(file);
+    for (const page of pages) {
+      console.log(`[web-library] Checking page ${page.path}`);
+      await verifyLivePage(page);
+    }
+    for (const file of rootFiles) {
+      console.log(`[web-library] Checking metadata ${file.path}`);
+      await verifyLiveRootFile(file);
+    }
+    console.log("[web-library] Checking catalog URL coverage and llms.txt links");
     const generatedUrlById = new Map(await verifyLiveCatalogSkillUrls());
     await verifyLiveLlmsLinks();
+    console.log("[web-library] Checking sitemap");
     await verifyLiveSitemap();
+    console.log("[web-library] Checking legacy redirects and missing-page response");
     for (const redirect of legacyCatalogSkillRedirects) {
       const location = generatedUrlById.get(redirect.catalogSkillId);
       if (!location) {
