@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-28T15:14:30.043Z",
+  "sourceCommit": "4ce60b2818f8e4574d49eb8f5a32490fb3a1c333",
+  "backfill": {
+    "batches": 16,
+    "selectedSkills": 51670,
+    "resolved": 32425,
+    "unresolved": 19245,
+    "unavailableRepoSkills": 3368,
+    "unprovenSkills": 15877,
+    "other": 0,
+    "runs": [
+      {
+        "batch": "batch-1.json",
+        "generatedAt": "2026-10-27T21:28:45.955Z",
+        "selectedSkills": 199,
+        "resolved": 138,
+        "unresolved": 61,
+        "errors": 28
+      },
+      {
+        "batch": "batch-2.json",
+        "generatedAt": "2026-10-27T21:35:04.319Z",
+        "selectedSkills": 1647,
+        "resolved": 948,
+        "unresolved": 699,
+        "errors": 110
+      },
+      {
+        "batch": "batch-3.json",
+        "generatedAt": "2026-10-27T22:18:01.662Z",
+        "selectedSkills": 4338,
+        "resolved": 2994,
+        "unresolved": 1344,
+        "errors": 302
+      },
+      {
+        "batch": "batch-4.json",
+        "generatedAt": "2026-10-27T23:18:12.224Z",
+        "selectedSkills": 3804,
+        "resolved": 2378,
+        "unresolved": 1426,
+        "errors": 338
+      },
+      {
+        "batch": "batch-5.json",
+        "generatedAt": "2026-10-28T00:19:27.180Z",
+        "selectedSkills": 4230,
+        "resolved": 2614,
+        "unresolved": 1616,
+        "errors": 271
+      },
+      {
+        "batch": "batch-6.json",
+        "generatedAt": "2026-10-28T01:20:58.638Z",
+        "selectedSkills": 4218,
+        "resolved": 2433,
+        "unresolved": 1785,
+        "errors": 325
+      },
+      {
+        "batch": "batch-7.json",
+        "generatedAt": "2026-10-28T02:24:09.170Z",
+        "selectedSkills": 4894,
+        "resolved": 3028,
+        "unresolved": 1866,
+        "errors": 253
+      },
+      {
+        "batch": "batch-8.json",
+        "generatedAt": "2026-10-28T04:51:07.917Z",
+        "selectedSkills": 2747,
+        "resolved": 1592,
+        "unresolved": 1155,
+        "errors": 236
+      },
+      {
+        "batch": "batch-9.json",
+        "generatedAt": "2026-10-28T05:28:37.263Z",
+        "selectedSkills": 3090,
+        "resolved": 1882,
+        "unresolved": 1208,
+        "errors": 204
+      },
+      {
+        "batch": "batch-10.json",
+        "generatedAt": "2026-10-28T08:10:13.717Z",
+        "selectedSkills": 3980,
+        "resolved": 2392,
+        "unresolved": 1588,
+        "errors": 148
+      },
+      {
+        "batch": "batch-11.json",
+        "generatedAt": "2026-10-28T09:13:04.336Z",
+        "selectedSkills": 5000,
+        "resolved": 3317,
+        "unresolved": 1683,
+        "errors": 330
+      },
+      {
+        "batch": "batch-12.json",
+        "generatedAt": "2026-10-28T10:13:18.928Z",
+        "selectedSkills": 4009,
+        "resolved": 2718,
+        "unresolved": 1291,
+        "errors": 198
+      },
+      {
+        "batch": "batch-13.json",
+        "generatedAt": "2026-10-28T11:12:28.431Z",
+        "selectedSkills": 2815,
+        "resolved": 1743,
+        "unresolved": 1072,
+        "errors": 201
+      },
+      {
+        "batch": "batch-14.json",
+        "generatedAt": "2026-10-28T12:14:37.977Z",
+        "selectedSkills": 3199,
+        "resolved": 1993,
+        "unresolved": 1206,
+        "errors": 296
+      },
+      {
+        "batch": "batch-15.json",
+        "generatedAt": "2026-10-28T13:15:02.405Z",
+        "selectedSkills": 3069,
+        "resolved": 1932,
+        "unresolved": 1137,
+        "errors": 113
+      },
+      {
+        "batch": "batch-16.json",
+        "generatedAt": "2026-10-28T14:03:14.997Z",
+        "selectedSkills": 431,
+        "resolved": 323,
+        "unresolved": 108,
+        "errors": 15
+      }
+    ]
+  },
+  "overlayFilter": {
+    "overlayEntries": 39001,
+    "kept": 37959,
+    "alreadyIdentical": 6566,
+    "newlyPinned": 31393,
+    "changedPin": 0,
+    "missingOnMain": 0,
+    "shaChangedOnMain": 0,
+    "repoMismatch": 1042,
+    "mainSkills": 58289,
+    "mainPinnedBefore": 6576
+  },
+  "applied": {
+    "skills": 58289,
+    "changed": 31393,
+    "fieldCounts": {
+      "repo_slug": 31393,
+      "skill_md_path": 16261,
+      "repo_commit_sha": 31393,
+      "skill_tree_sha": 31393,
+      "install_target_name": 31393
+    },
+    "pinnedInstallBefore": 6548,
+    "pinnedInstallAfter": 34089
+  },
+  "cutoverValidation": {
+    "published": 58289,
+    "appliedCount": 37959,
+    "failures": 0,
+    "failureSample": [],
+    "idsMatch": true,
+    "coordMismatch": 0
+  },
+  "tracks": {
+    "v2": {
+      "skills": {
+        "path": "skills-732e767841a8.json",
+        "sha256": "732e767841a8fa13476ecd3ea15f99ff39663a13303ac9932a98b20cdf6e8aca",
+        "bytes": 103043629
+      },
+      "searchCatalog": null,
+      "impactPassed": true
+    },
+    "crawl4": {
+      "skills": {
+        "path": "skills-0a00c751aad8.json",
+        "sha256": "0a00c751aad8a1bd63ad6595ea85b89b4642e7fbecdaca6f1d78ec32f5442017",
+        "bytes": 95108312
+      },
+      "searchCatalog": {
+        "path": "search-catalog-b654ba6366af.json",
+        "sha256": "b654ba6366afb01543e087806be4c6a7627ce24f3a6b80179be4b332d38de375",
+        "bytes": 813
+      },
+      "impactPassed": true
+    }
+  },
+  "fullCrawlRun": false,
+  "deployed": false,
+  "noOverrideUsed": true,
+  "crawl4SkillsAssetUnindented": true
+}
