@@ -45,7 +45,7 @@ test("production consent uses the gated normal API, strips private access and ca
     api: async <T>(path: string, init?: RequestInit) => {
       called++;
       assert.equal(path, "/api/portal/sync-pairing-code?inventory=3");
-      assert.deepEqual(JSON.parse(init!.body as string).scopes, ["sync:write", "self:revoke"]);
+      assert.deepEqual(JSON.parse(init!.body as string).scopes, ["sync:write", "self:revoke", "content:read"]);
       return { callbackUrl: `omgskills://pair?state=${state}&code=pair_${"c".repeat(43)}`,
         expiresAt: new Date(Date.now() + 60_000).toISOString() } as T;
     } };

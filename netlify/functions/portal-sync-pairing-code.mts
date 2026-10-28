@@ -65,8 +65,9 @@ export async function portalSyncPairingCode(req: Request, context: Context, depe
       body.scopes ?? [...BASE_DEVICE_SCOPES],
       browserState !== null
     );
-    if (inventoryRequest && (browserState === null || grantedScopes.some(scope => !BASE_DEVICE_SCOPES.includes(scope as typeof BASE_DEVICE_SCOPES[number])))) {
-      throw new Response("Connected inventory requires browser approval with metadata-only permissions", { status: 400 });
+    // content:read is allowed here so the companion can download Sets; it still needs browser approval.
+    if (inventoryRequest && browserState === null) {
+      throw new Response("Connected inventory requires browser approval", { status: 400 });
     }
 
     const user = await requirePortalUser(req);
