@@ -281,7 +281,7 @@ test("preview wiring gates setup, disables download and suppresses the normal ap
   assert.match(shared, /disabled aria-describedby="ua-download-status"/);
   assert.doesNotMatch(component, /https:\/\/omgskills.com\/download|setTimeout|visibilitychange|window.open/);
   const ui = read("../src/app/unified/UnifiedApp.tsx");
-  assert.match(ui, /!publicInstallAction && <a\s+className="ua-sidebar-download"\s+href="\/downloads\/omgskills-mac.dmg"/);
+  assert.match(ui, /!publicInstallAction && <a\s+className="ua-sidebar-download"\s+href="\/download"/);
   assert.match(ui, /publicInstallAction\?\.\(selected, !detailPending\)/);
   const production = read("../src/unified-main.tsx");
   assert.doesNotMatch(production, /PublicInstallSetup|InstallSetupSession|publicInstallAction|install-intent/);

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import test from "node:test";
-import { verifyProductionDeploy } from "./verify-production-deploy.mjs";
+import { defaultDownloadURL, verifyProductionDeploy } from "./verify-production-deploy.mjs";
 
 const origin = "https://example.test";
 const appcast = '<enclosure url="https://omgskills.com/updates/omgskills-1.0.0.zip"/>';
@@ -12,10 +12,10 @@ function responseFor(path, options = {}, features = disabledFeatures) {
   if (path === "/app/release-config.json") {
     return Response.json({ version: 1, skillGroupsAuthEnabled: features.skillGroupsAuthEnabled });
   }
-  if (path === "/download") {
+  if (path === "/download" || path === "/download/") {
     return new Response(null, {
       status: 302,
-      headers: { location: "/downloads/omgskills-mac.dmg" },
+      headers: { location: defaultDownloadURL },
     });
   }
   if (path === "/appcast.xml") return new Response(appcast, { status: 200 });
@@ -131,6 +131,7 @@ test("verifies the complete production deploy surface", async () => {
     { path: "/data/v2/manifest.json", method: "GET" },
     { path: "/data/crawl4/manifest.json", method: "GET" },
     { path: "/download", method: "GET" },
+    { path: "/download/", method: "GET" },
     { path: "/appcast.xml", method: "GET" },
     { path: "/downloads/omgskills-mac.dmg", method: "HEAD" },
     { path: "/downloads/omgskills-mac.dmg.sha256", method: "HEAD" },
@@ -278,6 +279,20 @@ test("the deploy helper's search override enforces the reviewed flag independent
   const active = { ...options, expectedFeatures: { ...disabledFeatures, catalogSearchEnabled: true } };
   await assert.rejects(verifyProductionDeploy(active), /not using the ready ranked compact catalog/);
   await verifyProductionDeploy({ ...active, verifyCatalogSearch: false });
+});
+
+test("default download rejects old, unpinned and other release targets on either route", async () => {
+  for (const path of ["/download", "/download/"]) {
+    for (const location of ["/downloads/omgskills-mac.dmg", defaultDownloadURL.replaceAll("0.0.27", "0.0.26"),
+      "https://github.com/jonslimak/omgskills/releases/latest/download/omgskills.zip", `${defaultDownloadURL}?unexpected=1`]) {
+      await assert.rejects(verifyProductionDeploy({
+        origin, expectedFeatures: disabledFeatures, expectedHelperRelease: disabledHelper,
+        fetchImpl: async (url, options) => new URL(url).pathname === path
+          ? new Response(null, { status: 302, headers: { location } })
+          : responseFor(new URL(url).pathname, options),
+      }), /redirected to/);
+    }
+  }
 });
 
 test("fails when a required release asset is missing", async () => {

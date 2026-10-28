@@ -7,6 +7,7 @@ import { verifyMcpEndpoint } from "./verify-mcp-endpoint.mjs";
 import { verifyLiveHelperReleaseAssets } from "./helper-release-assets.mjs";
 
 const defaultOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
+export const defaultDownloadURL = "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.27/OMGSkills-Connected-0.0.27-27-arm64.zip";
 const requiredStaticReleaseAssets = [
   "downloads/omgskills-mac.dmg",
   "downloads/omgskills-mac.dmg.sha256",
@@ -142,10 +143,12 @@ export async function verifyProductionDeploy({
     await verifyManifest(fetchImpl, origin, path);
   }
 
-  const download = await expectStatus(fetchImpl, origin, "/download", 302);
-  const downloadLocation = download.headers.get("location");
-  if (downloadLocation !== "/downloads/omgskills-mac.dmg") {
-    throw new Error(`${origin}/download redirected to ${downloadLocation || "no location"}`);
+  for (const path of ["/download", "/download/"]) {
+    const download = await expectStatus(fetchImpl, origin, path, 302);
+    const downloadLocation = download.headers.get("location");
+    if (downloadLocation !== defaultDownloadURL) {
+      throw new Error(`${origin}${path} redirected to ${downloadLocation || "no location"}`);
+    }
   }
 
   const appcast = await expectStatus(fetchImpl, origin, "/appcast.xml", 200);

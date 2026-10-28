@@ -1273,13 +1273,13 @@ export function UnifiedApp({
               </button>
               {!publicInstallAction && <a
                 className="ua-sidebar-download"
-                href="/downloads/omgskills-mac.dmg"
+                href="/download"
                 data-humblytics="App Get Mac App"
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Get the Mac app"
-                title="Get the Mac app"
-              ><span className="ua-apple-mark" aria-hidden="true">&#63743;</span><span>Get the Mac app</span></a>}
+                aria-label="Get the Mac app for Apple silicon, macOS 14 or later"
+                title="OMGSkills 0.0.27 for Apple silicon, macOS 14 or later"
+              ><span className="ua-apple-mark" aria-hidden="true">&#63743;</span><span>Get the Mac app<small className="ua-download-requirements">Apple silicon, macOS 14+</small></span></a>}
             </div>
           )}
         </aside>

@@ -9,6 +9,7 @@ import {
 } from "./web-library-skill-urls.mjs";
 import { homepageCollectionPaths } from "./home-preview-content.mjs";
 import { assertIndexStateMatchesSitemap } from "./web-library-index-verification.mjs";
+import { defaultDownloadURL } from "./verify-production-deploy.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
@@ -312,8 +313,11 @@ function verifyHomepageTrustMetadata(html, label) {
   if (website.publisher?.["@id"] !== organization["@id"] || application.publisher?.["@id"] !== organization["@id"]) {
     throw new Error(`${label} JSON-LD entities do not share the Organization publisher`);
   }
-  if (application.operatingSystem !== "macOS" || application.offers?.price !== "0") {
-    throw new Error(`${label} SoftwareApplication JSON-LD must describe the free macOS app`);
+  if (application.operatingSystem !== "macOS 14 or later"
+    || application.softwareRequirements !== "Apple silicon Mac"
+    || application.downloadUrl !== "https://omgskills.com/download"
+    || application.offers?.price !== "0") {
+    throw new Error(`${label} SoftwareApplication JSON-LD must describe the free Apple silicon macOS 14+ companion and default download`);
   }
 }
 
@@ -370,6 +374,14 @@ async function collectLocalReferenceFailures(text, label, failures) {
 }
 
 async function verifyAllLocalReferences() {
+  const redirectRules = (await readFile(path.join(siteDir, "_redirects"), "utf8")).split(/\r?\n/);
+  for (const urlPath of ["/download", "/download/"]) {
+    const rules = redirectRules.filter(line => line.trim().split(/\s+/)[0] === urlPath);
+    if (rules.length !== 1 || rules[0].trim() !== `${urlPath} ${defaultDownloadURL} 302`) {
+      throw new Error(`Expected one exact companion download redirect for ${urlPath}`);
+    }
+    dynamicLocalPaths.add(urlPath);
+  }
   const failures = new Set();
   const htmlRoots = ["skills", "library", "collections", "developers"].map((directory) => path.join(siteDir, directory));
   const generatedFiles = (await Promise.all(htmlRoots.flatMap((directory) => [
@@ -442,7 +454,7 @@ function verifyMetadata(html, page, label) {
   );
   assertIncludes(
     html,
-    '<a class="cta" href="/downloads/omgskills-mac.dmg"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for macOS</a>',
+    '<a class="cta" href="/download"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for Mac</a><small>Apple silicon, macOS 14+</small>',
     label,
   );
   assertNotIncludes(html, '<a class="cta" href="/">', label);

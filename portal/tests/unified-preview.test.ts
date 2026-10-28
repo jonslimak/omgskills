@@ -103,9 +103,10 @@ test("signed-out Mac downloads sit centered below Sign in and hide in the collap
   assert.ok(bottom.indexOf('{themeToggle}') < bottom.indexOf('<PanelLeft />'));
   const footer = source.slice(source.indexOf('{signedIn ? (', source.indexOf('<div className="ua-sidebar-bottom">')), source.indexOf('</aside>'));
   assert.ok(footer.indexOf('<span>Sign in</span>') < footer.indexOf('className="ua-sidebar-download"'));
-  assert.ok(footer.includes('href="/downloads/omgskills-mac.dmg"'));
-  assert.ok(footer.includes('aria-label="Get the Mac app"'));
-  assert.ok(footer.includes('title="Get the Mac app"'));
+  assert.ok(footer.includes('href="/download"'));
+  assert.ok(footer.includes('aria-label="Get the Mac app for Apple silicon, macOS 14 or later"'));
+  assert.ok(footer.includes('title="OMGSkills 0.0.27 for Apple silicon, macOS 14 or later"'));
+  assert.ok(footer.includes('Apple silicon, macOS 14+'));
   assert.ok(footer.includes('<span className="ua-apple-mark" aria-hidden="true">&#63743;</span>'));
   // The homepage no longer offers the Mac download (the old discovery app) directly.
   const home = readFileSync(new URL("../../site/index.html", import.meta.url), "utf8");
