@@ -1443,7 +1443,7 @@ Mostly, but not all. Skills are instructions, not code, but agents act on instru
 
 ## Are skills free?
 
-Yes. Skills are open-source Markdown files on GitHub. All 49,000+ indexed here are free.
+Yes. Skills are open-source Markdown files on GitHub. All 58,000+ indexed here are free.
 
 ## Links
 
