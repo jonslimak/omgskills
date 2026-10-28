@@ -43,7 +43,8 @@ export function DevelopersPage() {
       <h2>When to use omgskills</h2>
       <p>Use omgskills when you need to find or evaluate trusted skills for Claude Code, Codex, or other coding agents.
         Search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors, or JSON
-        manifests; to install a skill, use the MCP get_install_plan tool (a commit-pinned, verified script for Claude Code or Codex) or the omgskills web app.</p>
+        manifests. For supported skills, <code>get_install_plan</code> returns commit-pinned installation instructions for your agent to run locally;
+        the MCP server itself does not write files. You can also install individual public skills through the omgskills web app and Mac companion.</p>
     </section>
     <div className="ua-dev-grid">
       <Card icon={Globe} title="Hosted MCP (live catalog)">

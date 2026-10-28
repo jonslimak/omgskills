@@ -4,7 +4,13 @@
 
 # omgskills
 
-A macOS menubar app for browsing and installing Claude, Codex, and agent skills from GitHub. Two independent parts: a Node.js scraper that builds the public skill library, and a Swift menubar app that reads bundled or remotely refreshed library data.
+A web library for finding, organizing and sharing Claude Code and Codex skills, with a companion Mac app for installation and connected inventory.
+
+Start at [omgskills.com/app/](https://omgskills.com/app/). Browse public skills without an account, organize Sets on the web, and choose a skill to open its Mac installation flow. The opt-in companion requires Apple silicon and macOS 14 or later; its download is available in the skill's setup panel. The older Mac app and its update feed remain available separately.
+
+Connect the companion to your account to see installed skills by Mac and agent, including supported external installs. Sync keeps the installed-skills list up to date; it does not update skill files. Set installation and automatic skill updates are **coming soon**.
+
+This repository contains the web app, catalog pipeline, MCP server and Mac code. The native discovery architecture documented below describes the older Mac app, not the slim companion's interface.
 
 ---
 

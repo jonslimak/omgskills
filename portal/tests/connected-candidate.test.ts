@@ -599,7 +599,7 @@ test("candidate shared composition exposes refresh but no management and uses ca
     const skill = { key: "catalog:example/repo", catalogId: "example/repo", name: "Skill", author: "example", description: "", tags: [], githubUrl: null };
     const install = props.publicInstallAction!(skill, true) as ReactElement<{ store: CatalogInstallIntentStore; distribution?: unknown }>;
     assert.equal(install.props.store.client, "candidate"); assert.equal(install.props.distribution, undefined);
-    assert.match(renderToStaticMarkup(install), /Set up skill management/);
+    assert.match(renderToStaticMarkup(install), /Set up Mac companion/);
     assert.equal(f.stored.size, 0);
     install.props.store.save({ version: 1, catalogId: skill.catalogId, agent: "codex", createdAt: Date.now(), returnRoute: "/app/?view=discover&skill=catalog%3Aexample%2Frepo" });
     props.navigate({ ...initialNavigation, view: "discover", selected: "catalog:another/repo" });

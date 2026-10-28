@@ -22,6 +22,7 @@
 .hero-text{display:flex;flex-direction:column;align-items:center;gap:22px;min-width:0}
 .hero h1{font-size:112px;line-height:.88;max-width:100%;overflow-wrap:normal}
 .hero-copy{max-width:26em;font-size:19px;line-height:1.4;color:var(--muted);text-wrap:balance}
+.coming-soon{display:block;margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.4}
 .hero-visual{position:relative;width:100%;max-width:470px;margin-top:4px}
 .hero iframe{display:block;width:100%;height:540px;border:0;background:transparent}
 .section{max-width:1100px;margin:var(--section-space) auto 0;padding:0 20px;text-align:left}
