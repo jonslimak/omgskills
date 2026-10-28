@@ -659,7 +659,7 @@ async function verifyLocalRootFile(file) {
   if (file.path === "/agents.md") {
     assertIncludes(contents, "## When to use omgskills", filePath);
     assertIncludes(contents, "read-only MCP endpoint", filePath);
-    assertIncludes(contents, "to install a skill, use the MCP get_install_plan tool", filePath);
+    assertIncludes(contents, "get_install_plan returns commit-pinned installation instructions", filePath);
     assertIncludes(contents, `${publicOrigin}/developers/index.md`, filePath);
     assertIncludes(contents, `${publicOrigin}/.well-known/ai-catalog.json`, filePath);
   }
@@ -702,11 +702,11 @@ function verifyGuideHtml(html, label) {
   const faq = structuredData.find((entry) => entry["@type"] === "FAQPage");
   if (!article) throw new Error(`${label} did not contain TechArticle JSON-LD`);
   if (!faq) throw new Error(`${label} did not contain FAQPage JSON-LD`);
-  if (article.dateModified !== "2026-08-27") {
+  if (article.dateModified !== "2026-10-28") {
     throw new Error(`${label} had unexpected TechArticle dateModified ${article.dateModified || "<missing>"}`);
   }
   const questions = new Map((faq.mainEntity || []).map((entry) => [entry.name, entry.acceptedAnswer?.text]));
-  if (!questions.get("Are skills safe?")?.includes("Skills are instructions, not code")) {
+  if (!questions.get("Are skills safe?")?.includes("A catalog listing or pinned version is not a security audit.")) {
     throw new Error(`${label} did not contain the visible skills safety answer in FAQPage JSON-LD`);
   }
   if (!questions.get("Are skills free?")?.includes("All 58,000+ indexed here are free.")) {
@@ -717,7 +717,7 @@ function verifyGuideHtml(html, label) {
 function verifyGuideMarkdown(markdown, label) {
   assertIncludes(markdown, "# Skills: The Complete Guide", label);
   assertIncludes(markdown, "## Are skills safe?", label);
-  assertIncludes(markdown, "Skills are instructions, not code", label);
+  assertIncludes(markdown, "A catalog listing or pinned version is not a security audit.", label);
   assertIncludes(markdown, "## Are skills free?", label);
   assertIncludes(markdown, "All 58,000+ indexed here are free.", label);
   assertIncludes(markdown, `${publicOrigin}/guide/`, label);
@@ -981,7 +981,7 @@ async function verifyLiveRootFile(file) {
     }
     assertIncludes(contents, "## When to use omgskills", url);
     assertIncludes(contents, "read-only MCP endpoint", url);
-    assertIncludes(contents, "to install a skill, use the MCP get_install_plan tool", url);
+    assertIncludes(contents, "get_install_plan returns commit-pinned installation instructions", url);
     assertIncludes(contents, `${publicOrigin}/developers/index.md`, url);
     assertIncludes(contents, `${publicOrigin}/.well-known/ai-catalog.json`, url);
   }

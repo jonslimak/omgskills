@@ -36,7 +36,7 @@ const generatedDirs = ["skills", "profiles", "creators", "library", "collections
 const goldBundlePages = [];
 const agentWhenToUse = [
   "Use omgskills when you need to find or evaluate trusted skills for Claude Code, Codex, or other coding agents.",
-  "Search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors, or JSON manifests; to install a skill, use the MCP get_install_plan tool (a commit-pinned, verified script for Claude Code or Codex) or the omgskills web app.",
+  "Search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors, or JSON manifests. For supported skills, get_install_plan returns commit-pinned installation instructions for your agent to run locally; the MCP server itself does not write files. You can also install individual public skills through the omgskills web app and Mac companion.",
 ].join(" ");
 
 function escapeHtml(value) {
@@ -1408,9 +1408,15 @@ It is like asking an AI for good dinner ideas versus asking while sharing a reci
 
 ## How to use a skill
 
-Install skills by sharing a GitHub link with your agent or using the omgskills app.
+Find a skill in the [omgskills web library](${origin}/app/), open its install panel, choose Claude or Codex, and open OMGSkills. Approve the installation on your Mac. If you need the companion, follow the setup link in the install panel and return to the skill.
 
-Use them automatically, or type \`/skill-name\` during a chat session with your prompt.
+Connect the companion to your account to see installed skills in My skills. Browsing and individual public skill installs do not require an account. Sync reports installed skills; it does not update their files.
+
+Use the skill in a new agent session. Your agent can load it when relevant, or you can use \`/skill-name\` where supported. You can also share a GitHub source link with your agent to install it yourself.
+
+## Sharing skills as a team
+
+Create a [Set](${origin}/app/?view=sets), add skills and share it with your team. Individual public skill installs are available now. **Set installation and automatic team updates: Coming soon.** Teams maintaining their own skills can also use a shared GitHub repository.
 
 ## How to find good skills
 
@@ -1435,7 +1441,7 @@ They compose: a skill can teach an agent how to use an MCP server well.
 
 ## Are skills safe?
 
-Mostly, but not all. Skills are instructions, not code, but agents act on instructions. Like other software, it is best to use skills by trusted creators with large user bases, or ones you create yourself or with your team.
+Review skills before using them. They can include instructions, scripts and other files that affect what your agent does. A catalog listing or pinned version is not a security audit.
 
 ## Why skills?
 
@@ -1449,7 +1455,8 @@ Yes. Skills are open-source Markdown files on GitHub. All 58,000+ indexed here a
 
 - HTML guide: ${origin}/guide/
 - Browse skills: ${origin}/skills/
-- Download omgskills for macOS: ${origin}/downloads/omgskills-mac.dmg
+- Original Mac app download: ${origin}/downloads/omgskills-mac.dmg
+- Companion setup: open a skill's install panel at ${origin}/app/
 `;
 }
 

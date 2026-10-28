@@ -23,9 +23,9 @@ export function ConnectionDialog({ api, denied, close, local = true, theme }: { 
     };
   }, []);
   const label = state.mode === "pairing" ? "Connection code" : "Legacy token";
-  return <Modal title="Connect app" theme={theme} close={() => { session.current?.dispose(); close(); }}>
+  return <Modal title="Connect original Mac app" theme={theme} close={() => { session.current?.dispose(); close(); }}>
     {local ? <p>Local test only. Do not paste these codes into your installed app.</p>
-      : <p>Paste the code into the app to connect this account.</p>}
+      : <p>Paste the code into an older Mac app version to connect this account. In the companion, choose Connect account and approve the browser request instead.</p>}
     <Tabs value={state.mode} onValueChange={(value) => { if (value === "pairing" || value === "legacy") session.current?.select(value); }}>
       <TabsList aria-label="Connection method"><TabsTrigger value="pairing">Connection code</TabsTrigger>
         <TabsTrigger value="legacy">Legacy token</TabsTrigger></TabsList>

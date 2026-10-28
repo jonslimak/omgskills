@@ -16,10 +16,10 @@ export function ConsentContent({ request, policy, snapshot, approve, cancel }: {
     <section className="connect-panel">
       <p className="eyebrow">omgskills</p>
       <h1>Connect this Mac?</h1>
-      <p>The app will be able to sync installed skill metadata to your account.</p>
+      <p>Keep your installed-skills list up to date on the web. This reports what is installed; it does not update skill files.</p>
       {policy.disclosure && <p>{policy.disclosure}</p>}
       <div className="connect-permission">
-        <strong>Access</strong><span>Sync installed skills</span>
+        <strong>Access</strong><span>Report installed-skill metadata</span>
         {request && policy.scopes(request).includes("content:read") && <span>Read private skills shared with you</span>}
       </div>
       {snapshot.status && <p role={snapshot.phase === "invalid" || snapshot.phase === "error" ? "alert" : "status"}
