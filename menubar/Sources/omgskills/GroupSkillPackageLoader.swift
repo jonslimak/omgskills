@@ -66,7 +66,12 @@ protocol PrivateSkillPackageFetching: Sendable {
     ) async throws -> SkillPackage
 }
 
-struct CatalogSkillPackageIndex: Sendable {
+/// Maps a catalog skill ID to the GitHub repository its packages are fetched from.
+protocol CatalogSkillRepositoryResolving: Sendable {
+    func repositorySlug(for catalogSkillID: String) async throws -> String
+}
+
+struct CatalogSkillPackageIndex: CatalogSkillRepositoryResolving, Sendable {
     private enum Entry: Sendable {
         case repository(String)
         case invalid
@@ -111,7 +116,7 @@ struct CatalogSkillPackageIndex: Sendable {
         CatalogSkillID.repositorySlug(from: catalogSkillID)
     }
 
-    private static func githubRepository(from githubURL: String) -> String? {
+    static func githubRepository(from githubURL: String) -> String? {
         guard let components = URLComponents(string: githubURL),
               components.scheme?.lowercased() == "https",
               components.host?.lowercased() == "github.com",
@@ -133,13 +138,13 @@ struct CatalogSkillPackageIndex: Sendable {
 }
 
 struct GroupSkillPackageLoader: GroupSkillPackageLoading, Sendable {
-    private let catalog: CatalogSkillPackageIndex
+    private let catalog: any CatalogSkillRepositoryResolving
     private let publicFetcher: any PublicSkillPackageFetching
     private let privateFetcher: any PrivateSkillPackageFetching
     private let limits: SkillPackageValidationLimits
 
     init(
-        catalog: CatalogSkillPackageIndex,
+        catalog: any CatalogSkillRepositoryResolving,
         publicFetcher: any PublicSkillPackageFetching = GitPublicSkillPackageFetcher(),
         privateFetcher: any PrivateSkillPackageFetching = DevicePrivateSkillPackageAPI(),
         limits: SkillPackageValidationLimits = .standard
@@ -165,7 +170,7 @@ struct GroupSkillPackageLoader: GroupSkillPackageLoading, Sendable {
         switch source {
         case .catalog(_, let catalogSkillID, let normalizedRoot):
             package = try await publicFetcher.fetchPackage(
-                repositorySlug: catalog.repositorySlug(for: catalogSkillID),
+                repositorySlug: try await catalog.repositorySlug(for: catalogSkillID),
                 normalizedRoot: normalizedRoot,
                 expected: release.coordinates
             )

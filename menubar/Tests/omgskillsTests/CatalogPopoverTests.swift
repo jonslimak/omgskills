@@ -187,7 +187,7 @@ struct CatalogPopoverTests {
         #expect(code.contains("appUpdater.check()"))
         #expect(code.contains(".disabled(!appUpdater.canCheck)"))
         #expect(code.contains(".disabled(!model.canClose)"))
-        #expect(code.contains("private func quit() {\n        guard model.canClose else { return }"))
+        #expect(code.contains("private func quit() {\n        guard model.canClose, setInstall?.canClose ?? true else { return }"))
     }
 
     @Test func navigationButtonsUseMacDefaultHitTargets() throws {
