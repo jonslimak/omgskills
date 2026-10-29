@@ -21,13 +21,14 @@ function writeAsset(dataDir, name, value) {
   };
 }
 
-function verifyFixture({ skills, shaHistory, collections, skillEquivalence }) {
+function verifyFixture({ skills, shaHistory, collections, skillEquivalence, earlierShaHistory }) {
   const root = mkdtempSync(join(tmpdir(), "verify-published-data-test-"));
   const dataRoot = join(root, "isolated-data");
   const dataDir = join(dataRoot, "test");
   mkdirSync(dataDir, { recursive: true });
 
   try {
+    if (earlierShaHistory !== undefined) writeAsset(dataDir, "sha-history-earlier.json", earlierShaHistory);
     const manifest = {
       version: 1,
       skills: writeAsset(dataDir, "skills.json", skills),
@@ -114,6 +115,31 @@ test("accepts historical SHA assets without canonicalBySha", () => {
   assert.equal(JSON.parse(result.stdout).canonicalByShaCount, 0);
   assert.equal(JSON.parse(result.stdout).collectionsCount, 0);
   assert.equal(JSON.parse(result.stdout).skillEquivalenceGroupCount, 0);
+});
+
+test("rejects a SHA asset that drops canonicalBySha an earlier asset published", () => {
+  const canonical = { [shaA]: { skillId: "owner/repo:one", confidence: "high", reason: "same-repo" } };
+  const dropped = verifyFixture({
+    skills: [skill("owner/repo:one", shaA)],
+    shaHistory: history(undefined),
+    earlierShaHistory: history(canonical),
+  });
+  assert.notEqual(dropped.status, 0);
+  assert.match(dropped.stderr, /dropped canonicalBySha that sha-history-earlier\.json published/);
+
+  const kept = verifyFixture({
+    skills: [skill("owner/repo:one", shaA)],
+    shaHistory: history(canonical),
+    earlierShaHistory: history(canonical),
+  });
+  assert.equal(kept.status, 0, kept.stderr);
+
+  const neverPublished = verifyFixture({
+    skills: [skill("owner/repo:one", shaA)],
+    shaHistory: history(undefined),
+    earlierShaHistory: history(undefined),
+  });
+  assert.equal(neverPublished.status, 0, neverPublished.stderr);
 });
 
 test("accepts a live high-confidence same-repository canonical mapping", () => {
