@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-29T13:31:54.344Z",
+  "sourceCommit": "d6f15f567851e68d83c36bd1b9a689f725853d3b",
+  "refreshBase": "0ada5e73",
+  "refresh": {
+    "batches": 12,
+    "checkedSkills": 20280,
+    "outcomes": {
+      "refreshed-pinned": 11828,
+      "refreshed-unpinned": 239,
+      "repo-missing": 3353,
+      "skill-file-missing": 3838,
+      "repo-moved": 732,
+      "invalid-frontmatter": 239,
+      "error": 51
+    }
+  },
+  "patch": {
+    "refreshed": 12089,
+    "applied": 11298,
+    "unchanged": 10,
+    "changedOnMain": 1,
+    "pathChanged": 780,
+    "fieldCounts": {
+      "last_updated": 10255,
+      "skill_md_sha": 8572,
+      "readme_snippet": 1616,
+      "repo_slug": 11076,
+      "repo_commit_sha": 11076,
+      "skill_tree_sha": 11076,
+      "install_target_name": 11076,
+      "description": 3532,
+      "skill_md_path": 6573,
+      "install_cmd": 1944,
+      "stars": 9245,
+      "tags": 1762,
+      "name": 111
+    },
+    "snippetsNotAdded": 7736
+  },
+  "applied": {
+    "v2": {
+      "file": "skills.json",
+      "compact": true,
+      "skills": 58290,
+      "changed": 11298,
+      "patchesNotFound": 0,
+      "pinnedInstallBefore": 34090,
+      "pinnedInstallAfter": 44524
+    },
+    "crawl4": {
+      "file": "crawl4-published.json",
+      "compact": true,
+      "skills": 58290,
+      "changed": 11298,
+      "patchesNotFound": 0,
+      "pinnedInstallBefore": 34090,
+      "pinnedInstallAfter": 44524
+    }
+  },
+  "cutoverValidation": {
+    "cutover": 58290,
+    "failures": 0,
+    "failureSample": [],
+    "idsMatch": true
+  },
+  "tracks": {
+    "v2": {
+      "skills": {
+        "path": "skills-46a32c868ae4.json",
+        "sha256": "46a32c868ae46961d42e09203da942b995b7b9bfd9a1bf61c87cd6aabfdea4f5",
+        "bytes": 96417619
+      },
+      "impactPassed": true
+    },
+    "crawl4": {
+      "skills": {
+        "path": "skills-68d835a6db63.json",
+        "sha256": "68d835a6db6385d2b13daef89f632d0af3d4d41ac034950ddf99bac03266f78a",
+        "bytes": 97964537
+      },
+      "impactPassed": true
+    }
+  },
+  "fullCrawlRun": false,
+  "deployed": false,
+  "noOverrideUsed": true
+}
