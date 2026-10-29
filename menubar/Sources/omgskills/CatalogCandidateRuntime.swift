@@ -113,7 +113,7 @@ enum CatalogCandidateRuntime {
               info[AppRuntimeConfiguration.f1RootKey] == nil, info[AppRuntimeConfiguration.f1WebsiteKey] == nil,
               info[AppRuntimeConfiguration.catalogInstallEnabledKey] == nil,
               info[SetupTestRuntime.websiteKey] == nil, info[SetupTestUpdateConfiguration.enabledKey] == nil,
-              boolean(info[AppRuntimeConfiguration.skillGroupsAuthEnabledKey]) != true,
+              profile == .production || boolean(info[AppRuntimeConfiguration.skillGroupsAuthEnabledKey]) != true,
               let version = info["CFBundleShortVersionString"] as? String,
               let build = info["CFBundleVersion"] as? String, validVersion(version, build: build),
               updateKeys == expectedKeys, info["SUFeedURL"] as? String == profile.feedURL,

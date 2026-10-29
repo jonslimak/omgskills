@@ -42,6 +42,61 @@ struct ProductionConnectedConfigurationTests {
         return value
     }
 
+    @Test(arguments: [false, true])
+    func productionCompanionAcceptsEitherExplicitSetSetting(setsEnabled: Bool) throws {
+        let home = try CatalogCandidateRuntimeTests.home()
+        defer { try? FileManager.default.removeItem(at: home) }
+        var value = info(.production)
+        value[AppRuntimeConfiguration.skillGroupsAuthEnabledKey] = setsEnabled
+        guard case .enabled(let configuration) = CatalogCandidateRuntime.mode(info: value, home: home,
+            allowed: true, connectedAllowed: true, profile: .production) else {
+            Issue.record("Production companion rejected the explicit Set setting"); return
+        }
+        #expect(configuration.profile == .production)
+        #expect(configuration.connected != nil)
+        #expect(try FileManager.default.contentsOfDirectory(atPath: home.path).isEmpty)
+    }
+
+    @Test func setEnabledProductionStillRequiresTrustedIdentityConnectionAndUpdater() throws {
+        let home = try CatalogCandidateRuntimeTests.home()
+        defer { try? FileManager.default.removeItem(at: home) }
+        var value = info(.production)
+        value[AppRuntimeConfiguration.skillGroupsAuthEnabledKey] = true
+        for change: [String: Any] in [
+            ["CFBundleIdentifier": "another.app"],
+            [CatalogRuntimeProfile.production.catalogKeys[1]: "https://other.invalid/app/"],
+            [CatalogRuntimeProfile.production.connectedKeys[1]: "https://other.invalid/connect"],
+            [CatalogRuntimeProfile.production.connectedKeys[0]: false],
+            ["SUFeedURL": "https://omgskills.com/appcast.xml"],
+            ["SUEnableAutomaticChecks": true], ["SUAutomaticallyUpdate": true],
+            [CatalogRuntimeProfile.candidate.catalogKeys[0]: true],
+        ] {
+            guard case .invalid = CatalogCandidateRuntime.mode(info: value.merging(change) { _, new in new },
+                home: home, allowed: true, connectedAllowed: true, profile: .production) else {
+                Issue.record("Sets bypassed another production guard: \(change.keys)"); continue
+            }
+        }
+        guard case .invalid = CatalogCandidateRuntime.mode(info: value, home: home,
+            allowed: true, connectedAllowed: false, profile: .production) else {
+            Issue.record("Sets bypassed the connected build gate"); return
+        }
+    }
+
+    @Test func candidateProfileStillRefusesSetEnabledConfiguration() throws {
+        let home = try CatalogCandidateRuntimeTests.home()
+        defer { try? FileManager.default.removeItem(at: home) }
+        var value = info(.candidate)
+        guard case .enabled = CatalogCandidateRuntime.mode(info: value, home: home,
+            allowed: true, connectedAllowed: true, profile: .candidate) else {
+            Issue.record("Candidate fixture is invalid before enabling Sets"); return
+        }
+        value[AppRuntimeConfiguration.skillGroupsAuthEnabledKey] = true
+        guard case .invalid = CatalogCandidateRuntime.mode(info: value, home: home,
+            allowed: true, connectedAllowed: true, profile: .candidate) else {
+            Issue.record("Production Set allowance leaked into the candidate profile"); return
+        }
+    }
+
     @Test func productionReusesStorageAndIdentityButNeverTestEndpointsOrCredentials() throws {
         let home = try CatalogCandidateRuntimeTests.home()
         defer { try? FileManager.default.removeItem(at: home) }
