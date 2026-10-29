@@ -1867,7 +1867,7 @@ async function main() {
     path.join(siteDir, catalogSkillUrlsFilename),
     `${JSON.stringify(buildCatalogSkillUrlsAsset(generatedSkillUrlById), null, 2)}\n`,
   );
-  const llmsExampleSkill = skillById.get("openai/codex:code-review") || includedSkills[0];
+  const llmsExampleSkill = includedSkills[0];
   await writeFile(
     path.join(siteDir, "llms.txt"),
     renderLlmsText(profileCollections, topicCollections, llmsExampleSkill, skillUrlById),

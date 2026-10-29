@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { runInNewContext } from "node:vm";
 import { createLiveLinkVerifier } from "./web-library-live-links.mjs";
+import { skillPathForId } from "./web-library-skill-urls.mjs";
 
 const origin = "https://preview.example";
 const internalStatus = (status) => [200, 301, 302, 308].includes(status);
@@ -148,4 +150,32 @@ test("main verifier wires both link sweeps without weakening timeouts or retries
   assert.match(source, /await sleep\(500 \* attempt\)/);
   assert.match(source, /status === 200 \|\| \(urlPath === "\/mcp" && status === 405\)/);
   assert.match(source, /\[200, 301, 302, 308\]\.includes\(status\)/);
+});
+
+test("OpenAI verification examples remain featured and are not suppressed", async () => {
+  const source = await readFile(new URL("./verify-web-library-pages.mjs", import.meta.url), "utf8");
+  const curations = JSON.parse(await readFile(new URL("../index/curations/collections.json", import.meta.url), "utf8"));
+  const suppressions = JSON.parse(await readFile(new URL("../index/seeds/suppressed-skills.json", import.meta.url), "utf8"));
+  const suppressedIds = new Set(suppressions.skills.map((skill) => skill.id));
+  const featuredPaths = new Set(curations.authorOverrides.openai.featuredSkillIds
+    .filter((id) => !suppressedIds.has(id))
+    .map(skillPathForId));
+  const examples = [...source.matchAll(/path: "(\/skills\/openai\/[^"]+)"/g)].map((match) => match[1]);
+  assert.equal(examples.length, 2);
+  for (const example of examples) {
+    assert(featuredPaths.has(example), `${example} must remain an active featured skill, not a removed example`);
+  }
+});
+
+test("llms.txt example comes from generated pages even when an old example remains in the catalog", async () => {
+  const source = await readFile(new URL("./build-web-library.mjs", import.meta.url), "utf8");
+  const selection = source.match(/const llmsExampleSkill = ([^;]+);/);
+  assert(selection, "builder must select an example skill");
+  const obsolete = { id: "openai/codex:code-review" };
+  const generated = { id: "openai/codex:skill-creator" };
+  const result = runInNewContext(selection[1], {
+    skillById: new Map([[obsolete.id, obsolete], [generated.id, generated]]),
+    includedSkills: [generated],
+  });
+  assert.equal(result, generated);
 });
