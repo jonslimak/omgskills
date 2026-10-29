@@ -1,0 +1,37 @@
+{
+  "count": 6,
+  "skills": [
+    {
+      "id": "jlowin/fastmcp:.claude/skills/code-review",
+      "reason": "no match for the ID folder",
+      "candidates": [
+        "examples/skills/sample_skills/code-review/SKILL.md"
+      ]
+    },
+    {
+      "id": "mway/dotfiles:skill-creator",
+      "path": "home/dot_codex/skills/skill-creator/SKILL.md",
+      "reason": "skill-path-unresolved"
+    },
+    {
+      "id": "aaronjmars/aeon:search-skill",
+      "path": "skills/search-skill/SKILL.md",
+      "reason": "repository renamed or transferred"
+    },
+    {
+      "id": "Catsofsuffering/CCGS:skills",
+      "path": "templates/skills/SKILL.md",
+      "reason": "repository renamed or transferred"
+    },
+    {
+      "id": "jnuyens/gsd-plugin:undo",
+      "path": "skills/undo/SKILL.md",
+      "reason": "repository renamed or transferred"
+    },
+    {
+      "id": "Lobbi-Docs/claude:plugins/jira-orchestrator/skills/confluence",
+      "path": "plugins/delivery-orchestrator/skills/confluence/SKILL.md",
+      "reason": "repository renamed or transferred"
+    }
+  ]
+}
