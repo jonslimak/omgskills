@@ -1,3 +1,5 @@
+import { consumeVerificationBody } from "./verification-fetch.mjs";
+
 export function createLiveLinkVerifier({ origin, fetchLive, log = console.log }) {
   // Cache status only: callers still apply their own rules, and content checks fetch afresh.
   const statusByUrl = new Map();
@@ -8,7 +10,7 @@ export function createLiveLinkVerifier({ origin, fetchLive, log = console.log })
       statusByUrl.set(url, (async () => {
         const response = await fetchLive(url, { redirect: "manual" });
         const status = response.status;
-        await response.body?.cancel();
+        await consumeVerificationBody(response, url);
         return status;
       })());
     }

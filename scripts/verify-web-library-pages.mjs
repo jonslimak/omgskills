@@ -11,13 +11,13 @@ import { homepageCollectionPaths } from "./home-preview-content.mjs";
 import { assertIndexStateMatchesSitemap } from "./web-library-index-verification.mjs";
 import { defaultDownloadURL } from "./verify-production-deploy.mjs";
 import { createLiveLinkVerifier } from "./web-library-live-links.mjs";
+import { fetchForVerification } from "./verification-fetch.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
 const origin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
 const publicOrigin = (process.env.PUBLIC_ORIGIN || origin).replace(/\/$/, "");
 const isLive = process.argv.includes("--live");
-const liveFetchAttempts = 3;
 const livePageHtmlByPath = new Map();
 const verifyLiveLinks = createLiveLinkVerifier({ origin, fetchLive });
 // Served by functions or by the app build, which is copied into the site after this check.
@@ -38,24 +38,8 @@ const escapeHtml = (value) => String(value)
   .replaceAll("<", "&lt;")
   .replaceAll(">", "&gt;");
 
-const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
-
 async function fetchLive(url, options = {}) {
-  let lastError;
-  for (let attempt = 1; attempt <= liveFetchAttempts; attempt += 1) {
-    try {
-      const response = await fetch(url, {
-        ...options,
-        signal: AbortSignal.timeout(15_000),
-      });
-      if (response.status < 500 || attempt === liveFetchAttempts) return response;
-      lastError = new Error(`${url} returned ${response.status}`);
-    } catch (error) {
-      lastError = error;
-    }
-    await sleep(500 * attempt);
-  }
-  throw new Error(`Failed to fetch ${url} after ${liveFetchAttempts} attempts: ${lastError?.message || lastError}`);
+  return fetchForVerification(url, options, { timeoutMs: 15_000 });
 }
 
 const pages = [

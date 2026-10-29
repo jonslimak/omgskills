@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import http from "node:http";
 import test from "node:test";
 import { runInNewContext } from "node:vm";
 import { createLiveLinkVerifier } from "./web-library-live-links.mjs";
@@ -15,10 +16,10 @@ function deferred() {
   return { promise, resolve };
 }
 
-test("checks four distinct links at once, reuses duplicates and releases bodies", async () => {
+test("checks four distinct links at once, reuses duplicates and consumes bodies", async () => {
   const release = deferred();
   const calls = [];
-  const cancelled = [];
+  const consumed = [];
   const logs = [];
   let active = 0;
   let peak = 0;
@@ -33,7 +34,10 @@ test("checks four distinct links at once, reuses duplicates and releases bodies"
       await release.promise;
       return {
         status: 200,
-        body: { cancel: async () => { cancelled.push(url); active -= 1; } },
+        body: {
+          async *[Symbol.asyncIterator]() { yield new Uint8Array([1]); consumed.push(url); active -= 1; },
+          cancel: () => assert.fail("Do not close reusable connections by cancelling bodies"),
+        },
       };
     },
   });
@@ -47,11 +51,34 @@ test("checks four distinct links at once, reuses duplicates and releases bodies"
   assert.equal(active, 0);
   assert.deepEqual(new Set(calls), new Set(paths.map((path) => origin + path)));
   assert.equal(calls.length, 9);
-  assert.equal(cancelled.length, 9);
+  assert.equal(consumed.length, 9);
   await verify(paths, { label: "another page", acceptStatus: internalStatus });
   assert.equal(calls.length, 9, "reuse link status across pages in this verifier run");
   assert.match(logs[0], /homepage.*0\/9/);
   assert(logs.some((line) => /homepage.*9\/9/.test(line)));
+});
+
+test("link sweeps reuse HTTP connections instead of reconnecting for each page", async () => {
+  let connections = 0;
+  const server = http.createServer((request, response) => {
+    response.writeHead(200, { "content-type": "text/html" });
+    response.write("first chunk".repeat(2_000));
+    const timer = setTimeout(() => response.end("last chunk".repeat(2_000)), 5);
+    response.on("close", () => clearTimeout(timer));
+  });
+  server.on("connection", () => connections++);
+  await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+  try {
+    const localOrigin = `http://127.0.0.1:${server.address().port}`;
+    const verify = createLiveLinkVerifier({ origin: localOrigin, fetchLive: fetch, log: () => {} });
+    await verify(Array.from({ length: 80 }, (_, i) => `/page-${i}/`), {
+      label: "connection reuse regression", acceptStatus: status => status === 200,
+    });
+    assert.ok(connections <= 8, `80 pages opened ${connections} connections; expected reusable worker connections`);
+  } finally {
+    server.closeAllConnections();
+    await new Promise(resolve => server.close(resolve));
+  }
 });
 
 test("cached status still obeys each caller's stricter rules", async () => {
@@ -142,12 +169,14 @@ test("logs intermediate progress and handles empty batches", async () => {
 
 test("main verifier wires both link sweeps without weakening timeouts or retries", async () => {
   const source = await readFile(new URL("./verify-web-library-pages.mjs", import.meta.url), "utf8");
+  const transport = await readFile(new URL("./verification-fetch.mjs", import.meta.url), "utf8");
   assert.match(source, /createLiveLinkVerifier\(\{ origin, fetchLive \}\)/);
   assert.match(source, /verifyLiveLinks\(internalLinks\(html\)/);
   assert.match(source, /verifyLiveLinks\(llmsUrls\(text\)/);
-  assert.match(source, /const liveFetchAttempts = 3;/);
-  assert.match(source, /AbortSignal.timeout\(15_000\)/);
-  assert.match(source, /await sleep\(500 \* attempt\)/);
+  assert.match(source, /fetchForVerification\(url, options, \{ timeoutMs: 15_000 \}\)/);
+  assert.match(transport, /const attempts = 3;/);
+  assert.match(transport, /AbortSignal.timeout\(timeoutMs\)/);
+  assert.match(transport, /const delay = 500 \* attempt/);
   assert.match(source, /status === 200 \|\| \(urlPath === "\/mcp" && status === 405\)/);
   assert.match(source, /\[200, 301, 302, 308\]\.includes\(status\)/);
 });

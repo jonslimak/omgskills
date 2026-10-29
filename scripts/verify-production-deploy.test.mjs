@@ -146,6 +146,36 @@ test("verifies the complete production deploy surface", async () => {
   ]);
 });
 
+test("structural verification retries a transient request and consumes status-only bodies", async () => {
+  let calls = 0;
+  let first;
+  await verifyProductionDeploy({
+    origin, expectedFeatures: disabledFeatures, expectedHelperRelease: disabledHelper,
+    fetchImpl: async (url, options) => {
+      const path = new URL(url).pathname;
+      if (path === "/app/" && ++calls === 1) throw new TypeError("fetch failed", {
+        cause: Object.assign(new Error("connection reset"), { code: "ECONNRESET" }),
+      });
+      if (path === "/app/") {
+        first = new Response("app HTML", { status: 200 });
+        return first;
+      }
+      assert.equal(first.bodyUsed, true, "consume the status-only response before the next request");
+      return responseFor(path, options);
+    },
+  });
+  assert.equal(calls, 2);
+});
+
+test("incorrect structural status fails without request retry", async () => {
+  let calls = 0;
+  await assert.rejects(verifyProductionDeploy({
+    origin, expectedFeatures: disabledFeatures, expectedHelperRelease: disabledHelper,
+    fetchImpl: async () => { calls++; return new Response(null, { status: 404 }); },
+  }), /\/app\/ returned 404, expected 200/);
+  assert.equal(calls, 1);
+});
+
 test("rollback verification skips candidate-only public group checks", async () => {
   const requests = [];
   await verifyProductionDeploy({

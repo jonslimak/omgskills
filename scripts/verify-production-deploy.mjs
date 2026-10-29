@@ -5,6 +5,7 @@ import { extractUpdateAssetPaths } from "./deploy-artifact-guard.mjs";
 import { loadProductionFeatures } from "./production-features.mjs";
 import { verifyMcpEndpoint } from "./verify-mcp-endpoint.mjs";
 import { verifyLiveHelperReleaseAssets } from "./helper-release-assets.mjs";
+import { consumeVerificationBody, fetchForVerification } from "./verification-fetch.mjs";
 
 const defaultOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
 export const defaultDownloadURL = "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.28/OMGSkills-Connected-0.0.28-28-arm64.zip";
@@ -18,22 +19,22 @@ const publicGroupProbe = {
   missingManifestPath: "/api/public/groups/jonslimak/health-check-missing/manifest",
 };
 
-async function expectStatus(fetchImpl, origin, path, expected, options = {}) {
+async function expectStatus(fetchImpl, origin, path, expected, { keepBody = false, ...options } = {}) {
   const url = `${origin}${path}`;
-  const response = await fetchImpl(url, {
+  const response = await fetchForVerification(url, {
     redirect: "manual",
-    signal: AbortSignal.timeout(20_000),
     ...options,
-  });
+  }, { fetchImpl, expectedStatus: expected });
   if (response.status !== expected) {
     throw new Error(`${url} returned ${response.status}, expected ${expected}`);
   }
+  if (!keepBody) await consumeVerificationBody(response, url);
   console.log(`ok ${expected} ${url}`);
   return response;
 }
 
 async function verifyManifest(fetchImpl, origin, path) {
-  const response = await expectStatus(fetchImpl, origin, path, 200);
+  const response = await expectStatus(fetchImpl, origin, path, 200, { keepBody: true });
   const manifest = await response.json();
   if (!manifest?.skills?.path) {
     throw new Error(`${origin}${path} is missing skills.path`);
@@ -42,7 +43,7 @@ async function verifyManifest(fetchImpl, origin, path) {
 
 async function verifyAiCatalog(fetchImpl, origin, publicOrigin) {
   const path = "/.well-known/ai-catalog.json";
-  const response = await expectStatus(fetchImpl, origin, path, 200);
+  const response = await expectStatus(fetchImpl, origin, path, 200, { keepBody: true });
   const contentType = response.headers.get("content-type") || "";
   if (!contentType.toLowerCase().startsWith("application/json")) {
     throw new Error(`${origin}${path} returned Content-Type ${contentType || "<missing>"}`);
@@ -61,7 +62,7 @@ async function verifyAiCatalog(fetchImpl, origin, publicOrigin) {
 
 async function verifyReleaseConfig(fetchImpl, origin, expected) {
   const path = "/app/release-config.json";
-  const response = await expectStatus(fetchImpl, origin, path, 200);
+  const response = await expectStatus(fetchImpl, origin, path, 200, { keepBody: true });
   const config = await response.json();
   if (
     config?.version !== 1
@@ -72,13 +73,13 @@ async function verifyReleaseConfig(fetchImpl, origin, expected) {
 }
 
 async function verifyPublicGroupSurface(fetchImpl, origin) {
-  const profile = await expectStatus(fetchImpl, origin, publicGroupProbe.profilePath, 200);
+  const profile = await expectStatus(fetchImpl, origin, publicGroupProbe.profilePath, 200, { keepBody: true });
   const profileHtml = await profile.text();
   if (!profileHtml.includes("@jonslimak")) {
     throw new Error(`${origin}${publicGroupProbe.profilePath} is not the expected public profile`);
   }
 
-  const missingPage = await expectStatus(fetchImpl, origin, publicGroupProbe.missingPagePath, 404);
+  const missingPage = await expectStatus(fetchImpl, origin, publicGroupProbe.missingPagePath, 404, { keepBody: true });
   if (!(await missingPage.text()).includes("Not found")) {
     throw new Error(`${origin}${publicGroupProbe.missingPagePath} did not return the public page not-found response`);
   }
@@ -88,6 +89,7 @@ async function verifyPublicGroupSurface(fetchImpl, origin) {
     origin,
     publicGroupProbe.missingManifestPath,
     404,
+    { keepBody: true },
   );
   const manifestError = await missingManifest.json();
   if (typeof manifestError?.error !== "string") {
@@ -107,6 +109,7 @@ export async function verifyProductionDeploy({
   origin = origin.replace(/\/$/, "");
   publicOrigin = publicOrigin.replace(/\/$/, "");
   const reviewedFeatures = expectedFeatures || await loadProductionFeatures();
+  const fetchVerified = (url, options) => fetchForVerification(url, options, { fetchImpl });
   await expectStatus(fetchImpl, origin, "/app/", 200);
   await verifyReleaseConfig(fetchImpl, origin, reviewedFeatures);
   await expectStatus(fetchImpl, origin, "/about/", 200);
@@ -151,7 +154,7 @@ export async function verifyProductionDeploy({
     }
   }
 
-  const appcast = await expectStatus(fetchImpl, origin, "/appcast.xml", 200);
+  const appcast = await expectStatus(fetchImpl, origin, "/appcast.xml", 200, { keepBody: true });
   const updateAssets = extractUpdateAssetPaths(await appcast.text());
   if (updateAssets.length === 0) {
     throw new Error(`${origin}/appcast.xml has no /updates/ assets`);
@@ -162,11 +165,12 @@ export async function verifyProductionDeploy({
   }
 
   if (verifyCandidateFeatures) {
-    await verifyLiveHelperReleaseAssets({ origin, fetchImpl, manifest: expectedHelperRelease });
+    await verifyLiveHelperReleaseAssets({ origin, fetchImpl: fetchVerified, manifest: expectedHelperRelease });
   }
 
   await verifyAiCatalog(fetchImpl, origin, publicOrigin);
-  await verifyMcpEndpoint({ origin, fetchImpl, requireCatalogSearch: verifyCatalogSearch && reviewedFeatures.catalogSearchEnabled === true });
+  await verifyMcpEndpoint({ origin, fetchImpl: fetchVerified,
+    requireCatalogSearch: verifyCatalogSearch && reviewedFeatures.catalogSearchEnabled === true });
 
   console.log("Production deploy verified");
 }
