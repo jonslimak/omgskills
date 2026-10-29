@@ -1631,13 +1631,13 @@
     },
     "facebook": {
       "featuredSkillIds": [
-        "facebook/react:extract-errors",
-        "facebook/react:feature-flags",
-        "facebook/react:flags",
-        "facebook/react:flow",
-        "facebook/react:test",
-        "facebook/react:verify",
-        "facebook/react:.claude/skills/fix",
+        "react/react:extract-errors",
+        "react/react:feature-flags",
+        "react/react:flags",
+        "react/react:flow",
+        "react/react:test",
+        "react/react:verify",
+        "facebook/react:fix",
         "facebook/relay:relay-best-practices",
         "facebook/buck2:buck2-rule-basics"
       ],
@@ -1649,7 +1649,7 @@
       "featuredSkillIds": [
         "react/react:extract-errors",
         "react/react:feature-flags",
-        "facebook/react:.claude/skills/fix",
+        "facebook/react:fix",
         "react/react:flags",
         "react/react:flow",
         "react/react:test",
@@ -6314,7 +6314,7 @@
         "twostraws/swift-concurrency-agent-skill:swift-concurrency-pro",
         "twostraws/swift-testing-agent-skill:swift-testing-pro",
         "twostraws/swiftdata-agent-skill:swiftdata-pro",
-        "eronred/aso-skills:aso-audit",
+        "appeeky/aso-skills:aso-audit",
         "dimillian/skills:swiftui-performance-audit",
         "wshobson/agents:mobile-ios-design",
         "github/awesome-copilot:apple-appstore-reviewer"
@@ -6324,7 +6324,7 @@
         "twostraws/swift-concurrency-agent-skill:swift-concurrency-pro",
         "twostraws/swift-testing-agent-skill:swift-testing-pro",
         "twostraws/swiftdata-agent-skill:swiftdata-pro",
-        "eronred/aso-skills:aso-audit",
+        "appeeky/aso-skills:aso-audit",
         "dimillian/skills:swiftui-performance-audit",
         "wshobson/agents:mobile-ios-design",
         "github/awesome-copilot:apple-appstore-reviewer"
@@ -6428,23 +6428,23 @@
       "subtitle": "Analysis, models, earnings and more.",
       "featuredSkillIds": [
         "anthropics/financial-services-plugins:thesis-tracker",
-        "anthropics/financial-services-plugins:earnings-analysis",
+        "anthropics/financial-services:earnings-analysis",
         "wshobson/agents:plugins/quantitative-trading/skills/risk-metrics-calculation",
         "OpenBB-finance/OpenBB:configure_mcp_server",
         "marketcalls/vectorbt-backtesting-skills:backtest",
         "ccxt/ccxt:ccxt-python",
-        "anthropics/financial-services-plugins:bond-futures-basis",
-        "anthropics/financial-services-plugins:comps-analysis",
-        "anthropics/financial-services-plugins:dcf-model"
+        "anthropics/financial-services:bond-futures-basis",
+        "anthropics/financial-services-plugins:fsi-comps-analysis",
+        "anthropics/financial-services:dcf-model"
       ],
       "skillIds": [
         "anthropics/financial-services-plugins:thesis-tracker",
-        "anthropics/financial-services-plugins:earnings-analysis",
+        "anthropics/financial-services:earnings-analysis",
         "wshobson/agents:plugins/quantitative-trading/skills/risk-metrics-calculation",
         "OpenBB-finance/OpenBB:configure_mcp_server",
-        "anthropics/financial-services-plugins:dcf-model",
-        "anthropics/financial-services-plugins:comps-analysis",
-        "anthropics/financial-services-plugins:bond-futures-basis",
+        "anthropics/financial-services:dcf-model",
+        "anthropics/financial-services-plugins:fsi-comps-analysis",
+        "anthropics/financial-services:bond-futures-basis",
         "ccxt/ccxt:ccxt-python",
         "marketcalls/vectorbt-backtesting-skills:backtest"
       ],
@@ -6461,7 +6461,7 @@
         "affaan-m/ecc:frontend-slides",
         "slidevjs/slidev:slidev",
         "affaan-m/ecc:investor-materials",
-        "anthropics/financial-services-plugins:funding-digest",
+        "anthropics/financial-services:funding-digest",
         "googleworkspace/cli:gws-slides",
         "hugohe3/ppt-master:ppt-master",
         "bytedance/deer-flow:ppt-generation",
@@ -6478,7 +6478,7 @@
         "bytedance/deer-flow:ppt-generation",
         "hugohe3/ppt-master:ppt-master",
         "googleworkspace/cli:gws-slides",
-        "anthropics/financial-services-plugins:funding-digest"
+        "anthropics/financial-services:funding-digest"
       ],
       "imageUrl": "https://omgskills.com/images/collections/presentations-decks.webp?v=3d9df632c6ab",
       "description": "Best Presentations & Decks skills for beautiful slides and great deck design "
@@ -6518,23 +6518,23 @@
       "subtitle": "Spreadsheets, DCF models, and clean data",
       "featuredSkillIds": [
         "anthropics/skills:xlsx",
-        "anthropics/financial-services-plugins:dcf-model",
-        "anthropics/financial-services-plugins:comps-analysis",
+        "anthropics/financial-services:dcf-model",
+        "anthropics/financial-services-plugins:fsi-comps-analysis",
         "googleworkspace/cli:gws-sheets",
-        "anthropics/financial-services-plugins:funding-digest",
+        "anthropics/financial-services:funding-digest",
         "n8n-io/n8n:data-table-manager",
-        "anthropics/financial-services-plugins:earnings-analysis",
-        "anthropics/financial-services-plugins:clean-data-xls"
+        "anthropics/financial-services:earnings-analysis",
+        "anthropics/financial-services:clean-data-xls"
       ],
       "skillIds": [
         "anthropics/skills:xlsx",
-        "anthropics/financial-services-plugins:dcf-model",
-        "anthropics/financial-services-plugins:comps-analysis",
+        "anthropics/financial-services:dcf-model",
+        "anthropics/financial-services-plugins:fsi-comps-analysis",
         "googleworkspace/cli:gws-sheets",
-        "anthropics/financial-services-plugins:clean-data-xls",
-        "anthropics/financial-services-plugins:earnings-analysis",
+        "anthropics/financial-services:clean-data-xls",
+        "anthropics/financial-services:earnings-analysis",
         "n8n-io/n8n:data-table-manager",
-        "anthropics/financial-services-plugins:funding-digest"
+        "anthropics/financial-services:funding-digest"
       ],
       "imageUrl": "https://omgskills.com/images/collections/excel-financial-modeling.webp?v=38450eb3ee3d",
       "description": "Best Excel & Finance Skills to build accurate financial models and projections in excel "
