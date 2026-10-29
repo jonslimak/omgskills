@@ -520,8 +520,8 @@ struct ConnectedInventoryRuntimeTests {
             #expect(!branch.contains(forbidden))
         }
         let view = try String(contentsOf: source.appendingPathComponent("CatalogInstallView.swift"), encoding: .utf8)
-        #expect(view.contains("anchorProvider: { [weak self] in self?.window }"))
-        #expect(view.contains("onReturn: { [weak self] in self?.showStatus() }"))
+        #expect(view.contains("anchorProvider: { [weak self] in self?.browserPresentationAnchor() }"))
+        #expect(view.contains("onReturn: { [weak self] in self?.returnFromBrowser() }"))
         #expect(view.contains("connectedRuntime?.receivePairingCallback(url)"))
         #expect(view.contains("Analytics.connectedTracker(profile: candidate.profile)"))
         #expect(view.contains("client: .product, track: track"))
