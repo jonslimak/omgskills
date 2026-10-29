@@ -16,7 +16,7 @@ function deferred() {
   return { promise, resolve };
 }
 
-test("checks four distinct links at once, reuses duplicates and consumes bodies", async () => {
+test("checks two distinct links at once, reuses duplicates and consumes bodies", async () => {
   const release = deferred();
   const calls = [];
   const consumed = [];
@@ -25,6 +25,7 @@ test("checks four distinct links at once, reuses duplicates and consumes bodies"
   let peak = 0;
   const verify = createLiveLinkVerifier({
     origin,
+    sleep: async () => {},
     log: (line) => logs.push(line),
     fetchLive: async (url, options) => {
       assert.deepEqual(options, { redirect: "manual" });
@@ -44,10 +45,10 @@ test("checks four distinct links at once, reuses duplicates and consumes bodies"
   const paths = Array.from({ length: 9 }, (_, i) => `/page-${i}/`);
   const checking = verify([...paths, paths[0], paths[1]], { label: "homepage", acceptStatus: internalStatus });
   await tick();
-  assert.equal(calls.length, 4);
+  assert.equal(calls.length, 2);
   release.resolve();
   await checking;
-  assert.equal(peak, 4);
+  assert.equal(peak, 2);
   assert.equal(active, 0);
   assert.deepEqual(new Set(calls), new Set(paths.map((path) => origin + path)));
   assert.equal(calls.length, 9);
@@ -56,6 +57,25 @@ test("checks four distinct links at once, reuses duplicates and consumes bodies"
   assert.equal(calls.length, 9, "reuse link status across pages in this verifier run");
   assert.match(logs[0], /homepage.*0\/9/);
   assert(logs.some((line) => /homepage.*9\/9/.test(line)));
+});
+
+test("paces each worker by 100ms before starting another request", async () => {
+  const release = deferred();
+  const calls = [];
+  const delays = [];
+  const verify = createLiveLinkVerifier({
+    origin, log: () => {},
+    sleep: async milliseconds => { delays.push(milliseconds); await release.promise; },
+    fetchLive: async url => { calls.push(url); return { status: 200, body: null }; },
+  });
+  const checking = verify(["/a", "/b", "/c"], { label: "paced", acceptStatus: internalStatus });
+  await tick();
+  assert.equal(calls.length, 2, "later requests must wait for the pacing delay");
+  assert.deepEqual(delays, [100, 100]);
+  release.resolve();
+  await checking;
+  assert.deepEqual(calls, ["/a", "/b", "/c"].map(path => origin + path));
+  assert.equal(delays.length, 2, "no delay after the final request");
 });
 
 test("link sweeps reuse HTTP connections instead of reconnecting for each page", async () => {
@@ -131,18 +151,18 @@ test("stops scheduling on failure and waits for already active work", async () =
     },
   });
   let settled = false;
-  const checking = verify(["/bad", "/a", "/b", "/c", "/unscheduled"], {
+  const checking = verify(["/bad", "/a", "/unscheduled"], {
     label: "page", acceptStatus: internalStatus,
   });
   const rejected = assert.rejects(checking, /fetch exhausted its retries/).then(() => { settled = true; });
   await failed.promise;
   await tick();
-  assert.equal(calls.length, 4);
+  assert.equal(calls.length, 2);
   assert.equal(settled, false);
   release.resolve();
   await rejected;
   assert.equal(active, 0);
-  assert.equal(calls.length, 4);
+  assert.equal(calls.length, 2);
 });
 
 test("caches are scoped to one origin/run and do not hide a later failure", async () => {

@@ -17,7 +17,9 @@ function commandText(command, args) {
   return [command, ...args].join(" ");
 }
 
-export async function runCommand(command, args, { cwd = process.cwd(), env = process.env } = {}) {
+export async function runCommand(command, args, {
+  cwd = process.cwd(), env = process.env, includeFailureStdout = false,
+} = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd,
@@ -38,7 +40,9 @@ export async function runCommand(command, args, { cwd = process.cwd(), env = pro
         resolve({ stdout, stderr });
         return;
       }
-      const detail = stderr.trim() || stdout.trim() || `exit ${code}`;
+      const detail = includeFailureStdout
+        ? [stdout.trim().split("\n").slice(-10).join("\n"), stderr.trim()].filter(Boolean).join("\n") || `exit ${code}`
+        : stderr.trim() || stdout.trim() || `exit ${code}`;
       reject(new Error(`${commandText(command, args)} failed: ${detail}`));
     });
   });
@@ -247,6 +251,7 @@ async function verifyWithRetries({
       })) {
         const result = await run(command.command, command.args, {
           env: { ...env, ...command.env },
+          includeFailureStdout: true,
         });
         if (result.stdout) process.stdout.write(result.stdout);
         if (result.stderr) process.stderr.write(result.stderr);

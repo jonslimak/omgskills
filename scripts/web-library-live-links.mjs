@@ -1,6 +1,9 @@
 import { consumeVerificationBody } from "./verification-fetch.mjs";
 
-export function createLiveLinkVerifier({ origin, fetchLive, log = console.log }) {
+export function createLiveLinkVerifier({
+  origin, fetchLive, log = console.log,
+  sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds)),
+}) {
   // Cache status only: callers still apply their own rules, and content checks fetch afresh.
   const statusByUrl = new Map();
 
@@ -42,11 +45,12 @@ export function createLiveLinkVerifier({ origin, fetchLive, log = console.log })
           if (!failed) failure = error;
           failed = true;
         }
+        if (!failed && next < uniquePaths.length) await sleep(100);
       }
     }
 
     // Drain active requests before rejecting; do not start more work after a failure.
-    await Promise.all(Array.from({ length: Math.min(4, uniquePaths.length) }, worker));
+    await Promise.all(Array.from({ length: Math.min(2, uniquePaths.length) }, worker));
     if (failed) throw failure;
   };
 }

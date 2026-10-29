@@ -2,8 +2,27 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   deployProduction,
+  runCommand,
   ROLLBACK_ISSUE_TITLE,
 } from "./deploy-netlify-production.mjs";
+
+test("verification failures retain the last ten progress lines and network errors", async () => {
+  const code = 'for(let i=0;i<15;i++) console.log("links " + i); console.error("ETIMEDOUT draft.example"); process.exitCode=1;';
+  await assert.rejects(runCommand(process.execPath, ["-e", code], { includeFailureStdout: true }), error => {
+    assert.match(error.message, /links 5\nlinks 6/);
+    assert.match(error.message, /links 14\nETIMEDOUT draft\.example/);
+    assert.doesNotMatch(error.message, /links 0\n/);
+    return true;
+  });
+});
+
+test("other command failures do not expose stdout when stderr is available", async () => {
+  await assert.rejects(runCommand(process.execPath, ["-e", 'console.log("private-result"); console.error("command failed"); process.exitCode=1;']), error => {
+    assert.match(error.message, /failed: command failed$/);
+    assert.doesNotMatch(error.message.split("failed: ")[1], /private-result/);
+    return true;
+  });
+});
 
 const env = {
   NETLIFY_AUTH_TOKEN: "netlify-secret",
@@ -53,7 +72,7 @@ function createHarness({
   let productionVerifyCalls = 0;
   const run = async (command, args, options = {}) => {
     const key = `${command} ${args.join(" ")}`;
-    calls.push({ type: "command", key, env: options.env });
+    calls.push({ type: "command", key, env: options.env, includeFailureStdout: options.includeFailureStdout });
     if (key === "git rev-parse HEAD") return { stdout: `${head}\n`, stderr: "" };
     if (key === "git rev-parse origin/main") return { stdout: `${originMain}\n`, stderr: "" };
     if (key.includes("netlify-cli database status")) {
@@ -168,6 +187,10 @@ test("accepts the workflow's pushed commit and records a verified receipt", asyn
   assert.equal(receipt.manualRestoreCommand, undefined);
   const deployCalls = harness.calls.filter((call) => call.key?.includes("netlify-cli deploy"));
   assert.equal(deployCalls.length, 2);
+  for (const call of harness.calls.filter(call => call.type === "command")) {
+    assert.equal(call.includeFailureStdout === true, /scripts\/verify-/.test(call.key),
+      "failed progress output must be enabled only for verification commands");
+  }
   const helperCheckIndex = harness.calls.findIndex((call) => call.type === "helper-assets");
   assert.ok(helperCheckIndex >= 0);
   assert.ok(helperCheckIndex < harness.calls.indexOf(deployCalls[0]));
