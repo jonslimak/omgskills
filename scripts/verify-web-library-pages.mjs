@@ -95,12 +95,12 @@ const pages = [
     markdownText: `# ${starterPack.title}`,
   },
   {
-    path: "/skills/openai/codex/code-review/",
-    canonical: "https://omgskills.com/skills/openai/codex/code-review/",
-    text: "code-review",
+    path: "/skills/openai/codex/skill-creator/",
+    canonical: "https://omgskills.com/skills/openai/codex/skill-creator/",
+    text: "skill-creator",
     titleText: "Claude skill by openai",
-    descriptionText: "Install code-review",
-    visibleText: "Run a final code review on a pull request",
+    descriptionText: "Install skill-creator",
+    visibleText: "Create or update a Codex skill",
     metadata: true,
     skillLayout: true,
     profileAuthor: {
@@ -108,7 +108,7 @@ const pages = [
       path: "/library/openai/",
     },
     allowNoindex: true,
-    markdownText: "# code-review",
+    markdownText: "# skill-creator",
   },
   {
     path: "/skills/obra/superpowers/systematic-debugging/",
@@ -122,11 +122,11 @@ const pages = [
     markdownText: "# systematic-debugging",
   },
   {
-    path: "/skills/openai/codex/code-review-change-size/",
-    canonical: "https://omgskills.com/skills/openai/codex/code-review-change-size/",
-    text: "code-review-change-size",
+    path: "/skills/openai/skills/plugin-creator/",
+    canonical: "https://omgskills.com/skills/openai/skills/plugin-creator/",
+    text: "plugin-creator",
     allowNoindex: true,
-    markdownText: "# code-review-change-size",
+    markdownText: "# plugin-creator",
   },
   {
     path: "/skills/",
