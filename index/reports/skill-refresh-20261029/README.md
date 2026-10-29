@@ -45,6 +45,20 @@ restored. Both published-data verifiers and both publication-impact checks
 pass without an override: 58,290 skills before and after, none removed.
 Tests: 565 shadow-guard, 65 published-data and 81 MCP passed.
 
+## Release review correction
+
+The initial refresh omitted `canonicalBySha` from both new sha-history assets,
+dropping all 47 prior duplicate-resolution choices. Release review rebuilt the
+mapping with `buildCanonicalBySha`, the same trusted-seed policy used by the
+scheduled publisher. Both tracks now publish 290 current, high-confidence
+same-repository choices. Historical SHA/ID pairs and older hashed assets remain
+intact; stale choices are not copied onto changed content. Skills files, pinned
+records, collections and feature settings are unchanged by this correction.
+
+Verification after correction: 565 shadow-guard, 65 published-data, 81 MCP and
+35 focused API tests passed, along with index typecheck and the full combined
+site build. Three refreshed files matched their exact GitHub commit/blob pins.
+
 The skills assets are 96.4 MB (v2 and `index/skills.json`) and 98.0 MB
 (Crawl 4), against a 104.9 MB limit.
 

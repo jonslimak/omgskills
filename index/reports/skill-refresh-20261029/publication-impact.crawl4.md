@@ -1,7 +1,7 @@
 # Publication Impact: crawl4
 
-- Generated: 2026-10-29T13:29:36.949Z
-- Source commit: d6f15f567851e68d83c36bd1b9a689f725853d3b
+- Generated: 2026-10-29T14:13:23.524Z
+- Source commit: 2b047860ea9ea49985ebbaee35042ebd962cf540
 - Policy digest: sha256:d7f4b9874506ce983edad0fee02ab3e02baaec3a7976a7a5b8227fa5ad584b69
 - Decision: PASS
 - Override: none
