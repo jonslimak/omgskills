@@ -127,7 +127,7 @@ struct ConnectedCandidateConfigurationTests {
         #expect(controller.contains("if let connectionSetupError {"))
         #expect(controller.contains("Text(connectionSetupError)"))
         #expect(controller.contains("if model.phase == .confirm"))
-        #expect(controller.contains("model.install()"))
+        #expect(controller.contains("Button(action: model.install)"))
         let view = try String(contentsOf: root.appendingPathComponent("ConnectedInventoryView.swift"), encoding: .utf8)
         #expect(view.contains("if let warning = model.continuityWarning {"))
         #expect(view.contains("if let warning = model.disconnectWarning {"))
