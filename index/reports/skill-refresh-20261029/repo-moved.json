@@ -1,0 +1,2227 @@
+{
+  "repoCount": 248,
+  "skillCount": 733,
+  "repos": [
+    {
+      "catalogRepo": "affaan-m/everything-claude-code",
+      "currentRepo": "affaan-m/ecc",
+      "skillIds": [
+        "affaan-m/everything-claude-code:docs/zh-TW/skills/frontend-patterns",
+        "affaan-m/everything-claude-code:docs/zh-TW/skills/golang-patterns",
+        "affaan-m/everything-claude-code:documentation-lookup",
+        "affaan-m/everything-claude-code:dotnet-patterns",
+        "affaan-m/everything-claude-code:e2e-testing",
+        "affaan-m/everything-claude-code:ecc-tools-cost-audit",
+        "affaan-m/everything-claude-code:email-ops",
+        "affaan-m/everything-claude-code:energy-procurement",
+        "affaan-m/everything-claude-code:enterprise-agent-ops",
+        "affaan-m/everything-claude-code:eval-harness",
+        "affaan-m/everything-claude-code:evm-token-decimals",
+        "affaan-m/everything-claude-code:exa-search",
+        "affaan-m/everything-claude-code:fal-ai-media",
+        "affaan-m/everything-claude-code:finance-billing-ops",
+        "affaan-m/everything-claude-code:flutter-dart-code-review",
+        "affaan-m/everything-claude-code:foundation-models-on-device",
+        "affaan-m/everything-claude-code:frontend-design",
+        "affaan-m/everything-claude-code:frontend-patterns",
+        "affaan-m/everything-claude-code:frontend-slides",
+        "affaan-m/everything-claude-code:gan-style-harness",
+        "affaan-m/everything-claude-code:gateguard",
+        "affaan-m/everything-claude-code:git-workflow",
+        "affaan-m/everything-claude-code:github-ops",
+        "affaan-m/everything-claude-code:golang-patterns",
+        "affaan-m/everything-claude-code:golang-testing",
+        "affaan-m/everything-claude-code:google-workspace-ops",
+        "affaan-m/everything-claude-code:healthcare-cdss-patterns",
+        "affaan-m/everything-claude-code:healthcare-emr-patterns",
+        "affaan-m/everything-claude-code:healthcare-eval-harness",
+        "affaan-m/everything-claude-code:healthcare-phi-compliance",
+        "affaan-m/everything-claude-code:hermes-imports",
+        "affaan-m/everything-claude-code:hexagonal-architecture",
+        "affaan-m/everything-claude-code:hipaa-compliance",
+        "affaan-m/everything-claude-code:hookify-rules",
+        "affaan-m/everything-claude-code:inventory-demand-planning",
+        "affaan-m/everything-claude-code:investor-materials",
+        "affaan-m/everything-claude-code:investor-outreach",
+        "affaan-m/everything-claude-code:iterative-retrieval",
+        "affaan-m/everything-claude-code:java-coding-standards",
+        "affaan-m/everything-claude-code:jira-integration",
+        "affaan-m/everything-claude-code:jpa-patterns",
+        "affaan-m/everything-claude-code:knowledge-ops",
+        "affaan-m/everything-claude-code:kotlin-coroutines-flows",
+        "affaan-m/everything-claude-code:kotlin-exposed-patterns",
+        "affaan-m/everything-claude-code:kotlin-ktor-patterns",
+        "affaan-m/everything-claude-code:kotlin-patterns",
+        "affaan-m/everything-claude-code:kotlin-testing",
+        "affaan-m/everything-claude-code:laravel-patterns",
+        "affaan-m/everything-claude-code:laravel-plugin-discovery",
+        "affaan-m/everything-claude-code:laravel-security",
+        "affaan-m/everything-claude-code:laravel-tdd",
+        "affaan-m/everything-claude-code:laravel-verification",
+        "affaan-m/everything-claude-code:lead-intelligence",
+        "affaan-m/everything-claude-code:liquid-glass-design",
+        "affaan-m/everything-claude-code:llm-trading-agent-security",
+        "affaan-m/everything-claude-code:logistics-exception-management",
+        "affaan-m/everything-claude-code:manim-video",
+        "affaan-m/everything-claude-code:market-research",
+        "affaan-m/everything-claude-code:mcp-server-patterns",
+        "affaan-m/everything-claude-code:messages-ops",
+        "affaan-m/everything-claude-code:nanoclaw-repl",
+        "affaan-m/everything-claude-code:nestjs-patterns",
+        "affaan-m/everything-claude-code:nextjs-turbopack",
+        "affaan-m/everything-claude-code:nodejs-keccak256",
+        "affaan-m/everything-claude-code:nutrient-document-processing",
+        "affaan-m/everything-claude-code:nuxt4-patterns",
+        "affaan-m/everything-claude-code:openclaw-persona-forge",
+        "affaan-m/everything-claude-code:opensource-pipeline",
+        "affaan-m/everything-claude-code:perl-patterns",
+        "affaan-m/everything-claude-code:perl-security",
+        "affaan-m/everything-claude-code:perl-testing",
+        "affaan-m/everything-claude-code:plankton-code-quality",
+        "affaan-m/everything-claude-code:postgres-patterns",
+        "affaan-m/everything-claude-code:product-capability",
+        "affaan-m/everything-claude-code:product-lens",
+        "affaan-m/everything-claude-code:production-scheduling",
+        "affaan-m/everything-claude-code:project-flow-ops",
+        "affaan-m/everything-claude-code:prompt-optimizer",
+        "affaan-m/everything-claude-code:python-patterns",
+        "affaan-m/everything-claude-code:python-testing",
+        "affaan-m/everything-claude-code:pytorch-patterns",
+        "affaan-m/everything-claude-code:quality-nonconformance",
+        "affaan-m/everything-claude-code:ralphinho-rfc-pipeline",
+        "affaan-m/everything-claude-code:regex-vs-llm-structured-text",
+        "affaan-m/everything-claude-code:remotion-video-creation",
+        "affaan-m/everything-claude-code:repo-scan",
+        "affaan-m/everything-claude-code:research-ops",
+        "affaan-m/everything-claude-code:returns-reverse-logistics",
+        "affaan-m/everything-claude-code:rules-distill",
+        "affaan-m/everything-claude-code:rust-patterns",
+        "affaan-m/everything-claude-code:rust-testing",
+        "affaan-m/everything-claude-code:safety-guard",
+        "affaan-m/everything-claude-code:santa-method",
+        "affaan-m/everything-claude-code:search-first",
+        "affaan-m/everything-claude-code:security-bounty-hunter",
+        "affaan-m/everything-claude-code:security-review",
+        "affaan-m/everything-claude-code:security-scan",
+        "affaan-m/everything-claude-code:seo",
+        "affaan-m/everything-claude-code:skill-comply",
+        "affaan-m/everything-claude-code:skills/strategic-compact",
+        "affaan-m/everything-claude-code:social-graph-ranker",
+        "affaan-m/everything-claude-code:springboot-patterns",
+        "affaan-m/everything-claude-code:springboot-security",
+        "affaan-m/everything-claude-code:springboot-tdd",
+        "affaan-m/everything-claude-code:springboot-verification",
+        "affaan-m/everything-claude-code:strategic-compact",
+        "affaan-m/everything-claude-code:swift-actor-persistence",
+        "affaan-m/everything-claude-code:swift-concurrency-6-2",
+        "affaan-m/everything-claude-code:swift-protocol-di-testing",
+        "affaan-m/everything-claude-code:swiftui-patterns",
+        "affaan-m/everything-claude-code:tdd-workflow",
+        "affaan-m/everything-claude-code:team-builder",
+        "affaan-m/everything-claude-code:terminal-ops",
+        "affaan-m/everything-claude-code:token-budget-advisor",
+        "affaan-m/everything-claude-code:ui-demo",
+        "affaan-m/everything-claude-code:unified-notifications-ops",
+        "affaan-m/everything-claude-code:verification-loop",
+        "affaan-m/everything-claude-code:video-editing",
+        "affaan-m/everything-claude-code:videodb",
+        "affaan-m/everything-claude-code:visa-doc-translate",
+        "affaan-m/everything-claude-code:workspace-surface-audit",
+        "affaan-m/everything-claude-code:x-api"
+      ]
+    },
+    {
+      "catalogRepo": "jabrena/cursor-rules-java",
+      "currentRepo": "jabrena/plinth",
+      "skillIds": [
+        "jabrena/cursor-rules-java:skills/001-skills-inventory",
+        "jabrena/cursor-rules-java:skills/002-agents-inventory",
+        "jabrena/cursor-rules-java:skills/003-agents-installation",
+        "jabrena/cursor-rules-java:skills/012-agile-epic",
+        "jabrena/cursor-rules-java:skills/013-agile-feature",
+        "jabrena/cursor-rules-java:skills/014-agile-user-story",
+        "jabrena/cursor-rules-java:skills/030-architecture-adr-general",
+        "jabrena/cursor-rules-java:skills/033-architecture-diagrams",
+        "jabrena/cursor-rules-java:skills/041-planning-plan-mode",
+        "jabrena/cursor-rules-java:skills/042-planning-openspec",
+        "jabrena/cursor-rules-java:skills/043-planning-github-issues",
+        "jabrena/cursor-rules-java:skills/044-planning-jira",
+        "jabrena/cursor-rules-java:skills/110-java-maven-best-practices",
+        "jabrena/cursor-rules-java:skills/111-java-maven-dependencies",
+        "jabrena/cursor-rules-java:skills/112-java-maven-plugins",
+        "jabrena/cursor-rules-java:skills/113-java-maven-documentation",
+        "jabrena/cursor-rules-java:skills/114-java-maven-search",
+        "jabrena/cursor-rules-java:skills/121-java-object-oriented-design",
+        "jabrena/cursor-rules-java:skills/122-java-type-design",
+        "jabrena/cursor-rules-java:skills/123-java-exception-handling",
+        "jabrena/cursor-rules-java:skills/124-java-secure-coding",
+        "jabrena/cursor-rules-java:skills/125-java-concurrency",
+        "jabrena/cursor-rules-java:skills/128-java-generics",
+        "jabrena/cursor-rules-java:skills/130-java-testing-strategies",
+        "jabrena/cursor-rules-java:skills/131-java-testing-unit-testing",
+        "jabrena/cursor-rules-java:skills/132-java-testing-integration-testing",
+        "jabrena/cursor-rules-java:skills/133-java-testing-acceptance-tests",
+        "jabrena/cursor-rules-java:skills/141-java-refactoring-with-modern-features",
+        "jabrena/cursor-rules-java:skills/142-java-functional-programming",
+        "jabrena/cursor-rules-java:skills/143-java-functional-exception-handling",
+        "jabrena/cursor-rules-java:skills/144-java-data-oriented-programming",
+        "jabrena/cursor-rules-java:skills/151-java-performance-jmeter",
+        "jabrena/cursor-rules-java:skills/161-java-profiling-detect",
+        "jabrena/cursor-rules-java:skills/162-java-profiling-analyze",
+        "jabrena/cursor-rules-java:skills/163-java-profiling-refactor",
+        "jabrena/cursor-rules-java:skills/164-java-profiling-verify",
+        "jabrena/cursor-rules-java:skills/170-java-documentation",
+        "jabrena/cursor-rules-java:skills/180-java-observability-logging",
+        "jabrena/cursor-rules-java:skills/200-agents-md",
+        "jabrena/cursor-rules-java:skills/301-frameworks-spring-boot-core",
+        "jabrena/cursor-rules-java:skills/302-frameworks-spring-boot-rest",
+        "jabrena/cursor-rules-java:skills/303-frameworks-spring-boot-validation",
+        "jabrena/cursor-rules-java:skills/304-frameworks-spring-boot-security",
+        "jabrena/cursor-rules-java:skills/311-frameworks-spring-jdbc",
+        "jabrena/cursor-rules-java:skills/312-frameworks-spring-data-jdbc",
+        "jabrena/cursor-rules-java:skills/313-frameworks-spring-db-migrations-flyway",
+        "jabrena/cursor-rules-java:skills/321-frameworks-spring-boot-testing-unit-tests",
+        "jabrena/cursor-rules-java:skills/322-frameworks-spring-boot-testing-integration-tests",
+        "jabrena/cursor-rules-java:skills/323-frameworks-spring-boot-testing-acceptance-tests",
+        "jabrena/cursor-rules-java:skills/401-frameworks-quarkus-core",
+        "jabrena/cursor-rules-java:skills/402-frameworks-quarkus-rest",
+        "jabrena/cursor-rules-java:skills/403-frameworks-quarkus-validation",
+        "jabrena/cursor-rules-java:skills/404-frameworks-quarkus-security",
+        "jabrena/cursor-rules-java:skills/411-frameworks-quarkus-jdbc",
+        "jabrena/cursor-rules-java:skills/412-frameworks-quarkus-panache",
+        "jabrena/cursor-rules-java:skills/413-frameworks-quarkus-db-migrations-flyway",
+        "jabrena/cursor-rules-java:skills/421-frameworks-quarkus-testing-unit-tests",
+        "jabrena/cursor-rules-java:skills/422-frameworks-quarkus-testing-integration-tests",
+        "jabrena/cursor-rules-java:skills/423-frameworks-quarkus-testing-acceptance-tests",
+        "jabrena/cursor-rules-java:skills/501-frameworks-micronaut-core",
+        "jabrena/cursor-rules-java:skills/502-frameworks-micronaut-rest",
+        "jabrena/cursor-rules-java:skills/503-frameworks-micronaut-validation",
+        "jabrena/cursor-rules-java:skills/504-frameworks-micronaut-security",
+        "jabrena/cursor-rules-java:skills/511-frameworks-micronaut-jdbc",
+        "jabrena/cursor-rules-java:skills/512-frameworks-micronaut-data",
+        "jabrena/cursor-rules-java:skills/513-frameworks-micronaut-db-migrations-flyway",
+        "jabrena/cursor-rules-java:skills/521-frameworks-micronaut-testing-unit-tests",
+        "jabrena/cursor-rules-java:skills/522-frameworks-micronaut-testing-integration-tests",
+        "jabrena/cursor-rules-java:skills/523-frameworks-micronaut-testing-acceptance-tests",
+        "jabrena/cursor-rules-java:skills/701-technologies-openapi",
+        "jabrena/cursor-rules-java:skills/702-technologies-wiremock",
+        "jabrena/cursor-rules-java:skills/703-technologies-fuzzing-testing"
+      ]
+    },
+    {
+      "catalogRepo": "danielmiessler/Personal_AI_Infrastructure",
+      "currentRepo": "danielmiessler/lifeos",
+      "skillIds": [
+        "danielmiessler/Personal_AI_Infrastructure:BeCreative",
+        "danielmiessler/Personal_AI_Infrastructure:Cloudflare",
+        "danielmiessler/Personal_AI_Infrastructure:Council",
+        "danielmiessler/Personal_AI_Infrastructure:CreateSkill",
+        "danielmiessler/Personal_AI_Infrastructure:Fabric",
+        "danielmiessler/Personal_AI_Infrastructure:Prompting",
+        "danielmiessler/Personal_AI_Infrastructure:RedTeam",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/Art",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/BrightData",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/Council",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/CreateCLI",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/CreateSkill",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/FirstPrinciples",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/AnnualReports",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/Aphorisms",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/Art",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/BeCreative",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/BrightData",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/Council",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/CreateCLI",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/CreateSkill",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/Fabric",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/FirstPrinciples",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/AnnualReports",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/Aphorisms",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/Art",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/BeCreative",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/BrightData",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/Council",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/CreateCLI",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/CreateSkill",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/Fabric",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/FirstPrinciples",
+        "danielmiessler/Personal_AI_Infrastructure:Science",
+        "danielmiessler/Personal_AI_Infrastructure:Telos"
+      ]
+    },
+    {
+      "catalogRepo": "fusengine/agents",
+      "currentRepo": "fusengine/claude-plugins",
+      "skillIds": [
+        "fusengine/agents:plugins/ai-pilot/skills/agent-creator",
+        "fusengine/agents:plugins/ai-pilot/skills/apex",
+        "fusengine/agents:plugins/ai-pilot/skills/code-quality",
+        "fusengine/agents:plugins/ai-pilot/skills/elicitation",
+        "fusengine/agents:plugins/ai-pilot/skills/exploration",
+        "fusengine/agents:plugins/changelog-watcher/skills/breaking-changes",
+        "fusengine/agents:plugins/changelog-watcher/skills/changelog-scan",
+        "fusengine/agents:plugins/changelog-watcher/skills/community-pulse",
+        "fusengine/agents:plugins/commit-pro/skills/commit-detection",
+        "fusengine/agents:plugins/laravel-expert/skills/fusecore",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-api",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-architecture",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-auth",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-billing",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-blade",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-eloquent",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-i18n",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-livewire",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-migrations",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-permission",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-queues",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-stripe-connect",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-testing",
+        "fusengine/agents:plugins/laravel-expert/skills/laravel-vite",
+        "fusengine/agents:plugins/nextjs-expert/skills/better-auth",
+        "fusengine/agents:plugins/prompt-engineer/skills/agent-design",
+        "fusengine/agents:plugins/prompt-engineer/skills/guardrails",
+        "fusengine/agents:plugins/security-expert/skills/auth-audit",
+        "fusengine/agents:plugins/security-expert/skills/cve-research",
+        "fusengine/agents:plugins/security-expert/skills/dependency-audit",
+        "fusengine/agents:plugins/swift-apple-expert/skills/build-distribution",
+        "fusengine/agents:plugins/swift-apple-expert/skills/ios",
+        "fusengine/agents:plugins/swift-apple-expert/skills/ipados"
+      ]
+    },
+    {
+      "catalogRepo": "kagenti/kagenti",
+      "currentRepo": "rossoctl/rossoctl",
+      "skillIds": [
+        "kagenti/kagenti:.claude/skills/auth",
+        "kagenti/kagenti:.claude/skills/auth:keycloak-confidential-client",
+        "kagenti/kagenti:.claude/skills/auth:mlflow-oidc-auth",
+        "kagenti/kagenti:.claude/skills/auth:otel-oauth2-exporter",
+        "kagenti/kagenti:.claude/skills/ci:monitoring",
+        "kagenti/kagenti:.claude/skills/ci:status",
+        "kagenti/kagenti:.claude/skills/git:commit",
+        "kagenti/kagenti:.claude/skills/git:rebase",
+        "kagenti/kagenti:.claude/skills/git:worktree",
+        "kagenti/kagenti:.claude/skills/github",
+        "kagenti/kagenti:.claude/skills/github:last-week",
+        "kagenti/kagenti:.claude/skills/helm",
+        "kagenti/kagenti:.claude/skills/helm:debug",
+        "kagenti/kagenti:.claude/skills/hypershift",
+        "kagenti/kagenti:.claude/skills/hypershift:cluster",
+        "kagenti/kagenti:.claude/skills/hypershift:debug",
+        "kagenti/kagenti:.claude/skills/hypershift:setup",
+        "kagenti/kagenti:.claude/skills/istio",
+        "kagenti/kagenti:.claude/skills/istio:ambient-waypoint",
+        "kagenti/kagenti:.claude/skills/k8s",
+        "kagenti/kagenti:.claude/skills/k8s:health",
+        "kagenti/kagenti:.claude/skills/k8s:live-debugging",
+        "kagenti/kagenti:.claude/skills/k8s:logs",
+        "kagenti/kagenti:.claude/skills/k8s:pods",
+        "kagenti/kagenti:.claude/skills/kagenti:ui-debug",
+        "kagenti/kagenti:.claude/skills/kind",
+        "kagenti/kagenti:.claude/skills/kind:cluster"
+      ]
+    },
+    {
+      "catalogRepo": "MakFly/superpowers-symfony",
+      "currentRepo": "dev-toolings/superpowers-symfony",
+      "skillIds": [
+        "MakFly/superpowers-symfony:skills/api-platform-dto-resources",
+        "MakFly/superpowers-symfony:skills/api-platform-filters",
+        "MakFly/superpowers-symfony:skills/api-platform-resources",
+        "MakFly/superpowers-symfony:skills/api-platform-security",
+        "MakFly/superpowers-symfony:skills/api-platform-serialization",
+        "MakFly/superpowers-symfony:skills/api-platform-state-providers",
+        "MakFly/superpowers-symfony:skills/api-platform-tests",
+        "MakFly/superpowers-symfony:skills/api-platform-versioning",
+        "MakFly/superpowers-symfony:skills/bootstrap-check",
+        "MakFly/superpowers-symfony:skills/config-env-parameters",
+        "MakFly/superpowers-symfony:skills/controller-cleanup",
+        "MakFly/superpowers-symfony:skills/cqrs-and-handlers",
+        "MakFly/superpowers-symfony:skills/daily-workflow",
+        "MakFly/superpowers-symfony:skills/doctrine-batch-processing",
+        "MakFly/superpowers-symfony:skills/doctrine-fetch-modes",
+        "MakFly/superpowers-symfony:skills/doctrine-fixtures-foundry",
+        "MakFly/superpowers-symfony:skills/doctrine-migrations",
+        "MakFly/superpowers-symfony:skills/doctrine-relations",
+        "MakFly/superpowers-symfony:skills/doctrine-transactions",
+        "MakFly/superpowers-symfony:skills/e2e-panther-playwright",
+        "MakFly/superpowers-symfony:skills/effective-context",
+        "MakFly/superpowers-symfony:skills/executing-plans",
+        "MakFly/superpowers-symfony:skills/form-types-validation",
+        "MakFly/superpowers-symfony:skills/functional-tests",
+        "MakFly/superpowers-symfony:skills/interfaces-and-autowiring"
+      ]
+    },
+    {
+      "catalogRepo": "markus41/claude",
+      "currentRepo": "thelobbi/claude",
+      "skillIds": [
+        "Lobbi-Docs/claude:.claude/skills/authentication",
+        "Lobbi-Docs/claude:.claude/skills/batch-processing",
+        "Lobbi-Docs/claude:.claude/skills/citations-retrieval",
+        "Lobbi-Docs/claude:.claude/skills/complex-reasoning",
+        "Lobbi-Docs/claude:.claude/skills/database",
+        "Lobbi-Docs/claude:.claude/skills/extended-thinking",
+        "Lobbi-Docs/claude:plugins/jira-orchestrator/skills/clean-architecture",
+        "Lobbi-Docs/claude:plugins/jira-orchestrator/skills/harness-cd",
+        "Lobbi-Docs/claude:plugins/jira-orchestrator/skills/harness-ci",
+        "Lobbi-Docs/claude:plugins/jira-orchestrator/skills/harness-mcp",
+        "Lobbi-Docs/claude:plugins/jira-orchestrator/skills/harness-platform"
+      ]
+    },
+    {
+      "catalogRepo": "dmccreary/claude-skills",
+      "currentRepo": "dmccreary/ibook-skills",
+      "skillIds": [
+        "dmccreary/claude-skills:interactive-infographic-overlay",
+        "dmccreary/claude-skills:skills/book-chapter-generator",
+        "dmccreary/claude-skills:skills/chapter-content-generator",
+        "dmccreary/claude-skills:skills/course-description-analyzer",
+        "dmccreary/claude-skills:skills/diagram-reports-generator",
+        "dmccreary/claude-skills:skills/faq-generator",
+        "dmccreary/claude-skills:skills/glossary-generator",
+        "dmccreary/claude-skills:skills/linkedin-announcement-generator",
+        "dmccreary/claude-skills:skills/microsim-utils",
+        "dmccreary/claude-skills:skills/reference-generator"
+      ]
+    },
+    {
+      "catalogRepo": "mkurman/tamux",
+      "currentRepo": "mkurman/zorai",
+      "skillIds": [
+        "mkurman/tamux:account-management",
+        "mkurman/tamux:bookkeeping-automation",
+        "mkurman/tamux:email-deliverability",
+        "mkurman/tamux:growth-hacking",
+        "mkurman/tamux:knowledge-base",
+        "mkurman/tamux:product-analytics",
+        "mkurman/tamux:regulatory-compliance",
+        "mkurman/tamux:saas-metrics",
+        "mkurman/tamux:spreadsheet-modeling",
+        "mkurman/tamux:video-production"
+      ]
+    },
+    {
+      "catalogRepo": "SyntaxAsSpiral/zk-context-vault",
+      "currentRepo": "syntaxasspiral/consensus",
+      "skillIds": [
+        "SyntaxAsSpiral/zk-context-vault:nix-os",
+        "SyntaxAsSpiral/zk-context-vault:skills/agent-steering",
+        "SyntaxAsSpiral/zk-context-vault:skills/archive/advanced-evaluation",
+        "SyntaxAsSpiral/zk-context-vault:skills/archive/context-compression",
+        "SyntaxAsSpiral/zk-context-vault:skills/archive/context-fundamentals",
+        "SyntaxAsSpiral/zk-context-vault:skills/archive/context-optimization",
+        "SyntaxAsSpiral/zk-context-vault:skills/archive/evaluation",
+        "SyntaxAsSpiral/zk-context-vault:skills/context-degradation",
+        "SyntaxAsSpiral/zk-context-vault:skills/covenant-patterns",
+        "SyntaxAsSpiral/zk-context-vault:skills/epistemic-rendering"
+      ]
+    },
+    {
+      "catalogRepo": "facebook/agentic-tools",
+      "currentRepo": "meta/agentic-tools",
+      "skillIds": [
+        "facebook/agentic-tools:plugins/devtools/skills/api-health",
+        "facebook/agentic-tools:plugins/devtools/skills/api-integration",
+        "facebook/agentic-tools:plugins/devtools/skills/app-health-check",
+        "facebook/agentic-tools:plugins/devtools/skills/app-review-prep",
+        "facebook/agentic-tools:plugins/devtools/skills/compliance-check",
+        "facebook/agentic-tools:plugins/devtools/skills/debug-access-token",
+        "facebook/agentic-tools:plugins/devtools/skills/debug-webhooks",
+        "facebook/agentic-tools:plugins/devtools/skills/search-docs",
+        "facebook/agentic-tools:plugins/devtools/skills/webhook-setup"
+      ]
+    },
+    {
+      "catalogRepo": "wedsamuel1230/arduino-skills",
+      "currentRepo": "wedsamuel1230/embedded-engineering-skills",
+      "skillIds": [
+        "wedsamuel1230/arduino-skills:skills/arduino-code-generator",
+        "wedsamuel1230/arduino-skills:skills/arduino-project-builder",
+        "wedsamuel1230/arduino-skills:skills/battery-selector",
+        "wedsamuel1230/arduino-skills:skills/bom-generator",
+        "wedsamuel1230/arduino-skills:skills/circuit-debugger",
+        "wedsamuel1230/arduino-skills:skills/code-review-facilitator",
+        "wedsamuel1230/arduino-skills:skills/datasheet-interpreter",
+        "wedsamuel1230/arduino-skills:skills/enclosure-designer",
+        "wedsamuel1230/arduino-skills:skills/error-message-explainer"
+      ]
+    },
+    {
+      "catalogRepo": "sd0xdev/sd0x-dev-flow",
+      "currentRepo": "sd0xdev/sd0x-harness",
+      "skillIds": [
+        "sd0xdev/sd0x-dev-flow:bump-version",
+        "sd0xdev/sd0x-dev-flow:skills/code-investigate",
+        "sd0xdev/sd0x-dev-flow:skills/codex-architect",
+        "sd0xdev/sd0x-dev-flow:skills/codex-brainstorm",
+        "sd0xdev/sd0x-dev-flow:skills/codex-code-review",
+        "sd0xdev/sd0x-dev-flow:skills/create-request",
+        "sd0xdev/sd0x-dev-flow:skills/feature-verify",
+        "sd0xdev/sd0x-dev-flow:skills/issue-analyze"
+      ]
+    },
+    {
+      "catalogRepo": "waynesutton/convexskills",
+      "currentRepo": "waynesutton/builder-skills",
+      "skillIds": [
+        "waynesutton/convexskills:avoid-feature-creep",
+        "waynesutton/convexskills:convex-component-authoring",
+        "waynesutton/convexskills:convex-functions",
+        "waynesutton/convexskills:convex-schema-validator",
+        "waynesutton/convexskills:skills/avoid-feature-creep",
+        "waynesutton/convexskills:skills/convex-component-authoring",
+        "waynesutton/convexskills:skills/convex-functions",
+        "waynesutton/convexskills:skills/convex-schema-validator"
+      ]
+    },
+    {
+      "catalogRepo": "genomewalker/cc-soul",
+      "currentRepo": "genomewalker/chitta",
+      "skillIds": [
+        "genomewalker/cc-soul:skills/antahkarana",
+        "genomewalker/cc-soul:skills/cc-soul-daemon",
+        "genomewalker/cc-soul:skills/cc-soul-mcp",
+        "genomewalker/cc-soul:skills/cc-soul-setup",
+        "genomewalker/cc-soul:skills/cc-soul-shutdown",
+        "genomewalker/cc-soul:skills/cc-soul-update",
+        "genomewalker/cc-soul:skills/checkpoint"
+      ]
+    },
+    {
+      "catalogRepo": "jleechanorg/claude-commands",
+      "currentRepo": "jleechanorg/jleechan-skills",
+      "skillIds": [
+        "jleechanorg/claude-commands:claw-dispatch",
+        "jleechanorg/claude-commands:cmux",
+        "jleechanorg/claude-commands:cmux-codex-autoapprove",
+        "jleechanorg/claude-commands:goal_harness",
+        "jleechanorg/claude-commands:loop-level-zfc",
+        "jleechanorg/claude-commands:repro-twin-clone-evidence",
+        "jleechanorg/claude-commands:ui-video-evidence"
+      ]
+    },
+    {
+      "catalogRepo": "LucasSantana-Dev/ai-dev-toolkit",
+      "currentRepo": "lucassantana-dev/forgekit",
+      "skillIds": [
+        "LucasSantana-Dev/ai-dev-toolkit:adt-add",
+        "LucasSantana-Dev/ai-dev-toolkit:adt-plugin-audit",
+        "LucasSantana-Dev/ai-dev-toolkit:adt-route",
+        "LucasSantana-Dev/ai-dev-toolkit:mac-optimize",
+        "LucasSantana-Dev/ai-dev-toolkit:skill-md-adoption",
+        "LucasSantana-Dev/ai-dev-toolkit:sync-ai-tools",
+        "LucasSantana-Dev/ai-dev-toolkit:warp-ai-setup"
+      ]
+    },
+    {
+      "catalogRepo": "alinaqi/claude-bootstrap",
+      "currentRepo": "alinaqi/maggy",
+      "skillIds": [
+        "alinaqi/claude-bootstrap:agentic-development",
+        "alinaqi/claude-bootstrap:security",
+        "alinaqi/claude-bootstrap:skills/agent-teams",
+        "alinaqi/claude-bootstrap:skills/ai-models",
+        "alinaqi/claude-bootstrap:skills/base",
+        "alinaqi/claude-bootstrap:skills/code-review"
+      ]
+    },
+    {
+      "catalogRepo": "Nmor/the-claude-council",
+      "currentRepo": "nmor/the-council",
+      "skillIds": [
+        "Nmor/the-claude-council:council-rules",
+        "Nmor/the-claude-council:edtech-patterns",
+        "Nmor/the-claude-council:java-coding-standards",
+        "Nmor/the-claude-council:observability-patterns",
+        "Nmor/the-claude-council:springboot-testing",
+        "Nmor/the-claude-council:swift-actor-persistence"
+      ]
+    },
+    {
+      "catalogRepo": "HermeticOrmus/LibreUIUX-Claude-Code",
+      "currentRepo": "ormus-solutions/libreuiux-claude-code",
+      "skillIds": [
+        "HermeticOrmus/LibreUIUX-Claude-Code:plugins/context-management/skills/design-system-context",
+        "HermeticOrmus/LibreUIUX-Claude-Code:plugins/design-mastery/skills/brand-systems",
+        "HermeticOrmus/LibreUIUX-Claude-Code:plugins/design-mastery/skills/design-masters",
+        "HermeticOrmus/LibreUIUX-Claude-Code:plugins/design-mastery/skills/design-movements",
+        "HermeticOrmus/LibreUIUX-Claude-Code:plugins/mcp-integrations/skills/browser-devtools-mcp"
+      ]
+    },
+    {
+      "catalogRepo": "liuzhengdongfortest/CodeStable",
+      "currentRepo": "codestable/codestable",
+      "skillIds": [
+        "liuzhengdongfortest/codestable:cs-feat",
+        "liuzhengdongfortest/codestable:cs-issue",
+        "liuzhengdongfortest/codestable:cs-onboard",
+        "liuzhengdongfortest/CodeStable:cs-onboard",
+        "liuzhengdongfortest/codestable:cs-refactor"
+      ]
+    },
+    {
+      "catalogRepo": "totalaudiopromo/totalaud.io",
+      "currentRepo": "chrisschouk/totalaud.io",
+      "skillIds": [
+        "totalaudiopromo/totalaud.io:.claude/skills/discovery-specialist",
+        "totalaudiopromo/totalaud.io:.claude/skills/ideas-curator",
+        "totalaudiopromo/totalaud.io:.claude/skills/motion-director",
+        "totalaudiopromo/totalaud.io:.claude/skills/pitch-coach",
+        "totalaudiopromo/totalaud.io:.claude/skills/timeline-planner"
+      ]
+    },
+    {
+      "catalogRepo": "xalgord/xalgorix",
+      "currentRepo": "xalgorix/xalgorix",
+      "skillIds": [
+        "xalgord/xalgorix:configuring-identity-aware-proxy-with-google-iap",
+        "xalgord/xalgorix:implementing-deception-based-detection-with-canarytoken",
+        "xalgord/xalgorix:implementing-ransomware-backup-strategy",
+        "xalgord/xalgorix:pentesting-freeipa",
+        "xalgord/xalgorix:pentesting-rsync"
+      ]
+    },
+    {
+      "catalogRepo": "avav25/ai-assets",
+      "currentRepo": "alex-voloshin-dev/ai-skills",
+      "skillIds": [
+        "avav25/ai-assets:.agents/skills/context-engineering",
+        "avav25/ai-assets:.claude/skills/architecture",
+        "avav25/ai-assets:.claude/skills/context-engineering",
+        "avav25/ai-assets:.windsurf/skills/context-engineering"
+      ]
+    },
+    {
+      "catalogRepo": "ils15/pantheon",
+      "currentRepo": "ils15/pantheon-legacy",
+      "skillIds": [
+        "ils15/copilot-global-config:skills/api-design-patterns",
+        "ils15/copilot-global-config:skills/docker-best-practices",
+        "ils15/copilot-global-config:skills/fastapi-async-patterns",
+        "ils15/copilot-global-config:skills/frontend-analyzer"
+      ]
+    },
+    {
+      "catalogRepo": "khalilbenaz/claude-skills-collection",
+      "currentRepo": "vantaflow/claude-skills-collection",
+      "skillIds": [
+        "khalilbenaz/claude-skills-collection:agent-skill-creator",
+        "khalilbenaz/claude-skills-collection:client-contract-builder",
+        "khalilbenaz/claude-skills-collection:project-kickstart",
+        "khalilbenaz/claude-skills-collection:typescript-mastery"
+      ]
+    },
+    {
+      "catalogRepo": "MaxMiksa/Auto-Company",
+      "currentRepo": "maxmiksa/autonomous-company",
+      "skillIds": [
+        "MaxMiksa/Auto-Company:.claude/skills/deep-research",
+        "MaxMiksa/Auto-Company:.claude/skills/devops",
+        "MaxMiksa/Auto-Company:.claude/skills/email-sequence",
+        "MaxMiksa/Auto-Company:.claude/skills/github-explorer"
+      ]
+    },
+    {
+      "catalogRepo": "MetaMask/ocap-kernel",
+      "currentRepo": "consensys-incorporated/ocap-kernel",
+      "skillIds": [
+        "MetaMask/ocap-kernel:.claude/skills/code-review",
+        "MetaMask/ocap-kernel:.claude/skills/create-package",
+        "MetaMask/ocap-kernel:.claude/skills/lint-build-test",
+        "MetaMask/ocap-kernel:commit"
+      ]
+    },
+    {
+      "catalogRepo": "MisterClean/claude-plugins",
+      "currentRepo": "misterclean/ai-plugins",
+      "skillIds": [
+        "MisterClean/claude-plugins:skills/chicago-data-portal",
+        "MisterClean/claude-plugins:skills/cook-county-data-portal",
+        "MisterClean/claude-plugins:skills/gridstatus-api",
+        "MisterClean/claude-plugins:skills/housing-copywriter"
+      ]
+    },
+    {
+      "catalogRepo": "mr-daedalium/ostack",
+      "currentRepo": "mr-daedalium/ostack-saas",
+      "skillIds": [
+        "mr-daedalium/ostack:codex",
+        "mr-daedalium/ostack:office-hours",
+        "mr-daedalium/ostack:ostack-upgrade",
+        "mr-daedalium/ostack:qa"
+      ]
+    },
+    {
+      "catalogRepo": "qwibitai/nanoclaw",
+      "currentRepo": "nanocoai/nanoclaw",
+      "skillIds": [
+        "qwibitai/nanoclaw:.claude/skills/customize",
+        "qwibitai/nanoclaw:.claude/skills/debug",
+        "qwibitai/nanoclaw:.claude/skills/init-first-agent",
+        "qwibitai/nanoclaw:container/skills/frontend-engineer"
+      ]
+    },
+    {
+      "catalogRepo": "cliftonc/unwind",
+      "currentRepo": "nearform/unwind",
+      "skillIds": [
+        "cliftonc/unwind:skills/analyzing-e2e-tests",
+        "cliftonc/unwind:skills/analyzing-integration-tests",
+        "cliftonc/unwind:skills/analyzing-unit-tests"
+      ]
+    },
+    {
+      "catalogRepo": "getsentry/sentry-mcp",
+      "currentRepo": "getsentry/toolkit",
+      "skillIds": [
+        "getsentry/sentry-mcp:logging-observability",
+        "getsentry/sentry-mcp:qa",
+        "getsentry/sentry-mcp:testing-guidelines"
+      ]
+    },
+    {
+      "catalogRepo": "huggingface/OpenEnv",
+      "currentRepo": "openenv/openenv",
+      "skillIds": [
+        "huggingface/OpenEnv:.claude/skills/generate-openenv-env",
+        "huggingface/OpenEnv:.claude/skills/release",
+        "huggingface/OpenEnv:.claude/skills/simplify"
+      ]
+    },
+    {
+      "catalogRepo": "HugoRCD/evlog",
+      "currentRepo": "evloghq/evlog",
+      "skillIds": [
+        "hugorcd/evlog:create-evlog-adapter",
+        "hugorcd/evlog:create-evlog-enricher",
+        "hugorcd/evlog:review-logging-patterns"
+      ]
+    },
+    {
+      "catalogRepo": "MotWakorb/claude-agent-dev-team",
+      "currentRepo": "motwakorb/ai-agent-dev-team",
+      "skillIds": [
+        "MotWakorb/claude-agent-dev-team:onboard",
+        "MotWakorb/claude-agent-dev-team:postmortem",
+        "MotWakorb/claude-agent-dev-team:standup"
+      ]
+    },
+    {
+      "catalogRepo": "munlucky/claude-settings",
+      "currentRepo": "munlucky/moonshot-relay",
+      "skillIds": [
+        "munlucky/claude-settings:.claude/skills/codex-review-code",
+        "munlucky/claude-settings:.claude/skills/codex-validate-plan",
+        "munlucky/claude-settings:.claude/skills/completion-verifier"
+      ]
+    },
+    {
+      "catalogRepo": "nowork-studio/NotFair",
+      "currentRepo": "nowork-studio/notfair-plugin",
+      "skillIds": [
+        "nowork-studio/NotFair:content-writer",
+        "nowork-studio/NotFair:NotFair",
+        "nowork-studio/NotFair:seo-analysis"
+      ]
+    },
+    {
+      "catalogRepo": "nowork-studio/toprank",
+      "currentRepo": "nowork-studio/notfair-plugin",
+      "skillIds": [
+        "nowork-studio/toprank:content-writer",
+        "nowork-studio/toprank:geo-optimizer",
+        "nowork-studio/toprank:seo-analysis"
+      ]
+    },
+    {
+      "catalogRepo": "rkz91/coco",
+      "currentRepo": "coco-research/coco",
+      "skillIds": [
+        "rkz91/coco:brain-export",
+        "rkz91/coco:brain-rescan",
+        "rkz91/coco:coco"
+      ]
+    },
+    {
+      "catalogRepo": "ryan-ressmeyer/llm-skills",
+      "currentRepo": "ryan-ressmeyer/agent-config",
+      "skillIds": [
+        "ryan-ressmeyer/llm-skills:literature-review",
+        "ryan-ressmeyer/llm-skills:paper-summarize",
+        "ryan-ressmeyer/llm-skills:writing-skills"
+      ]
+    },
+    {
+      "catalogRepo": "TencentCloudBase/CloudBase-MCP",
+      "currentRepo": "tencentcloudbase/cloudbase-ai-toolkit",
+      "skillIds": [
+        "TencentCloudBase/CloudBase-MCP:config/.claude/skills/cloud-functions",
+        "TencentCloudBase/CloudBase-MCP:config/.claude/skills/cloud-storage-web",
+        "TencentCloudBase/CloudBase-MCP:config/.claude/skills/cloudrun-development"
+      ]
+    },
+    {
+      "catalogRepo": "timurgaleev/tstackvibe",
+      "currentRepo": "timurgaleev/vibestack",
+      "skillIds": [
+        "timurgaleev/tstackvibe:land-and-deploy",
+        "timurgaleev/tstackvibe:setup-browser-cookies",
+        "timurgaleev/tstackvibe:ship"
+      ]
+    },
+    {
+      "catalogRepo": "AbsolutelySkilled/AbsolutelySkilled",
+      "currentRepo": "dhruvjainin/absolute",
+      "skillIds": [
+        "AbsolutelySkilled/AbsolutelySkilled:absolute-simplify",
+        "AbsolutelySkilled/AbsolutelySkilled:absolute-ui"
+      ]
+    },
+    {
+      "catalogRepo": "aliabbaschadhar/agent-superpowers",
+      "currentRepo": "aliabbaschadhar/copilot-superpowers",
+      "skillIds": [
+        "aliabbaschadhar/agent-superpowers:notebooklm",
+        "aliabbaschadhar/agent-superpowers:playwright-skill"
+      ]
+    },
+    {
+      "catalogRepo": "bfly123/claude_codex_bridge",
+      "currentRepo": "seemseam/claude_codex_bridge",
+      "skillIds": [
+        "bfly123/claude_code_bridge:claude_skills/ask",
+        "bfly123/claude_code_bridge:codex_skills/ask"
+      ]
+    },
+    {
+      "catalogRepo": "coder/mux",
+      "currentRepo": "coder/xum",
+      "skillIds": [
+        "coder/mux:.mux/skills/dev-desktop-sandbox",
+        "coder/mux:.mux/skills/dev-server-sandbox"
+      ]
+    },
+    {
+      "catalogRepo": "danielraffel/pulp",
+      "currentRepo": "generous-corp/pulp",
+      "skillIds": [
+        "danielraffel/pulp:ara",
+        "danielraffel/pulp:tart-ci"
+      ]
+    },
+    {
+      "catalogRepo": "flonat/claude-research",
+      "currentRepo": "flonat/flonat-research",
+      "skillIds": [
+        "flonat/claude-research:pre-submission-report",
+        "flonat/claude-research:skill-extract"
+      ]
+    },
+    {
+      "catalogRepo": "get-convex/agent-skills",
+      "currentRepo": "convex/agent-skills",
+      "skillIds": [
+        "get-convex/agent-skills:convex-quickstart",
+        "get-convex/agent-skills:convex-setup-auth"
+      ]
+    },
+    {
+      "catalogRepo": "Gold-b/claude-code-governance",
+      "currentRepo": "goldorganization/claude-code-governance",
+      "skillIds": [
+        "Gold-b/claude-code-governance:live-state-orchestrator",
+        "Gold-b/claude-code-governance:pre-close-check"
+      ]
+    },
+    {
+      "catalogRepo": "GongLingRui/screen-creative-skills",
+      "currentRepo": "vangong1999/screen-creative-skills",
+      "skillIds": [
+        "gonglingrui/screen-creative-skills:drama-creator",
+        "GongLingRui/screen-creative-skills:series-analyzer"
+      ]
+    },
+    {
+      "catalogRepo": "majiayu000/claude-arsenal",
+      "currentRepo": "majiayu000/spellbook",
+      "skillIds": [
+        "majiayu000/claude-arsenal:skills/codex-agent",
+        "majiayu000/claude-arsenal:xiaohongshu"
+      ]
+    },
+    {
+      "catalogRepo": "MDGrey33/claude_boilerplate",
+      "currentRepo": "mdgrey33/memnyx",
+      "skillIds": [
+        "MDGrey33/claude_boilerplate:contribute",
+        "MDGrey33/claude_boilerplate:pull-contributions"
+      ]
+    },
+    {
+      "catalogRepo": "renocrypt/latex-arxiv-SKILL",
+      "currentRepo": "appautomaton/latex-arxiv-skill",
+      "skillIds": [
+        "renocrypt/latex-arxiv-SKILL:.codex/skills/arxiv-paper-writer",
+        "renocrypt/latex-arxiv-SKILL:.codex/skills/latex-rhythm-refiner"
+      ]
+    },
+    {
+      "catalogRepo": "serenakeyitan/tdoc",
+      "currentRepo": "tornado-doc/tdoc",
+      "skillIds": [
+        "serenakeyitan/tdoc",
+        "serenakeyitan/tdoc:tdoc"
+      ]
+    },
+    {
+      "catalogRepo": "sgcarstrends/sgcarstrends",
+      "currentRepo": "motormetrics/motormetrics",
+      "skillIds": [
+        "sgcarstrends/sgcarstrends:.claude/skills/component-naming",
+        "sgcarstrends/sgcarstrends:.claude/skills/release-management"
+      ]
+    },
+    {
+      "catalogRepo": "thedivergentai/GD-Agentic-Skills",
+      "currentRepo": "thedivergentai/game-dev-agentic-skills",
+      "skillIds": [
+        "thedivergentai/GD-Agentic-Skills:godot-genre-roguelike",
+        "thedivergentai/gd-agentic-skills:godot-master"
+      ]
+    },
+    {
+      "catalogRepo": "vm0-ai/vm0",
+      "currentRepo": "okou-ai/okou",
+      "skillIds": [
+        "vm0-ai/vm0:.claude/skills/cli-design",
+        "vm0-ai/vm0:.claude/skills/database-development"
+      ]
+    },
+    {
+      "catalogRepo": "Wind-Information-Co-Ltd/wind-skills",
+      "currentRepo": "wind-alice/alicemarket",
+      "skillIds": [
+        "wind-information-co-ltd/wind-skills:wind-alice",
+        "wind-information-co-ltd/wind-skills:wind-find-finance-skill"
+      ]
+    },
+    {
+      "catalogRepo": "wyre-technology/msp-claude-plugins",
+      "currentRepo": "wyre-ai/msp-claude-plugins",
+      "skillIds": [
+        "wyre-technology/msp-claude-plugins:api-patterns",
+        "wyre-technology/msp-claude-plugins:computers"
+      ]
+    },
+    {
+      "catalogRepo": "0xrafasec/ai-workflow",
+      "currentRepo": "rafagomes/ai-workflow",
+      "skillIds": [
+        "0xrafasec/ai-workflow:new-project"
+      ]
+    },
+    {
+      "catalogRepo": "491034170/expert-review-panel",
+      "currentRepo": "tianmind-studio/expert-review-panel",
+      "skillIds": [
+        "491034170/expert-review-panel"
+      ]
+    },
+    {
+      "catalogRepo": "A-cat-with-carrots/ai-short-drama-skill",
+      "currentRepo": "a-cat-with-carrots/onlyshot",
+      "skillIds": [
+        "A-cat-with-carrots/ai-short-drama-skill"
+      ]
+    },
+    {
+      "catalogRepo": "Abdullahmohammadaref/acar",
+      "currentRepo": "abdullahmohammadaref/drivebase",
+      "skillIds": [
+        "Abdullahmohammadaref/acar:api-design"
+      ]
+    },
+    {
+      "catalogRepo": "aboul3ata/lazyweb-skill",
+      "currentRepo": "lazywebhq/lazyweb-skill",
+      "skillIds": [
+        "aboul3ata/lazyweb-skill:lazyweb-design"
+      ]
+    },
+    {
+      "catalogRepo": "ActiveInferenceInstitute/GEO-INFER",
+      "currentRepo": "activeinferenceinstitute/geo_infer",
+      "skillIds": [
+        "ActiveInferenceInstitute/GEO-INFER"
+      ]
+    },
+    {
+      "catalogRepo": "adamaiken89/learn-anything",
+      "currentRepo": "adamaiken89/learn-something",
+      "skillIds": [
+        "adamaiken89/learn-anything"
+      ]
+    },
+    {
+      "catalogRepo": "adand-91/requirement-ledger",
+      "currentRepo": "adand-91/gpt-6-astra-skill",
+      "skillIds": [
+        "adand-91/requirement-ledger"
+      ]
+    },
+    {
+      "catalogRepo": "by-adeonir/golden-anniversary",
+      "currentRepo": "adeonir/golden-anniversary",
+      "skillIds": [
+        "adeonir/golden-anniversary:.claude/skills/tech-details"
+      ]
+    },
+    {
+      "catalogRepo": "adkit/skills",
+      "currentRepo": "adkit/ads-skills",
+      "skillIds": [
+        "adkit-so/ads-skills:skills/adkit"
+      ]
+    },
+    {
+      "catalogRepo": "agents-infrastructure/licell",
+      "currentRepo": "team-harness/licell",
+      "skillIds": [
+        "agents-infrastructure/licell:.claude/skills/alicloud-rds"
+      ]
+    },
+    {
+      "catalogRepo": "AgriciDaniel/codex-seo",
+      "currentRepo": "agricidaniel/chatgpt-seo",
+      "skillIds": [
+        "agricidaniel/codex-seo:seo-programmatic"
+      ]
+    },
+    {
+      "catalogRepo": "ai-hero/hero-skills",
+      "currentRepo": "ai-hero/wayfare-skills",
+      "skillIds": [
+        "ai-hero/hero-skills:create-skill"
+      ]
+    },
+    {
+      "catalogRepo": "AI-Lab-Yonder/ai-lab-agent-skills",
+      "currentRepo": "tss-blue-ai-lab/ai-lab-agent-skills",
+      "skillIds": [
+        "AI-Lab-Yonder/ai-lab-agent-skills:skill-builder"
+      ]
+    },
+    {
+      "catalogRepo": "akillness/oh-my-skills",
+      "currentRepo": "akillness/jeo-skills",
+      "skillIds": [
+        "akillness/oh-my-skills:zeude"
+      ]
+    },
+    {
+      "catalogRepo": "alexander-danilenko/cortex-ai-skills",
+      "currentRepo": "alexander-danilenko/cortex-claude-code-plugins",
+      "skillIds": [
+        "alexander-danilenko/cortex-ai-skills:skills/jira-report-comment"
+      ]
+    },
+    {
+      "catalogRepo": "alexeygrigorev/.claude",
+      "currentRepo": "alexeygrigorev/.agents",
+      "skillIds": [
+        "alexeygrigorev/.claude:fetch-youtube"
+      ]
+    },
+    {
+      "catalogRepo": "AlexZio00/claude-code-skills",
+      "currentRepo": "alexzio00/sovereign-skills",
+      "skillIds": [
+        "AlexZio00/claude-code-skills:session-checkpoint"
+      ]
+    },
+    {
+      "catalogRepo": "Alpha-Park/genspark-workspace-skill",
+      "currentRepo": "alpha-park/genpark-workspace-skill",
+      "skillIds": [
+        "Alpha-Park/genspark-workspace-skill"
+      ]
+    },
+    {
+      "catalogRepo": "antoniojvrf/vibecoding-security",
+      "currentRepo": "antoniojvrf/ultra-thermo-nuclear-vibecoding-security-review",
+      "skillIds": [
+        "antoniojvrf/vibecoding-security"
+      ]
+    },
+    {
+      "catalogRepo": "Apra-Labs/claude-bitbucket-devops-skill",
+      "currentRepo": "apra-labs/bitbucket-devops-skill",
+      "skillIds": [
+        "Apra-Labs/claude-bitbucket-devops-skill"
+      ]
+    },
+    {
+      "catalogRepo": "AreteDriver/ai-skills",
+      "currentRepo": "arete-consortium/ai-skills",
+      "skillIds": [
+        "AreteDriver/ai-skills:github-operations"
+      ]
+    },
+    {
+      "catalogRepo": "arosenkranz/claude-code-config",
+      "currentRepo": "arosenkranz/agent-config",
+      "skillIds": [
+        "arosenkranz/claude-code-config:optimize"
+      ]
+    },
+    {
+      "catalogRepo": "Arslan-jh/3d-deep-research",
+      "currentRepo": "jeffy-peng/jeffy-skills",
+      "skillIds": [
+        "Arslan-jh/3d-deep-research"
+      ]
+    },
+    {
+      "catalogRepo": "ashmoonori-afk/Design-Claude-Burnguard",
+      "currentRepo": "ashmoonori-afk/burnguard",
+      "skillIds": [
+        "ashmoonori-afk/Design-Claude-Burnguard:cyberpunk"
+      ]
+    },
+    {
+      "catalogRepo": "AtlasOmnia/hermes-agent-custom-pack",
+      "currentRepo": "atlasomnia/hermes-custom-pack",
+      "skillIds": [
+        "AtlasOmnia/hermes-agent-custom-pack:evidence-based-replies"
+      ]
+    },
+    {
+      "catalogRepo": "avalonreset/claude-seo-dungeon",
+      "currentRepo": "avalonreset/legends-seo-dungeon",
+      "skillIds": [
+        "avalonreset/claude-seo-dungeon:seo-cluster"
+      ]
+    },
+    {
+      "catalogRepo": "awrshift/claude-memory-kit",
+      "currentRepo": "awrshift/agent-memory-kit",
+      "skillIds": [
+        "awrshift/claude-memory-kit"
+      ]
+    },
+    {
+      "catalogRepo": "awrshift/skill-gemini",
+      "currentRepo": "awrshift/claude-friends",
+      "skillIds": [
+        "awrshift/skill-gemini"
+      ]
+    },
+    {
+      "catalogRepo": "BaseInfinity/claude-sdlc-wizard",
+      "currentRepo": "baseinfinity/claude-sdlc-harness",
+      "skillIds": [
+        "BaseInfinity/claude-sdlc-wizard:sdlc"
+      ]
+    },
+    {
+      "catalogRepo": "bathlasiddharth/myna",
+      "currentRepo": "agentflock/myna",
+      "skillIds": [
+        "bathlasiddharth/myna:myna-dev-brainstorm"
+      ]
+    },
+    {
+      "catalogRepo": "bearbinary/Jarvy",
+      "currentRepo": "cliftonz/jarvy",
+      "skillIds": [
+        "bearbinary/Jarvy:.claude/skills/agentic-jumpstart-dependency-management"
+      ]
+    },
+    {
+      "catalogRepo": "bfly123/claude_code_bridge",
+      "currentRepo": "seemseam/claude_codex_bridge",
+      "skillIds": [
+        "bfly123/claude_code_bridge:droid_skills/ask"
+      ]
+    },
+    {
+      "catalogRepo": "bhingston-va/dotfiles",
+      "currentRepo": "benjfactor/dotfiles",
+      "skillIds": [
+        "bhingston-va/dotfiles:notify-pr-channels"
+      ]
+    },
+    {
+      "catalogRepo": "Bobby-Gray/claude-dnd-skill",
+      "currentRepo": "neuralinitiative/claude-dnd-skill",
+      "skillIds": [
+        "Bobby-Gray/claude-dnd-skill"
+      ]
+    },
+    {
+      "catalogRepo": "buzzdan/ai-coding-rules",
+      "currentRepo": "weka/linter-driven-development",
+      "skillIds": [
+        "buzzdan/ai-coding-rules:go-linter-driven-development/skills/code-designing"
+      ]
+    },
+    {
+      "catalogRepo": "Calvin-LLC/claude-harden-plugin",
+      "currentRepo": "calvin-llc/agentic-hardening-skill",
+      "skillIds": [
+        "Calvin-LLC/claude-harden-plugin"
+      ]
+    },
+    {
+      "catalogRepo": "casterkay/gurutalk",
+      "currentRepo": "casterkay/gurutalks",
+      "skillIds": [
+        "casterkay/gurutalk"
+      ]
+    },
+    {
+      "catalogRepo": "Catsofsuffering/CCGS",
+      "currentRepo": "catsofsuffering/ccsm",
+      "skillIds": [
+        "Catsofsuffering/CCGS:frontend-design"
+      ]
+    },
+    {
+      "catalogRepo": "caura-ai/caura-memclaw",
+      "currentRepo": "caura-ai/caura",
+      "skillIds": [
+        "caura-ai/caura-memclaw:memclaw"
+      ]
+    },
+    {
+      "catalogRepo": "CCDawn/codex-skills",
+      "currentRepo": "ccdawn/briefbound-skills",
+      "skillIds": [
+        "CCDawn/codex-skills:briefbound-readme-optimization"
+      ]
+    },
+    {
+      "catalogRepo": "CesarAugustusGroB/SHINOBI-WAY-the-inifinite-tower",
+      "currentRepo": "cesaraugustoandrade/game-shinobi-way-infinite-tower",
+      "skillIds": [
+        "CesarAugustusGroB/SHINOBI-WAY-the-inifinite-tower:.claude/skills/combat-system-creator"
+      ]
+    },
+    {
+      "catalogRepo": "chethanbhatbs/organize-skill",
+      "currentRepo": "chethanbhatbs/cleanroom-skill",
+      "skillIds": [
+        "chethanbhatbs/organize-skill"
+      ]
+    },
+    {
+      "catalogRepo": "clafollett/lafollettlabs-claude-plugins",
+      "currentRepo": "lafollett-labs/lafollett-labs-claude-plugins",
+      "skillIds": [
+        "clafollett/lafollettlabs-claude-plugins:issue-manager"
+      ]
+    },
+    {
+      "catalogRepo": "openclaw/nix-steipete-tools",
+      "currentRepo": "openclaw/nix-openclaw-tools",
+      "skillIds": [
+        "clawdbot/nix-steipete-tools:tools/peekaboo/skills/peekaboo"
+      ]
+    },
+    {
+      "catalogRepo": "cloudflare/workspace",
+      "currentRepo": "cloudflare/computer",
+      "skillIds": [
+        "cloudflare/workspace:capnweb"
+      ]
+    },
+    {
+      "catalogRepo": "CodingCossack/geo-seo-agent-skill",
+      "currentRepo": "codingcossack/geo-seo-toolkit",
+      "skillIds": [
+        "CodingCossack/geo-seo-agent-skill"
+      ]
+    },
+    {
+      "catalogRepo": "CORP-md/CORP",
+      "currentRepo": "mithraeums/skills",
+      "skillIds": [
+        "CORP-md/CORP"
+      ]
+    },
+    {
+      "catalogRepo": "cuic19053-hue/-skills-",
+      "currentRepo": "cuic19053-hue/awesome-student-ai-skills",
+      "skillIds": [
+        "cuic19053-hue/-skills-"
+      ]
+    },
+    {
+      "catalogRepo": "daha1216/dsh-skill-adult-tension-narrative",
+      "currentRepo": "daha1216/dsh-adult-tension",
+      "skillIds": [
+        "daha1216/dsh-skill-adult-tension-narrative"
+      ]
+    },
+    {
+      "catalogRepo": "Devesh-Shirsath/product-ui-illustrations",
+      "currentRepo": "devesh-shirsath/spotkit",
+      "skillIds": [
+        "Devesh-Shirsath/product-ui-illustrations"
+      ]
+    },
+    {
+      "catalogRepo": "DevOtts/fable-it",
+      "currentRepo": "devotts/build-it",
+      "skillIds": [
+        "DevOtts/fable-it"
+      ]
+    },
+    {
+      "catalogRepo": "domengabrovsek/claude",
+      "currentRepo": "domengabrovsek/agent-config",
+      "skillIds": [
+        "domengabrovsek/claude:debug"
+      ]
+    },
+    {
+      "catalogRepo": "eltmon/panopticon-cli",
+      "currentRepo": "eltmon/overdeck",
+      "skillIds": [
+        "eltmon/panopticon-cli:pan-help"
+      ]
+    },
+    {
+      "catalogRepo": "EntityProcess/allagents",
+      "currentRepo": "allagentsdev/allagents",
+      "skillIds": [
+        "EntityProcess/allagents:plugins/deepwiki/skills/deepwiki"
+      ]
+    },
+    {
+      "catalogRepo": "ericmjl/opencode-autolearn",
+      "currentRepo": "ericmjl/agent-autolearn",
+      "skillIds": [
+        "ericmjl/opencode-autolearn:self-improving-agent"
+      ]
+    },
+    {
+      "catalogRepo": "erp-mafia/swedish-accounting-skills",
+      "currentRepo": "erp-mafia/accounted-skills",
+      "skillIds": [
+        "erp-mafia/swedish-accounting-skills:swedish-invoice-compliance"
+      ]
+    },
+    {
+      "catalogRepo": "Farenhytee/supabase-sentinel",
+      "currentRepo": "farenhytee/database-sentinel",
+      "skillIds": [
+        "Farenhytee/supabase-sentinel"
+      ]
+    },
+    {
+      "catalogRepo": "flutter/skills",
+      "currentRepo": "flutter/agent-plugins",
+      "skillIds": [
+        "flutter/skills:flutter-add-widget-preview"
+      ]
+    },
+    {
+      "catalogRepo": "fnkydcks-lab/dt-foundry",
+      "currentRepo": "sprnova-lab/dt-foundry",
+      "skillIds": [
+        "fnkydcks-lab/dt-foundry:dev"
+      ]
+    },
+    {
+      "catalogRepo": "FogMoe/agents",
+      "currentRepo": "scarletkc/agents",
+      "skillIds": [
+        "FogMoe/agents:talk-like-scarletkc"
+      ]
+    },
+    {
+      "catalogRepo": "futureweapons2022-crypto/thesis-writer",
+      "currentRepo": "ibrahim-kukash/thesis-writer",
+      "skillIds": [
+        "futureweapons2022-crypto/thesis-writer"
+      ]
+    },
+    {
+      "catalogRepo": "GCWing/BitFun",
+      "currentRepo": "gcwing/openbitfun",
+      "skillIds": [
+        "GCWing/BitFun:gstack-review"
+      ]
+    },
+    {
+      "catalogRepo": "getsentry/XcodeBuildMCP",
+      "currentRepo": "getsentry/mobilebuildmcp",
+      "skillIds": [
+        "getsentry/XcodeBuildMCP:xcodebuildmcp-structured-output-review"
+      ]
+    },
+    {
+      "catalogRepo": "Gilead-BioStats/qcthat",
+      "currentRepo": "gilead-public/qcthat",
+      "skillIds": [
+        "Gilead-BioStats/qcthat:create-issue"
+      ]
+    },
+    {
+      "catalogRepo": "Goldentrii/AgentRecall-MCP",
+      "currentRepo": "goldentrii/agentrecall-x",
+      "skillIds": [
+        "Goldentrii/AgentRecall-MCP"
+      ]
+    },
+    {
+      "catalogRepo": "graphsignal/graphsignal-profiler",
+      "currentRepo": "graphsignal/graphsignal",
+      "skillIds": [
+        "graphsignal/graphsignal-profiler"
+      ]
+    },
+    {
+      "catalogRepo": "graphwork/workgraph",
+      "currentRepo": "graphwork/wg",
+      "skillIds": [
+        "graphwork/workgraph:wg"
+      ]
+    },
+    {
+      "catalogRepo": "grcwarlock/warlock-password",
+      "currentRepo": "grcwarlock/password-standard",
+      "skillIds": [
+        "grcwarlock/warlock-password"
+      ]
+    },
+    {
+      "catalogRepo": "halt-catch-fire/skills",
+      "currentRepo": "inference-sh/skills",
+      "skillIds": [
+        "halt-catch-fire/skills:ai-avatar-video"
+      ]
+    },
+    {
+      "catalogRepo": "hamzamirai/claude-app-store-privacy-skill",
+      "currentRepo": "hamzamirai/app-store-privacy-skill",
+      "skillIds": [
+        "hamzamirai/claude-app-store-privacy-skill:app-privacy"
+      ]
+    },
+    {
+      "catalogRepo": "hcompai/computer-use-agents-demos",
+      "currentRepo": "hcompai/agents-api-demos",
+      "skillIds": [
+        "hcompai/computer-use-agents-demos:hai-qa-via-cli"
+      ]
+    },
+    {
+      "catalogRepo": "helderberto/skills",
+      "currentRepo": "helderberto/agent-skills",
+      "skillIds": [
+        "helderberto/skills:commit"
+      ]
+    },
+    {
+      "catalogRepo": "helloo1568/image-ppt",
+      "currentRepo": "helloo1568/slidemuse",
+      "skillIds": [
+        "helloo1568/image-ppt"
+      ]
+    },
+    {
+      "catalogRepo": "HomericIntelligence/ProjectOdyssey",
+      "currentRepo": "homericintelligence/odyssey",
+      "skillIds": [
+        "HomericIntelligence/ProjectOdyssey:plugins/ci-cd/fix-docker-image-org-mismatch/skills/fix-docker-image-org-mismatch"
+      ]
+    },
+    {
+      "catalogRepo": "howarewoo/woo-stack",
+      "currentRepo": "howarewoo/woostack",
+      "skillIds": [
+        "howarewoo/monorepo-template:.claude/skills/commit"
+      ]
+    },
+    {
+      "catalogRepo": "hughcameron/orbit",
+      "currentRepo": "meridian-online/orbit",
+      "skillIds": [
+        "hughcameron/orbit:memo"
+      ]
+    },
+    {
+      "catalogRepo": "hzqst/metamod-fallguys",
+      "currentRepo": "metamod-svencoop/metamod-svencoop",
+      "skillIds": [
+        "hzqst/metamod-fallguys:.codex/skills/add-private-function-with-signatures"
+      ]
+    },
+    {
+      "catalogRepo": "iFurySt/open-codex-computer-use",
+      "currentRepo": "ifuryst/open-computer-use",
+      "skillIds": [
+        "ifuryst/open-codex-computer-use:open-computer-use"
+      ]
+    },
+    {
+      "catalogRepo": "j0ruge/skills_commands_manager",
+      "currentRepo": "j0ruge/skills",
+      "skillIds": [
+        "j0ruge/skills_commands_manager:ticket"
+      ]
+    },
+    {
+      "catalogRepo": "jackculpan/flightclaw",
+      "currentRepo": "flightclaw/agents",
+      "skillIds": [
+        "jackculpan/flightclaw:flightclaw"
+      ]
+    },
+    {
+      "catalogRepo": "janwilmake/linear-orchestrator",
+      "currentRepo": "janwilmake/watchloop",
+      "skillIds": [
+        "janwilmake/linear-orchestrator"
+      ]
+    },
+    {
+      "catalogRepo": "jerryfane/gitmoot",
+      "currentRepo": "gitmoot/gitmoot",
+      "skillIds": [
+        "jerryfane/gitmoot"
+      ]
+    },
+    {
+      "catalogRepo": "JimmySadek/youtube-fetcher-to-markdown",
+      "currentRepo": "jimmysadek/video-fetcher-to-markdown",
+      "skillIds": [
+        "JimmySadek/youtube-fetcher-to-markdown"
+      ]
+    },
+    {
+      "catalogRepo": "jkitchin/skillz",
+      "currentRepo": "jkitchin/knowhow",
+      "skillIds": [
+        "jkitchin/skillz:skills/programming/fairchem"
+      ]
+    },
+    {
+      "catalogRepo": "jl-cmd/claude-dev-env",
+      "currentRepo": "jl-cmd-projects/claude-dev-env",
+      "skillIds": [
+        "jl-cmd/claude-dev-env:orchestrator-refresh"
+      ]
+    },
+    {
+      "catalogRepo": "jleechanorg/smartclaw",
+      "currentRepo": "jleechanorg/jleechanbrain",
+      "skillIds": [
+        "jleechanorg/smartclaw:antigravity-computer-use"
+      ]
+    },
+    {
+      "catalogRepo": "jmfontaine/jmf-claude-plugins",
+      "currentRepo": "jmfontaine/agent-skills",
+      "skillIds": [
+        "jmfontaine/jmf-claude-plugins:plugins/git/skills/commit"
+      ]
+    },
+    {
+      "catalogRepo": "JNHFlow21/content-factory-skill",
+      "currentRepo": "risingjerry/content-factory-skill",
+      "skillIds": [
+        "JNHFlow21/content-factory-skill"
+      ]
+    },
+    {
+      "catalogRepo": "jnuyens/gsd-plugin",
+      "currentRepo": "buildomator/buildomator",
+      "skillIds": [
+        "jnuyens/gsd-plugin:extract_learnings"
+      ]
+    },
+    {
+      "catalogRepo": "johnsje183/hermes-telegram-checklist",
+      "currentRepo": "bablobanov/hermes-agent-telegram-checklist",
+      "skillIds": [
+        "johnsje183/hermes-telegram-checklist"
+      ]
+    },
+    {
+      "catalogRepo": "JonLatane/jonline",
+      "currentRepo": "jonlatane/rellm",
+      "skillIds": [
+        "JonLatane/jonline:run-tamagui"
+      ]
+    },
+    {
+      "catalogRepo": "jovd83/agentic-bdd-test-case-mentor",
+      "currentRepo": "jovd83/test-case-reviewer",
+      "skillIds": [
+        "jovd83/agentic-bdd-test-case-mentor"
+      ]
+    },
+    {
+      "catalogRepo": "jovd83/defect-lifecycle-agent-skill",
+      "currentRepo": "jovd83/bug-fix-lifecycle",
+      "skillIds": [
+        "jovd83/defect-lifecycle-agent-skill"
+      ]
+    },
+    {
+      "catalogRepo": "jovd83/test-artifact-export-skill",
+      "currentRepo": "jovd83/test-management-sync",
+      "skillIds": [
+        "jovd83/test-artifact-export-skill"
+      ]
+    },
+    {
+      "catalogRepo": "Kemerd/video-use-premiere",
+      "currentRepo": "kemerd/premiere-agent",
+      "skillIds": [
+        "Kemerd/video-use-premiere"
+      ]
+    },
+    {
+      "catalogRepo": "kensaurus/cursor-kenji",
+      "currentRepo": "kensaurus/skills",
+      "skillIds": [
+        "kensaurus/cursor-kenji:create-hook"
+      ]
+    },
+    {
+      "catalogRepo": "keros68/academic-reference-matcher-skill",
+      "currentRepo": "keros68/academic-reference-matcher",
+      "skillIds": [
+        "keros68/academic-reference-matcher-skill"
+      ]
+    },
+    {
+      "catalogRepo": "KimYx0207/agent-teams-playbook",
+      "currentRepo": "kimyx0207/kim_service",
+      "skillIds": [
+        "KimYx0207/agent-teams-playbook"
+      ]
+    },
+    {
+      "catalogRepo": "Kiriketsuki/agenKic-sKills",
+      "currentRepo": "kiriketsuki/agenkic-hub",
+      "skillIds": [
+        "Kiriketsuki/agenKic-sKills:insights-to-vault"
+      ]
+    },
+    {
+      "catalogRepo": "kyzdes/vps-ninja",
+      "currentRepo": "kyzdes/dokpilot",
+      "skillIds": [
+        "kyzdes/vps-ninja"
+      ]
+    },
+    {
+      "catalogRepo": "leeguooooo/chatgpt-imagegen",
+      "currentRepo": "leeguooooo/image-use",
+      "skillIds": [
+        "leeguooooo/chatgpt-imagegen"
+      ]
+    },
+    {
+      "catalogRepo": "leejpsd/typescript-react-patterns",
+      "currentRepo": "leejpsd/typescript-react-nextjs-patterns",
+      "skillIds": [
+        "leejpsd/typescript-react-patterns"
+      ]
+    },
+    {
+      "catalogRepo": "lhaig/loop",
+      "currentRepo": "lhaig/norman",
+      "skillIds": [
+        "lhaig/loop:prd"
+      ]
+    },
+    {
+      "catalogRepo": "lonewaler/ofsec",
+      "currentRepo": "lonewalkeryash/ofsec",
+      "skillIds": [
+        "lonewaler/ofsec:vet"
+      ]
+    },
+    {
+      "catalogRepo": "maptiler/agent-skills",
+      "currentRepo": "maptiler/maptiler-skills",
+      "skillIds": [
+        "maptiler/agent-skills"
+      ]
+    },
+    {
+      "catalogRepo": "mari0car/creative-loop",
+      "currentRepo": "mari0car/creative-loop-1",
+      "skillIds": [
+        "mari0car/creative-loop"
+      ]
+    },
+    {
+      "catalogRepo": "Mark393295827/third-brain-v5-skills",
+      "currentRepo": "mark393295827/third-brain-v7-skills",
+      "skillIds": [
+        "Mark393295827/third-brain-v5-skills:loop-engineering"
+      ]
+    },
+    {
+      "catalogRepo": "matiaspalmac/fivem-audit-skill",
+      "currentRepo": "matiaspalmac/fivem-security-audit",
+      "skillIds": [
+        "matiaspalmac/fivem-audit-skill"
+      ]
+    },
+    {
+      "catalogRepo": "matteoscurati/ai-consultants",
+      "currentRepo": "reasance/ai-consultants",
+      "skillIds": [
+        "matteoscurati/ai-consultants"
+      ]
+    },
+    {
+      "catalogRepo": "mcj-coder/development-skills",
+      "currentRepo": "martincjarvis/development-skills",
+      "skillIds": [
+        "mcj-coder/development-skills:agent-workitem-automation"
+      ]
+    },
+    {
+      "catalogRepo": "mechanicianwang/skillkit-find-skill",
+      "currentRepo": "mechanicianwang/skillspool-find-skill",
+      "skillIds": [
+        "mechanicianwang/skillkit-find-skill"
+      ]
+    },
+    {
+      "catalogRepo": "meimakes/xqueue",
+      "currentRepo": "madebydia/xqueue",
+      "skillIds": [
+        "meimakes/xqueue"
+      ]
+    },
+    {
+      "catalogRepo": "metafeng/fangxin-image-gen",
+      "currentRepo": "metafeng/gpthuatu",
+      "skillIds": [
+        "metafeng/fangxin-image-gen"
+      ]
+    },
+    {
+      "catalogRepo": "Michaelliv/markit",
+      "currentRepo": "shift-labs-ai/markit",
+      "skillIds": [
+        "michaelliv/markit"
+      ]
+    },
+    {
+      "catalogRepo": "mifunedev/openharness",
+      "currentRepo": "mifunedev/agro",
+      "skillIds": [
+        "mifunedev/openharness:prd"
+      ]
+    },
+    {
+      "catalogRepo": "MinBZK/NeRDS",
+      "currentRepo": "nederlandsedigitaledienst/nerds",
+      "skillIds": [
+        "MinBZK/NeRDS:nerds-toegankelijkheid"
+      ]
+    },
+    {
+      "catalogRepo": "MinBZK/regelrecht",
+      "currentRepo": "nederlandsedigitaledienst/regelrecht",
+      "skillIds": [
+        "MinBZK/regelrecht-mvp:.claude/skills/code-reviewer"
+      ]
+    },
+    {
+      "catalogRepo": "mnbplus/resource-hunter",
+      "currentRepo": "taffy-owo/quarry",
+      "skillIds": [
+        "mnbplus/resource-hunter"
+      ]
+    },
+    {
+      "catalogRepo": "modoojunko/awesome-novel-skill",
+      "currentRepo": "modoojunko/awesome-novel-agent",
+      "skillIds": [
+        "modoojunko/awesome-novel-skill"
+      ]
+    },
+    {
+      "catalogRepo": "mrKanoh/claude-wcag-accessibility-skill",
+      "currentRepo": "mrkanoh/wcag-accessibility-audit-skill",
+      "skillIds": [
+        "mrKanoh/claude-wcag-accessibility-skill"
+      ]
+    },
+    {
+      "catalogRepo": "msaad00/agent-bom",
+      "currentRepo": "koda-ai-studio/agent-bom",
+      "skillIds": [
+        "msaad00/agent-bom:openclaw"
+      ]
+    },
+    {
+      "catalogRepo": "MystenLabs/MemWal",
+      "currentRepo": "mystenlabs/walrus-memory",
+      "skillIds": [
+        "MystenLabs/MemWal"
+      ]
+    },
+    {
+      "catalogRepo": "natdexterra/generate-design-system",
+      "currentRepo": "natdexterra/work-with-design-systems",
+      "skillIds": [
+        "natdexterra/generate-design-system"
+      ]
+    },
+    {
+      "catalogRepo": "nebrass/hve-spielberg",
+      "currentRepo": "nebrass/hve-video-director",
+      "skillIds": [
+        "nebrass/hve-spielberg"
+      ]
+    },
+    {
+      "catalogRepo": "ni1o1/claude-skill-transbigdata",
+      "currentRepo": "ni1o1/transbigdata-skill",
+      "skillIds": [
+        "ni1o1/claude-skill-transbigdata"
+      ]
+    },
+    {
+      "catalogRepo": "NimaChu/free-imagegen",
+      "currentRepo": "nimachu/xhs-imagen",
+      "skillIds": [
+        "NimaChu/free-imagegen"
+      ]
+    },
+    {
+      "catalogRepo": "NVIDIA/IsaacTeleop",
+      "currentRepo": "nvidia/isaaccapture",
+      "skillIds": [
+        "nvidia/isaacteleop:cmake-structure"
+      ]
+    },
+    {
+      "catalogRepo": "obulai/obul-apis",
+      "currentRepo": "polymerdao/pay-apis",
+      "skillIds": [
+        "obulai/obul-apis:obul-api-finder"
+      ]
+    },
+    {
+      "catalogRepo": "ocn/zk-activity",
+      "currentRepo": "ocn/picket",
+      "skillIds": [
+        "ocn/zk-activity:.claude/skills/eve-esi-api"
+      ]
+    },
+    {
+      "catalogRepo": "Ohh-889/skyroc-admin",
+      "currentRepo": "ohh-889/skyroc",
+      "skillIds": [
+        "Ohh-889/skyroc-admin:feature-dev"
+      ]
+    },
+    {
+      "catalogRepo": "OwenPawl/ghidra-re-skill",
+      "currentRepo": "owenpawl/cerberus-re-skill",
+      "skillIds": [
+        "OwenPawl/ghidra-re-skill"
+      ]
+    },
+    {
+      "catalogRepo": "paulrobello/parsidion-cc",
+      "currentRepo": "paulrobello/parsidion",
+      "skillIds": [
+        "paulrobello/parsidion-cc:parsidion-cc"
+      ]
+    },
+    {
+      "catalogRepo": "petbrains/mvp-builder",
+      "currentRepo": "app-builders-club/mvp-builder",
+      "skillIds": [
+        "petbrains/mvp-builder:.claude/skills/code-analyzer"
+      ]
+    },
+    {
+      "catalogRepo": "popup-studio-ai/bkit-claude-code",
+      "currentRepo": "ww-w-ai/bkit-claude-code",
+      "skillIds": [
+        "popup-studio-ai/bkit-claude-code:skill-status"
+      ]
+    },
+    {
+      "catalogRepo": "powerycy/personal-homepage-skill",
+      "currentRepo": "shengjidaguai-china/personal-homepage-skill",
+      "skillIds": [
+        "powerycy/personal-homepage-skill"
+      ]
+    },
+    {
+      "catalogRepo": "ptmrio/harness-subagent",
+      "currentRepo": "realspqrk/harness-subagent",
+      "skillIds": [
+        "ptmrio/harness-subagent"
+      ]
+    },
+    {
+      "catalogRepo": "Pythoughts-labs/css-pro-tips",
+      "currentRepo": "pymodel/css-pro-tips",
+      "skillIds": [
+        "Pythoughts-labs/css-pro-tips"
+      ]
+    },
+    {
+      "catalogRepo": "rexleimo/rex-cli",
+      "currentRepo": "rexleimo/aios",
+      "skillIds": [
+        "rexleimo/rex-cli:search-first"
+      ]
+    },
+    {
+      "catalogRepo": "Roasbeef/claude-files",
+      "currentRepo": "roasbeef/beefstack",
+      "skillIds": [
+        "Roasbeef/claude-files:mutation-testing"
+      ]
+    },
+    {
+      "catalogRepo": "roger52027/ecommerce-website-data-openclaw-skills",
+      "currentRepo": "roger52027/ecommerce-website-data",
+      "skillIds": [
+        "roger52027/ecommerce-website-data-openclaw-skills"
+      ]
+    },
+    {
+      "catalogRepo": "rrrrrredy/industry-research-framework",
+      "currentRepo": "rrrrrredy/research-toolkit",
+      "skillIds": [
+        "rrrrrredy/industry-research-framework"
+      ]
+    },
+    {
+      "catalogRepo": "rylsherdamz-rgb/stellar-agentic-framework",
+      "currentRepo": "rylsherdamz-rgb/stellar-forge",
+      "skillIds": [
+        "rylsherdamz-rgb/stellar-agentic-framework"
+      ]
+    },
+    {
+      "catalogRepo": "S0ulFood/design-cognition-skill",
+      "currentRepo": "s0ulfood/second-opinion",
+      "skillIds": [
+        "S0ulFood/design-cognition-skill"
+      ]
+    },
+    {
+      "catalogRepo": "Saltro/ai-native-thinking-skill",
+      "currentRepo": "saltro/skills",
+      "skillIds": [
+        "Saltro/ai-native-thinking-skill"
+      ]
+    },
+    {
+      "catalogRepo": "samcharles93/go-agent-skills",
+      "currentRepo": "samcharles93/skills",
+      "skillIds": [
+        "samcharles93/go-agent-skills:go-development"
+      ]
+    },
+    {
+      "catalogRepo": "shaohk/stock-analysis-skill",
+      "currentRepo": "shaohk/tradingagents-cn-skill",
+      "skillIds": [
+        "shaohk/stock-analysis-skill"
+      ]
+    },
+    {
+      "catalogRepo": "shareAI-lab/shareAI-skills",
+      "currentRepo": "shareai-lab/lab-skills",
+      "skillIds": [
+        "shareAI-lab/shareAI-skills:skills/agent-builder"
+      ]
+    },
+    {
+      "catalogRepo": "Shirhussain/humanize",
+      "currentRepo": "shir-danishyar/humanize",
+      "skillIds": [
+        "Shirhussain/humanize"
+      ]
+    },
+    {
+      "catalogRepo": "sirilsengolraj-source/presentation-skill",
+      "currentRepo": "siril9/presentation-skill",
+      "skillIds": [
+        "sirilsengolraj-source/presentation-skill"
+      ]
+    },
+    {
+      "catalogRepo": "soheilmomeniii/positioning-products",
+      "currentRepo": "soheilmomeniii/positioning-with-ekram",
+      "skillIds": [
+        "soheilmomeniii/positioning-products"
+      ]
+    },
+    {
+      "catalogRepo": "Soushi888/holochain-agent-skill",
+      "currentRepo": "soushi888/holochain-agent-skills",
+      "skillIds": [
+        "Soushi888/holochain-agent-skill"
+      ]
+    },
+    {
+      "catalogRepo": "stbenjam/claude-nine",
+      "currentRepo": "stbenjam/skills",
+      "skillIds": [
+        "stbenjam/claude-nine:plugins/books/skills/calibre"
+      ]
+    },
+    {
+      "catalogRepo": "sunflowermm/XRK-AGT",
+      "currentRepo": "xrkseek/xrk-agt",
+      "skillIds": [
+        "sunflowermm/XRK-AGT:xrk-www-compat"
+      ]
+    },
+    {
+      "catalogRepo": "SwitchbackTech/compass",
+      "currentRepo": "keepsoftwaresimple/compass-calendar",
+      "skillIds": [
+        "SwitchbackTech/compass:.codex/skills/a11y-audit"
+      ]
+    },
+    {
+      "catalogRepo": "szhygulin/vaultpilot-skill",
+      "currentRepo": "szhygulin/vaultpilot-security-skill",
+      "skillIds": [
+        "szhygulin/vaultpilot-skill"
+      ]
+    },
+    {
+      "catalogRepo": "t894924815/esxi-skill",
+      "currentRepo": "fouriertry/esxi-skill",
+      "skillIds": [
+        "t894924815/esxi-skill"
+      ]
+    },
+    {
+      "catalogRepo": "taxueseek/fund-investment-guide",
+      "currentRepo": "taxueseek/taxue-invest",
+      "skillIds": [
+        "taxueseek/fund-investment-guide"
+      ]
+    },
+    {
+      "catalogRepo": "The-Skyy-Rose-Collection-LLC/DevSkyy",
+      "currentRepo": "skyyroseco/devskyy",
+      "skillIds": [
+        "The-Skyy-Rose-Collection-LLC/DevSkyy:continuous-learning"
+      ]
+    },
+    {
+      "catalogRepo": "theaayushstha1/job-applier-agent",
+      "currentRepo": "0xyush/job-applier-agent",
+      "skillIds": [
+        "theaayushstha1/job-applier-agent"
+      ]
+    },
+    {
+      "catalogRepo": "TheColonyCC/colony-skill",
+      "currentRepo": "thecolonyai/colony-skill",
+      "skillIds": [
+        "TheColonyCC/colony-skill"
+      ]
+    },
+    {
+      "catalogRepo": "thedivergentai/Game-Design-Agentic-Skills",
+      "currentRepo": "thedivergentai/game-dev-agentic-skills",
+      "skillIds": [
+        "thedivergentai/game-design-agentic-skills:godot-master"
+      ]
+    },
+    {
+      "catalogRepo": "TimmyZinin/hh-outreach",
+      "currentRepo": "timmyzinin/vacancy-outreach-skill",
+      "skillIds": [
+        "TimmyZinin/hh-outreach"
+      ]
+    },
+    {
+      "catalogRepo": "tokenaissance/clean-architecture-skill",
+      "currentRepo": "tokenaissance/clean-architecture",
+      "skillIds": [
+        "tokenaissance/clean-architecture-skill"
+      ]
+    },
+    {
+      "catalogRepo": "tourmind-com/Tourmind-Booking-Skill",
+      "currentRepo": "tourmind-com/tourmind-booking-skills",
+      "skillIds": [
+        "tourmind-com/Tourmind-Booking-Skill"
+      ]
+    },
+    {
+      "catalogRepo": "trezero/archon-trinity",
+      "currentRepo": "trezero/cortex",
+      "skillIds": [
+        "trezero/archon-trinity:archon-extension-sync"
+      ]
+    },
+    {
+      "catalogRepo": "tvdavies/agent-skills",
+      "currentRepo": "tvdavies/agent-toolkit",
+      "skillIds": [
+        "tvdavies/agent-skills:review-queue"
+      ]
+    },
+    {
+      "catalogRepo": "tzwkb/wecom-agent",
+      "currentRepo": "freanocank/wecom-agent",
+      "skillIds": [
+        "tzwkb/wecom-agent"
+      ]
+    },
+    {
+      "catalogRepo": "UnTelevised-Media/untelevised-media-new",
+      "currentRepo": "untelevised-media/untelevised-media",
+      "skillIds": [
+        "UnTelevised-Media/untelevised-media-new:.agents/skills/content-modeling-best-practices"
+      ]
+    },
+    {
+      "catalogRepo": "vdelacou/ask-marcel-office-cli",
+      "currentRepo": "ask-marcel/ask-marcel-office-cli",
+      "skillIds": [
+        "vdelacou/ask-marcel-office-cli:atelier-greenfield"
+      ]
+    },
+    {
+      "catalogRepo": "vm0-ai/vm0-skills",
+      "currentRepo": "okou-ai/okou-skills",
+      "skillIds": [
+        "vm0-ai/vm0-skills:github-copilot"
+      ]
+    },
+    {
+      "catalogRepo": "VsevolodUstinov/openclaw-skill-claude-code",
+      "currentRepo": "vsevolodustinov/openclaw-worker-relay",
+      "skillIds": [
+        "VsevolodUstinov/openclaw-skill-claude-code"
+      ]
+    },
+    {
+      "catalogRepo": "wangyiyang/agent-skills",
+      "currentRepo": "wangyiyang/dev-agent-skills",
+      "skillIds": [
+        "wangyiyang/agent-skills:issue-worktree"
+      ]
+    },
+    {
+      "catalogRepo": "Wayne2Wang/codex-cat-hatcher",
+      "currentRepo": "wayne2wang/codex-skills-zilin",
+      "skillIds": [
+        "Wayne2Wang/codex-cat-hatcher"
+      ]
+    },
+    {
+      "catalogRepo": "webkubor/charmoji",
+      "currentRepo": "webkubor/charmoji-sticker-skill",
+      "skillIds": [
+        "webkubor/charmoji"
+      ]
+    },
+    {
+      "catalogRepo": "webkubor/tombstone-reaper-skill",
+      "currentRepo": "webkubor/deadcode-reaper-skill",
+      "skillIds": [
+        "webkubor/tombstone-reaper-skill"
+      ]
+    },
+    {
+      "catalogRepo": "webkubor/wechat-sticker-submit",
+      "currentRepo": "webkubor/charmoji-sticker-skill",
+      "skillIds": [
+        "webkubor/wechat-sticker-submit"
+      ]
+    },
+    {
+      "catalogRepo": "respira-press/claude-skills-wordpress",
+      "currentRepo": "respira-press/agent-skills-wordpress",
+      "skillIds": [
+        "webmyc/claude-skills-wordpress:skills/content-portability"
+      ]
+    },
+    {
+      "catalogRepo": "wobushilixi/lixi-nixiang-skill",
+      "currentRepo": "wobushilixi/lixi-reverse",
+      "skillIds": [
+        "wobushilixi/lixi-nixiang-skill"
+      ]
+    },
+    {
+      "catalogRepo": "workersio/spec",
+      "currentRepo": "workersio/skills",
+      "skillIds": [
+        "workersio/spec:skill-benchmark"
+      ]
+    },
+    {
+      "catalogRepo": "wxin9/cc-skill-product-lifecycle",
+      "currentRepo": "wxin9/cc-skill-product-lifecycle-orchestrator",
+      "skillIds": [
+        "wxin9/cc-skill-product-lifecycle"
+      ]
+    },
+    {
+      "catalogRepo": "xintaofei/codeg",
+      "currentRepo": "spacering-net/codeg",
+      "skillIds": [
+        "xintaofei/codeg:writing-skills"
+      ]
+    },
+    {
+      "catalogRepo": "yike-gunshi/forge-skills",
+      "currentRepo": "antonailog/forge-skills",
+      "skillIds": [
+        "yike-gunshi/forge-skills"
+      ]
+    },
+    {
+      "catalogRepo": "yjsoon/ynab-claimer",
+      "currentRepo": "yjsoon/this-claimer",
+      "skillIds": [
+        "yjsoon/ynab-claimer:.claude/skills/claims"
+      ]
+    },
+    {
+      "catalogRepo": "yuxinlaile/maimai-saver",
+      "currentRepo": "yuxinlaile/mcd-saver",
+      "skillIds": [
+        "yuxinlaile/maimai-saver"
+      ]
+    },
+    {
+      "catalogRepo": "ywatanabe1989/scitex-template",
+      "currentRepo": "scitex-ai/scitex-template",
+      "skillIds": [
+        "ywatanabe1989/scitex-template:scitex-template"
+      ]
+    },
+    {
+      "catalogRepo": "Zaious/a1expert-linkedin-coach",
+      "currentRepo": "zaious/claude-linkedin-profiler",
+      "skillIds": [
+        "Zaious/a1expert-linkedin-coach"
+      ]
+    }
+  ]
+}
