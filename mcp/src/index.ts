@@ -1,9 +1,16 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { loadDefaultCatalog } from "./catalog-tracks.js";
+import { createRefreshingCatalog } from "./catalog-refresh.js";
 import { createOmgskillsServer } from "./server.js";
 
-const library = await loadDefaultCatalog();
-const server = createOmgskillsServer(library, { paging: true, ranking: true });
+const catalog = await createRefreshingCatalog();
+const server = createOmgskillsServer(catalog.get, { paging: true, ranking: true });
+server.server.onclose = catalog.stop;
+process.stdin.once("end", () => { catalog.stop(); void server.close(); });
 
-await server.connect(new StdioServerTransport());
+try {
+  await server.connect(new StdioServerTransport());
+} catch (error) {
+  catalog.stop();
+  throw error;
+}

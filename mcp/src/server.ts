@@ -7,7 +7,7 @@ import type { RankedSearchOptions } from "./search-ranking.js";
 import { installAgents, installFolderName, installScopes, installScript, installScripts, pinnedInstallFor } from "./install.js";
 import { readSkillContent, SkillContentError } from "./content.js";
 
-export const serverVersion = "0.2.2";
+export const serverVersion = "0.2.3";
 
 const toolAnnotations = {
   readOnlyHint: true,
@@ -99,7 +99,10 @@ const idArg = z.string().min(1).max(500).describe("Skill ID, such as anthropics/
 type ServerOptions = { paging?: boolean; ranking?: boolean; fetcher?: typeof fetch };
 type PublicSkill = z.infer<typeof skillResultSchema>;
 
-export function createOmgskillsServer(library: CatalogReader, options: ServerOptions = {}): McpServer {
+export type CatalogProvider = CatalogReader | (() => CatalogReader);
+
+export function createOmgskillsServer(catalog: CatalogProvider, options: ServerOptions = {}): McpServer {
+  const readLibrary = typeof catalog === "function" ? catalog : () => catalog;
   if (options.ranking && !options.paging) throw new Error("Candidate ranking requires paging");
   const server = new McpServer(
     {
@@ -130,6 +133,7 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
       annotations: toolAnnotations
     },
     async (args: z.infer<typeof searchInput> & Partial<PageOptions> & { ranking?: "web-v1" }) => {
+      const library = readLibrary();
       const reader = readerFor(library, args.summary);
       return listResult(args, options.paging ? reader => {
         if (args.ranking !== undefined) {
@@ -155,6 +159,7 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
       annotations: toolAnnotations
     },
     async ({ id }) => {
+      const library = readLibrary();
       const rawSkill = await library.getSkill(id);
       if (!rawSkill) return result({ found: false, skill: null }, await notFoundText(library, id));
       const skill = publicSkill(rawSkill, { withScore: false, withInstall: true });
@@ -175,6 +180,7 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
       annotations: toolAnnotations
     },
     async ({ ids, summary }) => {
+      const library = readLibrary();
       const reader = readerFor(library, summary);
       const requested = [...new Set(ids)];
       const found = await Promise.all(requested.map(id => reader.getSkill(id)));
@@ -194,6 +200,7 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
       annotations: toolAnnotations
     },
     async (args: z.infer<typeof trendingInput> & Partial<PageOptions>) => {
+      const library = readLibrary();
       const reader = readerFor(library, args.summary);
       return listResult(args, options.paging ? reader => {
         if (!reader.listTrendingPage) throw new PagingError("paging_not_supported");
@@ -212,10 +219,13 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
       annotations: toolAnnotations
     },
     // Curated rows are complete records, so they never need the summary reader.
-    async (args: z.infer<typeof goldInput> & Partial<PageOptions>) => listResult(args, options.paging ? reader => {
-      if (!reader.listGoldBasketPage) throw new PagingError("paging_not_supported");
-      return reader.listGoldBasketPage(withPage(args) as PageOptions);
-    } : undefined, async reader => ({ skills: await reader.listGoldBasket(args.limit) }), library)
+    async (args: z.infer<typeof goldInput> & Partial<PageOptions>) => {
+      const library = readLibrary();
+      return listResult(args, options.paging ? reader => {
+        if (!reader.listGoldBasketPage) throw new PagingError("paging_not_supported");
+        return reader.listGoldBasketPage(withPage(args) as PageOptions);
+      } : undefined, async reader => ({ skills: await reader.listGoldBasket(args.limit) }), library);
+    }
   );
 
   server.registerTool(
@@ -228,6 +238,7 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
       annotations: toolAnnotations
     },
     async (args: z.infer<typeof authorInput> & Partial<PageOptions>) => {
+      const library = readLibrary();
       const reader = readerFor(library, args.summary);
       return listResult(args, options.paging ? reader => {
         if (!reader.listByAuthorPage) throw new PagingError("paging_not_supported");
@@ -246,6 +257,7 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
       annotations: toolAnnotations
     },
     async ({ id, limit, installable, summary }) => {
+      const library = readLibrary();
       let related: SkillResult[] | undefined;
       try { related = await library.relatedSkills?.(id, limit, installable); }
       catch (error) { if (error instanceof PagingError) return errorResult(error.code, error.message); throw error; }
@@ -282,6 +294,7 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
       annotations: toolAnnotations
     },
     async ({ id, agent, scope }) => {
+      const library = readLibrary();
       const skill = await library.getSkill(id);
       if (!skill) return result({ found: false, installable: false, agent, scope }, await notFoundText(library, id));
       const pin = pinnedInstallFor(skill), name = pin && installFolderName(skill, pin);
@@ -319,6 +332,7 @@ export function createOmgskillsServer(library: CatalogReader, options: ServerOpt
       annotations: { ...toolAnnotations, openWorldHint: true }
     },
     async ({ id, max_chars }) => {
+      const library = readLibrary();
       const skill = await library.getSkill(id);
       if (!skill) return result({ found: false }, await notFoundText(library, id));
       try {
