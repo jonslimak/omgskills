@@ -80,7 +80,7 @@ test("production install handoff preserves both agents and cannot offer the test
     returnRoute: "/app/?view=discover&skill=catalog%3Aowner%2Frepo", store }));
   assert.ok(markup.includes(productionDistribution.url));
   assert.ok(markup.includes(productionDistribution.checksumURL));
-  assert.match(markup, /Download OMGSkills 0\.0\.27/);
+  assert.ok(markup.includes(`Download OMGSkills ${productionDistribution.version}`));
   assert.match(markup, /Apple silicon Mac, macOS 14\.0 or later/);
   assert.match(markup, /replaces your existing OMGSkills app/);
   assert.match(markup, /installed skills stay in their current folders/);
@@ -103,12 +103,12 @@ test("production install handoff preserves both agents and cannot offer the test
 
 test("production setup references only the exact separately published Mac release", () => {
   assert.equal(productionDistribution.url,
-    "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.27/OMGSkills-Connected-0.0.27-27-arm64.zip");
+    "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.28/OMGSkills-Connected-0.0.28-28-arm64.zip");
   assert.equal(productionDistribution.checksumURL, productionDistribution.url + ".sha256");
-  assert.equal(productionDistribution.filename, "OMGSkills-Connected-0.0.27-27-arm64.zip");
-  assert.equal(productionDistribution.version, "0.0.27");
-  assert.equal(productionDistribution.build, "27");
-  assert.equal(productionDistribution.sha256, "ebcbbdb821f81e2c941d451d9955712c3e44b35d0b4382e94282879378c2ae85");
+  assert.equal(productionDistribution.filename, "OMGSkills-Connected-0.0.28-28-arm64.zip");
+  assert.equal(productionDistribution.version, "0.0.28");
+  assert.equal(productionDistribution.build, "28");
+  assert.equal(productionDistribution.sha256, "f1ad8b675ae249ef438e85f347113065120fd7715da6c35ca585493f99cd44df");
   assert.equal(productionFeatures.connectedInventoryReadEnabled, true);
   assert.equal(productionFeatures.connectedInventorySyncEnabled, true);
 });

@@ -1457,7 +1457,7 @@ Yes. Skills are open-source Markdown files on GitHub. All 58,000+ indexed here a
 
 - HTML guide: ${origin}/guide/
 - Browse skills: ${origin}/skills/
-- Mac companion 0.0.27 (Apple silicon, macOS 14+): ${origin}/download
+- Mac companion 0.0.28 (Apple silicon, macOS 14+): ${origin}/download
 - Original Mac app download: ${origin}/downloads/omgskills-mac.dmg
 - Companion setup: open a skill's install panel at ${origin}/app/
 `;

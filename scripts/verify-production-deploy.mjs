@@ -7,7 +7,7 @@ import { verifyMcpEndpoint } from "./verify-mcp-endpoint.mjs";
 import { verifyLiveHelperReleaseAssets } from "./helper-release-assets.mjs";
 
 const defaultOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
-export const defaultDownloadURL = "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.27/OMGSkills-Connected-0.0.27-27-arm64.zip";
+export const defaultDownloadURL = "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.28/OMGSkills-Connected-0.0.28-28-arm64.zip";
 const requiredStaticReleaseAssets = [
   "downloads/omgskills-mac.dmg",
   "downloads/omgskills-mac.dmg.sha256",
