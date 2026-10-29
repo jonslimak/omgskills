@@ -5,6 +5,9 @@ import {
   buildDeviceGroupManifestByRoute,
   buildMemberGroupManifest,
   buildPublicGroupManifestByRoute,
+  readDeviceGroupManifestByRoute,
+  readMemberGroupManifest,
+  readPublicGroupManifestByRoute,
   withGroupManifestSnapshot,
 } from "./group-manifest-adapters.js";
 import type { GroupAccessClient, GroupAccessFacts } from "./group-access.js";
@@ -82,6 +85,138 @@ function manifestRow(overrides: Record<string, unknown> = {}) {
     ...overrides,
   };
 }
+
+const remotionNames = ["remotion-best-practices", "remotion-render"];
+const setId = "00000000-0000-4000-8000-000000000028";
+const catalogSkills = remotionNames.map(name => ({
+  id: `remotion-dev/skills:${name}`, name, install_target_name: name,
+}));
+
+function remotionRows() {
+  return remotionNames.map((name, position) => manifestRow({
+    groupId: setId, groupName: "set test", groupSlug: "set-test", groupRevision: 3,
+    itemId: `remotion-${position}`, itemKind: "catalog", itemPosition: position,
+    itemName: position === 0 ? null : `remotion-dev/skills:${name}`,
+    itemCatalogSkillId: `remotion-dev/skills:${name}`, itemGithubUrl: null,
+    sourceId: name, sourceKind: "catalog", sourceCatalogSkillId: `remotion-dev/skills:${name}`,
+    sourceNormalizedRoot: `skills/${name}`, releaseSourceId: name,
+  }));
+}
+
+function snapshotPool(rows: any[][]) {
+  const calls: string[] = [];
+  const data = sequenceClient(rows);
+  const client = {
+    async query(sql: string, values?: unknown[]) {
+      calls.push(sql);
+      if (/^(BEGIN|COMMIT|ROLLBACK)/.test(sql)) return result([]);
+      return data.query(sql, values);
+    },
+    release() { calls.push("release"); },
+  } as unknown as PoolClient;
+  return { calls, pool: { async connect() { return client; } } };
+}
+
+test("all manifest readers repair the existing Remotion Set without changing its revision or pins", async () => {
+  for (const kind of ["member", "device", "public"] as const) {
+    const rows = remotionRows();
+    const { calls, pool } = snapshotPool([
+      ...(kind === "member" ? [] : [[{ id: setId }]]),
+      [accessFacts({ id: setId, visibility: kind === "public" ? "public" : "restricted" })],
+      rows,
+    ]);
+    let loads = 0;
+    const options = { async loadSkills() {
+      loads++;
+      assert.deepEqual(calls.slice(-2), ["COMMIT", "release"], "catalog loading must not hold the database transaction");
+      return catalogSkills;
+    } };
+    const actor = { id: "owner-id", email: "owner@example.com" };
+    const view = kind === "member" ? await readMemberGroupManifest(pool, actor, setId, options)
+      : kind === "device" ? await readDeviceGroupManifestByRoute(pool, actor, "jonslimak", "set-test", options)
+      : await readPublicGroupManifestByRoute(pool, "jonslimak", "set-test", options);
+    assert.equal(loads, 1, "one catalog lookup for the whole Set");
+    assert.equal(view.manifest.group.id, setId);
+    assert.equal(view.manifest.group.revision, 3);
+    assert.deepEqual(view.manifest.items.map(item => item.name), remotionNames);
+    assert.deepEqual(view.manifest.items.map(item => item.id), ["remotion-0", "remotion-1"]);
+    for (const item of view.manifest.items) {
+      assert.equal(item.installability.status, "installable");
+      if (item.installability.status === "installable") {
+        assert.equal(item.installability.release.commitSha, sha.commit);
+        assert.equal(item.installability.release.treeSha, sha.tree);
+        assert.equal(item.installability.release.skillMdSha, sha.skill);
+      }
+    }
+    assert.equal(rows[1].itemName, "remotion-dev/skills:remotion-render", "no input mutation");
+    assert.ok(calls.every(sql => sql === "release" || /^(?:\s*SELECT|BEGIN|COMMIT)/.test(sql)), "read-only repair only");
+  }
+});
+
+test("safe existing names and non-catalog items do not load the catalog or change destinations", async () => {
+  for (const row of [
+    { ...remotionRows()[0], itemName: "Kept name" },
+    manifestRow({ itemName: "Private / review" }),
+  ]) {
+    const { pool } = snapshotPool([[accessFacts()], [row]]);
+    const view = await readMemberGroupManifest(pool, { id: "owner-id", email: "owner@example.com" }, "group-id", {
+      async loadSkills() { assert.fail("must not introduce a catalog dependency"); },
+    });
+    assert.equal(view.manifest.items[0].name, row.itemName);
+  }
+});
+
+test("repairs unsafe catalog labels using authoritative target names, not display labels", async () => {
+  const { pool } = snapshotPool([[accessFacts()], [{ ...remotionRows()[0], itemName: "Video / best practices" }]]);
+  const view = await readMemberGroupManifest(pool, { id: "owner-id", email: "owner@example.com" }, setId, {
+    async loadSkills() { return [{ ...catalogSkills[0], name: "Different display name" }]; },
+  });
+  assert.equal(view.manifest.items[0].name, "remotion-best-practices");
+});
+
+test("legacy catalog records may use a safe skill name when pinned target metadata is absent", async () => {
+  const { pool } = snapshotPool([[accessFacts()], [remotionRows()[0]]]);
+  const view = await readMemberGroupManifest(pool, { id: "owner-id", email: "owner@example.com" }, setId, {
+    async loadSkills() { return [{ id: catalogSkills[0].id, name: "legacy-target" }]; },
+  });
+  assert.equal(view.manifest.items[0].name, "legacy-target");
+});
+
+test("unsafe, missing, and ambiguous catalog targets fail closed without name guessing", async () => {
+  for (const skills of [
+    [],
+    [catalogSkills[0], catalogSkills[0]],
+    ...["", ".", "..", "../escape", "/tmp/escape", "skills/nested", "bad\\name", "bad\u0000name", "bad\u200bname"]
+      .map(install_target_name => [{ ...catalogSkills[0], install_target_name }]),
+    [{ id: catalogSkills[0].id, name: "unsafe/legacy" }],
+  ]) {
+    const { pool } = snapshotPool([[accessFacts()], [remotionRows()[0]]]);
+    await assert.rejects(readMemberGroupManifest(pool, { id: "owner-id", email: "owner@example.com" }, setId, {
+      async loadSkills() { return skills; },
+    }), error => error instanceof Response && error.status === 409);
+  }
+});
+
+test("catalog lookup failure stays an explicit temporary failure without leaking internal errors", async () => {
+  const { pool } = snapshotPool([[accessFacts()], [remotionRows()[0]]]);
+  try {
+    await readMemberGroupManifest(pool, { id: "owner-id", email: "owner@example.com" }, setId, {
+      async loadSkills() { throw new Error("internal catalog detail"); },
+    });
+    assert.fail("expected temporary catalog failure");
+  } catch (error) {
+    assert.ok(error instanceof Response);
+    assert.equal(error.status, 503);
+    assert.equal(await error.text(), "Catalog temporarily unavailable");
+  }
+});
+
+test("access checks still run before any catalog lookup for inaccessible Sets", async () => {
+  const { pool } = snapshotPool([[accessFacts({ invited: false })]]);
+  await assert.rejects(readMemberGroupManifest(pool, { id: "stranger-id", email: "stranger@example.com" }, "group-id", {
+    async loadSkills() { assert.fail("must not resolve inaccessible Set data"); },
+  }), error => error instanceof Response && error.status === 404);
+});
 
 test("member manifest allows owners and invited members through the shared read policy", async () => {
   for (const actor of [

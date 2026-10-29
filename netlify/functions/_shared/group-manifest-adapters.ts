@@ -10,6 +10,7 @@ import {
   type GroupManifest,
   type GroupManifestInput
 } from "./group-manifest.js";
+import { loadPublishedSkills, type CatalogSkill } from "./published-catalog.js";
 
 type GroupManifestRow = {
   groupId: string;
@@ -59,6 +60,56 @@ export type GroupManifestView = {
 };
 
 export type GroupManifestPool = Pick<Pool, "connect">;
+
+type ManifestNameOptions = {
+  loadSkills?: () => Promise<CatalogSkill[]>;
+};
+
+function safeFolderName(value: unknown): value is string {
+  return typeof value === "string" && Boolean(value) && value === value.trim() && value !== "." && value !== ".."
+    && !/[\/\\\p{Cc}\p{Cf}]/u.test(value);
+}
+
+async function withCatalogInstallNames(
+  view: GroupManifestView,
+  options: ManifestNameOptions,
+): Promise<GroupManifestView> {
+  const repairs = new Map<string, string>();
+  for (const item of view.manifest.items) {
+    if (item.installability.status === "installable" && item.installability.source.kind === "catalog"
+      && !safeFolderName(item.name)) {
+      repairs.set(item.id, item.installability.source.catalogSkillId);
+    }
+  }
+  if (!repairs.size) return view;
+
+  let skills: CatalogSkill[];
+  try {
+    skills = await (options.loadSkills ?? loadPublishedSkills)();
+  } catch {
+    throw new Response("Catalog temporarily unavailable", { status: 503 });
+  }
+  const requested = new Set(repairs.values());
+  const names = new Map<string, string>();
+  for (const skill of skills) {
+    if (!skill.id || !requested.has(skill.id)) continue;
+    // Pinned names are authoritative; legacy records may use a safe catalog name.
+    const name = skill.install_target_name === undefined ? skill.name : skill.install_target_name;
+    if (names.has(skill.id) || !safeFolderName(name)
+      || (skill.install_target_name !== undefined && !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(name))) {
+      throw new Response("Catalog skill has no unambiguous safe install target", { status: 409 });
+    }
+    names.set(skill.id, name);
+  }
+  const items = view.manifest.items.map(item => {
+    const id = repairs.get(item.id);
+    if (!id) return item;
+    const name = names.get(id);
+    if (!name) throw new Response("Catalog skill has no safe install target", { status: 409 });
+    return { ...item, name };
+  });
+  return { ...view, manifest: { ...view.manifest, items } };
+}
 
 function groupNotFound(): Response {
   return new Response("Group not found", { status: 404 });
@@ -347,27 +398,33 @@ export async function withGroupManifestSnapshot<T>(
 export async function readMemberGroupManifest(
   pool: GroupManifestPool,
   actor: GroupAccessActor,
-  groupId: string
+  groupId: string,
+  options: ManifestNameOptions = {},
 ): Promise<GroupManifestView> {
-  return withGroupManifestSnapshot(pool, (client) =>
+  const view = await withGroupManifestSnapshot(pool, (client) =>
     buildMemberGroupManifest(actor, groupId, client));
+  return withCatalogInstallNames(view, options);
 }
 
 export async function readPublicGroupManifestByRoute(
   pool: GroupManifestPool,
   handle: string,
-  groupSlug: string
+  groupSlug: string,
+  options: ManifestNameOptions = {},
 ): Promise<GroupManifestView> {
-  return withGroupManifestSnapshot(pool, (client) =>
+  const view = await withGroupManifestSnapshot(pool, (client) =>
     buildPublicGroupManifestByRoute(handle, groupSlug, client));
+  return withCatalogInstallNames(view, options);
 }
 
 export async function readDeviceGroupManifestByRoute(
   pool: GroupManifestPool,
   actor: GroupAccessActor,
   handle: string,
-  groupSlug: string
+  groupSlug: string,
+  options: ManifestNameOptions = {},
 ): Promise<GroupManifestView> {
-  return withGroupManifestSnapshot(pool, (client) =>
+  const view = await withGroupManifestSnapshot(pool, (client) =>
     buildDeviceGroupManifestByRoute(actor, handle, groupSlug, client));
+  return withCatalogInstallNames(view, options);
 }
