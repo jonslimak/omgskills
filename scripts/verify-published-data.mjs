@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
-import { readFileSync, statSync, existsSync } from "node:fs";
+import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { validateSearchCatalog } from "./search-catalog.mjs";
 
@@ -349,6 +349,15 @@ if (shaHistory) {
   }
 
   const canonicalBySha = shaHistory.decoded.canonicalBySha;
+  // Older assets predate canonical choices, but once published they must not be dropped.
+  if (canonicalBySha === undefined) {
+    const earlier = readdirSync(dataDir).filter((file) =>
+      /^sha-history-.*\.json$/.test(file) && file !== manifest.shaHistory.path &&
+      readFileSync(join(dataDir, file), "utf8").includes('"canonicalBySha"'));
+    if (earlier.length > 0) {
+      fail(`shaHistory dropped canonicalBySha that ${earlier[0]} published; rebuild it with SHA_CANONICAL_PUBLISH=1`);
+    }
+  }
   if (canonicalBySha !== undefined) {
     if (!canonicalBySha || Array.isArray(canonicalBySha) || typeof canonicalBySha !== "object") {
       fail("shaHistory canonicalBySha must be an object when present");
