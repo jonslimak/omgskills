@@ -2,6 +2,8 @@
 
 Read-only MCP server for agent access to the omgskills library.
 
+Requires Node.js 20.3 or newer.
+
 ## What It Does
 
 The server exposes the skill library as safe agent tools. Agents can search, inspect one skill, read its SKILL.md, get a pinned install plan, find related skills, list trending and curated skills, and filter by author.
@@ -36,6 +38,26 @@ Override with environment variables:
 
 Each local file override works independently. Unset sources use the selected
 manifest and curated URL; setting all three file paths keeps loading offline.
+
+### Automatic Refresh
+
+The local npm server checks for catalog updates every ten minutes while running,
+in both stdio and local HTTP mode. Unchanged checks fetch only catalog metadata
+and curated data, not the full skills index. A validated update replaces the
+catalog between tool calls; a call already running keeps its original snapshot.
+
+If a check or download fails, the previous catalog stays available. Retries back
+off from ten minutes to at most one hour. Diagnostics go to stderr, not the MCP
+protocol stream. Refresh timers do not keep the process alive and are stopped
+when the transport or HTTP listener closes.
+
+The remote catalog selected at startup stays selected during refresh, including
+an explicit `OMGSKILLS_MANIFEST_URL`. Local-file overrides disable automatic
+refresh, preserving existing offline and mixed-source behavior. Restart to reload
+those files. A cursor from a previous catalog returns `catalog_snapshot_changed`;
+restart that search from its first page.
+
+This refreshes library data only. It never installs or updates skill files.
 
 ## Tools
 

@@ -1,6 +1,9 @@
 {
   "name": "omgskills-mcp",
-  "version": "0.2.2",
+  "version": "0.2.3",
+  "engines": {
+    "node": ">=20.3.0"
+  },
   "description": "Read-only MCP server for searching the omgskills agent skill library.",
   "homepage": "https://omgskills.com/developers/",
   "bugs": "https://github.com/jonslimak/omgskills/issues",
