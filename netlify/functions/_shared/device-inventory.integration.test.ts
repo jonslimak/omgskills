@@ -121,8 +121,9 @@ test("migration preserves legacy inventory IDs and complete Set snapshots/pins",
   await withSchema(async (pool) => {
     assert.deepEqual((await pool.query("SELECT * FROM skill_group_items")).rows, before);
     const rows = (await pool.query("SELECT * FROM synced_skills")).rows;
-    assert.deepEqual(rows.map(({ device_id, git_relative_path, catalog_skill_id_hint, ...old }) => old), rowsBefore);
+    assert.deepEqual(rows.map(({ device_id, git_relative_path, catalog_skill_id_hint, installed_from_set, ...old }) => old), rowsBefore);
     assert.ok(rows.every((row) => row.device_id === null));
+    assert.ok(rows.every((row) => row.installed_from_set === null));
     const legacyRead = await readSyncInventory(pool, owner, 1);
     assert.equal(legacyRead.skills.length, 1);
     const v2 = await readSyncInventory(pool, owner, 2);

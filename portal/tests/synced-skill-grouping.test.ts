@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { groupSyncedSkills, type SyncedSkill } from "../src/synced-skill-grouping.js";
+import { groupSyncedSkills, installedSetNames, type SyncedSkill } from "../src/synced-skill-grouping.js";
+
+test("Set origins include every grouped installation, without inventing membership", () => {
+  const base: SyncedSkill = { id: "first", name: "review", description: "Review", githubUrl: null,
+    isLocalOnly: false, source: "Claude", catalogSkillId: "owner/repo:review", lastSeenAt: "2026-10-30T12:00:00Z" };
+  const [group] = groupSyncedSkills([base, { ...base, id: "second", installedFromSet: "Team Skills" },
+    { ...base, id: "third", installedFromSet: "Team Skills" }, { ...base, id: "fourth", installedFromSet: "Design" }]);
+  assert.deepEqual(installedSetNames(group), ["Design", "Team Skills"]);
+  assert.deepEqual(installedSetNames(groupSyncedSkills([base])[0]), []);
+});
 
 test("groups Claude and Codex rows without discarding either installation", () => {
   const base = {

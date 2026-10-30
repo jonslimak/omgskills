@@ -174,6 +174,7 @@ test("real unified list groups identical skills but retains each Mac, agent and 
     Object.defineProperty(globalThis, "window", { configurable: true, value: { matchMedia: () => ({ matches: true }) } });
     const noOp = () => {};
     const data = await loadAccountData(readOnlyApi(api, undefined, true), identity, false, true);
+    data.skills[0].installedFromSet = "Team Skills";
     const html = renderToStaticMarkup(createElement(module.exports.UnifiedApp, { data, catalog, nav: initialNavigation,
       signedIn: true, readOnlyAccount: true, state: "ready", navigate: noOp, onSession: noOp, onFavorite: noOp,
       onCreateSet: noOp, onMembership: noOp, onVisibility: noOp, retry: noOp }));
@@ -182,6 +183,15 @@ test("real unified list groups identical skills but retains each Mac, agent and 
     // Each Mac's report stays out of the row; the skill panel shows it behind "Show history".
     for (const text of ["Work Mac / codex", "Home Mac / codex", "Unknown Mac / codex", "Last known (revoked)", "Last reported"]) assert.ok(!html.includes(text), text);
     assert.doesNotMatch(html, /Currently live|Currently installed/);
+    assert.match(html, /From Set: Team Skills/);
+    const id = "owner/repo:review";
+    data.skills.forEach(skill => { skill.catalogSkillId = id; });
+    const publicCatalog = { ...catalog, trendingIds: [id], skills: [{ id, name: "Same skill", description: "Public description",
+      author: "owner", githubUrl: "https://github.com/owner/repo", tags: [] }] };
+    const publicHtml = renderToStaticMarkup(createElement(module.exports.UnifiedApp, { data, catalog: publicCatalog,
+      nav: { ...initialNavigation, view: "top" }, signedIn: true, readOnlyAccount: true, state: "ready",
+      navigate: noOp, onSession: noOp, onFavorite: noOp, onCreateSet: noOp, onMembership: noOp, onVisibility: noOp, retry: noOp }));
+    assert.doesNotMatch(publicHtml, /From Set:|Team Skills/);
   } finally {
     if (descriptor) Object.defineProperty(globalThis, "window", descriptor);
     else Reflect.deleteProperty(globalThis, "window");
@@ -194,6 +204,17 @@ test("invalid v2 responses fail closed rather than falling back or erasing a kno
     { ...valid, skills: [valid.skills[0], valid.skills[0]] }, { ...valid, devices: [valid.devices[0], valid.devices[0]] },
     { ...valid, skills: [{ ...valid.skills[0], deviceId: undefined }] }, { ...valid, skills: [{ ...valid.skills[0], lastSeenAt: "bad" }] },
     { ...valid, devices: [{ ...valid.devices[0], lastReportedAt: "bad" }] }]) assert.throws(() => parseConnectedInventory(bad));
+});
+
+test("inventory accepts optional/null Set origins and rejects malformed values", () => {
+  const valid = inventory();
+  for (const value of [undefined, null, "Team Skills"]) {
+    const parsed = parseConnectedInventory({ ...valid, skills: [{ ...valid.skills[0], installedFromSet: value }] });
+    assert.equal(parsed.skills[0].installedFromSet, value);
+  }
+  for (const value of [1, {}, "x".repeat(201)]) {
+    assert.throws(() => parseConnectedInventory({ ...valid, skills: [{ ...valid.skills[0], installedFromSet: value }] }));
+  }
 });
 
 test("connected sessions stay memory-only, refresh v2 after Set saves and preserve stale rows", async () => {

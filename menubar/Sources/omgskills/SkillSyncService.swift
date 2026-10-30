@@ -104,6 +104,7 @@ struct PresenceSyncSkill: Encodable, Equatable, Sendable {
     let githubUrl: String?
     let gitRelativePath: String?
     let catalogSkillIdHint: String?
+    var installedFromSet: String? = nil
 }
 
 enum PresenceSyncError: LocalizedError, Equatable {
@@ -137,6 +138,7 @@ struct SkillSyncPayloadSkill: Codable, Equatable, Sendable {
     let githubUrl: String?
     let isLocalOnly: Bool
     let source: String
+    var installedFromSet: String? = nil
 }
 
 struct SkillSyncResult: Decodable, Equatable, Sendable {
@@ -269,7 +271,8 @@ enum SkillSyncService {
             catalogSkillId: identityStatus == "resolved" ? skill.catalogSkillId : nil,
             githubUrl: githubUrl.isEmpty ? nil : githubUrl,
             isLocalOnly: identityStatus == "localOnly",
-            source: source
+            source: source,
+            installedFromSet: safeSetName(skill.installedFromSet)
         )
     }
 
@@ -325,7 +328,14 @@ enum SkillSyncService {
             name: skill.name, description: skill.description,
             skillMdSha: hash?.range(of: "^(?:[a-f0-9]{40}|[a-f0-9]{64})$", options: .regularExpression) != nil ? hash : nil,
             githubUrl: safeRepositoryURL(skill.githubUrl),
-            gitRelativePath: safeRelativePath(skill.gitRelativePath), catalogSkillIdHint: hint)
+            gitRelativePath: safeRelativePath(skill.gitRelativePath), catalogSkillIdHint: hint,
+            installedFromSet: safeSetName(skill.installedFromSet))
+    }
+
+    private static func safeSetName(_ value: String?) -> String? {
+        guard let name = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !name.isEmpty, name.utf16.count <= 200 else { return nil }
+        return name
     }
 
     private static func validFolder(_ value: String) -> Bool {

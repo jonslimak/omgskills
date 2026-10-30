@@ -17,6 +17,16 @@ export async function lockLegacyInventorySchema(client: PoolClient, readOnly = f
   return result.rows[0].device_scoped;
 }
 
+/** Inspect under the upload's schema locks so an additive migration cannot race the write. */
+export async function hasInventorySetOrigin(client: PoolClient): Promise<boolean> {
+  const result = await client.query<{ available: boolean }>(
+    `SELECT EXISTS (SELECT 1 FROM pg_attribute
+     WHERE attrelid = 'synced_skills'::regclass AND attname = 'installed_from_set'
+       AND attnum > 0 AND NOT attisdropped) AS available`
+  );
+  return result.rows[0]?.available === true;
+}
+
 export function requireLegacyInventoryReport(body: Record<string, unknown>) {
   if (body.reportVersion === 2 || body.reportVersion === 3) {
     throw new Response("Per-Mac inventory is not enabled on this release", { status: 503 });

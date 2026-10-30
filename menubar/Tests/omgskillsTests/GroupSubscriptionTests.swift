@@ -3,6 +3,21 @@ import Testing
 @testable import omgskills
 
 struct GroupSubscriptionTests {
+    @Test func skippedOwnershipRoundTripsAndNeverSchedulesPackageActions() throws {
+        let item = GroupSubscriptionRecord.Item(id: "skipped", name: "Existing", position: 0,
+            presentationDigest: String(repeating: "a", count: 40), state: .alreadyInstalled)
+        let baseline = try subscriptionRecord(items: [item])
+        let data = try GroupSubscriptionStore.encode(baseline)
+        #expect(try JSONDecoder().decode(GroupSubscriptionRecord.self, from: data) == baseline)
+        for current in [try subscriptionRecord(revision: 8, items: []),
+                        try subscriptionRecord(revision: 8, items: [installableRecordItem(id: "skipped", name: "Renamed", position: 0)])] {
+            let diff = try GroupSubscriptionDiffer.compare(baseline: baseline, current: current,
+                localStates: ["skipped": .replaced])
+            #expect(diff.changes.allSatisfy { $0.packageAction == .none })
+            #expect(!diff.hasBlockingLocalConflicts)
+        }
+    }
+
     @Test func storeRoundTripsAValidatedRecordAtAnOpaquePath() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(
             UUID().uuidString,

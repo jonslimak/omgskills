@@ -3,6 +3,30 @@ import Foundation
 @testable import omgskills
 
 struct InstalledSkillsScannerTests {
+    @Test func setAttributionUsesSavedNameOrLegacyRouteAndLeavesSinglesUnlabelled() throws {
+        let root = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        for (name, setName, groupID, route, expected) in [
+            ("named", "Team Skills", "set-id", "/u/owner/sets/team-skills", "Team Skills"),
+            ("legacy", nil, "set-id", "/u/owner/sets/old-team", "old-team"),
+            ("single", nil, nil, nil, nil)
+        ] as [(String, String?, String?, String?, String?)] {
+            let target = root.appendingPathComponent(name)
+            try FileManager.default.createDirectory(at: target, withIntermediateDirectories: true)
+            try writeSkill(at: target, name: name)
+            let metadata = SkillInstallProvenance(catalogSkillId: nil, githubUrl: nil, installedAt: "now",
+                skillMdSha: nil, groupId: groupID, groupRoute: route, groupName: setName)
+            let url = SkillInstallProvenanceStore.metadataURL(targetRoot: root, targetName: name)
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try SkillInstallProvenanceStore.write(metadata, to: url)
+            let scan = InstalledSkillsScanner.scan(roots: [.init(url: root, origin: "Claude")])
+            let skill = try #require(scan.installations.first { $0.name == name })
+            #expect(skill.installedFromSet == expected)
+            let resolver = SkillIdentityResolver(catalogSkills: [], shaHistory: nil)
+            #expect(resolver.resolve([skill]).skills.first?.installedFromSet == expected)
+        }
+    }
+
     @Test func summaryCountsInstallLocationsWhileListDedupesSymlinks() throws {
         let root = try temporaryDirectory()
         let codex = root.appendingPathComponent("codex", isDirectory: true)

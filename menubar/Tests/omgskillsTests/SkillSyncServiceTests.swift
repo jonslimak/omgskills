@@ -3,6 +3,21 @@ import Foundation
 @testable import omgskills
 
 struct SkillSyncServiceTests {
+    @Test func setOriginIsOptionalBoundedAndIncludedInBothReportFormats() throws {
+        for (name, expected) in [(nil, nil), (" Team Skills ", "Team Skills"),
+                                 (String(repeating: "x", count: 201), nil)] as [(String?, String?)] {
+            let skill = makeSkill(name: "review", githubUrl: "", installCmd: "/tmp/skills/review",
+                origin: "Codex", isLocalOnly: true, installedFromSet: name)
+            let legacy = SkillSyncService.payloadSkill(skill)
+            let presence = try SkillSyncService.presencePayloadSkill(skill)
+            #expect(legacy.installedFromSet == expected)
+            #expect(presence.installedFromSet == expected)
+            let encoded = try JSONEncoder().encode(presence)
+            let json = try #require(try JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+            #expect(json["installedFromSet"] as? String == expected)
+        }
+    }
+
     @Test func defaultEndpointUsesProductionSiteAPI() {
         #expect(SkillSyncService.defaultEndpoint.absoluteString == "https://omgskills.com/api/portal/sync-upload")
     }
@@ -357,7 +372,8 @@ struct SkillSyncServiceTests {
         skillMdSha: String? = nil,
         catalogSkillId: String? = nil,
         identityStatus: SkillIdentityStatus? = nil,
-        gitRelativePath: String? = nil
+        gitRelativePath: String? = nil,
+        installedFromSet: String? = nil
     ) -> Skill {
         Skill(
             id: "installed:\(installCmd)",
@@ -380,7 +396,8 @@ struct SkillSyncServiceTests {
             isLocalOnly: isLocalOnly,
             gitRelativePath: gitRelativePath,
             catalogSkillId: catalogSkillId,
-            identityStatus: identityStatus
+            identityStatus: identityStatus,
+            installedFromSet: installedFromSet
         )
     }
 }

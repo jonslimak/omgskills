@@ -236,6 +236,7 @@ export const syncedSkills = pgTable(
     githubUrl: text("github_url"),
     gitRelativePath: text("git_relative_path"),
     catalogSkillIdHint: text("catalog_skill_id_hint"),
+    installedFromSet: text("installed_from_set"),
     isLocalOnly: boolean("is_local_only").notNull().default(false),
     source: text("source").notNull(),
     isCurrent: boolean("is_current").notNull().default(true),

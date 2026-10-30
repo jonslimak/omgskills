@@ -13,6 +13,7 @@ export type SyncSkill = {
   source: string;
   gitRelativePath?: string | null;
   catalogSkillIdHint?: string | null;
+  installedFromSet?: string | null;
 };
 
 export function locationStableKey(source: string, installationPath: string): string {
@@ -113,6 +114,7 @@ export function parseSyncSkill(value: unknown): SyncSkill {
     catalogSkillId: identity.catalogSkillId,
     githubUrl,
     isLocalOnly: identity.isLocalOnly,
+    ...(Object.hasOwn(record, "installedFromSet") ? { installedFromSet: optionalString(record.installedFromSet, 200) } : {}),
     source
   };
 }
@@ -134,7 +136,7 @@ export function parsePresenceSkill(value: unknown): SyncSkill {
   const record = value as Record<string, unknown>;
   const allowed = new Set([
     "source", "installationPath", "name", "description", "skillMdSha",
-    "githubUrl", "gitRelativePath", "catalogSkillIdHint"
+    "githubUrl", "gitRelativePath", "catalogSkillIdHint", "installedFromSet"
   ]);
   if (Object.keys(record).some((key) => !allowed.has(key))) {
     throw new Response("Unsupported presence skill field", { status: 400 });
@@ -191,6 +193,7 @@ export function parsePresenceSkill(value: unknown): SyncSkill {
     githubUrl,
     gitRelativePath,
     catalogSkillIdHint,
+    ...(Object.hasOwn(record, "installedFromSet") ? { installedFromSet: optionalString(record.installedFromSet, 200) } : {}),
     catalogSkillId: null,
     identityStatus: hasSource ? "ambiguous" : "localOnly",
     isLocalOnly: !hasSource
