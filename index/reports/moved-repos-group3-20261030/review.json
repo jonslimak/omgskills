@@ -1,0 +1,904 @@
+{
+  "count": 112,
+  "byOutcome": {
+    "path-changed": 90,
+    "repo-missing": 1,
+    "invalid-frontmatter": 16,
+    "skill-file-missing": 4,
+    "changed-on-main": 1
+  },
+  "skills": [
+    {
+      "id": "affaan-m/everything-claude-code:frontend-design",
+      "from": "affaan-m/everything-claude-code",
+      "to": "affaan-m/ECC",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/frontend-design-direction/SKILL.md"
+    },
+    {
+      "id": "jabrena/cursor-rules-java:skills/001-skills-inventory",
+      "from": "jabrena/cursor-rules-java",
+      "to": "jabrena/plinth",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/003-skills-inventory/SKILL.md"
+    },
+    {
+      "id": "jabrena/cursor-rules-java:skills/003-agents-installation",
+      "from": "jabrena/cursor-rules-java",
+      "to": "jabrena/plinth",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/005-agents-installation/SKILL.md"
+    },
+    {
+      "id": "jabrena/cursor-rules-java:skills/123-java-exception-handling",
+      "from": "jabrena/cursor-rules-java",
+      "to": "jabrena/plinth",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/126-java-exception-handling/SKILL.md"
+    },
+    {
+      "id": "jabrena/cursor-rules-java:skills/180-java-observability-logging",
+      "from": "jabrena/cursor-rules-java",
+      "to": "jabrena/plinth",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/181-java-observability-logging/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Fabric",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v3.0/.claude/skills/Fabric/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/Fabric/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Prompting",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v4.0.3/.claude/skills/Utilities/Prompting/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/Prompting/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/Art",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.3/.claude/skills/Art/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/Art/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/BrightData",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.3/.claude/skills/BrightData/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/BrightData/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/Council",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.3/.claude/skills/Council/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/Council/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/CreateCLI",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.3/.claude/skills/CreateCLI/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/CreateCLI/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/CreateSkill",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.3/.claude/skills/CreateSkill/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/CreateSkill/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/AnnualReports",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.4/.claude/skills/AnnualReports/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/AnnualReports/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/Aphorisms",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.4/.claude/skills/Aphorisms/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/Aphorisms/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/BeCreative",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.4/.claude/skills/BeCreative/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/BeCreative/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/BrightData",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.4/.claude/skills/BrightData/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/BrightData/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/Council",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.4/.claude/skills/Council/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/Council/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/CreateSkill",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.4/.claude/skills/CreateSkill/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/CreateSkill/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/Fabric",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.4/.claude/skills/Fabric/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/Fabric/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/FirstPrinciples",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.4/.claude/skills/FirstPrinciples/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/FirstPrinciples/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/Art",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.5/.claude/skills/Art/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/Art/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/CreateCLI",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.5/.claude/skills/CreateCLI/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/CreateCLI/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/CreateSkill",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.5/.claude/skills/CreateSkill/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/CreateSkill/SKILL.md"
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/FirstPrinciples",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/LifeOS",
+      "outcome": "path-changed",
+      "catalogPath": "Releases/v2.5/.claude/skills/FirstPrinciples/SKILL.md",
+      "resolvedPath": "LifeOS/install/skills/FirstPrinciples/SKILL.md"
+    },
+    {
+      "id": "fusengine/agents:plugins/ai-pilot/skills/apex",
+      "from": "fusengine/agents",
+      "to": "Fusengine/claude-plugins",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "plugins/ai-pilot/skills/apex-methodology/SKILL.md"
+    },
+    {
+      "id": "kagenti/kagenti:.claude/skills/kagenti:ui-debug",
+      "from": "kagenti/kagenti",
+      "to": "rossoctl/rossoctl",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": ".claude/skills/rossoctl:ui-debug/SKILL.md"
+    },
+    {
+      "id": "SyntaxAsSpiral/zk-context-vault:nix-os",
+      "from": "SyntaxAsSpiral/zk-context-vault",
+      "to": "SyntaxAsSpiral/ConSensus",
+      "outcome": "path-changed",
+      "catalogPath": ".grok/skills/nix-os/SKILL.md",
+      "resolvedPath": "skills/.archive/nix-os/SKILL.md"
+    },
+    {
+      "id": "jleechanorg/claude-commands:cmux-codex-autoapprove",
+      "from": "jleechanorg/claude-commands",
+      "to": "jleechanorg/jleechan-skills",
+      "outcome": "path-changed",
+      "catalogPath": ".claude/skills/cmux-codex-autoapprove/SKILL.md",
+      "resolvedPath": "hermes/skills/cmux-codex-autoapprove/SKILL.md"
+    },
+    {
+      "id": "jleechanorg/claude-commands:goal_harness",
+      "from": "jleechanorg/claude-commands",
+      "to": "jleechanorg/jleechan-skills",
+      "outcome": "path-changed",
+      "catalogPath": ".claude/skills/goal_harness/SKILL.md",
+      "resolvedPath": ".claude/skills_archive/2026-08-29-unused-and-redundant/goal_harness/SKILL.md"
+    },
+    {
+      "id": "jleechanorg/claude-commands:loop-level-zfc",
+      "from": "jleechanorg/claude-commands",
+      "to": "jleechanorg/jleechan-skills",
+      "outcome": "path-changed",
+      "catalogPath": ".claude/skills/loop-level-zfc/SKILL.md",
+      "resolvedPath": ".claude/skills_archive/2026-08-27-historical-zero-use/loop-level-zfc/SKILL.md"
+    },
+    {
+      "id": "liuzhengdongfortest/CodeStable:cs-onboard",
+      "from": "liuzhengdongfortest/CodeStable",
+      "to": "codestable/CodeStable",
+      "outcome": "path-changed",
+      "catalogPath": "cs-onboard/SKILL.md",
+      "resolvedPath": "plugins/codestable/skills/cs-onboard/SKILL.md"
+    },
+    {
+      "id": "liuzhengdongfortest/CodeStable:cs-onboard",
+      "from": "liuzhengdongfortest/CodeStable",
+      "to": "codestable/CodeStable",
+      "outcome": "path-changed",
+      "catalogPath": "cs-onboard/SKILL.md",
+      "resolvedPath": "plugins/codestable/skills/cs-onboard/SKILL.md"
+    },
+    {
+      "id": "cliftonc/unwind:skills/analyzing-e2e-tests",
+      "from": "cliftonc/unwind",
+      "to": "nearform/unwind",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/uw-analyze-e2e-tests/SKILL.md"
+    },
+    {
+      "id": "cliftonc/unwind:skills/analyzing-integration-tests",
+      "from": "cliftonc/unwind",
+      "to": "nearform/unwind",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/uw-analyze-integration-tests/SKILL.md"
+    },
+    {
+      "id": "cliftonc/unwind:skills/analyzing-unit-tests",
+      "from": "cliftonc/unwind",
+      "to": "nearform/unwind",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/uw-analyze-unit-tests/SKILL.md"
+    },
+    {
+      "id": "hugorcd/evlog:review-logging-patterns",
+      "from": "HugoRCD/evlog",
+      "to": "evloghq/evlog",
+      "outcome": "path-changed",
+      "catalogPath": "apps/docs/skills/review-logging-patterns/SKILL.md",
+      "resolvedPath": "skills/review-logging-patterns/SKILL.md"
+    },
+    {
+      "id": "munlucky/claude-settings:.claude/skills/codex-review-code",
+      "from": "munlucky/claude-settings",
+      "to": "munlucky/moonshot-relay",
+      "outcome": "path-changed",
+      "catalogPath": ".claude/skills/codex-review-code/SKILL.md",
+      "resolvedPath": "skills/codex-review-code/SKILL.md"
+    },
+    {
+      "id": "munlucky/claude-settings:.claude/skills/completion-verifier",
+      "from": "munlucky/claude-settings",
+      "to": "munlucky/moonshot-relay",
+      "outcome": "path-changed",
+      "catalogPath": ".claude/skills/completion-verifier/SKILL.md",
+      "resolvedPath": "skills/completion-verifier/SKILL.md"
+    },
+    {
+      "id": "nowork-studio/NotFair:content-writer",
+      "from": "nowork-studio/NotFair",
+      "to": "nowork-studio/notfair-plugin",
+      "outcome": "path-changed",
+      "catalogPath": "seo/content-writer/SKILL.md",
+      "resolvedPath": "skills/content-writer/SKILL.md"
+    },
+    {
+      "id": "nowork-studio/NotFair:NotFair",
+      "from": "nowork-studio/NotFair",
+      "to": "nowork-studio/notfair-plugin",
+      "outcome": "path-changed",
+      "catalogPath": "notfair-upgrade-skill/SKILL.md",
+      "resolvedPath": "skills/upgrade/SKILL.md"
+    },
+    {
+      "id": "nowork-studio/NotFair:seo-analysis",
+      "from": "nowork-studio/NotFair",
+      "to": "nowork-studio/notfair-plugin",
+      "outcome": "path-changed",
+      "catalogPath": "seo/seo-analysis/SKILL.md",
+      "resolvedPath": "skills/seo-analysis/SKILL.md"
+    },
+    {
+      "id": "nowork-studio/toprank:geo-optimizer",
+      "from": "nowork-studio/toprank",
+      "to": "nowork-studio/notfair-plugin",
+      "outcome": "path-changed",
+      "catalogPath": "seo/geo-optimizer/SKILL.md",
+      "resolvedPath": "skills/geo-optimizer/SKILL.md"
+    },
+    {
+      "id": "ryan-ressmeyer/llm-skills:literature-review",
+      "from": "ryan-ressmeyer/llm-skills",
+      "to": "ryan-ressmeyer/agent-config",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/knowledge/ansa-literature-review/SKILL.md"
+    },
+    {
+      "id": "bfly123/claude_code_bridge:claude_skills/ask",
+      "from": "bfly123/claude_codex_bridge",
+      "to": "SeemSeam/claude_codex_bridge",
+      "outcome": "path-changed",
+      "catalogPath": "claude_skills/ask/SKILL.md",
+      "resolvedPath": "inherit_skills/dsh_skills/ask/SKILL.md"
+    },
+    {
+      "id": "bfly123/claude_code_bridge:codex_skills/ask",
+      "from": "bfly123/claude_codex_bridge",
+      "to": "SeemSeam/claude_codex_bridge",
+      "outcome": "path-changed",
+      "catalogPath": "codex_skills/ask/SKILL.md",
+      "resolvedPath": "inherit_skills/dsh_skills/ask/SKILL.md"
+    },
+    {
+      "id": "coder/mux:.mux/skills/dev-desktop-sandbox",
+      "from": "coder/mux",
+      "to": "coder/xum",
+      "outcome": "path-changed",
+      "catalogPath": ".mux/skills/dev-desktop-sandbox/SKILL.md",
+      "resolvedPath": ".xum/skills/dev-desktop-sandbox/SKILL.md"
+    },
+    {
+      "id": "get-convex/agent-skills:convex-setup-auth",
+      "from": "get-convex/agent-skills",
+      "to": "convex/agent-skills",
+      "outcome": "path-changed",
+      "catalogPath": "skills/convex-setup-auth/SKILL.md",
+      "resolvedPath": "skills/convex-auth/SKILL.md"
+    },
+    {
+      "id": "agricidaniel/codex-seo:seo-programmatic",
+      "from": "AgriciDaniel/codex-seo",
+      "to": "AgriciDaniel/chatgpt-seo",
+      "outcome": "path-changed",
+      "catalogPath": "skills/seo-programmatic/SKILL.md",
+      "resolvedPath": "plugins/ai-marketing-hub-seo/skills/seo-programmatic/SKILL.md"
+    },
+    {
+      "id": "ai-hero/hero-skills:create-skill",
+      "from": "ai-hero/hero-skills",
+      "to": "ai-hero/wayfare-skills",
+      "outcome": "path-changed",
+      "catalogPath": "skills/create-skill/SKILL.md",
+      "resolvedPath": "skills/wayfare-create-skill/SKILL.md"
+    },
+    {
+      "id": "alexander-danilenko/cortex-ai-skills:skills/jira-report-comment",
+      "from": "alexander-danilenko/cortex-ai-skills",
+      "to": "alexander-danilenko/cortex-claude-code-plugins",
+      "outcome": "path-changed",
+      "catalogPath": "skills/jira-report-comment/SKILL.md",
+      "resolvedPath": "plugins/engineering/cortex-jira/skills/report-comment/SKILL.md"
+    },
+    {
+      "id": "antoniojvrf/vibecoding-security",
+      "from": "antoniojvrf/vibecoding-security",
+      "to": "antoniojvrf/ultra-thermo-nuclear-vibecoding-security-review",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "Arslan-jh/3d-deep-research",
+      "from": "Arslan-jh/3d-deep-research",
+      "to": "jeffy-Peng/jeffy-skills",
+      "outcome": "path-changed",
+      "catalogPath": "SKILL.md",
+      "resolvedPath": "3d-deep-research/SKILL.md"
+    },
+    {
+      "id": "awrshift/claude-memory-kit",
+      "from": "awrshift/claude-memory-kit",
+      "to": "awrshift/agent-memory-kit",
+      "outcome": "path-changed",
+      "catalogPath": "SKILL.md",
+      "resolvedPath": "plugins/memory-kit/skills/tour/SKILL.md"
+    },
+    {
+      "id": "awrshift/skill-gemini",
+      "from": "awrshift/skill-gemini",
+      "to": "awrshift/claude-friends",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/claude-friends/SKILL.md"
+    },
+    {
+      "id": "Bobby-Gray/claude-dnd-skill",
+      "from": "Bobby-Gray/claude-dnd-skill",
+      "to": "neuralinitiative/claude-dnd-skill",
+      "outcome": "path-changed",
+      "catalogPath": "SKILL.md",
+      "resolvedPath": "skills/dnd/SKILL.md"
+    },
+    {
+      "id": "daha1216/dsh-skill-adult-tension-narrative",
+      "from": "daha1216/dsh-skill-adult-tension-narrative",
+      "to": "daha1216/dsh-adult-tension",
+      "outcome": "path-changed",
+      "catalogPath": "SKILL.md",
+      "resolvedPath": "skill/adult-tension/SKILL.md"
+    },
+    {
+      "id": "eltmon/panopticon-cli:pan-help",
+      "from": "eltmon/panopticon-cli",
+      "to": "eltmon/overdeck",
+      "outcome": "path-changed",
+      "catalogPath": "skills/pan-help/SKILL.md",
+      "resolvedPath": "sync-sources/skills/pan-help/SKILL.md"
+    },
+    {
+      "id": "EntityProcess/allagents:plugins/deepwiki/skills/deepwiki",
+      "from": "EntityProcess/allagents",
+      "to": "allagentsdev/allagents",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "plugins/allagents/skills/allagents/SKILL.md"
+    },
+    {
+      "id": "ericmjl/opencode-autolearn:self-improving-agent",
+      "from": "ericmjl/opencode-autolearn",
+      "to": "ericmjl/agent-autolearn",
+      "outcome": "path-changed",
+      "catalogPath": "skills/self-improving-agent/SKILL.md",
+      "resolvedPath": "skills/autolearn/SKILL.md"
+    },
+    {
+      "id": "GCWing/BitFun:gstack-review",
+      "from": "GCWing/BitFun",
+      "to": "GCWing/OpenBitFun",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "src/crates/assembly/core/builtin_skills/pr-review-canvas/SKILL.md"
+    },
+    {
+      "id": "getsentry/XcodeBuildMCP:xcodebuildmcp-structured-output-review",
+      "from": "getsentry/XcodeBuildMCP",
+      "to": "getsentry/MobileBuildMCP",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": ".agents/skills/mobilebuildmcp-structured-output-review/SKILL.md"
+    },
+    {
+      "id": "grcwarlock/warlock-password",
+      "from": "grcwarlock/warlock-password",
+      "to": "grcwarlock/password-standard",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "howarewoo/monorepo-template:.claude/skills/commit",
+      "from": "howarewoo/woo-stack",
+      "to": "howarewoo/woostack",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/woostack-commit/SKILL.md"
+    },
+    {
+      "id": "jmfontaine/jmf-claude-plugins:plugins/git/skills/commit",
+      "from": "jmfontaine/jmf-claude-plugins",
+      "to": "jmfontaine/agent-skills",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/git-commit/SKILL.md"
+    },
+    {
+      "id": "Kemerd/video-use-premiere",
+      "from": "Kemerd/video-use-premiere",
+      "to": "Kemerd/premiere-agent",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "KimYx0207/agent-teams-playbook",
+      "from": "KimYx0207/agent-teams-playbook",
+      "to": "KimYx0207/Kim_Service",
+      "outcome": "path-changed",
+      "catalogPath": "SKILL.md",
+      "resolvedPath": "skills/agent-teams-playbook/SKILL.md"
+    },
+    {
+      "id": "kyzdes/vps-ninja",
+      "from": "kyzdes/vps-ninja",
+      "to": "kyzdes/dokpilot",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/dokpilot/SKILL.md"
+    },
+    {
+      "id": "leeguooooo/chatgpt-imagegen",
+      "from": "leeguooooo/chatgpt-imagegen",
+      "to": "leeguooooo/image-use",
+      "outcome": "path-changed",
+      "catalogPath": "SKILL.md",
+      "resolvedPath": "skills/image-use/SKILL.md"
+    },
+    {
+      "id": "maptiler/agent-skills",
+      "from": "maptiler/agent-skills",
+      "to": "maptiler/maptiler-skills",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/SKILL.md"
+    },
+    {
+      "id": "matiaspalmac/fivem-audit-skill",
+      "from": "matiaspalmac/fivem-audit-skill",
+      "to": "matiaspalmac/fivem-security-audit",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "mechanicianwang/skillkit-find-skill",
+      "from": "mechanicianwang/skillkit-find-skill",
+      "to": "mechanicianwang/skillspool-find-skill",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "metafeng/fangxin-image-gen",
+      "from": "metafeng/fangxin-image-gen",
+      "to": "metafeng/gpthuatu",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "mifunedev/openharness:prd",
+      "from": "mifunedev/openharness",
+      "to": "mifunedev/agro",
+      "outcome": "path-changed",
+      "catalogPath": ".mifune/skills/prd/SKILL.md",
+      "resolvedPath": ".agro/skills/prd/SKILL.md"
+    },
+    {
+      "id": "mnbplus/resource-hunter",
+      "from": "mnbplus/resource-hunter",
+      "to": "taffy-owo/quarry",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "natdexterra/generate-design-system",
+      "from": "natdexterra/generate-design-system",
+      "to": "natdexterra/work-with-design-systems",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "ni1o1/claude-skill-transbigdata",
+      "from": "ni1o1/claude-skill-transbigdata",
+      "to": "ni1o1/transbigdata-skill",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/transbigdata-skill/SKILL.md"
+    },
+    {
+      "id": "OwenPawl/ghidra-re-skill",
+      "from": "OwenPawl/ghidra-re-skill",
+      "to": "OwenPawl/cerberus-re-skill",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "paulrobello/parsidion-cc:parsidion-cc",
+      "from": "paulrobello/parsidion-cc",
+      "to": "paulrobello/parsidion",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "skills/parsidion/SKILL.md"
+    },
+    {
+      "id": "soheilmomeniii/positioning-products",
+      "from": "soheilmomeniii/positioning-products",
+      "to": "soheilmomeniii/positioning-with-ekram",
+      "outcome": "path-changed",
+      "catalogPath": "SKILL.md",
+      "resolvedPath": "positioning-with-ekram/SKILL.md"
+    },
+    {
+      "id": "stbenjam/claude-nine:plugins/books/skills/calibre",
+      "from": "stbenjam/claude-nine",
+      "to": "stbenjam/skills",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "plugins/books/skills/books-calibre/SKILL.md"
+    },
+    {
+      "id": "The-Skyy-Rose-Collection-LLC/DevSkyy:continuous-learning",
+      "from": "The-Skyy-Rose-Collection-LLC/DevSkyy",
+      "to": "SkyyRoseCo/DevSkyy",
+      "outcome": "repo-missing",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "trezero/archon-trinity:archon-extension-sync",
+      "from": "trezero/archon-trinity",
+      "to": "trezero/cortex",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "integrations/claude-code/extensions/cortex-extension-sync/SKILL.md"
+    },
+    {
+      "id": "VsevolodUstinov/openclaw-skill-claude-code",
+      "from": "VsevolodUstinov/openclaw-skill-claude-code",
+      "to": "VsevolodUstinov/openclaw-worker-relay",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "Wayne2Wang/codex-cat-hatcher",
+      "from": "Wayne2Wang/codex-cat-hatcher",
+      "to": "Wayne2Wang/codex-skills-zilin",
+      "outcome": "path-changed",
+      "catalogPath": "SKILL.md",
+      "resolvedPath": "skills/zilin-cat-hatcher/SKILL.md"
+    },
+    {
+      "id": "workersio/spec:skill-benchmark",
+      "from": "workersio/spec",
+      "to": "workersio/skills",
+      "outcome": "path-changed",
+      "catalogPath": "plugins/skill-benchmark/skills/skill-benchmark/SKILL.md",
+      "resolvedPath": "plugins/wio/skills/wio/SKILL.md"
+    },
+    {
+      "id": "wxin9/cc-skill-product-lifecycle",
+      "from": "wxin9/cc-skill-product-lifecycle",
+      "to": "wxin9/cc-skill-product-lifecycle-orchestrator",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "Zaious/a1expert-linkedin-coach",
+      "from": "Zaious/a1expert-linkedin-coach",
+      "to": "Zaious/claude-linkedin-profiler",
+      "outcome": "path-changed",
+      "catalogPath": null,
+      "resolvedPath": "SKILL.md"
+    },
+    {
+      "id": "scanbott/claude-skills:browse",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:codex",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:cso",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:design-html",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:devex-review",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:document-release",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:health",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:investigate",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:learn",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:office-hours",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:open-gstack-browser",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:plan-ceo-review",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:plan-design-review",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:qa-only",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:retro",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "scanbott/claude-skills:review",
+      "from": "scanbott/claude-skills",
+      "to": "chriswestt/claude-skills",
+      "outcome": "invalid-frontmatter",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "jleechanorg/claude-commands:ao-parameter-fidelity",
+      "from": "jleechanorg/claude-commands",
+      "to": "jleechanorg/jleechan-skills",
+      "outcome": "path-changed",
+      "catalogPath": ".claude/skills/ao-parameter-fidelity/SKILL.md",
+      "resolvedPath": ".claude/skills_archive/2026-08-27-historical-zero-use/ao-parameter-fidelity/SKILL.md"
+    },
+    {
+      "id": "jleechanorg/claude-commands:launchd-auto-cleanup",
+      "from": "jleechanorg/claude-commands",
+      "to": "jleechanorg/jleechan-skills",
+      "outcome": "path-changed",
+      "catalogPath": ".claude/skills/launchd-auto-cleanup/SKILL.md",
+      "resolvedPath": ".claude/skills_archive/2026-08-27-historical-zero-use/launchd-auto-cleanup/SKILL.md"
+    },
+    {
+      "id": "jl-cmd/claude-dev-env:pr-fix-protocol",
+      "from": "jl-cmd/claude-dev-env",
+      "to": "jl-cmd-projects/claude-dev-env",
+      "outcome": "path-changed",
+      "catalogPath": "packages/claude-dev-env/skills/pr-fix-protocol/SKILL.md",
+      "resolvedPath": "packages/claude-dev-env/.agents/skills-archived/pr-fix-protocol/SKILL.md"
+    },
+    {
+      "id": "vincentventalon/claude-code-video-editing-skill",
+      "from": "vincentventalon/claude-code-video-editing-skill",
+      "to": "vincentventalon/my-claude-skills",
+      "outcome": "path-changed",
+      "catalogPath": "SKILL.md",
+      "resolvedPath": "video-editing/skills/video-editing/SKILL.md"
+    },
+    {
+      "id": "aaronjmars/aeon:search-skill",
+      "from": "aaronjmars/aeon",
+      "to": "aeonfun/aeon",
+      "outcome": "skill-file-missing",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "Catsofsuffering/CCGS:skills",
+      "from": "Catsofsuffering/CCGS",
+      "to": "Catsofsuffering/ccsm",
+      "outcome": "skill-file-missing",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "jnuyens/gsd-plugin:undo",
+      "from": "jnuyens/gsd-plugin",
+      "to": "buildomator/buildomator",
+      "outcome": "skill-file-missing",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "Lobbi-Docs/claude:plugins/jira-orchestrator/skills/confluence",
+      "from": "markus41/claude",
+      "to": "TheLobbi/claude",
+      "outcome": "skill-file-missing",
+      "catalogPath": null,
+      "resolvedPath": null
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:CreateSkill",
+      "reason": "changed on main since the check"
+    }
+  ]
+}
