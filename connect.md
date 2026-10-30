@@ -7,8 +7,10 @@ the first milestone is a bare-bones local install/update proof, not a release.
 
 Initial source audit: `origin/main` `a8ab048e`; later evidence is dated below.
 `webwork.md` and its linked specs retain historical decisions and test evidence,
-not a second active queue. [New Mac](newmac.md) holds the initial C17 design
-and migration plan, not a separate tracker. `appwork.md` retains detailed
+not a second active queue. The local-only `newmac.md` holds the initial C17
+design and migration plan, not a separate tracker. It is intentionally excluded
+from this public repository; references below are not repository links.
+`appwork.md` retains detailed
 unified-web UI work; `webdown.md` retains broader hypotheses.
 New Mac's targeted source recheck at `03e44161` and F1 plan audit at `562877c9`
 supplement that initial audit; they do not reverify every web status or establish
@@ -29,7 +31,7 @@ This consolidation changes documentation only, not implementation or release sta
   B (`0.1.2` / build `3`) relaunched with a valid signature and one app process.
   Managed packages, activations and both skill links matched the baseline.
   Safari handoff to B and the already-installed no-op also passed, followed
-  by another unchanged-state check. See [F3d acceptance](newmac.md#f3d-signed-upgrade-acceptance-2026-10-12).
+  by another unchanged-state check. See F3d acceptance in local-only `newmac.md`.
   Manual `0.1.0`-to-A replacement is setup, not updater proof. Preserve the VM,
   its unlaunched backup, signed artifacts and good test feed. Do not repeat
   packaging, notarization or the passed happy path without a reason.
@@ -93,11 +95,11 @@ This consolidation changes documentation only, not implementation or release sta
   and after the update. Different-source/same-name refusal is covered by
   automated tests. Evidence is saved and approved cleanup is complete; see
   [results](archive/newmac-f2-2026-10-09/README.md) and the
-  [implementation plan](newmac.md#f2-implementation-plan). Source, tests and
+  F2 implementation plan in local-only `newmac.md`. Source, tests and
   evidence are committed locally as `f7a964b0` on `codex/newmac-f1-core`.
   No full-catalog, distribution or production-activation claim.
 - **F1 checkpoint complete locally.**
-  The [implementation plan](newmac.md#f1-implementation-plan) and short local
+  The F1 implementation plan in local-only `newmac.md` and short local
   acceptance passed on 2026-10-09: Cancel A/B, install A, repeat no-op, local-edit
   refusal/restoration, reviewed B update and isolated Codex discovery of A and B.
   Implementation is committed as `33b659e6` on `codex/newmac-f1-core`, based on
@@ -513,7 +515,7 @@ historical results in `webwork.md` / `webwork-h14-spec.md`, not merged-app accep
   is a later decision, not another first-slice entry point.
   Public content needs no account pairing or uploaded inventory.
 - [~] **First-time setup and retry (C5/C10/C17, F3).** Follow the
-  [stage-separated plan](newmac.md#f3-first-time-setup-and-retry-plan): local
+  stage-separated F3 plan in local-only `newmac.md`: local
   intent/retry UX first, then the actual signed download/open/return/retry path.
   Keep the intended skill/agent but revalidate the request. A timeout is unknown
   state, not proof the app is absent. F3a automated and user-run acceptance
@@ -523,7 +525,7 @@ historical results in `webwork.md` / `webwork-h14-spec.md`, not merged-app accep
   Humanizer discovery required a Codex restart, not just refresh. See
   [results](archive/newmac-f3c-2026-10-12/README.md).
   F3d then passed real signed app A-to-B replacement/relaunch, unchanged skills
-  and post-upgrade handoff/no-op; [acceptance](newmac.md#f3d-signed-upgrade-acceptance-2026-10-12).
+  and post-upgrade handoff/no-op; acceptance is recorded in local-only `newmac.md`.
   F1/F2/F3a used a preinstalled dev build; do not conflate those earlier results
   with signed setup or count the candidate as production migration proof.
 - [~] **Generalize helper targets, not just the allowlist.** F1/F2's existing-app
@@ -827,7 +829,7 @@ hosting or production change. The installed public binary's hash is unchanged.
 Scoped review found no blocking issues or required source fixes. The 10 packaging
 and 7 candidate-release checks passed again; saved source inputs, package bytes
 and manifests were reverified without launching or rebuilding the bundle.
-See [package evidence](newmac.md#f3b-local-packaging-checkpoint). At that earlier
+See F3b package evidence in local-only `newmac.md`. At that earlier
 checkpoint signing/hosting/setup still needed approval and Download was disabled;
 the subsequently approved signed run below supersedes that status.
 
@@ -879,7 +881,7 @@ Gatekeeper assessment passed, one app process remained, and all inventoried
 managed packages, activations and both skill links were unchanged. Safari
 handoff and repeat Humanizer B returned `Already installed. No changes made.`;
 the independent baseline comparison passed again. The stopped VM backup and
-local receipts are retained; [details and limits](newmac.md#f3d-signed-upgrade-acceptance-2026-10-12).
+local receipts are retained; details and limits are in local-only `newmac.md`.
 Only the dedicated test site and guest test app changed during execution.
 This follow-up is documentation-only: no commit, push, cleanup, production
 deployment or public release. G1-G4 and C5/C10/C13/C17 remain open beyond this

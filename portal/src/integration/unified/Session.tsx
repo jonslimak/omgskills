@@ -79,7 +79,6 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const publicData = usePublicCatalog(publicClient, publicNavigation(nav), true);
   // On a static library page, swap the app in once its first public view has rendered.
   const listState = publicData.status.list;
-  useEffect(() => { startPublicAnalytics(); }, []);
   useEffect(() => { if (takeover && listState === "ready") announceAppReady(); }, [takeover, listState]);
   const navigate = (next: Navigation, replace = false) => {
     const safe = navigation(next, available);
@@ -106,6 +105,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     }
     history.replaceState({ nav }, "", keep ? here : current);
   }, [current, available, base, requested.view]);
+  useEffect(() => { startPublicAnalytics(); }, [current]);
   useEffect(() => {
     const pop = () => {
       if (needsAnalyticsDocumentReload(location.href)) {
