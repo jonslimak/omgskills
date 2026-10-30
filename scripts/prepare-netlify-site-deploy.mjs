@@ -9,6 +9,7 @@ import {
   verifyReleaseDeployArtifacts,
   verifyWebLibraryDeployArtifacts,
 } from "./deploy-artifact-guard.mjs";
+import { pullMissing } from "./data-store.mjs";
 import { ensureHealthSnapshot } from "./health-snapshot-guard.mjs";
 import { verifyHelperReleaseAssets } from "./helper-release-assets.mjs";
 
@@ -168,6 +169,9 @@ export async function runPreparationSequence(steps) {
 }
 
 async function restoreRequiredAssets() {
+  // Hashed catalog data listed in assets.txt but not checked out comes from R2.
+  await pullMissing();
+
   const healthSnapshot = await ensureHealthSnapshot({ siteDir, productionOrigin });
   if (healthSnapshot.restored) {
     console.log(`Restored /data/health.json from ${healthSnapshot.source}`);
