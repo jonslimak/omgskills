@@ -1,4 +1,5 @@
 import Foundation
+import os
 import Testing
 @testable import omgskills
 
@@ -83,6 +84,65 @@ struct CatalogInstallRecordTests {
         await #expect(throws: CancellationError.self) { try await task.value }
     }
 
+    @Test(arguments: ["once-timeout", "once-disconnect", "once-503"])
+    func temporaryLookupFailureRetriesOnce(_ scenario: String) async throws {
+        let id = "\(scenario):\(UUID().uuidString)"
+        let waits = OSAllocatedUnfairLock(initialState: 0)
+        let client = CatalogInstallRecordClient(session: session(), waitBeforeRetry: {
+            waits.withLock { $0 += 1 }
+        })
+        #expect(try await client.fetch(id: id)?.id == id)
+        #expect(CatalogRecordURLProtocol.attempts(for: id) == 2)
+        #expect(waits.withLock { $0 } == 1)
+    }
+
+    @Test(arguments: ["always-timeout", "always-503"])
+    func repeatedFailuresStopAfterTwoRequests(_ scenario: String) async throws {
+        let id = "\(scenario):\(UUID().uuidString)"
+        let client = CatalogInstallRecordClient(session: session(), waitBeforeRetry: {})
+        do {
+            _ = try await client.fetch(id: id)
+            Issue.record("Expected exhausted lookup to fail")
+        } catch {
+            if scenario == "always-timeout" {
+                #expect((error as? URLError)?.code == .timedOut)
+            } else {
+                #expect(error as? CatalogInstallRecordClient.ClientError == .unavailable)
+            }
+        }
+        #expect(CatalogRecordURLProtocol.attempts(for: id) == 2)
+    }
+
+    @Test(arguments: ["terminal-401", "terminal-403", "terminal-404", "terminal-429",
+                      "terminal-redirect", "terminal-tls", "terminal-cancel",
+                      "terminal-malformed", "terminal-large", "terminal-wrong-id"])
+    func nonTemporaryFailuresNeverRetry(_ scenario: String) async throws {
+        let id = "\(scenario):\(UUID().uuidString)"
+        let client = CatalogInstallRecordClient(session: session(), waitBeforeRetry: {
+            Issue.record("Must not retry a permanent failure or cancellation")
+        })
+        do {
+            _ = try await client.fetch(id: id)
+            Issue.record("Expected lookup failure")
+        } catch {
+            if scenario == "terminal-cancel" { #expect(error is CancellationError) }
+        }
+        #expect(CatalogRecordURLProtocol.attempts(for: id) == 1)
+    }
+
+    @Test func cancellationDuringRetryDelayStopsWithoutAnotherRequest() async throws {
+        let id = "once-timeout:\(UUID().uuidString)"
+        let task = Task {
+            let client = CatalogInstallRecordClient(session: session(), waitBeforeRetry: {
+                withUnsafeCurrentTask { $0?.cancel() }
+                try Task.checkCancellation()
+            })
+            return try await client.fetch(id: id)
+        }
+        await #expect(throws: CancellationError.self) { try await task.value }
+        #expect(CatalogRecordURLProtocol.attempts(for: id) == 1)
+    }
+
     #if DEBUG
     @Test func testOriginMustBeExplicitLoopback() throws {
         _ = try CatalogInstallRecordClient(localOrigin: URL(string: "http://127.0.0.1:5197")!)
@@ -101,9 +161,9 @@ struct CatalogInstallRecordTests {
     }
 }
 
-private func recordJSON(extra: String = "") -> String {
+private func recordJSON(id: String = "owner/repo:alias", extra: String = "") -> String {
     """
-    {"id":"owner/repo:alias","name":"alias","description":"Skill","author_handle":"owner",
+    {"id":"\(id)","name":"alias","description":"Skill","author_handle":"owner",
     "github_url":"https://github.com/owner/repo",
     "install_cmd":"ln -s /tmp/repo/skills/design ~/.claude/skills/old-alias"\(extra)}
     """
@@ -113,15 +173,41 @@ private func decodeRecord(extra: String = "") throws -> CatalogInstallRecord {
 }
 
 private final class CatalogRecordURLProtocol: URLProtocol, @unchecked Sendable {
+    private static let requestCounts = OSAllocatedUnfairLock(initialState: [String: Int]())
+    static func attempts(for id: String) -> Int { requestCounts.withLock { $0[id, default: 0] } }
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
     override func startLoading() {
         let id = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!.queryItems!.first!.value!
+        let attempt = Self.requestCounts.withLock { counts in
+            counts[id, default: 0] += 1
+            return counts[id]!
+        }
         #expect(request.url!.host == "omgskills.com")
         #expect(request.url!.path == "/api/catalog/install-record")
         #expect(request.timeoutInterval == 20)
         #expect(!request.httpShouldHandleCookies)
         var body = "{\"version\":1,\"found\":true,\"skill\":\(recordJSON())}"
+        let scenario = String(id.split(separator: ":").first!)
+        var status = id == "offline" ? 503 : 200
+        if ["once-timeout", "once-disconnect", "always-timeout"].contains(scenario),
+           attempt == 1 || scenario == "always-timeout" {
+            client?.urlProtocol(self, didFailWithError: URLError(scenario == "once-disconnect" ? .networkConnectionLost : .timedOut))
+            return
+        }
+        if scenario == "terminal-cancel" || scenario == "terminal-tls" {
+            client?.urlProtocol(self, didFailWithError: URLError(scenario == "terminal-cancel" ? .cancelled : .serverCertificateUntrusted))
+            return
+        }
+        if scenario.hasPrefix("once-") || scenario.hasPrefix("always-") || scenario.hasPrefix("terminal-") {
+            body = "{\"version\":1,\"found\":true,\"skill\":\(recordJSON(id: id))}"
+            if scenario == "always-503" || (scenario == "once-503" && attempt == 1) { status = 503 }
+            if scenario.hasPrefix("terminal-"), let code = Int(scenario.dropFirst("terminal-".count)) { status = code }
+            if scenario == "terminal-redirect" { status = 302 }
+            if scenario == "terminal-malformed" { body = "{" }
+            if scenario == "terminal-wrong-id" { body = "{\"version\":1,\"found\":true,\"skill\":\(recordJSON())}" }
+            if scenario == "terminal-large" { body = String(repeating: "x", count: CatalogInstallRecordClient.maximumResponseBytes + 1) }
+        }
         switch id {
         case "missing": body = "{\"version\":1,\"found\":false,\"skill\":null}"
         case "bad-version": body = "{\"version\":2,\"found\":false,\"skill\":null}"
@@ -131,7 +217,7 @@ private final class CatalogRecordURLProtocol: URLProtocol, @unchecked Sendable {
         default: break
         }
         let headers = id == "large-header" ? ["Content-Length": "\(body.utf8.count)"] : [:]
-        client?.urlProtocol(self, didReceive: HTTPURLResponse(url: request.url!, statusCode: id == "offline" ? 503 : 200,
+        client?.urlProtocol(self, didReceive: HTTPURLResponse(url: request.url!, statusCode: status,
             httpVersion: nil, headerFields: headers)!, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: Data(body.utf8))
         client?.urlProtocolDidFinishLoading(self)

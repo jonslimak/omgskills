@@ -42,17 +42,24 @@ struct CatalogInstallRecordClient: Sendable {
     enum ClientError: Error, Equatable { case invalidOrigin, invalidID, unavailable, invalidResponse, responseTooLarge }
     private let origin: URL
     private let session: URLSession
+    private let waitBeforeRetry: @Sendable () async throws -> Void
+    private enum AttemptError: Error { case temporaryServerFailure }
     static let maximumResponseBytes = 256 * 1024
 
-    init(session: URLSession = .shared) {
+    init(session: URLSession = .shared,
+         waitBeforeRetry: @escaping @Sendable () async throws -> Void = {
+             try await Task.sleep(for: .milliseconds(500))
+         }) {
         origin = URL(string: "https://omgskills.com")!
         self.session = session
+        self.waitBeforeRetry = waitBeforeRetry
     }
 
     #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
     init(catalogCandidate: CatalogCandidateRuntime.Configuration, session: URLSession = .shared) {
         origin = catalogCandidate.profile.origin
         self.session = session
+        waitBeforeRetry = { try await Task.sleep(for: .milliseconds(500)) }
     }
     #endif
 
@@ -66,6 +73,7 @@ struct CatalogInstallRecordClient: Sendable {
         else { throw ClientError.invalidOrigin }
         origin = localOrigin
         self.session = session
+        waitBeforeRetry = { try await Task.sleep(for: .milliseconds(500)) }
     }
     #endif
 
@@ -78,11 +86,40 @@ struct CatalogInstallRecordClient: Sendable {
         var request = URLRequest(url: components.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 20)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.httpShouldHandleCookies = false
+        for attempt in 0..<2 {
+            do {
+                try Task.checkCancellation()
+                return try await fetchOnce(request, id: id)
+            } catch {
+                try Task.checkCancellation()
+                if error is CancellationError || (error as? URLError)?.code == .cancelled {
+                    throw CancellationError()
+                }
+                guard attempt == 0, Self.isTemporary(error) else {
+                    if error is AttemptError { throw ClientError.unavailable }
+                    throw error
+                }
+                try await waitBeforeRetry()
+            }
+        }
+        throw ClientError.unavailable
+    }
+
+    private static func isTemporary(_ error: any Error) -> Bool {
+        if error is AttemptError { return true }
+        guard let error = error as? URLError else { return false }
+        return [.timedOut, .networkConnectionLost, .cannotConnectToHost,
+                .cannotFindHost, .dnsLookupFailed].contains(error.code)
+    }
+
+    private func fetchOnce(_ request: URLRequest, id: String) async throws -> CatalogInstallRecord? {
         let (bytes, response) = try await session.bytes(for: request, delegate: CatalogRecordRedirectPolicy())
         defer { bytes.task.cancel() }
-        guard let http = response as? HTTPURLResponse, http.statusCode == 200,
+        guard let http = response as? HTTPURLResponse,
               http.url?.host == origin.host, http.url?.scheme == origin.scheme, http.url?.port == origin.port
         else { throw ClientError.unavailable }
+        if (500...599).contains(http.statusCode) { throw AttemptError.temporaryServerFailure }
+        guard http.statusCode == 200 else { throw ClientError.unavailable }
         if response.expectedContentLength > Self.maximumResponseBytes { throw ClientError.responseTooLarge }
         var data = Data()
         for try await byte in bytes {
@@ -90,6 +127,7 @@ struct CatalogInstallRecordClient: Sendable {
             guard data.count < Self.maximumResponseBytes else { throw ClientError.responseTooLarge }
             data.append(byte)
         }
+        try Task.checkCancellation()
         struct Envelope: Decodable { let version: Int; let found: Bool; let skill: CatalogInstallRecord? }
         guard let envelope = try? JSONDecoder().decode(Envelope.self, from: data), envelope.version == 1,
               envelope.found == (envelope.skill != nil), envelope.skill == nil || envelope.skill?.id == id
