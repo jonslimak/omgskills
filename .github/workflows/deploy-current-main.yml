@@ -65,6 +65,10 @@ jobs:
         run: curl -fsSL https://omgskills.com/appcast.xml | sha256sum | awk '{print $1}' > "$RUNNER_TEMP/appcast.sha256"
 
       - name: Prepare release assets for Netlify deploy
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: node ./scripts/prepare-netlify-site-deploy.mjs
 
       - name: Install site dependencies
