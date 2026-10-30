@@ -16,7 +16,7 @@ test("homepage marketing stays intact with adjacent Coming soon labels", () => {
     '<h2 id="closing-title">Your team\'s skills, every agent</h2>',
   ]) assert.ok(home.includes(copy), copy);
   const labels = [...home.matchAll(/<small class="coming-soon" data-planned-feature="([^"]+)">([^<]+)<\/small>/g)];
-  assert.deepEqual(labels.map(m => m[1]), ["team-sync", "shared-version", "set-install", "set-subscription", "set-install-faq", "shared-version-faq"]);
+  assert.deepEqual(labels.map(m => m[1]), ["team-sync", "set-updates", "set-subscription"]);
   for (const label of labels) assert.match(label[2], /Coming soon/);
 });
 
@@ -26,12 +26,12 @@ test("guide, structured answers and generated Markdown describe the same availab
   const structured = [...html.matchAll(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/g)].map(m => JSON.parse(m[1]));
   const faq = structured.find(item => item["@type"] === "FAQPage");
   const answer = name => faq.mainEntity.find(item => item.name === name).acceptedAnswer.text;
-  assert.match(answer("What is the easiest way to share skills with a team?"), /Set installation and automatic team updates are coming soon/);
+  assert.match(answer("What is the easiest way to share skills with a team?"), /Install a whole Set from the Mac companion\. Automatic team updates are coming soon/);
   assert.match(answer("Are skills safe?"), /not a security audit/);
   assert.equal(structured.find(item => item["@type"] === "TechArticle").dateModified, "2026-10-28");
   for (const text of [html, generator]) {
     assert.match(text, /Sync reports installed skills; it does not update their files\./);
-    assert.match(text, /Set installation and automatic team updates: Coming soon\./);
+    assert.match(text, /Automatic team updates: Coming soon\./);
     assert.match(text, /Original Mac app/);
   }
 });
@@ -46,5 +46,5 @@ test("help and privacy distinguish reporting, local installs and account deletio
   for (const copy of ["Clerk", "SKILL.md fingerprint", "Inventory reports do not upload full local paths or full skill files", "Sets and invitations", "account-deletion request", "hi@omgskills.com"]) {
     assert.ok(privacy.includes(copy), copy);
   }
-  assert.match(read("site/terms/index.html"), /Set installation and automatic skill updates are coming soon/);
+  assert.match(read("site/terms/index.html"), /Set installation is available in the companion; automatic skill updates are coming soon/);
 });
