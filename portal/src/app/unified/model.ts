@@ -283,6 +283,12 @@ export function isDiscovery(view: View) {
     "category",
   ].includes(view);
 }
+// Catalog IDs start with the GitHub owner, so linked skills outside the loaded catalog page keep an author.
+function catalogOwner(id: string | null | undefined) {
+  const owner = id?.split("/")[0] ?? "";
+  return /^[a-zA-Z0-9][a-zA-Z0-9-]{0,99}$/.test(owner) && id!.includes("/") ? owner : "";
+}
+
 export function skillDisplays(data: PortalData, catalog: CatalogDisplay) {
   const grouped = groupSyncedSkills(data.skills, { groupInstallations: true });
   const byId = new Map(catalog.skills.map((skill) => [skill.id, skill]));
@@ -295,8 +301,9 @@ export function skillDisplays(data: PortalData, catalog: CatalogDisplay) {
       catalogId: skill.catalogSkillId || undefined,
       name: skill.name,
       description: skill.description || "",
-      author: publicSkill?.author || "",
-      avatar: publicSkill?.avatar,
+      author: publicSkill?.author || catalogOwner(skill.catalogSkillId),
+      avatar: publicSkill?.avatar || (catalogOwner(skill.catalogSkillId)
+        ? `https://github.com/${encodeURIComponent(catalogOwner(skill.catalogSkillId))}.png?size=80` : undefined),
       githubUrl: skill.githubUrl,
       stars: publicSkill?.stars,
       tags: publicSkill?.tags || [],
