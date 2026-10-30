@@ -33,6 +33,17 @@ test("deployment no longer depends on temporary firewall approval", () => {
   assert.match(workflow, /issues: write/);
 });
 
+test("asset restoration receives existing R2 credentials only in the prepare step", () => {
+  const prepare = workflow.split("- name: Prepare release assets for Netlify deploy")[1]?.split("- name:")[0];
+  assert.ok(prepare);
+  assert.match(prepare, /run: node \.\/scripts\/prepare-netlify-site-deploy\.mjs/);
+  for (const key of ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY"]) {
+    const mapping = `${key}: \${{ secrets.${key} }}`;
+    assert.ok(prepare.includes(mapping), `missing prepare secret: ${key}`);
+    assert.equal(workflow.split(mapping).length - 1, 1, `secret escapes prepare step: ${key}`);
+  }
+});
+
 test("local dispatcher requires a clean checkout exactly at origin main", () => {
   assert.match(wrapper, /git status --porcelain/);
   assert.match(wrapper, /git fetch origin main/);
