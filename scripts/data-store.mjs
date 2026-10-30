@@ -215,6 +215,20 @@ export async function pull(client, dirs, { log = console.log } = {}) {
   return summary;
 }
 
+/**
+ * Restores listed assets that are absent locally, for folders that have an asset list.
+ * Credentials are needed only when something is missing.
+ */
+export async function pullMissing(dirs = DATA_DIRS, { env = process.env, log = console.log, makeClient = createR2Client } = {}) {
+  const pending = dirs.filter((dir) => {
+    if (!existsSync(join(repoRoot, dir, ASSET_LIST))) return false;
+    const read = (name) => { const path = join(repoRoot, dir, name); return existsSync(path) ? readFileSync(path) : null; };
+    return planPull(readAssetList(dir), read).length > 0;
+  });
+  if (!pending.length) return {};
+  return pull(makeClient(env), pending, { log });
+}
+
 /** Fails when a listed asset is not in the bucket. */
 export async function check(client, dirs, { log = console.log } = {}) {
   const summary = {};

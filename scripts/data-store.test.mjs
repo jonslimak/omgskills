@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 import {
   assetHash,
   contentMatchesName,
@@ -9,6 +12,7 @@ import {
   parseListObjects,
   planPull,
   planPush,
+  pullMissing,
   signRequest,
 } from "./data-store.mjs";
 
@@ -44,6 +48,33 @@ test("pull downloads listed assets that are absent or do not match", () => {
   const missing = named("missing", Buffer.from("z"));
   assert.deepEqual(planPull([goodName, ...Object.keys(files).slice(1), missing], (name) => files[name] ?? null),
     [Object.keys(files)[1], missing]);
+});
+
+test("pullMissing contacts R2 only when a listed asset is absent", async () => {
+  const dir = `site/data/.pull-missing-test-${process.pid}`;
+  const path = join(fileURLToPath(new URL("..", import.meta.url)), dir);
+  const body = Buffer.from("asset");
+  const name = named("skills", body);
+  const quiet = () => {};
+  let clients = 0;
+  const makeClient = () => {
+    clients++;
+    return { get: async (key) => { assert.equal(key, `data/.pull-missing-test-${process.pid}/${name}`); return body; } };
+  };
+  try {
+    assert.deepEqual(await pullMissing([dir], { makeClient, log: quiet }), {}, "a folder without a list is skipped");
+    mkdirSync(path, { recursive: true });
+    writeFileSync(join(path, "assets.txt"), `${name}\n`);
+    writeFileSync(join(path, name), body);
+    assert.deepEqual(await pullMissing([dir], { makeClient, log: quiet }), {});
+    assert.equal(clients, 0, "nothing missing needs no credentials");
+    unlinkSync(join(path, name));
+    assert.deepEqual(await pullMissing([dir], { makeClient, log: quiet }), { [dir]: { listed: 1, downloaded: 1 } });
+    assert.equal(clients, 1);
+    assert.deepEqual(readFileSync(join(path, name)), body);
+  } finally {
+    rmSync(path, { recursive: true, force: true });
+  }
 });
 
 test("list responses yield keys and continue only when truncated", () => {
