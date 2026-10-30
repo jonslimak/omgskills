@@ -4,7 +4,7 @@ import { join } from "node:path";
 import type { TestContext } from "node:test";
 import { buildSearchCatalog } from "../../scripts/search-catalog.mjs";
 import { sha256 } from "../src/search-catalog-format.mjs";
-import { OmgskillsLibrary, type GoldBasketEntry, type Skill } from "../src/library.js";
+import { OmgskillsLibrary, type GoldBasketEntry, type LoadedLibrary, type Skill } from "../src/library.js";
 
 export const rows = [
   { id: "example/skills:swift-review", name: "swift-review", description: "Swift app store review design 中文", author_handle: "Example", github_url: "https://github.com/example/skills", install_cmd: "legacy swift", tags: ["swift", "design"], stars: 1200,
@@ -18,14 +18,15 @@ export const goldBasket: GoldBasketEntry[] = [
   { ...rows[2], id: "curated/only:extra", name: "curated-only", score: 90 },
 ];
 
-export function catalogFixture(context: Pick<TestContext, "after">, skills = rows, ranking = false) {
+export function catalogFixture(context: Pick<TestContext, "after">, skills = rows, ranking = false, signals: { trending?: LoadedLibrary["trending"] } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "compact-mcp-"));
   context.after(() => rmSync(dir, { recursive: true, force: true }));
   const bytes = Buffer.from(JSON.stringify(skills) + "\n");
   const hash = sha256(bytes), source = { path: `skills-${hash.slice(0, 12)}.json`, sha256: hash, bytes: bytes.length };
   writeFileSync(join(dir, source.path), bytes);
   const ref = buildSearchCatalog(dir, source, { generatedAt: "2026-10-16", ranking });
-  const trendBytes = Buffer.from(JSON.stringify(trending));
+  const selectedTrending = signals.trending ?? trending;
+  const trendBytes = Buffer.from(JSON.stringify(selectedTrending));
   const trendHash = sha256(trendBytes);
   const manifest = { skills: source, searchCatalog: ref, trending: { path: `trending-${trendHash.slice(0, 12)}.json`, sha256: trendHash, bytes: trendBytes.length } };
   const files = new Map<string, Uint8Array>(readdirSync(dir).map(name => [`https://catalog.test/${name}`, readFileSync(join(dir, name))]));
@@ -40,5 +41,5 @@ export function catalogFixture(context: Pick<TestContext, "after">, skills = row
   };
   const options = { fetcher, goldBasketUrl: "https://catalog.test/gold.json" };
   return { dir, manifest, files, requested, fetcher, options,
-    legacy: OmgskillsLibrary.fromData({ skills, trending, goldBasket }), url: "https://catalog.test/manifest.json" };
+    legacy: OmgskillsLibrary.fromData({ skills, trending: selectedTrending, goldBasket }), url: "https://catalog.test/manifest.json" };
 }
