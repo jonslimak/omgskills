@@ -19,6 +19,25 @@ export function installFolderName(skill: SkillResult, pin: PinnedInstall): strin
   return name && safePart.test(name) && name !== "." && name !== ".." ? name : undefined;
 }
 
+export const installBlockerCodes = ["invalid_repository", "invalid_skill_path", "missing_commit", "invalid_commit", "missing_content_hash", "invalid_content_hash", "invalid_install_target"] as const;
+export type InstallBlocker = { code: typeof installBlockerCodes[number]; message: string };
+
+/** Explain existing install checks without inferring missing metadata from sibling skills. */
+export function installBlockers(skill: SkillResult): InstallBlocker[] {
+  const blockers: InstallBlocker[] = [];
+  const sha = /^[a-f0-9]{40}$/i;
+  const parts = skillMdParts(skill.skill_md_path);
+  if (!githubRepo(skill.github_url)) blockers.push({ code: "invalid_repository", message: "No valid HTTPS GitHub repository is recorded." });
+  if (!parts || parts.length < 2) blockers.push({ code: "invalid_skill_path", message: "No supported skill folder containing SKILL.md is recorded." });
+  if (!skill.repo_commit_sha) blockers.push({ code: "missing_commit", message: "No commit is recorded for this skill yet." });
+  else if (!sha.test(skill.repo_commit_sha)) blockers.push({ code: "invalid_commit", message: "The recorded commit is not a full Git commit SHA." });
+  if (!skill.skill_md_sha) blockers.push({ code: "missing_content_hash", message: "No SKILL.md verification hash is recorded." });
+  else if (!sha.test(skill.skill_md_sha)) blockers.push({ code: "invalid_content_hash", message: "The recorded SKILL.md hash is invalid." });
+  const pin = pinnedInstallFor(skill);
+  if (pin && !installFolderName(skill, pin)) blockers.push({ code: "invalid_install_target", message: "The recorded install folder name is unsafe or unsupported." });
+  return blockers;
+}
+
 /**
  * A POSIX shell script that fetches exactly the pinned commit, checks SKILL.md against the
  * catalog hash, and copies the skill folder into the agent's skills directory. It never
