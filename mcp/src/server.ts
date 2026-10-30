@@ -4,7 +4,7 @@ import type { SearchOptions, SkillResult } from "./library.js";
 import type { CatalogReader } from "./catalog-reader.js";
 import { catalogSorts, defaultLimit, PagingError, type PageInfo, type PageOptions, type SearchNote, type SkillPage } from "./paging.js";
 import type { RankedSearchOptions } from "./search-ranking.js";
-import { installAgents, installFolderName, installScopes, installScript, installScripts, pinnedInstallFor } from "./install.js";
+import { installAgents, installBlockerCodes, installBlockers, installFolderName, installScopes, installScript, installScripts, pinnedInstallFor } from "./install.js";
 import { readSkillContent, SkillContentError } from "./content.js";
 
 export const serverVersion = "0.2.3";
@@ -23,6 +23,8 @@ const pinnedInstallSchema = z.object({
   skill_tree_sha: z.string().optional()
 });
 
+const installBlockerSchema = z.object({ code: z.enum(installBlockerCodes), message: z.string() });
+
 const skillResultSchema = z.object({
   id: z.string(),
   name: z.string().optional(),
@@ -39,6 +41,8 @@ const skillResultSchema = z.object({
   install_status: z.enum(["pinned", "discovery_only"]).optional()
     .describe("pinned: get_install_plan can install it at a verified commit. discovery_only: it cannot be installed reproducibly. Omitted only when the catalog does not record it."),
   pinned_install: pinnedInstallSchema.optional(),
+  discovery_only_reason: z.string().optional().describe("Full-record reads only: why this record cannot be installed reproducibly."),
+  install_blockers: z.array(installBlockerSchema).optional().describe("Full-record reads only: recorded metadata that prevents an install plan."),
   install: z.object({ claude_code: z.string(), codex: z.string() }).optional()
     .describe("get_skill only: user-scope install scripts pinned to commit_sha, for pinned skills."),
   score: z.number().optional().describe("Relevance to this query; only meaningful within one result list."),
@@ -289,6 +293,7 @@ export function createOmgskillsServer(catalog: CatalogProvider, options: ServerO
         steps: z.array(z.string()).optional(),
         script: z.string().optional(),
         reason: z.string().optional(),
+        install_blockers: z.array(installBlockerSchema).optional(),
         alternatives: z.array(skillResultSchema).optional()
       }),
       annotations: toolAnnotations
@@ -303,9 +308,10 @@ export function createOmgskillsServer(catalog: CatalogProvider, options: ServerO
         const value = { found: true, installable: true, id: skill.id, agent, scope, destination: plan.destination, pinned_install: pin, steps: plan.steps, script: plan.script };
         return result(value, `Install ${skill.id} for ${agent} (${scope}) into ${plan.destination}, pinned to ${pin.repo}@${pin.commit_sha.slice(0, 12)}. Run:\n\n${plan.script}`);
       }
-      const reason = "No commit is recorded for this skill yet, so its files can't be fetched at a fixed, verified version. Don't install it from the default branch.";
+      const blockers = installBlockers(skill);
+      const reason = `${blockers.map(blocker => blocker.message).join(" ")} Don't install it from the default branch.`;
       const alternatives = await pinnedAlternatives(library, skill.id);
-      const value = { found: true, installable: false, id: skill.id, agent, scope, reason, ...(alternatives.length ? { alternatives } : {}) };
+      const value = { found: true, installable: false, id: skill.id, agent, scope, reason, install_blockers: blockers, ...(alternatives.length ? { alternatives } : {}) };
       return result(value, [reason, alternatives.length ? `Pinned alternatives:\n${alternatives.map(row).join("\n")}` : "No pinned alternative was found."].join("\n\n"));
     }
   );
@@ -398,12 +404,15 @@ function summarySkill(skill: SkillResult) {
 
 function publicSkill(skill: SkillResult, options: { withScore?: boolean; withInstall?: boolean } = {}) {
   const pinnedInstall = pinnedInstallFor(skill);
+  const blockers = installBlockers(skill);
   const install = options.withInstall && pinnedInstall ? installScripts(skill, pinnedInstall) : undefined;
   const { score, ...rest } = skill;
   return skillResultSchema.parse({
     ...rest,
     ...(options.withScore === false ? {} : { score }),
     install_status: pinnedInstall ? "pinned" : "discovery_only",
+    ...(!pinnedInstall && blockers.length ? { discovery_only_reason: blockers.map(blocker => blocker.message).join(" ") } : {}),
+    ...(blockers.length ? { install_blockers: blockers } : {}),
     ...(pinnedInstall ? { pinned_install: pinnedInstall } : {}),
     ...(install ? { install } : {})
   });
@@ -443,8 +452,9 @@ function skillText(skill: PublicSkill) {
   return [
     row(skill).slice(2),
     skill.github_url ? `Source: ${skill.github_url}${skill.skill_md_path ? ` (${skill.skill_md_path})` : ""}` : "",
-    pin ? `Pinned to ${pin.repo}@${pin.commit_sha.slice(0, 12)}. Read it with get_skill_content; install with get_install_plan (claude_code or codex).`
-      : "discovery_only: no pinned commit, so don't install it from github_url. Use related_skills to find a pinned alternative.",
+    skill.install_blockers?.length ? `${skill.install_status}: ${skill.install_blockers.map(blocker => blocker.message).join(" ")} Do not install from github_url; use related_skills to find a pinned alternative.`
+      : pin ? `Pinned to ${pin.repo}@${pin.commit_sha.slice(0, 12)}. Read it with get_skill_content; install with get_install_plan (claude_code or codex).`
+      : "discovery_only: don't install it from github_url. Use related_skills to find a pinned alternative.",
   ].filter(Boolean).join("\n");
 }
 

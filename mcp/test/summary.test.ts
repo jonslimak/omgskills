@@ -13,7 +13,7 @@ const cleanRows = rows.map(({ skill_md_sha, ...row }) => (skill_md_sha === null 
 
 type Row = Record<string, unknown> & { id: string };
 // Summary rows keep install_status (from the published installable set) but no install metadata.
-const detailFields = ["pinned_install", "install_cmd", "skill_md_sha", "skill_md_path"];
+const detailFields = ["pinned_install", "install_cmd", "skill_md_sha", "skill_md_path", "discovery_only_reason", "install_blockers"];
 
 async function connected(context: { after: (fn: () => unknown) => void }, reader: CatalogReader, paging: boolean) {
   const server = createOmgskillsServer(reader, { paging, ranking: paging }), client = new Client({ name: "summary-test", version: "1" });

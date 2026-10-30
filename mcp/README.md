@@ -85,6 +85,13 @@ Every row reports `install_status`; pass `installable: true` to get only skills 
 Fetch one skill by ID, with `install_status`, `pinned_install` and, for pinned skills,
 user-scope `install` scripts for Claude Code and Codex.
 
+Full-record reads also report `discovery_only_reason` and `install_blockers` when
+recorded metadata prevents installation. Blockers distinguish missing or invalid
+commits, verification hashes, repository URLs, paths and install folder names.
+Summary lists do not load detail files to derive these fields. An install plan
+returns the same blockers alongside its existing `reason` and pinned alternatives.
+These are reproducibility checks, not a security audit or a claim that a skill is safe.
+
 ```json
 {
   "id": "anthropics/skills:algorithmic-art"
