@@ -72,6 +72,25 @@ This refreshes library data only. It never installs or updates skill files.
 
 ## Tools
 
+### Paging and Errors
+
+Search and sortable author lists accept `sort` without an explicit `page`. First
+pages include totals and a cursor when more results exist. Continue using the same
+tool, query, filters, sort and limit; add `page: {"cursor": "<nextCursor>"}`.
+Do not decode or modify cursors. `summary` may change between pages.
+
+- `invalid_cursor`: repeat the original arguments or restart with `page: {}`.
+- `catalog_snapshot_changed`: the data refreshed; restart from the first page.
+- `catalog_unavailable`: retry later; this is not a successful empty search.
+- Missing IDs are normal `found: false` results for single-ID tools, not protocol
+  failures. Batch reads return any missing IDs in `missing`.
+- Validation and availability failures set `isError: true`. Existing paging error
+  text contains JSON with `error.code` and an actionable `error.message`.
+
+The stdio and local HTTP transports share tool definitions. Tests compare their
+full schemas, and check the documented tool list. Hosted adapter/site docs and npm
+publishing are separate release checks; changing this folder alone does not release them.
+
 ### `search_skills`
 
 Search by keywords or a short task description, with optional filters. Typos are
