@@ -20,7 +20,9 @@ Bring the skills for a project or team together in a Set:
 
 You can create and share Sets now. Invitations provide a copyable link; they do not send an invitation email.
 
-**Coming soon:** installing a whole Set, installing the same Set version across a team, and automatic skill updates. Sharing a Set today does not automatically install or update skill files on teammates' machines.
+Teammates install a whole Set from the Mac companion, either at a fixed version or kept updated (the companion shows changes when they open the Set again and asks before applying them).
+
+**Coming soon:** automatic skill updates in the background.
 
 ## Find useful skills
 
@@ -32,7 +34,7 @@ Save useful skills to your library and Sets when signed in. The library compleme
 
 ## Optional Mac companion
 
-Start at [omgskills.com/app/](https://omgskills.com/app/). Browse public skills without an account, organize Sets on the web, and choose a skill to open its Mac installation flow. [Download the Mac companion 0.0.27](https://omgskills.com/download) for Apple silicon and macOS 14 or later, or use the skill's setup panel. The [original Mac app](https://omgskills.com/downloads/omgskills-mac.dmg) and its update feed remain available separately. Existing users are not automatically upgraded.
+Start at [omgskills.com/app/](https://omgskills.com/app/). Browse public skills without an account, organize Sets on the web, and choose a skill to open its Mac installation flow. [Download the Mac companion 0.0.28](https://omgskills.com/download) for Apple silicon and macOS 14 or later, or use the skill's setup panel. The [original Mac app](https://omgskills.com/downloads/omgskills-mac.dmg) and its update feed remain available separately. Existing users are not automatically upgraded.
 
 Connect the companion to your account to see installed skills by Mac and agent, including supported external installs. Sync keeps the installed-skills list up to date; it does not update skill files.
 
