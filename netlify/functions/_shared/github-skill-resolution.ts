@@ -184,6 +184,23 @@ export function resolveCatalogSkillId(
   return { status: "unresolved", reason: "ambiguous" };
 }
 
+/**
+ * A Mac's catalog hint is only a claim. It names the catalog skill when that skill is still
+ * published and the reported SKILL.md is one of its published versions.
+ */
+export function verifiedCatalogHint(
+  hint: string | null | undefined,
+  skillMdSha: string | null | undefined,
+  identity: PublishedCatalogIdentity | null,
+): string | null {
+  const normalizedSha = skillMdSha?.trim().toLowerCase() ?? "";
+  if (!hint || !gitBlobShaPattern.test(normalizedSha) || !identity?.shaHistory || !identity.liveSkillIds.has(hint)) {
+    return null;
+  }
+  const mappedIds = identity.shaHistory.shaToSkillIds[normalizedSha];
+  return Array.isArray(mappedIds) && mappedIds.includes(hint) ? hint : null;
+}
+
 export function groupItemForValidatedGithubSkill(
   skill: ValidatedGithubSkill,
   identity: PublishedCatalogIdentity | null,
