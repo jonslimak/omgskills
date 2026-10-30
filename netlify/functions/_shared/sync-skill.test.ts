@@ -20,6 +20,22 @@ function skill(overrides: Record<string, unknown> = {}) {
   };
 }
 
+test("Set origin is optional, nullable and bounded in legacy and presence reports", () => {
+  for (const value of [undefined, null, "", " Team Skills "]) {
+    for (const parse of [parseSyncSkill, parsePresenceSkill]) {
+      const body = parse === parseSyncSkill ? skill() : { source: "codex", installationPath: "review", name: "review" };
+      const parsed = parse({ ...body, ...(value === undefined ? {} : { installedFromSet: value }) });
+      assert.equal(parsed.installedFromSet, value === undefined ? undefined : value?.trim() || null);
+    }
+  }
+  for (const value of [17, {}, [], "x".repeat(201)]) {
+    for (const parse of [parseSyncSkill, parsePresenceSkill]) {
+      const body = parse === parseSyncSkill ? skill() : { source: "codex", installationPath: "review", name: "review" };
+      assert.throws(() => parse({ ...body, installedFromSet: value }), e => e instanceof Response && e.status === 400);
+    }
+  }
+});
+
 test("preserves a valid location key and derives local-only from status", () => {
   const parsed = parseSyncSkill(skill());
 

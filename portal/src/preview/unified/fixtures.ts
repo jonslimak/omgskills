@@ -14,6 +14,8 @@ export type { Scenario };
 
 export function makeFixtures(scenario: Scenario = "populated") {
   const data = makeBaseFixtures(scenario);
+  // Sample install history, independent of current Set membership.
+  if (data.skills[0]) data.skills[0].installedFromSet = "Marketing essentials";
   if (scenario === "long-content") {
     const first = data.skills[0];
     data.skills = data.skills.map((skill) =>

@@ -36,6 +36,7 @@ export async function readSyncInventory(
        is_local_only AS "isLocalOnly", source, is_current AS "isCurrent",
        last_seen_at AS "lastSeenAt"
        , device_id AS "deviceId", git_relative_path AS "gitRelativePath", catalog_skill_id_hint AS "catalogSkillIdHint"
+       , to_jsonb(skill)->>'installed_from_set' AS "installedFromSet"
      FROM synced_skills skill
      WHERE user_id = $1 ${version === 3 ? "" : "AND is_current = true"}
        -- A disconnected Mac's rows stay for a same-account reconnect, but are hidden.

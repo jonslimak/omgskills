@@ -324,7 +324,8 @@ enum InstalledSkillsScanner {
             isSymlink: isSymlink,
             isLocalOnly: isLocalOnly,
             gitRelativePath: gitLocation?.relativePath,
-            catalogSkillId: provenance?.catalogSkillId
+            catalogSkillId: provenance?.catalogSkillId,
+            installedFromSet: provenance?.installedSetName
         )
     }
 

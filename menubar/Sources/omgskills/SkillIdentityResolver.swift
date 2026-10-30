@@ -47,6 +47,7 @@ struct SkillInstallProvenance: Codable, Equatable, Sendable {
     let releaseId: String?
     let groupId: String?
     let groupRoute: String?
+    let groupName: String?
     let groupRevision: Int?
     let commitSha: String?
     let treeSha: String?
@@ -65,6 +66,7 @@ struct SkillInstallProvenance: Codable, Equatable, Sendable {
         releaseId: String? = nil,
         groupId: String? = nil,
         groupRoute: String? = nil,
+        groupName: String? = nil,
         groupRevision: Int? = nil,
         commitSha: String? = nil,
         treeSha: String? = nil,
@@ -82,6 +84,7 @@ struct SkillInstallProvenance: Codable, Equatable, Sendable {
         self.releaseId = releaseId
         self.groupId = groupId
         self.groupRoute = groupRoute
+        self.groupName = groupName
         self.groupRevision = groupRevision
         self.commitSha = commitSha
         self.treeSha = treeSha
@@ -89,6 +92,15 @@ struct SkillInstallProvenance: Codable, Equatable, Sendable {
         self.targetScope = targetScope
         self.targetRootIdentifier = targetRootIdentifier
         self.installMode = installMode
+    }
+
+    var installedSetName: String? {
+        guard groupId != nil else { return nil }
+        if let name = groupName?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty { return name }
+        guard let groupRoute else { return nil }
+        let parts = groupRoute.split(separator: "/")
+        guard parts.count == 4, parts[0] == "u", parts[2] == "sets" else { return nil }
+        return String(parts[3])
     }
 }
 
@@ -309,6 +321,7 @@ private extension Skill {
             authorConfidence: authorConfidence,
             catalogSkillId: catalogSkillId,
             identityStatus: identityStatus,
+            installedFromSet: installedFromSet,
             sourceTag: sourceTag,
             sourceUrl: sourceUrl,
             tweetUrl: tweetUrl,

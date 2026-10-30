@@ -37,6 +37,7 @@ struct ManagedSkillInstallRequest: Equatable, Sendable {
     let releaseId: String
     let groupId: String?
     let groupRoute: String?
+    let groupName: String?
     let groupRevision: Int?
     let catalogSkillId: String?
     let githubUrl: String?
@@ -50,6 +51,7 @@ struct ManagedSkillInstallRequest: Equatable, Sendable {
         releaseId: String,
         groupId: String? = nil,
         groupRoute: String? = nil,
+        groupName: String? = nil,
         groupRevision: Int?,
         catalogSkillId: String?,
         githubUrl: String?,
@@ -62,6 +64,7 @@ struct ManagedSkillInstallRequest: Equatable, Sendable {
         self.releaseId = releaseId
         self.groupId = groupId
         self.groupRoute = groupRoute
+        self.groupName = groupName
         self.groupRevision = groupRevision
         self.catalogSkillId = catalogSkillId
         self.githubUrl = githubUrl
@@ -922,6 +925,7 @@ actor ManagedSkillInstaller {
                     releaseId: release.id,
                     groupId: manifest.group.id,
                     groupRoute: groupRoute,
+                    groupName: manifest.group.name,
                     groupRevision: manifest.group.revision,
                     catalogSkillId: sourceValues.catalogSkillId,
                     githubUrl: sourceValues.githubUrl,
@@ -1725,6 +1729,7 @@ actor ManagedSkillInstaller {
             releaseId: request.releaseId,
             groupId: request.groupId,
             groupRoute: request.groupRoute,
+            groupName: request.groupName,
             groupRevision: request.groupRevision,
             commitSha: request.expectedCoordinates.commitSha.lowercased(),
             treeSha: request.expectedCoordinates.treeSha.lowercased(),

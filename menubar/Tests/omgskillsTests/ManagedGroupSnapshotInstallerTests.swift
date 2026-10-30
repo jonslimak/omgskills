@@ -693,6 +693,23 @@ struct ManagedGroupSnapshotInstallerTests {
         #expect(try fixture.targetDestination("shared") == before)
     }
 
+    @Test func groupInstallsCarrySetNamesIntoScannedInventoryAndReports() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let manifest = try fixture.manifest(items: [
+            fixture.installable(name: "example", kind: "catalog", source: fixture.catalogSource())
+        ])
+        _ = try await fixture.installer().installGroupSnapshot(fixture.request(manifest),
+            credential: fixture.credential, packageLoader: RecordingGroupPackageLoader(package: fixture.package))
+        let provenance = try #require(SkillInstallProvenanceStore.read(targetRoot: fixture.targetRoot, targetName: "example"))
+        #expect(provenance.groupName == "Team Skills")
+        let scan = InstalledSkillsScanner.scan(roots: [.init(url: fixture.targetRoot, origin: "Claude")])
+        let skill = try #require(scan.installations.first)
+        #expect(skill.installedFromSet == "Team Skills")
+        #expect(try SkillSyncService.presencePayloadSkill(skill).installedFromSet == "Team Skills")
+        #expect(SkillSyncService.payloadSkill(skill).installedFromSet == "Team Skills")
+    }
+
     @Test func snapshotInstallSkipsSkillsAlreadyInstalledAnotherWay() async throws {
         let fixture = try GroupTransactionFixture()
         defer { fixture.remove() }

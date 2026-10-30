@@ -38,6 +38,7 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
     let authorConfidence: String?
     let catalogSkillId: String?
     let identityStatus: SkillIdentityStatus?
+    let installedFromSet: String?
     var sourceTag: String? = nil
     var sourceUrl: String? = nil
     var tweetUrl: String? = nil
@@ -81,6 +82,7 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
         authorConfidence: String? = nil,
         catalogSkillId: String? = nil,
         identityStatus: SkillIdentityStatus? = nil,
+        installedFromSet: String? = nil,
         sourceTag: String? = nil,
         sourceUrl: String? = nil,
         tweetUrl: String? = nil,
@@ -123,6 +125,7 @@ struct Skill: Codable, Identifiable, Hashable, Sendable {
         self.authorConfidence = authorConfidence
         self.catalogSkillId = catalogSkillId
         self.identityStatus = identityStatus
+        self.installedFromSet = installedFromSet
         self.sourceTag = sourceTag
         self.sourceUrl = sourceUrl
         self.tweetUrl = tweetUrl
@@ -170,6 +173,7 @@ extension Skill {
             authorConfidence: authorConfidence,
             catalogSkillId: catalogSkillId,
             identityStatus: identityStatus,
+            installedFromSet: installedFromSet,
             sourceTag: sourceTag,
             sourceUrl: sourceUrl,
             tweetUrl: tweetUrl,

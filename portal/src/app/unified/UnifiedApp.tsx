@@ -105,7 +105,7 @@ import "./unified.css";
 import type { PublicStatus } from "./use-public-catalog";
 import type { UnifiedManagement } from "./management";
 import { publicPageRequest, publicSorts, type PublicSort } from "./public-paging";
-import { displaySourceName, displaySourceNames } from "../../synced-skill-grouping";
+import { displaySourceName, displaySourceNames, installedSetNames } from "../../synced-skill-grouping";
 import { CreatorSocialLinks, CreatorProfileDetails } from "./CreatorProfileDetails";
 import { discoveryCreatorGroups, featuredProfiles, isCompany } from "./discovery-presentation";
 import { descriptionParagraphs, descriptionSummary, whenLead } from "./description-paragraphs";
@@ -796,6 +796,7 @@ export function UnifiedApp({
   function renderRow(skill: SkillDisplay, rank?: number, compact = false) {
     const canSelect = editing && !!skill.installed;
     const installedSources = displaySourceNames(skill.installed?.sources ?? []);
+    const fromSets = !discovery && skill.installed ? installedSetNames(skill.installed) : [];
     return (
       <div
         key={skill.key}
@@ -859,6 +860,9 @@ export function UnifiedApp({
                   </>
                 : skill.description || "No description available"}
             </span>
+            {fromSets.length > 0 && <span className="ua-row-description" title={`From Set: ${fromSets.join(", ")}`}>
+              From Set: {fromSets.join(", ")}
+            </span>}
           </span>
         </button>
         {!compact && !discovery && !nav.query && (

@@ -15,6 +15,7 @@ export type SyncedSkill = {
   installationFolder?: string | null;
   gitRelativePath?: string | null;
   catalogSkillIdHint?: string | null;
+  installedFromSet?: string | null;
   id: string;
   name: string;
   description: string | null;
@@ -32,6 +33,13 @@ export type GroupedSyncedSkill = SyncedSkill & {
   sourceSkills: SyncedSkill[];
   sources: string[];
 };
+
+export function installedSetNames(skill: GroupedSyncedSkill): string[] {
+  return [...new Set(skill.sourceSkills.flatMap(source => {
+    const name = source.installedFromSet?.trim();
+    return name ? [name] : [];
+  }))].sort((a, b) => a.localeCompare(b));
+}
 
 function normalizedSkillText(value: string | null | undefined) {
   return (value || "")

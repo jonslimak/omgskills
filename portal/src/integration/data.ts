@@ -173,7 +173,8 @@ export function parseConnectedInventory(value: unknown, version: 2 | 3 = 2) {
       || (version === 3 && typeof skill.isCurrent !== "boolean")
       || (skill.catalogSkillId != null && typeof skill.catalogSkillId !== "string")
       || (skill.gitRelativePath != null && typeof skill.gitRelativePath !== "string")
-      || (skill.catalogSkillIdHint != null && typeof skill.catalogSkillIdHint !== "string"))
+      || (skill.catalogSkillIdHint != null && typeof skill.catalogSkillIdHint !== "string")
+      || (skill.installedFromSet != null && (typeof skill.installedFromSet !== "string" || skill.installedFromSet.length > 200)))
     || new Set(data.skills.map(skill => skill.id)).size !== data.skills.length) {
     throw new Error("The portal returned an invalid connected inventory response.");
   }
