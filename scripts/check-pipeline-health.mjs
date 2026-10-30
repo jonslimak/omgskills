@@ -2,7 +2,9 @@
 
 const repo = process.env.GITHUB_REPOSITORY;
 const token = process.env.GITHUB_TOKEN;
-const shadowMaxAgeHours = Number(process.env.SHADOW_MAX_AGE_HOURS ?? 18);
+// Twice-daily crawls have started up to ~7 hours late; allow queue/runtime margin too.
+export const DEFAULT_SHADOW_MAX_AGE_HOURS = 24;
+const shadowMaxAgeHours = Number(process.env.SHADOW_MAX_AGE_HOURS ?? DEFAULT_SHADOW_MAX_AGE_HOURS);
 const stuckMaxMinutes = Number(process.env.STUCK_MAX_MINUTES ?? 90);
 const checkedAt = new Date().toISOString();
 
@@ -22,8 +24,10 @@ async function github(path) {
 
 const jobsCache = new Map();
 
-function hoursSince(iso) {
-  return (Date.now() - new Date(iso).getTime()) / 36e5;
+export function shadowCrawlFreshnessIssues(completedAt, nowMs = Date.now(), maxAgeHours = shadowMaxAgeHours) {
+  if (!completedAt) return ["No successful shadow crawl stage found"];
+  const ageHours = (nowMs - new Date(completedAt).getTime()) / 36e5;
+  return ageHours > maxAgeHours ? [`shadow crawl is stale (${ageHours.toFixed(1)}h)`] : [];
 }
 
 function section(status, details = {}, issues = []) {
@@ -180,12 +184,7 @@ async function main() {
     latestStageSuccess(verifiedDeployRuns, shadowStageSteps.verifiedDeploy),
   ]);
 
-  const crawlerIssues = [];
-  if (!latestShadowCrawl) {
-    crawlerIssues.push("No successful shadow crawl stage found");
-  } else if (hoursSince(latestShadowCrawl.completedAt) > shadowMaxAgeHours) {
-    crawlerIssues.push(`shadow crawl is stale (${hoursSince(latestShadowCrawl.completedAt).toFixed(1)}h)`);
-  }
+  const crawlerIssues = shadowCrawlFreshnessIssues(latestShadowCrawl?.completedAt);
 
   crawlerIssues.push(...stuckShadowWorkflowIssues(inProgressRuns.workflow_runs ?? []));
 
