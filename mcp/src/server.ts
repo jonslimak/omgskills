@@ -29,6 +29,7 @@ const skillResultSchema = z.object({
   id: z.string(),
   name: z.string().optional(),
   description: z.string().optional(),
+  description_truncated: z.boolean().optional().describe("Summary description was shortened; get_skill or summary: false returns the full text."),
   github_url: z.string().optional(),
   install_cmd: z.string().optional().describe("Legacy unpinned example; do not run it. Use get_install_plan instead."),
   author_handle: z.string().optional(),
@@ -71,7 +72,7 @@ const skillListOutputSchema = z.object({
 
 const limitArg = (max = 100) => z.number().int().min(1).max(max).default(defaultLimit).describe("Maximum number of skills to return.");
 const summaryArg = z.boolean().default(true)
-  .describe("Default true: list fields and install_status, without install metadata. Pass false for pinned_install, or call get_skill.");
+  .describe("Default true: compact list fields, descriptions up to 160 characters and install_status, without install metadata. Pass false for full descriptions and pinned_install, or call get_skill.");
 const installableArg = z.boolean().optional().describe("true: only skills that get_install_plan can install (pinned to a verified commit).");
 const pageArg = z.object({ cursor: z.string().optional() }).strict().optional()
   .describe("Paging: omit or {} for the first page, then {cursor: page.nextCursor} with otherwise unchanged arguments.");
@@ -399,7 +400,15 @@ function readerFor(library: CatalogReader, summary: boolean | undefined): Catalo
 // List fields only: never derive install_status from a record whose install fields were not loaded.
 function summarySkill(skill: SkillResult) {
   const { install_cmd: _cmd, skill_md_sha: _sha, skill_md_path: _path, repo_commit_sha: _commit, skill_tree_sha: _tree, ...rest } = skill;
-  return skillResultSchema.parse(rest);
+  const description = skill.description === undefined ? undefined : shortDescription(skill.description);
+  return skillResultSchema.parse({ ...rest, ...(description === undefined ? {} : { description: description.text,
+    ...(description.truncated ? { description_truncated: true } : {}) }) });
+}
+
+function shortDescription(description: string) {
+  const characters = Array.from(description.replace(/\s+/g, " ").trim());
+  const truncated = characters.length > 160;
+  return { text: truncated ? `${characters.slice(0, 157).join("").trimEnd()}...` : characters.join(""), truncated };
 }
 
 function publicSkill(skill: SkillResult, options: { withScore?: boolean; withInstall?: boolean } = {}) {
@@ -459,8 +468,7 @@ function skillText(skill: PublicSkill) {
 }
 
 function row(skill: PublicSkill) {
-  const description = (skill.description ?? "").replace(/\s+/g, " ").trim();
-  const short = description.length > 160 ? `${description.slice(0, 157).trimEnd()}...` : description;
+  const short = shortDescription(skill.description ?? "").text;
   const facts = [skill.stars !== undefined ? `${compactNumber.format(skill.stars)} stars` : "", skill.install_status ?? ""].filter(Boolean).join(", ");
   return `- ${skill.id}${skill.name && !skill.id.endsWith(skill.name) ? ` (${skill.name})` : ""}${facts ? ` [${facts}]` : ""}${short ? `: ${short}` : ""}`;
 }

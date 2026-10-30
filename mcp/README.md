@@ -14,6 +14,11 @@ Every tool returns structured content (the full fields) plus a short text render
 
 IDs are case-insensitive and accept the web app's `catalog:` prefix. Author handles accept a leading `@`.
 
+Summary descriptions normalize whitespace and contain at most 160 Unicode characters.
+When shortened, `description_truncated: true` is added; no existing response field
+is renamed or removed. Use `summary: false` or `get_skill` for the original full
+description. Summary reads still avoid downloading detail shards.
+
 ## Data Sources
 
 Default remote sources, the same as the hosted server at `https://omgskills.com/mcp`, tried newest first:
