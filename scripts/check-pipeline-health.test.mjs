@@ -3,14 +3,35 @@ import test from "node:test";
 
 import {
   buildShadowCutoverState,
+  DEFAULT_SHADOW_MAX_AGE_HOURS,
   latestStageSuccess,
   newestRunsFirst,
+  shadowCrawlFreshnessIssues,
   stuckShadowWorkflowIssues,
   VERIFIED_DEPLOY_WORKFLOWS,
 } from "./check-pipeline-health.mjs";
 
 const run = (id, status = "completed") => ({ id, status });
 const stage = (id, completedAt) => ({ run: run(id), completedAt });
+
+test("allows the twice-daily crawl plus observed scheduler delay and queue margin", () => {
+  assert.equal(DEFAULT_SHADOW_MAX_AGE_HOURS, 24);
+  const now = Date.parse("2026-10-30T12:00:00Z");
+  for (const hours of [12, 18, 19, 23.9, 24]) {
+    assert.deepEqual(shadowCrawlFreshnessIssues(new Date(now - hours * 36e5).toISOString(), now), []);
+  }
+  assert.deepEqual(shadowCrawlFreshnessIssues(new Date(now - 24.1 * 36e5).toISOString(), now),
+    ["shadow crawl is stale (24.1h)"]);
+});
+
+test("still alerts on missing success, overdue crawls and an explicit tighter threshold", () => {
+  const now = Date.parse("2026-10-30T12:00:00Z");
+  assert.deepEqual(shadowCrawlFreshnessIssues(null, now), ["No successful shadow crawl stage found"]);
+  const completedAt = new Date(now - 19 * 36e5).toISOString();
+  assert.deepEqual(shadowCrawlFreshnessIssues(completedAt, now, 18), ["shadow crawl is stale (19.0h)"]);
+  assert.deepEqual(shadowCrawlFreshnessIssues(new Date(now - 36 * 36e5).toISOString(), now),
+    ["shadow crawl is stale (36.0h)"]);
+});
 
 test("keeps health ok while the latest shadow run is waiting for its guarded deploy", () => {
   const state = buildShadowCutoverState({
