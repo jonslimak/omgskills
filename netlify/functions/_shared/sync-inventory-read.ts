@@ -1,5 +1,8 @@
 import type { Pool } from "pg";
 import { listUserDevices } from "./device-auth.js";
+import { verifiedCatalogHint } from "./github-skill-resolution.js";
+import { withTimeout } from "./http.js";
+import { loadPublishedCatalogIdentity, type PublishedCatalogIdentity } from "./published-catalog.js";
 import { installationFolderFromKey } from "./sync-skill.js";
 import type { RootCoverage } from "./inventory-reconciliation.js";
 import { readLegacySyncInventory } from "./sync-inventory.js";
@@ -15,7 +18,13 @@ export function inventoryReadVersion(req: Request, allowReconciliation = false):
   return 2;
 }
 
-export async function readSyncInventory(pool: Pool, userId: string, version: 1 | 2 | 3, now = new Date()) {
+export async function readSyncInventory(
+  pool: Pool,
+  userId: string,
+  version: 1 | 2 | 3,
+  now = new Date(),
+  loadCatalogIdentity: () => Promise<PublishedCatalogIdentity> = loadPublishedCatalogIdentity,
+) {
   if (version === 1) {
     const { skills } = await readLegacySyncInventory(pool, userId);
     return { skills };
@@ -42,6 +51,15 @@ export async function readSyncInventory(pool: Pool, userId: string, version: 1 |
     // Historical uploads accepted arbitrary URLs. Do not repeat credentials.
     githubUrl: safeRepositoryUrl(row.githubUrl)
   }));
+  // Presence reports store the Mac's catalog hint unverified; link the rows it proves.
+  const hinted = skills.filter((skill) => !skill.catalogSkillId && skill.catalogSkillIdHint && skill.skillMdSha);
+  if (hinted.length) {
+    const identity = await withTimeout(loadCatalogIdentity(), 4_000).catch(() => null);
+    for (const skill of hinted) {
+      const catalogSkillId = verifiedCatalogHint(skill.catalogSkillIdHint, skill.skillMdSha, identity);
+      if (catalogSkillId) Object.assign(skill, { catalogSkillId, identityStatus: "resolved", isLocalOnly: false });
+    }
+  }
   const devices = await listUserDevices(pool, userId, now);
   const reports = await pool.query<{ deviceId: string; lastReportedAt: Date | null; scanCoverage?: RootCoverage[] | null }>(
     version === 3

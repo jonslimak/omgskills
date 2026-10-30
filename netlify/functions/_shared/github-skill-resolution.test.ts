@@ -6,6 +6,7 @@ import {
   groupItemForValidatedGithubSkill,
   resolveCatalogSkillId,
   validateGithubSkill,
+  verifiedCatalogHint,
   type ValidatedGithubSkill,
 } from "./github-skill-resolution.js";
 import type {
@@ -205,4 +206,15 @@ test("a resolved GitHub item uses F1's exact generated catalog page", () => {
       url: "/skills/owner/repo/skill--1234abcd/",
     },
   );
+});
+
+test("a catalog hint links only a published version of that live skill", () => {
+  const catalog = identity(["owner/repo:example", "owner/repo:other"], history(["owner/repo:example", "old/repo:example"]));
+  assert.equal(verifiedCatalogHint("owner/repo:example", sha.toUpperCase(), catalog), "owner/repo:example");
+  assert.equal(verifiedCatalogHint("owner/repo:other", sha, catalog), null, "fingerprint belongs to another skill");
+  assert.equal(verifiedCatalogHint("old/repo:example", sha, catalog), null, "skill no longer published");
+  assert.equal(verifiedCatalogHint("owner/repo:example", "b".repeat(40), catalog), null, "edited locally");
+  assert.equal(verifiedCatalogHint("owner/repo:example", "a".repeat(64), catalog), null, "not a Git blob fingerprint");
+  assert.equal(verifiedCatalogHint(null, sha, catalog), null);
+  assert.equal(verifiedCatalogHint("owner/repo:example", sha, null), null, "catalog unavailable");
 });
