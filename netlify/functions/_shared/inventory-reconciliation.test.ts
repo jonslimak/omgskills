@@ -141,7 +141,11 @@ test("check endpoint rejects query, invalid body and bearer before pool access",
   const malformed = new Request("http://127.0.0.1:8888/api/portal/sync-upload", {
     method: "POST", body: "{", headers: { "Content-Type": "application/json" }
   });
-  assert.equal((await portalSyncUpload(malformed, context, deps)).status, 400);
+  assert.equal((await portalSyncUpload(malformed, context, deps)).status, 401);
+  const authenticatedMalformed = new Request("http://127.0.0.1:8888/api/portal/sync-upload", {
+    method: "POST", body: "{", headers: { Authorization: `Bearer ${credential}` }
+  });
+  assert.equal((await portalSyncUpload(authenticatedMalformed, context, deps)).status, 400);
 });
 
 test("check endpoint retains local deployment gate and existing feature/auth/error boundaries", async () => {

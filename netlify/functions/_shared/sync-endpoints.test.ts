@@ -57,11 +57,46 @@ test("invalid upload contracts and missing/malformed bearer auth cannot reach st
   ]) {
     assert.equal((await portalSyncUpload(request(body), context, deps)).status, 400);
   }
-  assert.equal((await portalSyncUpload(request({ reportVersion: 2, skills: [] }, null), context, deps)).status, 400);
+  assert.equal((await portalSyncUpload(request({ reportVersion: 2, skills: [] }, null), context, deps)).status, 401);
   assert.equal((await portalSyncUpload(request({ reportVersion: 2, skills: [] }, "Bearer bad"), context, deps)).status, 401);
   assert.equal((await portalSyncUpload(request({ reportVersion: 2, skills: [] }), context, {
     ...deps, getPgPool: () => pool, async performSyncUpload() { throw new DeviceAuthError(); }
   })).status, 401);
+});
+
+test("uploads reject absent or malformed credentials before report validation", async () => {
+  const deps = { requireSkillGroupsWebFeature() {}, getPgPool: noDatabase,
+    requireReconciliation: noDatabase, performSyncUpload: noDatabase };
+  for (const body of ["{", "null", "[]", "{}", '{"skills":"bad"}',
+    '{"reportVersion":3,"mode":"bad"}', '{"token":null}', '{"token":"  "}']) {
+    for (const authorization of [undefined, "Bearer bad", "Basic invalid"]) {
+      const req = new Request("https://example.test/api/portal/sync-upload", {
+        method: "POST", body,
+        headers: authorization ? { Authorization: authorization } : {}
+      });
+      assert.equal((await portalSyncUpload(req, context, deps)).status, 401, body);
+    }
+  }
+});
+
+test("credential-bearing uploads retain payload errors and legacy token compatibility", async () => {
+  const deps = { requireSkillGroupsWebFeature() {}, getPgPool: noDatabase,
+    requireReconciliation() {}, performSyncUpload: noDatabase };
+  for (const body of ["{", "null", "[]", '{"skills":"bad"}']) {
+    const req = new Request("https://example.test/api/portal/sync-upload", {
+      method: "POST", body, headers: { Authorization: `Bearer ${credential}` }
+    });
+    assert.equal((await portalSyncUpload(req, context, deps)).status, 400);
+  }
+  assert.equal((await portalSyncUpload(request({ token: "legacy", skills: "bad" }, null), context, deps)).status, 400);
+  const response = await portalSyncUpload(request({ token: "legacy", skills: [] }, null), context, {
+    ...deps, getPgPool: () => pool,
+    async performSyncUpload(_pool, authentication) {
+      assert.deepEqual(authentication, { kind: "legacy", token: "legacy" });
+      return { syncRunId: "legacy-run", syncedSkillCount: 0 };
+    }
+  });
+  assert.equal(response.status, 200);
 });
 
 test("inventory endpoint authenticates before data access and uses only the authenticated owner", async () => {

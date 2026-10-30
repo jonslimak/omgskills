@@ -43,7 +43,16 @@ export async function portalSyncUpload(req: Request, context: Context, dependenc
       deviceCredentialFromRequest(req);
       return secretJsonResponse(req, await (dependencies.readInventoryRevision ?? readInventoryRevision)(getPgPool(), req));
     }
-    const body = await requireJsonObject(req);
+    if (req.headers.has("authorization")) deviceCredentialFromRequest(req);
+    let body: Record<string, unknown>;
+    try {
+      body = await requireJsonObject(req);
+    } catch (error) {
+      // Legacy uploads carry their credential in JSON; unreadable JSON has no credential.
+      if (!req.headers.has("authorization")) throw new DeviceAuthError();
+      throw error;
+    }
+    const authentication = uploadAuthenticationFromRequest(req, body);
     if (body.reportVersion === 2 || body.reportVersion === 3) {
       requireReconciliation();
     } else {
@@ -63,7 +72,6 @@ export async function portalSyncUpload(req: Request, context: Context, dependenc
       requireReconciliation();
       if (new URL(req.url).search) throw new Response("Reconciliation uploads do not accept query parameters", { status: 400 });
     }
-    const authentication = uploadAuthenticationFromRequest(req, body);
     if (reportVersion !== 1 && authentication.kind !== "device") {
       throw new Response("Presence reports require device authorization", { status: 400 });
     }
