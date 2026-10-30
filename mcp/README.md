@@ -14,6 +14,12 @@ Every tool returns structured content (the full fields) plus a short text render
 
 IDs are case-insensitive and accept the web app's `catalog:` prefix. Author handles accept a leading `@`.
 
+Lookup normalization preserves catalog IDs and case-sensitive GitHub file paths.
+Search suppresses known list duplicates; an exact duplicate ID remains readable.
+Renamed-repository aliases and consistent repository star snapshots require catalog
+maintenance, not guessed rewrites in MCP. Search `score` is query-relative;
+`get_skill` omits it rather than returning a misleading zero.
+
 Summary descriptions normalize whitespace and contain at most 160 Unicode characters.
 When shortened, `description_truncated: true` is added; no existing response field
 is renamed or removed. Use `summary: false` or `get_skill` for the original full
