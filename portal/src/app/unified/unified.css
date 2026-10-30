@@ -2721,3 +2721,7 @@
 .ua-dev-item a { display: inline-flex; align-items: center; gap: 4px; color: inherit; text-decoration: none; }
 .ua-dev-item a:hover { color: var(--ua-blue); }
 .ua-dev-item svg { width: 13px; height: 13px; }
+.ua-detail-copy-hint {
+  margin: -8px 0 0;
+  font-size: 12px;
+}

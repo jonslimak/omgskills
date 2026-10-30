@@ -112,6 +112,7 @@ import { descriptionParagraphs, descriptionSummary, whenLead } from "./descripti
 import { Avatar } from "./Avatar";
 import { DataPage } from "./DataPage";
 import { DevelopersPage } from "./DevelopersPage";
+import { isMacDevice } from "./install-command";
 import { SiteFooter } from "./SiteFooter";
 import { saveTheme, storedTheme, type Theme } from "./theme-preference";
 import { trackEvent } from "./analytics";
@@ -451,6 +452,8 @@ export function UnifiedApp({
   supportedAccountViews,
   initialNotice = "",
 }: Props) {
+  // The Mac companion installs skills; elsewhere the copy command is the way to install.
+  const [onMac] = useState(() => isMacDevice());
   const supportsView = (view: View) => !supportedAccountViews || isDiscovery(view) || supportedAccountViews.includes(view);
   const [rail, setRail] = useState(false);
   const [theme, setTheme] = useState<Theme>(() => storedTheme());
@@ -1857,7 +1860,7 @@ export function UnifiedApp({
                 </div>
                 {!panelPending && <>
                 <div className="ua-detail-actions">
-                  {signedIn && publicInstallAction && detail.catalogId && !detail.installed?.isLocalOnly && (
+                  {onMac && signedIn && publicInstallAction && detail.catalogId && !detail.installed?.isLocalOnly && (
                     installOpen ? (
                       <button
                         type="button"
@@ -1879,10 +1882,10 @@ export function UnifiedApp({
                     )
                   )}
                   {detail.installCommand ? (
-                    <button type="button" className="ua-pill ua-detail-copy" aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
+                    <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
                       Copy <Copy />
                     </button>
-                  ) : !(signedIn && publicInstallAction && detail.catalogId) && (
+                  ) : !(onMac && signedIn && publicInstallAction && detail.catalogId) && (
                     <span className="ua-pill">
                       {detail.installed?.isLocalOnly && <Lock />}
                       {detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Local skill" : "Source unavailable"}
@@ -1924,6 +1927,11 @@ export function UnifiedApp({
                     </button>
                   )}
                 </div>
+                {!onMac && detail.installCommand && (
+                  <p className="ua-muted ua-detail-copy-hint">
+                    Paste in your terminal (macOS, Linux or WSL). <a className="ua-link" href="/developers/">Use with any agent (MCP)</a>
+                  </p>
+                )}
                 {installOpen && selected && signedIn && (
                   <div className="ua-install-card">{publicInstallAction?.(selected, !detailPending)}</div>
                 )}
