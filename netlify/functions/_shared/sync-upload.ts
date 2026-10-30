@@ -1,6 +1,7 @@
 import type { Pool, PoolClient } from "pg";
 import { hashToken } from "./crypto.js";
 import {
+  DeviceAuthError,
   deviceCredentialFromRequest,
   requireDeviceToken,
   rollback,
@@ -27,7 +28,13 @@ export function uploadAuthenticationFromRequest(
     }
     return { kind: "device", request: req };
   }
-  return { kind: "legacy", token: requireString(body.token, "token", 500) };
+  let token: string;
+  try {
+    token = requireString(body.token, "token", 500);
+  } catch {
+    throw new DeviceAuthError();
+  }
+  return { kind: "legacy", token };
 }
 
 export async function performSyncUpload(
