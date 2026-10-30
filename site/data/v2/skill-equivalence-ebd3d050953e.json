@@ -1,0 +1,461 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-30T20:50:18.385Z",
+  "groups": [
+    {
+      "id": "eq-012f2167b9e2b890ef5dcff05a89e09f420110f3d28533470ac3a35164a4e425",
+      "memberSkillIds": [
+        "hippocampus-dev/hippocampus:.claude/skills/kubernetes-operations",
+        "hippocampus-dev/hippocampus:.codex/skills/kubernetes-operations"
+      ],
+      "representativeSkillId": "hippocampus-dev/hippocampus:.codex/skills/kubernetes-operations",
+      "preferredSkillIds": {
+        "claude": "hippocampus-dev/hippocampus:.claude/skills/kubernetes-operations",
+        "codex": "hippocampus-dev/hippocampus:.codex/skills/kubernetes-operations"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-16cb26e200229499e8b5c043b258b29142d6bb14d73fe7a0202ea6f1824b09ce",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/invention-structuring",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/invention-structuring"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/invention-structuring",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/invention-structuring",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/invention-structuring"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-1b7b9a47910e6ba71622165fda13e0217223da950e200aba66e34492cf4512ca",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-queue",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-queue"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-queue",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-queue",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-queue"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-44bf6ae671ea0615c9a08fc4a0deb0fb42f55753d903191b7e8d9adcb529a81a",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/auto-review-loop-llm",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-llm"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-llm",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/auto-review-loop-llm",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-llm"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-4507aa418467858ec443d28aaf0b8005fe49dc55786081d0b2d0cb0551d4e177",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/analyze-results",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/analyze-results"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/analyze-results",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/analyze-results",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/analyze-results"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-4f80c874709699a6712d51214c4fb227da4d16bd5a09e8429d8c63b9dad58dae",
+      "memberSkillIds": [
+        "Chachamaru127/claude-code-harness:codex/.codex/skills/breezing",
+        "Chachamaru127/claude-code-harness:skills/breezing"
+      ],
+      "representativeSkillId": "Chachamaru127/claude-code-harness:codex/.codex/skills/breezing",
+      "preferredSkillIds": {
+        "claude": "Chachamaru127/claude-code-harness:skills/breezing",
+        "codex": "Chachamaru127/claude-code-harness:codex/.codex/skills/breezing"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-591e2963804ffdec95345c49de12b6abbe33d9c5cf7873fec7996996a012d1f7",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-plan",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-plan"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-plan",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-plan",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-plan"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-657d63fa3237ef19987c1e5036b6b9b342cbed3174956ffbef3cbfd98bf7242c",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/ablation-planner",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/ablation-planner"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/ablation-planner",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/ablation-planner",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/ablation-planner"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-67faa0782205b69fb987d1ae57f4a2cc31b88e4985ee899681d994067e1adf01",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/dse-loop",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/dse-loop"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/dse-loop",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/dse-loop",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/dse-loop"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-6e93b8d2a70375a9ddeb517e8f53ce9d3ebbcb9345c57545c48c66d39fb8afe4",
+      "memberSkillIds": [
+        "hippocampus-dev/hippocampus:.claude/skills/docker-compose-operations",
+        "hippocampus-dev/hippocampus:.codex/skills/docker-compose-operations"
+      ],
+      "representativeSkillId": "hippocampus-dev/hippocampus:.codex/skills/docker-compose-operations",
+      "preferredSkillIds": {
+        "claude": "hippocampus-dev/hippocampus:.claude/skills/docker-compose-operations",
+        "codex": "hippocampus-dev/hippocampus:.codex/skills/docker-compose-operations"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-7531fa101f84d3a9aa2f577aecbe0d0d309fc705c0d40838490f8dcb523fdfb5",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/figure-spec",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/figure-spec"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/figure-spec",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/figure-spec",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/figure-spec"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-7c7f88f33deef37bf3df48a7ee200909b47eb038b010425d1ac700100fd85b70",
+      "memberSkillIds": [
+        "CongDon1207/AGENTS.md:.claude/skills/ai-artist",
+        "CongDon1207/AGENTS.md:.codex/skills/ai-artist"
+      ],
+      "representativeSkillId": "CongDon1207/AGENTS.md:.codex/skills/ai-artist",
+      "preferredSkillIds": {
+        "claude": "CongDon1207/AGENTS.md:.claude/skills/ai-artist",
+        "codex": "CongDon1207/AGENTS.md:.codex/skills/ai-artist"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-87295fa3d06877136d8f0959678f72ed36dcf3b134f2cde1de5114287c273747",
+      "memberSkillIds": [
+        "hippocampus-dev/hippocampus:.claude/skills/frontend",
+        "hippocampus-dev/hippocampus:.codex/skills/frontend"
+      ],
+      "representativeSkillId": "hippocampus-dev/hippocampus:.codex/skills/frontend",
+      "preferredSkillIds": {
+        "claude": "hippocampus-dev/hippocampus:.claude/skills/frontend",
+        "codex": "hippocampus-dev/hippocampus:.codex/skills/frontend"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-9ad188ef2873299e2e7b19de63b26daa06f09cac7f0b586ff831367d8e2310c9",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/claims-drafting",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/claims-drafting"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/claims-drafting",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/claims-drafting",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/claims-drafting"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-a6dae46bdc5ad42e1ff46f0fd879067d89196cfa356108be0a541dda9988ec96",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/feishu-notify",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/feishu-notify"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/feishu-notify",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/feishu-notify",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/feishu-notify"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-bc97f46b2664fac1798d35b687e0a95ba9682f3df4cd051c78ff454ceeac8361",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/alphaxiv",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/alphaxiv"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/alphaxiv",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/alphaxiv",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/alphaxiv"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-bd7dc5d7f6c8c00372b632f1a74bb919c8fde9c43b61f40b4e036aebe48696aa",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-audit",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-audit"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-audit",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-audit",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-audit"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-c8878c80a6c75c8b4d38959805c615559f8787a71219c303c889830689a473dc",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/auto-review-loop-minimax",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-minimax"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-minimax",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/auto-review-loop-minimax",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/auto-review-loop-minimax"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-d37b34f26ede9e8af5e57de3a7f4ae0aab2bb6f2bff86d3cdf67c07538b4a345",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/arxiv",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/arxiv"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/arxiv",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/arxiv",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/arxiv"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-db503cdfb3f709f81f5a7551c5c33f2588deec6d8f8d34e806e697c7a0696cee",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/citation-audit",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/citation-audit"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/citation-audit",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/citation-audit",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/citation-audit"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-eabb36d06ab5bd1e5b6f21b26c7f6f48791f678d559008144630c190cfb11aec",
+      "memberSkillIds": [
+        "hippocampus-dev/hippocampus:.claude/skills/browser-automation",
+        "hippocampus-dev/hippocampus:.codex/skills/browser-automation"
+      ],
+      "representativeSkillId": "hippocampus-dev/hippocampus:.codex/skills/browser-automation",
+      "preferredSkillIds": {
+        "claude": "hippocampus-dev/hippocampus:.claude/skills/browser-automation",
+        "codex": "hippocampus-dev/hippocampus:.codex/skills/browser-automation"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match"
+      ]
+    },
+    {
+      "id": "eq-edb44c2581c60361862592ce3e63343c588095640e8d8f7a51bf27aea0bb9092",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-bridge",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-bridge"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-bridge",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/experiment-bridge",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/experiment-bridge"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    },
+    {
+      "id": "eq-f98e5565926686380408bf65ad26a217d5588dad8936757dd36bb25aac3f7519",
+      "memberSkillIds": [
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/deepxiv",
+        "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/deepxiv"
+      ],
+      "representativeSkillId": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/deepxiv",
+      "preferredSkillIds": {
+        "claude": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/deepxiv",
+        "codex": "wanshuiyin/Auto-claude-code-research-in-sleep:skills/skills-codex/deepxiv"
+      },
+      "confidence": "high",
+      "evidence": [
+        "same-repo",
+        "exact-name",
+        "agent-path",
+        "description-match",
+        "manual-approval"
+      ]
+    }
+  ]
+}

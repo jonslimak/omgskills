@@ -1,0 +1,1767 @@
+{
+ "count": 412,
+ "byGroup": {
+  "invalid-frontmatter": 237,
+  "unverified": 109,
+  "still-present": 66
+ },
+ "skills": [
+  {
+   "id": "Aks-4125/kmp-glassmorphism-skill",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "ComeOnOliver/skillshub:bats-testing-patterns",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "ComeOnOliver/skillshub:tanstack-router",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "ComeOnOliver/skillshub:wp-playground",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "CongDon1207/AGENTS.md:.opencode/skills/docs-seeker",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "CongDon1207/AGENTS.md:.opencode/skills/document-skills/docx",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "CongDon1207/AGENTS.md:.opencode/skills/frontend-design",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "FlorianBruniaux/ccboard:.claude/skills/backend-architect",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "FlorianBruniaux/ccboard:.claude/skills/code-simplifier",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "FlorianBruniaux/ccboard:.claude/skills/design-patterns",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "FlorianBruniaux/ccboard:.claude/skills/issue-triage",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "GPTomics/bioSkills:workflows/cnv-pipeline",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "I194/PMTools_2.0:canary",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "IsmaelMartinez/delegate-local",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "JovieInc/Jovie:benchmark",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "JovieInc/Jovie:canary",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "JovieInc/Jovie:codex",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "JovieInc/Jovie:design-html",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "JovieInc/Jovie:investigate",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "JovieInc/Jovie:office-hours",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "JovieInc/Jovie:plan-eng-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "JovieInc/Jovie:retro",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "JovieInc/Jovie:setup-deploy",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Kaminoikari/product-playbook",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "KevinYoung-Kw/vibe-resume-skill",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "MCrank/code-compress:.claude/skills/cli-expert",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "MahmoudHalat/slop-cop",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-adr-author",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-adr-consult",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-docstring-author",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-rtd-auditor",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-rtd-writer",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-skill-audit",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-skill-creator",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-skill-registry-sync",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Patasse97/claude-skills:agenthub",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Patasse97/claude-skills:terraform-patterns",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "RicherTunes/Brainarr:.claude/skills/container-deployment",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "TencentBlueKing/bk-bcs:virtual-list",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "TheOrcDev/videorc:videorc-design",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "TomLeeLive/openclaw-unity-skill",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "TomLeeLive/openclaw-unreal-skill",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "YanivZalach/IceGraph:frontend-smoke-test",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "a5c-ai/babysitter:library/methodologies/cc10x/skills/debugging-patterns",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "a5c-ai/babysitter:library/methodologies/claudekit/skills/file-guard",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "a5c-ai/babysitter:library/methodologies/gsd/skills/git-integration",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:alert-manager",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:backlink-analyzer",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:competitor-analysis",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:content-gap-analysis",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:content-quality-auditor",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:content-refresher",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:domain-authority-auditor",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:entity-optimizer",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:geo-content-optimizer",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:internal-linking-optimizer",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:keyword-research",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:memory-management",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:meta-tags-optimizer",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:monitor/alert-manager",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:on-page-seo-auditor",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:performance-reporter",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:rank-tracker",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:schema-markup-generator",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:seo-content-writer",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:serp-analysis",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:technical-seo-checker",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "abustamam/portfolio-blog:browse",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "abustamam/portfolio-blog:gstack-upgrade",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "abustamam/portfolio-blog:setup-browser-cookies",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "agatx/serenada:browse",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "agatx/serenada:qa-only",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "agatx/serenada:ship",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "alirezarezvani/claude-skills:engineering-team/playwright-pro/skills/init",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "alirezarezvani/claude-skills:engineering/agenthub/skills/init",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "andr81/pers-assist:.claude/skills/add-med-record",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "bankrbot/skills:bankr",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "bmad-code-org/bmad-method:bmad-retrospective",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:autoplan",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:canary",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:cso",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:design-shotgun",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:devex-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:health",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:investigate",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:office-hours",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:open-gstack-browser",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:plan-design-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:setup-browser-cookies",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:autoplan",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:benchmark",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:codex",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:cso",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:design-consultation",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:investigate",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:office-hours",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:plan-ceo-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:plan-design-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "danielmiessler/LifeOS:LifeOS/install/skills/BiasCheck",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "danielmiessler/LifeOS:LifeOS/install/skills/DetectAI",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "danielmiessler/LifeOS:LifeOS/install/skills/ThreatModel",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "danielmiessler/LifeOS:LifeOS/install/skills/Trim",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "djfksjd/ir-search",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "dmlguq456/agent_setting:audit",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "dmlguq456/claude_setting:draft-strategy",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "dmlguq456/hearting:audit",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "elithril/blender-kiln",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "faionfaion/faion-network:faion-claude-code",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "forbotsake/forbotsake:canary",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "github/gh-aw:reporting",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "google/capsem:dev-skills",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "gr1m0h/dot:learn",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "hec-ovi/research-skill",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "hotdata-dev/hotdata-cli:hotdata",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "hyt315/notebook-video",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "jamie950315/ccsync:skills",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "jantichy/claude:project",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "jleechanorg/claude-commands:chrome-superpowers-reference",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kaivyy/kabot:voice-call",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "khengyun/notebooklm-experts-skill",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:autoplan",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:benchmark",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:codex",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:cso",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:devex-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:office-hours",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:open-gstack-browser",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:pair-agent",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:plan-design-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:plan-devex-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:qa",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:retro",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:setup-deploy",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:ship",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "lachieh/babytalk:review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "leyuan0602-glitch/cc-claude-codex",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "lunashia/code-generation-skill",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "melodic-software/claude-code-plugins:plugins/enterprise-architecture/skills/event-storming",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "microsoft/agent-framework:verify-samples-tool",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "nelson820125/iforgeai:zh-CN/copilot/skills/devops-engineer",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "noncuro/agent-wormhole:agent_wormhole",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "nuroctane/nur-cli:ship",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "pageel/para-workspace:page-map",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "qingxuantang/migrate-openclaw-to-cc-skill:deploy-telegram",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "sanctifai/skills",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:browse",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:canary",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:codex",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:cso",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:design-html",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:devex-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:document-release",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:health",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:investigate",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:land-and-deploy",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:learn",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:office-hours",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:open-gstack-browser",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:plan-ceo-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:plan-design-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:qa-only",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:retro",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:benchmark",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:browse",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:connect-chrome",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:gstack-upgrade",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:investigate",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:open-gstack-browser",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:setup-deploy",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:benchmark",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:design-shotgun",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:gstack",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:plan-design-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:plan-eng-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:ship",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "stancsz/meow:second-brain",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:autoplan",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:benchmark",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:benchmark-models",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:codex",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:context-save",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:cso",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:design-consultation",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:design-html",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:devex-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:document-release",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:gstack",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:health",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:investigate",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:make-pdf",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:office-hours",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:open-gstack-browser",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:pair-agent",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:plan-ceo-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:plan-design-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:plan-devex-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:plan-eng-review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:qa",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:qa-only",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:retro",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:review",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:setup-deploy",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "subodhkolhe/campfire-analyst",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "tdimino/claude-code-minoan:skills/integration-automation/cloudflare",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "testdino-hq/playwright-skill",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "thedotmack/claude-mem:mem-search",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "vahnxu/doubao-asr",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "vchelaru/Gum:gum-layout",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "vercel-labs/next-browser:next-browser",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "vitorpamplona/amethyst:compose-expert",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "vitorpamplona/amethyst:kotlin-multiplatform",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "vivalence/Vivalence:pull-prod-mountpoint",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:convex",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-agents",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-best-practices",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-cron-jobs",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-file-storage",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-http-actions",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-migrations",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-realtime",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-security-audit",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-security-check",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-agents",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-best-practices",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-cron-jobs",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-file-storage",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-http-actions",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-migrations",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-realtime",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-security-audit",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-security-check",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "windmill-labs/windmill:rust-backend",
+   "group": "invalid-frontmatter"
+  },
+  {
+   "id": "Catsofsuffering/CCGS:skills",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "GCWing/BitFun:gstack-review",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "MMEHDI0606/protom:loki-mode",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "SeaLion-hub/DICEE:autoplan",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "aaronjmars/aeon:search-skill",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "affaan-m/everything-claude-code:frontend-design",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:ai-image",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:auto-create-skill",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:clawdraw",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:dtek-light-check",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:feishu-skills-kit",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:hhxg-market",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:marriott",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:mijia",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:note-writer",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:safe-encryption",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:seedance-video-byteplus",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:tesy",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:url-reader",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:wechat-article-to-markdown",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:widget",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:adhx",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:api-security-testing",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:autoplan",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:configure-ecc",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:context-save",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:daily-meeting-update",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:design-consultation",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:makepad-basics",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:mobile-cicd",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:network-rca",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:open-gstack-browser",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:pageclaw-test",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:personalize-skills",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:readme-updater",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:realm",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:repo-scan",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:skill-optimizer",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:skills-search",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:xcodebuildmcp-structured-output-review",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "getsentry/XcodeBuildMCP:xcodebuildmcp-structured-output-review",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "ibragimov-oasis/vibe-coder:antigravity-blueprint",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "ibragimov-oasis/vibe-coder:blueprint",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "jlowin/fastmcp:.claude/skills/code-review",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "jnuyens/gsd-plugin:undo",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "masharratt/claude-flow-novice:.claude/skills/cfn-routing-config/lib/hybrid",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "ngocsangyem/MeowKit:advise",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "ngocsangyem/MeowKit:brainstorming",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "ngocsangyem/MeowKit:ship",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "opusgamelabs/game-creator:add-audio",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "opusgamelabs/game-creator:design-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "opusgamelabs/game-creator:improve-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "opusgamelabs/game-creator:make-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "opusgamelabs/game-creator:monetize-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "opusgamelabs/game-creator:promo-video",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "opusgamelabs/game-creator:qa-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "opusgamelabs/game-creator:quick-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "opusgamelabs/game-creator:review-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "opusgamelabs/game-creator:use-template",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "shihyu/jason_note:blueprint",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "shihyu/jason_note:strategic-compact",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check"
+  },
+  {
+   "id": "stevenwinnick/ai-agent-config:cloning-repos",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "stevenwinnick/ai-agent-config:initializing-repos",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "sunholo-data/ailang_bootstrap:skills/ailang-debug",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "vib795/copilot-anatomy:gstack-gstack-upgrade",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "vib795/copilot-anatomy:gstack-investigate",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "vib795/copilot-anatomy:gstack-open-gstack-browser",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "vib795/copilot-anatomy:gstack-setup-deploy",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "vib795/copilot-anatomy:gstack-ship",
+   "group": "unverified",
+   "why": "folder named after the skill exists"
+  },
+  {
+   "id": "K-Dense-AI/claude-scientific-writer:skills/document-skills/docx",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "OutlineDriven/odin-claude-plugin:skills/init",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "athina-ai/goose-skills:skills/capabilities/company-contact-finder",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "athina-ai/goose-skills:skills/capabilities/job-posting-intent",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "baidu-netdisk/bdpan-storage:skills/baidu-netdisk",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "gooseworks-ai/goose-skills:skills/capabilities/lead-qualification",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "gooseworks-ai/goose-skills:skills/composites/ad-angle-miner",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "gooseworks-ai/goose-skills:skills/composites/ad-campaign-analyzer",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "gooseworks-ai/goose-skills:skills/composites/goose-graphics-create-style",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "hyperlane-xyz/hyperlane-monorepo:.claude/skills/alert-validator-checkpoints-inconsistent",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/1password-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/az-aks-agent-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/azure-ad-sso-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/cloudflare-dns-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/consulting-design-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/defectdojo-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/direnv-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/external-dns-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/iterm2-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/keyvault-csi-driver-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/knative-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "lobehub/lobehub:packages/builtin-skills/src/acceptance",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "open-agreements/open-agreements:skills/canonical-markdown-authoring",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "open-agreements/open-agreements:skills/cloud-service-agreement",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "personamanagmentlayer/pcl:stdlib/domains/education",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "personamanagmentlayer/pcl:stdlib/domains/farming",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "personamanagmentlayer/pcl:stdlib/domains/healthcare",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "pleaseai/claude-code-plugins:.claude/skills/plugin-builder",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "wshobson/agents:plugins/database-design/skills/postgresql",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "xr843/Master-skill:prebuilt/compare",
+   "group": "unverified",
+   "why": "new folder does not match the ID"
+  },
+  {
+   "id": "Vladimir-Human/humanizer-ru",
+   "group": "unverified",
+   "why": "two skills resolve to this path"
+  },
+  {
+   "id": "Vladimir-Human/humanizer-ru:humanizer-ru",
+   "group": "unverified",
+   "why": "two skills resolve to this path"
+  },
+  {
+   "id": "clawdbot/clawdbot:skills/slack",
+   "group": "unverified",
+   "why": "re-read at the new path did not match"
+  },
+  {
+   "id": "clawdbot/clawdbot:skills/voice-call",
+   "group": "unverified",
+   "why": "re-read at the new path did not match"
+  },
+  {
+   "id": "clawdbot/clawdbot:skills/wacli",
+   "group": "unverified",
+   "why": "re-read at the new path did not match"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/marketing/skills/approval-workflow",
+   "group": "unverified",
+   "why": "re-read at the new path did not match"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/marketing/skills/data-pipeline",
+   "group": "unverified",
+   "why": "re-read at the new path did not match"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/sdlc/skills/artifact-orchestration",
+   "group": "unverified",
+   "why": "re-read at the new path did not match"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/sdlc/skills/gate-evaluation",
+   "group": "unverified",
+   "why": "re-read at the new path did not match"
+  },
+  {
+   "id": "nvidia/nemo-rl:cicd",
+   "group": "unverified",
+   "why": "re-read at the new path did not match"
+  },
+  {
+   "id": "IsKenKenYa/1Panel-Client:.claude/skills/agent-memory-mcp",
+   "group": "still-present"
+  },
+  {
+   "id": "IsKenKenYa/1Panel-Client:.cursor/skills/flutter-expert",
+   "group": "still-present"
+  },
+  {
+   "id": "IsKenKenYa/Open1PanelApp:.claude/skills/flutter-development",
+   "group": "still-present"
+  },
+  {
+   "id": "Receiptor-AI/bookkeeping-skills",
+   "group": "still-present"
+  },
+  {
+   "id": "WenJunDuan/Rlues:architect-doc",
+   "group": "still-present"
+  },
+  {
+   "id": "WenJunDuan/Rlues:brainstorm",
+   "group": "still-present"
+  },
+  {
+   "id": "WenJunDuan/Rlues:compound",
+   "group": "still-present"
+  },
+  {
+   "id": "algorithmbasics/gstack",
+   "group": "still-present"
+  },
+  {
+   "id": "andycungkrinx91/konoha:performing-blind-ssrf-exploitation",
+   "group": "still-present"
+  },
+  {
+   "id": "antoniojvrf/vibecoding-security",
+   "group": "still-present"
+  },
+  {
+   "id": "broomva/bstack",
+   "group": "still-present"
+  },
+  {
+   "id": "broomva/control-metalayer",
+   "group": "still-present"
+  },
+  {
+   "id": "bundie-fi/skills",
+   "group": "still-present"
+  },
+  {
+   "id": "grcwarlock/warlock-password",
+   "group": "still-present"
+  },
+  {
+   "id": "hleliofficiel/ExaAiAgent",
+   "group": "still-present"
+  },
+  {
+   "id": "j5ik2o/ai-tools:skill",
+   "group": "still-present"
+  },
+  {
+   "id": "jl-cmd/claude-dev-env:pr-fix-protocol",
+   "group": "still-present"
+  },
+  {
+   "id": "jleechanorg/claude-commands:ao-parameter-fidelity",
+   "group": "still-present"
+  },
+  {
+   "id": "jleechanorg/claude-commands:cmux-codex-autoapprove",
+   "group": "still-present"
+  },
+  {
+   "id": "jleechanorg/claude-commands:launchd-auto-cleanup",
+   "group": "still-present"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/marketing/skills/audience-synthesis",
+   "group": "still-present"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/marketing/skills/brand-compliance",
+   "group": "still-present"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/marketing/skills/competitive-intel",
+   "group": "still-present"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/sdlc/skills/architecture-evolution",
+   "group": "still-present"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/sdlc/skills/decision-support",
+   "group": "still-present"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/sdlc/skills/incident-triage",
+   "group": "still-present"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/utils/skills/artifact-metadata",
+   "group": "still-present"
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/utils/skills/claims-validator",
+   "group": "still-present"
+  },
+  {
+   "id": "konippi/aidlc-skill",
+   "group": "still-present"
+  },
+  {
+   "id": "legotec73/gstack",
+   "group": "still-present"
+  },
+  {
+   "id": "matiaspalmac/fivem-audit-skill",
+   "group": "still-present"
+  },
+  {
+   "id": "mechanicianwang/skillkit-find-skill",
+   "group": "still-present"
+  },
+  {
+   "id": "metafeng/fangxin-image-gen",
+   "group": "still-present"
+  },
+  {
+   "id": "mnbplus/resource-hunter",
+   "group": "still-present"
+  },
+  {
+   "id": "modelarts-agent/huawei-cloud-modelarts-skill",
+   "group": "still-present"
+  },
+  {
+   "id": "mway/dotfiles:skill-creator",
+   "group": "still-present"
+  },
+  {
+   "id": "natdexterra/generate-design-system",
+   "group": "still-present"
+  },
+  {
+   "id": "ni1o1/claude-skill-transbigdata",
+   "group": "still-present"
+  },
+  {
+   "id": "oliverschmidtprietz/GDPR-Breach-Sentinel",
+   "group": "still-present"
+  },
+  {
+   "id": "oliverschmidtprietz/GDPR-DPIA-Sentinel",
+   "group": "still-present"
+  },
+  {
+   "id": "oliverschmidtprietz/GDPR-Privacy-Notice-EU",
+   "group": "still-present"
+  },
+  {
+   "id": "onlypfachi/chief",
+   "group": "still-present"
+  },
+  {
+   "id": "opusgamelabs/game-creator:add-3d-assets",
+   "group": "still-present"
+  },
+  {
+   "id": "opusgamelabs/game-creator:add-assets",
+   "group": "still-present"
+  },
+  {
+   "id": "opusgamelabs/game-creator:add-feature",
+   "group": "still-present"
+  },
+  {
+   "id": "opusgamelabs/game-creator:fetch-tweet",
+   "group": "still-present"
+  },
+  {
+   "id": "opusgamelabs/game-creator:game-deploy",
+   "group": "still-present"
+  },
+  {
+   "id": "opusgamelabs/game-creator:game-qa",
+   "group": "still-present"
+  },
+  {
+   "id": "opusgamelabs/game-creator:meshyai",
+   "group": "still-present"
+  },
+  {
+   "id": "opusgamelabs/game-creator:record-promo",
+   "group": "still-present"
+  },
+  {
+   "id": "opusgamelabs/game-creator:worldlabs",
+   "group": "still-present"
+  },
+  {
+   "id": "phatblat/dotfiles:artifact-message-bus",
+   "group": "still-present"
+  },
+  {
+   "id": "piiiico/agentlair-email-skill",
+   "group": "still-present"
+  },
+  {
+   "id": "ranvirsingh/speckit",
+   "group": "still-present"
+  },
+  {
+   "id": "vercel/next.js:.agents/skills/backport-pr",
+   "group": "still-present"
+  },
+  {
+   "id": "vercel/next.js:.agents/skills/create-pr",
+   "group": "still-present"
+  },
+  {
+   "id": "vercel/next.js:.agents/skills/pr-status-triage",
+   "group": "still-present"
+  },
+  {
+   "id": "vercel/next.js:skills/next-cache-components-optimizer",
+   "group": "still-present"
+  },
+  {
+   "id": "vercel/next.js:skills/next-dev-loop",
+   "group": "still-present"
+  },
+  {
+   "id": "vercel/next.js:skills/next-partial-prefetching-adoption",
+   "group": "still-present"
+  },
+  {
+   "id": "vincentventalon/claude-code-video-editing-skill",
+   "group": "still-present"
+  },
+  {
+   "id": "wxin9/cc-skill-product-lifecycle",
+   "group": "still-present"
+  },
+  {
+   "id": "Kemerd/video-use-premiere",
+   "group": "still-present"
+  },
+  {
+   "id": "OwenPawl/ghidra-re-skill",
+   "group": "still-present"
+  },
+  {
+   "id": "VsevolodUstinov/openclaw-skill-claude-code",
+   "group": "still-present"
+  },
+  {
+   "id": "Zaious/a1expert-linkedin-coach",
+   "group": "still-present"
+  }
+ ]
+}
