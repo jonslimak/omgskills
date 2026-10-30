@@ -1,6 +1,20 @@
 {
-  "count": 153,
+  "count": 175,
   "skills": [
+    {
+      "id": "491034170/expert-review-panel",
+      "replacementId": "tianmind-studio/expert-review-panel",
+      "from": "491034170/expert-review-panel",
+      "to": "tianmind-studio/expert-review-panel",
+      "sameContent": true
+    },
+    {
+      "id": "adamaiken89/learn-anything",
+      "replacementId": "adamaiken89/learn-something",
+      "from": "adamaiken89/learn-anything",
+      "to": "adamaiken89/learn-something",
+      "sameContent": true
+    },
     {
       "id": "affaan-m/everything-claude-code:documentation-lookup",
       "replacementId": "affaan-m/ecc:documentation-lookup",
@@ -625,6 +639,13 @@
       "sameContent": true
     },
     {
+      "id": "affaan-m/everything-claude-code:skills/strategic-compact",
+      "replacementId": "affaan-m/ecc:strategic-compact",
+      "from": "affaan-m/everything-claude-code",
+      "to": "affaan-m/ecc",
+      "sameContent": false
+    },
+    {
       "id": "affaan-m/everything-claude-code:social-graph-ranker",
       "replacementId": "affaan-m/ecc:social-graph-ranker",
       "from": "affaan-m/everything-claude-code",
@@ -658,6 +679,13 @@
       "from": "affaan-m/everything-claude-code",
       "to": "affaan-m/ECC",
       "sameContent": true
+    },
+    {
+      "id": "affaan-m/everything-claude-code:strategic-compact",
+      "replacementId": "affaan-m/ecc:strategic-compact",
+      "from": "affaan-m/everything-claude-code",
+      "to": "affaan-m/ecc",
+      "sameContent": false
     },
     {
       "id": "affaan-m/everything-claude-code:swift-actor-persistence",
@@ -765,10 +793,52 @@
       "sameContent": true
     },
     {
-      "id": "jabrena/cursor-rules-java:skills/151-java-performance-jmeter",
-      "replacementId": "jabrena/plinth:151-java-performance-jmeter",
-      "from": "jabrena/cursor-rules-java",
-      "to": "jabrena/plinth",
+      "id": "akillness/oh-my-skills:zeude",
+      "replacementId": "akillness/jeo-skills:zeude",
+      "from": "akillness/oh-my-skills",
+      "to": "akillness/jeo-skills",
+      "sameContent": true
+    },
+    {
+      "id": "AlexZio00/claude-code-skills:session-checkpoint",
+      "replacementId": "AlexZio00/sovereign-skills:session-checkpoint",
+      "from": "AlexZio00/claude-code-skills",
+      "to": "AlexZio00/sovereign-skills",
+      "sameContent": true
+    },
+    {
+      "id": "alinaqi/claude-bootstrap:skills/code-review",
+      "replacementId": "alinaqi/maggy:code-review",
+      "from": "alinaqi/claude-bootstrap",
+      "to": "alinaqi/maggy",
+      "sameContent": true
+    },
+    {
+      "id": "Alpha-Park/genspark-workspace-skill",
+      "replacementId": "Alpha-Park/genpark-workspace-skill",
+      "from": "Alpha-Park/genspark-workspace-skill",
+      "to": "alpha-park/genpark-workspace-skill",
+      "sameContent": true
+    },
+    {
+      "id": "casterkay/gurutalk",
+      "replacementId": "casterkay/gurutalks",
+      "from": "casterkay/gurutalk",
+      "to": "casterkay/gurutalks",
+      "sameContent": true
+    },
+    {
+      "id": "cuic19053-hue/-skills-",
+      "replacementId": "cuic19053-hue/awesome-student-ai-skills",
+      "from": "cuic19053-hue/-skills-",
+      "to": "cuic19053-hue/awesome-student-ai-skills",
+      "sameContent": true
+    },
+    {
+      "id": "danielmiessler/Personal_AI_Infrastructure:BeCreative",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/BeCreative",
+      "from": "danielmiessler/Personal_AI_Infrastructure",
+      "to": "danielmiessler/lifeos",
       "sameContent": true
     },
     {
@@ -818,6 +888,97 @@
       "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Telos",
       "from": "danielmiessler/Personal_AI_Infrastructure",
       "to": "danielmiessler/LifeOS",
+      "sameContent": true
+    },
+    {
+      "id": "Devesh-Shirsath/product-ui-illustrations",
+      "replacementId": "Devesh-Shirsath/spotkit",
+      "from": "Devesh-Shirsath/product-ui-illustrations",
+      "to": "devesh-shirsath/spotkit",
+      "sameContent": true
+    },
+    {
+      "id": "DevOtts/fable-it",
+      "replacementId": "DevOtts/build-it",
+      "from": "DevOtts/fable-it",
+      "to": "devotts/build-it",
+      "sameContent": true
+    },
+    {
+      "id": "helloo1568/image-ppt",
+      "replacementId": "helloo1568/slidemuse",
+      "from": "helloo1568/image-ppt",
+      "to": "helloo1568/slidemuse",
+      "sameContent": true
+    },
+    {
+      "id": "jabrena/cursor-rules-java:skills/151-java-performance-jmeter",
+      "replacementId": "jabrena/plinth:151-java-performance-jmeter",
+      "from": "jabrena/cursor-rules-java",
+      "to": "jabrena/plinth",
+      "sameContent": true
+    },
+    {
+      "id": "leejpsd/typescript-react-patterns",
+      "replacementId": "leejpsd/typescript-react-nextjs-patterns",
+      "from": "leejpsd/typescript-react-patterns",
+      "to": "leejpsd/typescript-react-nextjs-patterns",
+      "sameContent": true
+    },
+    {
+      "id": "LucasSantana-Dev/ai-dev-toolkit:adt-add",
+      "replacementId": "LucasSantana-Dev/forgekit:adt-add",
+      "from": "LucasSantana-Dev/ai-dev-toolkit",
+      "to": "LucasSantana-Dev/forgekit",
+      "sameContent": true
+    },
+    {
+      "id": "LucasSantana-Dev/ai-dev-toolkit:adt-plugin-audit",
+      "replacementId": "LucasSantana-Dev/forgekit:adt-plugin-audit",
+      "from": "LucasSantana-Dev/ai-dev-toolkit",
+      "to": "LucasSantana-Dev/forgekit",
+      "sameContent": true
+    },
+    {
+      "id": "LucasSantana-Dev/ai-dev-toolkit:adt-route",
+      "replacementId": "LucasSantana-Dev/forgekit:adt-route",
+      "from": "LucasSantana-Dev/ai-dev-toolkit",
+      "to": "LucasSantana-Dev/forgekit",
+      "sameContent": true
+    },
+    {
+      "id": "LucasSantana-Dev/ai-dev-toolkit:mac-optimize",
+      "replacementId": "LucasSantana-Dev/forgekit:mac-optimize",
+      "from": "LucasSantana-Dev/ai-dev-toolkit",
+      "to": "LucasSantana-Dev/forgekit",
+      "sameContent": true
+    },
+    {
+      "id": "LucasSantana-Dev/ai-dev-toolkit:skill-md-adoption",
+      "replacementId": "LucasSantana-Dev/forgekit:skill-md-adoption",
+      "from": "LucasSantana-Dev/ai-dev-toolkit",
+      "to": "LucasSantana-Dev/forgekit",
+      "sameContent": true
+    },
+    {
+      "id": "LucasSantana-Dev/ai-dev-toolkit:sync-ai-tools",
+      "replacementId": "LucasSantana-Dev/forgekit:sync-ai-tools",
+      "from": "LucasSantana-Dev/ai-dev-toolkit",
+      "to": "LucasSantana-Dev/forgekit",
+      "sameContent": true
+    },
+    {
+      "id": "LucasSantana-Dev/ai-dev-toolkit:warp-ai-setup",
+      "replacementId": "LucasSantana-Dev/forgekit:warp-ai-setup",
+      "from": "LucasSantana-Dev/ai-dev-toolkit",
+      "to": "LucasSantana-Dev/forgekit",
+      "sameContent": true
+    },
+    {
+      "id": "majiayu000/claude-arsenal:xiaohongshu",
+      "replacementId": "majiayu000/spellbook:xiaohongshu",
+      "from": "majiayu000/claude-arsenal",
+      "to": "majiayu000/spellbook",
       "sameContent": true
     },
     {
@@ -891,62 +1052,6 @@
       "sameContent": true
     },
     {
-      "id": "LucasSantana-Dev/ai-dev-toolkit:adt-add",
-      "replacementId": "LucasSantana-Dev/forgekit:adt-add",
-      "from": "LucasSantana-Dev/ai-dev-toolkit",
-      "to": "LucasSantana-Dev/forgekit",
-      "sameContent": true
-    },
-    {
-      "id": "LucasSantana-Dev/ai-dev-toolkit:adt-plugin-audit",
-      "replacementId": "LucasSantana-Dev/forgekit:adt-plugin-audit",
-      "from": "LucasSantana-Dev/ai-dev-toolkit",
-      "to": "LucasSantana-Dev/forgekit",
-      "sameContent": true
-    },
-    {
-      "id": "LucasSantana-Dev/ai-dev-toolkit:adt-route",
-      "replacementId": "LucasSantana-Dev/forgekit:adt-route",
-      "from": "LucasSantana-Dev/ai-dev-toolkit",
-      "to": "LucasSantana-Dev/forgekit",
-      "sameContent": true
-    },
-    {
-      "id": "LucasSantana-Dev/ai-dev-toolkit:mac-optimize",
-      "replacementId": "LucasSantana-Dev/forgekit:mac-optimize",
-      "from": "LucasSantana-Dev/ai-dev-toolkit",
-      "to": "LucasSantana-Dev/forgekit",
-      "sameContent": true
-    },
-    {
-      "id": "LucasSantana-Dev/ai-dev-toolkit:skill-md-adoption",
-      "replacementId": "LucasSantana-Dev/forgekit:skill-md-adoption",
-      "from": "LucasSantana-Dev/ai-dev-toolkit",
-      "to": "LucasSantana-Dev/forgekit",
-      "sameContent": true
-    },
-    {
-      "id": "LucasSantana-Dev/ai-dev-toolkit:sync-ai-tools",
-      "replacementId": "LucasSantana-Dev/forgekit:sync-ai-tools",
-      "from": "LucasSantana-Dev/ai-dev-toolkit",
-      "to": "LucasSantana-Dev/forgekit",
-      "sameContent": true
-    },
-    {
-      "id": "LucasSantana-Dev/ai-dev-toolkit:warp-ai-setup",
-      "replacementId": "LucasSantana-Dev/forgekit:warp-ai-setup",
-      "from": "LucasSantana-Dev/ai-dev-toolkit",
-      "to": "LucasSantana-Dev/forgekit",
-      "sameContent": true
-    },
-    {
-      "id": "alinaqi/claude-bootstrap:skills/code-review",
-      "replacementId": "alinaqi/maggy:code-review",
-      "from": "alinaqi/claude-bootstrap",
-      "to": "alinaqi/maggy",
-      "sameContent": true
-    },
-    {
       "id": "mr-daedalium/ostack:codex",
       "replacementId": "mr-daedalium/ostack-saas:codex",
       "from": "mr-daedalium/ostack",
@@ -975,6 +1080,13 @@
       "sameContent": true
     },
     {
+      "id": "rexleimo/rex-cli:search-first",
+      "replacementId": "rexleimo/aios:search-first",
+      "from": "rexleimo/rex-cli",
+      "to": "rexleimo/aios",
+      "sameContent": true
+    },
+    {
       "id": "rkz91/coco:brain-export",
       "replacementId": "coco-research/coco:brain-export",
       "from": "rkz91/coco",
@@ -996,6 +1108,13 @@
       "sameContent": true
     },
     {
+      "id": "roger52027/ecommerce-website-data-openclaw-skills",
+      "replacementId": "roger52027/ecommerce-website-data",
+      "from": "roger52027/ecommerce-website-data-openclaw-skills",
+      "to": "roger52027/ecommerce-website-data",
+      "sameContent": true
+    },
+    {
       "id": "ryan-ressmeyer/llm-skills:paper-summarize",
       "replacementId": "ryan-ressmeyer/agent-config:paper-summarize",
       "from": "ryan-ressmeyer/llm-skills",
@@ -1010,59 +1129,17 @@
       "sameContent": true
     },
     {
-      "id": "timurgaleev/tstackvibe:land-and-deploy",
-      "replacementId": "timurgaleev/vibestack:land-and-deploy",
-      "from": "timurgaleev/tstackvibe",
-      "to": "timurgaleev/vibestack",
+      "id": "rylsherdamz-rgb/stellar-agentic-framework",
+      "replacementId": "rylsherdamz-rgb/stellar-forge",
+      "from": "rylsherdamz-rgb/stellar-agentic-framework",
+      "to": "rylsherdamz-rgb/stellar-forge",
       "sameContent": true
     },
     {
-      "id": "majiayu000/claude-arsenal:xiaohongshu",
-      "replacementId": "majiayu000/spellbook:xiaohongshu",
-      "from": "majiayu000/claude-arsenal",
-      "to": "majiayu000/spellbook",
-      "sameContent": true
-    },
-    {
-      "id": "491034170/expert-review-panel",
-      "replacementId": "tianmind-studio/expert-review-panel",
-      "from": "491034170/expert-review-panel",
-      "to": "tianmind-studio/expert-review-panel",
-      "sameContent": true
-    },
-    {
-      "id": "akillness/oh-my-skills:zeude",
-      "replacementId": "akillness/jeo-skills:zeude",
-      "from": "akillness/oh-my-skills",
-      "to": "akillness/jeo-skills",
-      "sameContent": true
-    },
-    {
-      "id": "AlexZio00/claude-code-skills:session-checkpoint",
-      "replacementId": "AlexZio00/sovereign-skills:session-checkpoint",
-      "from": "AlexZio00/claude-code-skills",
-      "to": "AlexZio00/sovereign-skills",
-      "sameContent": true
-    },
-    {
-      "id": "casterkay/gurutalk",
-      "replacementId": "casterkay/gurutalks",
-      "from": "casterkay/gurutalk",
-      "to": "casterkay/gurutalks",
-      "sameContent": true
-    },
-    {
-      "id": "rexleimo/rex-cli:search-first",
-      "replacementId": "rexleimo/aios:search-first",
-      "from": "rexleimo/rex-cli",
-      "to": "rexleimo/aios",
-      "sameContent": true
-    },
-    {
-      "id": "roger52027/ecommerce-website-data-openclaw-skills",
-      "replacementId": "roger52027/ecommerce-website-data",
-      "from": "roger52027/ecommerce-website-data-openclaw-skills",
-      "to": "roger52027/ecommerce-website-data",
+      "id": "S0ulFood/design-cognition-skill",
+      "replacementId": "S0ulFood/second-opinion",
+      "from": "S0ulFood/design-cognition-skill",
+      "to": "s0ulfood/second-opinion",
       "sameContent": true
     },
     {
@@ -1070,6 +1147,83 @@
       "replacementId": "shaohk/TradingAgents-CN-SKILL",
       "from": "shaohk/stock-analysis-skill",
       "to": "shaohk/TradingAgents-CN-SKILL",
+      "sameContent": true
+    },
+    {
+      "id": "taxueseek/fund-investment-guide",
+      "replacementId": "taxueseek/taxue-invest",
+      "from": "taxueseek/fund-investment-guide",
+      "to": "taxueseek/taxue-invest",
+      "sameContent": true
+    },
+    {
+      "id": "timurgaleev/tstackvibe:land-and-deploy",
+      "replacementId": "timurgaleev/vibestack:land-and-deploy",
+      "from": "timurgaleev/tstackvibe",
+      "to": "timurgaleev/vibestack",
+      "sameContent": true
+    },
+    {
+      "id": "waynesutton/convexskills:avoid-feature-creep",
+      "replacementId": "waynesutton/convexskills:skills/avoid-feature-creep",
+      "from": "waynesutton/convexskills",
+      "to": "waynesutton/builder-skills",
+      "sameContent": true
+    },
+    {
+      "id": "waynesutton/convexskills:convex-component-authoring",
+      "replacementId": "waynesutton/convexskills:skills/convex-component-authoring",
+      "from": "waynesutton/convexskills",
+      "to": "waynesutton/builder-skills",
+      "sameContent": true
+    },
+    {
+      "id": "waynesutton/convexskills:convex-functions",
+      "replacementId": "waynesutton/convexskills:skills/convex-functions",
+      "from": "waynesutton/convexskills",
+      "to": "waynesutton/builder-skills",
+      "sameContent": true
+    },
+    {
+      "id": "waynesutton/convexskills:convex-schema-validator",
+      "replacementId": "waynesutton/convexskills:skills/convex-schema-validator",
+      "from": "waynesutton/convexskills",
+      "to": "waynesutton/builder-skills",
+      "sameContent": true
+    },
+    {
+      "id": "webkubor/tombstone-reaper-skill",
+      "replacementId": "webkubor/deadcode-reaper-skill",
+      "from": "webkubor/tombstone-reaper-skill",
+      "to": "webkubor/deadcode-reaper-skill",
+      "sameContent": true
+    },
+    {
+      "id": "webkubor/wechat-sticker-submit",
+      "replacementId": "webkubor/charmoji-sticker-skill",
+      "from": "webkubor/wechat-sticker-submit",
+      "to": "webkubor/charmoji-sticker-skill",
+      "sameContent": true
+    },
+    {
+      "id": "wobushilixi/lixi-nixiang-skill",
+      "replacementId": "wobushilixi/lixi-reverse",
+      "from": "wobushilixi/lixi-nixiang-skill",
+      "to": "wobushilixi/lixi-reverse",
+      "sameContent": true
+    },
+    {
+      "id": "yuxinlaile/maimai-saver",
+      "replacementId": "yuxinlaile/McD-saver",
+      "from": "yuxinlaile/maimai-saver",
+      "to": "yuxinlaile/mcd-saver",
+      "sameContent": true
+    },
+    {
+      "id": "zenozan/vela:model-usage",
+      "replacementId": "Zavianx/vela:model-usage",
+      "from": "zenozan/vela",
+      "to": "evanwangz/vela",
       "sameContent": true
     }
   ]
