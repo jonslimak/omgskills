@@ -2,7 +2,7 @@ import type { Pool } from "pg";
 import { listUserDevices } from "./device-auth.js";
 import { verifiedCatalogHint } from "./github-skill-resolution.js";
 import { withTimeout } from "./http.js";
-import { loadPublishedCatalogIdentity, type PublishedCatalogIdentity } from "./published-catalog.js";
+import { loadCatalogHintIdentity, type PublishedCatalogIdentity } from "./published-catalog.js";
 import { installationFolderFromKey } from "./sync-skill.js";
 import type { RootCoverage } from "./inventory-reconciliation.js";
 import { readLegacySyncInventory } from "./sync-inventory.js";
@@ -23,7 +23,7 @@ export async function readSyncInventory(
   userId: string,
   version: 1 | 2 | 3,
   now = new Date(),
-  loadCatalogIdentity: () => Promise<PublishedCatalogIdentity> = loadPublishedCatalogIdentity,
+  loadCatalogIdentity: (hintIds: string[]) => Promise<PublishedCatalogIdentity> = loadCatalogHintIdentity,
 ) {
   if (version === 1) {
     const { skills } = await readLegacySyncInventory(pool, userId);
@@ -54,7 +54,7 @@ export async function readSyncInventory(
   // Presence reports store the Mac's catalog hint unverified; link the rows it proves.
   const hinted = skills.filter((skill) => !skill.catalogSkillId && skill.catalogSkillIdHint && skill.skillMdSha);
   if (hinted.length) {
-    const identity = await withTimeout(loadCatalogIdentity(), 4_000).catch(() => null);
+    const identity = await withTimeout(loadCatalogIdentity(hinted.map((skill) => skill.catalogSkillIdHint as string)), 4_000).catch(() => null);
     for (const skill of hinted) {
       const catalogSkillId = verifiedCatalogHint(skill.catalogSkillIdHint, skill.skillMdSha, identity);
       if (catalogSkillId) Object.assign(skill, { catalogSkillId, identityStatus: "resolved", isLocalOnly: false });

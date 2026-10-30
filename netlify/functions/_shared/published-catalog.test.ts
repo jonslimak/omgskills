@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import {
+  createCatalogHintIdentityLoader,
   createPublishedCatalogIdentityLoader,
   fetchPublishedCatalogIdentity,
   fetchPublishedSkills,
@@ -130,4 +132,35 @@ test("briefly caches successful identity loads and retries after expiry", async 
   now += 101;
   await load();
   assert.equal(calls.filter((url) => url === manifestUrl).length, 2);
+});
+
+test("hint identity checks only the detail shards holding the hints, never the full skills asset", async () => {
+  const manifestUrl = "https://example.test/crawl4/manifest.json";
+  const live = "owner/repo:live";
+  const bucket = (id: string) => createHash("sha256").update(id, "utf8").digest("hex").slice(0, 2);
+  const calls: string[] = [];
+  const load = createCatalogHintIdentityLoader({
+    tracks: [{ name: "crawl4", manifestUrl }],
+    fetcher: fixtureFetcher({
+      [manifestUrl]: { body: {
+        skills: { path: "skills.json" },
+        shaHistory: { path: "sha-history.json" },
+        searchCatalog: { path: "search-catalog.json" },
+      } },
+      "https://example.test/crawl4/sha-history.json": { body: { version: 1, shaToSkillIds: { ["a".repeat(40)]: [live] } } },
+      "https://example.test/crawl4/search-catalog.json": { body: { details: { path: "detail-index.json" } } },
+      "https://example.test/crawl4/detail-index.json": { body: {
+        partition: "sha256-first-byte",
+        shards: { [bucket(live)]: { path: "details-live.json" } },
+      } },
+      "https://example.test/crawl4/details-live.json": { body: [{ id: live }] },
+    }, calls),
+  });
+
+  const identity = await load([live, live, "owner/repo:removed"]);
+  assert.deepEqual([...identity.liveSkillIds], [live]);
+  assert.deepEqual(identity.shaHistory?.shaToSkillIds, { ["a".repeat(40)]: [live] });
+  await load([live]);
+  assert.equal(calls.filter((url) => url.endsWith("details-live.json")).length, 1, "shards are cached");
+  assert.ok(!calls.some((url) => url.endsWith("skills.json")));
 });
