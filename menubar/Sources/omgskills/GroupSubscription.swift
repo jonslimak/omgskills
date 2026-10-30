@@ -42,6 +42,8 @@ struct GroupSubscriptionRecord: Codable, Equatable, Sendable {
                 skillMdSha: String
             )
             case metadataOnly(reason: String)
+            // This Set must never update or remove a skill it did not install.
+            case alreadyInstalled
         }
 
         let id: String
@@ -54,7 +56,8 @@ struct GroupSubscriptionRecord: Codable, Equatable, Sendable {
     static func make(
         manifest: GroupManifest,
         route: DeviceGroupManifestRoute,
-        destination: ManagedGroupSnapshotDestination
+        destination: ManagedGroupSnapshotDestination,
+        skipping itemIDs: Set<String> = []
     ) throws -> GroupSubscriptionRecord {
         let record = GroupSubscriptionRecord(
             version: supportedVersion,
@@ -71,7 +74,7 @@ struct GroupSubscriptionRecord: Codable, Equatable, Sendable {
                     name: item.name,
                     position: item.position,
                     presentationDigest: presentationDigest(for: item),
-                    state: state(for: item.installability)
+                    state: itemIDs.contains(item.id) ? .alreadyInstalled : state(for: item.installability)
                 )
             }
         )
@@ -126,6 +129,8 @@ struct GroupSubscriptionRecord: Codable, Equatable, Sendable {
                 guard GroupManifestMetadataOnlyReason(rawValue: reason) != nil else {
                     throw GroupSubscriptionError.invalidRecord
                 }
+            case .alreadyInstalled:
+                break
             }
         }
     }
@@ -371,7 +376,7 @@ enum GroupSubscriptionDiffer {
                     wasReordered: false,
                     isMetadataOnly: item.isMetadataOnly,
                     localState: nil,
-                    packageAction: item.isMetadataOnly ? .none : .install
+                    packageAction: item.isMetadataOnly || item.isAlreadyInstalled ? .none : .install
                 )
             }
             let reordered = previous.position != item.position
@@ -396,7 +401,7 @@ enum GroupSubscriptionDiffer {
                 wasReordered: false,
                 isMetadataOnly: item.isMetadataOnly,
                 localState: localStates[item.id],
-                packageAction: item.isMetadataOnly ? .none : .remove
+                packageAction: item.isMetadataOnly || item.isAlreadyInstalled ? .none : .remove
             )
         })
         return GroupSubscriptionDiff(
@@ -412,6 +417,8 @@ enum GroupSubscriptionDiffer {
         current: GroupSubscriptionRecord.Item
     ) -> GroupSubscriptionPackageAction {
         switch (previous.state, current.state) {
+        case (.alreadyInstalled, _), (_, .alreadyInstalled):
+            return .none
         case (.metadataOnly, .metadataOnly):
             return .none
         case (.metadataOnly, .installable):
@@ -426,6 +433,11 @@ enum GroupSubscriptionDiffer {
 }
 
 extension GroupSubscriptionRecord.Item {
+    var isAlreadyInstalled: Bool {
+        if case .alreadyInstalled = state { return true }
+        return false
+    }
+
     var isMetadataOnly: Bool {
         if case .metadataOnly = state { return true }
         return false

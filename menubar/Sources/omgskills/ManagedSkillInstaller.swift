@@ -109,7 +109,7 @@ struct ManagedGroupSnapshotInstallResult: Equatable, Sendable {
     let updatedCount: Int
     let removedCount: Int
     let metadataOnlyItems: [ManagedGroupMetadataOnlyItem]
-    /// Snapshot items left alone because another install already uses their name.
+    /// Items left alone because another install already uses their name.
     let alreadyPresentNames: [String]
 
     init(
@@ -143,6 +143,7 @@ private struct GroupInstallPlan: Sendable {
     let installable: [PlannedGroupItem]
     let metadataOnly: [ManagedGroupMetadataOnlyItem]
     let alreadyPresent: [String]
+    let alreadyPresentItemIDs: Set<String>
 }
 
 private struct StoredGroupItem: Sendable {
@@ -511,7 +512,7 @@ actor ManagedSkillInstaller {
             }
         })
         let baselineTargetKeys = Set<String>(baseline.items.compactMap { item in
-            guard !item.isMetadataOnly else { return nil }
+            guard !item.isMetadataOnly && !item.isAlreadyInstalled else { return nil }
             return portableTargetKey(item.name)
         })
         let plan = try makeGroupPlan(
@@ -627,7 +628,7 @@ actor ManagedSkillInstaller {
             )
         }
 
-        let journal = try makeJournal(for: request, mutations: mutations)
+        let journal = try makeJournal(for: request, mutations: mutations, skipping: plan.alreadyPresentItemIDs)
         try writeJournal(journal)
         do {
             for (index, mutation) in mutations.enumerated() {
@@ -894,10 +895,8 @@ actor ManagedSkillInstaller {
         var installable: [PlannedGroupItem] = []
         var metadataOnly: [ManagedGroupMetadataOnlyItem] = []
         var alreadyPresent: [String] = []
+        var alreadyPresentItemIDs = Set<String>()
         var targetKeys = Set<String>()
-        // A first "Install this version" skips names another install already uses; it writes no
-        // subscription record, so nothing later expects those items. "Keep updated" still refuses.
-        let skipsOccupiedTargets = allowedExistingTargetKeys == nil && request.mode == .snapshot
 
         for item in manifest.items {
             switch item.installability {
@@ -912,6 +911,7 @@ actor ManagedSkillInstaller {
                 let sourceValues = try managedSourceValues(for: item, source: source)
                 try validateTargetName(item.name)
                 let collisionKey = portableTargetKey(item.name)
+                let skipsOccupiedTargets = allowedExistingTargetKeys?.contains(collisionKey) != true
                 guard targetKeys.insert(collisionKey).inserted else {
                     throw InstallError.invalidGroupManifest
                 }
@@ -945,18 +945,22 @@ actor ManagedSkillInstaller {
                     previousActivation = try existingManagedActivation(at: targetURL, fileManager: .default)
                 } catch InstallError.unmanagedTargetExists where skipsOccupiedTargets {
                     alreadyPresent.append(item.name)
+                    alreadyPresentItemIDs.insert(item.id)
                     continue
                 }
                 if previousActivation != nil,
                    let allowedExistingTargetKeys,
                    !allowedExistingTargetKeys.contains(collisionKey) {
-                    throw InstallError.unmanagedTargetExists
+                    alreadyPresent.append(item.name)
+                    alreadyPresentItemIDs.insert(item.id)
+                    continue
                 }
                 // A first install may replace only this Set's own skills, never a single install or another Set's.
                 if let previousActivation, allowedExistingTargetKeys == nil,
                    activationGroupId(previousActivation) != manifest.group.id {
                     guard skipsOccupiedTargets else { throw InstallError.targetOwnedByAnotherInstall }
                     alreadyPresent.append(item.name)
+                    alreadyPresentItemIDs.insert(item.id)
                     continue
                 }
                 installable.append(PlannedGroupItem(
@@ -968,7 +972,8 @@ actor ManagedSkillInstaller {
             }
         }
 
-        return GroupInstallPlan(installable: installable, metadataOnly: metadataOnly, alreadyPresent: alreadyPresent)
+        return GroupInstallPlan(installable: installable, metadataOnly: metadataOnly,
+                              alreadyPresent: alreadyPresent, alreadyPresentItemIDs: alreadyPresentItemIDs)
     }
 
     private func managedSourceValues(
@@ -1005,7 +1010,8 @@ actor ManagedSkillInstaller {
 
     private func makeJournal(
         for request: ManagedGroupSnapshotInstallRequest,
-        mutations: [PreparedGroupMutation]
+        mutations: [PreparedGroupMutation],
+        skipping itemIDs: Set<String>
     ) throws -> ManagedGroupTransactionJournal {
         guard let targetRootRelativePath = relativePath(
             of: request.destination.rootURL,
@@ -1047,7 +1053,7 @@ actor ManagedSkillInstaller {
                 )
             }
         }
-        let subscription = try makeSubscriptionMutation(for: request)
+        let subscription = try makeSubscriptionMutation(for: request, skipping: itemIDs)
         return ManagedGroupTransactionJournal(
             version: ManagedGroupTransactionJournal.supportedVersion,
             transactionId: UUID().uuidString.lowercased(),
@@ -1064,13 +1070,18 @@ actor ManagedSkillInstaller {
     }
 
     private func makeSubscriptionMutation(
-        for request: ManagedGroupSnapshotInstallRequest
+        for request: ManagedGroupSnapshotInstallRequest,
+        skipping itemIDs: Set<String>
     ) throws -> ManagedGroupTransactionJournal.Subscription? {
         guard request.mode == .subscribed else { return nil }
+        let previous = try GroupSubscriptionStore.read(
+            groupId: request.manifest.group.id, targetRoot: request.destination.rootURL)
+        let skipped = itemIDs.union(previous?.items.filter(\.isAlreadyInstalled).map(\.id) ?? [])
         let record = try GroupSubscriptionRecord.make(
             manifest: request.manifest,
             route: request.route,
-            destination: request.destination
+            destination: request.destination,
+            skipping: skipped
         )
         let replacementData = try GroupSubscriptionStore.encode(record)
         let url = GroupSubscriptionStore.recordURL(
@@ -1084,10 +1095,7 @@ actor ManagedSkillInstaller {
         }
 
         let previousData: Data?
-        if let previous = try GroupSubscriptionStore.read(
-            groupId: request.manifest.group.id,
-            targetRoot: request.destination.rootURL
-        ) {
+        if let previous {
             guard previous.groupId == record.groupId,
                   previous.targetAgent == record.targetAgent,
                   previous.targetScope == record.targetScope,

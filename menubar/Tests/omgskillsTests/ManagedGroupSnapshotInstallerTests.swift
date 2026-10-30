@@ -595,7 +595,7 @@ struct ManagedGroupSnapshotInstallerTests {
         #expect(await loader.loadedNames().isEmpty)
     }
 
-    @Test func preflightRejectsUnmanagedTargetsBeforeLoading() async throws {
+    @Test func subscribedInstallSkipsUnmanagedTargetsBeforeLoading() async throws {
         let fixture = try GroupTransactionFixture()
         defer { fixture.remove() }
         let loader = RecordingGroupPackageLoader(package: fixture.package)
@@ -606,18 +606,20 @@ struct ManagedGroupSnapshotInstallerTests {
             fixture.installable(name: "blocked", kind: "catalog", source: fixture.catalogSource())
         ])
 
-        await #expect(throws: ManagedSkillInstaller.InstallError.unmanagedTargetExists) {
-            try await fixture.installer().installGroupSnapshot(
+        let result = try await fixture.installer().installGroupSnapshot(
                 fixture.request(manifest, mode: .subscribed),
                 credential: fixture.credential,
                 packageLoader: loader
             )
-        }
+        #expect(result.alreadyPresentNames == ["blocked"])
+        #expect(result.installedCount == 0)
+        let receipt = try #require(try GroupSubscriptionStore.read(groupId: fixture.groupID, targetRoot: fixture.targetRoot))
+        #expect(receipt.items.first?.state == .alreadyInstalled)
         #expect(await loader.loadedNames().isEmpty)
         #expect(try Data(contentsOf: target.appendingPathComponent("SKILL.md")) == Data("unmanaged".utf8))
     }
 
-    @Test func subscribedInstallRefusesSkillsInstalledOutsideThisSetBeforeLoading() async throws {
+    @Test func subscribedInstallSkipsSkillsInstalledOutsideThisSetBeforeLoading() async throws {
         let fixture = try GroupTransactionFixture()
         defer { fixture.remove() }
         let installer = fixture.installer()
@@ -630,19 +632,65 @@ struct ManagedGroupSnapshotInstallerTests {
             fixture.installable(name: "shared", kind: "catalog", source: fixture.catalogSource())
         ])
 
-        await #expect(throws: ManagedSkillInstaller.InstallError.targetOwnedByAnotherInstall) {
-            try await installer.installGroupSnapshot(
+        let result = try await installer.installGroupSnapshot(
                 fixture.request(manifest, mode: .subscribed),
                 credential: fixture.credential,
                 packageLoader: loader
             )
-        }
+        #expect(result.alreadyPresentNames == ["shared"])
+        #expect(result.installedCount == 0)
         #expect(await loader.loadedNames().isEmpty)
         #expect(try fixture.targetDestination("shared") == before)
         #expect(SkillInstallProvenanceStore.read(
             targetRoot: fixture.targetRoot,
             targetName: "shared"
         )?.releaseId == "single")
+    }
+
+    @Test func subscribedUpdatesNeverAdoptRenameOrRemoveSkippedSkills() async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let installer = fixture.installer()
+        _ = try await installer.install(fixture.singleRequest(name: "shared", releaseID: "single")) { fixture.package }
+        let before = try fixture.targetDestination("shared")
+        let original = try fixture.manifest(items: [
+            fixture.installable(id: "skipped", name: "shared", kind: "catalog", source: fixture.catalogSource()),
+            fixture.installable(id: "owned", name: "fresh", kind: "catalog", source: fixture.catalogSource())
+        ])
+        let loader = RecordingGroupPackageLoader(package: fixture.package)
+        let initial = try await installer.installGroupSnapshot(fixture.request(original, mode: .subscribed),
+            credential: fixture.credential, packageLoader: loader)
+        #expect(initial.installedCount == 1)
+        #expect(initial.alreadyPresentNames == ["shared"])
+        #expect(await loader.loadedNames() == ["fresh"])
+        let clean = try #require(await installer.detectGroupSubscription(manifest: original,
+            route: fixture.route, destination: fixture.destination))
+        #expect(!clean.hasUpstreamChanges && !clean.hasBlockingLocalConflicts)
+
+        let next = try fixture.manifest(revision: 8, items: [
+            fixture.installable(id: "skipped", name: "renamed", kind: "catalog", source: fixture.catalogSource(), releaseID: "new-skip"),
+            fixture.installable(id: "owned", name: "fresh", kind: "catalog", source: fixture.catalogSource(), releaseID: "new-owned"),
+            fixture.installable(id: "new-collision", name: "shared", kind: "catalog", source: fixture.catalogSource())
+        ])
+        let updateLoader = RecordingGroupPackageLoader(package: fixture.package)
+        let update = try await installer.applyGroupSubscriptionUpdate(fixture.request(next, mode: .subscribed),
+            credential: fixture.credential, packageLoader: updateLoader)
+        #expect(update.updatedCount == 1)
+        #expect(update.alreadyPresentNames == ["shared"])
+        #expect(await updateLoader.loadedNames() == ["fresh"])
+        #expect(!fixture.targetExists("renamed"))
+        #expect(try fixture.targetDestination("shared") == before)
+        let saved = try #require(try GroupSubscriptionStore.read(groupId: fixture.groupID, targetRoot: fixture.targetRoot))
+        #expect(saved.items.filter(\.isAlreadyInstalled).map(\.id) == ["skipped", "new-collision"])
+        let removed = try fixture.manifest(revision: 9, items: [
+            fixture.installable(id: "owned", name: "fresh", kind: "catalog", source: fixture.catalogSource(), releaseID: "new-owned")
+        ])
+        let removalLoader = RecordingGroupPackageLoader(package: fixture.package)
+        let removal = try await installer.applyGroupSubscriptionUpdate(fixture.request(removed, mode: .subscribed),
+            credential: fixture.credential, packageLoader: removalLoader)
+        #expect(removal.removedCount == 0)
+        #expect(await removalLoader.loadedNames().isEmpty)
+        #expect(try fixture.targetDestination("shared") == before)
     }
 
     @Test func snapshotInstallSkipsSkillsAlreadyInstalledAnotherWay() async throws {

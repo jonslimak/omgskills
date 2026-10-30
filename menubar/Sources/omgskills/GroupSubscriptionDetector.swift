@@ -24,7 +24,8 @@ extension ManagedSkillInstaller: GroupSubscriptionDetecting {
         let current = try GroupSubscriptionRecord.make(
             manifest: manifest,
             route: route,
-            destination: destination
+            destination: destination,
+            skipping: Set(baseline.items.filter(\.isAlreadyInstalled).map(\.id))
         )
 
         var localStates: [String: GroupSubscriptionLocalState] = [:]
