@@ -105,6 +105,7 @@ import "./unified.css";
 import type { PublicStatus } from "./use-public-catalog";
 import type { UnifiedManagement } from "./management";
 import { publicPageRequest, publicSorts, type PublicSort } from "./public-paging";
+import { displaySourceName, displaySourceNames } from "../../synced-skill-grouping";
 import { CreatorSocialLinks, CreatorProfileDetails } from "./CreatorProfileDetails";
 import { discoveryCreatorGroups, featuredProfiles, isCompany } from "./discovery-presentation";
 import { descriptionParagraphs, descriptionSummary, whenLead } from "./description-paragraphs";
@@ -373,20 +374,21 @@ function AgentTiles({
   onlyInstalled?: boolean;
 }) {
   if (!skill.installed?.sources.length) return null;
-  const visibleSources = onlyInstalled ? sources.filter(source => skill.installed!.sources.includes(source)) : sources;
+  const installedSources = displaySourceNames(skill.installed.sources);
+  const visibleSources = onlyInstalled ? sources.filter(source => installedSources.includes(source)) : sources;
   return (
     <div
       className="ua-agent-tiles"
-      aria-label={skill.installed?.sources.join(", ")}
+      aria-label={installedSources.join(", ")}
     >
       {visibleSources.map((source) => (
         <span
           className="ua-agent-tile"
-          data-present={skill.installed?.sources.includes(source)}
+          data-present={installedSources.includes(source)}
           key={source}
-          title={skill.installed?.sources.includes(source) ? source : undefined}
+          title={installedSources.includes(source) ? source : undefined}
         >
-          {skill.installed?.sources.includes(source) ? (
+          {installedSources.includes(source) ? (
             agentKind(source) !== "other" ? (
               <span className="ua-agent-logo" data-agent={agentKind(source)} aria-hidden="true" />
             ) : (
@@ -485,7 +487,7 @@ export function UnifiedApp({
   const detailTrigger = useRef<HTMLElement | null>(null);
   const models = useMemo(() => skillDisplays(data, catalog), [data, catalog]);
   const sources = useMemo(
-    () => [...new Set(data.skills.map((s) => s.source))].sort(),
+    () => displaySourceNames(data.skills.map((s) => s.source)),
     [data.skills],
   );
   const mine = signedIn ? models.mine : [];
@@ -540,7 +542,7 @@ export function UnifiedApp({
     signedIn && (!readOnlyAccount || !!management) &&
     ["all", "favorites", "set"].includes(nav.view) &&
     (!activeSet || (activeSet.role === "owner" && !activeSet.hidden));
-  const matchingMine = mine.filter((skill) => matchesSearch(skill, nav.query) && (nav.source === "all" || skill.installed?.sources.includes(nav.source)));
+  const matchingMine = mine.filter((skill) => matchesSearch(skill, nav.query) && (nav.source === "all" || skill.installed?.sources.includes(displaySourceName(nav.source))));
   const remoteRows = catalog.resultIds?.flatMap((id) => library.find((skill) => skill.catalogId === id) || []) || [];
   const matchingLibrary = publicStatus ? remoteRows : library.filter((skill) => matchesSearch(skill, nav.query));
   const privateSearch = readOnlyAccount && !discovery;
@@ -793,6 +795,7 @@ export function UnifiedApp({
 
   function renderRow(skill: SkillDisplay, rank?: number, compact = false) {
     const canSelect = editing && !!skill.installed;
+    const installedSources = displaySourceNames(skill.installed?.sources ?? []);
     return (
       <div
         key={skill.key}
@@ -861,10 +864,10 @@ export function UnifiedApp({
         {!compact && !discovery && !nav.query && (
           <AgentTiles skill={skill} sources={sources} onlyInstalled={nav.view === "favorites"} />
         )}
-        {!!skill.installed?.sources.length && <span className="ua-agent-count"
-          aria-label={`${skill.installed.inventoryVersion === 3 ? "Observed" : "Installed"} in ${skill.installed.sources.length} ${skill.installed.sources.length === 1 ? "agent" : "agents"}`}
-          title={skill.installed.sources.join(", ")}>
-          {skill.installed.sources.length}
+        {!!installedSources.length && <span className="ua-agent-count"
+          aria-label={`${skill.installed?.inventoryVersion === 3 ? "Observed" : "Installed"} in ${installedSources.length} ${installedSources.length === 1 ? "agent" : "agents"}`}
+          title={installedSources.join(", ")}>
+          {installedSources.length}
         </span>}
         {!canSelect &&
           (discovery || nav.query || compact ? (
@@ -1091,7 +1094,7 @@ export function UnifiedApp({
   if (publicStatus && ["top", "creator", "collection", "category"].includes(nav.view)) visible = remoteRows;
   if (nav.source !== "all")
     visible = visible.filter((skill) =>
-      skill.installed?.sources.includes(nav.source),
+      skill.installed && displaySourceNames(skill.installed.sources).includes(displaySourceName(nav.source)),
     );
   const titles: Record<View, string> = {
     all: "my skills",
@@ -1151,7 +1154,7 @@ export function UnifiedApp({
         <span className="ua-filter-label">Agent</span>
         <select
           aria-label="Filter by agent"
-          value={nav.source}
+          value={nav.source === "all" ? "all" : displaySourceName(nav.source)}
           onChange={(event) => navigate({ ...nav, source: event.target.value })}
         >
           <option value="all">All</option>
@@ -1955,7 +1958,7 @@ export function UnifiedApp({
                     <h3>On this account</h3>
                     <div>
                       <span>Observed on</span>
-                      <strong>{detail.installed.sources.join(", ")}</strong>
+                      <strong>{displaySourceNames(detail.installed.sources).join(", ")}</strong>
                     </div>
                     {(!readOnlyAccount || management) && <div className="ua-set-chips">
                       {data.sets

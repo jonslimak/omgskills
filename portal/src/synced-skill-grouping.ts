@@ -88,6 +88,28 @@ function normalizedSource(value: string) {
   return value.toLowerCase();
 }
 
+export function displaySourceName(value: string) {
+  const source = value.trim();
+  switch (source.toLowerCase()) {
+    case "claude":
+    case "claude code": return "Claude";
+    case "codex": return "Codex";
+    case "agents": return "Agents";
+    default: return source;
+  }
+}
+
+export function displaySourceNames(sources: string[]) {
+  return [...new Set(sources.map(displaySourceName))].sort((a, b) => a.localeCompare(b));
+}
+
+function contentIdentity(skill: SyncedSkill) {
+  const name = normalizedSkillText(skill.name);
+  const fingerprint = skill.skillMdSha?.trim().toLowerCase();
+  return name && fingerprint && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(fingerprint)
+    ? JSON.stringify([name, fingerprint]) : null;
+}
+
 export function hasSource(skill: GroupedSyncedSkill, source: string) {
   const target = source.toLowerCase();
   return skill.sources.some((item) => normalizedSource(item).includes(target));
@@ -112,19 +134,19 @@ export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = 
   const unresolvedSkills: SyncedSkill[] = [];
 
   for (const skill of skills) {
-    // Only presentation may combine presence rows; mutation callers keep physical identities.
-    if (skill.inventoryVersion === 2 || skill.inventoryVersion === 3 || skill.deviceId != null) {
+    if (groupInstallations) {
       const catalogId = skill.catalogSkillId?.trim();
-      const fingerprint = skill.skillMdSha;
-      const key = catalogId ? `catalog:${catalogId}`
-        : fingerprint && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(fingerprint) && normalizedSkillText(skill.name)
-          ? `content:${JSON.stringify([normalizedSkillText(skill.name), fingerprint])}` : null;
-      if (groupInstallations && key) {
-        const group = displayGroups.get(key) ?? [];
+      const identity = catalogId || contentIdentity(skill);
+      if (identity) {
+        const groups = catalogId ? catalogGroups : displayGroups;
+        const group = groups.get(identity) ?? [];
         group.push(skill);
-        displayGroups.set(key, group);
+        groups.set(identity, group);
         continue;
       }
+    }
+    // Mutation callers retain the original physical identities and source labels.
+    if (skill.inventoryVersion === 2 || skill.inventoryVersion === 3 || skill.deviceId != null) {
       physicalGroups.push([skill]);
       continue;
     }
@@ -135,6 +157,27 @@ export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = 
       catalogGroups.set(catalogSkillId, group);
     } else {
       unresolvedSkills.push(skill);
+    }
+  }
+
+  if (groupInstallations) {
+    const catalogIdsByContent = new Map<string, Set<string>>();
+    for (const [catalogId, group] of catalogGroups) {
+      for (const skill of group) {
+        const key = contentIdentity(skill);
+        if (!key) continue;
+        const matches = catalogIdsByContent.get(key) ?? new Set<string>();
+        matches.add(catalogId);
+        catalogIdsByContent.set(key, matches);
+      }
+    }
+    // An exact copy may join one known identity, but must never bridge conflicting catalog IDs.
+    for (const [key, group] of displayGroups) {
+      const matches = catalogIdsByContent.get(key);
+      if (matches?.size !== 1) continue;
+      const [catalogId] = matches;
+      catalogGroups.get(catalogId)!.push(...group);
+      displayGroups.delete(key);
     }
   }
 
@@ -161,15 +204,16 @@ export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = 
 
   return [...physicalGroups, ...displayGroups.values(), ...catalogGroups.values(), ...unresolvedGroups]
     .map((group) => {
-      const representative = chooseRepresentativeSkill(group);
+      const resolved = groupInstallations ? group.filter(skill => skill.catalogSkillId?.trim()) : [];
+      const representative = chooseRepresentativeSkill(resolved.length ? resolved : group);
       const bestDescription =
         [...group]
           .map((skill) => skill.description)
           .filter((description): description is string => Boolean(description))
           .sort((first, second) => second.length - first.length)[0] ?? null;
-      const sources = [...new Set(group.map((skill) => skill.source))].sort((first, second) =>
-        first.localeCompare(second)
-      );
+      const sources = groupInstallations
+        ? displaySourceNames(group.map(skill => skill.source))
+        : [...new Set(group.map((skill) => skill.source))].sort((first, second) => first.localeCompare(second));
       return {
         ...representative,
         description: bestDescription,
