@@ -225,6 +225,7 @@ test("local Streamable HTTP transport initializes and calls tools", async (conte
 
   const { tools } = await client.listTools();
   assert.equal(tools.length, 9);
+  await assertSharedToolSchemas(client);
 
   const result = await client.callTool({
     name: "list_trending",
@@ -255,6 +256,7 @@ test("published stdio entry point still exposes the shared tools", async (contex
 
   const { tools } = await client.listTools();
   assert.equal(tools.length, 9);
+  await assertSharedToolSchemas(client);
 
   const result = await client.callTool({
     name: "get_skill",
@@ -262,6 +264,18 @@ test("published stdio entry point still exposes the shared tools", async (contex
   });
   assert.equal(result.structuredContent?.found, true);
 });
+
+async function assertSharedToolSchemas(client: Client) {
+  const server = createOmgskillsServer(OmgskillsLibrary.fromData(fixtureData), { paging: true, ranking: true });
+  const reference = new Client({ name: "schema-reference", version: "1" });
+  const [a, b] = InMemoryTransport.createLinkedPair();
+  try {
+    await server.connect(b); await reference.connect(a);
+    // Compare the wire representation: in-memory transport retains undefined optional keys.
+    assert.deepEqual(JSON.parse(JSON.stringify((await client.listTools()).tools)),
+      JSON.parse(JSON.stringify((await reference.listTools()).tools)));
+  } finally { await reference.close(); await server.close(); }
+}
 
 async function closeHttpServer(server: Server): Promise<void> {
   await new Promise<void>((resolveClose, reject) => {
