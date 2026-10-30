@@ -523,6 +523,12 @@ actor ManagedSkillInstaller {
             installing: packageItemIDs,
             allowedExistingTargetKeys: baselineTargetKeys
         )
+        // A skipped rename must not remove the old target or abandon its ownership receipt.
+        guard !diff.changes.contains(where: {
+            $0.packageAction == .rename && plan.alreadyPresentItemIDs.contains($0.id)
+        }) else {
+            throw InstallError.targetOwnedByAnotherInstall
+        }
         let currentTargetKeys = Set<String>(request.manifest.items.compactMap { item in
             guard case .installable = item.installability else { return nil }
             return portableTargetKey(item.name)

@@ -407,6 +407,47 @@ struct ManagedGroupSnapshotInstallerTests {
         )?.items.first?.name == "new-name")
     }
 
+    @Test(arguments: [false, true])
+    func subscribedRenameCollisionPreservesEveryTargetAndReceipt(managedCollision: Bool) async throws {
+        let fixture = try GroupTransactionFixture()
+        defer { fixture.remove() }
+        let installer = fixture.installer()
+        let baseline = try fixture.manifest(revision: 7, items: [
+            fixture.installable(id: "renamed", name: "old-name", kind: "catalog", source: fixture.catalogSource()),
+            fixture.installable(id: "other", name: "other", kind: "catalog", source: fixture.catalogSource(), releaseID: "old-other")
+        ])
+        _ = try await installer.installGroupSnapshot(fixture.request(baseline, mode: .subscribed),
+            credential: fixture.credential, packageLoader: RecordingGroupPackageLoader(package: fixture.package))
+        let occupied = fixture.targetRoot.appendingPathComponent("occupied", isDirectory: true)
+        if managedCollision {
+            _ = try await installer.install(fixture.singleRequest(name: "occupied", releaseID: "independent")) { fixture.package }
+        } else {
+            try FileManager.default.createDirectory(at: occupied, withIntermediateDirectories: true)
+            try Data("independent".utf8).write(to: occupied.appendingPathComponent("SKILL.md"))
+        }
+        let oldTarget = try fixture.targetDestination("old-name")
+        let otherTarget = try fixture.targetDestination("other")
+        let occupiedBytes = try Data(contentsOf: occupied.appendingPathComponent("SKILL.md"))
+        let receiptURL = GroupSubscriptionStore.recordURL(groupId: fixture.groupID, targetRoot: fixture.targetRoot)
+        let receiptBytes = try Data(contentsOf: receiptURL)
+        let current = try fixture.manifest(revision: 8, items: [
+            fixture.installable(id: "renamed", name: "occupied", kind: "catalog", source: fixture.catalogSource()),
+            fixture.installable(id: "other", name: "other", kind: "catalog", source: fixture.catalogSource(), releaseID: "new-other")
+        ])
+        let loader = RecordingGroupPackageLoader(package: fixture.package)
+
+        await #expect(throws: ManagedSkillInstaller.InstallError.targetOwnedByAnotherInstall) {
+            try await installer.applyGroupSubscriptionUpdate(fixture.request(current, mode: .subscribed),
+                credential: fixture.credential, packageLoader: loader)
+        }
+
+        #expect(try fixture.targetDestination("old-name") == oldTarget)
+        #expect(try fixture.targetDestination("other") == otherTarget)
+        #expect(try Data(contentsOf: occupied.appendingPathComponent("SKILL.md")) == occupiedBytes)
+        #expect(try Data(contentsOf: receiptURL) == receiptBytes)
+        #expect(await loader.loadedNames().isEmpty)
+    }
+
     @Test func subscribedUpdateFailureAfterRemovalRestoresEveryTargetAndReceipt() async throws {
         let fixture = try GroupTransactionFixture()
         defer { fixture.remove() }
