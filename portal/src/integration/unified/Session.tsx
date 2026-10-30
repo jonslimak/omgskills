@@ -105,7 +105,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     }
     history.replaceState({ nav }, "", keep ? here : current);
   }, [current, available, base, requested.view]);
-  useEffect(() => { startPublicAnalytics(); }, [current]);
+  useEffect(() => { startPublicAnalytics(); }, [current, requested]);
   useEffect(() => {
     const pop = () => {
       if (needsAnalyticsDocumentReload(location.href)) {

@@ -2,6 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { needsAnalyticsDocumentReload, startPublicAnalytics, trackEvent } from "../src/app/unified/analytics";
+import { navigationLocation } from "../src/app/unified/model";
+import { entryNavigation } from "../src/integration/unified/entry-navigation";
+import { accountNavigation } from "../src/integration/unified/policy";
 
 const trackerSource = "https://app.humblytics.com/hmbl.min.js?id=a156a68";
 
@@ -156,8 +159,21 @@ test("navigating from a private page to a public page starts tracking without du
     startPublicAnalytics();
     assert.equal(scripts.length, 1);
     const session = readFileSync(new URL("../src/integration/unified/Session.tsx", import.meta.url), "utf8");
-    assert.match(session, /useEffect\(\(\) => \{ startPublicAnalytics\(\); \}, \[current\]\)/);
+    assert.match(session, /useEffect\(\(\) => \{ startPublicAnalytics\(\); \}, \[current, requested\]\)/);
   });
+});
+
+test("signed-out private-to-Discover navigation must retrigger analytics even when the public target is unchanged", () => {
+  for (const view of ["profile", "sets", "all"]) {
+    const requested = entryNavigation("/app/", `?view=${view}`, "/app/");
+    const displayed = accountNavigation(requested, false);
+    const next = accountNavigation({ ...displayed, view: "discover" }, false);
+    assert.equal(displayed.view, "discover");
+    assert.notDeepEqual(requested, next);
+    assert.equal(navigationLocation(displayed, true), navigationLocation(next, true), "current alone cannot detect this navigation");
+  }
+  const session = readFileSync(new URL("../src/integration/unified/Session.tsx", import.meta.url), "utf8");
+  assert.match(session, /useEffect\(\(\) => \{ startPublicAnalytics\(\); \}, \[current, requested\]\)/);
 });
 
 test("blocked analytics never breaks the app and SDK retries are bounded", () => {
