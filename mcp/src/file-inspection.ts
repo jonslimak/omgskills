@@ -138,8 +138,9 @@ export async function inspectSkillFiles(skill: SkillResult, options: { max_files
         file.read_error = error instanceof FileInspectionError ? error.message : "Text could not be read within the inspection limits.";
       }
     }
+    const listedPaths = new Set(output.filter(file => file.sha !== undefined).map(file => file.path));
     return { id: skill.id, ref: pin.commit_sha, path: pin.path, pinned: true, files: output,
-      listing_truncated: listing.truncated || files.length > output.length,
+      listing_truncated: listing.truncated || files.some(file => !listedPaths.has(file.path)),
       ...(!listing.truncated ? { total_files: files.length } : {}), skipped_entries: listing.tree.length - files.length };
   } catch (error) {
     throw error instanceof FileInspectionError ? error : new FileInspectionError("Pinned files could not be read within the inspection limits. Retry later.");

@@ -63,6 +63,25 @@ test("selected content is hash-verified, bounded UTF-8 text and is never execute
   assert.equal(value.listing_truncated, true, "an explicit subset is not a complete listing");
 });
 
+test("missing or non-regular requested paths cannot make a partial listing look complete", async () => {
+  for (const [paths, truncated] of [
+    [["SKILL.md", "missing.txt"], true],
+    [["missing.txt", "another-missing.txt"], true],
+    [["SKILL.md", "scripts", "missing.txt"], true],
+    [["SKILL.md", "scripts/check.sh"], false],
+    [["SKILL.md", "scripts/check.sh", "missing.txt"], false]
+  ] as [string[], boolean][]) {
+    const f = fixture();
+    const value = await inspectSkillFiles(f.skill, { ...options, paths }, f.fetcher);
+    assert.equal(value.total_files, 2);
+    assert.equal(value.listing_truncated, truncated, JSON.stringify(paths));
+    for (const file of value.files.filter(file => file.path === "scripts" || file.path.includes("missing"))) {
+      assert.ok(file.read_error); assert.equal(file.content, undefined);
+      assert.ok(!f.requested.some(request => request.url === rawUrl(file.path)));
+    }
+  }
+});
+
 test("missing pins never make network requests; malformed pins cannot use HEAD", async () => {
   const f = fixture();
   for (const fields of [{ repo_commit_sha: undefined }, { repo_commit_sha: "main" }, { skill_md_sha: undefined }, { github_url: "https://evil.test/a/b" }])
@@ -215,6 +234,11 @@ test("tool exposes additive schemas, pinned-only availability and Cursor plans f
   const { file_inspection: added, ...existing } = found.structuredContent!;
   assert.deepEqual(existing, original.structuredContent, "opt-in adds a field without changing existing content fields");
   assert.equal(original.structuredContent?.file_inspection, undefined);
+  const partial = await client.callTool({ name: "get_skill_content", arguments: {
+    id: f.skill.id, include_files: true, file_paths: ["SKILL.md", "missing.txt"]
+  } });
+  assert.equal((partial.structuredContent?.file_inspection as any).listing_truncated, true);
+  assert.match((partial.content as { text: string }[])[0].text, /File listing is limited/);
   assert.equal((await client.listTools()).tools.length, 9);
   for (const args of [{ file_paths: ["../escape"] }, { file_paths: Array(11).fill("SKILL.md") }, { max_files: 21 }, { file_max_chars: 8001 }]) {
     const response = await client.callTool({ name: "get_skill_content", arguments: { id: f.skill.id, include_files: true, ...args } });
