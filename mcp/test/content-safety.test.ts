@@ -78,3 +78,14 @@ test("error responses cancel their bodies", async () => {
     assert.equal(cancelled, true);
   }
 });
+
+test("pinned-only inspection rejects binary SKILL.md while legacy decoding stays unchanged", async () => {
+  for (const bytes of [new Uint8Array([0xff, 0xfe]), new Uint8Array([0, 1, 2])]) {
+    const pinned = { ...skill, repo_commit_sha: "a".repeat(40), skill_md_sha: gitBlobSha(bytes) };
+    const fetcher = (async () => new Response(bytes as BodyInit)) as typeof fetch;
+    await assert.rejects(readSkillContent(pinned, 500, fetcher, { pinnedOnly: true }), /not plain UTF-8 text/);
+    const legacy = await readSkillContent(pinned, 500, fetcher);
+    assert.equal(legacy.verified, true);
+    assert.equal(legacy.content, new TextDecoder().decode(bytes));
+  }
+});

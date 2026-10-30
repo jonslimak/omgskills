@@ -10,7 +10,7 @@ The server exposes the skill library as safe agent tools. Agents can search, ins
 
 It does not crawl, scrape, edit, install, or write files. `get_install_plan` returns a script for the agent to run; the server never runs it.
 
-Every tool returns structured content (the full fields) plus a short text rendering, one line per skill. List tools return compact rows by default (`summary: true`, 10 results) and page automatically: each result reports `page.total` and a `page.nextCursor` to pass back as `page: {"cursor": ...}`. Tool metadata marks every operation as read-only and non-destructive; only `get_skill_content` reads outside the catalog (SKILL.md from GitHub).
+Every tool returns structured content (the full fields) plus a short text rendering, one line per skill. List tools return compact rows by default (`summary: true`, 10 results) and page automatically: each result reports `page.total` and a `page.nextCursor` to pass back as `page: {"cursor": ...}`. Tool metadata marks every operation as read-only and non-destructive; only `get_skill_content` reads outside the catalog (from GitHub).
 
 IDs are case-insensitive and accept the web app's `catalog:` prefix. Author handles accept a leading `@`.
 
@@ -113,7 +113,8 @@ Every row reports `install_status`; pass `installable: true` to get only skills 
 ### `get_skill`
 
 Fetch one skill by ID, with `install_status`, `pinned_install` and, for pinned skills,
-user-scope `install` scripts for Claude Code and Codex.
+user-scope `install` scripts for Claude Code, Codex and Cursor. Existing Claude Code
+and Codex fields are unchanged; Cursor is an additional field/agent option.
 
 Full-record reads also report `discovery_only_reason` and `install_blockers` when
 recorded metadata prevents installation. Blockers distinguish missing or invalid
@@ -189,7 +190,9 @@ most-starred. Pass `installable: true` to find a pinned alternative to a
 Commit-pinned install steps for one agent and scope. The script fetches exactly
 `pinned_install.commit_sha`, checks SKILL.md against `skill_md_sha`, refuses to
 overwrite an existing destination (including symlinks), and copies the skill into `~/.claude/skills`,
-`~/.codex/skills` (user scope) or `.claude/skills`, `.codex/skills` (project scope).
+`~/.codex/skills`, `~/.cursor/skills` (user scope) or `.claude/skills`,
+`.codex/skills`, `.cursor/skills` (project scope). Cursor destinations follow its
+[official skill-directory documentation](https://cursor.com/docs/skills).
 For `discovery_only` skills it explains why and suggests pinned alternatives.
 Temporary files and incomplete installs are cleaned up on failure or interruption.
 
@@ -215,6 +218,52 @@ download before `max_chars` limits the displayed text.
   "max_chars": 12000
 }
 ```
+
+#### Opt-in Pinned File Inspection
+
+Use `get_skill_content` with `include_files: true` to add `file_inspection`, listing
+files at the recorded commit and optionally reading selected relative paths as
+**untrusted text only**. No tenth tool is added. Missing pins return
+`file_inspection.available: false` without any network request; opt-in calls never
+use HEAD. Existing calls without the opt-in keep their original behavior and fields.
+
+```json
+{
+  "id": "anthropics/skills:pptx",
+  "include_files": true,
+  "max_files": 10,
+  "file_paths": ["SKILL.md", "scripts/example.py"],
+  "file_max_chars": 4000
+}
+```
+
+Omit `file_paths` to list without downloading extra file bodies (the existing
+SKILL.md read is preserved). Paths require `include_files: true` and are relative
+to the skill folder, not the repository. Extra-file inspection limits per call:
+20 listed files, 10 selected
+reads, 64 KiB per file, 256 KiB total file bytes, 256 KiB per tree response, 1 MiB
+total tree metadata, 1,000 entries per tree, eight parent directories, 32,000 total
+returned text characters, and a shared ten-second inspection deadline. The existing
+SKILL.md read retains its 256 KiB/eight-second limit and `max_chars` argument.
+Limits are not coverage guarantees: `file_inspection.listing_truncated` marks a
+limited listing and `read_error` marks an unread file. No claim of complete/security
+coverage is made from partial results.
+
+The inspection resolves the folder from the pinned commit using GitHub's
+[tree API](https://docs.github.com/en/rest/git/trees), checks SKILL.md's recorded
+hash, and verifies each returned file's blob hash before decoding UTF-8. Redirects,
+symlinks, submodules, path traversal, binary/control-byte data and hash mismatches
+are not read as text. Rate limits and missing files are explicit failures.
+Opt-in SKILL.md reads reject redirects and hash mismatches rather than following
+another ref or returning unverified text; legacy reads remain unchanged.
+`file_inspection.available: false` and `reason` report a failed optional inspection
+without discarding a successful SKILL.md read. Returned scripts are inert text;
+nothing is executed, installed or written.
+This is file inspection, **not** a security audit or a safe-to-install verdict.
+
+Additional #203 requests (security summaries, collections, agent-capability/date/
+niche filters, resources and prompts) remain separate follow-ups; this tool does
+not infer those capabilities from filenames or claim to finish that issue.
 
 ## Setup
 
