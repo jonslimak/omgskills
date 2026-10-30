@@ -15,9 +15,10 @@ listed once. For truncated trees, the stored path was fetched directly.
 ## Applied
 
 - New path: 228 skills whose folder moved inside the repository, re-read and
-  pinned at the new `SKILL.md` (226 pinned). The new folder must keep the ID's
-  last two segments, as in `../path-fixes-20261029`, and no other skill may
-  already be listed at it. Refreshed in place: 4 (`applied.json`).
+  pinned at the new `SKILL.md` (226 pinned). Identity is checked against the
+  ID's last two segments or the skill's existing frontmatter name. Legacy
+  catalog IDs do not always name the skill folder. No other skill may already
+  be listed at the new path. Refreshed in place: 4 (`applied.json`).
 - Suppressed: 581 (`suppressed.json`).
   - `source-skill-missing`: 450. Neither the stored path, the ID's folder nor
     the indexed blob is in the default branch.
@@ -58,3 +59,24 @@ Skills go from 50,724 to 50,143 on both tracks. The publication-impact checks
 pass with an override, because 581 removals exceed the 500 threshold (reason:
 "Review lists: hide 581 skills whose GitHub source is gone"). Tests: 577
 shadow-guard, 74 published-data, 103 MCP and 6 MCP production.
+
+## Independent Pin Review
+
+`pin-identity-audit.json` records a second review of all 232 applied records
+against main `e9e6d2cc`. All 230 pinned files were fetched from their exact
+recorded GitHub commits, their Git blob hashes were checked, and their YAML
+names were compared with the published metadata. Identity was established by
+the ID/path suffix or the name already recorded in main. Two records remain
+explicitly unpinned; no default-branch fetch or installability claim was made
+for them. No identity check was blocked. Author handles and first-seen dates
+were also confirmed unchanged.
+
+The flagged examples are existing skills, not newly substituted content:
+
+- `MustBeSimo/web-design-studio` was already named `cinematic-scroll`.
+- `jkitchin/scimax_vscode:assets` was already named `scimax`.
+- `nowork-studio/NotFair:NotFair` was already named `upgrade`.
+
+The earlier ID-only wording was too narrow. This review changes no catalog
+records, suppressions, manifests, assets or counts. Both tracks remain at
+50,143 skills. It verifies source identity and recorded pins, not skill safety.
