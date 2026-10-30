@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import test from "node:test";
 
 const workflow = await readFile(
@@ -21,6 +24,44 @@ test("published app data is mirrored to R2 before it is committed", () => {
   assert.match(step, /node \.\/scripts\/data-store\.mjs push --dir site\/data\/v2 --dir site\/data\/crawl4/);
   for (const name of ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY"]) {
     assert.match(step, new RegExp(`${name}: \\$\\{\\{ secrets\\.${name} \\}\\}`));
+  }
+});
+
+test("the commit step includes new and changed asset lists even without catalog changes", async () => {
+  const step = workflow.match(/      - name: Commit if changed\n        run: \|\n([\s\S]*?)(?=\n      - name:)/)?.[1];
+  assert.ok(step, "commit step missing");
+  const script = step.replace(/^          /gm, "");
+  const dir = await mkdtemp(path.join(tmpdir(), "shadow-assets-commit-"));
+  const env = { ...process.env, GIT_CONFIG_GLOBAL: "/dev/null", GIT_CONFIG_NOSYSTEM: "1" };
+  const git = (...args) => execFileSync("git", args, { cwd: dir, env, encoding: "utf8" }).trim();
+  // Only transport is stubbed; the real workflow stages and commits a temporary repository.
+  const run = () => execFileSync("bash", ["-e", "-c", `git() { case "$1" in pull|push) return 0 ;; *) command git "$@" ;; esac; }\n${script}`], { cwd: dir, env });
+  try {
+    for (const folder of ["index/snapshots", "site/data/v2", "site/data/crawl4"]) await mkdir(path.join(dir, folder), { recursive: true });
+    for (const file of ["skills", "trending", "trending-leaderboard", "leaderboard-view-data", "skill-signals", "author-signals", "author-leaderboards"]) {
+      await writeFile(path.join(dir, "index", `${file}.json`), "[]\n");
+    }
+    await writeFile(path.join(dir, "index/snapshots/.keep"), "");
+    for (const track of ["v2", "crawl4"]) await writeFile(path.join(dir, `site/data/${track}/manifest.json`), "{}\n");
+    git("init", "-q");
+    git("config", "user.name", "Fixture");
+    git("config", "user.email", "fixture@example.test");
+    git("add", ".");
+    git("commit", "-qm", "Baseline");
+    const before = git("rev-parse", "HEAD");
+    for (const track of ["v2", "crawl4"]) await writeFile(path.join(dir, `site/data/${track}/assets.txt`), "skills-000000000000.json\n");
+    run();
+    const created = git("rev-parse", "HEAD");
+    assert.notEqual(created, before, "new untracked lists must produce a commit");
+    assert.deepEqual(git("show", "--format=", "--name-only", "HEAD").split("\n"), ["site/data/crawl4/assets.txt", "site/data/v2/assets.txt"]);
+    run();
+    assert.equal(git("rev-parse", "HEAD"), created, "unchanged lists must not create an empty commit");
+    await writeFile(path.join(dir, "site/data/v2/assets.txt"), "skills-111111111111.json\n");
+    run();
+    assert.notEqual(git("rev-parse", "HEAD"), created, "changed lists must produce a commit");
+    assert.equal(git("status", "--porcelain"), "");
+  } finally {
+    await rm(dir, { recursive: true, force: true });
   }
 });
 
