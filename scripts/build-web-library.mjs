@@ -1418,7 +1418,7 @@ Use the skill in a new agent session. Your agent can load it when relevant, or y
 
 ## Sharing skills as a team
 
-Create a [Set](${origin}/app/?view=sets), add skills and share it with your team. Individual public skill installs are available now. **Set installation and automatic team updates: Coming soon.** Teams maintaining their own skills can also use a shared GitHub repository.
+Create a [Set](${origin}/app/?view=sets), add skills and share it with your team. Install a whole Set from the Mac companion. **Automatic team updates: Coming soon.** Teams maintaining their own skills can also use a shared GitHub repository.
 
 ## How to find good skills
 
