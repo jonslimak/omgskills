@@ -302,6 +302,29 @@ test("rendered My skills and Set rows retain missing history separately from lat
     assert.match(existingLink, /aria-label="Open Removal fixture" aria-expanded="true"/);
     assert.doesNotMatch(mine, /Uninstalled|Currently live/);
     assert.deepEqual(data.sets[0].items, [item]);
+
+    data.skills = [
+      { ...data.skills[0], deviceId: null, source: "Codex", skillMdSha: "a".repeat(64) },
+      { ...data.skills[1], catalogSkillId: null, identityStatus: "localOnly", source: "codex", skillMdSha: "a".repeat(64) },
+      { ...data.skills[0], id: "claude-copy", source: "Claude Code", skillMdSha: "a".repeat(64) },
+    ];
+    const beforeGrouping = structuredClone(data);
+    const histories = data.skills.map(inventorySummary);
+    const filtered = render({ ...initialNavigation, source: "codex" });
+    assert.equal([...filtered.matchAll(/aria-label="Open Removal fixture"/g)].length, 1);
+    assert.equal([...filtered.matchAll(/<option[^>]*>Codex<\/option>/g)].length, 1);
+    assert.equal([...filtered.matchAll(/<option[^>]*>Claude<\/option>/g)].length, 1);
+    assert.doesNotMatch(filtered, /<option[^>]*>(?:codex|Claude Code)<\/option>/);
+    assert.match(filtered, /aria-label="Observed in 2 agents"/);
+    const grouped = skillDisplays(data, catalog).mine;
+    assert.equal(grouped.length, 1);
+    assert.equal(isMember(data.sets[0], grouped[0].installed!), true);
+    const saved = setSkillDisplays(data.sets[0], grouped)[0];
+    assert.deepEqual(saved.installed?.allSkillIds, ["missing-id"]);
+    assert.equal(saved.installed?.sourceSkills[0], data.skills[0]);
+    assert.match(render({ ...setNav, source: "codex" }, management), /aria-label="Open Saved snapshot"/);
+    assert.deepEqual(data.skills.map(inventorySummary), histories);
+    assert.deepEqual(data, beforeGrouping);
   } finally {
     if (descriptor) Object.defineProperty(globalThis, "window", descriptor); else Reflect.deleteProperty(globalThis, "window");
   }
