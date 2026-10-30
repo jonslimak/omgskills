@@ -16,16 +16,21 @@ function isPublicAppPage(url: URL) {
   if (!url.pathname.startsWith("/app/")) return false;
   if (url.pathname !== "/app/") return parsePublicNavigationPath(url.pathname.slice("/app/".length), url.search) !== null;
   const params = url.searchParams;
+  // A bare /app/ opens public Discover, not the signed-in library.
+  if (params.size === 0) return true;
   if ([...params.keys()].some(key => !["view", "id", "q", "skill", "source", "sort"].includes(key))) return false;
   const nav = parseNavigation(url.search);
   return params.get("view") === nav.view && isDiscovery(nav.view) && nav.source === "all"
     && (!nav.selected || nav.selected.startsWith("catalog:"));
 }
 
+function isTrackedPublicPage(url: URL) {
+  return isPublicAnalyticsPage(url.hostname, url.pathname) || isPublicAppPage(url);
+}
+
 export function startPublicAnalytics() {
   try {
-    const { hostname, pathname } = window.location;
-    if (!isPublicAnalyticsPage(hostname, pathname)
+    if (!isTrackedPublicPage(new URL(window.location.href))
       || (window as { Humblytics?: Humblytics }).Humblytics
       || document.querySelector(trackerSelector)) return;
     const script = document.createElement("script");
@@ -39,16 +44,14 @@ export function startPublicAnalytics() {
 export function needsAnalyticsDocumentReload(href: string) {
   if (window.location.hostname !== "omgskills.com" && window.location.hostname !== "www.omgskills.com") return false;
   const next = new URL(href, window.location.href);
-  return !isPublicAnalyticsPage(next.hostname, next.pathname) && !isPublicAppPage(next)
+  return !isTrackedPublicPage(next)
     && !!document.querySelector(trackerSelector);
 }
 
 /** Sends the event once Humblytics has loaded (it loads async), giving up after ~5 seconds. */
 export function trackEvent(name: EventName, attempts = 10) {
   try {
-    const { hostname, pathname } = window.location;
-    if (!isPublicAnalyticsPage(hostname, pathname)
-      && !(isPublicAppPage(new URL(window.location.href)) && document.querySelector(trackerSelector))) return;
+    if (!isTrackedPublicPage(new URL(window.location.href))) return;
     const track = (window as { Humblytics?: Humblytics }).Humblytics?.trackClickEvent;
     if (track) track(name);
     else if (attempts > 1) setTimeout(() => trackEvent(name, attempts - 1), 500);
