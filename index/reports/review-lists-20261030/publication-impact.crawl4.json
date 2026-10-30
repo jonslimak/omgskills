@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-30T20:50:23.893Z",
+  "track": "crawl4",
+  "sourceCommit": "e9e6d2cc794d096e15f8fd07a2a87707bae59ea6",
+  "policyDigest": "sha256:e079aa62e61ed75e1aea3f6805c8f57da1a8ab4a42a931241653c7d8af628511",
+  "baseline": {
+    "manifestGeneratedAt": "2026-10-30T16:28:40.884Z",
+    "skillsCount": 50724,
+    "collectionsCount": 338,
+    "membershipCount": 3767
+  },
+  "proposed": {
+    "manifestGeneratedAt": "2026-10-30T20:50:01.245Z",
+    "skillsCount": 50143,
+    "collectionsCount": 338,
+    "membershipCount": 3767
+  },
+  "skills": {
+    "addedCount": 0,
+    "removedCount": 581,
+    "removalThreshold": 500,
+    "addedSample": [],
+    "removedSample": [
+      "917Dhj/DeepPaperNote",
+      "A/.dotfiles:scrum-grooming",
+      "AgentWorkforce/relay:skills/adding-swarm-patterns",
+      "Agentchengfeng/chengfeng-videocut-skills:口播成片",
+      "AlpacaLabsLLC/skills-for-architects:plugins/01-site-planning/skills/history",
+      "Arcanexis/Alice-Single:skills/akshare",
+      "Arcanexis/Alice-Single:skills/fetch",
+      "Arslan-jh/3d-deep-research",
+      "Asymmetric-al/core:diagnose",
+      "Automattic/data-liberation-agent:skills/adapt",
+      "Automattic/data-liberation-agent:skills/compose-page-blocks",
+      "Automattic/data-liberation-agent:skills/creating-blocks",
+      "Automattic/data-liberation-agent:skills/creating-themes",
+      "Automattic/data-liberation-agent:skills/design-foundations",
+      "Automattic/data-liberation-agent:skills/design-qa",
+      "Automattic/data-liberation-agent:skills/diagnose",
+      "Automattic/data-liberation-agent:skills/editing-blocks",
+      "Automattic/data-liberation-agent:skills/editing-themes",
+      "Automattic/data-liberation-agent:skills/generating-patterns",
+      "Automattic/data-liberation-agent:skills/match-page"
+    ]
+  },
+  "collections": {
+    "addedIds": [],
+    "removedIds": [],
+    "removedMembershipCount": 0,
+    "removedMembershipPercent": 0
+  },
+  "assets": {
+    "addedKeys": [],
+    "removedKeys": [],
+    "authorizedRemovedKeys": []
+  },
+  "override": {
+    "enabled": true,
+    "reason": "Review lists: hide 581 skills whose GitHub source is gone (index/reports/review-lists-20261030)"
+  },
+  "issues": [
+    {
+      "code": "large-skill-removal",
+      "message": "removed 581 skills; threshold is 500 (500 or 2%, whichever is tighter)",
+      "blocking": false,
+      "overrideable": true
+    }
+  ],
+  "blocked": false
+}

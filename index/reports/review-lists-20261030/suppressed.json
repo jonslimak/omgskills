@@ -1,0 +1,2460 @@
+{
+ "count": 581,
+ "byReason": {
+  "source-skill-missing": 450,
+  "source-repo-missing": 5,
+  "moved-duplicate": 126
+ },
+ "skills": [
+  {
+   "id": "A/.dotfiles:scrum-grooming",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "AgentWorkforce/relay:skills/adding-swarm-patterns",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Agentchengfeng/chengfeng-videocut-skills:口播成片",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "AlpacaLabsLLC/skills-for-architects:plugins/01-site-planning/skills/history",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Arcanexis/Alice-Single:skills/akshare",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Arcanexis/Alice-Single:skills/fetch",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Asymmetric-al/core:diagnose",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/adapt",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/compose-page-blocks",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/creating-blocks",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/creating-themes",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/design-foundations",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/design-qa",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/diagnose",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/editing-blocks",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/editing-themes",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/generating-patterns",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/match-page",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/match-section",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/migrate",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/model-local-data",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/qa",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/rebuild-section",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/replicate-theme",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/replicate-with-blocks",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/testing-js",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/testing-php",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Automattic/data-liberation-agent:skills/testing-wp-runtime",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Bang-isme/CodexAI---Skills:skills/codex-design-system",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "CCOSTAN/Home-AssistantConfig:codex_skills/homeassistant-dashboard-designer",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "CaseMark/skills:skills/legal/form-d",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Casper-Studios/casper-marketplace:stack-patterns/skills/better-all",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Clockwork-Innovations/simply-mcp:claude-agent-sdk-ts",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Clockwork-Innovations/simply-mcp:mcp-tools",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Clockwork-Innovations/simply-mcp:shadcn-ui",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Cognitohazard/ltspice-mcp:ngspice",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ComposioHQ/composio-plugin-cc:composio-cli",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Crescent617/yomi:yomi-self",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "DataZooDE/anofox-forecast:.claude/skills/anofox-forecast",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ECNU-ICALK/AutoSkill:时空见证式哀伤外化对话",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Edward-H26/OnePromptClaudeCode:learn",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ElliotDrel/e-stack:edit-e-stack",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "EntityProcess/allagents:plugins/deepwiki/skills/deepwiki",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ErebusBat/chezmoi:dot_config/opencode/skill/atlassian-cli-jira",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ErebusBat/chezmoi:github-cli",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Fancu1/dotfile:skills/claude-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Gelio/dotfiles:pr-conventions",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "GregoryHo/arcforge:arc-writing-skills",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "JHamidun/claude-code-config-pack:writing-skills",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "KaiNakamura/dotfiles:auto",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "LeeYudok/doksam-skills:mobile-web-planner",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Leonxlnx/taste-skill:skills/minimalist-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Leonxlnx/taste-skill:skills/redesign-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Leonxlnx/taste-skill:skills/stitch-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Leonxlnx/taste-skill:skills/taste-skill-v1",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "LerianStudio/ring:dev-team/skills/dev-cycle",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MH4GF/dotfiles:session-log",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Meet-Miyani/compose-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Mnemoclaw/immune",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/00-meta-chain-flow-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/000-TnR",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/01-meta-chain-of-skills-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/02-meta-skill-forge-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/03-capture-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/10-session-new-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/11-session-continue-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/20-understand-goal-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/21-understand-research-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/22-understand-deep-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/23-understand-ask-ai-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/30-analyze-impact-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/31-analyze-think-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/32-analyze-verify-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/40-plan-action-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/50-execute-gated-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/51-execute-quality-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/52-execute-refactor-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/60-test-coverage",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/61-validate-lint-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/62-validate-integrity-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/70-close-task-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/71-close-tidy-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/72-session-close-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/73-lessons-learn-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "MykhailoDmytriakha/my-preacher-helper:.codex/skills/74-mid-session-save-150",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "NodeJSmith/Claudefiles:mine.challenge",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "OrcaQubits/agentic-commerce-claude-plugins:ap2-agentic-payments/skills/ap2-cart-mandate",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "OutlineDriven/odin-claude-plugin:skills/debug",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "OutlineDriven/odin-claude-plugin:skills/domain-model",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "OutlineDriven/odin-claude-plugin:skills/fix",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "PixiBixi/dotfiles:charting-grafana-metrics",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Ruya-AI/cozempic:plugin/skills/doctor",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "SkillNerds/xskill:xskill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "SteamedFish/dotfiles:test-driven-development",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Tapppi/dotfiles:subrepo-permissions",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "TeamSPWK/nova-algorithm:deep-dive-task",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "TeamSPWK/nova-algorithm:llm-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "TylorS/typed-smol:effect-module-resource",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "WILLOSCAR/research-units-pipeline-skills:.codex/skills/tutorial-spec",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Walrus-Computing/piper-draw:cso",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Walrus-Computing/piper-draw:design-html",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Walrus-Computing/piper-draw:landing-report",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Walrus-Computing/piper-draw:pair-agent",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Walrus-Computing/piper-draw:plan-ceo-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Walrus-Computing/piper-draw:retro",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Walrus-Computing/piper-draw:scrape",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Walrus-Computing/piper-draw:setup-browser-cookies",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Wenaixi/dsh-superpower:superpower-writing-skills",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Wolfe-Jam/faf-mcp:skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "YaroslavKomarov/ShedulerBot:skill-generator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Yeachan-Heo/oh-my-claudecode:skills/setup",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Yeachan-Heo/oh-my-codex:skills/review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ZeKaiNie/universal-examprep-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "a5c-ai/babysitter:plugins/babysitter-codex/skills/call",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "a5c-ai/babysitter:plugins/babysitter-codex/skills/help",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "a5c-ai/babysitter:plugins/babysitter-codex/skills/issue",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "a5c-ai/babysitter:plugins/babysitter-omp/skills/assimilate",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "adoptai/noui:noui-generate-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "agent-sh/agentsys:enhance-skills",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "agentscope-ai/OpenJudge:openjudge",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "agentscope-ai/OpenJudge:skills/auto-arena",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "agentscope-ai/OpenJudge:skills/bib-verify",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ahundt/autorun:claude-skill-builder",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ai-hero/hero-skills:create-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "aimasteracc/tree-sitter-analyzer:review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "aj-geddes/claude-code-bmad-skills:builder",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "aksisonline/gitswitch:skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "alexander-danilenko/cortex-ai-skills:skills/jira-report-comment",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "alirezarezvani/claude-skills:c-level-advisor",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "andfanilo/streamlit-echarts:.claude/skills/developing-with-streamlit/skills/building-streamlit-chat-ui",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "andfanilo/streamlit-echarts:.claude/skills/developing-with-streamlit/skills/building-streamlit-custom-components-v2",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "andfanilo/streamlit-echarts:.claude/skills/developing-with-streamlit/skills/building-streamlit-dashboards",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "andfanilo/streamlit-echarts:.claude/skills/developing-with-streamlit/skills/building-streamlit-multipage-apps",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "andfanilo/streamlit-echarts:.claude/skills/developing-with-streamlit/skills/choosing-streamlit-selection-widgets",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "andfanilo/streamlit-echarts:.claude/skills/developing-with-streamlit/skills/connecting-streamlit-to-snowflake",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "andfanilo/streamlit-echarts:.claude/skills/developing-with-streamlit/skills/creating-streamlit-themes",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "andfanilo/streamlit-echarts:.claude/skills/developing-with-streamlit/skills/displaying-streamlit-data",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "andfanilo/streamlit-echarts:.claude/skills/developing-with-streamlit/skills/improving-streamlit-design",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "anthropics/skills:skills/claude-academy-guide",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "arcasilesgroup/ai-engineering:.claude/skills/ai-test",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "arcasilesgroup/ai-engineering:src/ai_engineering/templates/project/.claude/skills/ai-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "athina-ai/goose-skills:skills/composites/inbound-lead-qualification",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:acul-screen-generator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:auth0-cli",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:auth0-expo",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:auth0-fastapi-api",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:auth0-flask",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:auth0-java-mvc-common",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:auth0-spa-js",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:auth0-springboot-api",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:auth0-swift",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:express-oauth2-jwt-bearer",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0-sdks/skills/auth0-android",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0-sdks/skills/auth0-angular",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0-sdks/skills/auth0-aspnetcore-api",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0-sdks/skills/auth0-express",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0-sdks/skills/auth0-fastify",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0-sdks/skills/auth0-fastify-api",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0-sdks/skills/auth0-nextjs",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0-sdks/skills/auth0-nuxt",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0-sdks/skills/auth0-react",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0-sdks/skills/auth0-react-native",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0-sdks/skills/auth0-vue",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0/skills/auth0-mfa",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0/skills/auth0-migration",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "auth0/agent-skills:plugins/auth0/skills/auth0-quickstart",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "awinogradov/code-assistants:pdf:create",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "awrshift/claude-memory-kit",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "awrshift/skill-gemini",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "axiomhq/skills:building-dashboards",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "axiomhq/skills:controlling-costs",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "axiomhq/skills:spl-to-apl",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ben196888/mac-set-up:codex-programming",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "bigdra50/dotfiles:sync-knowledge",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "bitrefill/agents:skills/bitrefill-cli",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "bitrefill/agents:skills/bitrefill-website",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "blakeox/llm-skills:skills/apple-ship",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "blakeox/llm-skills:skills/aws-ship",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "blakeox/llm-skills:skills/azure-ship",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "blakeox/llm-skills:skills/cloudflare-ship",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "broomva/skills",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "brujack/dotfiles:pr-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "channingwalton/dotfiles:.claude/skills/vault",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "chrisbanes/skills:compose-recomposition-performance",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "chrisbanes/skills:kotlin-coroutines-structured-concurrency",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "chriskrycho/nova-rust-2:.claude/skills/skill-developer",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "cliftonc/unwind:skills/analyzing-e2e-tests",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "cliftonc/unwind:skills/analyzing-integration-tests",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "cliftonc/unwind:skills/analyzing-unit-tests",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "cosscom/coss:coss-particles",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "cq112233/unibestX:writing-skills",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "crowdin/skills:crowdin-context-cli",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "daha1216/dsh-skill-adult-tension-narrative",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "darkroomengineering/cc-settings:skills/context",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "darkroomengineering/cc-settings:skills/init",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "darkroomengineering/cc-settings:skills/learn",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "davidondrej/skills:codex-goal-loop",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "deepklarity/harness-kit:.claude/skills/dk-breadcrumb-creator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "deepklarity/harness-kit:.claude/skills/dk-local-logs",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "deepklarity/harness-kit:.claude/skills/dk-local-run-spec",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "deepklarity/harness-kit:.claude/skills/dk-merge-resolve",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "deepklarity/harness-kit:.claude/skills/dk-slop-audit",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "devame/llm-context-tools:.claude/skills/.claude/skills/analyzing-codebases",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "duc01226/EasyPlatform:.claude/skills/code",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "duc01226/EasyPlatform:.claude/skills/context",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "duc01226/EasyPlatform:.claude/skills/feature",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "duc01226/EasyPlatform:.claude/skills/greenfield",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "duc01226/EasyPlatform:.claude/skills/lint",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "duc01226/easy-claude:.claude/skills/ask",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "eclipse-oniro-mirrors/arkui_ace_engine:.claude/skills/arkoala_diff_apply",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "emiperez95/cc-toolkit:skills/athena-pr-reviewer/skills/athena-pr-reviewer",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ericmjl/opencode-autolearn:self-improving-agent",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "etr/groundwork:skills-of-groundwork",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "expo/skills:native-data-fetching",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "eze-is/chat-memo-website:.claude/skills/chatmemo-update",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "fb0sh/pentester:playwright-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "fcakyon/claude-codex-settings:plugins/livekit-skills/skills/livekit-skills",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "fcakyon/claude-codex-settings:plugins/mongodb-skills/skills/atlas-stream-processing",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "flutter-it/watch_it:get-it-expert",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "geniusgordon/dotfiles:clickup-prd",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "get-convex/agent-skills:convex-setup-auth",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "getaero-io/gtm-eng-skills:skills/gtm-meta-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "getty104/claude-code-marketplace:base-tools/skills/check-library",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "github/awesome-copilot:create-github-pull-request-from-specification",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "github/awesome-copilot:csharp-mcp-server-generator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gustavofsantos/dot-files:knowledge",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "higgsfield-ai/cursor-plugin:skills/generate-image",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "higgsfield-ai/cursor-plugin:skills/generate-video",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "howarewoo/monorepo-template:.claude/skills/commit",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "huangwb8/ChineseResearchLaTeX:skills/guide-updater",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "hyperlane-xyz/hyperlane-monorepo:.claude/skills/claude-security-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "hyperlane-xyz/hyperlane-monorepo:.claude/skills/claude-tob-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "hyperlane-xyz/hyperlane-warp-ui-template:.claude/skills/claude-security-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "inliner-ai/agent-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "jabrena/cursor-rules-java:skills/001-skills-inventory",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "jabrena/cursor-rules-java:skills/003-agents-installation",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "jabrena/cursor-rules-java:skills/123-java-exception-handling",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "jabrena/cursor-rules-java:skills/180-java-observability-logging",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "jayhjenkins/ProductOSv0.2:.claude/skills/quality-gates/citation-compliance",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "jayhjenkins/ProductOSv0.2:.claude/skills/quality-gates/content-style",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "jmfontaine/jmf-claude-plugins:plugins/git/skills/commit",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "johnlindquist/script-kit-next:.opencode/skill/gpui",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "johnlindquist/script-kit-next:.opencode/skill/gpui-component",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/azure-devops-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/gitops-principles-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/holmesgpt-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "kagenti/kagenti:.claude/skills/kagenti:ui-debug",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "kanade0404/dotfiles:strategic-compact",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "kantord/dotfiles:chezmoi",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "keboola/ai-kit:plugins/dataapp-developer/skills/dataapp-dev",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "kenlck/skills:review-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "kirinnee/home-manager:create-file-processor-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "kyzdes/vps-ninja",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "lacolaco/dotfiles:address-pr-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "lacolaco/dotfiles:slack-notify",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "lambdalisue/dotfiles:cc-add-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "leeguooooo/chatgpt-imagegen",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "livekit/agent-skills:livekit-agents",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "lobehub/lobe-chat:debug",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "lobehub/lobehub:.agents/skills/agent-testing",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "mameli/dotfiles:sync-skills",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "maptiler/agent-skills",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "marbonestu/dotfiles:cargo-check",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "marcelocantos/skills:audit",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "mgajewskik/opencode-config:git-commit",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "microsoft/GitHub-Copilot-for-Azure:plugins/azure-skills/skills/azure-cost",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "microsoft/azure-skills:.github/plugins/azure-skills/skills/azure-cost",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "microsoft/github-copilot-for-azure:azure-cost",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "microsoft/power-platform-skills:edit-canvas-app",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "microsoft/power-platform-skills:plugins/canvas-apps/skills/generate-canvas-app",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "microsoft/skills:azure-hosted-copilot-sdk",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "mongodb/agent-skills:atlas-stream-processing",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "moorestech/moorestech:create-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nangongwentian-fe/jay-skills:sync-skill-to-jay",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "neonvoidx/dotfiles:agent-configuration",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "neonvoidx/nix:agent-configuration",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ngocsangyem/MeowKit:meow:document-release",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ngocsangyem/MeowKit:meow:office-hours",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ngocsangyem/MeowKit:meow:plan-ceo-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ngocsangyem/MeowKit:meow:plan-creator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ngocsangyem/MeowKit:meow:sprint-contract",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ngocsangyem/MeowKit:meow:validate-plan",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nvidia/skills:doca-flow-dpa-perf",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nvidia/skills:doca-flow-perf",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "o11y-dev/reflect:skills",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "oceanbase/powercontext:powercontext",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "oldwinter/skills:research",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "oliver-kriska/claude-elixir-phoenix:plugins/elixir-phoenix/skills/call-tracing",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "openai/openai-agents-python:.agents/skills/examples-auto-run",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "passionseed/ps_app:truefoundry-access-control",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "passionseed/ps_app:truefoundry-access-tokens",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "passionseed/ps_app:truefoundry-mcp-servers",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "paulrobello/parsidion-cc:parsidion-cc",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "poemswe/co-researcher:.codex/skills/ethics",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "poemswe/co-researcher:.codex/skills/grant",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "poemswe/co-researcher:.codex/skills/research",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "poemswe/co-researcher:.codex/skills/review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "posit-dev/skills:r-lib/cli",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "posit-dev/skills:r-lib/cran-extrachecks",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "purrgrammer/grimoire:.claude/skills/nostr",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "rlch/dotfiles:docs-sync",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/02-cqrs-command-generator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/03-cqrs-query-generator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/04-domain-entity-generator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/05-repository-pattern",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/06-ef-core-configuration",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/07.2-minimal-api-endpoints",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/08-result-pattern",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/09-domain-events-generator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/10-pipeline-behaviors",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/11-fluent-validation",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/12-jwt-authentication",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/13-permission-authorization",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/14-outbox-pattern",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/15-quartz-background-jobs",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/16.1-email-service-sendgrid",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/16.2-email-service-aws-ses",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/17-health-checks",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/18-audit-trail",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/19-dapper-query-builder",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/20-specification-pattern",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/21-unit-testing",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/22-integration-testing",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/23-logging-configuration",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/24-rate-limiting",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/25.1-postgresql-best-practices",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/25.2-sqlserver-best-practices",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ronnythedev/dotnet-clean-architecture-skills:skills/26-options-pattern",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ruvnet/ruflo:plugins/ruflo-core/skills/doctor",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ryan-ressmeyer/agent-config:literature-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ryan-ressmeyer/llm-skills:literature-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "sasamuku/dotfiles:.claude/skills/create-sub-issue",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "scapilix/LojaDiana:upstash-qstash",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "shedowe19/ShieldPM:skill-creator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "soheilmomeniii/positioning-products",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "soneta/soneta-erp-skills:soneta-addon-planning",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "soneta/soneta-erp-skills:soneta-ui-style",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "stbenjam/claude-nine:plugins/books/skills/calibre",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "stevenwinnick/ai-agent-config:converting-repos",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:building-streamlit-chat-ui",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:building-streamlit-custom-components-v2",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:building-streamlit-dashboards",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:building-streamlit-multipage-apps",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:choosing-streamlit-selection-widgets",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:connecting-streamlit-to-snowflake",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:creating-streamlit-themes",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:displaying-streamlit-data",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:improving-streamlit-design",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:optimizing-streamlit-performance",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:organizing-streamlit-code",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:setting-up-streamlit-environment",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:using-streamlit-cli",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:using-streamlit-custom-components",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:using-streamlit-layouts",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:using-streamlit-markdown",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "streamlit/agent-skills:using-streamlit-session-state",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "susamn/dotfiles:skill-creator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "suxrobGM/sgm-website:cover-letter",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "tarrragon/claude:skills/test-async-guardian",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "tilmon-engineering/claude-skills:plugins/autonomy/skills/analyzing-branch-status",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "treasure-data/td-skills:tdx-skills/agent-prompt",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "trezero/archon-trinity:archon-extension-sync",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ttakanawa/dotfiles:find-session-file",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "vercel-labs/json-render:shadcn",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "webiny/webiny-js:skills-generator",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "workersio/spec:skill-benchmark",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "wrsmith108/skill-builder-claude-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "xberg-io/crawlberg:automating-the-browser",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "xoai/sage:research",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "xr843/Master-skill:prebuilt/fazang",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "xr843/Master-skill:prebuilt/huineng",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "xr843/Master-skill:prebuilt/kumarajiva",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "yigitkonur/skills-by-yigitkonur:enhance-skill-by-derailment",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ytqh/agent-skills:learn-from-mistake",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "zjamesblake/claude-code-workspace-generator:new-workflow",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Arslan-jh/3d-deep-research",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "KimYx0207/agent-teams-playbook",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:arbeitsrecht-aufopferung",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:beirat-zustimmungsvorbehalte",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:bho-114-entlastung-praktisch-anwenden",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:cic-can-1320",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:cic-can-1413",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:fachanwalt-erbrecht-erbschaftsausschlagung",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:geldwaesche-verhandlung-vergleich-und-eskalation",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:inso-p237-stimmrecht-der-insolvenzglaubiger",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:lph-09-mangel-claim-vorsorge",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:lph-09-terminsteuerung",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:naturrecht-und-aufklaerung",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:notariat-014-ehevertrag-scheidungsfolgenvereinbarung-belehrung",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:spezial-glaeubigerantrag-risikoampel-und-gegenargumente",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:spezial-ueber-schriftsatz-brief-und-memo-bausteine",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Klotzkette/claude-fuer-deutsches-recht:spezial-visum-national-d",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Lobbi-Docs/claude:plugins/jira-orchestrator/skills/confluence",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "RedBoardDev/cookmate:.codex/skills/backend-context-loader",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "SyntaxAsSpiral/zk-context-vault:nix-os",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ThomasMoreAI/legal-skills-open:forma-cn",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ThomasMoreAI/legal-skills-open:gesellschaftsgruender-rechtsformwahl",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ThomasMoreAI/legal-skills-open:ip-management",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "ThomasMoreAI/legal-skills-open:kanzlei-allgemein-lohn-sv",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "VectorSpaceLab/AREX-Skill:passnet-skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "Wayne2Wang/codex-cat-hatcher",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "agricidaniel/codex-seo:seo-programmatic",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "beep-effect/beep-effect:effect-services",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "bfly123/claude_code_bridge:claude_skills/ask",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "bfly123/claude_code_bridge:codex_skills/ask",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "dotnet/dotnet:nuget-restore-repro-triage",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "fusengine/agents:plugins/ai-pilot/skills/apex",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:agentflow",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:bug-bounty",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:content-writer",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:cutlass_skill",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:dbs-agent-migration",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:debrief",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:file-op",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:glean-rate-limits",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:inline-widget",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:loom",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:octocode-install",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:skill-check",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "liferay/liferay-portal:manage-environments",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "liferay/liferay-portal:mcp-server",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "liferay/liferay-portal:scaffold-fragment",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:autoplan",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:benchmark",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:codex",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:context-save",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:cso",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:design-consultation",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:design-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:design-shotgun",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:devex-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:document-generate",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:health",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:ios-design-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:ios-qa",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:land-and-deploy",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:learn",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:make-pdf",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:office-hours",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:plan-ceo-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:plan-eng-review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:qa-only",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:review",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:setup-browser-cookies",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:setup-deploy",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:setup-gbrain",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "nota-america/forgecat-agent-profiles:ship",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "posthog/posthog:auditing-warehouse-data-health",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "posthog/posthog:making-scenes-tab-aware",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "posthog/posthog:query-clickhouse-via-metabase",
+   "reason": "source-skill-missing"
+  },
+  {
+   "id": "The-Skyy-Rose-Collection-LLC/DevSkyy:continuous-learning",
+   "reason": "source-repo-missing"
+  },
+  {
+   "id": "johnpsasser/nanobanana",
+   "reason": "source-repo-missing"
+  },
+  {
+   "id": "vicyap/skills:vimtutor",
+   "reason": "source-repo-missing"
+  },
+  {
+   "id": "dzcmemory-web/bazi-ziwei-skill",
+   "reason": "source-repo-missing"
+  },
+  {
+   "id": "jackwener/wx-cli:wx-cli",
+   "reason": "source-repo-missing"
+  },
+  {
+   "id": "917Dhj/DeepPaperNote",
+   "reason": "moved-duplicate",
+   "replacementId": "917dhj/deeppapernote:deeppapernote"
+  },
+  {
+   "id": "Bradliebs/VolumeTurtle:gstack-gstack-upgrade",
+   "reason": "moved-duplicate",
+   "replacementId": "Bradliebs/VolumeTurtle:gstack-upgrade"
+  },
+  {
+   "id": "Bradliebs/VolumeTurtle:gstack-investigate",
+   "reason": "moved-duplicate",
+   "replacementId": "Bradliebs/VolumeTurtle:investigate"
+  },
+  {
+   "id": "DeL-TaiseiOzaki/claude-code-orchestra:.gemini/skills/context-loader",
+   "reason": "moved-duplicate",
+   "replacementId": "DeL-TaiseiOzaki/claude-code-orchestra:.codex/skills/context-loader"
+  },
+  {
+   "id": "K-Dense-AI/claude-scientific-skills:scientific-skills/fluidsim",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:fluidsim"
+  },
+  {
+   "id": "K-Dense-AI/claude-scientific-skills:scientific-skills/geniml",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:geniml"
+  },
+  {
+   "id": "K-Dense-AI/claude-scientific-skills:scientific-skills/gtars",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:gtars"
+  },
+  {
+   "id": "K-Dense-AI/claude-scientific-skills:scientific-skills/latchbio-integration",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:latchbio-integration"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/adaptyv",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:adaptyv"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/aeon",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:aeon"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/anndata",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:anndata"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/arboreto",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:arboreto"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/astropy",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:astropy"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/autoskill",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:autoskill"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/benchling-integration",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:benchling-integration"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/bgpt-paper-search",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:bgpt-paper-search"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/biopython",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:biopython"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/bioservices",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:bioservices"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/cellxgene-census",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:cellxgene-census"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/cirq",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:cirq"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/citation-management",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:citation-management"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/clinical-decision-support",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:clinical-decision-support"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/clinical-reports",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:clinical-reports"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/cobrapy",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:cobrapy"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/consciousness-council",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:consciousness-council"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/dask",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:dask"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/database-lookup",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:database-lookup"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/datamol",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:datamol"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/deepchem",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:deepchem"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/deeptools",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:deeptools"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/depmap",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:depmap"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/dhdna-profiler",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:dhdna-profiler"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/diffdock",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:diffdock"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/dnanexus-integration",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:dnanexus-integration"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/esm",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:esm"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/etetoolkit",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:etetoolkit"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/exploratory-data-analysis",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:exploratory-data-analysis"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/flowio",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:flowio"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/generate-image",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:generate-image"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/geomaster",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:geomaster"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/geopandas",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:geopandas"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/get-available-resources",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:get-available-resources"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/gget",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:gget"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/ginkgo-cloud-lab",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:ginkgo-cloud-lab"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/glycoengineering",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:glycoengineering"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/histolab",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:histolab"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/hugging-science",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:hugging-science"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/hypogenic",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:hypogenic"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/hypothesis-generation",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:hypothesis-generation"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/imaging-data-commons",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:imaging-data-commons"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/infographics",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:infographics"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/labarchive-integration",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:labarchive-integration"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/lamindb",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:lamindb"
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scientific-skills/latex-posters",
+   "reason": "moved-duplicate",
+   "replacementId": "k-dense-ai/scientific-agent-skills:latex-posters"
+  },
+  {
+   "id": "Kadajett/agent-nestjs-skills",
+   "reason": "moved-duplicate",
+   "replacementId": "kadajett/agent-nestjs-skills:nestjs-best-practices"
+  },
+  {
+   "id": "a5c-ai/babysitter:plugins/babysitter-codex/skills/babysit",
+   "reason": "moved-duplicate",
+   "replacementId": "a5c-ai/babysitter:plugins/babysitter/skills/babysit"
+  },
+  {
+   "id": "ahmedkhaledmohamed/PM-AI-Partner-Framework:framework/templates/claude-code-skills/builder",
+   "reason": "moved-duplicate",
+   "replacementId": "ahmedkhaledmohamed/PM-AI-Partner-Framework:framework/templates/skills/builder"
+  },
+  {
+   "id": "ahmedkhaledmohamed/PM-AI-Partner-Framework:framework/templates/claude-code-skills/data-analyst",
+   "reason": "moved-duplicate",
+   "replacementId": "ahmedkhaledmohamed/PM-AI-Partner-Framework:framework/templates/skills/data-analyst"
+  },
+  {
+   "id": "ahmedkhaledmohamed/PM-AI-Partner-Framework:framework/templates/claude-code-skills/devil-advocate",
+   "reason": "moved-duplicate",
+   "replacementId": "ahmedkhaledmohamed/PM-AI-Partner-Framework:framework/templates/skills/devil-advocate"
+  },
+  {
+   "id": "anthropics/knowledge-work-plugins:small-business/skills/review-contract",
+   "reason": "moved-duplicate",
+   "replacementId": "anthropics/knowledge-work-plugins:review-contract"
+  },
+  {
+   "id": "boshu2/agentops:skills-codex-overrides/council",
+   "reason": "moved-duplicate",
+   "replacementId": "boshu2/agentops:skills/council"
+  },
+  {
+   "id": "boshu2/agentops:skills-codex/council",
+   "reason": "moved-duplicate",
+   "replacementId": "boshu2/agentops:skills/council"
+  },
+  {
+   "id": "boshu2/agentops:skills-codex/doc",
+   "reason": "moved-duplicate",
+   "replacementId": "boshu2/agentops:skills/doc"
+  },
+  {
+   "id": "boshu2/agentops:skills-codex/implement",
+   "reason": "moved-duplicate",
+   "replacementId": "boshu2/agentops:skills/implement"
+  },
+  {
+   "id": "brettdavies/crawl4ai-skill:crawl4ai",
+   "reason": "moved-duplicate",
+   "replacementId": "brettdavies/crawl4ai-skill"
+  },
+  {
+   "id": "danielmiessler/LifeOS:AudioEditor",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/Personal_AI_Infrastructure:AudioEditor"
+  },
+  {
+   "id": "danielmiessler/LifeOS:Fabric",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Fabric"
+  },
+  {
+   "id": "danielmiessler/LifeOS:IterativeDepth",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/IterativeDepth"
+  },
+  {
+   "id": "danielmiessler/LifeOS:RedTeam",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/RedTeam"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:AnnualReports",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/AnnualReports"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Fabric",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Fabric"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:IterativeDepth",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/IterativeDepth"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Prompting",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Prompting"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/Art",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:Art"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/BrightData",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/BrightData"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/Council",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Council"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/CreateCLI",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/CreateCLI"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.3/.claude/skills/CreateSkill",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/Personal_AI_Infrastructure:CreateSkill"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/AnnualReports",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/AnnualReports"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/Aphorisms",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:Aphorisms"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/BeCreative",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/BeCreative"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/BrightData",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/BrightData"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/Council",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Council"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/CreateSkill",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/Personal_AI_Infrastructure:CreateSkill"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/Fabric",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Fabric"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.4/.claude/skills/FirstPrinciples",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/FirstPrinciples"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/Art",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:Art"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/CreateCLI",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/CreateCLI"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/CreateSkill",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/Personal_AI_Infrastructure:CreateSkill"
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/FirstPrinciples",
+   "reason": "moved-duplicate",
+   "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/FirstPrinciples"
+  },
+  {
+   "id": "dartsim/dart:.codex/skills/dart-build",
+   "reason": "moved-duplicate",
+   "replacementId": "dartsim/dart:.claude/skills/dart-build"
+  },
+  {
+   "id": "dartsim/dart:.codex/skills/dart-ci",
+   "reason": "moved-duplicate",
+   "replacementId": "dartsim/dart:.claude/skills/dart-ci"
+  },
+  {
+   "id": "dartsim/dart:.codex/skills/dart-contribute",
+   "reason": "moved-duplicate",
+   "replacementId": "dartsim/dart:.claude/skills/dart-contribute"
+  },
+  {
+   "id": "dartsim/dart:.codex/skills/dart-io",
+   "reason": "moved-duplicate",
+   "replacementId": "dartsim/dart:.claude/skills/dart-io"
+  },
+  {
+   "id": "dartsim/dart:.codex/skills/dart-python",
+   "reason": "moved-duplicate",
+   "replacementId": "dartsim/dart:.claude/skills/dart-python"
+  },
+  {
+   "id": "dartsim/dart:.codex/skills/dart-test",
+   "reason": "moved-duplicate",
+   "replacementId": "dartsim/dart:.claude/skills/dart-test"
+  },
+  {
+   "id": "endman100/skill-router-nexus:gstack-design-consultation",
+   "reason": "moved-duplicate",
+   "replacementId": "endman100/skill-router-nexus:design-consultation"
+  },
+  {
+   "id": "endman100/skill-router-nexus:gstack-document-release",
+   "reason": "moved-duplicate",
+   "replacementId": "endman100/skill-router-nexus:document-release"
+  },
+  {
+   "id": "fluxxion82/android-emulator-skill:skill",
+   "reason": "moved-duplicate",
+   "replacementId": "fluxxion82/android-emulator-skill:android-emulator-skill"
+  },
+  {
+   "id": "githubnext/gh-aw:skills/developer",
+   "reason": "moved-duplicate",
+   "replacementId": "github/gh-aw:developer"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:context7-skill",
+   "reason": "moved-duplicate",
+   "replacementId": "julianobarbosa/claude-code-skills:context7"
+  },
+  {
+   "id": "lambdalisue/dotfiles:ai-notes",
+   "reason": "moved-duplicate",
+   "replacementId": "lambdalisue/dotfiles:home/claude/skills/ai-notes"
+  },
+  {
+   "id": "microsoft/github-copilot-for-azure:azure-compute",
+   "reason": "moved-duplicate",
+   "replacementId": "microsoft/GitHub-Copilot-for-Azure:plugins/azure-skills/skills/azure-compute"
+  },
+  {
+   "id": "microsoft/github-copilot-for-azure:azure-diagnostics",
+   "reason": "moved-duplicate",
+   "replacementId": "microsoft/GitHub-Copilot-for-Azure:plugins/azure-skills/skills/azure-diagnostics"
+  },
+  {
+   "id": "microsoft/github-copilot-for-azure:azure-enterprise-infra-planner",
+   "reason": "moved-duplicate",
+   "replacementId": "microsoft/GitHub-Copilot-for-Azure:plugins/azure-skills/skills/azure-enterprise-infra-planner"
+  },
+  {
+   "id": "microsoft/github-copilot-for-azure:azure-kubernetes",
+   "reason": "moved-duplicate",
+   "replacementId": "microsoft/GitHub-Copilot-for-Azure:plugins/azure-skills/skills/azure-kubernetes"
+  },
+  {
+   "id": "microsoft/github-copilot-for-azure:azure-resource-lookup",
+   "reason": "moved-duplicate",
+   "replacementId": "microsoft/GitHub-Copilot-for-Azure:plugins/azure-skills/skills/azure-resource-lookup"
+  },
+  {
+   "id": "microsoft/github-copilot-for-azure:entra-agent-id",
+   "reason": "moved-duplicate",
+   "replacementId": "microsoft/GitHub-Copilot-for-Azure:plugins/azure-skills/skills/entra-agent-id"
+  },
+  {
+   "id": "microsoft/github-copilot-for-azure:microsoft-foundry",
+   "reason": "moved-duplicate",
+   "replacementId": "microsoft/GitHub-Copilot-for-Azure:plugins/azure-skills/skills/microsoft-foundry"
+  },
+  {
+   "id": "nowork-studio/NotFair:content-writer",
+   "reason": "moved-duplicate",
+   "replacementId": "nowork-studio/toprank:content-writer"
+  },
+  {
+   "id": "nowork-studio/NotFair:seo-analysis",
+   "reason": "moved-duplicate",
+   "replacementId": "nowork-studio/toprank:seo-analysis"
+  },
+  {
+   "id": "oaustegard/claude-skills:building-github-index-v2",
+   "reason": "moved-duplicate",
+   "replacementId": "oaustegard/claude-skills:building-github-index"
+  },
+  {
+   "id": "ruvnet/claude-flow:v2/.claude/skills/agentdb-optimization",
+   "reason": "moved-duplicate",
+   "replacementId": "ruvnet/ruflo:agentdb-performance-optimization"
+  },
+  {
+   "id": "ruvnet/claude-flow:v2/.claude/skills/agentic-jujutsu",
+   "reason": "moved-duplicate",
+   "replacementId": "ruvnet/ruflo:agentic-jujutsu"
+  },
+  {
+   "id": "ruvnet/claude-flow:v2/.claude/skills/github-workflow-automation",
+   "reason": "moved-duplicate",
+   "replacementId": "ruvnet/ruflo:github-workflow-automation"
+  },
+  {
+   "id": "ruvnet/ruflo:v2/.claude/skills/flow-nexus-neural",
+   "reason": "moved-duplicate",
+   "replacementId": "ruvnet/ruflo:flow-nexus-neural"
+  },
+  {
+   "id": "ruvnet/ruflo:v2/.claude/skills/flow-nexus-platform",
+   "reason": "moved-duplicate",
+   "replacementId": "ruvnet/ruflo:flow-nexus-platform"
+  },
+  {
+   "id": "ruvnet/ruflo:v2/.claude/skills/flow-nexus-swarm",
+   "reason": "moved-duplicate",
+   "replacementId": "ruvnet/ruflo:flow-nexus-swarm"
+  },
+  {
+   "id": "ruvnet/ruflo:v2/.claude/skills/github-code-review",
+   "reason": "moved-duplicate",
+   "replacementId": "ruvnet/ruflo:github-code-review"
+  },
+  {
+   "id": "ruvnet/ruflo:v2/.claude/skills/github-project-management",
+   "reason": "moved-duplicate",
+   "replacementId": "ruvnet/ruflo:github-project-management"
+  },
+  {
+   "id": "ruvnet/ruflo:v2/.claude/skills/github-release-management",
+   "reason": "moved-duplicate",
+   "replacementId": "ruvnet/ruflo:github-release-management"
+  },
+  {
+   "id": "ruvnet/ruflo:v2/.claude/skills/hive-mind-advanced",
+   "reason": "moved-duplicate",
+   "replacementId": "ruvnet/ruflo:hive-mind-advanced"
+  },
+  {
+   "id": "trailofbits/skills:plugins/skill-improver/skills/skill-improver",
+   "reason": "moved-duplicate",
+   "replacementId": "trailofbits/skills:skill-improver"
+  },
+  {
+   "id": "twostraws/SwiftUI-Agent-Skill:swiftui-pro/skills/swiftui-pro",
+   "reason": "moved-duplicate",
+   "replacementId": "twostraws/swiftui-agent-skill:swiftui-pro"
+  },
+  {
+   "id": "umputun/agterm:agent-skill",
+   "reason": "moved-duplicate",
+   "replacementId": "umputun/agterm:agterm"
+  },
+  {
+   "id": "xixihhhh/clipforge:clipforge",
+   "reason": "moved-duplicate",
+   "replacementId": "xixihhhh/clipforge:clipforge-video"
+  }
+ ]
+}

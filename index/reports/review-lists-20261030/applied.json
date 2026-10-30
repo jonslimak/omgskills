@@ -1,0 +1,1621 @@
+{
+ "count": 232,
+ "skills": [
+  {
+   "id": "clawdbot/clawdbot:skills/discord",
+   "action": "refresh",
+   "pinned": true
+  },
+  {
+   "id": "code-yeongyu/oh-my-openagent:src/features/builtin-skills/git-master",
+   "action": "refresh",
+   "pinned": true
+  },
+  {
+   "id": "danielmiessler/Personal_AI_Infrastructure:CreateSkill",
+   "action": "refresh",
+   "pinned": true
+  },
+  {
+   "id": "earthtojake/text-to-cad:step-parts",
+   "action": "refresh",
+   "pinned": true
+  },
+  {
+   "id": "Ai-Eastern/reuse-before-build",
+   "action": "new-path",
+   "path": "skills/reuse-before-build/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Ai-Eastern/reuse-before-build"
+  },
+  {
+   "id": "AutoFor/dotfiles:gh-pr-approve",
+   "action": "new-path",
+   "path": "codex/skills.disabled/gh-backup-20260506/gh-pr-approve/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/AutoFor/dotfiles"
+  },
+  {
+   "id": "Bobby-Gray/claude-dnd-skill",
+   "action": "new-path",
+   "path": "skills/dnd/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/neuralinitiative/claude-dnd-skill"
+  },
+  {
+   "id": "CamilleScholtz/swmpc:swiftui-whats-new-27",
+   "action": "new-path",
+   "path": ".agents/skills/swiftui-whats-new-27/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/CamilleScholtz/swmpc"
+  },
+  {
+   "id": "DataDog/dd-trace-py:.claude/skills/compare-cpython-versions",
+   "action": "new-path",
+   "path": ".agents/skills/compare-cpython-versions/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/DataDog/dd-trace-py"
+  },
+  {
+   "id": "DorShaer/Husk:AudioEditor",
+   "action": "new-path",
+   "path": "libs/lifeos/skills/AudioEditor/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/DorShaer/Husk"
+  },
+  {
+   "id": "Edward-H26/OnePromptClaudeCode:plan-design-review",
+   "action": "new-path",
+   "path": ".claude/skills/plan-design-review/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Edward-H26/OnePromptClaudeCode"
+  },
+  {
+   "id": "Edward-H26/OnePromptClaudeCode:review",
+   "action": "new-path",
+   "path": ".claude/skills/review/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Edward-H26/OnePromptClaudeCode"
+  },
+  {
+   "id": "Esposter/Esposter:.claude/skills/dependency-updates",
+   "action": "new-path",
+   "path": ".agents/skills/dependency-updates/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Esposter/Esposter"
+  },
+  {
+   "id": "HiQS-Labs/XYZ-forge:vendor-stack",
+   "action": "new-path",
+   "path": "skills/4-occasional/vendor-stack/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/HiQS-Labs/XYZ-forge"
+  },
+  {
+   "id": "HiroHyun/grounded-copy",
+   "action": "new-path",
+   "path": "skills/grounded-copy/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/HiroHyun/grounded-copy"
+  },
+  {
+   "id": "HolobiomicsLab/asb-skill-collections:fragmentation-spectrum-extraction",
+   "action": "new-path",
+   "path": "packs/metabolomics/lc-ms/leaves/fragmentation-spectrum-extraction/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/HolobiomicsLab/asb-skill-collections"
+  },
+  {
+   "id": "HolobiomicsLab/asb-skill-collections:metabolomic-feature-table-imputation",
+   "action": "new-path",
+   "path": "packs/metabolomics/lc-ms/leaves/metabolomic-feature-table-imputation/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/HolobiomicsLab/asb-skill-collections"
+  },
+  {
+   "id": "JPeetz/agent-skills:accessibility-compliance-audit",
+   "action": "new-path",
+   "path": "skills/frontend/accessibility-compliance-audit/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/JPeetz/agent-skills"
+  },
+  {
+   "id": "JPeetz/agent-skills:skill-lifecycle-foundry",
+   "action": "new-path",
+   "path": "skills/skill-development/skill-lifecycle-foundry/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/JPeetz/agent-skills"
+  },
+  {
+   "id": "Jaxon1216/interview-analyzer-skill",
+   "action": "new-path",
+   "path": "skill/project-interview-skill/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Jaxon1216/interview-analyzer-skill"
+  },
+  {
+   "id": "Jeffallan/writing-with-agents:skills/architect",
+   "action": "new-path",
+   "path": "plugin/skills/architect/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Jeffallan/writing-with-agents"
+  },
+  {
+   "id": "Jeffallan/writing-with-agents:skills/carpenter",
+   "action": "new-path",
+   "path": "plugin/skills/carpenter/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Jeffallan/writing-with-agents"
+  },
+  {
+   "id": "Jeffallan/writing-with-agents:skills/content-strategist",
+   "action": "new-path",
+   "path": "plugin/skills/content-strategist/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Jeffallan/writing-with-agents"
+  },
+  {
+   "id": "Jeffallan/writing-with-agents:skills/judge",
+   "action": "new-path",
+   "path": "plugin/skills/judge/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Jeffallan/writing-with-agents"
+  },
+  {
+   "id": "Jeffallan/writing-with-agents:skills/knowledge-harvester",
+   "action": "new-path",
+   "path": "plugin/skills/knowledge-harvester/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Jeffallan/writing-with-agents"
+  },
+  {
+   "id": "Jeffallan/writing-with-agents:skills/madman",
+   "action": "new-path",
+   "path": "plugin/skills/madman/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Jeffallan/writing-with-agents"
+  },
+  {
+   "id": "Jeffallan/writing-with-agents:skills/quality-rubric",
+   "action": "new-path",
+   "path": "plugin/skills/quality-rubric/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Jeffallan/writing-with-agents"
+  },
+  {
+   "id": "Jeffallan/writing-with-agents:skills/research-intake",
+   "action": "new-path",
+   "path": "plugin/skills/research-intake/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Jeffallan/writing-with-agents"
+  },
+  {
+   "id": "Jeffallan/writing-with-agents:skills/seo-writer",
+   "action": "new-path",
+   "path": "plugin/skills/seo-writer/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Jeffallan/writing-with-agents"
+  },
+  {
+   "id": "Jeffallan/writing-with-agents:skills/whirlybird",
+   "action": "new-path",
+   "path": "plugin/skills/whirlybird/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Jeffallan/writing-with-agents"
+  },
+  {
+   "id": "JotJunior/cstk:plan",
+   "action": "new-path",
+   "path": "plugins/cstk/skills/plan/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/JotJunior/cstk"
+  },
+  {
+   "id": "JotJunior/cstk:specify",
+   "action": "new-path",
+   "path": "plugins/cstk/skills/specify/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/JotJunior/cstk"
+  },
+  {
+   "id": "MustBeSimo/web-design-studio",
+   "action": "new-path",
+   "path": "skills/cinematic-scroll/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/MustBeSimo/web-design-studio"
+  },
+  {
+   "id": "Openclaw-Metis/cc-designer",
+   "action": "new-path",
+   "path": "cc-designer/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Openclaw-Metis/cc-designer"
+  },
+  {
+   "id": "OptimNow/cloud-finops-skills:cloud-finops",
+   "action": "new-path",
+   "path": "plugins/cloud-finops/skills/cloud-finops/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/OptimNow/cloud-finops-skills"
+  },
+  {
+   "id": "OutlineDriven/odin-claude-plugin:skills/ai-collab-protocols",
+   "action": "new-path",
+   "path": "plugins/odin-core/skills/ai-collab-protocols/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/OutlineDriven/odin-claude-plugin"
+  },
+  {
+   "id": "OutlineDriven/odin-claude-plugin:skills/askme",
+   "action": "new-path",
+   "path": "plugins/odin-planning/skills/askme/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/OutlineDriven/odin-claude-plugin"
+  },
+  {
+   "id": "OutlineDriven/odin-claude-plugin:skills/axiom-mode",
+   "action": "new-path",
+   "path": "plugins/odin-core/skills/axiom-mode/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/OutlineDriven/odin-claude-plugin"
+  },
+  {
+   "id": "OutlineDriven/odin-claude-plugin:skills/design",
+   "action": "new-path",
+   "path": "plugins/odin-design/skills/design/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/OutlineDriven/odin-claude-plugin"
+  },
+  {
+   "id": "OutlineDriven/odin-claude-plugin:skills/duet",
+   "action": "new-path",
+   "path": "plugins/odin-run/skills/duet/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/OutlineDriven/odin-claude-plugin"
+  },
+  {
+   "id": "OutlineDriven/odin-claude-plugin:skills/explore",
+   "action": "new-path",
+   "path": "plugins/odin-code/skills/explore/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/OutlineDriven/odin-claude-plugin"
+  },
+  {
+   "id": "Soul-Brews-Studio/arra-oracle-skills-cli:mailbox",
+   "action": "new-path",
+   "path": "src/skills/.archive/mailbox/SKILL.md",
+   "pinned": false,
+   "github_url": "https://github.com/Soul-Brews-Studio/arra-oracle-skills-cli"
+  },
+  {
+   "id": "Soushi888/holochain-agent-skills",
+   "action": "new-path",
+   "path": "skills/holochain/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Soushi888/holochain-agent-skills"
+  },
+  {
+   "id": "TYBLHQY/mihomo-skill",
+   "action": "new-path",
+   "path": "skills/mihomo/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/TYBLHQY/mihomo-skill"
+  },
+  {
+   "id": "TeamWiseFlow/xiaobei:ir-record",
+   "action": "new-path",
+   "path": "crews/main/skills/expert-ir/tools/ir-record/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/TeamWiseFlow/xiaobei"
+  },
+  {
+   "id": "Terryc21/unforget",
+   "action": "new-path",
+   "path": "skills/unforget/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Terryc21/unforget"
+  },
+  {
+   "id": "TheaDust/lore",
+   "action": "new-path",
+   "path": "skill/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/TheaDust/lore"
+  },
+  {
+   "id": "WenJunDuan/Rlues:vibe-dev",
+   "action": "new-path",
+   "path": "vibeCoding/old/04-athena-8.9-9.9.9/claude/9.3.9/.claude/skills/vibe-dev/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/WenJunDuan/Rlues"
+  },
+  {
+   "id": "YurunChen/repo-docs-skills",
+   "action": "new-path",
+   "path": "skills/repo-docs/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/YurunChen/repo-docs-skills"
+  },
+  {
+   "id": "Zyoffsec/airtight-secure-coding",
+   "action": "new-path",
+   "path": "skills/airtight/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/Zyoffsec/airtight-secure-coding"
+  },
+  {
+   "id": "adeonir/agent-skills:skill-reliability",
+   "action": "new-path",
+   "path": "skills/productivity/skill-reliability/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/adeonir/agent-skills"
+  },
+  {
+   "id": "agntcy/shadi:agentbridge",
+   "action": "new-path",
+   "path": "skills/agentbridge/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/agntcy/shadi"
+  },
+  {
+   "id": "ahmadatallah/jabr",
+   "action": "new-path",
+   "path": "skills/jabr/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/ahmadatallah/jabr"
+  },
+  {
+   "id": "aliyun/data-agent-skill",
+   "action": "new-path",
+   "path": "alibabacloud-data-agent-skill/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/aliyun/data-agent-skill"
+  },
+  {
+   "id": "alvarose/android-update-deps",
+   "action": "new-path",
+   "path": "skills/android-update-deps/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/alvarose/android-update-deps"
+  },
+  {
+   "id": "andycungkrinx91/konoha:konoha",
+   "action": "new-path",
+   "path": "src/templates/skills/konoha/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/andycungkrinx91/konoha"
+  },
+  {
+   "id": "antigenomics/vdjdb-db:vdjdb-duplicates",
+   "action": "new-path",
+   "path": "skills/curator/vdjdb-duplicates/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/antigenomics/vdjdb-db"
+  },
+  {
+   "id": "antigenomics/vdjdb-db:vdjdb-extract",
+   "action": "new-path",
+   "path": "skills/curator/vdjdb-extract/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/antigenomics/vdjdb-db"
+  },
+  {
+   "id": "antigenomics/vdjdb-db:vdjdb-format",
+   "action": "new-path",
+   "path": "skills/curator/vdjdb-format/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/antigenomics/vdjdb-db"
+  },
+  {
+   "id": "antigenomics/vdjdb-db:vdjdb-harmonize",
+   "action": "new-path",
+   "path": "skills/curator/vdjdb-harmonize/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/antigenomics/vdjdb-db"
+  },
+  {
+   "id": "antigenomics/vdjdb-db:vdjdb-publish",
+   "action": "new-path",
+   "path": "skills/curator/vdjdb-publish/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/antigenomics/vdjdb-db"
+  },
+  {
+   "id": "apache/magpie:license-compliance-audit",
+   "action": "new-path",
+   "path": "plugins/magpie-repo-health/skills/license-compliance-audit/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/apache/magpie"
+  },
+  {
+   "id": "aplaceforallmystuff/the-antislop",
+   "action": "new-path",
+   "path": "skills/antislop/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/aplaceforallmystuff/the-antislop"
+  },
+  {
+   "id": "arcasilesgroup/ai-engineering:.claude/skills/ai-verify",
+   "action": "new-path",
+   "path": "skills/ai-verify/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/arcasilesgroup/ai-engineering"
+  },
+  {
+   "id": "arcasilesgroup/ai-engineering:src/ai_engineering/templates/project/.claude/skills/ai-note",
+   "action": "new-path",
+   "path": "skills/ai-note/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/arcasilesgroup/ai-engineering"
+  },
+  {
+   "id": "arcasilesgroup/ai-engineering:src/ai_engineering/templates/project/.claude/skills/ai-security",
+   "action": "new-path",
+   "path": "skills/ai-security/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/arcasilesgroup/ai-engineering"
+  },
+  {
+   "id": "av1155/.dotfiles:deep-audit",
+   "action": "new-path",
+   "path": "Agents/.agents/skills/deep-audit/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/av1155/.dotfiles"
+  },
+  {
+   "id": "barefootford/buttercut:.claude/skills/backup-library",
+   "action": "new-path",
+   "path": "skills/backup-library/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/barefootford/buttercut"
+  },
+  {
+   "id": "barefootford/buttercut:.claude/skills/transcribe-audio",
+   "action": "new-path",
+   "path": "skills/transcribe-audio/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/barefootford/buttercut"
+  },
+  {
+   "id": "benbrastmckie/nvim:skill-slide-planning",
+   "action": "new-path",
+   "path": ".opencode/extensions/present/skills/skill-slide-planning/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/benbrastmckie/nvim"
+  },
+  {
+   "id": "benthamite/dotfiles:twitter-digest",
+   "action": "new-path",
+   "path": "archive/codex/programmatic-skills/twitter-digest/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/benthamite/dotfiles"
+  },
+  {
+   "id": "benthamite/dotfiles:twitter-vet",
+   "action": "new-path",
+   "path": "archive/codex/programmatic-skills/twitter-vet/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/benthamite/dotfiles"
+  },
+  {
+   "id": "bex-co/bex:ship",
+   "action": "new-path",
+   "path": ".claude/skills/ship/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/bex-co/bex"
+  },
+  {
+   "id": "boshu2/agentops:idea-genie",
+   "action": "new-path",
+   "path": "skills/idea-genie/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/boshu2/agentops"
+  },
+  {
+   "id": "boshu2/agentops:validate",
+   "action": "new-path",
+   "path": "skills/validate/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/boshu2/agentops"
+  },
+  {
+   "id": "bossanova-dev/bossanova:boss-build",
+   "action": "new-path",
+   "path": "lib/bossalib/contract/plugin/skillpayload/skills/boss-build/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/bossanova-dev/bossanova"
+  },
+  {
+   "id": "bossanova-dev/bossanova:boss-finalize",
+   "action": "new-path",
+   "path": "lib/bossalib/contract/plugin/skillpayload/skills/boss-finalize/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/bossanova-dev/bossanova"
+  },
+  {
+   "id": "bossanova-dev/bossanova:boss-plan",
+   "action": "new-path",
+   "path": "lib/bossalib/contract/plugin/skillpayload/skills/boss-plan/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/bossanova-dev/bossanova"
+  },
+  {
+   "id": "cameronraysmith/vanixiets:jj-version-control",
+   "action": "new-path",
+   "path": "modules/home/ai/plugins/version-control-and-forge/.apm/skills/jj-version-control/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/cameronraysmith/vanixiets"
+  },
+  {
+   "id": "cameronraysmith/vanixiets:meta-agent-teams",
+   "action": "new-path",
+   "path": "modules/home/ai/plugins/agent-orchestration-and-meta-tooling/.apm/skills/meta-agent-teams/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/cameronraysmith/vanixiets"
+  },
+  {
+   "id": "cameronraysmith/vanixiets:nix-flake-pr-cycle",
+   "action": "new-path",
+   "path": "modules/home/ai/plugins/nix-build-operations/.apm/skills/nix-flake-pr-cycle/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/cameronraysmith/vanixiets"
+  },
+  {
+   "id": "cameronraysmith/vanixiets:preferences-rust-development",
+   "action": "new-path",
+   "path": "modules/home/ai/plugins/preferences-programming-languages/.apm/skills/preferences-rust-development/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/cameronraysmith/vanixiets"
+  },
+  {
+   "id": "cameronraysmith/vanixiets:preferences-web-application-deployment",
+   "action": "new-path",
+   "path": "modules/home/ai/plugins/preferences-web-platform-and-deployment/.apm/skills/preferences-web-application-deployment/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/cameronraysmith/vanixiets"
+  },
+  {
+   "id": "cameronraysmith/vanixiets:session-review",
+   "action": "new-path",
+   "path": "modules/home/ai/plugins/beads-issue-tracking-and-session-workflow/.apm/skills/session-review/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/cameronraysmith/vanixiets"
+  },
+  {
+   "id": "coder/mux:.mux/skills/dev-desktop-sandbox",
+   "action": "new-path",
+   "path": ".xum/skills/dev-desktop-sandbox/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/coder/xum"
+  },
+  {
+   "id": "codeswithroh/tastemaker",
+   "action": "new-path",
+   "path": "skills/tastemaker/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/codeswithroh/tastemaker"
+  },
+  {
+   "id": "coil398/dotfiles:debug",
+   "action": "new-path",
+   "path": ".agents/skills/debug/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/coil398/dotfiles"
+  },
+  {
+   "id": "coil398/dotfiles:pir2",
+   "action": "new-path",
+   "path": ".agents/skills/pir2/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/coil398/dotfiles"
+  },
+  {
+   "id": "coil398/dotfiles:refactor-advisor",
+   "action": "new-path",
+   "path": ".agents/skills/refactor-advisor/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/coil398/dotfiles"
+  },
+  {
+   "id": "coji/natural-japanese",
+   "action": "new-path",
+   "path": "skills/natural-japanese/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/coji/natural-japanese"
+  },
+  {
+   "id": "daha1216/dsh-adult-tension",
+   "action": "new-path",
+   "path": "skill/adult-tension/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/daha1216/dsh-adult-tension"
+  },
+  {
+   "id": "deltadbu/WIT-skill",
+   "action": "new-path",
+   "path": "wit/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/deltadbu/WIT-skill"
+  },
+  {
+   "id": "denolfe/dotfiles:task",
+   "action": "new-path",
+   "path": "skills/task/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/denolfe/dotfiles"
+  },
+  {
+   "id": "denolfe/dotfiles:viewmd",
+   "action": "new-path",
+   "path": "skills/viewmd/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/denolfe/dotfiles"
+  },
+  {
+   "id": "display-dev/visualize:visualize",
+   "action": "new-path",
+   "path": "skills/visualize/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/display-dev/visualize"
+  },
+  {
+   "id": "distil-labs/distil-cli-skill",
+   "action": "new-path",
+   "path": "skills/distil-cli/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/distil-labs/distil-cli-skill"
+  },
+  {
+   "id": "dotnet/skills:csharp-scripts",
+   "action": "new-path",
+   "path": "plugins/dotnet-advanced/skills/csharp-scripts/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/dotnet/skills"
+  },
+  {
+   "id": "dylannalex/llm-code-wiki:setup-wiki",
+   "action": "new-path",
+   "path": "plugins/llm-code-wiki/skills/setup-wiki/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/dylannalex/llm-code-wiki"
+  },
+  {
+   "id": "dylannalex/llm-code-wiki:wiki",
+   "action": "new-path",
+   "path": "plugins/llm-code-wiki/skills/wiki/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/dylannalex/llm-code-wiki"
+  },
+  {
+   "id": "eltmon/panopticon-cli:pan-help",
+   "action": "new-path",
+   "path": "sync-sources/skills/pan-help/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/eltmon/overdeck"
+  },
+  {
+   "id": "erfnzdeh/arvancloud-agent-skill",
+   "action": "new-path",
+   "path": "skills/arvancloud-api/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/erfnzdeh/arvancloud-agent-skill"
+  },
+  {
+   "id": "fengyunzaidushi/sub2api-4k-image-generator-ts",
+   "action": "new-path",
+   "path": "sub2api-4k-image-generator-ts/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/fengyunzaidushi/sub2api-4k-image-generator-ts"
+  },
+  {
+   "id": "forjd/better-writing",
+   "action": "new-path",
+   "path": "skills/better-writing/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/forjd/better-writing"
+  },
+  {
+   "id": "frontkom/night-shift:skill",
+   "action": "new-path",
+   "path": "skills/night-shift/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/frontkom/night-shift"
+  },
+  {
+   "id": "geekjourneyx/hyperframes-motion-director",
+   "action": "new-path",
+   "path": "skills/hyperframes-motion-director/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/geekjourneyx/hyperframes-motion-director"
+  },
+  {
+   "id": "geekjourneyx/namelens",
+   "action": "new-path",
+   "path": "skills/namelens/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/geekjourneyx/namelens"
+  },
+  {
+   "id": "get-bb/bb:bb-cli",
+   "action": "new-path",
+   "path": "plugins/bb-guide/skills/bb-cli/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/get-bb/bb"
+  },
+  {
+   "id": "gooseworks-ai/goose-skills:goose-graphics",
+   "action": "new-path",
+   "path": "skills/shared/goose-graphics/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/gooseworks-ai/goose-skills"
+  },
+  {
+   "id": "griddynamics/rosetta:init-workspace-rules",
+   "action": "new-path",
+   "path": "instructions/r2/core/skills/init-workspace-rules/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/griddynamics/rosetta"
+  },
+  {
+   "id": "haabe/mycelium:.claude/skills/assumption-test",
+   "action": "new-path",
+   "path": "plugins/mycelium/skills/assumption-test/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/haabe/mycelium"
+  },
+  {
+   "id": "haabe/mycelium:.claude/skills/canvas-update",
+   "action": "new-path",
+   "path": "plugins/mycelium/skills/canvas-update/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/haabe/mycelium"
+  },
+  {
+   "id": "haabe/mycelium:.claude/skills/corrections-audit",
+   "action": "new-path",
+   "path": "plugins/mycelium/skills/corrections-audit/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/haabe/mycelium"
+  },
+  {
+   "id": "haabe/mycelium:.claude/skills/definition-of-done",
+   "action": "new-path",
+   "path": "plugins/mycelium/skills/definition-of-done/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/haabe/mycelium"
+  },
+  {
+   "id": "haabe/mycelium:.claude/skills/diamond-assess",
+   "action": "new-path",
+   "path": "plugins/mycelium/skills/diamond-assess/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/haabe/mycelium"
+  },
+  {
+   "id": "haabe/mycelium:.claude/skills/diamond-progress",
+   "action": "new-path",
+   "path": "plugins/mycelium/skills/diamond-progress/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/haabe/mycelium"
+  },
+  {
+   "id": "haabe/mycelium:.claude/skills/framework-health",
+   "action": "new-path",
+   "path": "plugins/mycelium/skills/framework-health/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/haabe/mycelium"
+  },
+  {
+   "id": "haabe/mycelium:.claude/skills/handoff",
+   "action": "new-path",
+   "path": "plugins/mycelium/skills/handoff/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/haabe/mycelium"
+  },
+  {
+   "id": "haabe/mycelium:.claude/skills/interview",
+   "action": "new-path",
+   "path": "plugins/mycelium/skills/interview/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/haabe/mycelium"
+  },
+  {
+   "id": "haabe/mycelium:.claude/skills/jtbd-map",
+   "action": "new-path",
+   "path": "plugins/mycelium/skills/jtbd-map/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/haabe/mycelium"
+  },
+  {
+   "id": "haabe/mycelium:.claude/skills/launch-tier",
+   "action": "new-path",
+   "path": "plugins/mycelium/skills/launch-tier/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/haabe/mycelium"
+  },
+  {
+   "id": "hashintel/hash:.claude/skills/documenting-rust-code",
+   "action": "new-path",
+   "path": ".agents/skills/documenting-rust-code/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/hashintel/hash"
+  },
+  {
+   "id": "huangwb8/skills:awesome-code",
+   "action": "new-path",
+   "path": "skills/alpha/awesome-code/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/huangwb8/skills"
+  },
+  {
+   "id": "huangwb8/skills:awesome-code/agents/code-reviewer",
+   "action": "new-path",
+   "path": "skills/alpha/awesome-code/agents/code-reviewer/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/huangwb8/skills"
+  },
+  {
+   "id": "huangwb8/skills:install-bensz-skills",
+   "action": "new-path",
+   "path": "skills/alpha/install-bensz-skills/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/huangwb8/skills"
+  },
+  {
+   "id": "hugorcd/evlog:review-logging-patterns",
+   "action": "new-path",
+   "path": "skills/review-logging-patterns/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/evloghq/evlog"
+  },
+  {
+   "id": "hyperlane-xyz/hyperlane-monorepo:svm-warp-alt-manage",
+   "action": "new-path",
+   "path": ".agents/skills/svm-warp-alt-manage/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/hyperlane-xyz/hyperlane-monorepo"
+  },
+  {
+   "id": "iamasters-academy/iamasters-os:health-check",
+   "action": "new-path",
+   "path": ".claude/skills/health-check/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/iamasters-academy/iamasters-os"
+  },
+  {
+   "id": "ilyautov/humanizer-ru",
+   "action": "new-path",
+   "path": "skills/humanizer-ru/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/ilyautov/humanizer-ru"
+  },
+  {
+   "id": "infometa/workbuddyskills:linkfox-zhihuiya-simple-bibliography",
+   "action": "new-path",
+   "path": "connectors/linkfox/skills/linkfox-zhihuiya-simple-bibliography/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/infometa/workbuddyskills"
+  },
+  {
+   "id": "isaac-sim/IsaacLab-Arena:dev-container",
+   "action": "new-path",
+   "path": "skills/developer/dev-container/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/isaac-sim/IsaacLab-Arena"
+  },
+  {
+   "id": "jasonvarga/dotfiles:statamic-pr-into-sandbox",
+   "action": "new-path",
+   "path": "ai/skills/statamic-pr-into-sandbox/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/jasonvarga/dotfiles"
+  },
+  {
+   "id": "jezweb/claude-skills:cloudflare-worker-builder",
+   "action": "new-path",
+   "path": "archive/plugins/cloudflare/skills/cloudflare-worker-builder/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/jezweb/claude-skills"
+  },
+  {
+   "id": "jkitchin/scimax_vscode:assets",
+   "action": "new-path",
+   "path": "skills/scimax/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/jkitchin/scimax_vscode"
+  },
+  {
+   "id": "jleechanorg/claude-commands:goal_harness",
+   "action": "new-path",
+   "path": ".claude/skills_archive/2026-08-29-unused-and-redundant/goal_harness/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/jleechanorg/jleechan-skills"
+  },
+  {
+   "id": "jleechanorg/claude-commands:loop-level-zfc",
+   "action": "new-path",
+   "path": ".claude/skills_archive/2026-08-27-historical-zero-use/loop-level-zfc/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/jleechanorg/jleechan-skills"
+  },
+  {
+   "id": "jnjaeschke/webspec-index",
+   "action": "new-path",
+   "path": "skills/webspec-index/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/jnjaeschke/webspec-index"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:vault-setup-skill",
+   "action": "new-path",
+   "path": "skills/vault-setup/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/julianobarbosa/claude-code-skills"
+  },
+  {
+   "id": "junjiangao/ccode:plugins/ccode-skills/skills/codex-ai",
+   "action": "new-path",
+   "path": "external_plugins/codex-ai/skills/codex-ai/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/junjiangao/ccode"
+  },
+  {
+   "id": "kdha200501/gists:set-up-fedora-kde-plasma-on-mac",
+   "action": "new-path",
+   "path": "set-up-fedora-kde-plasma-on-mac/.agents/skills/fedora-update/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/kdha200501/gists"
+  },
+  {
+   "id": "keithmackay/wikifyskill:skill",
+   "action": "new-path",
+   "path": "src/skill/skills/wikify/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/keithmackay/wikifyskill"
+  },
+  {
+   "id": "kpango/dotfiles:swarm-architect",
+   "action": "new-path",
+   "path": "agent/skills/swarm-architect/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/kpango/dotfiles"
+  },
+  {
+   "id": "kpango/dotfiles:swarm-graph",
+   "action": "new-path",
+   "path": "agent/skills/swarm-graph/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/kpango/dotfiles"
+  },
+  {
+   "id": "kpango/dotfiles:swarm-loop",
+   "action": "new-path",
+   "path": "agent/skills/swarm-loop/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/kpango/dotfiles"
+  },
+  {
+   "id": "kyh/vibedgames:image-to-threejs",
+   "action": "new-path",
+   "path": "plugins/vibedgames/skills/image-to-threejs/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/kyh/vibedgames"
+  },
+  {
+   "id": "kyh/vibedgames:pixel-art",
+   "action": "new-path",
+   "path": "plugins/vibedgames/skills/pixel-art/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/kyh/vibedgames"
+  },
+  {
+   "id": "kyh/vibedgames:pixel-snapper",
+   "action": "new-path",
+   "path": "plugins/vibedgames/skills/pixel-snapper/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/kyh/vibedgames"
+  },
+  {
+   "id": "lambdalisue/dotfiles:doc-review",
+   "action": "new-path",
+   "path": "home/agents/skills/doc-review/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/lambdalisue/dotfiles"
+  },
+  {
+   "id": "leeguooooo/image-use",
+   "action": "new-path",
+   "path": "skills/image-use/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/leeguooooo/image-use"
+  },
+  {
+   "id": "lev-os/agents:geo",
+   "action": "new-path",
+   "path": "skills-db/geo/geo/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/lev-os/agents"
+  },
+  {
+   "id": "level09/enferno:.claude/skills/enferno-dev",
+   "action": "new-path",
+   "path": ".agents/skills/enferno-dev/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/level09/enferno"
+  },
+  {
+   "id": "limingrui679-design/high-stakes-analytics-decision-lab",
+   "action": "new-path",
+   "path": "skills/high-stakes-analytics-decision-lab/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/limingrui679-design/high-stakes-analytics-decision-lab"
+  },
+  {
+   "id": "logicalclocks/hopsworks-api:hops-eda",
+   "action": "new-path",
+   "path": "python/hopsworks/skills/ml/hops-eda/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/logicalclocks/hopsworks-api"
+  },
+  {
+   "id": "lornshrimp/Lorn.NovelWriteSkills",
+   "action": "new-path",
+   "path": "CommonSkills/通用-去AI味重写/SKILL.md",
+   "pinned": false,
+   "github_url": "https://github.com/lornshrimp/Lorn.NovelWriteSkills"
+  },
+  {
+   "id": "lucasrp/edge-of-chaos:discovery",
+   "action": "new-path",
+   "path": ".agents/skills/ed-discovery/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/lucasrp/edge-of-chaos"
+  },
+  {
+   "id": "marimo-team/marimo-pair",
+   "action": "new-path",
+   "path": "skills/marimo-pair/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/marimo-team/marimo-pair"
+  },
+  {
+   "id": "markus1189/nixos-config:skill-creator",
+   "action": "new-path",
+   "path": "nixos-shared/agent-skills/skill-creator/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/markus1189/nixos-config"
+  },
+  {
+   "id": "mateusjunges/dotfiles:file-upload",
+   "action": "new-path",
+   "path": "skills/file-upload/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/mateusjunges/dotfiles"
+  },
+  {
+   "id": "mattpocock/skills:implement-spec",
+   "action": "new-path",
+   "path": "skills/engineering/implement-spec/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/mattpocock/skills"
+  },
+  {
+   "id": "microsoft/GitHub-Copilot-for-Azure:appinsights-instrumentation",
+   "action": "new-path",
+   "path": "plugins/azure-skills/skills/appinsights-instrumentation/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/microsoft/GitHub-Copilot-for-Azure"
+  },
+  {
+   "id": "microsoft/github-copilot-for-azure:airunway-aks-setup",
+   "action": "new-path",
+   "path": "plugins/azure-skills/skills/airunway-aks-setup/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/microsoft/GitHub-Copilot-for-Azure"
+  },
+  {
+   "id": "microsoft/github-copilot-for-azure:azure-upgrade",
+   "action": "new-path",
+   "path": "plugins/azure-skills/skills/azure-upgrade/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/microsoft/GitHub-Copilot-for-Azure"
+  },
+  {
+   "id": "mifunedev/openharness:prd",
+   "action": "new-path",
+   "path": ".agro/skills/prd/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/mifunedev/agro"
+  },
+  {
+   "id": "mintlify/docs:mintlify",
+   "action": "new-path",
+   "path": "agent-context/context/skills/mintlify/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/mintlify/docs"
+  },
+  {
+   "id": "mnott/PAI:setup",
+   "action": "new-path",
+   "path": "plugins/core/skills/setup/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/mnott/PAI"
+  },
+  {
+   "id": "mohitagw15856/pm-claude-skills:ai-assisted-performance-review",
+   "action": "new-path",
+   "path": "skills/ai-assisted-performance-review/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/mohitagw15856/pm-claude-skills"
+  },
+  {
+   "id": "mohitagw15856/pm-claude-skills:git-troubleshooter",
+   "action": "new-path",
+   "path": "skills/git-troubleshooter/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/mohitagw15856/pm-claude-skills"
+  },
+  {
+   "id": "msdanyg/humanize-pro",
+   "action": "new-path",
+   "path": "skills/humanize-pro/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/msdanyg/humanize-pro"
+  },
+  {
+   "id": "mudden2380078550-creator/write-chinese-long-screenplay",
+   "action": "new-path",
+   "path": "integrations/write-chinese-long-screenplay/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/mudden2380078550-creator/write-chinese-long-screenplay"
+  },
+  {
+   "id": "munlucky/claude-settings:.claude/skills/codex-review-code",
+   "action": "new-path",
+   "path": "skills/codex-review-code/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/munlucky/moonshot-relay"
+  },
+  {
+   "id": "munlucky/claude-settings:.claude/skills/completion-verifier",
+   "action": "new-path",
+   "path": "skills/completion-verifier/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/munlucky/moonshot-relay"
+  },
+  {
+   "id": "mycelium-io/mycelium:mycelium",
+   "action": "new-path",
+   "path": "mycelium-cli/src/mycelium/skills/mycelium/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/mycelium-io/mycelium"
+  },
+  {
+   "id": "nowork-studio/NotFair:NotFair",
+   "action": "new-path",
+   "path": "skills/upgrade/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/nowork-studio/notfair-plugin"
+  },
+  {
+   "id": "nowork-studio/toprank:geo-optimizer",
+   "action": "new-path",
+   "path": "skills/geo-optimizer/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/nowork-studio/notfair-plugin"
+  },
+  {
+   "id": "openSUSE/openSUSE-packaging-skill",
+   "action": "new-path",
+   "path": "skills/opensuse-packaging/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/openSUSE/openSUSE-packaging-skill"
+  },
+  {
+   "id": "openshift/agentic-skills:cluster-update-advisor",
+   "action": "new-path",
+   "path": "cluster-update/cluster-update-advisor/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/openshift/agentic-skills"
+  },
+  {
+   "id": "openstatushq/data-table-filters:skills",
+   "action": "new-path",
+   "path": "skills/data-table-filters/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/openstatusHQ/data-table-filters"
+  },
+  {
+   "id": "phatblat/dotfiles:plan-design-review",
+   "action": "new-path",
+   "path": ".claude/skills/plan-design-review/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/phatblat/dotfiles"
+  },
+  {
+   "id": "phatblat/dotfiles:retro",
+   "action": "new-path",
+   "path": ".claude/skills/retro/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/phatblat/dotfiles"
+  },
+  {
+   "id": "pulumi/agent-skills:package-usage",
+   "action": "new-path",
+   "path": "pulumi/skills/package-usage/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/pulumi/agent-skills"
+  },
+  {
+   "id": "pulumi/agent-skills:provider-upgrade",
+   "action": "new-path",
+   "path": "pulumi/skills/provider-upgrade/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/pulumi/agent-skills"
+  },
+  {
+   "id": "pulumi/agent-skills:pulumi-best-practices",
+   "action": "new-path",
+   "path": "pulumi/skills/pulumi-best-practices/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/pulumi/agent-skills"
+  },
+  {
+   "id": "pulumi/agent-skills:pulumi-esc",
+   "action": "new-path",
+   "path": "pulumi/skills/pulumi-esc/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/pulumi/agent-skills"
+  },
+  {
+   "id": "pulumi/agent-skills:pulumi-upgrade-provider",
+   "action": "new-path",
+   "path": "package-maintenance/skills/pulumi-upgrade-provider/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/pulumi/agent-skills"
+  },
+  {
+   "id": "pulumi/agent-skills:upstream-patches",
+   "action": "new-path",
+   "path": "package-maintenance/skills/upstream-patches/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/pulumi/agent-skills"
+  },
+  {
+   "id": "pytorch/pytorch:.claude/skills/ci-metrics",
+   "action": "new-path",
+   "path": ".agents/skills/ci-metrics/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/pytorch/pytorch"
+  },
+  {
+   "id": "pytorch/torchtitan:torchtitan/experiments/rl/.claude/skills/inference_perf_hillclimb",
+   "action": "new-path",
+   "path": "torchtitan/rl/.claude/skills/inference_perf_hillclimb/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/pytorch/torchtitan"
+  },
+  {
+   "id": "referodesign/refero_skill",
+   "action": "new-path",
+   "path": "skills/refero-design/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/referodesign/refero_skill"
+  },
+  {
+   "id": "ricoyudog/Coding_Corgi_flow:corgispec-install",
+   "action": "new-path",
+   "path": ".claude/skills/molecules/corgispec-install/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/ricoyudog/Coding_Corgi_flow"
+  },
+  {
+   "id": "rjmurillo/ai-agents:SkillForge",
+   "action": "new-path",
+   "path": "src/codex/skills/skillforge/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/rjmurillo/ai-agents"
+  },
+  {
+   "id": "rubyh218/real-estate-asset-management",
+   "action": "new-path",
+   "path": "skills/real-estate-asset-management/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/rubyh218/real-estate-asset-management"
+  },
+  {
+   "id": "sasamuku/dotfiles:empirical-prompt-tuning",
+   "action": "new-path",
+   "path": ".agents/skills/empirical-prompt-tuning/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/sasamuku/dotfiles"
+  },
+  {
+   "id": "sgaabdu4/building-flutter-apps",
+   "action": "new-path",
+   "path": "skills/building-flutter-apps/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/sgaabdu4/building-flutter-apps"
+  },
+  {
+   "id": "skanehira/dotfiles:demo-site-builder",
+   "action": "new-path",
+   "path": "agents/skills/demo-site-builder/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/skanehira/dotfiles"
+  },
+  {
+   "id": "skanehira/dotfiles:dev-impl",
+   "action": "new-path",
+   "path": "agents/skills/dev-impl/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/skanehira/dotfiles"
+  },
+  {
+   "id": "smixs/disruptor-skills",
+   "action": "new-path",
+   "path": "skills/disruptor/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/smixs/disruptor-skills"
+  },
+  {
+   "id": "sodiumjoe/dotfiles:brainstorming",
+   "action": "new-path",
+   "path": "home/.agents/skills/brainstorming/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/sodiumjoe/dotfiles"
+  },
+  {
+   "id": "sodiumjoe/dotfiles:writing-plans",
+   "action": "new-path",
+   "path": "home/.agents/skills/writing-plans/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/sodiumjoe/dotfiles"
+  },
+  {
+   "id": "sodiumjoe/dotfiles:writing-skills",
+   "action": "new-path",
+   "path": "home/.agents/skills/writing-skills/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/sodiumjoe/dotfiles"
+  },
+  {
+   "id": "statespace-tech/statespace",
+   "action": "new-path",
+   "path": "skills/statespace/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/statespace-tech/statespace"
+  },
+  {
+   "id": "subframeapp/subframe:design",
+   "action": "new-path",
+   "path": "plugins/subframe/skills/design/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/SubframeApp/subframe"
+  },
+  {
+   "id": "subframeapp/subframe:develop",
+   "action": "new-path",
+   "path": "plugins/subframe/skills/develop/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/SubframeApp/subframe"
+  },
+  {
+   "id": "supabase/supabase:.claude/skills/react-hook-form",
+   "action": "new-path",
+   "path": ".agents/skills/react-hook-form/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/supabase/supabase"
+  },
+  {
+   "id": "supabase/supabase:.claude/skills/studio-mock-api-tests",
+   "action": "new-path",
+   "path": ".agents/skills/studio-mock-api-tests/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/supabase/supabase"
+  },
+  {
+   "id": "synthesisengineering/synthesis-skills:synthesis-inbox-cleanup",
+   "action": "new-path",
+   "path": "skills/synthesis-inbox-cleanup/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/synthesisengineering/synthesis-skills"
+  },
+  {
+   "id": "synthesisengineering/synthesis-skills:synthesis-meeting-transcripts",
+   "action": "new-path",
+   "path": "skills/synthesis-meeting-transcripts/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/synthesisengineering/synthesis-skills"
+  },
+  {
+   "id": "synthesisengineering/synthesis-skills:synthesis-skills-manager",
+   "action": "new-path",
+   "path": "skills/synthesis-skills-manager/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/synthesisengineering/synthesis-skills"
+  },
+  {
+   "id": "szaghi/mosaic:data",
+   "action": "new-path",
+   "path": ".claude/skills/mosaic/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/szaghi/mosaic"
+  },
+  {
+   "id": "tednaaa/nixos-config:context7-mcp",
+   "action": "new-path",
+   "path": "home/agents/skills/context7-mcp/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/tednaaa/nixos-config"
+  },
+  {
+   "id": "tencentcloudbase/skills:cloudbase-guidelines",
+   "action": "new-path",
+   "path": "skills/cloudbase/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/TencentCloudBase/skills"
+  },
+  {
+   "id": "terrylica/cc-skills:setup",
+   "action": "new-path",
+   "path": "plugins/itp/skills/setup/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/terrylica/cc-skills"
+  },
+  {
+   "id": "tetherto/qvac:qv-devops-runner-queue",
+   "action": "new-path",
+   "path": ".agents/skills/qv-devops-runner-queue/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/tetherto/qvac"
+  },
+  {
+   "id": "the0cp/beatflow-skill",
+   "action": "new-path",
+   "path": "skills/beatflow-skill/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/the0cp/beatflow-skill"
+  },
+  {
+   "id": "thepushkarp/cc-gemini-plugin",
+   "action": "new-path",
+   "path": "skills/gemini-integration/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/thepushkarp/cc-gemini-plugin"
+  },
+  {
+   "id": "tobihagemann/turbo:skills/draft-plan",
+   "action": "new-path",
+   "path": "claude/skills/draft-plan/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/tobihagemann/turbo"
+  },
+  {
+   "id": "tobihagemann/turbo:skills/implement",
+   "action": "new-path",
+   "path": "claude/skills/implement/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/tobihagemann/turbo"
+  },
+  {
+   "id": "tobihagemann/turbo:skills/implement-plan",
+   "action": "new-path",
+   "path": "claude/skills/implement-plan/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/tobihagemann/turbo"
+  },
+  {
+   "id": "tourmind-com/Tourmind-Booking-Skills",
+   "action": "new-path",
+   "path": "skills/tourmind-booking/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/tourmind-com/Tourmind-Booking-Skills"
+  },
+  {
+   "id": "v1truv1us/ai-eng-system:.claude/skills/comprehensive-research",
+   "action": "new-path",
+   "path": "skills/comprehensive-research/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/v1truv1us/ai-eng-system"
+  },
+  {
+   "id": "v1truv1us/ai-eng-system:.claude/skills/coolify-deploy",
+   "action": "new-path",
+   "path": "skills/coolify-deploy/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/v1truv1us/ai-eng-system"
+  },
+  {
+   "id": "vvvvvvvvvvel/VibeHacking",
+   "action": "new-path",
+   "path": "skill/caido-mcp/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/vvvvvvvvvvel/VibeHacking"
+  },
+  {
+   "id": "wdhwg001/csift",
+   "action": "new-path",
+   "path": "skills/csift/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/wdhwg001/csift"
+  },
+  {
+   "id": "webern/mx:mx-api-add-feature",
+   "action": "new-path",
+   "path": ".agents/skills/mx-api-add-feature/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/webern/mx"
+  },
+  {
+   "id": "woditschka/agentic-coding-reference:marketplace-setup",
+   "action": "new-path",
+   "path": "plugins/agent-team-go/skills/marketplace-setup/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/woditschka/agentic-coding-reference"
+  },
+  {
+   "id": "xuanji86/ainiee-translate-skill:skill",
+   "action": "new-path",
+   "path": "skills/ainiee-translate/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/xuanji86/ainiee-translate-skill"
+  },
+  {
+   "id": "yigitkonur/skills-by-yigitkonur:init-makefiles",
+   "action": "new-path",
+   "path": "skills/init-makefiles/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/yigitkonur/skills-by-yigitkonur"
+  },
+  {
+   "id": "yunshu0909/yunshu_skillshub:github-repo-search",
+   "action": "new-path",
+   "path": "coding/github-repo-search/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/yunshu0909/yunshu_skillshub"
+  },
+  {
+   "id": "zenobi-us/dotfiles:code-review",
+   "action": "new-path",
+   "path": "mise/conf.d/devtools-agent/bundles/matt-pocock/skills/code-review/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/zenobi-us/dotfiles"
+  },
+  {
+   "id": "zj-ai-lab/shuanglv-legal-skills",
+   "action": "new-path",
+   "path": "runtime/shuanglv-legal-skills/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/zj-ai-lab/shuanglv-legal-skills"
+  },
+  {
+   "id": "zjp1997720/html-express",
+   "action": "new-path",
+   "path": "skills/html-express/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/zjp1997720/html-express"
+  },
+  {
+   "id": "zjp1997720/skill-open-sourcer",
+   "action": "new-path",
+   "path": "skills/skill-open-sourcer/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/zjp1997720/skill-open-sourcer"
+  },
+  {
+   "id": "zjp1997720/wechat-article-search",
+   "action": "new-path",
+   "path": "skills/wechat-article-search/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/zjp1997720/wechat-article-search"
+  },
+  {
+   "id": "zjp1997720/wechat-styler",
+   "action": "new-path",
+   "path": "skills/wechat-styler/SKILL.md",
+   "pinned": true,
+   "github_url": "https://github.com/zjp1997720/wechat-styler"
+  }
+ ]
+}
