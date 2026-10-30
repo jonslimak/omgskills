@@ -61,8 +61,9 @@ async function boundedBytes(response: Response, controller: AbortController) {
 }
 
 /** Reads SKILL.md from GitHub at the pinned commit (or HEAD) and checks it against the catalog hash. */
-export async function readSkillContent(skill: SkillResult, maxChars: number, fetcher: typeof fetch = fetch): Promise<SkillContent> {
+export async function readSkillContent(skill: SkillResult, maxChars: number, fetcher: typeof fetch = fetch, options: { pinnedOnly?: boolean } = {}): Promise<SkillContent> {
   const pin = pinnedInstallFor(skill);
+  if (options.pinnedOnly && !pin) throw new SkillContentError("Pinned file inspection cannot read the default branch.");
   const repo = pin?.repo ?? githubRepo(skill.github_url);
   const parts = skillMdParts(skill.skill_md_path);
   if (!repo || !parts) throw new SkillContentError("This skill has no recorded SKILL.md location, so its text can't be read.");
@@ -75,13 +76,14 @@ export async function readSkillContent(skill: SkillResult, maxChars: number, fet
     for (let redirects = 0; ; redirects++) {
       response = await fetcher(url.toString(), { redirect: "manual", credentials: "omit", signal,
         headers: { Accept: "text/plain", "User-Agent": "omgskills-mcp" } });
-      if (response.url && !allowedUrl(new URL(response.url))) {
+      if (response.url && (!allowedUrl(new URL(response.url)) || (options.pinnedOnly && response.url !== url.toString()))) {
         await cancel(response);
         throw new SkillContentError(redirectMessage);
       }
       if (![301, 302, 303, 307, 308].includes(response.status)) break;
       const location = response.headers.get("location");
       await cancel(response);
+      if (options.pinnedOnly) throw new SkillContentError("Pinned file inspection does not follow redirects.");
       if (!location || redirects >= 3) throw new SkillContentError(redirectMessage);
       const next = new URL(location, url);
       if (!allowedUrl(next)) throw new SkillContentError(redirectMessage);
@@ -98,13 +100,19 @@ export async function readSkillContent(skill: SkillResult, maxChars: number, fet
     throw new SkillContentError(`GitHub returned ${response.status}. Try again shortly.`);
   }
   const bytes = await boundedBytes(response, controller);
-  const text = new TextDecoder().decode(bytes);
+  const verified = !!skill.skill_md_sha && gitBlobSha(bytes) === skill.skill_md_sha.toLowerCase();
+  if (options.pinnedOnly && !verified) throw new SkillContentError("SKILL.md does not match the pinned catalog hash; not returning unverified text.");
+  let text: string;
+  try { text = new TextDecoder("utf-8", { fatal: !!options.pinnedOnly }).decode(bytes); }
+  catch { throw new SkillContentError("SKILL.md is not plain UTF-8 text."); }
+  if (options.pinnedOnly && /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(text))
+    throw new SkillContentError("SKILL.md is not plain UTF-8 text.");
   return {
     id: skill.id,
     path: parts.join("/"),
     ref,
     pinned: !!pin,
-    verified: !!skill.skill_md_sha && gitBlobSha(bytes) === skill.skill_md_sha.toLowerCase(),
+    verified,
     truncated: text.length > maxChars,
     content: text.slice(0, maxChars)
   };

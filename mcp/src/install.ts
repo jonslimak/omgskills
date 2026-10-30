@@ -3,7 +3,7 @@ import type { SkillResult } from "./library.js";
 import { githubRepo, pinnedInstallFor, safePart, skillMdParts, type PinnedInstall } from "./install-record.mjs";
 
 export { githubRepo, pinnedInstallFor, skillMdParts, type PinnedInstall };
-export const installAgents = ["claude_code", "codex"] as const;
+export const installAgents = ["claude_code", "codex", "cursor"] as const;
 export const installScopes = ["user", "project"] as const;
 export type InstallAgent = typeof installAgents[number];
 export type InstallScope = typeof installScopes[number];
@@ -12,6 +12,7 @@ export type InstallScope = typeof installScopes[number];
 const skillRoots: Record<InstallAgent, Record<InstallScope, string>> = {
   claude_code: { user: "~/.claude/skills", project: ".claude/skills" },
   codex: { user: "~/.codex/skills", project: ".codex/skills" },
+  cursor: { user: "~/.cursor/skills", project: ".cursor/skills" },
 };
 
 export function installFolderName(skill: SkillResult, pin: PinnedInstall): string | undefined {

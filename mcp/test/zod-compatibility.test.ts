@@ -58,6 +58,9 @@ test("tool schemas preserve required fields, optional defaults and strict inputs
   assert.equal(properties("get_install_plan").agent.default, "claude_code");
   assert.equal(properties("get_install_plan").scope.default, "user");
   assert.equal(properties("get_skill_content").max_chars.default, 12000);
+  assert.equal(properties("get_skill_content").include_files.default, false);
+  assert.equal(properties("get_skill_content").max_files.default, 10);
+  assert.equal(properties("get_skill_content").file_max_chars.default, 4000);
 });
 
 test("omitted arguments retain compact results, paging and install/content defaults", async context => {

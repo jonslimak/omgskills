@@ -4,16 +4,16 @@ import { mkdtemp, mkdir, writeFile, readFile, readdir, rm, symlink, lstat } from
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
-import { installScript, type PinnedInstall } from "../src/install.js";
+import { installAgents, installScript, type InstallAgent, type PinnedInstall } from "../src/install.js";
 
 const pin: PinnedInstall = { repo: "owner/repo", path: "skills/example", commit_sha: "a".repeat(40), skill_md_sha: "b".repeat(40) };
 
-async function fixture(context: { after: (fn: () => unknown) => void }, mode = "success", scope: "user" | "project" = "project") {
+async function fixture(context: { after: (fn: () => unknown) => void }, mode = "success", scope: "user" | "project" = "project", agent: InstallAgent = "codex") {
   const root = await mkdtemp(join(tmpdir(), "mcp-install-test-"));
   context.after(() => rm(root, { recursive: true, force: true }));
   const cwd = join(root, "project with spaces"), home = join(root, "home with spaces"), scratch = join(root, "scratch"), bin = join(root, "bin");
   for (const path of [cwd, home, scratch, bin]) await mkdir(path);
-  const destination = join(scope === "user" ? home : cwd, ".codex/skills/example");
+  const destination = join(scope === "user" ? home : cwd, `.${agent === "claude_code" ? "claude" : agent}/skills/example`);
   await writeFile(join(bin, "git"), `#!/bin/sh
 set -e
 work="$2"
@@ -35,14 +35,14 @@ esac
 if [ "$MODE" = copy-fail ]; then printf partial > "$DESTINATION/partial"; exit 25; fi
 exec /bin/cp "$@"
 `, { mode: 0o700 });
-  const run = () => spawnSync("/bin/sh", ["-c", installScript(pin, "example", "codex", scope).script], {
+  const run = () => spawnSync("/bin/sh", ["-c", installScript(pin, "example", agent, scope).script], {
     cwd, env: { ...process.env, PATH: `${bin}:/usr/bin:/bin`, HOME: home, TMPDIR: scratch, MODE: mode, DESTINATION: destination }, encoding: "utf8"
   });
   return { destination, scratch, run };
 }
 
-for (const scope of ["user", "project"] as const) test(`successful ${scope} installation handles spaces and cleans scratch files`, async context => {
-  const f = await fixture(context, "success", scope);
+for (const agent of installAgents) for (const scope of ["user", "project"] as const) test(`successful ${agent} ${scope} installation handles spaces and cleans scratch files`, async context => {
+  const f = await fixture(context, "success", scope, agent);
   const result = f.run();
   assert.equal(result.status, 0, result.stderr);
   assert.equal(await readFile(join(f.destination, "SKILL.md"), "utf8"), "skill");
@@ -58,8 +58,8 @@ for (const [mode, status] of [["fetch-fail", 23], ["checkout-fail", 24], ["hash-
   await assert.rejects(lstat(f.destination), { code: "ENOENT" });
 });
 
-for (const kind of ["directory", "file", "dangling-symlink"] as const) test(`preserves an existing ${kind}`, async context => {
-  const f = await fixture(context);
+for (const agent of installAgents) for (const kind of ["directory", "file", "dangling-symlink"] as const) test(`${agent} preserves an existing ${kind}`, async context => {
+  const f = await fixture(context, "success", "project", agent);
   await mkdir(join(f.destination, ".."), { recursive: true });
   if (kind === "directory") { await mkdir(f.destination); await writeFile(join(f.destination, "sentinel"), "original"); }
   else if (kind === "file") await writeFile(f.destination, "original");
