@@ -12,7 +12,7 @@ import { createAccountSession } from "../src/integration/account-session";
 import { managementApi } from "../src/integration/unified/management-api";
 import { groupSyncedSkills, type ScanCoverage } from "../src/synced-skill-grouping";
 import { inventorySummary, inventoryCoverageSummary, initialNavigation, skillDisplays, setSkillDisplays } from "../src/app/unified/model";
-import { isMember } from "../src/app/model";
+import { isMember, type PortalData } from "../src/app/model";
 import { PortalApiError } from "../src/api-error";
 import type { PortalApi } from "../src/portal-api";
 import type { UnifiedManagement } from "../src/app/unified/management";
@@ -411,4 +411,15 @@ test("disposed, switched and unauthorized v3 accounts cannot accept late retaine
   await unauthorized.refresh();
   assert.equal(unauthorized.getSnapshot().accessDenied, true);
   assert.equal(unauthorized.getSnapshot().data, null); unauthorized.dispose();
+});
+
+test("linked skills outside the loaded catalog still show their GitHub owner", () => {
+  const base = { id: "linked", stableKey: "k", skillMdSha: null, identityStatus: "resolved", name: "remotion-render", description: "",
+    githubUrl: null, isLocalOnly: false, source: "codex", isCurrent: true, lastSeenAt: null };
+  const data = { skills: [{ ...base, catalogSkillId: "remotion-dev/skills:remotion-render" }, { ...base, id: "local", catalogSkillId: null }], sets: [] } as unknown as PortalData;
+  const [linked, local] = skillDisplays(data, catalog).mine;
+  assert.equal(linked.author, "remotion-dev");
+  assert.equal(linked.avatar, "https://github.com/remotion-dev.png?size=80");
+  assert.equal(local.author, "");
+  assert.equal(local.avatar, undefined);
 });
