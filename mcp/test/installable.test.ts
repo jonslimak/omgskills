@@ -8,7 +8,7 @@ import { createOmgskillsServer } from "../src/server.js";
 import { installScript } from "../src/install.js";
 import { loadCatalogReader } from "../src/search-catalog.js";
 import { encodeInstallable, installablePayload } from "../src/search-catalog-format.mjs";
-import { catalogFixture, rows } from "./search-catalog-fixture.js";
+import { catalogFixture, goldBasket, rows } from "./search-catalog-fixture.js";
 
 const cleanRows = rows.map(({ skill_md_sha, ...row }) => (skill_md_sha === null ? row : { ...row, skill_md_sha })) as Skill[];
 const pinned = { skill_md_path: "x/SKILL.md", skill_md_sha: "c".repeat(40), repo_commit_sha: "a".repeat(40) };
@@ -102,12 +102,19 @@ test("same-repo alternatives rank by shared topic, keep scores in full rows and 
 
 test("list_gold_basket pages", async context => {
   const f = catalogFixture(context, cleanRows, true);
+  // The published curated records can lack the pin that the catalog record has.
+  f.files.set("https://catalog.test/gold.json", Buffer.from(JSON.stringify(goldBasket.map(({ repo_commit_sha: _commit, ...row }) => row))));
   const client = await connect(context, await loadCatalogReader(f.url, { ...f.options, ranking: true }));
   const first = value(await client.callTool({ name: "list_gold_basket", arguments: { limit: 1 } }));
   assert.equal(first.page?.total, 2);
   const second = value(await client.callTool({ name: "list_gold_basket", arguments: { limit: 1, page: { cursor: first.page!.nextCursor! } } }));
   assert.notEqual(second.skills[0].id, first.skills[0].id);
   assert.equal(second.page?.nextCursor, null);
+  // Full rows report the catalog record's install status, the same as summary rows.
+  const status = async (summary: boolean) => value(await client.callTool({ name: "list_gold_basket", arguments: { summary } }))
+    .skills.map(row => [row.id, row.install_status]);
+  assert.deepEqual(await status(false), [["example/skills:swift-review", "pinned"], ["curated/only:extra", "discovery_only"]]);
+  assert.deepEqual((await status(true))[0], ["example/skills:swift-review", "pinned"]);
 });
 
 test("an over-long query reports one error, with the limit in the schema", async context => {
