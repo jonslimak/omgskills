@@ -17,6 +17,7 @@ import {
   ArrowUpRight,
   Atom,
   ChartNoAxesColumn,
+  CodeXml,
   BookOpen,
   Bot,
   Braces,
@@ -1237,6 +1238,7 @@ export function UnifiedApp({
                 {navItem("creators", "Creators", Users)}
                 {navItem("collections", "Collections", PlayingCardsFan)}
                 {navItem("data", "Data", ChartNoAxesColumn)}
+                {navItem("developers", "Developers", CodeXml)}
               </>
             ) : (
               <>
@@ -1332,6 +1334,7 @@ export function UnifiedApp({
                       ["creators", "Creators", Users, false, ""],
                       ["collections", "Collections", PlayingCardsFan, false, ""],
                       ["data", "Data", ChartNoAxesColumn, false, ""],
+                      ["developers", "Developers", CodeXml, false, ""],
                     ] as const).filter(([view]) => supportsView(view)).map(([view, label, Icon, heading, id]) => <button type="button" key={`${view}:${id}`}
                       className={`ua-nav-item${heading ? " ua-drawer-section" : ""}`}
                       aria-current={(view === "creators"

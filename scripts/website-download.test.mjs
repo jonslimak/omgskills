@@ -29,6 +29,9 @@ test("primary links show Mac requirements and retain an explicit original-app op
   assert.equal(app.downloadUrl, "https://omgskills.com/download");
   assert.equal(app.operatingSystem, "macOS 14 or later");
   assert.equal(app.softwareRequirements, "Apple silicon Mac");
+  const webApp = structured.find(item => item["@type"] === "WebApplication");
+  assert.equal(webApp.url, "https://omgskills.com/app/");
+  assert.equal(webApp.publisher["@id"], app.publisher["@id"]);
 });
 
 test("existing download reports count the promoted URL as well as historical DMG clicks", () => {

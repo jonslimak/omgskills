@@ -6,6 +6,7 @@ import { normalPortalBase } from "./app/routes";
 import { connectedInventoryTest, inventoryReconciliationTest } from "./connected-inventory-runtime";
 import { productionConnectedProfile } from "./production-connected";
 import { startTakeover } from "./takeover";
+import { AppErrorBoundary } from "./app/unified/AppErrorBoundary";
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 // On a static library page the app loads hidden and swaps in when ready. In-app
@@ -18,7 +19,7 @@ const production = productionConnectedProfile(location.href, publishableKey);
 const cleanPaths = !import.meta.env.DEV && base === "/app/" && !connectedInventoryTest;
 createRoot(document.getElementById("root")!).render(<StrictMode>
   {!publishableKey ? <main><h1>Portal unavailable</h1><p>Missing sign-in configuration.</p></main>
-    : <ClerkProvider publishableKey={publishableKey}><UnifiedSession base={base} cleanPaths={cleanPaths} publicFirst={cleanPaths} takeover={takeover} local={connectedInventoryTest}
+    : <AppErrorBoundary><ClerkProvider publishableKey={publishableKey}><UnifiedSession base={base} cleanPaths={cleanPaths} publicFirst={cleanPaths} takeover={takeover} local={connectedInventoryTest}
       productionInstall={production.sync} connectedInventory={connectedInventoryTest || production.inventory}
-      inventoryReconciliation={inventoryReconciliationTest || production.inventory} /></ClerkProvider>}
+      inventoryReconciliation={inventoryReconciliationTest || production.inventory} /></ClerkProvider></AppErrorBoundary>}
 </StrictMode>);
