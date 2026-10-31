@@ -38,6 +38,7 @@ import { buildCandidateFromSkill } from "./candidate-path.js";
 import { bootstrapRisingRepos, removeFailedNewlyAdmittedRepos, repairDeadPersistedRisingSkillLinks, sortBootstrapCandidates, toEnrichCandidate } from "./bootstrap.js";
 import { canonicalizeAdmissionRepos } from "./repo-canonicalization.js";
 import { assertGitHubQuotaAvailable } from "./github-quota-guard.js";
+import { createRefreshReplayStoreFromEnv } from "./refresh-replay.js";
 import { buildCutoverCompare, buildCutoverCompareSummary } from "./cutover-compare.js";
 import { validateCutoverOutputs } from "./cutover-validation.js";
 import { buildCrawl4Preview } from "./crawl4-preview.js";
@@ -2247,7 +2248,7 @@ function sampleRepos(
 
 async function main() {
   const timings: StageTimings = {};
-  const checkedAt = new Date().toISOString();
+  let checkedAt = new Date().toISOString();
   const argv = process.argv.slice(2);
   const cadence = parseCadence(argv);
   const forceHighStarSkillMd = parseForceHighStarSkillMd(argv);
@@ -2259,6 +2260,12 @@ async function main() {
   if (!onlyPackageMetadataOverlay) {
     await assertGitHubQuotaAvailable(cadence);
   }
+  const replayInputs = createRefreshReplayStoreFromEnv();
+  const replayRunKey = JSON.stringify({
+    cadence, forceHighStarSkillMd, forceWebLibrarySnippets, onlyHighStarBackfill,
+    onlyPackageMetadataOverlay, highStarQueryBatch, policyPrecedenceMode,
+  });
+  checkedAt = await replayInputs.input(`checked-at:v1:${replayRunKey}`, async () => checkedAt);
 
   const baselinePath = join(indexRoot, "skills.json");
   const goldBasketPath = join(indexRoot, "gold-basket.json");
@@ -2366,7 +2373,7 @@ async function main() {
         xDiscoveryCandidateCount: 0,
         xDiscoveryCandidateSample: [],
       }
-    : await runDiscovery(
+    : await replayInputs.input(`discovery:v1:${replayRunKey}`, () => runDiscovery(
         cadence,
         repoIndex,
         checkedAt,
@@ -2374,7 +2381,7 @@ async function main() {
         onlyHighStarBackfill,
         highStarQueryBatch,
         seeds,
-      );
+      ));
   for (const repo of [...discovered.keys()]) {
     if (isDoNotCrawlRepo(repo, seeds)) discovered.delete(repo);
   }
@@ -2400,10 +2407,10 @@ async function main() {
     if (isDoNotCrawlRepo(repo, seeds)) discovered.delete(repo);
   }
   timings.canonicalizeAdmissionRepos = Math.round(performance.now() - canonicalizationStart);
-  const { momentumByRepo, warning: momentumWarning } = buildMomentumSignals(
+  const { momentumByRepo, warning: momentumWarning } = await replayInputs.input(`momentum:v1:${replayRunKey}`, async () => buildMomentumSignals(
     discovered,
     join(indexRoot, "top-x-skill-tweets.json"),
-  );
+  ));
   const canonicalizationWarnings = [
     ...(repoCanonicalization.deferredByErrorCount > 0
       ? [`repository canonicalization deferred ${repoCanonicalization.deferredByErrorCount} admission candidates after lookup errors`]

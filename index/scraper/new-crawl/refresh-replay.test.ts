@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -102,4 +102,59 @@ test("refreshReplayEnv and createRefreshReplayStoreFromEnv round-trip", () => {
 
   assert.equal(store.mode, "replay");
   assert.equal(store.root, root);
+});
+
+test("input replay preserves discovery Maps, Sets, order, and optional fields without loading live feeds", async (t) => {
+  const root = mkdtempSync(join(tmpdir(), "discovery-replay-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const value = {
+    discovered: new Map([
+      ["second/repo", { sources: new Set(["skillssh", "registry"]), bootstrapCandidate: undefined }],
+      ["first/repo", { sources: new Set(["official"]), bootstrapCandidate: undefined }],
+    ]),
+    momentum: new Map([["second/repo", new Set(["skillssh", "validatedX"])]]),
+    checkedAt: "2026-10-31T18:00:00.000Z",
+  };
+  const recorder = new RefreshReplayStore("record", root);
+  assert.strictEqual(await recorder.input("discovery:combined", async () => value), value);
+  const replayer = new RefreshReplayStore("replay", root);
+  const replayed = await replayer.input<typeof value>("discovery:combined", async () => {
+    assert.fail("replay must not fetch changing live feeds");
+  });
+  assert.deepEqual(replayed, value);
+  assert.deepEqual([...replayed.discovered.keys()], ["second/repo", "first/repo"]);
+});
+
+test("input recording is disabled during normal crawls", async () => {
+  const store = new RefreshReplayStore("off", null);
+  let calls = 0;
+  const value = new Map([["live/repo", new Set(["skillssh"])]]);
+  const load = async () => { calls++; return value; };
+  assert.strictEqual(await store.input("discovery", load), value);
+  assert.strictEqual(await store.input("discovery", load), value);
+  assert.equal(calls, 2);
+});
+
+test("input replay fails closed on missing, corrupt, or mismatched recordings", async (t) => {
+  const root = mkdtempSync(join(tmpdir(), "discovery-replay-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const recorder = new RefreshReplayStore("record", root);
+  const replayer = new RefreshReplayStore("replay", root);
+  let liveLoads = 0;
+  const load = async () => { liveLoads++; return new Map(); };
+  await assert.rejects(replayer.input("missing", load), /missing refresh replay entry/);
+  assert.equal(existsSync(buildRefreshReplayPath(root, "input", "missing")), false);
+  await recorder.input("discovery", async () => new Map());
+  const path = buildRefreshReplayPath(root, "input", "discovery");
+  for (const entry of [
+    "not json",
+    JSON.stringify({ key: "other", kind: "ok", value: "" }),
+    JSON.stringify({ key: "discovery", kind: "null" }),
+    JSON.stringify({ key: "discovery", kind: "ok", value: 123 }),
+    JSON.stringify({ key: "discovery", kind: "ok", value: "invalid serialized data" }),
+  ]) {
+    writeFileSync(path, entry);
+    await assert.rejects(replayer.input("discovery", load));
+  }
+  assert.equal(liveLoads, 0, "invalid recordings must not fall back to live feeds");
 });
