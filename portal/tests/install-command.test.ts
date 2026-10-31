@@ -8,6 +8,27 @@ import { installCommandFor, isMacDevice } from "../src/app/unified/install-comma
 
 const commit = "a".repeat(40);
 
+test("MCP API pins remain pinned when raw catalog-only fields are absent", () => {
+  const command = installCommandFor({
+    github_url: "https://github.com/example/skills",
+    skill_md_path: "skills/review/SKILL.md",
+    install_status: "pinned",
+    pinned_install: { repo: "example/skills", path: "skills/review", commit_sha: commit, skill_md_sha: "b".repeat(40) },
+  })!;
+  assert.ok(command);
+  assert.ok(command.includes(`fetch -q --depth 1 'https://github.com/example/skills' ${commit}`));
+  assert.doesNotMatch(command, /git clone/);
+});
+
+test("malformed or missing advertised pins never fall back to the default branch", () => {
+  const source = { github_url: "https://github.com/example/skills", skill_md_path: "skills/review/SKILL.md" };
+  for (const pinned_install of [{}, { commit_sha: "main" }, { commit_sha: "" }, [], "bad"]) {
+    assert.equal(installCommandFor({ ...source, pinned_install }), undefined);
+  }
+  assert.equal(installCommandFor({ ...source, install_status: "pinned" }), undefined);
+  assert.equal(installCommandFor({ ...source, repo_commit_sha: "not-a-commit" }), undefined);
+});
+
 test("pinned skills fetch their commit and move only the skill folder", () => {
   const command = installCommandFor({ github_url: "https://github.com/example/skills", skill_md_path: "skills/review/SKILL.md", repo_commit_sha: commit, install_target_name: "review" })!;
   assert.match(command, /^test ! -e ~\/\.claude\/skills\/'review' && d=\$\(mktemp -d\) && /);
@@ -47,7 +68,13 @@ test("the command installs a skill folder from a local repository and refuses to
     execFileSync("git", ["init", "-q", repo], { env });
     git("add", ".");
     git("commit", "-qm", "init");
-    const command = installCommandFor({ github_url: "https://github.com/example/skills", skill_md_path: "skills/review/SKILL.md", repo_commit_sha: git("rev-parse", "HEAD"), install_target_name: "review" })!
+    const pinnedCommit = git("rev-parse", "HEAD");
+    writeFileSync(join(repo, "skills", "review", "SKILL.md"), "Default branch content must not be installed.\n");
+    git("add", ".");
+    git("commit", "-qm", "change default branch");
+    const command = installCommandFor({ github_url: "https://github.com/example/skills", skill_md_path: "skills/review/SKILL.md",
+      install_status: "pinned", pinned_install: { repo: "example/skills", path: "skills/review", commit_sha: pinnedCommit,
+        skill_md_sha: "b".repeat(40) } })!
       .replace("'https://github.com/example/skills'", `'${repo}'`);
     const run = () => execFileSync("sh", ["-c", command], { env: { ...env, HOME: home }, stdio: "pipe" });
     run();

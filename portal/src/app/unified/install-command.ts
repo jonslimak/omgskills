@@ -7,6 +7,8 @@ type InstallSource = {
   skill_md_path?: unknown;
   repo_commit_sha?: unknown;
   install_target_name?: unknown;
+  pinned_install?: unknown;
+  install_status?: unknown;
 };
 
 const quote = (value: string) => `'${value.replace(/'/g, `'\\''`)}'`;
@@ -33,7 +35,16 @@ export function installCommandFor(skill: InstallSource): string | undefined {
     ? targetName(skill.install_target_name)
     : targetName(folder.split("/").pop() || url.split("/").pop()!);
   if (!name) return;
-  const commit = typeof skill.repo_commit_sha === "string" && /^[0-9a-f]{40}$/.test(skill.repo_commit_sha) ? skill.repo_commit_sha : undefined;
+  // MCP exposes its pin here, while raw catalog records use repo_commit_sha.
+  let commitValue = skill.repo_commit_sha;
+  if (skill.pinned_install != null) {
+    if (typeof skill.pinned_install !== "object" || Array.isArray(skill.pinned_install)) return;
+    commitValue = (skill.pinned_install as Record<string, unknown>).commit_sha;
+    if (commitValue == null) return;
+  }
+  if (commitValue != null && (typeof commitValue !== "string" || !/^[0-9a-f]{40}$/i.test(commitValue))) return;
+  const commit = typeof commitValue === "string" ? commitValue.toLowerCase() : undefined;
+  if (skill.install_status === "pinned" && !commit) return;
   const target = `~/.claude/skills/${quote(name)}`;
   const fetch = commit
     ? `git -C "$d" init -q && git -C "$d" fetch -q --depth 1 ${quote(url)} ${commit} && git -C "$d" checkout -q FETCH_HEAD`
