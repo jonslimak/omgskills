@@ -77,5 +77,5 @@ test("readers without a summary view still return list fields only", async conte
   const summary = await skills(client, "search_skills", { query: "swift", summary: true });
   const full = await skills(client, "search_skills", { query: "swift", summary: false });
   assert.deepEqual(summary.skills, full.skills.map(listFieldsOf));
-  assert.ok(full.skills.some(row => "install_cmd" in row));
+  assert.ok(full.skills.some(row => "skill_md_sha" in row) && full.skills.every(row => !("install_cmd" in row)));
 });

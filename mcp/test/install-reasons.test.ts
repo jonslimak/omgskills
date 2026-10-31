@@ -40,7 +40,7 @@ test("detail and install-plan responses add accurate reasons while summary reads
   assert.doesNotMatch((response.content as { text: string }[])[0].text, /no pinned commit/i);
   assert.equal(detail.found, true);
   assert.equal(detail.skill.install_status, "discovery_only");
-  assert.equal(detail.skill.install_cmd, "legacy");
+  assert.equal(detail.skill.install_cmd, undefined);
   assert.equal(detail.skill.discovery_only_reason, "No SKILL.md verification hash is recorded.");
   assert.deepEqual(detail.skill.install_blockers.map((blocker: any) => blocker.code), ["missing_content_hash"]);
   const plan = (await client.callTool({ name: "get_install_plan", arguments: { id: unpinned.id } })).structuredContent as any;
