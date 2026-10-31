@@ -77,6 +77,29 @@ test("related skills put skills named for the job first, then the most-starred, 
   assert.deepEqual(installable.skills.map(row => row.id), ["pin/w:react-performance-kit"]);
 });
 
+test("same-repo alternatives rank by shared topic, keep scores in full rows and carry their pin", async context => {
+  const library = OmgskillsLibrary.fromData({ skills: [
+    skill("lobe/hub:react", 10, "Use for TSX components, render performance and memoization."),
+    skill("ecc/x:react-native-patterns", 9000, "React Native and Expo navigation.", pinned),
+    skill("ecc/x:react-patterns", 9000, "React hooks and server components.", pinned),
+    skill("ecc/x:react-performance", 9000, "React render performance and memoization patterns.", pinned),
+  ], trending: [], goldBasket: [] }, "v1");
+  const client = await connect(context, library);
+  const order = ["ecc/x:react-performance", "ecc/x:react-patterns", "ecc/x:react-native-patterns"];
+  const summary = (await client.callTool({ name: "related_skills", arguments: { id: "lobe/hub:react" } })).structuredContent as any;
+  const full = (await client.callTool({ name: "related_skills", arguments: { id: "lobe/hub:react", summary: false } })).structuredContent as any;
+  assert.deepEqual(summary.skills.map((row: any) => row.id), order);
+  assert.deepEqual(full.skills.map((row: any) => row.score), summary.skills.map((row: any) => row.score));
+  assert.ok(full.skills.every((row: any) => row.score > 0 && !("install_cmd" in row)));
+  const plan = (await client.callTool({ name: "get_install_plan", arguments: { id: "lobe/hub:react" } })).structuredContent as any;
+  assert.equal(plan.installable, false);
+  assert.deepEqual(plan.alternatives.map((row: any) => row.id), order);
+  assert.ok(plan.alternatives.every((row: any) => row.install_status === "pinned" && row.pinned_install.commit_sha === "a".repeat(40)));
+  const detail = (await client.callTool({ name: "get_skill", arguments: { id: "ecc/x:react-performance" } })).structuredContent as any;
+  assert.equal(detail.skill.install_cmd, undefined);
+  assert.ok(detail.skill.install.claude_code && detail.skill.install.codex && detail.skill.install.cursor);
+});
+
 test("list_gold_basket pages", async context => {
   const f = catalogFixture(context, cleanRows, true);
   const client = await connect(context, await loadCatalogReader(f.url, { ...f.options, ranking: true }));

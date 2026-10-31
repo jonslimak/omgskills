@@ -120,6 +120,13 @@ const genericNameWords = new Set(["skill", "skills", "agent", "agents", "claude"
 const fillerWords = new Set(["a", "an", "and", "the", "to", "for", "from", "of", "in", "on", "with", "my", "me", "i", "we", "our",
   "it", "is", "be", "can", "you", "please", "help", "make", "want", "need", "how", "do", "that", "this", "some", "using", "use"]);
 
+/** Distinct words of four or more letters, singular, for comparing what two skills are about. */
+function contentWords(text: string) {
+  return new Set(normalize(text).split(/[^\p{L}\p{N}]+/u)
+    .filter(word => word.length >= 4 && !fillerWords.has(word) && !genericNameWords.has(word))
+    .map(word => word.length > 4 && word.endsWith("s") && !word.endsWith("ss") ? word.slice(0, -1) : word));
+}
+
 // Words people use for a file format whose skills are named after the format ("slides" for pptx).
 const synonymGroups = [
   ["slides", "slide", "presentation", "presentations", "deck", "powerpoint", "pptx"],
@@ -372,17 +379,35 @@ export class OmgskillsLibrary {
     return changed ? corrected : undefined;
   }
 
-  /** Other skills for the same job: most shared name words first (in their own name ahead of elsewhere), then most-starred. */
+  /**
+   * Other skills for the same job: most shared name words first (in their own name ahead of
+   * elsewhere), then most-starred by order of magnitude, then the most words shared with this
+   * skill's description, then exact stars.
+   */
   relatedSkills(id: string, limit?: number, installable?: boolean): SkillResult[] | undefined {
     const base = this.getSkill(id);
     if (!base) return undefined;
     const words = [...new Set(normalize(base.name).split(/[^\p{L}\p{N}]+/u))].filter(word => word.length >= 3 && !genericNameWords.has(word));
     if (!words.length) return [];
     const author = normalize(base.author_handle), name = compactKey(base.name);
+    // Skills in one repository share a star count, so stars alone cannot tell them apart.
+    const decade = (stars: number) => Math.floor(Math.log10(Math.max(stars, 0) + 1));
+    const topic = contentWords(base.description), overlap = new Map<string, number>();
+    const shared = (entry: SearchEntry) => {
+      let count = overlap.get(entry.skill.id);
+      if (count === undefined) {
+        // A word in the other skill's name says more about its job than one in its description.
+        const named = contentWords(entry.skill.name), own = contentWords(entry.skill.description);
+        count = [...topic].reduce((sum, word) => sum + (named.has(word) ? 3 : own.has(word) ? 1 : 0), 0);
+        overlap.set(entry.skill.id, count);
+      }
+      return count;
+    };
     return this.partialMatches(words, { minStars: 0, installable })
       // Skip the skill itself and its copies under the same author (case or path variants).
       .filter(({ entry }) => entry.skill.id !== base.id && !(entry.author === author && entry.nameKey === name))
-      .sort((a, b) => (b.matched ?? 0) - (a.matched ?? 0) || (b.inName ?? 0) - (a.inName ?? 0) || b.entry.stars - a.entry.stars || b.score - a.score)
+      .sort((a, b) => (b.matched ?? 0) - (a.matched ?? 0) || (b.inName ?? 0) - (a.inName ?? 0)
+        || decade(b.entry.stars) - decade(a.entry.stars) || shared(b.entry) - shared(a.entry) || b.entry.stars - a.entry.stars || b.score - a.score)
       .slice(0, clampLimit(limit))
       .map(({ entry, score }) => this.enrich(entry.skill, score));
   }
