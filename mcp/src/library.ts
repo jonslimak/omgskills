@@ -115,6 +115,8 @@ const searchFieldWeights = [12, 10, 8, 6, 4, 2];
 // 20-star one with the same name match, but not one that matches the query much better.
 const starWeight = 6;
 const exactNameBonus = 20;
+// Shorter descriptions ("A helpful skill.") can match by chance, so they never mark a copy.
+const minCopyDescription = 40;
 // Above any difference in text matches or stars, below an exact name.
 const formatNameBonus = 60;
 // Words a task description adds around the skill it needs ("help me make my app faster").
@@ -158,6 +160,10 @@ export class OmgskillsLibrary {
   private readonly collectionLike: ReadonlySet<string>;
   /** Copies left out of lists and searches: same repository, name and description as a kept record. */
   private readonly duplicates = new Set<string>();
+  /** The same skill copied into another repository (same name and description), left out of lists except the author's own. */
+  private readonly crossCopies = new Set<string>();
+  /** Lowercase short IDs (owner/repo:name) for skills whose ID carries a path (owner/repo:skills/name). */
+  private readonly idsByShortId = new Map<string, string | null>();
   /** Collection copies credited to an author who does not own the repository (a mirror). */
   private readonly mirrors = new Set<string>();
 
@@ -172,6 +178,14 @@ export class OmgskillsLibrary {
     for (const entry of data.goldBasket) this.goldById.set(entry.id, entry);
     for (const id of [...this.skillsById.keys(), ...this.goldById.keys()]) {
       if (!this.idsByLowerId.has(id.toLowerCase())) this.idsByLowerId.set(id.toLowerCase(), id);
+    }
+    for (const id of this.skillsById.keys()) {
+      const [repo, name] = id.toLowerCase().split(/:(.*)/s);
+      if (!name?.includes("/")) continue;
+      const short = `${repo}:${name.split("/").pop()}`;
+      if (this.idsByLowerId.has(short)) continue;
+      // Two path IDs with the same last folder are ambiguous, so neither gets the short form.
+      this.idsByShortId.set(short, this.idsByShortId.has(short) ? null : id);
     }
 
     this.entries = this.data.skills.map((skill) => ({
@@ -208,6 +222,22 @@ export class OmgskillsLibrary {
       group.sort((a, b) => Number(this.installable?.has(b.skill.id) ?? 0) - Number(this.installable?.has(a.skill.id) ?? 0)
         || b.stars - a.stars || a.skill.id.length - b.skill.id.length || compareText(a.skill.id, b.skill.id));
       for (const copy of group.slice(1)) this.duplicates.add(copy.skill.id);
+    }
+    // Across repositories: the same name and a description long enough to be specific.
+    const copies = new Map<string, SearchEntry[]>();
+    for (const entry of this.entries) {
+      const description = normalize(entry.skill.description).replace(/\s+/g, " ");
+      if (this.duplicates.has(entry.skill.id) || description.length < minCopyDescription || !entry.nameKey) continue;
+      const key = `${entry.nameKey}\n${description}`, group = copies.get(key);
+      if (group) group.push(entry); else copies.set(key, [entry]);
+    }
+    // Keep the installable copy, then the most-starred outside collections, then the shortest ID.
+    for (const group of copies.values()) {
+      if (group.length < 2) continue;
+      const stars = (entry: SearchEntry) => this.collectionLike.has(entry.skill.id) ? 0 : entry.stars;
+      group.sort((a, b) => Number(this.installable?.has(b.skill.id) ?? 0) - Number(this.installable?.has(a.skill.id) ?? 0)
+        || stars(b) - stars(a) || a.skill.id.length - b.skill.id.length || compareText(a.skill.id, b.skill.id));
+      for (const copy of group.slice(1)) this.crossCopies.add(copy.skill.id);
     }
   }
 
@@ -263,7 +293,7 @@ export class OmgskillsLibrary {
   canonicalId(id: string): string | undefined {
     const trimmed = id.trim().replace(/^catalog:/i, "");
     if (this.skillsById.has(trimmed) || this.goldById.has(trimmed)) return trimmed;
-    return this.idsByLowerId.get(trimmed.toLowerCase());
+    return this.idsByLowerId.get(trimmed.toLowerCase()) ?? this.idsByShortId.get(trimmed.toLowerCase()) ?? undefined;
   }
 
   getSkill(id: string): SkillResult | undefined {
@@ -364,6 +394,7 @@ export class OmgskillsLibrary {
     // !(a < b), not a >= b: records with a missing or invalid star count stay listed.
     return pool.filter(entry => (!filters.tag || entry.tags.includes(filters.tag)) && !(entry.stars < filters.minStars)
       && (!installable || installable.has(entry.skill.id)) && !this.duplicates.has(entry.skill.id)
+      && !(!filters.author && this.crossCopies.has(entry.skill.id))
       && !(filters.author && this.mirrors.has(entry.skill.id)));
   }
 

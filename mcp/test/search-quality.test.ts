@@ -5,7 +5,7 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { OmgskillsLibrary, type Skill } from "../src/library.js";
 import { createOmgskillsServer } from "../src/server.js";
 
-const skill = (id: string, stars: number, description: string): Skill => ({ id, name: id.split(":")[1], description,
+const skill = (id: string, stars: number, description: string): Skill => ({ id, name: id.split(":")[1].split("/").pop()!, description,
   github_url: `https://github.com/${id.split(":")[0]}`, install_cmd: "", author_handle: id.split("/")[0], stars });
 const library = () => OmgskillsLibrary.fromData({ skills: [
   skill("a/x:swiftui-pro", 50, "Write better SwiftUI views."),
@@ -59,4 +59,29 @@ test("an unknown ID suggests only close names", async context => {
   const text = async (id: string) => ((await client.callTool({ name: "get_skill", arguments: { id } })).content as { text: string }[])[0].text;
   assert.match(await text("q/q:swiftui-layouts"), /Did you mean: .*b\/y:swiftui-layout/);
   assert.doesNotMatch(await text("q/q:zephyr-react-ui"), /Did you mean/);
+});
+
+test("a skill copied into other repositories is listed once, but stays in its author's list and readable by ID", () => {
+  const description = "Create distinctive, production-grade frontend interfaces with high design quality.";
+  const l = OmgskillsLibrary.fromData({ skills: [
+    skill("anthropics/skills:skills/frontend-design", 180000, description),
+    skill("anthropics/plugins:frontend-design", 45000, description),
+    skill("someone/kit:frontend-design", 900, description),
+    skill("other/kit:frontend-design", 800, "My own take on frontend design for dashboards and admin tools."),
+    skill("tiny/x:frontend-design", 5, "Frontend design."),
+    skill("tiny/y:frontend-design", 4, "Frontend design."),
+  ], trending: [], goldBasket: [] }, "v1");
+  assert.deepEqual(ids(l.searchPage({ query: "frontend design", page: {} }).skills),
+    ["anthropics/skills:skills/frontend-design", "other/kit:frontend-design", "tiny/x:frontend-design", "tiny/y:frontend-design"]);
+  assert.deepEqual(ids(l.listByAuthorPage("someone", { page: {} }).skills), ["someone/kit:frontend-design"]);
+  assert.equal(l.getSkill("someone/kit:frontend-design")?.id, "someone/kit:frontend-design");
+  // The short form of a path ID resolves when it is unambiguous.
+  assert.equal(l.getSkill("Anthropics/Skills:frontend-design")?.id, "anthropics/skills:skills/frontend-design");
+});
+
+test("a short ID shared by two path IDs resolves to neither", () => {
+  const l = OmgskillsLibrary.fromData({ skills: [
+    skill("a/b:skills/one/helper", 1, "First helper skill."), skill("a/b:skills/two/helper", 1, "Second helper skill."),
+  ], trending: [], goldBasket: [] }, "v1");
+  assert.equal(l.getSkill("a/b:helper"), undefined);
 });
