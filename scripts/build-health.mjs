@@ -281,12 +281,20 @@ if (lastSuccessfulShadowRunAt || liveV2ManifestGeneratedAt || lastSuccessfulDepl
     lastSuccessfulShadowRunAt &&
     liveV2ManifestGeneratedAt &&
     publishLagMinutes !== null &&
-    publishLagMinutes >= -crawlerPublishSkewMinutes &&
-    (!lastSuccessfulDeployAt || lastSuccessfulDeployAt >= lastSuccessfulShadowRunAt)
+    publishLagMinutes >= -crawlerPublishSkewMinutes
   ) {
-    crawlerPublishStatus = "ok";
-    crawlerPublishIssues.length = 0;
-    crawlerPublishMessage = "v2 publish is current";
+    if (
+      lastSuccessfulDeployAt &&
+      Date.parse(lastSuccessfulDeployAt) >= Date.parse(lastSuccessfulShadowRunAt) &&
+      Date.parse(lastSuccessfulDeployAt) >= Date.parse(liveV2ManifestGeneratedAt)
+    ) {
+      crawlerPublishStatus = "ok";
+      crawlerPublishIssues.length = 0;
+      crawlerPublishMessage = "v2 publish is current";
+    } else if (lastSuccessfulDeployAt) {
+      crawlerPublishMessage = "v2 publish is awaiting a verified production deploy";
+      crawlerPublishIssues.push(crawlerPublishMessage);
+    }
   }
 }
 
