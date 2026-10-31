@@ -374,14 +374,14 @@ export class OmgskillsLibrary {
 
   /** Other skills for the same job: most shared name words first (in their own name ahead of elsewhere), then most-starred. */
   relatedSkills(id: string, limit?: number, installable?: boolean): SkillResult[] | undefined {
-    const canonical = this.canonicalId(id), base = canonical ? this.entriesById.get(canonical) : undefined;
+    const base = this.getSkill(id);
     if (!base) return undefined;
-    const words = [...new Set(base.fields[0].split(/[^\p{L}\p{N}]+/u))].filter(word => word.length >= 3 && !genericNameWords.has(word));
+    const words = [...new Set(normalize(base.name).split(/[^\p{L}\p{N}]+/u))].filter(word => word.length >= 3 && !genericNameWords.has(word));
     if (!words.length) return [];
-    const author = base.author;
+    const author = normalize(base.author_handle), name = compactKey(base.name);
     return this.partialMatches(words, { minStars: 0, installable })
       // Skip the skill itself and its copies under the same author (case or path variants).
-      .filter(({ entry }) => entry !== base && !(entry.author === author && entry.nameKey === base.nameKey))
+      .filter(({ entry }) => entry.skill.id !== base.id && !(entry.author === author && entry.nameKey === name))
       .sort((a, b) => (b.matched ?? 0) - (a.matched ?? 0) || (b.inName ?? 0) - (a.inName ?? 0) || b.entry.stars - a.entry.stars || b.score - a.score)
       .slice(0, clampLimit(limit))
       .map(({ entry, score }) => this.enrich(entry.skill, score));

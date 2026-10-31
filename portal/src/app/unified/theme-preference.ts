@@ -5,11 +5,15 @@ export type Theme = "light" | "dark";
 
 export function storedTheme(storage?: Pick<Storage, "getItem">): Theme {
   try {
-    const value = (storage ?? globalThis.localStorage)?.getItem(themeStorageKey);
-    return value === "dark" ? "dark" : "light";
-  } catch {
-    return "light";
-  }
+    const saved = storage ?? globalThis.localStorage;
+    for (const key of [themeStorageKey, "omgskills-home-theme"]) {
+      const value = saved?.getItem(key);
+      if (value === "dark" || value === "light") return value;
+    }
+  } catch { /* Fall back to the system when storage is blocked. */ }
+  try {
+    return globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  } catch { return "light"; }
 }
 
 export function saveTheme(theme: Theme, storage?: Pick<Storage, "setItem">) {

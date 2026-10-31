@@ -55,11 +55,16 @@ async function main() {
   const port = parsePort(process.env.OMGSKILLS_MCP_PORT);
   const catalog = await createRefreshingCatalog();
   const app = createOmgskillsHttpApp(catalog.get);
-  const listener = app.listen(port, host, () => {
+  const listener = app.listen(port, host);
+  listener.once("listening", () => {
     console.log(`omgskills MCP development server: http://${host}:${port}/mcp`);
   });
   listener.once("close", catalog.stop);
-  listener.once("error", catalog.stop);
+  listener.once("error", error => {
+    catalog.stop();
+    console.error("Failed to start local MCP server:", error);
+    process.exitCode = 1;
+  });
 }
 
 function methodNotAllowed(_request: Request, response: Response) {

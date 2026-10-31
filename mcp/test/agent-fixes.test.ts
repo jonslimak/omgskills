@@ -119,6 +119,35 @@ test("related skills skip the skill itself and its copies", async context => {
   assert.deepEqual((await mcp.callTool({ name: "related_skills", arguments: { id: "nope/x:y" } })).structuredContent, { found: false, count: 0, skills: [] });
 });
 
+test("gold-only related lookups accept canonical IDs and still exclude same-author copies", () => {
+  const gold = skill("curator/only:react-performance", { author_handle: "Curator" });
+  const copy = { ...data.skills[4], id: "curator/copies:react-performance", name: gold.name, author_handle: "curator" };
+  const library = OmgskillsLibrary.fromData({ ...data, skills: [...data.skills, copy], goldBasket: [gold] });
+  assert.equal(library.getSkill(gold.id)?.id, gold.id);
+  assert.deepEqual(library.relatedSkills(`catalog:${gold.id.toUpperCase()}`, 3, true)?.map(row => row.id), [data.skills[4].id]);
+  assert.equal(library.getStats().skills, data.skills.length + 1, "gold-only records must not be added to ordinary searches");
+  assert.equal(library.searchSkills({ query: "", author: "curator" }).some(row => row.id === gold.id), false);
+  assert.equal(library.relatedSkills("missing/skill"), undefined);
+});
+
+test("gold-only skills return related results and pinned install alternatives through MCP", async context => {
+  const gold = skill("curator/only:react-performance", {});
+  const server = createOmgskillsServer(OmgskillsLibrary.fromData({ ...data, goldBasket: [gold] }));
+  const mcp = new Client({ name: "gold-only-regression", version: "1" });
+  const [a, b] = InMemoryTransport.createLinkedPair(); await server.connect(b); await mcp.connect(a);
+  context.after(async () => { await mcp.close(); await server.close(); });
+  const found = await mcp.callTool({ name: "get_skill", arguments: { id: gold.id } });
+  assert.equal(found.structuredContent?.found, true);
+  const related = await mcp.callTool({ name: "related_skills", arguments: { id: gold.id, installable: true } });
+  assert.equal(related.isError, undefined);
+  assert.deepEqual(ids(related.structuredContent), [data.skills[4].id]);
+  const plan = await mcp.callTool({ name: "get_install_plan", arguments: { id: gold.id } });
+  assert.equal(plan.structuredContent?.installable, false);
+  const alternatives = plan.structuredContent?.alternatives as { id: string; score?: number }[];
+  assert.deepEqual(alternatives.map(row => row.id), [data.skills[4].id]);
+  assert.ok(alternatives.every(row => !("score" in row)));
+});
+
 test("get_skill_content reads SKILL.md at the pinned commit and checks its hash", async context => {
   const requested: string[] = [];
   const fetcher = (async (url: string) => {
