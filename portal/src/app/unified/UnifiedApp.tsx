@@ -458,7 +458,11 @@ export function UnifiedApp({
   const supportsView = (view: View) => !supportedAccountViews || isDiscovery(view) || supportedAccountViews.includes(view);
   const [rail, setRail] = useState(false);
   const [theme, setTheme] = useState<Theme>(() => storedTheme());
-  useEffect(() => saveTheme(theme), [theme]);
+  function toggleTheme() {
+    const next = theme === "light" ? "dark" : "light";
+    saveTheme(next);
+    setTheme(next);
+  }
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerNavigating = useRef(false);
   const [editing, setEditing] = useState(false);
@@ -728,7 +732,7 @@ export function UnifiedApp({
   const themeToggle = <IconButton
     label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
     className="ua-icon ua-theme-toggle"
-    onClick={() => setTheme(current => current === "light" ? "dark" : "light")}
+    onClick={toggleTheme}
   >{theme === "light" ? <Moon /> : <Sun />}</IconButton>;
   const accountMenu = (mobile = false) => (
     <Menu
@@ -782,7 +786,7 @@ export function UnifiedApp({
       <DropdownMenu.Separator className="ua-separator" />
       <MenuItem
         icon={theme === "light" ? Moon : Sun}
-        onSelect={() => setTheme(theme === "light" ? "dark" : "light")}
+        onSelect={toggleTheme}
       >
         {theme === "light" ? "Dark" : "Light"} appearance
       </MenuItem>

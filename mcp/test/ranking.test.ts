@@ -86,6 +86,26 @@ test("handle parsing and existing filters compose without broadening malformed a
   assert.deepEqual(l.searchRankedPage({ ...q, query: "", author: "owner" }).skills, l.searchPage({ query: "", author: "owner", page: {} }).skills);
 });
 
+test("ranked author filters accept a leading @ with text and handle queries", () => {
+  const l = library([skill("design"), skill("design-other", "design", 100, { author_handle: "other" })]);
+  for (const query of ["design", "@OWNER design", ""]) {
+    const options = { query, ranking: "web-v1" as const, page: {} };
+    const expected = l.searchRankedPage({ ...options, author: "owner" });
+    assert.equal(expected.skills.length, 1);
+    assert.deepEqual(l.searchRankedPage({ ...options, author: " @OwNeR " }), expected);
+  }
+  assert.throws(() => l.searchRankedPage({ query: "@owner design", author: "@other", ranking: "web-v1", page: {} }), /Invalid paging/);
+});
+
+test("ranked cursors treat prefixed and plain author filters as the same request", () => {
+  const l = library([skill("design-a"), skill("design-b")]);
+  const options = { query: "design", ranking: "web-v1" as const, page: {}, limit: 1 };
+  const first = l.searchRankedPage({ ...options, author: "owner" });
+  assert.ok(first.page.nextCursor);
+  const next = { ...options, page: { cursor: first.page.nextCursor! } };
+  assert.deepEqual(l.searchRankedPage({ ...next, author: "@OWNER" }), l.searchRankedPage({ ...next, author: "owner" }));
+});
+
 test("ranked pages traverse the full matching set under all sorts and filters", () => {
   const skills = Array.from({ length: 257 }, (_, i) => skill(`design-${String(i).padStart(3, "0")}`, "workflow", i % 17, { tags: [i % 2 ? "odd" : "even"], first_seen: "2026-01-01", last_updated: "2026-02-01" }));
   const l = library(skills), base = { query: "design", ranking: "web-v1" as const, page: {} };

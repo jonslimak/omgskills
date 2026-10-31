@@ -34,7 +34,7 @@ function fieldScore(text: string, token: string, partial: boolean, exactWeight: 
 }
 
 export function rankedRequest(options: SearchOptions) {
-  let query = options.query.trim(), author = options.author?.toLowerCase().trim();
+  let query = options.query.trim(), author = options.author?.toLowerCase().trim().replace(/^@/, "");
   if (query.startsWith("@")) {
     const [head, ...rest] = query.split(/\s+/), handle = head.slice(1);
     if (!/^[a-z0-9](?:[a-z0-9-]{0,37}[a-z0-9])?$/i.test(handle) || handle.includes("--")
