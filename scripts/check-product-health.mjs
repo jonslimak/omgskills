@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const origin = (process.env.PRODUCT_HEALTH_ORIGIN ?? "https://omgskills.com").replace(/\/$/, "");
-const defaultDownloadURL = "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.28/OMGSkills-Connected-0.0.28-28-arm64.zip";
+const defaultDownloadURL = "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.29/OMGSkills-Connected-0.0.29-29-arm64.zip";
 const minDownloadBytes = Number(process.env.MIN_DOWNLOAD_BYTES ?? 1_000_000);
 const minSkillsCount = Number(process.env.MIN_SKILLS_COUNT ?? 40_000);
 const minTrendingCount = Number(process.env.MIN_TRENDING_COUNT ?? 100);
