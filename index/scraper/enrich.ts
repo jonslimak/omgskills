@@ -1,5 +1,5 @@
-import { parse as parseYaml } from "yaml";
 import { octokit } from "./client.js";
+import { parseFrontmatter, stripFrontmatter } from "./frontmatter.js";
 import { gitBlobSha } from "./git-blob-sha.js";
 import { pinnedPackageMetadataFromSkill } from "./new-crawl/package-metadata.js";
 import { createRefreshReplayStoreFromEnv } from "./new-crawl/refresh-replay.js";
@@ -39,12 +39,6 @@ export interface NegativeCacheFailure {
 export interface EnrichResult {
   skill: Skill | null;
   failure?: NegativeCacheFailure;
-}
-
-interface Frontmatter {
-  name?: string;
-  description?: string;
-  tags?: string[];
 }
 
 const repoCache = new Map<string, RepoMeta>();
@@ -147,13 +141,6 @@ export async function getCandidateRepoMeta(c: Candidate, today: string): Promise
 const treeCache = new Map<string, string[]>();
 const branchGuessCache = new Map<string, string>();
 const failedSkillPathCache = new Map<string, Error>();
-
-function stripFrontmatter(content: string): string {
-  if (!content.startsWith("---")) return content;
-  const end = content.indexOf("\n---", 3);
-  if (end === -1) return content;
-  return content.slice(end + 4);
-}
 
 function truncateSnippet(text: string, maxLength = 1000): string {
   if (text.length <= maxLength) return text;
@@ -425,18 +412,8 @@ async function fetchSkillFile(
   }
 }
 
-function parseFrontmatter(content: string): Frontmatter | null {
-  if (!content.startsWith("---")) return null;
-  const end = content.indexOf("\n---", 3);
-  if (end === -1) return null;
-  const block = content.slice(3, end).trim();
-  try {
-    const parsed = parseYaml(block);
-    if (!parsed || typeof parsed !== "object") return null;
-    return parsed as Frontmatter;
-  } catch {
-    return null;
-  }
+function skillFolderName(skillMdPath: string, repo: string): string {
+  return skillMdPath.split("/").slice(0, -1).pop() || repo;
 }
 
 function normalize(s: string): string {
@@ -627,7 +604,9 @@ export async function enrichCandidate(
 
     const content = fileData.content;
     const fm = parseFrontmatter(content);
-    if (!fm?.name || !fm?.description) {
+    // Agents name a skill after its folder when the frontmatter has no name.
+    const fmName = fm?.name ?? (fm?.description ? skillFolderName(resolvedPath, repo) : undefined);
+    if (!fmName || !fm?.description) {
       console.warn(`[skip] ${c.id}: missing name/description in frontmatter`);
       return {
         skill: null,
@@ -639,7 +618,7 @@ export async function enrichCandidate(
       };
     }
 
-    const name = stripSurrogates(normalize(fm.name));
+    const name = stripSurrogates(normalize(fmName));
     const description = stripSurrogates(normalize(fm.description));
     const mergedTags = Array.from(new Set([...(fm.tags ?? []), ...meta.tags])).filter(Boolean).map(stripSurrogates);
     const install_cmd = deriveInstallCmd(meta.githubUrl, resolvedPath, name);

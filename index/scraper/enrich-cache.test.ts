@@ -30,6 +30,11 @@ function mockFetchOnce(handler: (
   };
 }
 
+test("README snippets exclude frontmatter after a leading blank CRLF prefix", () => {
+  const content = "\uFEFF\r\n\r\n---\r\nname: review\r\ndescription: Metadata only\r\n---\r\nHuman-readable body without a heading.\r\n";
+  assert.equal(buildReadmeSnippetFromSkillContent(content, "Metadata only"), "Human-readable body without a heading.");
+});
+
 test("raw GitHub requests use the configured token without requiring one", () => {
   assert.deepEqual(buildGitHubRawRequestHeaders(" test-token "), {
     Authorization: "Bearer test-token",
@@ -143,6 +148,34 @@ test("missing required frontmatter is reported as a stable candidate failure", a
       key: "owner/repo:invalid",
       reason: "missing-frontmatter",
     });
+  } finally {
+    restoreFetch();
+  }
+});
+
+test("frontmatter with a byte-order mark and no name is admitted under its folder name", async () => {
+  const restoreFetch = mockFetchOnce(() => ({
+    ok: true,
+    status: 200,
+    text: "﻿---\r\ndescription: Audits work: drift and omissions\r\n---\r\n# Audit\r\n",
+  }));
+
+  try {
+    const result = await enrichCandidate(
+      { id: "owner/repo:audit", skill_md_path: "skills/audit/SKILL.md" },
+      new Map(),
+      new Map(),
+      "2026-10-30",
+      {
+        stars: 1,
+        lastUpdated: "2026-10-30T00:00:00Z",
+        tags: [],
+        githubUrl: "https://github.com/owner/repo",
+      },
+    );
+
+    assert.equal(result.skill?.name, "audit");
+    assert.equal(result.skill?.description, "Audits work: drift and omissions");
   } finally {
     restoreFetch();
   }

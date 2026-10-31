@@ -1,0 +1,1457 @@
+{
+ "checkedAt": "2026-10-30",
+ "counts": {
+  "restored": 74,
+  "kept-hidden-still-invalid": 152,
+  "kept-hidden-wrong-file": 8,
+  "passes-was-held-live": 3
+ },
+ "skills": [
+  {
+   "id": "Aks-4125/kmp-glassmorphism-skill",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": "SKILL.md",
+   "name": "kmp-glassmorphism-ui",
+   "skill_md_sha": "045f61d23481571c62ce5c52d0173f38bc0065aa"
+  },
+  {
+   "id": "ComeOnOliver/skillshub:bats-testing-patterns",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "ComeOnOliver/skillshub:tanstack-router",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "ComeOnOliver/skillshub:wp-playground",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "CongDon1207/AGENTS.md:.opencode/skills/docs-seeker",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": ".opencode/skills/docs-seeker/SKILL.md",
+   "name": "docs-seeker",
+   "skill_md_sha": "22803e43864f09b24406433598caf588dccd6ca8"
+  },
+  {
+   "id": "CongDon1207/AGENTS.md:.opencode/skills/document-skills/docx",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": ".opencode/skills/document-skills/docx/SKILL.md",
+   "name": "docx",
+   "skill_md_sha": "6ad14ddef67b46f53bc69840e24dc1a4617e05a8"
+  },
+  {
+   "id": "CongDon1207/AGENTS.md:.opencode/skills/frontend-design",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": ".opencode/skills/frontend-design/SKILL.md",
+   "name": "frontend-design",
+   "skill_md_sha": "d561f99d9690c62dc6913c1123a628ec368c969d"
+  },
+  {
+   "id": "FlorianBruniaux/ccboard:.claude/skills/backend-architect",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "fields-on-one-line"
+  },
+  {
+   "id": "FlorianBruniaux/ccboard:.claude/skills/code-simplifier",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "fields-on-one-line"
+  },
+  {
+   "id": "FlorianBruniaux/ccboard:.claude/skills/design-patterns",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "fields-on-one-line"
+  },
+  {
+   "id": "FlorianBruniaux/ccboard:.claude/skills/issue-triage",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "fields-on-one-line"
+  },
+  {
+   "id": "GPTomics/bioSkills:workflows/cnv-pipeline",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "workflows/cnv-pipeline/SKILL.md",
+   "name": "bio-workflows-cnv-pipeline",
+   "skill_md_sha": "6c885fd0aa065243bf48b3a347fb1fe0fdfd1d1d"
+  },
+  {
+   "id": "I194/PMTools_2.0:canary",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "IsmaelMartinez/delegate-local",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "SKILL.md",
+   "name": "delegate-local",
+   "skill_md_sha": "a82926d1b95c6fc84c230e0a2426a8efff5a27df"
+  },
+  {
+   "id": "JovieInc/Jovie:benchmark",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "JovieInc/Jovie:canary",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "JovieInc/Jovie:codex",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "JovieInc/Jovie:design-html",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "JovieInc/Jovie:investigate",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "JovieInc/Jovie:office-hours",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "JovieInc/Jovie:plan-eng-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "JovieInc/Jovie:retro",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "JovieInc/Jovie:setup-deploy",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "Kaminoikari/product-playbook",
+   "outcome": "kept-hidden-wrong-file",
+   "cause": "unknown",
+   "path": "skills/product-playbook/SKILL.md",
+   "name": "product-playbook",
+   "skill_md_sha": "7f2d89714d549a1c26ad5f9c59dfabe6da6e7e39"
+  },
+  {
+   "id": "KevinYoung-Kw/vibe-resume-skill",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "SKILL.md",
+   "name": "html-resume-builder",
+   "skill_md_sha": "b9ce86d1551bc289385b09755840671f2d6a2afc"
+  },
+  {
+   "id": "MCrank/code-compress:.claude/skills/cli-expert",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": ".claude/skills/cli-expert/SKILL.md",
+   "name": "cli-expert",
+   "skill_md_sha": "6efa16052773ec86303a6bd622b5cf3d0b5e8e8d"
+  },
+  {
+   "id": "MahmoudHalat/slop-cop",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "SKILL.md",
+   "name": "ai-slop-detector",
+   "skill_md_sha": "1deda421ef4fbc37ae6c8dadb8aecdf3e26bbee1"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-adr-author",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": ".claude/skills/ce-adr-author/SKILL.md",
+   "name": "ce-adr-author",
+   "skill_md_sha": "93f1ea51a092bdd3db4eaf141bcb40064c2b2762"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-adr-consult",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": ".claude/skills/ce-adr-consult/SKILL.md",
+   "name": "ce-adr-consult",
+   "skill_md_sha": "0257466875cd10cfb7c86b43ddbed23deee01242"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-docstring-author",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": ".claude/skills/ce-docstring-author/SKILL.md",
+   "name": "ce-docstring-author",
+   "skill_md_sha": "994a44fe0b1c118141d3d8ad6ff0958ed547c39c"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-rtd-auditor",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": ".claude/skills/ce-rtd-auditor/SKILL.md",
+   "name": "ce-rtd-auditor",
+   "skill_md_sha": "5c7a582e9dcdf8ff8b6f6be4923e8734b5c4d364"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-rtd-writer",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": ".claude/skills/ce-rtd-writer/SKILL.md",
+   "name": "ce-rtd-writer",
+   "skill_md_sha": "30fedf405318be74453202a6c091803cfa2b6e33"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-skill-audit",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": ".claude/skills/ce-skill-audit/SKILL.md",
+   "name": "ce-skill-audit",
+   "skill_md_sha": "d043752d61831d6080786206a054d54042deaa61"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-skill-creator",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": ".claude/skills/ce-skill-creator/SKILL.md",
+   "name": "ce-skill-creator",
+   "skill_md_sha": "7897a39d0f894eafb4579d666c4bd301d09e5e6f"
+  },
+  {
+   "id": "Moffran/calibrated_explanations:.claude/skills/ce-skill-registry-sync",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": ".claude/skills/ce-skill-registry-sync/SKILL.md",
+   "name": "ce-skill-registry-sync",
+   "skill_md_sha": "05b4951050c4cfb08930394309ca45a803657799"
+  },
+  {
+   "id": "Patasse97/claude-skills:agenthub",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": "engineering/agenthub/SKILL.md",
+   "name": "agenthub",
+   "skill_md_sha": "0f03740d5ad49d8b8c6ac28841768f5d233286c5"
+  },
+  {
+   "id": "Patasse97/claude-skills:terraform-patterns",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": "engineering/terraform-patterns/SKILL.md",
+   "name": "terraform-patterns",
+   "skill_md_sha": "08126a832f4a022bbc9addc9ac6e580921611e2c"
+  },
+  {
+   "id": "RicherTunes/Brainarr:.claude/skills/container-deployment",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "TencentBlueKing/bk-bcs:virtual-list",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "file-not-found-by-path"
+  },
+  {
+   "id": "TheOrcDev/videorc:videorc-design",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": ".claude/skills/videorc-design/SKILL.md",
+   "name": "videorc-design",
+   "skill_md_sha": "23d0088328479853007bdaac793fbb58b42edfa8"
+  },
+  {
+   "id": "TomLeeLive/openclaw-unity-skill",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "SKILL.md",
+   "name": "unity-plugin",
+   "skill_md_sha": "beead8d078637e348c9eda0c2bbfe866f56ffc9b"
+  },
+  {
+   "id": "TomLeeLive/openclaw-unreal-skill",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "SKILL.md",
+   "name": "unreal-plugin",
+   "skill_md_sha": "07c40d66b6249de1078bf8fc63f662719df00de5"
+  },
+  {
+   "id": "YanivZalach/IceGraph:frontend-smoke-test",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "a5c-ai/babysitter:library/methodologies/cc10x/skills/debugging-patterns",
+   "outcome": "restored",
+   "cause": "yaml:MULTILINE_IMPLICIT_KEY",
+   "path": "library/methodologies/cc10x/skills/debugging-patterns/SKILL.md",
+   "name": "debugging-patterns",
+   "skill_md_sha": "4aab19dd404c76decd4ea74401ec6b60765fc22f"
+  },
+  {
+   "id": "a5c-ai/babysitter:library/methodologies/claudekit/skills/file-guard",
+   "outcome": "restored",
+   "cause": "yaml:BAD_SCALAR_START",
+   "path": "library/methodologies/claudekit/skills/file-guard/SKILL.md",
+   "name": "file-guard",
+   "skill_md_sha": "64601f7e772a710ab89af96673fd66c3e6d0384d"
+  },
+  {
+   "id": "a5c-ai/babysitter:library/methodologies/gsd/skills/git-integration",
+   "outcome": "restored",
+   "cause": "yaml:MISSING_CHAR",
+   "path": "library/methodologies/gsd/skills/git-integration/SKILL.md",
+   "name": "git-integration",
+   "skill_md_sha": "f04372071b897263aee7994b995c2b4e19ba191f"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:alert-manager",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:backlink-analyzer",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:competitor-analysis",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:content-gap-analysis",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:content-quality-auditor",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:content-refresher",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:domain-authority-auditor",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:entity-optimizer",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:geo-content-optimizer",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:internal-linking-optimizer",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:keyword-research",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:memory-management",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:meta-tags-optimizer",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:monitor/alert-manager",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:on-page-seo-auditor",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:performance-reporter",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:rank-tracker",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:schema-markup-generator",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:seo-content-writer",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:serp-analysis",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "aaron-he-zhu/seo-geo-claude-skills:technical-seo-checker",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "abustamam/portfolio-blog:browse",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "abustamam/portfolio-blog:gstack-upgrade",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "abustamam/portfolio-blog:setup-browser-cookies",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "agatx/serenada:browse",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "agatx/serenada:qa-only",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "agatx/serenada:ship",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "alirezarezvani/claude-skills:engineering-team/playwright-pro/skills/init",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "file-not-found-by-path"
+  },
+  {
+   "id": "alirezarezvani/claude-skills:engineering/agenthub/skills/init",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "file-not-found-by-path"
+  },
+  {
+   "id": "andr81/pers-assist:.claude/skills/add-med-record",
+   "outcome": "kept-hidden-wrong-file",
+   "cause": "unknown",
+   "path": ".claude/skills/weekly-plan/SKILL.md",
+   "name": "weekly-plan",
+   "skill_md_sha": "24c237f113d8cc386491b8a8a6e67c3b9392eb93"
+  },
+  {
+   "id": "bankrbot/skills:bankr",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "bankr/SKILL.md",
+   "name": "bankr",
+   "skill_md_sha": "d26c6ba08ef9bfdef891fb6ffd4792f81ceb07ff"
+  },
+  {
+   "id": "bmad-code-org/bmad-method:bmad-retrospective",
+   "outcome": "passes-was-held-live",
+   "cause": "yaml:UNEXPECTED_TOKEN",
+   "path": "skills/bmad-retrospective/SKILL.md",
+   "name": "bmad-retrospective",
+   "skill_md_sha": "a91a4676b4b0d9f13d7d6eda8d39c72fbb33f2c3"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:autoplan",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:canary",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:cso",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:design-shotgun",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:devex-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:health",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:investigate",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:office-hours",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:open-gstack-browser",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:plan-design-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "breaktapes/breaktapes-dev:setup-browser-cookies",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:autoplan",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:benchmark",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:codex",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:cso",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:design-consultation",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:investigate",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:office-hours",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:plan-ceo-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "concept2cure/ClinicalSageAI-2-replit:plan-design-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "danielmiessler/LifeOS:LifeOS/install/skills/BiasCheck",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "LifeOS/install/skills/BiasCheck/SKILL.md",
+   "name": "BiasCheck",
+   "skill_md_sha": "06471feb6ab726708c26e7ac8050d07cc3eadf12"
+  },
+  {
+   "id": "danielmiessler/LifeOS:LifeOS/install/skills/DetectAI",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "LifeOS/install/skills/DetectAI/SKILL.md",
+   "name": "DetectAI",
+   "skill_md_sha": "e19672e24ba98a4be01d5a3b1e40edb558c29599"
+  },
+  {
+   "id": "danielmiessler/LifeOS:LifeOS/install/skills/ThreatModel",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "LifeOS/install/skills/ThreatModel/SKILL.md",
+   "name": "ThreatModel",
+   "skill_md_sha": "8e86b28da200deb65ef05a06570d6281639b8483"
+  },
+  {
+   "id": "danielmiessler/LifeOS:LifeOS/install/skills/Trim",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "LifeOS/install/skills/Trim/SKILL.md",
+   "name": "Trim",
+   "skill_md_sha": "e65cba0a83242b95cb1e937b458662066ebbad80"
+  },
+  {
+   "id": "djfksjd/ir-search",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "dmlguq456/agent_setting:audit",
+   "outcome": "restored",
+   "cause": "no-name",
+   "path": "skills/audit/SKILL.md",
+   "name": "audit",
+   "skill_md_sha": "325b14e5b5f37f883325d7941b7efff3b04115c2"
+  },
+  {
+   "id": "dmlguq456/claude_setting:draft-strategy",
+   "outcome": "restored",
+   "cause": "no-name",
+   "path": "skills/draft-strategy/SKILL.md",
+   "name": "draft-strategy",
+   "skill_md_sha": "f5da491f929de5e916ad2c514836f3da0ba79280"
+  },
+  {
+   "id": "dmlguq456/hearting:audit",
+   "outcome": "restored",
+   "cause": "no-name",
+   "path": "skills/audit/SKILL.md",
+   "name": "audit",
+   "skill_md_sha": "325b14e5b5f37f883325d7941b7efff3b04115c2"
+  },
+  {
+   "id": "elithril/blender-kiln",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "faionfaion/faion-network:faion-claude-code",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "file-not-found-by-path"
+  },
+  {
+   "id": "forbotsake/forbotsake:canary",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "github/gh-aw:reporting",
+   "outcome": "restored",
+   "cause": "no-name",
+   "path": ".github/skills/reporting/SKILL.md",
+   "name": "reporting",
+   "skill_md_sha": "4fbb7322954c1a2553d1bb59ca35bc7282d69765"
+  },
+  {
+   "id": "google/capsem:dev-skills",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/dev-skills/SKILL.md",
+   "name": "dev-skills",
+   "skill_md_sha": "147934875adaed0f0622a18bc7170657081efee9"
+  },
+  {
+   "id": "gr1m0h/dot:learn",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "home/.claude/skills/learn/SKILL.md",
+   "name": "learn",
+   "skill_md_sha": "02e3dfdb0b76a9d01858503285c7d29dc7db83c2"
+  },
+  {
+   "id": "hec-ovi/research-skill",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "SKILL.md",
+   "name": "research",
+   "skill_md_sha": "4a0ef3b511cfebf5d2427f5d91a8ffa448c03481"
+  },
+  {
+   "id": "hotdata-dev/hotdata-cli:hotdata",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "plugin/skills/hotdata/SKILL.md",
+   "name": "hotdata",
+   "skill_md_sha": "918fa84c62e800be057792d779fd902a6b5c84c0"
+  },
+  {
+   "id": "hyt315/notebook-video",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "SKILL.md",
+   "name": "notebook-video",
+   "skill_md_sha": "2992bbc9a5480c16207cab5e78ffbbb7ab88dceb"
+  },
+  {
+   "id": "jamie950315/ccsync:skills",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "jantichy/claude:project",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/project/SKILL.md",
+   "name": "project",
+   "skill_md_sha": "7c0b61b846f69baf92ebf6ddf048a1a30dc02d16"
+  },
+  {
+   "id": "jleechanorg/claude-commands:chrome-superpowers-reference",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "kaivyy/kabot:voice-call",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": "kabot/skills/voice-call/SKILL.md",
+   "name": "voice-call",
+   "skill_md_sha": "000dc4afd6d55ab1b877e96614744268ec7976e5"
+  },
+  {
+   "id": "khengyun/notebooklm-experts-skill",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": "SKILL.md",
+   "name": "notebooklm-experts-skill",
+   "skill_md_sha": "e79789dc8f077c1fba0fdc2f4edac1983035aec8"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:autoplan",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:benchmark",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:codex",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:cso",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:devex-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:office-hours",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:open-gstack-browser",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:pair-agent",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:plan-design-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:plan-devex-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:qa",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:retro",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:setup-deploy",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "kunalrawat425/conductor-playground:ship",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "lachieh/babytalk:review",
+   "outcome": "kept-hidden-wrong-file",
+   "cause": "unknown",
+   "path": ".claude/skills/dx-review/SKILL.md",
+   "name": "dx-review",
+   "skill_md_sha": "7c5299bfe8b868eee2ac131aa06dc0a007036583"
+  },
+  {
+   "id": "leyuan0602-glitch/cc-claude-codex",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": "SKILL.md",
+   "name": "cc-claude-codex",
+   "skill_md_sha": "a5c589571aaa2cbe1210f1848a7d28937ff79f02"
+  },
+  {
+   "id": "lunashia/code-generation-skill",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": "SKILL.md",
+   "name": "generate-code",
+   "skill_md_sha": "95f3f17d231cadcd072c54eac95cc8f5c21ba694"
+  },
+  {
+   "id": "melodic-software/claude-code-plugins:plugins/enterprise-architecture/skills/event-storming",
+   "outcome": "kept-hidden-wrong-file",
+   "cause": "unknown",
+   "path": "plugins/event-storming/skills/simulation/SKILL.md",
+   "name": "simulation",
+   "skill_md_sha": "5190e34916718fe020c91c33ed3cb112edd5feae"
+  },
+  {
+   "id": "microsoft/agent-framework:verify-samples-tool",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": "dotnet/.github/skills/verify-samples-tool/SKILL.md",
+   "name": "verify-samples-tool",
+   "skill_md_sha": "ca71bd9b5eef7ef409daafc157088b4dc08032d4"
+  },
+  {
+   "id": "nelson820125/iforgeai:zh-CN/copilot/skills/devops-engineer",
+   "outcome": "restored",
+   "cause": "byte-order-mark",
+   "path": "zh-CN/copilot/skills/devops-engineer/SKILL.md",
+   "name": "devops-engineer",
+   "skill_md_sha": "c1fa1435f321fec65fe5a21244b80a7e4556bbfb"
+  },
+  {
+   "id": "noncuro/agent-wormhole:agent_wormhole",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "nuroctane/nur-cli:ship",
+   "outcome": "kept-hidden-wrong-file",
+   "cause": "unknown",
+   "path": "skills/ship-deploy/SKILL.md",
+   "name": "ship-deploy",
+   "skill_md_sha": "100b342c387ebf0171a39825ff2c27d684780ddc"
+  },
+  {
+   "id": "pageel/para-workspace:page-map",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "templates/common/agents/skills/page-map/SKILL.md",
+   "name": "page-map",
+   "skill_md_sha": "7271e51ca20ef77900b30011fe33d3e6135eb7f2"
+  },
+  {
+   "id": "qingxuantang/migrate-openclaw-to-cc-skill:deploy-telegram",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/deploy-telegram/SKILL.md",
+   "name": "deploy-telegram",
+   "skill_md_sha": "6ecc7c853a1994c3409d562df34d6ced28ceb9ba"
+  },
+  {
+   "id": "sanctifai/skills",
+   "outcome": "kept-hidden-wrong-file",
+   "cause": "unknown",
+   "path": "plugins/sanctifai-source/skills/source/SKILL.md",
+   "name": "source",
+   "skill_md_sha": "f37772505eaadec9046f3dbaaebd7bdcdfcd2c8a"
+  },
+  {
+   "id": "scanbott/claude-skills:browse",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:canary",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:codex",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:cso",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:design-html",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:devex-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:document-release",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:health",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:investigate",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:land-and-deploy",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:learn",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:office-hours",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:open-gstack-browser",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:plan-ceo-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:plan-design-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:qa-only",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:retro",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "scanbott/claude-skills:review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:benchmark",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:browse",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:connect-chrome",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:gstack-upgrade",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:investigate",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:open-gstack-browser",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "shengdabai/Tony-Claude-Code-Skills:setup-deploy",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:benchmark",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:design-shotgun",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:gstack",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "file-not-found-by-path"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:plan-design-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:plan-eng-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "sixtycat2000-ctrl/gbrain-qmd:ship",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "stancsz/meow:second-brain",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "file-not-found-by-path"
+  },
+  {
+   "id": "steadyfall/fspeek:autoplan",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:benchmark",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:benchmark-models",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:codex",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:context-save",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:cso",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:design-consultation",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:design-html",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:devex-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:document-release",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:gstack",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "file-not-found-by-path"
+  },
+  {
+   "id": "steadyfall/fspeek:health",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:investigate",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:make-pdf",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:office-hours",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:open-gstack-browser",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:pair-agent",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:plan-ceo-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:plan-design-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:plan-devex-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:plan-eng-review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:qa",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:qa-only",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:retro",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:review",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "steadyfall/fspeek:setup-deploy",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "no-frontmatter"
+  },
+  {
+   "id": "subodhkolhe/campfire-analyst",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "SKILL.md",
+   "name": "campfire-analyst",
+   "skill_md_sha": "080d09ecae1a206411e0e0ae21318035bf00bcfa"
+  },
+  {
+   "id": "tdimino/claude-code-minoan:skills/integration-automation/cloudflare",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/integration-automation/cloudflare/SKILL.md",
+   "name": "cloudflare",
+   "skill_md_sha": "5e3bc6f820c390b40fa751c1c4f88740dbbd9270"
+  },
+  {
+   "id": "testdino-hq/playwright-skill",
+   "outcome": "passes-was-held-live",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "SKILL.md",
+   "name": "playwright-skill",
+   "skill_md_sha": "4121859998d96191126b5b7cc7b60593441b8596"
+  },
+  {
+   "id": "thedotmack/claude-mem:mem-search",
+   "outcome": "passes-was-held-live",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "plugin/skills/mem-search/SKILL.md",
+   "name": "mem-search",
+   "skill_md_sha": "454af79b69e9b20d1194c9d0a35dd75ec2e029ee"
+  },
+  {
+   "id": "vahnxu/doubao-asr",
+   "outcome": "restored",
+   "cause": "yaml:BAD_INDENT",
+   "path": "SKILL.md",
+   "name": "doubao-asr（豆包语音转写）",
+   "skill_md_sha": "eb123ca986285a1a5385a38971991ec3d0b3a822"
+  },
+  {
+   "id": "vchelaru/Gum:gum-layout",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": ".claude/skills/gum-layout/SKILL.md",
+   "name": "gum-layout",
+   "skill_md_sha": "1638637082daf5777d95068d280b928912add5ed"
+  },
+  {
+   "id": "vercel-labs/next-browser:next-browser",
+   "outcome": "kept-hidden-wrong-file",
+   "cause": "unknown",
+   "path": ".claude/skills/synthesize-transcript/SKILL.md",
+   "name": "synthesize-transcript",
+   "skill_md_sha": "514a6f53f48c55a76c916fb877630195815f0248"
+  },
+  {
+   "id": "vitorpamplona/amethyst:compose-expert",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": ".claude/skills/compose-expert/SKILL.md",
+   "name": "compose-expert",
+   "skill_md_sha": "0cfed139fde758118bf197a82c4a2565a448214c"
+  },
+  {
+   "id": "vitorpamplona/amethyst:kotlin-multiplatform",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": ".claude/skills/kotlin-multiplatform/SKILL.md",
+   "name": "kotlin-multiplatform",
+   "skill_md_sha": "95fb8f0503de75aca9f58ff0c77da600b37b1ad1"
+  },
+  {
+   "id": "vivalence/Vivalence:pull-prod-mountpoint",
+   "outcome": "kept-hidden-wrong-file",
+   "cause": "unknown",
+   "path": ".ikiro/skills/pull-prod-mountpoint/SKILL.md",
+   "name": "pull-prod-mountpoint",
+   "skill_md_sha": "d2c30468eb9236c63e44c901706fe62bd3ab3ed9"
+  },
+  {
+   "id": "waynesutton/convexskills:convex",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex/SKILL.md",
+   "name": "convex",
+   "skill_md_sha": "4e4a1127d6768904c5877d2aad44e2ecb00b7d1c"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-agents",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-agents/SKILL.md",
+   "name": "convex-agents",
+   "skill_md_sha": "1ca74e05d0018ededa9b6037707d5501b53be726"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-best-practices",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-best-practices/SKILL.md",
+   "name": "convex-best-practices",
+   "skill_md_sha": "44aeeeed6056a7bc2f05bee8ff04bd5b85cb7160"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-cron-jobs",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-cron-jobs/SKILL.md",
+   "name": "convex-cron-jobs",
+   "skill_md_sha": "4510652e142935af6779fe9a58f1315f684de35d"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-file-storage",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-file-storage/SKILL.md",
+   "name": "convex-file-storage",
+   "skill_md_sha": "1dd547f2b3396bc62d826c3267af927377182457"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-http-actions",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-http-actions/SKILL.md",
+   "name": "convex-http-actions",
+   "skill_md_sha": "143508c29b667f9fec9c8f7ee15d2a88a00d8547"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-migrations",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-migrations/SKILL.md",
+   "name": "convex-migrations",
+   "skill_md_sha": "0bc27780ad05130bb283fcff666212c107013555"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-realtime",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-realtime/SKILL.md",
+   "name": "convex-realtime",
+   "skill_md_sha": "128d4d2361cbda41972677bc2c4eddb7936ad518"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-security-audit",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-security-audit/SKILL.md",
+   "name": "convex-security-audit",
+   "skill_md_sha": "f3aca6ced2039ce37b5bb3617d1f2f53d12bc329"
+  },
+  {
+   "id": "waynesutton/convexskills:convex-security-check",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-security-check/SKILL.md",
+   "name": "convex-security-check",
+   "skill_md_sha": "a4ebc592dc5c11479dde4267f333035baa830df2"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex/SKILL.md",
+   "name": "convex",
+   "skill_md_sha": "4e4a1127d6768904c5877d2aad44e2ecb00b7d1c"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-agents",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-agents/SKILL.md",
+   "name": "convex-agents",
+   "skill_md_sha": "1ca74e05d0018ededa9b6037707d5501b53be726"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-best-practices",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-best-practices/SKILL.md",
+   "name": "convex-best-practices",
+   "skill_md_sha": "44aeeeed6056a7bc2f05bee8ff04bd5b85cb7160"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-cron-jobs",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-cron-jobs/SKILL.md",
+   "name": "convex-cron-jobs",
+   "skill_md_sha": "4510652e142935af6779fe9a58f1315f684de35d"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-file-storage",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-file-storage/SKILL.md",
+   "name": "convex-file-storage",
+   "skill_md_sha": "1dd547f2b3396bc62d826c3267af927377182457"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-http-actions",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-http-actions/SKILL.md",
+   "name": "convex-http-actions",
+   "skill_md_sha": "143508c29b667f9fec9c8f7ee15d2a88a00d8547"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-migrations",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-migrations/SKILL.md",
+   "name": "convex-migrations",
+   "skill_md_sha": "0bc27780ad05130bb283fcff666212c107013555"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-realtime",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-realtime/SKILL.md",
+   "name": "convex-realtime",
+   "skill_md_sha": "128d4d2361cbda41972677bc2c4eddb7936ad518"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-security-audit",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-security-audit/SKILL.md",
+   "name": "convex-security-audit",
+   "skill_md_sha": "f3aca6ced2039ce37b5bb3617d1f2f53d12bc329"
+  },
+  {
+   "id": "waynesutton/convexskills:skills/convex-security-check",
+   "outcome": "restored",
+   "cause": "yaml:BLOCK_AS_IMPLICIT_KEY",
+   "path": "skills/convex-security-check/SKILL.md",
+   "name": "convex-security-check",
+   "skill_md_sha": "a4ebc592dc5c11479dde4267f333035baa830df2"
+  },
+  {
+   "id": "windmill-labs/windmill:rust-backend",
+   "outcome": "kept-hidden-still-invalid",
+   "cause": "crawler-reads-a-different-file"
+  }
+ ],
+ "stillInvalidCauses": {
+  "crawler-reads-a-different-file": 36,
+  "no-frontmatter": 105,
+  "fields-on-one-line": 4,
+  "file-not-found-by-path": 7
+ }
+}
