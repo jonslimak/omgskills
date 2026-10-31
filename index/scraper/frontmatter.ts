@@ -6,12 +6,16 @@ export interface Frontmatter {
   tags?: string[];
 }
 
+function normalizedFrontmatterText(content: string): string {
+  return content.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n").replace(/^\s*\n/, "");
+}
+
 // Agents read SKILL.md frontmatter loosely, so a file they load should not be rejected here
 // for a byte-order mark, Windows line endings, or YAML that is strict-invalid (unquoted colons,
 // stray quotes, an unclosed block). Strict YAML is tried first; if it fails, only the top-level
 // `name:` and `description:` lines are read. A file without a frontmatter block still fails.
 export function parseFrontmatter(content: string): Frontmatter | null {
-  const text = content.replace(/^﻿/, "").replace(/\r\n?/g, "\n").replace(/^\s*\n/, "");
+  const text = normalizedFrontmatterText(content);
   if (!text.startsWith("---")) return null;
   const end = text.indexOf("\n---", 3);
   if (end === -1) return null;
@@ -27,10 +31,11 @@ export function parseFrontmatter(content: string): Frontmatter | null {
 
 /** The text after the frontmatter block, or the whole file when it has none. */
 export function stripFrontmatter(content: string): string {
-  const text = content.replace(/^﻿/, "");
-  if (!text.startsWith("---")) return text;
+  const original = content.replace(/^\uFEFF/, "");
+  const text = normalizedFrontmatterText(content);
+  if (!text.startsWith("---")) return original;
   const end = text.indexOf("\n---", 3);
-  if (end === -1) return text;
+  if (end === -1) return original;
   return text.slice(end + 4);
 }
 

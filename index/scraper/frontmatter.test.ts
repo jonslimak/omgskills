@@ -47,3 +47,17 @@ test("stripFrontmatter ignores a byte-order mark", () => {
   assert.equal(stripFrontmatter("﻿---\nname: a\n---\n# Body"), "\n# Body");
   assert.equal(stripFrontmatter("# Only body"), "# Only body");
 });
+
+test("parsing and stripping agree on leading blank lines and CRLF prefixes", () => {
+  for (const prefix of ["\n\n", "\r\n\r\n", "\uFEFF\r\n \t\r\n"]) {
+    const content = `${prefix}---\r\nname: review\r\ndescription: Metadata only\r\n---\r\nBody only.\r\n`;
+    assert.deepEqual(parseFrontmatter(content), { name: "review", description: "Metadata only" });
+    assert.equal(stripFrontmatter(content), "\nBody only.\n");
+  }
+});
+
+test("stripping preserves body-only and unclosed documents", () => {
+  for (const content of ["\n\nBody only.\r\n", "\r\n---\r\nname: unclosed\r\n"]) {
+    assert.equal(stripFrontmatter(content), content);
+  }
+});

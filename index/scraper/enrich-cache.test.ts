@@ -30,6 +30,11 @@ function mockFetchOnce(handler: (
   };
 }
 
+test("README snippets exclude frontmatter after a leading blank CRLF prefix", () => {
+  const content = "\uFEFF\r\n\r\n---\r\nname: review\r\ndescription: Metadata only\r\n---\r\nHuman-readable body without a heading.\r\n";
+  assert.equal(buildReadmeSnippetFromSkillContent(content, "Metadata only"), "Human-readable body without a heading.");
+});
+
 test("raw GitHub requests use the configured token without requiring one", () => {
   assert.deepEqual(buildGitHubRawRequestHeaders(" test-token "), {
     Authorization: "Bearer test-token",
