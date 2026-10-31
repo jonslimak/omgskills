@@ -12,5 +12,5 @@ test("the app renders normally until an error, then offers Reload and help", () 
   assert.match(html, /role="alert"/);
   assert.match(html, /Something went wrong/);
   assert.match(html, /<button type="button">Reload<\/button>/);
-  assert.match(html, /href="\/support\/"/);
+  assert.match(html, /href="https:\/\/omgskills\.com\/support\/"/);
 });

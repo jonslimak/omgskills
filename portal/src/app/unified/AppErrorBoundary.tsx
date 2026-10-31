@@ -17,7 +17,7 @@ export class AppErrorBoundary extends Component<{ children: ReactNode }, { faile
         <p>omgskills hit an unexpected error. Reloading usually fixes it.</p>
         <p>
           <button type="button" onClick={() => location.reload()}>Reload</button>{" "}
-          <a href="/support/">Get help</a>
+          <a href="https://omgskills.com/support/">Get help</a>
         </p>
       </main>
     );
