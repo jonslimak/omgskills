@@ -1451,7 +1451,7 @@ Review skills before using them. They can include instructions, scripts and othe
 
 ## Are skills free?
 
-Yes. Skills are open-source Markdown files on GitHub. All 58,000+ indexed here are free.
+Yes. Skills are open-source Markdown files on GitHub. Every skill indexed here is free.
 
 ## Links
 

@@ -705,7 +705,7 @@ function verifyGuideHtml(html, label) {
   if (!questions.get("Are skills safe?")?.includes("A catalog listing or pinned version is not a security audit.")) {
     throw new Error(`${label} did not contain the visible skills safety answer in FAQPage JSON-LD`);
   }
-  if (!questions.get("Are skills free?")?.includes("All 58,000+ indexed here are free.")) {
+  if (!questions.get("Are skills free?")?.includes("Every skill indexed here is free.")) {
     throw new Error(`${label} did not contain the visible free-skills answer in FAQPage JSON-LD`);
   }
 }
@@ -715,7 +715,7 @@ function verifyGuideMarkdown(markdown, label) {
   assertIncludes(markdown, "## Are skills safe?", label);
   assertIncludes(markdown, "A catalog listing or pinned version is not a security audit.", label);
   assertIncludes(markdown, "## Are skills free?", label);
-  assertIncludes(markdown, "All 58,000+ indexed here are free.", label);
+  assertIncludes(markdown, "Every skill indexed here is free.", label);
   assertIncludes(markdown, `${publicOrigin}/guide/`, label);
 }
 
