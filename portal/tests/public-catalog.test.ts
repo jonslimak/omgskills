@@ -210,6 +210,17 @@ test("MCP text fallback works but unsafe links and mismatched identities fail cl
   await assert.rejects(unsafe.list("search_skills", {}, signal()));
 });
 
+test("get_skill preserves the MCP commit in the Copy command without raw catalog pin fields", async () => {
+  const commit = "a".repeat(40);
+  const client = new PublicCatalogClient(async (_path, init) => reply(init, { found: true, skill: {
+    ...skill(), skill_md_path: "skills/pdf/SKILL.md", install_status: "pinned",
+    pinned_install: { repo: "author/repo", path: "skills/pdf", commit_sha: commit, skill_md_sha: "b".repeat(40) },
+  } }));
+  const result = await client.skill("author/repo:pdf", signal());
+  assert.ok(result?.installCommand?.includes(commit));
+  assert.doesNotMatch(result!.installCommand!, /git clone/);
+});
+
 test("HTTP failures, non-JSON responses, timeouts and oversized bodies are visible errors", async () => {
   const busy = new PublicCatalogClient(async () => json({}, 429));
   await assert.rejects(busy.list("list_trending", {}, signal()), /busy/);
