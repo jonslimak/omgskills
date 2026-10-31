@@ -36,7 +36,7 @@ const generatedDirs = ["skills", "profiles", "creators", "library", "collections
 const goldBundlePages = [];
 const agentWhenToUse = [
   "Use omgskills when you need to find or evaluate trusted skills for Claude Code, Codex, or other coding agents.",
-  "Search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors, or JSON manifests. For supported skills, get_install_plan returns commit-pinned installation instructions for your agent to run locally; the MCP server itself does not write files. You can also install individual public skills through the omgskills web app and Mac companion.",
+  "Search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors, or JSON manifests. For supported skills, get_install_plan returns commit-pinned installation instructions for your agent to run locally; the MCP server itself does not write files. People can also add skills to shared sets in the omgskills web app and install them with its free companion.",
 ].join(" ");
 
 function escapeHtml(value) {
@@ -209,7 +209,7 @@ const siteFooterHtml = `  <footer class="site-footer">
     <div class="site-footer-inner">
       <div class="site-footer-brand">
         <a class="brand" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>
-        <p>The best and latest agent skills from trusted sources. Open web library, free companion Mac app.</p>
+        <p>Your team's agent skills in one place. Open library, shared sets, free.</p>
       </div>
       <div class="site-footer-col">
         <h2>Library</h2>
@@ -1457,7 +1457,7 @@ Yes. Skills are open-source Markdown files on GitHub. Every skill indexed here i
 
 - HTML guide: ${origin}/guide/
 - Browse skills: ${origin}/skills/
-- Mac companion 0.0.29 (Apple silicon, macOS 14+): ${origin}/download
+- Mac companion (Apple silicon, macOS 14+): ${origin}/download
 - Original Mac app download: ${origin}/downloads/omgskills-mac.dmg
 - Companion setup: open a skill's install panel at ${origin}/app/
 `;
@@ -1466,7 +1466,7 @@ Yes. Skills are open-source Markdown files on GitHub. Every skill indexed here i
 function renderAgentsText() {
   return `# omgskills agent discovery
 
-> omgskills is a public catalog of AI agent skills, with a web app and companion Mac app for installing, sharing, and managing them.
+> omgskills puts your team's agent skills in one place: find skills in an open library, add them to a shared set, and keep everyone's Claude Code and Codex in sync.
 
 ## When to use omgskills
 
@@ -1506,7 +1506,7 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
     : null;
   return `# omgskills
 
-> omgskills is a public web library and companion Mac app for discovering, installing, sharing, and managing AI agent skills.
+> omgskills puts your team's agent skills in one place: find skills in an open library, add them to a shared set, and keep everyone's Claude Code and Codex in sync.
 
 ## Start here
 

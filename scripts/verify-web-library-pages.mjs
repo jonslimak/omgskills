@@ -142,7 +142,7 @@ const rootFiles = [
   },
   {
     path: "/llms.txt",
-    text: "omgskills is a public web library and companion Mac app",
+    text: "omgskills puts your team's agent skills in one place",
   },
   {
     path: "/agents.md",
