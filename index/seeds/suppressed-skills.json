@@ -8123,7 +8123,7 @@
     {
       "id": "AngelP17/ai-agent-skills:annualreports",
       "reason": "low-signal-copy",
-      "replacementId": "danielmiessler/LifeOS:AnnualReports",
+      "replacementId": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/AnnualReports",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
@@ -21114,7 +21114,7 @@
     {
       "id": "danielmiessler/Personal_AI_Infrastructure:Council",
       "reason": "moved-duplicate",
-      "replacementId": "danielmiessler/LifeOS:Council",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Council",
       "confidence": "high",
       "stagedAt": "2026-10-29T17:56:12.349Z",
       "notes": "danielmiessler/Personal_AI_Infrastructure now redirects to danielmiessler/LifeOS; identical SKILL.md already listed as the replacement"
@@ -21277,7 +21277,7 @@
     {
       "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/BeCreative",
       "reason": "moved-duplicate",
-      "replacementId": "danielmiessler/LifeOS:BeCreative",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/BeCreative",
       "confidence": "high",
       "stagedAt": "2026-10-29T17:56:12.349Z",
       "notes": "danielmiessler/Personal_AI_Infrastructure now redirects to danielmiessler/LifeOS; identical SKILL.md already listed as the replacement"
@@ -21285,7 +21285,7 @@
     {
       "id": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/Council",
       "reason": "moved-duplicate",
-      "replacementId": "danielmiessler/LifeOS:Council",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Council",
       "confidence": "high",
       "stagedAt": "2026-10-29T17:56:12.349Z",
       "notes": "danielmiessler/Personal_AI_Infrastructure now redirects to danielmiessler/LifeOS; identical SKILL.md already listed as the replacement"
@@ -24628,14 +24628,14 @@
     {
       "id": "diegosouzapw/awesome-omni-skill:prompting-majiayu000",
       "reason": "collection-like-copy",
-      "replacementId": "danielmiessler/LifeOS:Prompting",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Prompting",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
     {
       "id": "diegosouzapw/awesome-omni-skill:prompting-virtualian",
       "reason": "collection-like-copy",
-      "replacementId": "danielmiessler/LifeOS:Prompting",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Prompting",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
@@ -43834,7 +43834,7 @@
     {
       "id": "larsboes/pai-marketplace:AnnualReports",
       "reason": "collection-like-copy",
-      "replacementId": "danielmiessler/LifeOS:AnnualReports",
+      "replacementId": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/AnnualReports",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
@@ -57274,7 +57274,7 @@
     {
       "id": "pynbj1001/alpha-sense:Prompting",
       "reason": "low-signal-copy",
-      "replacementId": "danielmiessler/LifeOS:Prompting",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Prompting",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
@@ -59463,7 +59463,7 @@
     {
       "id": "RooseveltAdvisors/claude-agent-stack:AnnualReports",
       "reason": "low-signal-copy",
-      "replacementId": "danielmiessler/LifeOS:AnnualReports",
+      "replacementId": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/AnnualReports",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
@@ -60675,7 +60675,7 @@
     {
       "id": "saidrassai/AI_as_Infra:Prompting",
       "reason": "low-signal-copy",
-      "replacementId": "danielmiessler/LifeOS:Prompting",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Prompting",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
@@ -67803,7 +67803,7 @@
     {
       "id": "virtualian/pai:AnnualReports",
       "reason": "low-signal-copy",
-      "replacementId": "danielmiessler/LifeOS:AnnualReports",
+      "replacementId": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/AnnualReports",
       "confidence": "high",
       "stagedAt": "2026-07-06T20:57:44.716Z"
     },
@@ -78351,6 +78351,419 @@
       "confidence": "medium",
       "stagedAt": "2026-10-30T21:28:42.000Z",
       "notes": "SKILL.md has no name or description our parser accepts on 2026-10-30; hidden until the parser is relaxed (index/reports/review-lists-20261030/remaining.json)"
+    },
+    {
+      "id": "GCWing/BitFun:gstack-review",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "src/crates/core/builtin_skills/gstack-review/SKILL.md is not in GCWing/OpenBitFun's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "gabrielmoreira/agent-skills-mirror:makepad-basics",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "mirrors/repos/sickn33@antigravity-awesome-skills/plugins/antigravity-awesome-skills-claude/skills/makepad-basics/SKILL.md is not in gabrielmoreira/agent-skills-mirror's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "gabrielmoreira/agent-skills-mirror:realm",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "mirrors/repos/simota@agent-skills/realm/SKILL.md is not in gabrielmoreira/agent-skills-mirror's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "gabrielmoreira/agent-skills-mirror:skills-search",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "mirrors/repos/seaworld008@Commonly-used-high-value-skills/openclaw-skills/skills-search/SKILL.md is not in gabrielmoreira/agent-skills-mirror's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "gabrielmoreira/agent-skills-mirror:xcodebuildmcp-structured-output-review",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "mirrors/repos/getsentry@XcodeBuildMCP/.agents/skills/xcodebuildmcp-structured-output-review/SKILL.md is not in gabrielmoreira/agent-skills-mirror's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "jlowin/fastmcp:.claude/skills/code-review",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": ".claude/skills/code-review/SKILL.md is not in PrefectHQ/fastmcp's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "masharratt/claude-flow-novice:.claude/skills/cfn-routing-config/lib/hybrid",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": ".claude/skills/cfn-routing-config/lib/hybrid/SKILL.md is not in masharratt/claude-flow-novice's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "ngocsangyem/MeowKit:advise",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "plugin/skills/advise/SKILL.md is not in ngocsangyem/MeowKit's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "ngocsangyem/MeowKit:brainstorming",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "plugin/skills/brainstorming/SKILL.md is not in ngocsangyem/MeowKit's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "ngocsangyem/MeowKit:ship",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "plugin/skills/ship/SKILL.md is not in ngocsangyem/MeowKit's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "sunholo-data/ailang_bootstrap:skills/ailang-debug",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/ailang-debug/SKILL.md is not in sunholo-data/ailang_bootstrap's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "K-Dense-AI/claude-scientific-writer:skills/document-skills/docx",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/document-skills/docx/SKILL.md is not in K-Dense-AI/claude-scientific-writer's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "OutlineDriven/odin-claude-plugin:skills/init",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/init/SKILL.md is not in OutlineDriven/odin-claude-plugin's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "athina-ai/goose-skills:skills/capabilities/company-contact-finder",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/capabilities/company-contact-finder/SKILL.md is not in gooseworks-ai/goose-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "athina-ai/goose-skills:skills/capabilities/job-posting-intent",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/capabilities/job-posting-intent/SKILL.md is not in gooseworks-ai/goose-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "baidu-netdisk/bdpan-storage:skills/baidu-netdisk",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/baidu-netdisk/SKILL.md is not in baidu-netdisk/bdpan-storage's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "gooseworks-ai/goose-skills:skills/capabilities/lead-qualification",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/capabilities/lead-qualification/SKILL.md is not in gooseworks-ai/goose-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "gooseworks-ai/goose-skills:skills/composites/ad-angle-miner",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/composites/ad-angle-miner/SKILL.md is not in gooseworks-ai/goose-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "gooseworks-ai/goose-skills:skills/composites/ad-campaign-analyzer",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/composites/ad-campaign-analyzer/SKILL.md is not in gooseworks-ai/goose-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "gooseworks-ai/goose-skills:skills/composites/goose-graphics-create-style",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/composites/goose-graphics-create-style/SKILL.md is not in gooseworks-ai/goose-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "hyperlane-xyz/hyperlane-monorepo:.claude/skills/alert-validator-checkpoints-inconsistent",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": ".claude/skills/alert-validator-checkpoints-inconsistent/SKILL.md is not in hyperlane-xyz/hyperlane-monorepo's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "julianobarbosa/claude-code-skills:skills/1password-skill",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/1password-skill/SKILL.md is not in julianobarbosa/claude-code-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "julianobarbosa/claude-code-skills:skills/az-aks-agent-skill",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/az-aks-agent-skill/SKILL.md is not in julianobarbosa/claude-code-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "julianobarbosa/claude-code-skills:skills/azure-ad-sso-skill",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/azure-ad-sso-skill/SKILL.md is not in julianobarbosa/claude-code-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "julianobarbosa/claude-code-skills:skills/cloudflare-dns-skill",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/cloudflare-dns-skill/SKILL.md is not in julianobarbosa/claude-code-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "julianobarbosa/claude-code-skills:skills/consulting-design-skill",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/consulting-design-skill/SKILL.md is not in julianobarbosa/claude-code-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "julianobarbosa/claude-code-skills:skills/defectdojo-skill",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/defectdojo-skill/SKILL.md is not in julianobarbosa/claude-code-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "julianobarbosa/claude-code-skills:skills/direnv-skill",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/direnv-skill/SKILL.md is not in julianobarbosa/claude-code-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "julianobarbosa/claude-code-skills:skills/external-dns-skill",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/external-dns-skill/SKILL.md is not in julianobarbosa/claude-code-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "julianobarbosa/claude-code-skills:skills/iterm2-skill",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/iterm2-skill/SKILL.md is not in julianobarbosa/claude-code-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "julianobarbosa/claude-code-skills:skills/keyvault-csi-driver-skill",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/keyvault-csi-driver-skill/SKILL.md is not in julianobarbosa/claude-code-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "julianobarbosa/claude-code-skills:skills/knative-skill",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/knative-skill/SKILL.md is not in julianobarbosa/claude-code-skills's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "lobehub/lobehub:packages/builtin-skills/src/acceptance",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "packages/builtin-skills/src/acceptance/SKILL.md is not in lobehub/lobehub's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "open-agreements/open-agreements:skills/canonical-markdown-authoring",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/canonical-markdown-authoring/SKILL.md is not in open-agreements/open-agreements's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "open-agreements/open-agreements:skills/cloud-service-agreement",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/cloud-service-agreement/SKILL.md is not in open-agreements/open-agreements's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "personamanagmentlayer/pcl:stdlib/domains/education",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "stdlib/domains/education/SKILL.md is not in personamanagmentlayer/pcl's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "personamanagmentlayer/pcl:stdlib/domains/farming",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "stdlib/domains/farming/SKILL.md is not in personamanagmentlayer/pcl's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "personamanagmentlayer/pcl:stdlib/domains/healthcare",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "stdlib/domains/healthcare/SKILL.md is not in personamanagmentlayer/pcl's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "pleaseai/claude-code-plugins:.claude/skills/plugin-builder",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": ".claude/skills/plugin-builder/SKILL.md is not in pleaseai/claude-code-plugins's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "wshobson/agents:plugins/database-design/skills/postgresql",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "plugins/database-design/skills/postgresql/SKILL.md is not in wshobson/agents's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "xr843/Master-skill:prebuilt/compare",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "prebuilt/compare/SKILL.md is not in xr843/Master-skill's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "Vladimir-Human/humanizer-ru",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "root/SKILL.md is not in Vladimir-Human/humanizer-ru's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "Vladimir-Human/humanizer-ru:humanizer-ru",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "dsh/skills/humanizer-ru/SKILL.md is not in Vladimir-Human/humanizer-ru's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "clawdbot/clawdbot:skills/slack",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/slack/SKILL.md is not in openclaw/openclaw's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "clawdbot/clawdbot:skills/voice-call",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/voice-call/SKILL.md is not in openclaw/openclaw's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "clawdbot/clawdbot:skills/wacli",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "skills/wacli/SKILL.md is not in openclaw/openclaw's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "jmagly/ai-writing-guide:plugins/marketing/skills/approval-workflow",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "plugins/marketing/skills/approval-workflow/SKILL.md is not in jmagly/aiwg's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "jmagly/ai-writing-guide:plugins/marketing/skills/data-pipeline",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "plugins/marketing/skills/data-pipeline/SKILL.md is not in jmagly/aiwg's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "jmagly/ai-writing-guide:plugins/sdlc/skills/artifact-orchestration",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "plugins/sdlc/skills/artifact-orchestration/SKILL.md is not in jmagly/aiwg's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "jmagly/ai-writing-guide:plugins/sdlc/skills/gate-evaluation",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "plugins/sdlc/skills/gate-evaluation/SKILL.md is not in jmagly/aiwg's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "nvidia/nemo-rl:cicd",
+      "reason": "source-skill-missing",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": ".agents/contributor-skills/cicd/SKILL.md is not in NVIDIA-NeMo/RL's default branch on 2026-10-31 (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "cocoindex-io/cocoindex-claude:cocoindex-v1",
+      "reason": "moved-duplicate",
+      "replacementId": "cocoindex-io/cocoindex-claude:cocoindex",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "Stored SKILL.md is gone on 2026-10-31; the current skill is listed as the replacement, which now takes its collection slots (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "pydantic/skills:instrumentation",
+      "reason": "moved-duplicate",
+      "replacementId": "pydantic/skills:logfire-instrumentation",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "Stored SKILL.md is gone on 2026-10-31; the current skill is listed as the replacement, which now takes its collection slots (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "danielmiessler/LifeOS:AnnualReports",
+      "reason": "moved-duplicate",
+      "replacementId": "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/AnnualReports",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "Stored SKILL.md is gone on 2026-10-31; the current skill is listed as the replacement, which now takes its collection slots (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "danielmiessler/LifeOS:BeCreative",
+      "reason": "moved-duplicate",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/BeCreative",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "Stored SKILL.md is gone on 2026-10-31; the current skill is listed as the replacement, which now takes its collection slots (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "danielmiessler/LifeOS:Council",
+      "reason": "moved-duplicate",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Council",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "Stored SKILL.md is gone on 2026-10-31; the current skill is listed as the replacement, which now takes its collection slots (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "danielmiessler/LifeOS:Prompting",
+      "reason": "moved-duplicate",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/Prompting",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "Stored SKILL.md is gone on 2026-10-31; the current skill is listed as the replacement, which now takes its collection slots (index/reports/review-lists-20261031)"
+    },
+    {
+      "id": "danielmiessler/LifeOS:WriteStory",
+      "reason": "moved-duplicate",
+      "replacementId": "danielmiessler/LifeOS:LifeOS/install/skills/WriteStory",
+      "confidence": "high",
+      "stagedAt": "2026-10-31T17:30:00.000Z",
+      "notes": "Stored SKILL.md is gone on 2026-10-31; the current skill is listed as the replacement, which now takes its collection slots (index/reports/review-lists-20261031)"
     }
   ]
 }
