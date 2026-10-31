@@ -4,9 +4,21 @@ import { isAccessError, PortalApiError } from "../api-error";
 import { loadAccountData, readOnlyApi, saveProfileData, type AccountIdentity } from "./data";
 import { saveSetData, type SetCommand } from "./set-data";
 import { changeMembership, changeFavorites, createSelectedSet, removeMembershipItem, reorderMembership, emptyMembershipResult, type MembershipCommand } from "./membership-data";
-import { groupSyncedSkills } from "../synced-skill-grouping";
+import { groupSyncedSkills, type GroupedSyncedSkill, type SyncedSkill } from "../synced-skill-grouping";
 import type { MembershipResult } from "../app/model";
 import { addCatalogMembership, removeFavoriteMembership } from "./membership-data";
+
+function membershipRows(skills: SyncedSkill[], selected?: GroupedSyncedSkill[]) {
+  const displayGroups = groupSyncedSkills(skills, { groupInstallations: true });
+  return new Map(skills.map(row => {
+    const skill = groupSyncedSkills([row])[0];
+    const group = displayGroups.find(group => group.allSkillIds.includes(row.id));
+    const selectedIds = selected?.find(skill => skill.id === row.id)?.allSkillIds;
+    // Keep the physical write target, but recognize saved links to equivalent copies.
+    return [row.id, { ...skill, allSkillIds: group?.allSkillIds.filter(id =>
+      id === row.id || !selected || selectedIds?.includes(id)) ?? skill.allSkillIds }];
+  }));
+}
 
 export type AccountSnapshot = {
   data: PortalData | null;
@@ -214,12 +226,12 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
         else if (command.kind === "reorder") await reorderMembership(scoped, command.id, command.itemIds, signal);
         else if (command.kind === "catalog") result = await addCatalogMembership(scoped, current.sets, command, signal);
         else if (command.kind === "remove-favorite") {
-          const skill = command.skillId ? groupSyncedSkills(current.skills).find(skill => skill.id === command.skillId) : undefined;
+          const skill = command.skillId ? membershipRows(current.skills).get(command.skillId) : undefined;
           if (command.skillId && !skill) throw new PortalApiError("Your selected skill changed. Refresh and select it again.", 409);
           result = await removeFavoriteMembership(scoped, current.sets, command.catalogId, skill, signal);
         }
         else {
-          const live = new Map(groupSyncedSkills(current.skills).map((skill) => [skill.id, skill]));
+          const live = membershipRows(current.skills, command.skills);
           const skills = [...new Set(command.skills.map((skill) => skill.id))].map((id) => {
             const skill = live.get(id);
             if (!skill) throw new PortalApiError("Your selected skills changed. Refresh and select them again.", 409);

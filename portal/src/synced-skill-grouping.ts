@@ -135,6 +135,15 @@ function chooseRepresentativeSkill(skills: SyncedSkill[]) {
   return representative;
 }
 
+function chooseDisplayInstallation(skills: SyncedSkill[]) {
+  let candidates = skills.filter(skill => skill.isCurrent === true);
+  if (!candidates.length) candidates = skills.filter(skill => skill.isCurrent !== false);
+  if (!candidates.length) candidates = skills;
+  const deviceCopies = candidates.filter(skill => skill.deviceId != null);
+  const versionedCopies = candidates.filter(skill => skill.inventoryVersion === 2 || skill.inventoryVersion === 3);
+  return chooseRepresentativeSkill(deviceCopies.length ? deviceCopies : versionedCopies.length ? versionedCopies : candidates);
+}
+
 export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = false } = {}): GroupedSyncedSkill[] {
   const physicalGroups: SyncedSkill[][] = [];
   const displayGroups = new Map<string, SyncedSkill[]>();
@@ -213,7 +222,9 @@ export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = 
   return [...physicalGroups, ...displayGroups.values(), ...catalogGroups.values(), ...unresolvedGroups]
     .map((group) => {
       const resolved = groupInstallations ? group.filter(skill => skill.catalogSkillId?.trim()) : [];
-      const representative = chooseRepresentativeSkill(resolved.length ? resolved : group);
+      const catalog = resolved.length ? chooseRepresentativeSkill(resolved) : null;
+      // Actions use a current installation; catalog display fields may come from another copy.
+      const representative = groupInstallations ? chooseDisplayInstallation(group) : chooseRepresentativeSkill(group);
       const bestDescription =
         [...group]
           .map((skill) => skill.description)
@@ -224,8 +235,9 @@ export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = 
         : [...new Set(group.map((skill) => skill.source))].sort((first, second) => first.localeCompare(second));
       return {
         ...representative,
+        ...(catalog && { catalogSkillId: catalog.catalogSkillId, identityStatus: catalog.identityStatus, isLocalOnly: catalog.isLocalOnly }),
         description: bestDescription,
-        githubUrl: representative.githubUrl ?? group.find((skill) => skill.githubUrl)?.githubUrl ?? null,
+        githubUrl: catalog?.githubUrl ?? representative.githubUrl ?? group.find((skill) => skill.githubUrl)?.githubUrl ?? null,
         allSkillIds: group.map((skill) => skill.id),
         sourceSkills: group,
         sources
