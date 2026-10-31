@@ -257,7 +257,6 @@
       "isCompany": true,
       "featuredSkillIds": [
         "cocoindex-io/cocoindex-claude:cocoindex",
-        "cocoindex-io/cocoindex-claude:cocoindex-v1",
         "cocoindex-io/cocoindex-code:ccc",
         "cocoindex-io/cocoindex:cocoindex"
       ],
@@ -1064,12 +1063,12 @@
         "danielmiessler/LifeOS:Harvest",
         "danielmiessler/LifeOS:Interceptor",
         "danielmiessler/LifeOS:Art",
-        "danielmiessler/LifeOS:AnnualReports",
-        "danielmiessler/LifeOS:BeCreative",
-        "danielmiessler/LifeOS:WriteStory",
-        "danielmiessler/LifeOS:Council",
+        "danielmiessler/Personal_AI_Infrastructure:Releases/v2.5/.claude/skills/AnnualReports",
+        "danielmiessler/LifeOS:LifeOS/install/skills/BeCreative",
+        "danielmiessler/LifeOS:LifeOS/install/skills/WriteStory",
+        "danielmiessler/LifeOS:LifeOS/install/skills/Council",
         "danielmiessler/LifeOS:CreateSkill",
-        "danielmiessler/LifeOS:Prompting"
+        "danielmiessler/LifeOS:LifeOS/install/skills/Prompting"
       ],
       "subtitle": "Security and AI research",
       "description": "LifeOS tools for research, reconnaissance, documents, and structured prompting.",
@@ -2742,7 +2741,6 @@
         "pydantic/monty:.claude/skills/fastmod",
         "pydantic/pydantic-ai:building-pydantic-ai-agents",
         "pydantic/skills:building-pydantic-ai-agents",
-        "pydantic/skills:instrumentation",
         "pydantic/skills:logfire-instrumentation",
         "pydantic/skills:logfire-query",
         "pydantic/skills:logfire-ui",

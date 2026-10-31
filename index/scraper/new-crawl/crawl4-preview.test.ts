@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { buildCrawl4Preview } from "./crawl4-preview.js";
+import { RefreshReplayStore } from "./refresh-replay.js";
 import type { Crawl4Preview, ShadowRepoIndex, ShadowRepoIndexEntry, ShadowSkillRecord, TrustedSeeds } from "./types.js";
 
 function repo(overrides: Partial<ShadowRepoIndexEntry> & Pick<ShadowRepoIndexEntry, "repo" | "stars">): ShadowRepoIndexEntry {
@@ -76,6 +80,34 @@ function seeds(partial: Partial<TrustedSeeds> = {}): TrustedSeeds {
 function discovered(rows: Array<{ repo: string; sources: string[]; stars: number }>): Map<string, { repo: string; sources: Set<string>; lanes: Set<"fast" | "periodic" | "background">; stars: number }> {
   return new Map(rows.map((row) => [row.repo, { repo: row.repo, sources: new Set(row.sources), lanes: new Set(["periodic"]), stars: row.stars }]));
 }
+
+test("recorded discovery and momentum keep the entire planning preview stable when feeds change", async (t) => {
+  const root = mkdtempSync(join(tmpdir(), "planning-replay-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const repos = [
+    ...Array.from({ length: 50 }, (_, index) => repo({ repo: `plain/repo-${index}`, stars: 999 - index })),
+    repo({ repo: "momentum/repo", stars: 4 }),
+  ];
+  let liveDiscovery = discovered([{ repo: "momentum/repo", sources: ["skillssh"], stars: 4 }]);
+  let liveMomentum = new Map([["momentum/repo", new Set<"skillssh" | "validatedX">(["skillssh"])]]);
+  const preview = async (store: RefreshReplayStore) => buildCrawl4Preview({
+    repoIndex: repoIndex(repos),
+    shadowSkills: repos.map((row) => skill({ id: `${row.repo}:skill`, github_url: row.repoUrl, stars: row.stars })),
+    unresolvedCatalogPublishers: [],
+    discovered: await store.input("discovery:combined", async () => liveDiscovery),
+    momentumByRepo: await store.input("momentum:combined", async () => liveMomentum),
+    seeds: seeds(),
+  });
+  const recorded = await preview(new RefreshReplayStore("record", root));
+  liveDiscovery = discovered([{ repo: "new/feed", sources: ["skillssh"], stars: 100_000 }]);
+  liveMomentum = new Map([["new/feed", new Set(["validatedX"])]]);
+  const changed = await preview(new RefreshReplayStore("off", null));
+  assert.notDeepEqual(changed, recorded, "the fixture must reproduce live planning drift");
+  assert.notDeepEqual(changed.dailyPriorityAdded, recorded.dailyPriorityAdded);
+  for (let replay = 0; replay < 2; replay++) {
+    assert.deepEqual(await preview(new RefreshReplayStore("replay", root)), recorded);
+  }
+});
 
 test("builds tier counts, missing tiers, and momentum summary", () => {
   const preview = buildCrawl4Preview({

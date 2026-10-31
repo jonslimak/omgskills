@@ -1,0 +1,1497 @@
+{
+ "count": 125,
+ "skills": [
+  {
+   "id": "Catsofsuffering/CCGS:skills",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "Catsofsuffering/CCGS",
+   "repoFull": "Catsofsuffering/ccsm",
+   "path": "templates/skills",
+   "catalogName": "ccgs-skills",
+   "fileName": "ccsm-skills",
+   "blobMatches": false
+  },
+  {
+   "id": "GCWing/BitFun:gstack-review",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "file-404",
+   "repo": "GCWing/BitFun",
+   "repoFull": "GCWing/OpenBitFun",
+   "path": "src/crates/core/builtin_skills/gstack-review",
+   "catalogName": "review"
+  },
+  {
+   "id": "MMEHDI0606/protom:loki-mode",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "MMEHDI0606/protom",
+   "repoFull": "MMEHDI0606/protom",
+   "path": ".agents/skills/loki-mode",
+   "catalogName": "loki-mode",
+   "fileName": "loki-mode",
+   "blobMatches": false
+  },
+  {
+   "id": "SeaLion-hub/DICEE:autoplan",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "SeaLion-hub/DICEE",
+   "repoFull": "SeaLion-hub/DICEE",
+   "path": ".agents/skills/gstack/autoplan",
+   "catalogName": "autoplan",
+   "fileName": "autoplan",
+   "blobMatches": false
+  },
+  {
+   "id": "aaronjmars/aeon:search-skill",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "aaronjmars/aeon",
+   "repoFull": "aeonfun/aeon",
+   "path": "skills/search-skill",
+   "catalogName": "Search Skills",
+   "fileName": "search-skill",
+   "blobMatches": false
+  },
+  {
+   "id": "affaan-m/everything-claude-code:frontend-design",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "affaan-m/ECC",
+   "repoFull": "affaan-m/ECC",
+   "path": "skills/frontend-design-direction",
+   "catalogName": "frontend-design-direction",
+   "fileName": "frontend-design-direction",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:ai-image",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/phy041--phy-ai-image/skills/ai-image",
+   "catalogName": "ai-image",
+   "fileName": "ai-image",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:auto-create-skill",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/zhangxilong-43--auto-create-skill/skills/auto-create-skill",
+   "catalogName": "auto-create-skill",
+   "fileName": "auto-create-skill",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:clawdraw",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/kajukabla--clawdraw-skill/skills/clawdraw",
+   "catalogName": "clawdraw",
+   "fileName": "clawdraw",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:dtek-light-check",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/kapishdima--dtek-light/skills/dtek-light-check",
+   "catalogName": "dtek-light-check",
+   "fileName": "dtek-light-check",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:feishu-skills-kit",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/hewenqiang--feishu-skills-kit/skills/feishu-skills-kit",
+   "catalogName": "feishu-skills-kit",
+   "fileName": "feishu-skills-kit",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:hhxg-market",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/niceck--hhxg-market/skills/hhxg-market",
+   "catalogName": "hhxg-market",
+   "fileName": "hhxg-market",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:marriott",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/qianjunye--marriott/skills/marriott",
+   "catalogName": "marriott",
+   "fileName": "marriott",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:mijia",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/hqman--mijia/skills/mijia",
+   "catalogName": "mijia",
+   "fileName": "mijia",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:note-writer",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/sa9saq--note-writer/skills/note-writer",
+   "catalogName": "note-writer",
+   "fileName": "note-writer",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:safe-encryption",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/grittygrease--safe-encryption-skill/skills/safe-encryption",
+   "catalogName": "safe-encryption",
+   "fileName": "safe-encryption",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:seedance-video-byteplus",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/jackycser--seedance-video-generation-byteplus/skills/seedance-video-byteplus",
+   "catalogName": "seedance-video-byteplus",
+   "fileName": "seedance-video-byteplus",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:tesy",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/kipasdinding6969-alt--tesy/skills/tesy",
+   "catalogName": "tesy",
+   "fileName": "tesy",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:url-reader",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/justao--url-reader/skills/url-reader",
+   "catalogName": "url-reader",
+   "fileName": "url-reader",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:wechat-article-to-markdown",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/jackwener--wechat-article-to-markdown/skills/wechat-article-to-markdown",
+   "catalogName": "wechat-article-to-markdown",
+   "fileName": "wechat-article-to-markdown",
+   "blobMatches": true
+  },
+  {
+   "id": "dvcrn/openclaw-skills-marketplace:widget",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "dvcrn/openclaw-skills-marketplace",
+   "repoFull": "dvcrn/openclaw-skills-marketplace",
+   "path": "plugins/paranoidearth--widget/skills/widget",
+   "catalogName": "widget",
+   "fileName": "widget",
+   "blobMatches": true
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:adhx",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/sickn33@antigravity-awesome-skills/skills/adhx",
+   "catalogName": "adhx",
+   "fileName": "adhx",
+   "blobMatches": false
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:api-security-testing",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/sickn33@antigravity-awesome-skills/skills/api-security-testing",
+   "catalogName": "api-security-testing",
+   "fileName": "api-security-testing",
+   "blobMatches": false
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:autoplan",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/garrytan@gstack/autoplan",
+   "catalogName": "autoplan",
+   "fileName": "autoplan",
+   "blobMatches": false
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:configure-ecc",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/affaan-m@everything-claude-code/docs/zh-CN/skills/configure-ecc",
+   "catalogName": "configure-ecc",
+   "fileName": "configure-ecc",
+   "blobMatches": false
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:context-save",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/garrytan@gstack/context-save",
+   "catalogName": "context-save",
+   "fileName": "context-save",
+   "blobMatches": false
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:daily-meeting-update",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/davila7@claude-code-templates/cli-tool/components/skills/enterprise-communication/daily-meeting-update",
+   "catalogName": "daily-meeting-update",
+   "fileName": "daily-meeting-update",
+   "blobMatches": true
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:design-consultation",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/garrytan@gstack/design-consultation",
+   "catalogName": "design-consultation",
+   "fileName": "design-consultation",
+   "blobMatches": false
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:makepad-basics",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "file-404",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/sickn33@antigravity-awesome-skills/plugins/antigravity-awesome-skills-claude/skills/makepad-basics",
+   "catalogName": "makepad-basics"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:mobile-cicd",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/travisjneuman@.claude/skills/mobile-cicd",
+   "catalogName": "mobile-cicd",
+   "fileName": "mobile-cicd",
+   "blobMatches": false
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:network-rca",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/kubeshark@kubeshark/skills/network-rca",
+   "catalogName": "network-rca",
+   "fileName": "network-rca",
+   "blobMatches": false
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:open-gstack-browser",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/garrytan@gstack/open-gstack-browser",
+   "catalogName": "open-gstack-browser",
+   "fileName": "open-gstack-browser",
+   "blobMatches": false
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:pageclaw-test",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/XY-Showing@pageclaw/skills/pageclaw-test",
+   "catalogName": "pageclaw-test",
+   "fileName": "pageclaw-test",
+   "blobMatches": true
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:personalize-skills",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/dazuck@operator-skills/skills/personalize-skills",
+   "catalogName": "personalize-skills",
+   "fileName": "personalize-skills",
+   "blobMatches": true
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:readme-updater",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/alirezarezvani@claude-code-tresor/skills/documentation/readme-updater",
+   "catalogName": "readme-updater",
+   "fileName": "readme-updater",
+   "blobMatches": true
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:realm",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "file-404",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/simota@agent-skills/realm",
+   "catalogName": "realm"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:repo-scan",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/affaan-m@everything-claude-code/skills/repo-scan",
+   "catalogName": "repo-scan",
+   "fileName": "repo-scan",
+   "blobMatches": false
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:skill-optimizer",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/sickn33@antigravity-awesome-skills/skills/skill-optimizer",
+   "catalogName": "skill-optimizer",
+   "fileName": "skill-optimizer",
+   "blobMatches": false
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:skills-search",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "file-404",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/seaworld008@Commonly-used-high-value-skills/openclaw-skills/skills-search",
+   "catalogName": "skills-search"
+  },
+  {
+   "id": "gabrielmoreira/agent-skills-mirror:xcodebuildmcp-structured-output-review",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "file-404",
+   "repo": "gabrielmoreira/agent-skills-mirror",
+   "repoFull": "gabrielmoreira/agent-skills-mirror",
+   "path": "mirrors/repos/getsentry@XcodeBuildMCP/.agents/skills/xcodebuildmcp-structured-output-review",
+   "catalogName": "xcodebuildmcp-structured-output-review"
+  },
+  {
+   "id": "getsentry/XcodeBuildMCP:xcodebuildmcp-structured-output-review",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "file-404",
+   "repo": "getsentry/XcodeBuildMCP",
+   "repoFull": "getsentry/MobileBuildMCP",
+   "path": ".agents/skills/xcodebuildmcp-structured-output-review",
+   "catalogName": "xcodebuildmcp-structured-output-review",
+   "caseTwins": [
+    "getsentry/xcodebuildmcp:xcodebuildmcp-structured-output-review"
+   ]
+  },
+  {
+   "id": "ibragimov-oasis/vibe-coder:antigravity-blueprint",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "ibragimov-oasis/vibe-coder",
+   "repoFull": "ibragimov-oasis/vibe-coder",
+   "path": "vc-kit/content/COMBINED/COMBINED/skills/skills-antigravity/antigravity-blueprint",
+   "catalogName": "blueprint",
+   "fileName": "blueprint",
+   "blobMatches": true
+  },
+  {
+   "id": "ibragimov-oasis/vibe-coder:blueprint",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "ibragimov-oasis/vibe-coder",
+   "repoFull": "ibragimov-oasis/vibe-coder",
+   "path": "vc-kit/content/COMBINED/COMBINED/skills/skills-antigravity/source-antigravity-awesome-skills/plugins/antigravity-awesome-skills-claude/skills/blueprint",
+   "catalogName": "blueprint",
+   "fileName": "blueprint",
+   "blobMatches": true
+  },
+  {
+   "id": "jlowin/fastmcp:.claude/skills/code-review",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "file-404",
+   "repo": "PrefectHQ/fastmcp",
+   "repoFull": "PrefectHQ/fastmcp",
+   "path": ".claude/skills/code-review",
+   "catalogName": "reviewing-code",
+   "candidates": [
+    "examples/skills/sample_skills/code-review/SKILL.md"
+   ]
+  },
+  {
+   "id": "jnuyens/gsd-plugin:undo",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "jnuyens/gsd-plugin",
+   "repoFull": "buildomator/buildomator",
+   "path": "skills/undo",
+   "catalogName": "gsd:undo",
+   "fileName": "undo",
+   "blobMatches": false
+  },
+  {
+   "id": "masharratt/claude-flow-novice:.claude/skills/cfn-routing-config/lib/hybrid",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "file-404",
+   "repo": "masharratt/claude-flow-novice",
+   "repoFull": "masharratt/claude-flow-novice",
+   "path": ".claude/skills/cfn-routing-config/lib/hybrid",
+   "catalogName": "cfn-hybrid-routing",
+   "candidates": [
+    ".claude/cfn-extras/skills/cfn-routing-config/lib/hybrid/SKILL.md"
+   ]
+  },
+  {
+   "id": "ngocsangyem/MeowKit:advise",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "file-404",
+   "repo": "ngocsangyem/MeowKit",
+   "repoFull": "ngocsangyem/MeowKit",
+   "path": "plugin/skills/advise",
+   "catalogName": "mk:advise",
+   "candidates": [
+    ".claude/skills/advise/SKILL.md"
+   ]
+  },
+  {
+   "id": "ngocsangyem/MeowKit:brainstorming",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "file-404",
+   "repo": "ngocsangyem/MeowKit",
+   "repoFull": "ngocsangyem/MeowKit",
+   "path": "plugin/skills/brainstorming",
+   "catalogName": "mk:brainstorming",
+   "candidates": [
+    ".claude/skills/brainstorming/SKILL.md"
+   ]
+  },
+  {
+   "id": "ngocsangyem/MeowKit:ship",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "file-404",
+   "repo": "ngocsangyem/MeowKit",
+   "repoFull": "ngocsangyem/MeowKit",
+   "path": "plugin/skills/ship",
+   "catalogName": "mk:ship",
+   "candidates": [
+    ".claude/skills/ship/SKILL.md"
+   ]
+  },
+  {
+   "id": "opusgamelabs/game-creator:add-audio",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "OpusGameLabs/game-creator",
+   "repoFull": "PlayableIntelligence/game-creator",
+   "path": "skills/add-audio",
+   "catalogName": "add-audio",
+   "fileName": "add-audio",
+   "blobMatches": false
+  },
+  {
+   "id": "opusgamelabs/game-creator:design-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "OpusGameLabs/game-creator",
+   "repoFull": "PlayableIntelligence/game-creator",
+   "path": "skills/design-game",
+   "catalogName": "design-game",
+   "fileName": "design-game",
+   "blobMatches": false
+  },
+  {
+   "id": "opusgamelabs/game-creator:improve-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "OpusGameLabs/game-creator",
+   "repoFull": "PlayableIntelligence/game-creator",
+   "path": "skills/improve-game",
+   "catalogName": "improve-game",
+   "fileName": "improve-game",
+   "blobMatches": false
+  },
+  {
+   "id": "opusgamelabs/game-creator:make-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "OpusGameLabs/game-creator",
+   "repoFull": "PlayableIntelligence/game-creator",
+   "path": "skills/make-game",
+   "catalogName": "make-game",
+   "fileName": "make-game",
+   "blobMatches": false
+  },
+  {
+   "id": "opusgamelabs/game-creator:monetize-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "OpusGameLabs/game-creator",
+   "repoFull": "PlayableIntelligence/game-creator",
+   "path": "skills/monetize-game",
+   "catalogName": "monetize-game",
+   "fileName": "monetize-game",
+   "blobMatches": false
+  },
+  {
+   "id": "opusgamelabs/game-creator:promo-video",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "OpusGameLabs/game-creator",
+   "repoFull": "PlayableIntelligence/game-creator",
+   "path": "skills/promo-video",
+   "catalogName": "promo-video",
+   "fileName": "promo-video",
+   "blobMatches": false
+  },
+  {
+   "id": "opusgamelabs/game-creator:qa-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "OpusGameLabs/game-creator",
+   "repoFull": "PlayableIntelligence/game-creator",
+   "path": "skills/qa-game",
+   "catalogName": "qa-game",
+   "fileName": "qa-game",
+   "blobMatches": false
+  },
+  {
+   "id": "opusgamelabs/game-creator:quick-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "OpusGameLabs/game-creator",
+   "repoFull": "PlayableIntelligence/game-creator",
+   "path": "skills/quick-game",
+   "catalogName": "quick-game",
+   "fileName": "quick-game",
+   "blobMatches": false
+  },
+  {
+   "id": "opusgamelabs/game-creator:review-game",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "OpusGameLabs/game-creator",
+   "repoFull": "PlayableIntelligence/game-creator",
+   "path": "skills/review-game",
+   "catalogName": "review-game",
+   "fileName": "review-game",
+   "blobMatches": false
+  },
+  {
+   "id": "opusgamelabs/game-creator:use-template",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "OpusGameLabs/game-creator",
+   "repoFull": "PlayableIntelligence/game-creator",
+   "path": "skills/use-template",
+   "catalogName": "use-template",
+   "fileName": "use-template",
+   "blobMatches": false
+  },
+  {
+   "id": "shihyu/jason_note:blueprint",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "shihyu/jason_note",
+   "repoFull": "shihyu/jason_note",
+   "path": "src/tools/data/everything-claude-code/skills/blueprint",
+   "catalogName": "blueprint",
+   "fileName": "blueprint",
+   "blobMatches": true
+  },
+  {
+   "id": "shihyu/jason_note:strategic-compact",
+   "group": "unverified",
+   "why": "tree truncated; no stored path to check",
+   "status": "present",
+   "repo": "shihyu/jason_note",
+   "repoFull": "shihyu/jason_note",
+   "path": "src/tools/data/everything-claude-code/docs/zh-CN/skills/strategic-compact",
+   "catalogName": "strategic-compact",
+   "fileName": "strategic-compact",
+   "blobMatches": true
+  },
+  {
+   "id": "stevenwinnick/ai-agent-config:cloning-repos",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "stevenwinnick/ai-agent-config",
+   "repoFull": "stevenwinnick/ai-agent-config",
+   "path": "base-config/skills/cloning-repos",
+   "catalogName": "cloning-repos",
+   "fileName": "cloning-repos",
+   "blobMatches": false
+  },
+  {
+   "id": "stevenwinnick/ai-agent-config:initializing-repos",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "stevenwinnick/ai-agent-config",
+   "repoFull": "stevenwinnick/ai-agent-config",
+   "path": "base-config/skills/initializing-repos",
+   "catalogName": "initializing-repos",
+   "fileName": "initializing-repos",
+   "blobMatches": false
+  },
+  {
+   "id": "sunholo-data/ailang_bootstrap:skills/ailang-debug",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "file-404",
+   "repo": "sunholo-data/ailang_bootstrap",
+   "repoFull": "sunholo-data/ailang_bootstrap",
+   "path": "skills/ailang-debug",
+   "catalogName": "AILANG Debug",
+   "candidates": [
+    "archive/skills/ailang-debug/SKILL.md"
+   ]
+  },
+  {
+   "id": "vib795/copilot-anatomy:gstack-gstack-upgrade",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "vib795/copilot-anatomy",
+   "repoFull": "vib795/copilot-anatomy",
+   "path": ".github/skills/gstack-gstack-upgrade",
+   "catalogName": "gstack-upgrade",
+   "fileName": "gstack-gstack-upgrade",
+   "blobMatches": false
+  },
+  {
+   "id": "vib795/copilot-anatomy:gstack-investigate",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "vib795/copilot-anatomy",
+   "repoFull": "vib795/copilot-anatomy",
+   "path": ".github/skills/gstack-investigate",
+   "catalogName": "investigate",
+   "fileName": "gstack-investigate",
+   "blobMatches": false
+  },
+  {
+   "id": "vib795/copilot-anatomy:gstack-open-gstack-browser",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "vib795/copilot-anatomy",
+   "repoFull": "vib795/copilot-anatomy",
+   "path": ".github/skills/gstack-open-gstack-browser",
+   "catalogName": "open-gstack-browser",
+   "fileName": "gstack-open-gstack-browser",
+   "blobMatches": false
+  },
+  {
+   "id": "vib795/copilot-anatomy:gstack-setup-deploy",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "vib795/copilot-anatomy",
+   "repoFull": "vib795/copilot-anatomy",
+   "path": ".github/skills/gstack-setup-deploy",
+   "catalogName": "setup-deploy",
+   "fileName": "gstack-setup-deploy",
+   "blobMatches": false
+  },
+  {
+   "id": "vib795/copilot-anatomy:gstack-ship",
+   "group": "unverified",
+   "why": "folder named after the skill exists",
+   "status": "present",
+   "repo": "vib795/copilot-anatomy",
+   "repoFull": "vib795/copilot-anatomy",
+   "path": ".github/skills/gstack-ship",
+   "catalogName": "ship",
+   "fileName": "gstack-ship",
+   "blobMatches": false
+  },
+  {
+   "id": "K-Dense-AI/claude-scientific-writer:skills/document-skills/docx",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "K-Dense-AI/claude-scientific-writer",
+   "repoFull": "K-Dense-AI/claude-scientific-writer",
+   "path": "skills/document-skills/docx",
+   "catalogName": "docx",
+   "candidates": [
+    ".claude/skills/docx/SKILL.md",
+    "scientific_writer/.claude/skills/docx/SKILL.md",
+    "skills/docx/SKILL.md"
+   ]
+  },
+  {
+   "id": "OutlineDriven/odin-claude-plugin:skills/init",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "OutlineDriven/odin-claude-plugin",
+   "repoFull": "OutlineDriven/odin-claude-plugin",
+   "path": "skills/init",
+   "catalogName": "inits"
+  },
+  {
+   "id": "athina-ai/goose-skills:skills/capabilities/company-contact-finder",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "gooseworks-ai/goose-skills",
+   "repoFull": "gooseworks-ai/goose-skills",
+   "path": "skills/capabilities/company-contact-finder",
+   "catalogName": "company-contact-finder",
+   "candidates": [
+    "skills/shared/company-contact-finder/SKILL.md"
+   ]
+  },
+  {
+   "id": "athina-ai/goose-skills:skills/capabilities/job-posting-intent",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "gooseworks-ai/goose-skills",
+   "repoFull": "gooseworks-ai/goose-skills",
+   "path": "skills/capabilities/job-posting-intent",
+   "catalogName": "job-posting-intent",
+   "candidates": [
+    "skills/shared/job-posting-intent/SKILL.md"
+   ]
+  },
+  {
+   "id": "baidu-netdisk/bdpan-storage:skills/baidu-netdisk",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "baidu-netdisk/bdpan-storage",
+   "repoFull": "baidu-netdisk/bdpan-storage",
+   "path": "skills/baidu-netdisk",
+   "catalogName": "baidu-drive"
+  },
+  {
+   "id": "gooseworks-ai/goose-skills:skills/capabilities/lead-qualification",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "gooseworks-ai/goose-skills",
+   "repoFull": "gooseworks-ai/goose-skills",
+   "path": "skills/capabilities/lead-qualification",
+   "catalogName": "lead-qualification",
+   "candidates": [
+    "skills/shared/lead-qualification/SKILL.md"
+   ]
+  },
+  {
+   "id": "gooseworks-ai/goose-skills:skills/composites/ad-angle-miner",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "gooseworks-ai/goose-skills",
+   "repoFull": "gooseworks-ai/goose-skills",
+   "path": "skills/composites/ad-angle-miner",
+   "catalogName": "ad-angle-miner",
+   "candidates": [
+    "skills/shared/ad-angle-miner/SKILL.md"
+   ]
+  },
+  {
+   "id": "gooseworks-ai/goose-skills:skills/composites/ad-campaign-analyzer",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "gooseworks-ai/goose-skills",
+   "repoFull": "gooseworks-ai/goose-skills",
+   "path": "skills/composites/ad-campaign-analyzer",
+   "catalogName": "ad-campaign-analyzer",
+   "candidates": [
+    "skills/shared/ad-campaign-analyzer/SKILL.md"
+   ]
+  },
+  {
+   "id": "gooseworks-ai/goose-skills:skills/composites/goose-graphics-create-style",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "gooseworks-ai/goose-skills",
+   "repoFull": "gooseworks-ai/goose-skills",
+   "path": "skills/composites/goose-graphics-create-style",
+   "catalogName": "goose-graphics-create-style",
+   "candidates": [
+    "skills/shared/goose-graphics-create-style/SKILL.md"
+   ]
+  },
+  {
+   "id": "hyperlane-xyz/hyperlane-monorepo:.claude/skills/alert-validator-checkpoints-inconsistent",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "hyperlane-xyz/hyperlane-monorepo",
+   "repoFull": "hyperlane-xyz/hyperlane-monorepo",
+   "path": ".claude/skills/alert-validator-checkpoints-inconsistent",
+   "catalogName": "debug-validator-checkpoint-inconsistency"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/1password-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "julianobarbosa/claude-code-skills",
+   "repoFull": "julianobarbosa/claude-code-skills",
+   "path": "skills/1password-skill",
+   "catalogName": "1password"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/az-aks-agent-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "julianobarbosa/claude-code-skills",
+   "repoFull": "julianobarbosa/claude-code-skills",
+   "path": "skills/az-aks-agent-skill",
+   "catalogName": "az-aks-agent"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/azure-ad-sso-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "julianobarbosa/claude-code-skills",
+   "repoFull": "julianobarbosa/claude-code-skills",
+   "path": "skills/azure-ad-sso-skill",
+   "catalogName": "azure-ad-sso"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/cloudflare-dns-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "julianobarbosa/claude-code-skills",
+   "repoFull": "julianobarbosa/claude-code-skills",
+   "path": "skills/cloudflare-dns-skill",
+   "catalogName": "cloudflare-dns"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/consulting-design-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "julianobarbosa/claude-code-skills",
+   "repoFull": "julianobarbosa/claude-code-skills",
+   "path": "skills/consulting-design-skill",
+   "catalogName": "consulting-design"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/defectdojo-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "julianobarbosa/claude-code-skills",
+   "repoFull": "julianobarbosa/claude-code-skills",
+   "path": "skills/defectdojo-skill",
+   "catalogName": "defectdojo"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/direnv-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "julianobarbosa/claude-code-skills",
+   "repoFull": "julianobarbosa/claude-code-skills",
+   "path": "skills/direnv-skill",
+   "catalogName": "direnv"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/external-dns-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "julianobarbosa/claude-code-skills",
+   "repoFull": "julianobarbosa/claude-code-skills",
+   "path": "skills/external-dns-skill",
+   "catalogName": "external-dns"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/iterm2-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "julianobarbosa/claude-code-skills",
+   "repoFull": "julianobarbosa/claude-code-skills",
+   "path": "skills/iterm2-skill",
+   "catalogName": "Iterm2"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/keyvault-csi-driver-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "julianobarbosa/claude-code-skills",
+   "repoFull": "julianobarbosa/claude-code-skills",
+   "path": "skills/keyvault-csi-driver-skill",
+   "catalogName": "keyvault-csi-driver"
+  },
+  {
+   "id": "julianobarbosa/claude-code-skills:skills/knative-skill",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "julianobarbosa/claude-code-skills",
+   "repoFull": "julianobarbosa/claude-code-skills",
+   "path": "skills/knative-skill",
+   "catalogName": "knative"
+  },
+  {
+   "id": "lobehub/lobehub:packages/builtin-skills/src/acceptance",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "lobehub/lobehub",
+   "repoFull": "lobehub/lobehub",
+   "path": "packages/builtin-skills/src/acceptance",
+   "catalogName": "acceptance",
+   "candidates": [
+    ".agents/skills/acceptance/SKILL.md"
+   ]
+  },
+  {
+   "id": "open-agreements/open-agreements:skills/canonical-markdown-authoring",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "open-agreements/open-agreements",
+   "repoFull": "open-agreements/open-agreements",
+   "path": "skills/canonical-markdown-authoring",
+   "catalogName": "canonical-markdown-authoring",
+   "candidates": [
+    "skills/internal/canonical-markdown-authoring/SKILL.md"
+   ]
+  },
+  {
+   "id": "open-agreements/open-agreements:skills/cloud-service-agreement",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "open-agreements/open-agreements",
+   "repoFull": "open-agreements/open-agreements",
+   "path": "skills/cloud-service-agreement",
+   "catalogName": "cloud-service-agreement",
+   "candidates": [
+    "skills/agreements/cloud-service-agreement/SKILL.md"
+   ]
+  },
+  {
+   "id": "personamanagmentlayer/pcl:stdlib/domains/education",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "personamanagmentlayer/pcl",
+   "repoFull": "personamanagmentlayer/pcl",
+   "path": "stdlib/domains/education",
+   "catalogName": "education-expert"
+  },
+  {
+   "id": "personamanagmentlayer/pcl:stdlib/domains/farming",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "personamanagmentlayer/pcl",
+   "repoFull": "personamanagmentlayer/pcl",
+   "path": "stdlib/domains/farming",
+   "catalogName": "farming-expert"
+  },
+  {
+   "id": "personamanagmentlayer/pcl:stdlib/domains/healthcare",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "personamanagmentlayer/pcl",
+   "repoFull": "personamanagmentlayer/pcl",
+   "path": "stdlib/domains/healthcare",
+   "catalogName": "healthcare-expert"
+  },
+  {
+   "id": "pleaseai/claude-code-plugins:.claude/skills/plugin-builder",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "pleaseai/claude-code-plugins",
+   "repoFull": "pleaseai/claude-code-plugins",
+   "path": ".claude/skills/plugin-builder",
+   "catalogName": "Claude Code Plugin Builder"
+  },
+  {
+   "id": "wshobson/agents:plugins/database-design/skills/postgresql",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "wshobson/agents",
+   "repoFull": "wshobson/agents",
+   "path": "plugins/database-design/skills/postgresql",
+   "catalogName": "postgresql-table-design"
+  },
+  {
+   "id": "xr843/Master-skill:prebuilt/compare",
+   "group": "unverified",
+   "why": "new folder does not match the ID",
+   "status": "file-404",
+   "repo": "xr843/Master-skill",
+   "repoFull": "xr843/Master-skill",
+   "path": "prebuilt/compare",
+   "catalogName": "compare-masters"
+  },
+  {
+   "id": "Vladimir-Human/humanizer-ru",
+   "group": "unverified",
+   "why": "two skills resolve to this path",
+   "status": "file-404",
+   "repo": "Vladimir-Human/humanizer-ru",
+   "repoFull": "Vladimir-Human/humanizer-ru",
+   "path": "",
+   "catalogName": "humanizer-ru",
+   "candidates": [
+    "skills/humanizer-ru/SKILL.md"
+   ]
+  },
+  {
+   "id": "Vladimir-Human/humanizer-ru:humanizer-ru",
+   "group": "unverified",
+   "why": "two skills resolve to this path",
+   "status": "file-404",
+   "repo": "Vladimir-Human/humanizer-ru",
+   "repoFull": "Vladimir-Human/humanizer-ru",
+   "path": "dsh/skills/humanizer-ru",
+   "catalogName": "humanizer-ru",
+   "candidates": [
+    "skills/humanizer-ru/SKILL.md"
+   ]
+  },
+  {
+   "id": "clawdbot/clawdbot:skills/slack",
+   "group": "unverified",
+   "why": "re-read at the new path did not match",
+   "status": "file-404",
+   "repo": "openclaw/openclaw",
+   "repoFull": "openclaw/openclaw",
+   "path": "skills/slack",
+   "catalogName": "slack",
+   "candidates": [
+    "extensions/slack/skills/slack/SKILL.md"
+   ]
+  },
+  {
+   "id": "clawdbot/clawdbot:skills/voice-call",
+   "group": "unverified",
+   "why": "re-read at the new path did not match",
+   "status": "file-404",
+   "repo": "openclaw/openclaw",
+   "repoFull": "openclaw/openclaw",
+   "path": "skills/voice-call",
+   "catalogName": "voice-call",
+   "candidates": [
+    "extensions/voice-call/skills/voice-call/SKILL.md"
+   ]
+  },
+  {
+   "id": "clawdbot/clawdbot:skills/wacli",
+   "group": "unverified",
+   "why": "re-read at the new path did not match",
+   "status": "file-404",
+   "repo": "openclaw/openclaw",
+   "repoFull": "openclaw/openclaw",
+   "path": "skills/wacli",
+   "catalogName": "wacli",
+   "candidates": [
+    "extensions/whatsapp/skills/wacli/SKILL.md"
+   ]
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/marketing/skills/approval-workflow",
+   "group": "unverified",
+   "why": "re-read at the new path did not match",
+   "status": "file-404",
+   "repo": "jmagly/aiwg",
+   "repoFull": "jmagly/aiwg",
+   "path": "plugins/marketing/skills/approval-workflow",
+   "catalogName": "approval-workflow",
+   "candidates": [
+    "agentic/code/frameworks/media-marketing-kit/skills/approval-workflow/SKILL.md",
+    "agentic/code/plugins/marketing/skills/approval-workflow/SKILL.md"
+   ]
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/marketing/skills/data-pipeline",
+   "group": "unverified",
+   "why": "re-read at the new path did not match",
+   "status": "file-404",
+   "repo": "jmagly/aiwg",
+   "repoFull": "jmagly/aiwg",
+   "path": "plugins/marketing/skills/data-pipeline",
+   "catalogName": "data-pipeline",
+   "candidates": [
+    "agentic/code/frameworks/media-marketing-kit/skills/data-pipeline/SKILL.md",
+    "agentic/code/plugins/marketing/skills/data-pipeline/SKILL.md"
+   ]
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/sdlc/skills/artifact-orchestration",
+   "group": "unverified",
+   "why": "re-read at the new path did not match",
+   "status": "file-404",
+   "repo": "jmagly/aiwg",
+   "repoFull": "jmagly/aiwg",
+   "path": "plugins/sdlc/skills/artifact-orchestration",
+   "catalogName": "artifact-orchestration",
+   "candidates": [
+    "agentic/code/frameworks/sdlc-complete/skills/artifact-orchestration/SKILL.md",
+    "agentic/code/plugins/codex-sdlc/skills/artifact-orchestration/SKILL.md",
+    "agentic/code/plugins/sdlc/skills/artifact-orchestration/SKILL.md"
+   ]
+  },
+  {
+   "id": "jmagly/ai-writing-guide:plugins/sdlc/skills/gate-evaluation",
+   "group": "unverified",
+   "why": "re-read at the new path did not match",
+   "status": "file-404",
+   "repo": "jmagly/aiwg",
+   "repoFull": "jmagly/aiwg",
+   "path": "plugins/sdlc/skills/gate-evaluation",
+   "catalogName": "gate-evaluation",
+   "candidates": [
+    "agentic/code/frameworks/sdlc-complete/skills/gate-evaluation/SKILL.md",
+    "agentic/code/plugins/codex-sdlc/skills/gate-evaluation/SKILL.md",
+    "agentic/code/plugins/sdlc/skills/gate-evaluation/SKILL.md"
+   ]
+  },
+  {
+   "id": "nvidia/nemo-rl:cicd",
+   "group": "unverified",
+   "why": "re-read at the new path did not match",
+   "status": "file-404",
+   "repo": "NVIDIA-NeMo/RL",
+   "repoFull": "NVIDIA-NeMo/RL",
+   "path": ".agents/contributor-skills/cicd",
+   "catalogName": "cicd",
+   "candidates": [
+    "skills/cicd/SKILL.md"
+   ]
+  },
+  {
+   "id": "cocoindex-io/cocoindex-claude:cocoindex-v1",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "source-skill-missing",
+   "status": "file-404",
+   "repo": "cocoindex-io/cocoindex-claude",
+   "repoFull": "cocoindex-io/cocoindex-claude",
+   "path": "cocoindex-v1",
+   "catalogName": "cocoindex-v1"
+  },
+  {
+   "id": "elastic/agent-skills:elasticsearch-file-ingest",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "source-skill-missing",
+   "status": "file-404",
+   "repo": "elastic/agent-skills",
+   "repoFull": "elastic/agent-skills",
+   "path": "skills/elasticsearch/elasticsearch-file-ingest",
+   "catalogName": "elasticsearch-file-ingest"
+  },
+  {
+   "id": "leonxlnx/taste-skill:gpt-taste",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "source-skill-missing",
+   "status": "file-404",
+   "repo": "Leonxlnx/taste-skill",
+   "repoFull": "Leonxlnx/taste-skill",
+   "path": "skills/gpt-tasteskill",
+   "catalogName": "gpt-taste"
+  },
+  {
+   "id": "leonxlnx/taste-skill:image-to-code",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "source-skill-missing",
+   "status": "file-404",
+   "repo": "Leonxlnx/taste-skill",
+   "repoFull": "Leonxlnx/taste-skill",
+   "path": "skills/image-to-code-skill",
+   "catalogName": "image-to-code"
+  },
+  {
+   "id": "pydantic/skills:instrumentation",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "source-skill-missing",
+   "status": "file-404",
+   "repo": "pydantic/skills",
+   "repoFull": "pydantic/skills",
+   "path": "plugins/logfire/skills/instrumentation",
+   "catalogName": "instrumentation"
+  },
+  {
+   "id": "posthog/posthog:implementing-agent-modes",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "source-skill-missing",
+   "status": "file-404",
+   "repo": "PostHog/posthog",
+   "repoFull": "PostHog/posthog",
+   "path": ".agents/skills/implementing-agent-modes",
+   "catalogName": "implementing-agent-modes"
+  },
+  {
+   "id": "danielmiessler/LifeOS:AnnualReports",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "moved-duplicate",
+   "status": "file-404",
+   "repo": "danielmiessler/LifeOS",
+   "repoFull": "danielmiessler/LifeOS",
+   "path": "Releases/v4.0.2/.claude/skills/Security/AnnualReports",
+   "catalogName": "AnnualReports",
+   "candidates": [
+    "LifeOS/install/skills/AnnualReports/SKILL.md"
+   ]
+  },
+  {
+   "id": "danielmiessler/LifeOS:BeCreative",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "moved-duplicate",
+   "status": "file-404",
+   "repo": "danielmiessler/LifeOS",
+   "repoFull": "danielmiessler/LifeOS",
+   "path": "Releases/v3.0/.claude/skills/BeCreative",
+   "catalogName": "BeCreative",
+   "candidates": [
+    "LifeOS/install/skills/BeCreative/SKILL.md"
+   ]
+  },
+  {
+   "id": "danielmiessler/LifeOS:Council",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "moved-duplicate",
+   "status": "file-404",
+   "repo": "danielmiessler/LifeOS",
+   "repoFull": "danielmiessler/LifeOS",
+   "path": "Releases/v3.0/.claude/skills/Council",
+   "catalogName": "Council",
+   "candidates": [
+    "LifeOS/install/skills/Council/SKILL.md"
+   ]
+  },
+  {
+   "id": "danielmiessler/LifeOS:Prompting",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "moved-duplicate",
+   "status": "file-404",
+   "repo": "danielmiessler/LifeOS",
+   "repoFull": "danielmiessler/LifeOS",
+   "path": "Releases/v2.5/.claude/skills/Prompting",
+   "catalogName": "Prompting",
+   "candidates": [
+    "LifeOS/install/skills/Prompting/SKILL.md"
+   ]
+  },
+  {
+   "id": "danielmiessler/LifeOS:WriteStory",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "moved-duplicate",
+   "status": "file-404",
+   "repo": "danielmiessler/LifeOS",
+   "repoFull": "danielmiessler/LifeOS",
+   "path": "Releases/v3.0/.claude/skills/WriteStory",
+   "catalogName": "WriteStory",
+   "candidates": [
+    "LifeOS/install/skills/WriteStory/SKILL.md"
+   ]
+  },
+  {
+   "id": "EveryInc/compound-engineering-plugin:ce-setup",
+   "why": "featured on a creator page or in a collection",
+   "proposedReason": "moved-duplicate",
+   "status": "file-404",
+   "repo": "EveryInc/compound-engineering-plugin",
+   "repoFull": "EveryInc/compound-engineering-plugin",
+   "path": "plugins/compound-engineering/skills/ce-setup",
+   "catalogName": "ce-setup",
+   "candidates": [
+    "skills/ce-setup/SKILL.md"
+   ],
+   "caseTwins": [
+    "everyinc/compound-engineering-plugin:ce-setup"
+   ]
+  },
+  {
+   "id": "NVIDIA/skills:perf-expert-parallel-overlap",
+   "why": "another live ID differs only by case; suppression would hide both",
+   "proposedReason": "source-skill-missing",
+   "status": "file-404",
+   "repo": "NVIDIA/skills",
+   "repoFull": "NVIDIA/skills",
+   "path": "skills/Megatron-Bridge/perf-expert-parallel-overlap",
+   "catalogName": "perf-expert-parallel-overlap",
+   "caseTwins": [
+    "nvidia/skills:perf-expert-parallel-overlap"
+   ]
+  },
+  {
+   "id": "liuzhengdongfortest/CodeStable:cs-onboard",
+   "why": "another live ID differs only by case; suppression would hide both",
+   "proposedReason": "source-skill-missing",
+   "status": "file-404",
+   "repo": "liuzhengdongfortest/CodeStable",
+   "repoFull": "codestable/CodeStable",
+   "path": "cs-onboard",
+   "catalogName": "cs-onboard",
+   "candidates": [
+    "plugins/codestable/skills/cs-onboard/SKILL.md"
+   ],
+   "caseTwins": [
+    "liuzhengdongfortest/codestable:cs-onboard"
+   ]
+  },
+  {
+   "id": "K-Dense-AI/scientific-agent-skills:scikit-learn",
+   "why": "another live ID differs only by case; suppression would hide both",
+   "proposedReason": "moved-duplicate",
+   "status": "file-404",
+   "repo": "K-Dense-AI/scientific-agent-skills",
+   "repoFull": "K-Dense-AI/scientific-agent-skills",
+   "path": "scientific-skills/scikit-learn",
+   "catalogName": "scikit-learn",
+   "candidates": [
+    "skills/scikit-learn/SKILL.md"
+   ],
+   "caseTwins": [
+    "k-dense-ai/scientific-agent-skills:scikit-learn"
+   ]
+  },
+  {
+   "id": "mattpocock/skills:pr",
+   "why": "listed in trending",
+   "proposedReason": "moved-duplicate",
+   "status": "file-404",
+   "repo": "mattpocock/skills",
+   "repoFull": "mattpocock/skills",
+   "path": "skills/in-progress/pr",
+   "catalogName": "pr",
+   "candidates": [
+    "skills/engineering/pr/SKILL.md"
+   ]
+  }
+ ]
+}
