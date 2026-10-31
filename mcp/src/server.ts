@@ -8,7 +8,7 @@ import { installAgents, installBlockerCodes, installBlockers, installFolderName,
 import { readSkillContent, SkillContentError } from "./content.js";
 import { FileInspectionError, inspectSkillFiles, safeFilePath } from "./file-inspection.js";
 
-export const serverVersion = "0.2.4";
+export const serverVersion = "0.2.5";
 
 const toolAnnotations = {
   readOnlyHint: true,
