@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { deserialize, serialize } from "node:v8";
 import type { RepoMeta } from "../enrich.js";
 
-export type RefreshReplayKind = "repo-meta" | "tree" | "raw-file";
+export type RefreshReplayKind = "repo-meta" | "tree" | "raw-file" | "input";
 export type RefreshReplayMode = "off" | "record" | "replay";
 
 type ReplayOk<T> = {
@@ -50,6 +51,7 @@ function hashKey(key: string): string {
 function kindDirName(kind: RefreshReplayKind): string {
   if (kind === "repo-meta") return "repo-meta";
   if (kind === "tree") return "tree";
+  if (kind === "input") return "input";
   return "raw-file";
 }
 
@@ -91,6 +93,22 @@ export class RefreshReplayStore {
 
   private recordEntry<T>(kind: RefreshReplayKind, key: string, entry: RefreshReplayEntry<T>) {
     writeEntry(buildRefreshReplayPath(this.requireRoot(), kind, key), entry);
+  }
+
+  async input<T>(key: string, load: () => Promise<T>): Promise<T> {
+    if (this.mode === "replay") {
+      const entry = this.replayEntry<string>("input", key);
+      if (entry.kind !== "ok" || typeof entry.value !== "string") {
+        throw new Error(`invalid input replay entry for ${key}`);
+      }
+      return deserialize(Buffer.from(entry.value, "base64")) as T;
+    }
+    const value = await load();
+    if (this.mode === "record") {
+      // Preserve discovery Maps, Sets, and optional fields that JSON would lose.
+      this.recordEntry("input", key, { key, kind: "ok", value: serialize(value).toString("base64") });
+    }
+    return value;
   }
 
   async repoMeta(
