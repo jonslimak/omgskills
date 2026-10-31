@@ -7,6 +7,7 @@ import { changeMembership, changeFavorites, createSelectedSet, reorderMembership
 import { createAccountSession } from "../src/integration/account-session";
 import { membershipStatus } from "../src/app/model";
 import { setSummary } from "../src/integration/data";
+import { skillDisplays } from "../src/app/unified/model";
 
 const physical: SyncedSkill[] = ["codex", "claude", "second", "third"].map((id, index) => ({
   id, name: index < 2 ? "Pair" : id, description: index < 2 ? "Same skill" : id,
@@ -54,6 +55,89 @@ test("new membership adds exactly the representative and validates returned IDs"
   const api: PortalApi = async <T>(path: string, init?: RequestInit) => init?.method === "POST" ? {} as T : f.api(path, init);
   const bad = await changeMembership(api, "set", [second, third], true, signal());
   assert.equal(bad.uncertain, true); assert.equal(bad.completedIds.length, 0); assert.equal(bad.failed.length, 2);
+});
+
+test("mixed display groups use the current installation for Set and Favorites requests", async () => {
+  const current: SyncedSkill = { inventoryVersion: 3, id: "current", deviceId: "mac-a", name: "Review",
+    description: "Review changes", skillMdSha: "a".repeat(40), catalogSkillId: null, githubUrl: null,
+    isLocalOnly: true, source: "codex", lastSeenAt: "2026-10-30T12:00:00Z", isCurrent: true };
+  const old: SyncedSkill = { ...current, id: "old", inventoryVersion: 2, deviceId: null,
+    catalogSkillId: "owner/repo:review", isLocalOnly: false, isCurrent: false };
+  for (const rows of [[old, current], [current, old]]) {
+    const before = structuredClone(rows);
+    const grouped = groupSyncedSkills(rows, { groupInstallations: true });
+    for (const favorites of [false, true]) {
+      const f = fixture();
+      const api: PortalApi = async <T>(path: string, init?: RequestInit) => {
+        if (init?.method === "POST" && JSON.parse(init.body as string).syncedSkillId === old.id) {
+          throw new PortalApiError("Historical installation", 409);
+        }
+        return f.api<T>(path, init);
+      };
+      const sets = [{ ...setSummary({ id: "set", name: "Favorites", slug: "favorites" }, true, "Owner"), isFavorites: true }];
+      const result = favorites ? await changeFavorites(api, sets, grouped, true, signal())
+        : await changeMembership(api, "set", grouped, true, signal());
+      assert.equal(result.added, 1);
+      assert.deepEqual(result.failed, []);
+      assert.deepEqual(f.calls.find(call => call.method === "POST")?.body, { kind: "synced", syncedSkillId: current.id });
+    }
+    const creationApi: PortalApi = async <T>(_path: string, init?: RequestInit) => {
+      assert.deepEqual(JSON.parse(init!.body as string).syncedSkillIds, [current.id]);
+      return { groupId: "created" } as T;
+    };
+    assert.equal((await changeFavorites(creationApi, [], grouped, true, signal())).added, 1);
+    assert.equal((await createSelectedSet(creationApi, "New set", grouped, signal())).added, 1);
+    const existing = fixture([item("existing-old-link", old.id)]);
+    assert.equal((await changeMembership(existing.api, "set", grouped, true, signal())).unchanged, 1);
+    assert.deepEqual(existing.items(), [item("existing-old-link", old.id)]);
+    assert.ok(existing.calls.every(call => call.method === "GET"));
+    assert.deepEqual(rows, before);
+  }
+});
+
+test("account saves retain grouped membership identities while targeting the current physical row", async () => {
+  const current: SyncedSkill = { inventoryVersion: 3, id: "current", deviceId: "mac-a", name: "Review",
+    description: "Review changes", skillMdSha: "a".repeat(40), catalogSkillId: null, githubUrl: null,
+    isLocalOnly: true, source: "codex", lastSeenAt: "2026-10-30T12:00:00Z", isCurrent: true };
+  const rows = [current, { ...current, id: "old", inventoryVersion: 2 as const, deviceId: null,
+    catalogSkillId: "owner/repo:review", isLocalOnly: false, isCurrent: false },
+    { ...current, id: "other", name: "Other", skillMdSha: "b".repeat(40) }];
+  for (const action of ["new", "repeat", "remove", "unrelated"] as const) {
+    const f = fixture(action === "new" ? [] : action === "unrelated" ? [item("other-link", "other")] : [item("old-link", "old")]);
+    const api: PortalApi = async <T>(path: string, init?: RequestInit) => {
+      if (path.endsWith("/synced-skills")) return { skills: rows } as T;
+      if (path.endsWith("/profile")) return { profile: { handle: null, profilePublished: false, publicUrl: null } } as T;
+      if (path.endsWith("/shared")) return { groups: [] } as T;
+      if (path.endsWith("/groups")) return { groups: [{ id: "set", name: "Favorites", slug: "favorites", isFavorites: true,
+        syncedSkillIds: f.items().map(item => item.syncedSkillId), itemCount: f.items().length }] } as T;
+      const value = await f.api<any>(path, init);
+      return (value.group ? { ...value, group: { ...value.group, isFavorites: true } } : value) as T;
+    };
+    const session = createAccountSession({ api, identity: { name: "Test", email: "test@example.test" },
+      cacheKey: "grouped-membership", changed: () => {} });
+    try {
+      await session.refresh();
+      const { mine } = skillDisplays(session.getSnapshot().data!, { skills: [], creators: [], collections: [], categories: [], trendingIds: [] });
+      const skill = mine.find(skill => skill.installed?.id === current.id)!.installed!;
+      if (action === "unrelated") skill.allSkillIds.push("other");
+      const result = await session.saveMembership(action === "remove"
+        ? { kind: "remove-favorite", catalogId: skill.catalogSkillId || undefined, skillId: skill.id }
+        : { kind: "change", id: "set", skills: [skill], add: true });
+      assert.deepEqual(result.failed, []);
+      if (action === "new" || action === "unrelated") {
+        assert.equal(result.added, 1);
+        assert.deepEqual(f.calls.find(call => call.method === "POST")?.body, { kind: "synced", syncedSkillId: current.id });
+        if (action === "unrelated") assert.deepEqual(f.items()[0], item("other-link", "other"));
+      } else if (action === "repeat") {
+        assert.equal(result.unchanged, 1);
+        assert.deepEqual(f.items(), [item("old-link", "old")]);
+        assert.ok(f.calls.every(call => call.method === "GET"));
+      } else {
+        assert.equal(result.removed, 1);
+        assert.deepEqual(f.calls.find(call => call.method === "DELETE")?.body, { itemId: "old-link" });
+      }
+    } finally { session.dispose(); }
+  }
 });
 
 test("missing membership is unknown, never a guessed unchecked state", async () => {

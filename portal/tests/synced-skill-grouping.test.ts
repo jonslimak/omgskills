@@ -175,12 +175,19 @@ test("display joins catalog and unresolved copies only with an exact fingerprint
     githubUrl: null, isLocalOnly: true, source: "codex", lastSeenAt: "2026-10-30T12:00:00Z", isCurrent: true };
   const historical: SyncedSkill = { ...current, id: "old", inventoryVersion: 2, deviceId: null,
     name: " review ", catalogSkillId: "owner/repo:review", identityStatus: "resolved", isLocalOnly: false,
-    source: "Codex", lastSeenAt: "2026-09-01T00:00:00Z", isCurrent: false };
+    githubUrl: "https://github.com/owner/repo", source: "Codex", lastSeenAt: "2026-09-01T00:00:00Z", isCurrent: false };
   for (const rows of [[current, historical], [historical, current]]) {
     const before = structuredClone(rows);
     const groups = groupSyncedSkills(rows, { groupInstallations: true });
     assert.equal(groups.length, 1);
+    assert.equal(groups[0].id, current.id);
+    assert.equal(groups[0].inventoryVersion, 3);
+    assert.equal(groups[0].isCurrent, true);
+    assert.equal(groups[0].deviceId, current.deviceId);
+    assert.equal(groups[0].source, current.source);
     assert.equal(groups[0].catalogSkillId, historical.catalogSkillId);
+    assert.equal(groups[0].identityStatus, "resolved");
+    assert.equal(groups[0].githubUrl, historical.githubUrl);
     assert.equal(groups[0].isLocalOnly, false);
     assert.deepEqual(groups[0].sources, ["Codex"]);
     assert.deepEqual(new Set(groups[0].allSkillIds), new Set(["current", "old"]));
@@ -199,10 +206,38 @@ test("display groups exact copies across legacy and device-aware upload formats"
     skillMdSha: "a".repeat(40), catalogSkillId: "owner/repo:review", githubUrl: null,
     isLocalOnly: false, source: "Codex", lastSeenAt: "2026-09-01T00:00:00Z" };
   const current = { ...legacy, id: "device", inventoryVersion: 3 as const, deviceId: "mac-a", source: "codex" };
-  assert.equal(groupSyncedSkills([legacy, current], { groupInstallations: true }).length, 1);
+  for (const rows of [[legacy, current], [current, legacy]]) {
+    const [group] = groupSyncedSkills(rows, { groupInstallations: true });
+    assert.equal(group.id, current.id);
+    assert.equal(group.inventoryVersion, 3);
+    assert.equal(group.deviceId, current.deviceId);
+  }
   const unresolved = { ...legacy, catalogSkillId: null, isLocalOnly: true };
   assert.equal(groupSyncedSkills([unresolved, { ...current, catalogSkillId: null }], { groupInstallations: true }).length, 1);
   assert.equal(groupSyncedSkills([legacy, current]).length, 2);
+});
+
+test("display representatives prefer confirmed current copies over missing or legacy copies", () => {
+  const current: SyncedSkill = { inventoryVersion: 3, id: "current", deviceId: "mac-a", name: "Review",
+    description: "Review changes", skillMdSha: "a".repeat(40), catalogSkillId: "owner/repo:review",
+    githubUrl: null, isLocalOnly: false, source: "claude", lastSeenAt: "2026-10-30T12:00:00Z", isCurrent: true };
+  const old: SyncedSkill = { ...current, id: "old", source: "codex", isCurrent: false };
+  const legacy: SyncedSkill = { ...old, id: "legacy", deviceId: null, inventoryVersion: undefined, isCurrent: undefined };
+  for (const catalogSkillId of [current.catalogSkillId, null]) {
+    const rows = [old, legacy, current].map(skill => ({ ...skill, catalogSkillId }));
+    for (const input of [rows, [...rows].reverse()]) {
+      const before = structuredClone(input);
+      const [group] = groupSyncedSkills(input, { groupInstallations: true });
+      assert.equal(group.id, current.id);
+      assert.equal(group.isCurrent, true);
+      assert.equal(group.inventoryVersion, 3);
+      assert.deepEqual(input, before);
+      assert.deepEqual(group.sourceSkills, before);
+    }
+  }
+  const [missing] = groupSyncedSkills([old], { groupInstallations: true });
+  assert.equal(missing.id, old.id);
+  assert.equal(missing.isCurrent, false, "A missing-only group must not be reported as current");
 });
 
 test("a shared fingerprint cannot bridge conflicting catalog identities", () => {
