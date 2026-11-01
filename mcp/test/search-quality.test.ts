@@ -51,6 +51,44 @@ test("sorting by stars keeps to skills named for the query when there are any", 
   assert.deepEqual(l.searchPage({ query: "messages", sort: "stars", page: {} }).skills.map(row => row.id), ["i/r:slack"]);
 });
 
+test("stars and date sorts retain compact tag and ID matches but exclude description-only hits", () => {
+  const rows = [
+    skill("a/x:swiftui-pro", 50, "Write SwiftUI views."),
+    skill("b/y:swiftui-layout", 40, "SwiftUI layouts."),
+    skill("c/z:swiftui-charts", 30, "SwiftUI charts."),
+    { ...skill("d/w:helper", 200, "Tagged tools."), tags: ["swift-ui"] },
+    { ...skill("e/v:swift-ui", 100, "Identified tools."), name: "Other helper" },
+    skill("f/u:description-only", 500000, "Use Swift UI views."),
+  ];
+  const l = OmgskillsLibrary.fromData({ skills: rows, trending: [], goldBasket: [] }, "v1");
+  const expected = ids(rows.slice(0, 5));
+  for (const query of ["swiftui", "swift ui", "swift-ui"]) {
+    for (const sort of ["stars", "updated", "added"] as const) {
+      const found: Skill[] = [];
+      let cursor: string | null = null;
+      do {
+        const page = l.searchPage({ query, sort, limit: 2, page: cursor ? { cursor } : {} });
+        assert.equal(page.page.total, expected.length);
+        found.push(...page.skills);
+        cursor = page.page.nextCursor;
+      } while (cursor);
+      assert.deepEqual(ids(found), expected);
+    }
+  }
+});
+
+test("typo-corrected format searches keep the same format boost as the corrected query", () => {
+  const l = OmgskillsLibrary.fromData({ skills: [
+    skill("a/b:pptx", 900, "Create presentations."),
+    skill("c/d:document-processing", 99000, "Create slides from a document."),
+  ], trending: [], goldBasket: [] }, "v1");
+  const correct = l.searchPage({ query: "make slides from a document", page: {} });
+  const typo = l.searchPage({ query: "make slides from a documemt", page: {} });
+  assert.equal(typo.search?.did_you_mean, "slides document");
+  assert.deepEqual(typo.skills, correct.skills);
+  assert.equal(typo.skills[0].id, "a/b:pptx");
+});
+
 test("an unknown ID suggests only close names", async context => {
   const server = createOmgskillsServer(library(), { paging: true });
   const client = new Client({ name: "search-quality", version: "1" });

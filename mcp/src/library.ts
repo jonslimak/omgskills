@@ -331,7 +331,7 @@ export class OmgskillsLibrary {
     const corrected = this.correctTerms(required);
     if (corrected) {
       const fixed = this.strictMatches(corrected, filters);
-      if (fixed.length) return { list: fixed, note: { did_you_mean: corrected.join(" ") } };
+      if (fixed.length) return { list: this.withFormatSkills(fixed, corrected, filters), note: { did_you_mean: corrected.join(" ") } };
     }
     // A partial match must have a query word in its name: one stray word in a description
     // ("zzqxv nonsense") is not a result.
@@ -513,6 +513,7 @@ export class OmgskillsLibrary {
       : this.queryTerms(note?.did_you_mean ?? options.query).filter(term => !fillerWords.has(term));
     const about = (entry: SearchEntry) => terms.every(term => entry.nameKey.includes(compactKey(term))
       || entry.fields.slice(1, 4).some(field => field.includes(term))
+      || (this.compactScore(entry, term) > 0 && entry.fields.slice(1, 4).some(field => compactKey(field).includes(term)))
       || (synonyms.get(term) ?? []).some(other => entry.fields[0].includes(other)));
     const named = terms.length ? found.list.filter(({ entry }) => about(entry)) : [];
     const matches = named.length ? named : found.list;
