@@ -204,7 +204,8 @@ export class OmgskillsLibrary {
       if (list) list.push(entry);
       else this.entriesByAuthor.set(entry.author, [entry]);
     }
-    if (options.ranking) this.ranking = new SearchRankingIndex(this.entries, this.collectionLike, this.installable, id => this.duplicates.has(id), id => this.mirrors.has(id));
+    if (options.ranking) this.ranking = new SearchRankingIndex(this.entries, this.collectionLike, this.installable,
+      (id, author) => this.duplicates.has(id) || (!author && this.crossCopies.has(id)), id => this.mirrors.has(id));
   }
 
   private markCopies() {

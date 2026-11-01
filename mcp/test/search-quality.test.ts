@@ -123,3 +123,28 @@ test("a short ID shared by two path IDs resolves to neither", () => {
   ], trending: [], goldBasket: [] }, "v1");
   assert.equal(l.getSkill("a/b:helper"), undefined);
 });
+
+test("ranked pages hide cross-repository copies except in explicit author searches", () => {
+  const description = "Create distinctive, production-grade frontend interfaces with high design quality.";
+  const l = OmgskillsLibrary.fromData({ skills: [
+    skill("anthropics/skills:skills/frontend-design", 180000, description),
+    skill("anthropics/plugins:frontend-design", 45000, description),
+    skill("someone/kit:frontend-design", 900, description),
+    skill("other/kit:frontend-design", 800, "My own take on frontend design for dashboards and admin tools."),
+  ], trending: [], goldBasket: [] }, "v1", { ranking: true });
+  for (const sort of ["relevance", "stars", "updated"] as const) {
+    const found: Skill[] = [];
+    let cursor: string | null = null;
+    do {
+      const page = l.searchRankedPage({ query: "frontend design", ranking: "web-v1", sort, limit: 1, page: cursor ? { cursor } : {} });
+      assert.equal(page.page.total, 2);
+      found.push(...page.skills);
+      cursor = page.page.nextCursor;
+    } while (cursor);
+    assert.deepEqual(ids(found), ["anthropics/skills:skills/frontend-design", "other/kit:frontend-design"]);
+  }
+  for (const query of ["frontend design", "@someone frontend design", ""]) {
+    assert.deepEqual(ids(l.searchRankedPage({ query, author: "@someone", ranking: "web-v1", page: {} }).skills), ["someone/kit:frontend-design"]);
+  }
+  assert.equal(l.getSkill("someone/kit:frontend-design")?.id, "someone/kit:frontend-design");
+});
