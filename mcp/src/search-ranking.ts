@@ -50,7 +50,7 @@ export function rankedRequest(options: SearchOptions) {
 export class SearchRankingIndex {
   private readonly documents: Document[];
   constructor(entries: PreparedEntry[], collectionIds: ReadonlySet<string>, private readonly installable: ReadonlySet<string> | null = null,
-    private readonly isCopy: (id: string) => boolean = () => false, private readonly isMirror: (id: string) => boolean = () => false) {
+    private readonly isCopy: (id: string, author?: string) => boolean = () => false, private readonly isMirror: (id: string) => boolean = () => false) {
     this.documents = entries.map(entry => {
       const { skill } = entry;
       let fields = entry.fields;
@@ -89,7 +89,7 @@ export class SearchRankingIndex {
       const { skill } = document.entry;
       if ((author && document.entry.author !== author)
         || (tag && !document.entry.tags.includes(tag)) || document.stars < (options.minStars ?? 0)
-        || (installable && !installable.has(skill.id)) || this.isCopy(skill.id) || (author && this.isMirror(skill.id))) continue;
+        || (installable && !installable.has(skill.id)) || this.isCopy(skill.id, author) || (author && this.isMirror(skill.id))) continue;
       let matched = 0;
       for (const token of prepared) {
         for (let i = 0; i < document.fields.length; i++) {
