@@ -1,6 +1,6 @@
 {
   "name": "omgskills-mcp",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "engines": {
     "node": ">=20.3.0"
   },
@@ -38,6 +38,7 @@
     "dev": "tsx src/index.ts",
     "dev:http": "tsx src/http.ts",
     "smoke": "tsx src/smoke.ts",
+    "acceptance": "tsx scripts/acceptance.ts",
     "prepublishOnly": "npm run typecheck && npm run build"
   },
   "dependencies": {
