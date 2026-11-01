@@ -115,6 +115,8 @@ const searchFieldWeights = [12, 10, 8, 6, 4, 2];
 // 20-star one with the same name match, but not one that matches the query much better.
 const starWeight = 6;
 const exactNameBonus = 20;
+// Above any difference in text matches or stars, below an exact name.
+const formatNameBonus = 60;
 // Words a task description adds around the skill it needs ("help me make my app faster").
 const genericNameWords = new Set(["skill", "skills", "agent", "agents", "claude", "codex", "code", "pro", "expert", "helper", "tools", "tool", "the"]);
 const fillerWords = new Set(["a", "an", "and", "the", "to", "for", "from", "of", "in", "on", "with", "my", "me", "i", "we", "our",
@@ -135,6 +137,8 @@ const synonymGroups = [
 const synonyms = new Map(synonymGroups.flatMap(group => group.map(word => [word, group.filter(other => other !== word)] as const)));
 // A word in fewer catalog names than this may itself be a typo, so it can still be corrected.
 const knownWordCount = 3;
+// Shorter words would match across unrelated word boundaries once spaces are removed.
+const compactTermLength = 6;
 
 export class OmgskillsLibrary {
   private readonly data: LoadedLibrary;
@@ -142,6 +146,8 @@ export class OmgskillsLibrary {
   private readonly idsByLowerId = new Map<string, string>();
   private readonly entriesById = new Map<string, SearchEntry>();
   private vocabulary?: Map<string, number>;
+  /** Search fields with only letters and digits, built on first use, so "swift ui" matches "swiftui". */
+  private compactFields?: Map<string, string[]>;
   private readonly trendingById = new Map<string, TrendingEntry>();
   private readonly goldById = new Map<string, GoldBasketEntry>();
   private readonly entries: SearchEntry[];
@@ -277,8 +283,35 @@ export class OmgskillsLibrary {
       .map(({ entry, score }) => this.enrich(entry.skill, score)) };
   }
 
+  /**
+   * Query words: hyphens and underscores separate words ("swift-ui"), but IDs, URLs and handles
+   * keep their punctuation. Neighbouring words that the catalog writes as one ("swift ui" for
+   * "swiftui") are joined, so every spelling finds the same skills.
+   */
+  private queryTerms(query: string | undefined): string[] {
+    const vocabulary = this.vocabulary ??= buildVocabulary(this.entries);
+    const terms: string[] = [];
+    for (const term of normalize(query).split(/\s+/).filter(Boolean)
+      .flatMap(term => /[/:.@]/.test(term) ? [term] : term.split(/[-_]+/).filter(Boolean))) {
+      const previous = terms.at(-1), joined = previous === undefined ? "" : previous + term;
+      if (previous !== undefined && !/[^\p{L}\p{N}]/u.test(joined) && !fillerWords.has(previous) && !fillerWords.has(term)
+        && (vocabulary.get(joined) ?? 0) >= knownWordCount) terms[terms.length - 1] = joined;
+      else terms.push(term);
+    }
+    return terms;
+  }
+
+  /** A long catalog word ("swiftui") also matches text that spaces or hyphenates it ("Swift UI"). */
+  private compactScore(entry: SearchEntry, term: string): number {
+    if (term.length < compactTermLength || !/^[\p{L}\p{N}]+$/u.test(term) || (this.vocabulary?.get(term) ?? 0) < knownWordCount) return 0;
+    const cache = this.compactFields ??= new Map<string, string[]>();
+    let fields: string[] | undefined = cache.get(entry.skill.id);
+    if (!fields) cache.set(entry.skill.id, fields = entry.fields.slice(0, 5).map(compactKey));
+    return fields.reduce((score, text, index) => score + (text === term ? searchFieldWeights[index] * 3 : text.includes(term) ? searchFieldWeights[index] : 0), 0);
+  }
+
   private matches(options: SearchOptions): Matches {
-    const terms = normalize(options.query).split(" ").filter(Boolean);
+    const terms = this.queryTerms(options.query);
     const filters: Filters = {
       author: options.author ? authorKey(options.author) : undefined,
       tag: options.tag ? normalize(options.tag) : undefined,
@@ -294,14 +327,34 @@ export class OmgskillsLibrary {
     const meaningful = terms.filter(term => !fillerWords.has(term));
     const required = meaningful.length ? meaningful : terms;
     const strict = this.strictMatches(required, filters);
-    if (strict.length || terms.length === 0) return { list: strict };
+    if (strict.length || terms.length === 0) return { list: this.withFormatSkills(strict, required, filters) };
     const corrected = this.correctTerms(required);
     if (corrected) {
       const fixed = this.strictMatches(corrected, filters);
-      if (fixed.length) return { list: fixed, note: { did_you_mean: corrected.join(" ") } };
+      if (fixed.length) return { list: this.withFormatSkills(fixed, corrected, filters), note: { did_you_mean: corrected.join(" ") } };
     }
-    const partial = this.partialMatches(terms, filters);
+    // A partial match must have a query word in its name: one stray word in a description
+    // ("zzqxv nonsense") is not a result.
+    const partial = this.partialMatches(terms, filters).filter(match => match.inName);
     return { list: partial, note: partial.length ? { partial_match: true } : undefined };
+  }
+
+  /**
+   * A task that names a file format ("make slides from a document") wants the skills named for
+   * that format first, even when they do not mention every other word of the task.
+   */
+  private withFormatSkills(strict: Match[], terms: string[], filters: Filters): Match[] {
+    const formats = synonymGroups.filter(group => terms.some(term => group.includes(term)));
+    if (terms.length < 2 || !formats.length) return strict;
+    const named = (entry: SearchEntry) => formats.some(group => group.some(word => entry.fields[0].split(/[^\p{L}\p{N}]+/u).includes(word)));
+    // Every word for the format counts in full here: a "pptx" skill is as much a slides skill as a "slides" one.
+    const score = (entry: SearchEntry) => entry.signal + formatNameBonus
+      + terms.reduce((sum, term) => sum + Math.max(fieldScore(entry, term), ...(synonyms.get(term) ?? []).map(other => fieldScore(entry, other))), 0);
+    const byId = new Map(strict.map(match => [match.entry.skill.id, match]));
+    for (const { entry } of this.partialMatches(terms, filters)) {
+      if (named(entry)) byId.set(entry.skill.id, { entry, score: score(entry) });
+    }
+    return [...byId.values()];
   }
 
   private candidates(filters: Filters) {
@@ -321,7 +374,7 @@ export class OmgskillsLibrary {
     for (const entry of this.candidates(filters)) {
       if (terms.length === 0) { matches.push({ entry, score: entry.signal }); continue; }
       // "swift ui" also matches "swiftui".
-      let score = Math.max(textScore(entry, terms), joined ? textScore(entry, joined) : 0);
+      let score = Math.max(textScore(entry, terms, this.compactScore.bind(this)), joined ? textScore(entry, joined) : 0);
       if (score <= 0) continue;
       if (name && entry.nameKey === name) score += exactNameBonus;
       matches.push({ entry, score });
@@ -452,7 +505,18 @@ export class OmgskillsLibrary {
   }
 
   private matchPage(options: PagedSearchOptions, tool: string): SkillPage {
-    const context = preparePage(this.version, tool, options), { list: matches, note } = this.matches(options);
+    const context = preparePage(this.version, tool, options), found = this.matches(options), note = found.note;
+    // Sorted by stars or date, a search lists only the skills named, tagged or identified by every
+    // query word when there are any: a passing mention ("use Slack to react") in a popular
+    // skill's description would otherwise lead the list.
+    const terms = context.sort === "relevance" || note?.showing_trending || note?.partial_match ? []
+      : this.queryTerms(note?.did_you_mean ?? options.query).filter(term => !fillerWords.has(term));
+    const about = (entry: SearchEntry) => terms.every(term => entry.nameKey.includes(compactKey(term))
+      || entry.fields.slice(1, 4).some(field => field.includes(term))
+      || (this.compactScore(entry, term) > 0 && entry.fields.slice(1, 4).some(field => compactKey(field).includes(term)))
+      || (synonyms.get(term) ?? []).some(other => entry.fields[0].includes(other)));
+    const named = terms.length ? found.list.filter(({ entry }) => about(entry)) : [];
+    const matches = named.length ? named : found.list;
     for (const { entry } of matches) assertRank(this.trendingById.get(entry.skill.id)?.trending_rank ?? this.goldById.get(entry.skill.id)?.trending_rank);
     const page = pageInfo(context, matches.length);
     const sorted = this.sortMatches(matches, context.sort);
@@ -626,11 +690,12 @@ function optionalManifestAssetUrl(asset: ManifestAsset | undefined, baseUrl: str
   return asset?.path ? new URL(asset.path, baseUrl).toString() : undefined;
 }
 
-function textScore(entry: SearchEntry, terms: string[]): number {
+function textScore(entry: SearchEntry, terms: string[], compact?: (entry: SearchEntry, term: string) => number): number {
   let score = entry.signal;
   for (const term of terms) {
     // A synonym counts for half: "slides" finds pptx skills, after skills that say "slides".
-    const termScore = fieldScore(entry, term) || Math.max(0, ...(synonyms.get(term) ?? []).map(other => fieldScore(entry, other) / 2));
+    const termScore = fieldScore(entry, term) || (compact?.(entry, term) ?? 0)
+      || Math.max(0, ...(synonyms.get(term) ?? []).map(other => fieldScore(entry, other) / 2));
     if (!termScore) return 0;
     score += termScore;
   }

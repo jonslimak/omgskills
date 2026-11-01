@@ -482,12 +482,22 @@ async function notFoundText(library: CatalogReader, id: string) {
     .filter(skill => skill.id.toLowerCase().startsWith(`${repo}:`))
     .map(skill => ({ id: skill.id, shared: sharedPrefix(skill.id.toLowerCase().slice(repo.length + 1), name) }))
     .filter(row => row.shared >= Math.min(3, name.length)).sort((a, b) => b.shared - a.shared).map(row => row.id) : [];
+  // Elsewhere, only skills whose name is close to the requested one: a search on the ID's words
+  // alone can suggest something unrelated.
+  const wanted = compact(name || repo.split("/").pop() || "");
   const words = clean.split(/[^a-z0-9]+/i).filter(word => word.length >= 3).slice(-3).join(" ");
-  const searched = words ? (await reader.searchSkills({ query: words, limit: 3 })).map(skill => skill.id) : [];
+  const searched = words && wanted.length >= 3 ? (await reader.searchSkills({ query: words, limit: 10 }))
+    .filter(skill => closeName(compact(skill.name ?? skill.id.split(":").pop() ?? ""), wanted)).map(skill => skill.id) : [];
   const suggestions = [...new Set([...sameRepo, ...searched])].slice(0, 3);
   return `No skill with ID ${id}.${suggestions.length ? ` Did you mean: ${suggestions.join(", ")}?` : " Use search_skills to find one."}`;
 }
 function sharedPrefix(a: string, b: string) { let i = 0; while (i < a.length && a[i] === b[i]) i++; return i; }
+function compact(value: string) { return value.toLowerCase().replace(/[^a-z0-9]+/g, ""); }
+/** One name contains the other, or they share most of their beginning. */
+function closeName(a: string, b: string) {
+  if (!a || !b) return false;
+  return a.includes(b) || b.includes(a) || sharedPrefix(a, b) >= Math.max(4, Math.ceil(Math.min(a.length, b.length) * 0.6));
+}
 
 const compactNumber = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
 /** get_skill's readable summary; structuredContent carries every field, including install scripts. */
