@@ -229,13 +229,17 @@ export function createOmgskillsServer(catalog: CatalogProvider, options: ServerO
       outputSchema: skillListOutputSchema,
       annotations: toolAnnotations
     },
-    // Curated rows are complete records, so they never need the summary reader.
+    // Curated rows are complete records, so they never need the summary reader. Full rows use the
+    // catalog record where there is one: the curated copy has no pin, so it would read as discovery_only.
     async (args: z.infer<typeof goldInput> & Partial<PageOptions>) => {
       const library = readLibrary();
-      return listResult(args, options.paging ? reader => {
+      const withCatalog = async (skills: SkillResult[]) => args.summary ? skills
+        : Promise.all(skills.map(async skill => { const full = await library.getSkill(skill.id); return full ? { ...full, score: skill.score } : skill; }));
+      return listResult(args, options.paging ? async reader => {
         if (!reader.listGoldBasketPage) throw new PagingError("paging_not_supported");
-        return reader.listGoldBasketPage(withPage(args) as PageOptions);
-      } : undefined, async reader => ({ skills: await reader.listGoldBasket(args.limit) }), library);
+        const page = await reader.listGoldBasketPage(withPage(args) as PageOptions);
+        return { ...page, skills: await withCatalog(page.skills) };
+      } : undefined, async reader => ({ skills: await withCatalog(await reader.listGoldBasket(args.limit)) }), library);
     }
   );
 
