@@ -9,8 +9,9 @@ export type BrowserPairingRequest = {
 };
 
 export const BASE_DEVICE_SCOPES = ["sync:write", "self:revoke"] as const;
-export const ALL_DEVICE_SCOPES = [...BASE_DEVICE_SCOPES, "content:read"] as const;
+export const ALL_DEVICE_SCOPES = [...BASE_DEVICE_SCOPES, "content:read", "content:write"] as const;
 export type DeviceScope = typeof ALL_DEVICE_SCOPES[number];
+export const COMPANION_DEVICE_SCOPES: readonly DeviceScope[] = [...BASE_DEVICE_SCOPES, "content:read"];
 
 function parseScopes(params: URLSearchParams): DeviceScope[] | null {
   const values = params.getAll("scope");

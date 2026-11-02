@@ -6,7 +6,7 @@ const DEVICE_INACTIVITY_INTERVAL = "6 months";
 const LAST_USED_WRITE_INTERVAL = "1 day";
 
 export const BASE_DEVICE_SCOPES = ["sync:write", "self:revoke"] as const;
-export const ALL_DEVICE_SCOPES = [...BASE_DEVICE_SCOPES, "content:read"] as const;
+export const ALL_DEVICE_SCOPES = [...BASE_DEVICE_SCOPES, "content:read", "content:write"] as const;
 export type DeviceScope = typeof ALL_DEVICE_SCOPES[number];
 
 export class DeviceScopeError extends Error {
@@ -34,7 +34,7 @@ export function normalizeApprovedDeviceScopes(
   browserApproval: boolean
 ): DeviceScope[] {
   const scopes = normalizeDeviceScopes(value);
-  if (scopes.includes("content:read") && !browserApproval) {
+  if ((scopes.includes("content:read") || scopes.includes("content:write")) && !browserApproval) {
     throw new DeviceScopeError();
   }
   return scopes;

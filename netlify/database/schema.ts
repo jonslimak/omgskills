@@ -6,6 +6,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -85,7 +86,7 @@ export const skillSources = pgTable(
   (table) => [
     check(
       "skill_sources_kind_check",
-      sql`${table.kind} IN ('catalog', 'public_github', 'private_github')`
+      sql`${table.kind} IN ('catalog', 'public_github', 'private_github', 'cloud')`
     ),
     check(
       "skill_sources_root_check",
@@ -124,6 +125,13 @@ export const skillSources = pgTable(
           AND ${table.repositorySlug} IS NOT NULL
           AND ${table.ownerUserId} IS NOT NULL
           AND ${table.brokerInstallationId} IS NOT NULL
+        ) OR (
+          ${table.kind} = 'cloud'
+          AND ${table.catalogSkillId} IS NULL
+          AND ${table.repositoryId} IS NULL
+          AND ${table.repositorySlug} IS NULL
+          AND ${table.ownerUserId} IS NOT NULL
+          AND ${table.brokerInstallationId} IS NULL
         )`
     ),
     uniqueIndex("skill_sources_catalog_unique")
@@ -132,6 +140,9 @@ export const skillSources = pgTable(
     uniqueIndex("skill_sources_github_unique")
       .on(table.kind, table.repositoryId, table.normalizedRoot)
       .where(sql`${table.kind} IN ('public_github', 'private_github')`),
+    uniqueIndex("skill_sources_cloud_unique")
+      .on(table.ownerUserId, table.normalizedRoot)
+      .where(sql`${table.kind} = 'cloud'`),
     index("skill_sources_owner_idx").on(table.ownerUserId),
     index("skill_sources_repository_idx").on(table.repositoryId),
     foreignKey({
@@ -357,7 +368,7 @@ export const syncTokens = pgTable(
     ),
     check(
       "sync_tokens_granted_scopes_check",
-      sql`${table.grantedScopes} <@ ARRAY['sync:write', 'self:revoke', 'content:read']::text[]
+      sql`${table.grantedScopes} <@ ARRAY['sync:write', 'self:revoke', 'content:read', 'content:write']::text[]
         AND ${table.grantedScopes} @> ARRAY['sync:write', 'self:revoke']::text[]`
     )
   ]
@@ -396,7 +407,7 @@ export const deviceTokens = pgTable(
     ),
     check(
       "device_tokens_granted_scopes_check",
-      sql`${table.grantedScopes} <@ ARRAY['sync:write', 'self:revoke', 'content:read']::text[]
+      sql`${table.grantedScopes} <@ ARRAY['sync:write', 'self:revoke', 'content:read', 'content:write']::text[]
         AND ${table.grantedScopes} @> ARRAY['sync:write', 'self:revoke']::text[]`
     )
   ]
@@ -437,5 +448,88 @@ export const analyticsEvents = pgTable(
           AND ${table.releaseId} IS NOT NULL
         )`
     )
+  ]
+);
+
+export const cloudSaveSettings = pgTable(
+  "cloud_save_settings",
+  {
+    userId: uuid("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+    enabled: boolean("enabled").notNull().default(false),
+    excludedSkillKeys: text("excluded_skill_keys").array().notNull().default(sql`ARRAY[]::text[]`),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    check("cloud_save_settings_exclusions_check", sql`cardinality(${table.excludedSkillKeys}) <= 5000`)
+  ]
+);
+
+export const cloudBlobs = pgTable(
+  "cloud_blobs",
+  {
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    blobSha: text("blob_sha").notNull(),
+    byteSize: integer("byte_size").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.blobSha] }),
+    check("cloud_blobs_sha_check", sql`${table.blobSha} ~ '^[0-9a-f]{40}$'`),
+    check("cloud_blobs_size_check", sql`${table.byteSize} >= 0`)
+  ]
+);
+
+export const cloudReleases = pgTable(
+  "cloud_releases",
+  {
+    releaseId: uuid("release_id").primaryKey(),
+    sourceId: uuid("source_id").notNull(),
+    deviceId: uuid("device_id").references(() => deviceTokens.id, { onDelete: "set null" }),
+    fileCount: integer("file_count").notNull(),
+    totalBytes: integer("total_bytes").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.releaseId, table.sourceId],
+      foreignColumns: [skillReleases.id, skillReleases.sourceId]
+    }).onDelete("restrict"),
+    check("cloud_releases_size_check", sql`${table.fileCount} > 0 AND ${table.totalBytes} >= 0`)
+  ]
+);
+
+export const cloudReleaseFiles = pgTable(
+  "cloud_release_files",
+  {
+    releaseId: uuid("release_id").notNull().references(() => cloudReleases.releaseId, { onDelete: "restrict" }),
+    path: text("path").notNull(),
+    mode: text("mode").notNull(),
+    blobSha: text("blob_sha").notNull(),
+    byteSize: integer("byte_size").notNull()
+  },
+  (table) => [
+    primaryKey({ columns: [table.releaseId, table.path] }),
+    check("cloud_release_files_mode_check", sql`${table.mode} IN ('100644', '100755')`),
+    check("cloud_release_files_sha_check", sql`${table.blobSha} ~ '^[0-9a-f]{40}$'`),
+    check("cloud_release_files_size_check", sql`${table.byteSize} >= 0`)
+  ]
+);
+
+export const cloudSavedSkills = pgTable(
+  "cloud_saved_skills",
+  {
+    sourceId: uuid("source_id").primaryKey().references(() => skillSources.id, { onDelete: "restrict" }),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "restrict" }),
+    skillKey: text("skill_key").notNull(),
+    currentReleaseId: uuid("current_release_id").notNull(),
+    deletedLocallyAt: timestamp("deleted_locally_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.currentReleaseId, table.sourceId],
+      foreignColumns: [skillReleases.id, skillReleases.sourceId]
+    }).onDelete("restrict"),
+    uniqueIndex("cloud_saved_skills_user_key_unique").on(table.userId, table.skillKey)
   ]
 );
