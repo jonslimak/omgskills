@@ -238,6 +238,28 @@ test("the storage limit counts each stored file once", async () => {
   });
 });
 
+test("simultaneous uploads can't go past the storage limit together", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    // Room for exactly three of the ten 100-byte files sent at once.
+    await pool.query(
+      "INSERT INTO cloud_blobs (user_id, blob_sha, byte_size) VALUES ($1, $2, $3)",
+      [userId, "a".repeat(40), CLOUD_SAVE_LIMITS.maximumUserBytes - 300]
+    );
+    const files = Array.from({ length: 10 }, (_, index) => Buffer.from(String(index).padEnd(100, "x")));
+    const results = await Promise.allSettled(files.map((data) =>
+      storeCloudBlob(pool, store, { userId, blobSha: gitObjectSha("blob", data), data })));
+    assert.equal(results.filter((result) => result.status === "fulfilled").length, 3);
+    assert.ok(results.every((result) => result.status === "fulfilled"
+      || (result.reason instanceof CloudSaveError && result.reason.code === "quota_exceeded")));
+    const used = await pool.query<{ bytes: string }>("SELECT sum(byte_size)::text AS bytes FROM cloud_blobs WHERE user_id = $1", [userId]);
+    assert.equal(Number(used.rows[0].bytes), CLOUD_SAVE_LIMITS.maximumUserBytes);
+    assert.equal(store.objects.size, 3);
+  });
+});
+
 test("a skill deleted on the Mac keeps its cloud copy until it is saved again", async () => {
   await withMigratedSchema(async (pool) => {
     const store = new MemoryStore();

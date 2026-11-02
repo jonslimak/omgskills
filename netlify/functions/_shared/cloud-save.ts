@@ -223,36 +223,58 @@ async function requireSavingEnabled(db: Database, userId: string, skillKey?: str
 
 /** Stores one file's contents, named by its git blob hash. Saving the same file again is a no-op. */
 export async function storeCloudBlob(
-  db: Database,
+  pool: Pool,
   store: CloudObjectStore,
   input: { userId: string; blobSha: unknown; data: Uint8Array }
 ): Promise<{ blobSha: string; stored: boolean }> {
   const blobSha = requireBlobSha(input.blobSha);
-  await requireSavingEnabled(db, input.userId);
   if (input.data.byteLength > CLOUD_SAVE_LIMITS.maximumFileBytes) {
     throw new CloudSaveError("file_too_large", "File is too large to save");
   }
   if (gitObjectSha("blob", input.data) !== blobSha) {
     throw new CloudSaveError("blob_mismatch", "File contents do not match their hash");
   }
-  const existing = await db.query(
-    "SELECT 1 FROM cloud_blobs WHERE user_id = $1 AND blob_sha = $2",
-    [input.userId, blobSha]
-  );
-  if (existing.rowCount) return { blobSha, stored: false };
-  if (await usedBytes(db, input.userId) + input.data.byteLength > CLOUD_SAVE_LIMITS.maximumUserBytes) {
-    throw new CloudSaveError("quota_exceeded", "Cloud storage is full");
+  return withUploadLock(pool, input.userId, async (client) => {
+    const existing = await client.query(
+      "SELECT 1 FROM cloud_blobs WHERE user_id = $1 AND blob_sha = $2",
+      [input.userId, blobSha]
+    );
+    if (existing.rowCount) return { blobSha, stored: false };
+    if (await usedBytes(client, input.userId) + input.data.byteLength > CLOUD_SAVE_LIMITS.maximumUserBytes) {
+      throw new CloudSaveError("quota_exceeded", "Cloud storage is full");
+    }
+    await store.put(cloudBlobKey(input.userId, blobSha), input.data);
+    await client.query(
+      "INSERT INTO cloud_blobs (user_id, blob_sha, byte_size) VALUES ($1, $2, $3)",
+      [input.userId, blobSha, input.data.byteLength]
+    );
+    return { blobSha, stored: true };
+  });
+}
+
+/**
+ * Runs one upload while holding the user's cloud save settings row, so uploads from
+ * several requests take turns: the storage limit is checked and the file recorded
+ * before the next upload checks it. Cloud save must be on; the lock confirms it.
+ */
+async function withUploadLock<T>(pool: Pool, userId: string, run: (client: PoolClient) => Promise<T>): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const settings = await client.query<{ enabled: boolean }>(
+      "SELECT enabled FROM cloud_save_settings WHERE user_id = $1 FOR UPDATE",
+      [userId]
+    );
+    if (!settings.rows[0]?.enabled) throw new CloudSaveError("disabled", "Cloud save is turned off");
+    const result = await run(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
   }
-  await store.put(cloudBlobKey(input.userId, blobSha), input.data);
-  await db.query(
-    `
-      INSERT INTO cloud_blobs (user_id, blob_sha, byte_size)
-      VALUES ($1, $2, $3)
-      ON CONFLICT (user_id, blob_sha) DO NOTHING
-    `,
-    [input.userId, blobSha, input.data.byteLength]
-  );
-  return { blobSha, stored: true };
 }
 
 export function parseCloudManifest(body: Record<string, unknown>): SkillManifestEntry[] {
