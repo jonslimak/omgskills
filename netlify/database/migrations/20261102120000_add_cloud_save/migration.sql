@@ -82,7 +82,8 @@ CREATE TABLE cloud_blobs (
 CREATE TABLE cloud_releases (
   release_id uuid PRIMARY KEY,
   source_id uuid NOT NULL,
-  device_id uuid REFERENCES device_tokens(id) ON DELETE SET NULL,
+  -- A record of the Mac that saved the version, not a reference: versions are append-only.
+  device_id uuid,
   file_count integer NOT NULL,
   total_bytes integer NOT NULL,
   created_at timestamptz NOT NULL DEFAULT now(),

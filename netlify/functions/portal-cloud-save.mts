@@ -50,7 +50,8 @@ function parseRoute(req: Request): Route | null {
   if (rest.length === 1 && rest[0] === "settings") return { action: "settings" };
   if (rest.length === 2 && rest[0] === "blobs") return { action: "blob", blobSha: rest[1] };
   if (rest.length === 3 && rest[0] === "versions" && rest[2] === "package") {
-    return /^[0-9a-f-]{16,100}$/i.test(rest[1]) ? { action: "package", releaseId: rest[1] } : null;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rest[1])
+      ? { action: "package", releaseId: rest[1] } : null;
   }
   if (rest.length === 3 && rest[0] === "skills" && (rest[2] === "versions" || rest[2] === "deleted-locally")) {
     let skillKey: string;

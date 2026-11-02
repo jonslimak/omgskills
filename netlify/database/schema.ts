@@ -484,7 +484,7 @@ export const cloudReleases = pgTable(
   {
     releaseId: uuid("release_id").primaryKey(),
     sourceId: uuid("source_id").notNull(),
-    deviceId: uuid("device_id").references(() => deviceTokens.id, { onDelete: "set null" }),
+    deviceId: uuid("device_id"),
     fileCount: integer("file_count").notNull(),
     totalBytes: integer("total_bytes").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()

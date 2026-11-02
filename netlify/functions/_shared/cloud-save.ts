@@ -1,3 +1,4 @@
+import { createHash, randomUUID } from "node:crypto";
 import type { Pool, PoolClient, QueryResult, QueryResultRow } from "pg";
 import { appendSkillRelease } from "./group-storage.js";
 import { cloudBlobKey, type CloudObjectStore } from "./cloud-store.js";
@@ -14,7 +15,8 @@ import {
 // Cloud save keeps a versioned copy of each skill a user wrote or changed. A saved
 // skill is a 'cloud' skill source; each version is an append-only skill release
 // whose files are listed in cloud_release_files and stored by blob hash. Cloud
-// releases have no git commit, so commit_sha repeats the tree hash.
+// releases have no git commit; commit_sha is a random id, so saving earlier
+// content again records a new version instead of reviving the old one.
 
 type Database = {
   query<T extends QueryResultRow = any>(text: string, values?: any[]): Promise<QueryResult<T>>;
@@ -68,17 +70,20 @@ export function isCloudSaveAvailable(env: (key: string) => string | undefined): 
   return env("CLOUD_SAVE_ENABLED") === "true";
 }
 
-/** A skill's identity across agents and Macs: its folder name, NFC and lower case. */
+/**
+ * A skill's identity across agents and Macs: its folder name, NFC and lower case. Names with
+ * surrounding spaces, slashes, or control, format or line-separator characters are refused
+ * rather than trimmed, so the Mac, the web and the database always agree on the key.
+ */
 export function normalizeSkillKey(value: unknown): string {
   if (typeof value !== "string") throw new CloudSaveError("invalid_skill_key", "Invalid skill key");
-  const key = value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  const key = value.normalize("NFC").toLowerCase();
   if (
     !key
     || key.length > 200
-    || key === "."
-    || key === ".."
+    || key !== key.trim()
     || key.startsWith(".")
-    || /[/\\\u0000-\u001f\u007f]/.test(key)
+    || /[/\\\p{Cc}\p{Cf}\p{Zl}\p{Zp}]/u.test(key)
   ) {
     throw new CloudSaveError("invalid_skill_key", "Invalid skill key");
   }
@@ -356,40 +361,61 @@ export async function saveCloudVersion(
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    // Checked again under a lock: turning cloud save off or leaving the skill out waits for
+    // this save to finish, and a save that starts after the change is refused.
+    const settings = await client.query<{ enabled: boolean; excluded: string[] }>(
+      "SELECT enabled, excluded_skill_keys AS excluded FROM cloud_save_settings WHERE user_id = $1 FOR SHARE",
+      [input.userId]
+    );
+    if (!settings.rows[0]?.enabled) throw new CloudSaveError("disabled", "Cloud save is turned off");
+    if (settings.rows[0].excluded.includes(skillKey)) {
+      throw new CloudSaveError("excluded", "This skill is not chosen for cloud save");
+    }
     const sourceId = await lockCloudSource(client, input.userId, skillKey);
+    const current = await client.query<{ releaseId: string; treeSha: string }>(
+      `
+        SELECT release.id AS "releaseId", release.tree_sha AS "treeSha"
+        FROM cloud_saved_skills saved
+        JOIN skill_releases release ON release.id = saved.current_release_id
+        WHERE saved.source_id = $1
+      `,
+      [sourceId]
+    );
+    if (current.rows[0]?.treeSha === manifest.treeSha) {
+      await client.query("COMMIT");
+      return { status: "saved", created: false,
+        skill: { key: skillKey, currentVersion: await readVersion(pool, current.rows[0].releaseId) } };
+    }
+    const commitSha = createHash("sha1").update(`omgskills cloud save\n${manifest.treeSha}\n${randomUUID()}`).digest("hex");
     const releaseId = await appendSkillRelease(client, {
       sourceId,
-      commitSha: manifest.treeSha,
+      commitSha,
       treeSha: manifest.treeSha,
       skillMdSha: manifest.skillMdSha,
       createdBy: input.userId
     });
-    const inserted = await client.query(
+    await client.query(
       `
         INSERT INTO cloud_releases (release_id, source_id, device_id, file_count, total_bytes)
         VALUES ($1, $2, $3, $4, $5)
-        ON CONFLICT (release_id) DO NOTHING
       `,
       [releaseId, sourceId, input.deviceId, manifest.fileCount, manifest.totalBytes]
     );
-    const created = Boolean(inserted.rowCount);
-    if (created) {
-      await client.query(
-        `
-          INSERT INTO cloud_release_files (release_id, path, mode, blob_sha, byte_size)
-          SELECT $1, file.path, file.mode, file.blob_sha, file.byte_size
-          FROM unnest($2::text[], $3::text[], $4::text[], $5::int[])
-            AS file(path, mode, blob_sha, byte_size)
-        `,
-        [
-          releaseId,
-          input.files.map((file) => file.path),
-          input.files.map((file) => file.mode),
-          input.files.map((file) => file.blobSha),
-          input.files.map((file) => file.byteSize)
-        ]
-      );
-    }
+    await client.query(
+      `
+        INSERT INTO cloud_release_files (release_id, path, mode, blob_sha, byte_size)
+        SELECT $1, file.path, file.mode, file.blob_sha, file.byte_size
+        FROM unnest($2::text[], $3::text[], $4::text[], $5::int[])
+          AS file(path, mode, blob_sha, byte_size)
+      `,
+      [
+        releaseId,
+        input.files.map((file) => file.path),
+        input.files.map((file) => file.mode),
+        input.files.map((file) => file.blobSha),
+        input.files.map((file) => file.byteSize)
+      ]
+    );
     await client.query(
       `
         INSERT INTO cloud_saved_skills (source_id, user_id, skill_key, current_release_id)
@@ -402,7 +428,7 @@ export async function saveCloudVersion(
       [sourceId, input.userId, skillKey, releaseId]
     );
     await client.query("COMMIT");
-    return { status: "saved", created, skill: { key: skillKey, currentVersion: await readVersion(pool, releaseId) } };
+    return { status: "saved", created: true, skill: { key: skillKey, currentVersion: await readVersion(pool, releaseId) } };
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
@@ -479,9 +505,10 @@ export async function loadCloudVersionPackage(
   store: CloudObjectStore,
   input: { userId: string; releaseId: string }
 ): Promise<{ sourceId: string; releaseId: string; package: SkillPackage }> {
-  const release = await db.query<{ sourceId: string; treeSha: string; skillMdSha: string }>(
+  const release = await db.query<{ sourceId: string; commitSha: string; treeSha: string; skillMdSha: string }>(
     `
-      SELECT release.source_id AS "sourceId", release.tree_sha AS "treeSha", release.skill_md_sha AS "skillMdSha"
+      SELECT release.source_id AS "sourceId", release.commit_sha AS "commitSha",
+        release.tree_sha AS "treeSha", release.skill_md_sha AS "skillMdSha"
       FROM skill_releases release
       JOIN skill_sources source ON source.id = release.source_id
       WHERE release.id = $1 AND source.kind = 'cloud' AND source.owner_user_id = $2 AND source.tombstoned_at IS NULL
@@ -507,7 +534,7 @@ export async function loadCloudVersionPackage(
     sourceId: row.sourceId,
     releaseId: input.releaseId,
     package: {
-      coordinates: { commitSha: row.treeSha, treeSha: row.treeSha, skillMdSha: row.skillMdSha },
+      coordinates: { commitSha: row.commitSha, treeSha: row.treeSha, skillMdSha: row.skillMdSha },
       entries
     }
   };
