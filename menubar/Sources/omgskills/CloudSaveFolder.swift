@@ -6,6 +6,8 @@ struct CloudSaveFolder: Equatable, Sendable {
     let directory: URL
     let entries: [SkillPackageEntry]
     let coordinates: SkillPackageCoordinates
+    /// When any file in the folder last changed.
+    let modifiedAt: Date
 
     var treeSha: String { coordinates.treeSha }
 
@@ -27,10 +29,9 @@ struct CloudSaveFolder: Equatable, Sendable {
     }
 
     /// A skill's identity across agents and Macs, matching the server: the folder name, NFC and lower case.
+    /// Nothing is trimmed; the server refuses names it can't store, and that skill is reported, not saved.
     static func key(forFolderName name: String) -> String {
-        name.precomposedStringWithCanonicalMapping
-            .trimmingCharacters(in: .whitespaces)
-            .lowercased(with: Locale(identifier: "en_US_POSIX"))
+        name.precomposedStringWithCanonicalMapping.lowercased()
     }
 
     static func read(directory: URL, fileManager: FileManager = .default) throws -> CloudSaveFolder {
@@ -40,18 +41,19 @@ struct CloudSaveFolder: Equatable, Sendable {
             throw ReadError.unreadable
         }
         var entries: [SkillPackageEntry] = []
-        try collect(root, prefix: "", into: &entries, fileManager: fileManager)
+        var modifiedAt = Date.distantPast
+        try collect(root, prefix: "", into: &entries, modifiedAt: &modifiedAt, fileManager: fileManager)
         do {
             let coordinates = try SkillPackageValidator.unpinnedCoordinates(for: entries, limits: limits)
             return CloudSaveFolder(key: key(forFolderName: directory.lastPathComponent), directory: directory,
-                entries: entries, coordinates: coordinates)
+                entries: entries, coordinates: coordinates, modifiedAt: modifiedAt)
         } catch let error as SkillPackageValidationError {
             throw ReadError.invalid(error.code)
         }
     }
 
     private static func collect(_ directory: URL, prefix: String, into entries: inout [SkillPackageEntry],
-                                fileManager: FileManager) throws {
+                                modifiedAt: inout Date, fileManager: FileManager) throws {
         let names: [String]
         do { names = try fileManager.contentsOfDirectory(atPath: directory.path) }
         catch { throw ReadError.unreadable }
@@ -61,7 +63,7 @@ struct CloudSaveFolder: Equatable, Sendable {
             let values = try? url.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey, .isRegularFileKey])
             if values?.isSymbolicLink == true { throw ReadError.containsLink(path) }
             if values?.isDirectory == true {
-                try collect(url, prefix: path, into: &entries, fileManager: fileManager)
+                try collect(url, prefix: path, into: &entries, modifiedAt: &modifiedAt, fileManager: fileManager)
                 continue
             }
             guard values?.isRegularFile == true else { throw ReadError.invalid(.unsupportedEntryType) }
@@ -72,6 +74,7 @@ struct CloudSaveFolder: Equatable, Sendable {
             }
             guard let data = try? Data(contentsOf: url) else { throw ReadError.unreadable }
             let permissions = (attributes?[.posixPermissions] as? Int) ?? 0
+            if let changed = attributes?[.modificationDate] as? Date, changed > modifiedAt { modifiedAt = changed }
             entries.append(SkillPackageEntry(path: path, mode: permissions & 0o111 != 0 ? "100755" : "100644",
                 data: data, blobSha: SkillIdentityResolver.gitBlobSHA(for: data)))
         }

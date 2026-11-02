@@ -19,6 +19,8 @@ struct CloudSaveSummary: Equatable, Sendable {
     var uploadedCount = 0
     /// Library and Set installs left unchanged, which are not uploaded.
     var libraryCount = 0
+    /// Skills whose copy here is older than the one already in the cloud, so it isn't saved over it.
+    var olderHereCount = 0
     var needsReview: [String] = []
     /// Skills that can't be saved, by key, with the reason.
     var skipped: [String: String] = [:]
@@ -33,7 +35,9 @@ struct CloudSaveSync: Sendable {
     /// Spaces requests out to stay well under the server's rate limit.
     var pace: Pace = { try await Task.sleep(for: .milliseconds(250)) }
 
-    func run(installations: [Skill], scanComplete: Bool, deviceID: String,
+    /// `localFolderKeys` lists every skill folder name on this Mac, valid or not, or nil when a
+    /// skills folder couldn't be read; deletions are only marked when it is known.
+    func run(installations: [Skill], localFolderKeys: Set<String>?, deviceID: String,
              credential: StoredDeviceCredential) async throws -> CloudSaveSummary {
         let state: CloudSaveState
         do { state = try await api.state(credential: credential) }
@@ -46,13 +50,14 @@ struct CloudSaveSync: Sendable {
         var summary = CloudSaveSummary(status: .upToDate)
         let excluded = Set(state.settings.excludedSkillKeys)
         let saved = Dictionary(state.skills.map { ($0.key, $0) }, uniquingKeysWith: { first, _ in first })
-        let (folders, localKeys) = candidates(installations, summary: &summary)
+        let folders = candidates(installations, summary: &summary)
 
         for folder in folders where !excluded.contains(folder.key) {
             try Task.checkCancellation()
             if let current = saved[folder.key], current.currentVersion.treeSha == folder.treeSha {
                 summary.savedCount += 1
-                if current.deletedLocallyAt != nil {
+                // Only the Mac that saved it clears its "deleted" mark; another Mac's copy would flip it back and forth.
+                if current.deletedLocallyAt != nil && current.currentVersion.deviceId == deviceID {
                     do {
                         try await pace()
                         try await api.markDeletedLocally(key: folder.key, deleted: false, credential: credential)
@@ -60,6 +65,12 @@ struct CloudSaveSync: Sendable {
                         if let stop = Self.stopStatus(error) { summary.status = stop; return summary }
                     }
                 }
+                continue
+            }
+            // A stale copy on this Mac must not replace a newer save from another Mac.
+            if let current = saved[folder.key], let savedAt = Self.date(current.currentVersion.savedAt),
+               folder.modifiedAt <= savedAt {
+                summary.olderHereCount += 1
                 continue
             }
             do {
@@ -77,10 +88,10 @@ struct CloudSaveSync: Sendable {
         }
 
         // A skill this Mac saved and no longer has stays in the cloud, marked deleted on this Mac.
-        if scanComplete {
+        if let localFolderKeys {
             for skill in state.skills where skill.deletedLocallyAt == nil
                 && skill.currentVersion.deviceId == deviceID
-                && !localKeys.contains(skill.key) && !excluded.contains(skill.key) {
+                && !localFolderKeys.contains(skill.key) && !excluded.contains(skill.key) {
                 do {
                     try await pace()
                     try await api.markDeletedLocally(key: skill.key, deleted: true, credential: credential)
@@ -111,7 +122,12 @@ struct CloudSaveSync: Sendable {
             do { try await api.uploadFile(entry, confirmSecrets: false, credential: credential) }
             catch CloudSaveAPIError.needsReview(let findings) { held += findings }
         }
-        if !held.isEmpty { throw CloudSaveAPIError.needsReview(held) }
+        if !held.isEmpty {
+            // Asking to save again records the skill for review on the web now, not on the next pass.
+            try await pace()
+            _ = try? await api.saveVersion(folder, credential: credential)
+            throw CloudSaveAPIError.needsReview(held)
+        }
         try await pace()
         guard case .saved(let created) = try await api.saveVersion(folder, credential: credential) else {
             throw CloudSaveAPIError.invalidResponse
@@ -121,13 +137,11 @@ struct CloudSaveSync: Sendable {
 
     /// Reads each skill folder once per key. The same skill on two agents is one cloud skill;
     /// when the copies differ, the most recently edited one is saved.
-    private func candidates(_ installations: [Skill], summary: inout CloudSaveSummary) -> ([CloudSaveFolder], Set<String>) {
-        var chosen: [String: (folder: CloudSaveFolder, modified: String)] = [:]
-        var localKeys = Set<String>()
+    private func candidates(_ installations: [Skill], summary: inout CloudSaveSummary) -> [CloudSaveFolder] {
+        var chosen: [String: CloudSaveFolder] = [:]
         for skill in installations {
             let directory = URL(fileURLWithPath: skill.installCmd, isDirectory: true)
             let key = CloudSaveFolder.key(forFolderName: directory.lastPathComponent)
-            localKeys.insert(key)
             let folder: CloudSaveFolder
             do { folder = try CloudSaveFolder.read(directory: directory) }
             catch CloudSaveFolder.ReadError.containsLink { summary.skipped[key] = "Contains links to other files"; continue }
@@ -139,11 +153,18 @@ struct CloudSaveSync: Sendable {
                 summary.libraryCount += 1
                 continue
             }
-            if let existing = chosen[key], existing.modified >= skill.lastUpdated { continue }
-            chosen[key] = (folder, skill.lastUpdated)
+            // Any file counts as an edit, not just SKILL.md.
+            if let existing = chosen[key], existing.modifiedAt >= folder.modifiedAt { continue }
+            chosen[key] = folder
             summary.skipped[key] = nil
         }
-        return (chosen.values.map(\.folder).sorted { $0.key < $1.key }, localKeys)
+        return chosen.values.sorted { $0.key < $1.key }
+    }
+
+    static func date(_ value: String) -> Date? {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter.date(from: value) ?? ISO8601DateFormatter().date(from: value)
     }
 
     /// A skill installed by omgskills from the library or a Set, with its files unchanged.
@@ -162,8 +183,9 @@ struct CloudSaveSync: Sendable {
         case .permissionRequired: .permissionRequired
         case .reconnectRequired: .reconnectRequired
         case .storageFull: .storageFull
-        case .unavailable, .rateLimited, .invalidResponse: .unavailable
-        case .excluded, .needsReview, .tooLarge, .rejected: nil
+        case .unavailable, .rateLimited: .unavailable
+        // One skill's problem never stops the others.
+        case .excluded, .needsReview, .tooLarge, .rejected, .invalidResponse: nil
         }
     }
 

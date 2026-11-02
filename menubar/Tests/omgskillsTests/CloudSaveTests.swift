@@ -119,14 +119,14 @@ struct CloudSaveSyncTests {
         let root = try temporaryRoot()
         let api = FakeCloudSave(enabled: false)
         let summary = try await sync(api).run(installations: [installation(try makeSkill(root, "notes"))],
-            scanComplete: true, deviceID: "device-1", credential: credential())
+            localFolderKeys: [], deviceID: "device-1", credential: credential())
         #expect(summary.status == .off)
         #expect(await api.calls == ["state"])
     }
 
     @Test func asksToReconnectWithoutTheUploadPermission() async throws {
         let api = FakeCloudSave()
-        let summary = try await sync(api).run(installations: [], scanComplete: true, deviceID: "device-1",
+        let summary = try await sync(api).run(installations: [], localFolderKeys: [], deviceID: "device-1",
             credential: credential(scopes: [.syncWrite, .selfRevoke, .contentRead]))
         #expect(summary.status == .permissionRequired)
     }
@@ -135,7 +135,7 @@ struct CloudSaveSyncTests {
         let root = try temporaryRoot()
         let notes = try makeSkill(root, "notes", files: ["a.txt": "a"])
         let api = FakeCloudSave()
-        let first = try await sync(api).run(installations: [installation(notes)], scanComplete: true,
+        let first = try await sync(api).run(installations: [installation(notes)], localFolderKeys: [],
             deviceID: "device-1", credential: credential())
         #expect(first.status == .upToDate)
         #expect(first.uploadedCount == 1)
@@ -146,8 +146,8 @@ struct CloudSaveSyncTests {
         // Once the server's copy matches, a later pass sends nothing.
         let folder = try CloudSaveFolder.read(directory: notes)
         let synced = FakeCloudSave(skills: [.init(key: "notes", currentVersion: .init(id: "r1", treeSha: folder.treeSha,
-            deviceId: "device-1", labels: []), deletedLocallyAt: nil)])
-        let second = try await sync(synced).run(installations: [installation(notes)], scanComplete: true,
+            deviceId: "device-1", savedAt: "2026-01-01T00:00:00.000Z", labels: []), deletedLocallyAt: nil)])
+        let second = try await sync(synced).run(installations: [installation(notes)], localFolderKeys: ["notes"],
             deviceID: "device-1", credential: credential())
         #expect(second.savedCount == 1 && second.uploadedCount == 0)
         #expect(await synced.calls == ["state"])
@@ -165,14 +165,14 @@ struct CloudSaveSyncTests {
 
         let api = FakeCloudSave(excluded: ["private-notes"])
         let summary = try await sync(api).run(installations: [installation(mine), installation(library)],
-            scanComplete: true, deviceID: "device-1", credential: credential())
+            localFolderKeys: [], deviceID: "device-1", credential: credential())
         #expect(summary.libraryCount == 1)
         #expect(summary.uploadedCount == 0)
         #expect(await api.calls == ["state"])
 
         // Editing the library skill makes it the user's own copy.
         try Data("---\nname: pdf\ndescription: mine\n---\n".utf8).write(to: library.appendingPathComponent("SKILL.md"))
-        let edited = try await sync(api).run(installations: [installation(library)], scanComplete: true,
+        let edited = try await sync(api).run(installations: [installation(library)], localFolderKeys: [],
             deviceID: "device-1", credential: credential())
         #expect(edited.uploadedCount == 1)
     }
@@ -186,7 +186,7 @@ struct CloudSaveSyncTests {
         let secret = try #require(entries.first { $0.path == "config.env" })
         await api.hold(secret.blobSha)
         let summary = try await sync(api).run(installations: [installation(deploy), installation(notes)],
-            scanComplete: true, deviceID: "device-1", credential: credential())
+            localFolderKeys: [], deviceID: "device-1", credential: credential())
         #expect(summary.status == .incomplete)
         #expect(summary.needsReview == ["deploy"])
         #expect(summary.uploadedCount == 1)
@@ -196,22 +196,27 @@ struct CloudSaveSyncTests {
 
     @Test func marksSkillsThisMacSavedAndNoLongerHasAsDeleted() async throws {
         let api = FakeCloudSave(skills: [
-            .init(key: "gone", currentVersion: .init(id: "r1", treeSha: "a", deviceId: "device-1", labels: nil), deletedLocallyAt: nil),
-            .init(key: "other-mac", currentVersion: .init(id: "r2", treeSha: "b", deviceId: "device-2", labels: nil), deletedLocallyAt: nil)
+            .init(key: "gone", currentVersion: .init(id: "r1", treeSha: "a", deviceId: "device-1", savedAt: "2026-01-01T00:00:00.000Z", labels: nil), deletedLocallyAt: nil),
+            .init(key: "other-mac", currentVersion: .init(id: "r2", treeSha: "b", deviceId: "device-2", savedAt: "2026-01-01T00:00:00.000Z", labels: nil), deletedLocallyAt: nil)
         ])
-        _ = try await sync(api).run(installations: [], scanComplete: false, deviceID: "device-1", credential: credential())
+        _ = try await sync(api).run(installations: [], localFolderKeys: nil, deviceID: "device-1", credential: credential())
         #expect(await api.deleted.isEmpty, "an incomplete scan never marks deletions")
-        _ = try await sync(api).run(installations: [], scanComplete: true, deviceID: "device-1", credential: credential())
+        _ = try await sync(api).run(installations: [], localFolderKeys: [], deviceID: "device-1", credential: credential())
         #expect(await api.deleted == ["gone": true])
     }
 
     @Test func theSameSkillOnTwoAgentsIsSavedOnceFromTheNewestCopy() async throws {
         let claude = try temporaryRoot(), codex = try temporaryRoot()
         let older = try makeSkill(claude, "notes", skillMd: "---\nname: notes\ndescription: old\n---\n")
-        let newer = try makeSkill(codex, "Notes", skillMd: "---\nname: notes\ndescription: new\n---\n")
+        let newer = try makeSkill(codex, "Notes", skillMd: "---\nname: notes\ndescription: new\n---\n",
+                                  files: ["run.sh": "echo new"])
+        // SKILL.md says the Claude copy is newer, but the Codex copy has the latest edit (to run.sh).
+        try touch(older.appendingPathComponent("SKILL.md"), "2026-10-20T00:00:00Z")
+        try touch(newer.appendingPathComponent("SKILL.md"), "2026-10-01T00:00:00Z")
+        try touch(newer.appendingPathComponent("run.sh"), "2026-10-30T00:00:00Z")
         let api = FakeCloudSave()
         _ = try await sync(api).run(installations: [installation(older, modified: "2026-10-01T00:00:00Z"),
-            installation(newer, modified: "2026-11-01T00:00:00Z")], scanComplete: true, deviceID: "device-1", credential: credential())
+            installation(newer, modified: "2026-11-01T00:00:00Z")], localFolderKeys: [], deviceID: "device-1", credential: credential())
         let newest = try CloudSaveFolder.read(directory: newer).treeSha
         #expect(await api.saved == ["notes": newest])
     }
@@ -224,9 +229,107 @@ struct CloudSaveSyncTests {
             func saveVersion(_ folder: CloudSaveFolder, credential: StoredDeviceCredential) async throws -> CloudSaveVersionResult { .saved(created: false) }
             func markDeletedLocally(key: String, deleted: Bool, credential: StoredDeviceCredential) async throws {}
         }
-        let summary = try await CloudSaveSync(api: Down(), pace: {}).run(installations: [], scanComplete: true,
+        let summary = try await CloudSaveSync(api: Down(), pace: {}).run(installations: [], localFolderKeys: [],
             deviceID: "device-1", credential: credential())
         #expect(summary.status == .unavailable)
+    }
+}
+
+private func touch(_ url: URL, _ iso: String) throws {
+    try FileManager.default.setAttributes([.modificationDate: ISO8601DateFormatter().date(from: iso)!], ofItemAtPath: url.path)
+}
+
+struct CloudSaveReviewFixTests {
+    private func sync(_ api: FakeCloudSave) -> CloudSaveSync { CloudSaveSync(api: api, pace: {}) }
+
+    @Test func aStaleCopyDoesNotReplaceANewerCloudSave() async throws {
+        let root = try temporaryRoot()
+        let notes = try makeSkill(root, "notes", skillMd: "---\nname: notes\ndescription: old\n---\n")
+        try touch(notes.appendingPathComponent("SKILL.md"), "2026-10-01T00:00:00Z")
+        let api = FakeCloudSave(skills: [.init(key: "notes", currentVersion: .init(id: "r1", treeSha: String(repeating: "a", count: 40),
+            deviceId: "device-2", savedAt: "2026-11-01T00:00:00.000Z", labels: []), deletedLocallyAt: nil)])
+        let summary = try await sync(api).run(installations: [installation(notes)], localFolderKeys: ["notes"],
+            deviceID: "device-1", credential: credential())
+        #expect(summary.olderHereCount == 1 && summary.uploadedCount == 0)
+        #expect(await api.calls == ["state"])
+
+        // Edited here after that save: it is saved.
+        try touch(notes.appendingPathComponent("SKILL.md"), "2026-11-02T00:00:00Z")
+        let edited = try await sync(api).run(installations: [installation(notes)], localFolderKeys: ["notes"],
+            deviceID: "device-1", credential: credential())
+        #expect(edited.uploadedCount == 1)
+    }
+
+    @Test func oneSkillTheServerRefusesDoesNotStopTheOthers() async throws {
+        actor Refusing: CloudSaveServing {
+            var saved: [String] = []
+            func state(credential: StoredDeviceCredential) async throws -> CloudSaveState {
+                CloudSaveState(settings: .init(enabled: true, excludedSkillKeys: []), usage: .init(bytes: 0, limitBytes: 1),
+                               skills: [], needsReview: [])
+            }
+            func setEnabled(_ enabled: Bool, credential: StoredDeviceCredential) async throws {}
+            func uploadFile(_ entry: SkillPackageEntry, confirmSecrets: Bool, credential: StoredDeviceCredential) async throws {}
+            func saveVersion(_ folder: CloudSaveFolder, credential: StoredDeviceCredential) async throws -> CloudSaveVersionResult {
+                if folder.key == "a-bad" { throw CloudSaveAPIError.rejected("Invalid skill key") }
+                if folder.key == "b-odd" { throw CloudSaveAPIError.invalidResponse }
+                saved.append(folder.key)
+                return .saved(created: true)
+            }
+            func markDeletedLocally(key: String, deleted: Bool, credential: StoredDeviceCredential) async throws {}
+        }
+        let root = try temporaryRoot()
+        let api = Refusing()
+        let summary = try await CloudSaveSync(api: api, pace: {}).run(
+            installations: [installation(try makeSkill(root, "a-bad")), installation(try makeSkill(root, "b-odd")),
+                            installation(try makeSkill(root, "c-good"))],
+            localFolderKeys: nil, deviceID: "device-1", credential: credential())
+        #expect(await api.saved == ["c-good"])
+        #expect(summary.status == .incomplete)
+        #expect(Set(summary.skipped.keys) == ["a-bad", "b-odd"])
+    }
+
+    @Test func aHeldSkillIsReportedForReviewInTheSamePass() async throws {
+        let root = try temporaryRoot()
+        let deploy = try makeSkill(root, "deploy", files: ["config.env": "TOKEN=x"])
+        let api = FakeCloudSave()
+        let entries = try CloudSaveFolder.read(directory: deploy).entries
+        await api.hold(try #require(entries.first { $0.path == "config.env" }).blobSha)
+        _ = try await sync(api).run(installations: [installation(deploy)], localFolderKeys: ["deploy"],
+            deviceID: "device-1", credential: credential())
+        let versions = await api.calls.filter { $0 == "version:deploy" }
+        #expect(versions.count == 2, "the second save asks the server to record the review")
+    }
+
+    @Test func deletionsUseFolderNamesAndOnlyTheSavingMacClearsTheMark() async throws {
+        let api = FakeCloudSave(skills: [
+            .init(key: "broken", currentVersion: .init(id: "r1", treeSha: "a", deviceId: "device-1",
+                  savedAt: "2026-01-01T00:00:00.000Z", labels: nil), deletedLocallyAt: nil)
+        ])
+        // The folder is still there even though its SKILL.md no longer parses.
+        _ = try await sync(api).run(installations: [], localFolderKeys: ["broken"], deviceID: "device-1", credential: credential())
+        #expect(await api.deleted.isEmpty)
+
+        let root = try temporaryRoot()
+        let notes = try makeSkill(root, "notes")
+        let tree = try CloudSaveFolder.read(directory: notes).treeSha
+        let marked = FakeCloudSave(skills: [.init(key: "notes", currentVersion: .init(id: "r1", treeSha: tree,
+            deviceId: "device-2", savedAt: "2026-01-01T00:00:00.000Z", labels: nil), deletedLocallyAt: "2026-11-01T00:00:00.000Z")])
+        _ = try await sync(marked).run(installations: [installation(notes)], localFolderKeys: ["notes"],
+            deviceID: "device-1", credential: credential())
+        #expect(await marked.deleted.isEmpty, "another Mac's mark is left alone")
+    }
+
+    @Test func folderKeysAreUnknownWhenAFolderCantBeRead() throws {
+        let root = try temporaryRoot()
+        try makeSkill(root, "Notes")
+        try FileManager.default.createDirectory(at: root.appendingPathComponent(".omgskills"), withIntermediateDirectories: true)
+        #expect(CloudSaveController.folderKeys(in: [root, root.appendingPathComponent("missing")]) == ["notes"])
+        #expect(CloudSaveController.folderKeys(in: [root.appendingPathComponent("Notes/SKILL.md")]) == nil)
+    }
+
+    @Test func keysAreNotTrimmed() {
+        #expect(CloudSaveFolder.key(forFolderName: " Notes") == " notes")
+        #expect(CloudSaveFolder.key(forFolderName: "Cafe\u{301}") == "café")
     }
 }
 

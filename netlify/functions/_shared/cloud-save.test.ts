@@ -30,6 +30,7 @@ test("cloud save answers 503 until it is turned on", async () => {
 test("unknown routes and methods are refused before any sign-in check", async () => {
   assert.equal((await call("GET", "/nothing")).status, 404);
   assert.equal((await call("GET", "/versions/not-an-id/package")).status, 404);
+  assert.equal((await call("GET", "/versions/aaaaaaaaaaaaaaaa/package")).status, 404);
   assert.equal((await call("DELETE", "/settings")).status, 405);
   assert.equal((await call("GET", "/blobs/abc")).status, 405);
 });
@@ -55,9 +56,11 @@ test("uploads need a device even when a web session is present", async () => {
   assert.equal(response.status, 403);
 });
 
-test("skill keys are folder names compared without case", () => {
-  assert.equal(normalizeSkillKey("  PDF-Tools "), "pdf-tools");
-  for (const bad of ["", ".", "..", ".hidden", "a/b", "a\\b", "x\u0000", "x".repeat(201), 3]) {
+test("skill keys are folder names compared without case, and odd names are refused, not trimmed", () => {
+  assert.equal(normalizeSkillKey("PDF-Tools"), "pdf-tools");
+  assert.equal(normalizeSkillKey("Cafe\u0301 Notes"), "café notes");
+  for (const bad of ["", ".", "..", ".hidden", "a/b", "a\\b", "x\u0000", "x\u0085y", "\uFEFFx", "x\u200B", "x\u2028",
+    " padded", "padded ", "x".repeat(201), 3]) {
     assert.throws(() => normalizeSkillKey(bad), CloudSaveError);
   }
 });
