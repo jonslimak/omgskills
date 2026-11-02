@@ -56,6 +56,15 @@ test("production consent uses the gated normal API, strips private access and ca
   assert.match(returned, /^omgskills:\/\/pair\?/);
 });
 
+test("production pairing adds cloud save upload only for a companion that asks for it", () => {
+  const consent = productionInventoryConsent(true);
+  const base = `#state=${"a".repeat(43)}&code_challenge=${"b".repeat(43)}&scope=sync:write&scope=self:revoke`;
+  const older = consent.parse(base)!;
+  assert.deepEqual(consent.scopes(older), ["sync:write", "self:revoke", "content:read"]);
+  const newer = consent.parse(`${base}&scope=content:read&scope=content:write`)!;
+  assert.deepEqual(consent.scopes(newer), ["sync:write", "self:revoke", "content:read", "content:write"]);
+});
+
 test("production install handoff preserves both agents and cannot offer the test download", async () => {
   const skill = { key: "catalog:owner/repo", catalogId: "owner/repo", name: "Skill" } as SkillDisplay;
   for (const agent of ["claude", "codex"] as const) {

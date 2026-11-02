@@ -9,6 +9,8 @@ import AppKit
 final class ConnectedInventoryRuntime {
     let connection: DeviceConnectionModel
     private(set) var watchWarning: String?
+    /// Saves this Mac's own skills after each inventory report, when the account has cloud save on.
+    var cloudSave: CloudSaveController?
     @ObservationIgnored private let authorizer: any BrowserPairingAuthorizing
     @ObservationIgnored private let automation: Automation?
     @ObservationIgnored private let callbackScheme: String
@@ -32,6 +34,8 @@ final class ConnectedInventoryRuntime {
             if current == session {
                 if let event = ConnectedAppEvent.inventoryResult(outcome) { track(event) }
                 if outcome == .reconnectRequired { stopAutomation() }
+                if case .reported = outcome { cloudSave?.requestRun() }
+                if outcome == .checked { cloudSave?.requestRun() }
             }
             return outcome
         }
@@ -162,6 +166,7 @@ final class ConnectedInventoryRuntime {
             guard automation != nil, case .connected = connection.state,
                   let outcome = connection.lastReportOutcome else { stopAutomation(); return }
             scheduler.adoptInitialOutcome(outcome)
+            cloudSave?.requestRun()
             if bufferedRequest { scheduler.request() }
             else if bufferedChange { scheduler.changed() }
             bufferedChange = false
@@ -211,6 +216,7 @@ final class ConnectedInventoryRuntime {
     }
 
     private func stopAutomation() {
+        cloudSave?.cancel()
         stopWatching?(); stopWatching = nil
         stopWake?(); stopWake = nil
         hourly?.cancel(); hourly = nil

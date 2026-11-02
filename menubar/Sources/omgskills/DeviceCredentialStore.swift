@@ -5,6 +5,7 @@ enum DeviceScope: String, Codable, CaseIterable, Hashable, Sendable {
     case syncWrite = "sync:write"
     case selfRevoke = "self:revoke"
     case contentRead = "content:read"
+    case contentWrite = "content:write"
 
     static let metadataOnly: Set<DeviceScope> = [.syncWrite, .selfRevoke]
 }

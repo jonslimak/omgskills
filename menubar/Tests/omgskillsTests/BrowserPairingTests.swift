@@ -38,7 +38,7 @@ struct BrowserPairingTests {
         #expect(fragmentItems?.first(where: { $0.name == "state" })?.value == request.state)
         #expect(fragmentItems?.first(where: { $0.name == "code_challenge" })?.value == request.codeChallenge)
         #expect(fragmentItems?.filter { $0.name == "scope" }.compactMap(\.value) == [
-            "sync:write", "self:revoke", "content:read"
+            "sync:write", "self:revoke", "content:read", "content:write"
         ])
         #expect(url.absoluteString.contains(request.codeVerifier) == false)
     }

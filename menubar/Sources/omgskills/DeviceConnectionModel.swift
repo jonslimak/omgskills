@@ -42,6 +42,12 @@ final class DeviceConnectionModel {
     private(set) var lastInventoryCheckedAt: Date?
     @ObservationIgnored var onInventoryConnectionReady: (@MainActor () -> Void)?
 
+    /// The connected account's credential, for companion features that call the API directly.
+    var currentCredential: StoredDeviceCredential? {
+        guard case .connected = state else { return nil }
+        return connectedCredential
+    }
+
     @ObservationIgnored private let credentialStore: any DeviceCredentialStoring
     @ObservationIgnored private let reconnectKeyStore: (any DeviceReconnectKeyStoring)?
     @ObservationIgnored private let api: any DeviceSyncServing

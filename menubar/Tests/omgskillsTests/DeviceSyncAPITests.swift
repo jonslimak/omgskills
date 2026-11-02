@@ -355,7 +355,7 @@ struct DeviceSyncAPITests {
         #expect(Set(json.keys) == ["pairingCode", "deviceName", "codeVerifier"])
         #expect(result.credential == "device-secret")
         #expect(result.connection.deviceID == "device-1")
-        #expect(result.connection.grantedScopes == Set(DeviceScope.allCases))
+        #expect(result.connection.grantedScopes == [.syncWrite, .selfRevoke, .contentRead])
     }
 
     @Test func exchangeWithoutScopesRemainsMetadataOnly() async throws {

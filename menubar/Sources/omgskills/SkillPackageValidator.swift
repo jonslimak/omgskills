@@ -181,6 +181,30 @@ enum SkillPackageValidator {
         )
     }
 
+    /// Hashes a package that has no git commit (a folder on this Mac) and checks it against the limits.
+    /// The commit hash repeats the tree hash, matching how cloud save records versions.
+    static func unpinnedCoordinates(
+        for entries: [SkillPackageEntry],
+        limits: SkillPackageValidationLimits = .standard
+    ) throws -> SkillPackageCoordinates {
+        let tree = TreeDirectory()
+        var skillMdSha: String?
+        for entry in entries {
+            let components = try validatedPathComponents(entry.path)
+            try tree.insert(
+                components: ArraySlice(components),
+                file: TreeFile(mode: entry.mode, sha: entry.blobSha),
+                fullPath: entry.path
+            )
+            if entry.path == "SKILL.md" { skillMdSha = entry.blobSha }
+        }
+        guard let skillMdSha else { throw failure(.missingSkillMd) }
+        let treeSha = try tree.sha()
+        let coordinates = SkillPackageCoordinates(commitSha: treeSha, treeSha: treeSha, skillMdSha: skillMdSha)
+        _ = try validate(SkillPackage(coordinates: coordinates, entries: entries), expected: coordinates, limits: limits)
+        return coordinates
+    }
+
     private static func normalizedCoordinates(
         _ coordinates: SkillPackageCoordinates
     ) throws -> SkillPackageCoordinates {
