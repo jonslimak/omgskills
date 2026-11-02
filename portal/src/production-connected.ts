@@ -15,8 +15,10 @@ export function productionInventoryConsent(enabled: boolean): PairingConsentPoli
     ...normalPairingConsent,
     parse: hash => enabled ? normalPairingConsent.parse(hash) : null,
     // content:read lets the companion download Sets shared with this account.
-    // content:write (cloud save) waits for a companion release that knows the scope.
-    scopes: () => COMPANION_DEVICE_SCOPES,
+    // content:write (cloud save) only when the companion asks for it: older companions don't know it.
+    scopes: request => request.scopes.includes("content:write")
+      ? [...COMPANION_DEVICE_SCOPES, "content:write"]
+      : COMPANION_DEVICE_SCOPES,
     disclosure: connectedInventoryDisclosure,
     approvalPath: "/api/portal/sync-pairing-code?inventory=3",
   };

@@ -23,6 +23,9 @@ struct ConnectedInventoryView: View {
                         .font(.caption).foregroundStyle(.tertiary).padding(.top, 8)
                 }
                 if let warning = runtime?.watchWarning { Text(warning).font(.caption).foregroundStyle(.secondary) }
+                if let cloudSave = runtime?.cloudSave, cloudSave.isAvailable {
+                    CloudSaveSection(controller: cloudSave, reconnect: { runtime?.connect(deviceName: deviceName) })
+                }
                 HStack(spacing: 8) { inventoryActions }.buttonStyle(.bordered)
             case .authorizing, .exchanging, .storingCredential, .syncing:
                 HStack {
@@ -49,6 +52,30 @@ struct ConnectedInventoryView: View {
                 Text(warning).font(.caption).foregroundStyle(.secondary)
             }
         }.frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private struct CloudSaveSection: View {
+        let controller: CloudSaveController
+        let reconnect: () -> Void
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 4) {
+                Toggle("Save skills to the cloud", isOn: Binding(
+                    get: { controller.summary.map { $0.status != .off } ?? false },
+                    set: { controller.setEnabled($0) }))
+                .toggleStyle(.switch).controlSize(.small)
+                if let summary = controller.summary, summary.status != .off {
+                    HStack(spacing: 6) {
+                        if controller.isRunning { ProgressView().controlSize(.mini) }
+                        Text(CloudSaveController.statusText(summary)).font(.caption).foregroundStyle(.secondary)
+                    }
+                    if summary.status == .permissionRequired || summary.status == .reconnectRequired {
+                        Button("Reconnect", action: reconnect).controlSize(.small)
+                    }
+                }
+                if let message = controller.message { Text(message).font(.caption).foregroundStyle(.secondary) }
+            }.padding(.top, 8)
+        }
     }
 
     @ViewBuilder private var inventoryActions: some View {
