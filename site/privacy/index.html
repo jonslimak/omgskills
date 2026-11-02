@@ -24,7 +24,7 @@
   <main>
     <a class="back" href="/">Back to omgskills</a>
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated October 30, 2026</p>
+    <p class="updated">Last updated November 2, 2026</p>
 
     <p>omgskills is a web library for discovering, organizing and sharing agent skills, with a companion Mac app for installation and connected inventory reporting. We try to collect as little data as practical.</p>
 
@@ -36,8 +36,13 @@
 
     <h2>Accounts and connected Macs</h2>
     <p>Signing in uses Clerk. We process account information such as your account identifier and email address to provide saved Sets, invitations and connected inventory.</p>
-    <p>If you connect a Mac and approve inventory reporting, it sends skill names, descriptions, agent, folder name, SKILL.md fingerprint and safe source information such as the repository and relative skill path. Reports can include skills installed outside omgskills. Fingerprints may identify skills. Inventory reports do not upload full local paths or full skill files.</p>
+    <p>If you connect a Mac and approve inventory reporting, it sends skill names, descriptions, agent, folder name, SKILL.md fingerprint and safe source information such as the repository and relative skill path. Reports can include skills installed outside omgskills. Fingerprints may identify skills. Inventory reports do not upload full local paths or full skill files; cloud save, described below, uploads skill files only when you turn it on.</p>
     <p>We associate reports with your account and Mac so the website can show where a skill was observed, when it was reported and whether it was found on the last scan. Inventory reporting does not authorize automatic skill-file updates.</p>
+
+    <h2>Cloud save</h2>
+    <p>Cloud save is off until you turn it on. When it is on, your connected Mac uploads the files of skills you wrote or changed, including scripts and other files in the skill's folder, so we can keep a private, versioned copy for you. Unchanged skills installed from the omgskills library or a Set are not uploaded. You can leave out any skill.</p>
+    <p>Saved files are stored encrypted with Cloudflare R2 and are visible only to you in your account. We record which Mac saved each version and when. Before storing a file we scan it for text that looks like a key or password; those files are not stored unless you confirm them, and we keep only the kind of key found and its line number, never the key itself. We also label skills that download and run code, contain scripts or contain hidden text.</p>
+    <p>Turning cloud save off stops new uploads and keeps what is already saved. Deleting a skill on your Mac keeps its cloud copy until you delete it. To delete one saved skill or everything you saved, use Delete on the Cloud save page; deleted files are removed from storage and can't be restored.</p>
 
     <h2>Sets and invitations</h2>
     <p>We store the Sets, skill references, access choices and invitations you create. If you invite someone, we process their email address and membership information to provide access. A Set's visibility and sharing choices determine who can see it; public Sets are intended to be visible to others.</p>
@@ -66,7 +71,7 @@
     <p>Some data shown on omgskills.com/data may be public or derived from public sources. We may publish public skill metadata, rankings, counts, trend data, and aggregate signals that do not directly identify individual users.</p>
 
     <h2>Third-party services</h2>
-    <p>We use service providers for hosting, account sign-in, database storage, analytics, telemetry, downloads and advertising measurement. These include Clerk for sign-in, Netlify for hosting and database services, GitHub for public skill sources and release downloads, TelemetryDeck for app telemetry, Humblytics for website analytics, and OpenAI Ads, Reddit Ads and X Ads for advertising measurement and attribution. These providers process data under their own terms and privacy policies.</p>
+    <p>We use service providers for hosting, account sign-in, database storage, analytics, telemetry, downloads and advertising measurement. These include Clerk for sign-in, Netlify for hosting and database services, Cloudflare R2 for cloud save storage, GitHub for public skill sources and release downloads, TelemetryDeck for app telemetry, Humblytics for website analytics, and OpenAI Ads, Reddit Ads and X Ads for advertising measurement and attribution. These providers process data under their own terms and privacy policies.</p>
 
     <h2>What we do not intentionally collect</h2>
     <ul>
@@ -85,6 +90,7 @@
 
     <h2>Your choices</h2>
     <p>You can disconnect the companion to stop inventory reporting without uninstalling skills. Disconnecting or deleting local app data is not an account-deletion request and does not by itself delete stored account information.</p>
+    <p>You can delete your cloud save copies yourself at any time from the Cloud save page.</p>
     <p>To request deletion of your account, synced inventory or other information you provided, email <a href="mailto:hi@omgskills.com">hi@omgskills.com</a> from the email associated with your account. Do not send passwords or connection tokens. You may also use browser privacy controls or ad-blocking tools to limit website measurement, or stop using the service.</p>
 
     <h2>Children's privacy</h2>
