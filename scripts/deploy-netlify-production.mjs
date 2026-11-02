@@ -17,8 +17,24 @@ function commandText(command, args) {
   return [command, ...args].join(" ");
 }
 
+function redactFailureOutput(text, env) {
+  const secrets = Object.entries(env)
+    .filter(([key, value]) => /TOKEN|SECRET|PASSWORD|CREDENTIAL|PRIVATE_KEY|ACCESS_KEY|DATABASE_URL/i.test(key)
+      && typeof value === "string" && value.length >= 4)
+    .map(([, value]) => value)
+    .sort((a, b) => b.length - a.length);
+  for (const secret of secrets) text = text.split(secret).join("[redacted]");
+  return text
+    .replace(/-----BEGIN [^-]*PRIVATE KEY-----[\s\S]*?-----END [^-]*PRIVATE KEY-----/g, "[redacted]")
+    .replace(/\bBearer\s+[A-Za-z0-9._~+/=-]+/gi, "Bearer [redacted]")
+    .replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, "[redacted]")
+    .replace(/\b((?:https?|postgres(?:ql)?):\/\/)[^\s/@]+@/gi, "$1[redacted]@")
+    // Bound key matching so large build-output words cannot cause quadratic scans.
+    .replace(/((?:token|secret|password|credential|api[_-]?key|access[_-]?key|database[_-]?url|authorization)[\w-]{0,255}["']?\s*[:=]\s*)("[^"\r\n]*"|'[^'\r\n]*'|[^\s,}&\r\n]+)/gi, "$1[redacted]");
+}
+
 export async function runCommand(command, args, {
-  cwd = process.cwd(), env = process.env, includeFailureStdout = false,
+  cwd = process.cwd(), env = process.env, includeFailureStdout = false, failureStdoutLines = 10,
 } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
@@ -40,8 +56,13 @@ export async function runCommand(command, args, {
         resolve({ stdout, stderr });
         return;
       }
+      // Keep build diagnostics even when stderr contains only a generic warning.
+      // Redact before truncation so long credentials cannot leak as partial values.
       const detail = includeFailureStdout
-        ? [stdout.trim().split("\n").slice(-10).join("\n"), stderr.trim()].filter(Boolean).join("\n") || `exit ${code}`
+        ? [
+          redactFailureOutput(stdout, env).trim().split("\n").slice(-failureStdoutLines).join("\n").slice(-12_000),
+          redactFailureOutput(stderr, env).trim().slice(-12_000),
+        ].filter(Boolean).join("\n") || `exit ${code}`
         : stderr.trim() || stdout.trim() || `exit ${code}`;
       reject(new Error(`${commandText(command, args)} failed: ${detail}`));
     });
@@ -430,7 +451,7 @@ export async function deployProduction({
   const previewResult = await run(
     "npx",
     ["netlify-cli", "deploy", "--dir=dist/netlify-site", "--build", "--context=deploy-preview", "--json"],
-    { env },
+    { env, includeFailureStdout: true, failureStdoutLines: 80 },
   );
   const previewDeploy = parseDeployResult(previewResult.stdout);
   if (!previewDeploy.deployUrl) {
@@ -500,7 +521,7 @@ export async function deployProduction({
       "--context=production",
       "--json",
     ],
-    { env },
+    { env, includeFailureStdout: true, failureStdoutLines: 80 },
   );
   try {
     receipt.candidateDeployId = parseDeployResult(deployResult.stdout).deployId;

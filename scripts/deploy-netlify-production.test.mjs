@@ -24,6 +24,71 @@ test("other command failures do not expose stdout when stderr is available", asy
   });
 });
 
+test("successful deploy output remains intact for JSON parsing", async () => {
+  const result = await runCommand(process.execPath, ["-e", 'console.log(JSON.stringify({ deploy_id: "fixture-deploy" })); console.error("build warning");'], {
+    includeFailureStdout: true, failureStdoutLines: 80,
+  });
+  assert.deepEqual(JSON.parse(result.stdout), { deploy_id: "fixture-deploy" });
+  assert.equal(result.stderr, "build warning\n");
+});
+
+test("build failures retain a longer bounded stdout tail beside stderr", async () => {
+  const code = 'for(let i=0;i<100;i++) console.log("build line " + i); console.log("Build failed: missing module"); console.error("Error while running build"); process.exitCode=1;';
+  await assert.rejects(runCommand(process.execPath, ["-e", code], {
+    includeFailureStdout: true,
+    failureStdoutLines: 80,
+  }), error => {
+    const detail = error.message.slice(`${process.execPath} -e ${code} failed: `.length);
+    assert.match(detail, /build line 21\n/);
+    assert.doesNotMatch(detail, /build line 20\n/);
+    assert.match(detail, /Build failed: missing module\nError while running build$/);
+    return true;
+  });
+});
+
+test("opted-in failure output redacts credentials before truncating either stream", async () => {
+  const code = 'console.log("Build failed: " + process.env.NETLIFY_AUTH_TOKEN); console.log("REMOTE_API_KEY=" + process.env.EXAMPLE_REMOTE_VALUE); console.error(process.env.CLOUD_SAVE_R2_SECRET_ACCESS_KEY); console.error("postgresql://user:" + process.env.EXAMPLE_DB_VALUE + "@database.test/app"); console.error("Bearer " + process.env.EXAMPLE_BEARER_VALUE); process.exitCode=1;';
+  await assert.rejects(runCommand(process.execPath, ["-e", code], {
+    env: { ...process.env, NETLIFY_AUTH_TOKEN: "fixture-netlify-secret", CLOUD_SAVE_R2_SECRET_ACCESS_KEY: "fixture-r2-secret", EXAMPLE_REMOTE_VALUE: "remote-fixture-secret", EXAMPLE_DB_VALUE: "remote-password", EXAMPLE_BEARER_VALUE: "remote-bearer-value" },
+    includeFailureStdout: true,
+    failureStdoutLines: 80,
+  }), error => {
+    const detail = error.message.slice(`${process.execPath} -e ${code} failed: `.length);
+    for (const secret of ["fixture-netlify-secret", "fixture-r2-secret", "remote-fixture-secret", "remote-password", "remote-bearer-value"]) {
+      assert.ok(!detail.includes(secret), "Failure detail must redact credentials");
+    }
+    assert.match(detail, /Build failed: \[redacted\]/);
+    assert.match(detail, /REMOTE_API_KEY=\[redacted\]/);
+    assert.match(detail, /postgresql:\/\/\[redacted\]@database\.test/);
+    return true;
+  });
+});
+
+test("a single large build-output line cannot flood failure logs", async () => {
+  const code = 'console.log("x".repeat(30000)); console.log("Build failure marker"); console.error("warning"); process.exitCode=1;';
+  await assert.rejects(runCommand(process.execPath, ["-e", code], {
+    includeFailureStdout: true, failureStdoutLines: 80,
+  }), error => {
+    const detail = error.message.slice(`${process.execPath} -e ${code} failed: `.length);
+    assert.ok(detail.length < 12100);
+    assert.match(detail, /Build failure marker\nwarning$/);
+    return true;
+  });
+});
+
+test("JWTs, private keys and long credentials are redacted before taking output tails", async () => {
+  const code = 'console.log(process.env.TEST_LONG_TOKEN); console.error(process.env.EXAMPLE_JWT_VALUE); console.error(process.env.EXAMPLE_PEM_VALUE); process.exitCode=1;';
+  await assert.rejects(runCommand(process.execPath, ["-e", code], {
+    env: { ...process.env, TEST_LONG_TOKEN: "long-credential-".repeat(2000), EXAMPLE_JWT_VALUE: "eyJfakeheader.fakebody.fakesignature", EXAMPLE_PEM_VALUE: "-----BEGIN PRIVATE KEY-----\nprivate-fixture-content\n-----END PRIVATE KEY-----" },
+    includeFailureStdout: true,
+    failureStdoutLines: 80,
+  }), error => {
+    const detail = error.message.slice(`${process.execPath} -e ${code} failed: `.length);
+    assert.equal(detail, "[redacted]\n[redacted]\n[redacted]");
+    return true;
+  });
+});
+
 const env = {
   NETLIFY_AUTH_TOKEN: "netlify-secret",
   NETLIFY_SITE_ID: "site-123",
@@ -72,7 +137,7 @@ function createHarness({
   let productionVerifyCalls = 0;
   const run = async (command, args, options = {}) => {
     const key = `${command} ${args.join(" ")}`;
-    calls.push({ type: "command", key, env: options.env, includeFailureStdout: options.includeFailureStdout });
+    calls.push({ type: "command", key, env: options.env, includeFailureStdout: options.includeFailureStdout, failureStdoutLines: options.failureStdoutLines });
     if (key === "git rev-parse HEAD") return { stdout: `${head}\n`, stderr: "" };
     if (key === "git rev-parse origin/main") return { stdout: `${originMain}\n`, stderr: "" };
     if (key.includes("netlify-cli database status")) {
@@ -188,8 +253,8 @@ test("accepts the workflow's pushed commit and records a verified receipt", asyn
   const deployCalls = harness.calls.filter((call) => call.key?.includes("netlify-cli deploy"));
   assert.equal(deployCalls.length, 2);
   for (const call of harness.calls.filter(call => call.type === "command")) {
-    assert.equal(call.includeFailureStdout === true, /scripts\/verify-/.test(call.key),
-      "failed progress output must be enabled only for verification commands");
+    assert.equal(call.includeFailureStdout === true, /scripts\/verify-|netlify-cli deploy/.test(call.key),
+      "failed progress output must be enabled only for verification and deploy commands");
   }
   const helperCheckIndex = harness.calls.findIndex((call) => call.type === "helper-assets");
   assert.ok(helperCheckIndex >= 0);
@@ -200,6 +265,7 @@ test("accepts the workflow's pushed commit and records a verified receipt", asyn
   assert.equal(deployCalls[1].key.includes("--prod"), true);
   assert.equal(deployCalls[1].key.includes("--build"), true);
   assert.equal(deployCalls[1].key.includes("--context=production"), true);
+  for (const call of deployCalls) assert.equal(call.failureStdoutLines, 80);
   assert.equal(receipt.previewMigrationCount, 13);
   assert.deepEqual(receipt.pendingProductionMigrations, migrationNames.slice(9));
   assert.equal(receipt.previewDatabaseBranchId, "preview-database-1");
