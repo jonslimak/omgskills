@@ -129,6 +129,8 @@ export type CloudSavedSkill = {
 
 export type CloudSkillReview = {
   key: string;
+  /** The Mac whose copy is waiting. */
+  deviceId: string | null;
   files: { path: string; findings: SecretFinding[] }[];
   confirmed: boolean;
   updatedAt: string;
@@ -170,10 +172,11 @@ const versionColumns = `
 `;
 
 async function readReviews(db: Database, userId: string): Promise<CloudSkillReview[]> {
-  const result = await db.query<{ key: string; files: HeldFile[]; confirmed: boolean; updatedAt: string }>(
+  const result = await db.query<{ key: string; deviceId: string | null; files: HeldFile[]; confirmed: boolean; updatedAt: string }>(
     `
       SELECT
         review.skill_key AS key,
+        review.device_id AS "deviceId",
         review.files,
         to_char(review.updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "updatedAt",
         NOT EXISTS (
@@ -191,6 +194,7 @@ async function readReviews(db: Database, userId: string): Promise<CloudSkillRevi
   );
   return result.rows.map((row) => ({
     key: row.key,
+    deviceId: row.deviceId,
     files: row.files.map(({ path, findings }) => ({ path, findings })),
     confirmed: row.confirmed,
     updatedAt: row.updatedAt
@@ -614,12 +618,15 @@ async function lockCloudSource(client: PoolClient, userId: string, skillKey: str
  */
 export async function markDeletedLocally(
   db: Database,
-  input: { userId: string; skillKey: unknown; deleted: unknown }
+  input: { userId: string; deviceId?: string | null; skillKey: unknown; deleted: unknown }
 ): Promise<{ key: string; deletedLocallyAt: string | null }> {
   const skillKey = normalizeSkillKey(input.skillKey);
   if (typeof input.deleted !== "boolean") throw new CloudSaveError("invalid_request", "deleted must be true or false");
+  // Only the review for this Mac's copy; another Mac may still have the skill waiting.
   const review = input.deleted
-    ? await db.query("DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2", [input.userId, skillKey])
+    ? await db.query(
+      "DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2 AND device_id IS NOT DISTINCT FROM $3",
+      [input.userId, skillKey, input.deviceId ?? null])
     : { rowCount: 0 };
   const result = await db.query<{ deletedLocallyAt: string | null }>(
     `

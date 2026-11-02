@@ -471,10 +471,14 @@ test("a review belongs to its Mac's copy, and deleting the skill there clears it
     assert.equal((await readCloudSave(pool, userId)).needsReview.length, 1);
 
     // Deleting the skill on the first Mac clears it, even for a skill never saved.
-    await markDeletedLocally(pool, { userId, skillKey: "deploy", deleted: true });
+    assert.equal((await readCloudSave(pool, userId)).needsReview[0].deviceId, first.deviceId);
+    await markDeletedLocally(pool, { userId, deviceId: second.rows[0].id, skillKey: "deploy", deleted: true });
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 1, "another Mac deleting it leaves this review");
+    await markDeletedLocally(pool, { userId, deviceId: first.deviceId, skillKey: "deploy", deleted: true });
     assert.equal((await readCloudSave(pool, userId)).needsReview.length, 0);
     await assert.rejects(saveCloudVersion(pool, { userId, deviceId: first.deviceId, skillKey: "fresh", files: manifest(held) }));
-    assert.deepEqual(await markDeletedLocally(pool, { userId, skillKey: "fresh", deleted: true }), { key: "fresh", deletedLocallyAt: null });
+    assert.deepEqual(await markDeletedLocally(pool, { userId, deviceId: first.deviceId, skillKey: "fresh", deleted: true }),
+      { key: "fresh", deletedLocallyAt: null });
     assert.equal((await readCloudSave(pool, userId)).needsReview.length, 0);
   });
 });
