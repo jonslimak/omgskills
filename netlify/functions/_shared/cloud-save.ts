@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import type { Pool, PoolClient, QueryResult, QueryResultRow } from "pg";
 import { appendSkillRelease } from "./group-storage.js";
 import { cloudBlobKey, type CloudObjectStore } from "./cloud-store.js";
+import { combineLabels, pathLabels, scanFileContents, type SecretFinding, type SkillLabel } from "./skill-scan.js";
 import {
   BROKER_SKILL_PACKAGE_LIMITS,
   gitObjectSha,
@@ -40,10 +41,18 @@ export type CloudSaveErrorCode =
   | "blob_mismatch"
   | "file_too_large"
   | "quota_exceeded"
+  | "needs_review"
   | "not_found";
 
+export type HeldFile = { path: string; blobSha: string; findings: SecretFinding[] };
+
 export class CloudSaveError extends Error {
-  constructor(readonly code: CloudSaveErrorCode, message: string, readonly detail?: string) {
+  constructor(
+    readonly code: CloudSaveErrorCode,
+    message: string,
+    readonly detail?: string,
+    readonly heldFiles?: HeldFile[] | SecretFinding[]
+  ) {
     super(message);
     this.name = "CloudSaveError";
   }
@@ -59,6 +68,7 @@ const statusByCode: Record<CloudSaveErrorCode, number> = {
   blob_mismatch: 422,
   file_too_large: 413,
   quota_exceeded: 413,
+  needs_review: 422,
   not_found: 404
 };
 
@@ -107,6 +117,7 @@ export type CloudSavedVersion = {
   totalBytes: number;
   deviceId: string | null;
   savedAt: string;
+  labels: SkillLabel[];
 };
 
 export type CloudSavedSkill = {
@@ -116,10 +127,20 @@ export type CloudSavedSkill = {
   deletedLocallyAt: string | null;
 };
 
+export type CloudSkillReview = {
+  key: string;
+  /** The Mac whose copy is waiting. */
+  deviceId: string | null;
+  files: { path: string; findings: SecretFinding[] }[];
+  confirmed: boolean;
+  updatedAt: string;
+};
+
 export type CloudSaveState = {
   settings: CloudSaveSettings;
   usage: { bytes: number; limitBytes: number };
   skills: CloudSavedSkill[];
+  needsReview: CloudSkillReview[];
 };
 
 export async function readCloudSaveSettings(db: Database, userId: string): Promise<CloudSaveSettings> {
@@ -146,11 +167,42 @@ const versionColumns = `
   cloud.file_count AS "fileCount",
   cloud.total_bytes AS "totalBytes",
   cloud.device_id AS "deviceId",
-  to_char(release.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "savedAt"
+  to_char(release.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "savedAt",
+  cloud.labels
 `;
 
+async function readReviews(db: Database, userId: string): Promise<CloudSkillReview[]> {
+  const result = await db.query<{ key: string; deviceId: string | null; files: HeldFile[]; confirmed: boolean; updatedAt: string }>(
+    `
+      SELECT
+        review.skill_key AS key,
+        review.device_id AS "deviceId",
+        review.files,
+        to_char(review.updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "updatedAt",
+        NOT EXISTS (
+          SELECT 1
+          FROM jsonb_array_elements(review.files) AS file
+          LEFT JOIN cloud_secret_holds hold
+            ON hold.user_id = review.user_id AND hold.blob_sha = file->>'blobSha'
+          WHERE hold.confirmed_at IS NULL
+        ) AS confirmed
+      FROM cloud_skill_reviews review
+      WHERE review.user_id = $1
+      ORDER BY review.skill_key
+    `,
+    [userId]
+  );
+  return result.rows.map((row) => ({
+    key: row.key,
+    deviceId: row.deviceId,
+    files: row.files.map(({ path, findings }) => ({ path, findings })),
+    confirmed: row.confirmed,
+    updatedAt: row.updatedAt
+  }));
+}
+
 export async function readCloudSave(db: Database, userId: string): Promise<CloudSaveState> {
-  const [settings, bytes, skills] = await Promise.all([
+  const [settings, bytes, skills, needsReview] = await Promise.all([
     readCloudSaveSettings(db, userId),
     usedBytes(db, userId),
     db.query<CloudSavedVersion & { key: string; versionCount: number; deletedLocallyAt: string | null }>(
@@ -167,10 +219,12 @@ export async function readCloudSave(db: Database, userId: string): Promise<Cloud
         ORDER BY saved.skill_key
       `,
       [userId]
-    )
+    ),
+    readReviews(db, userId)
   ]);
   return {
     settings,
+    needsReview,
     usage: { bytes, limitBytes: CLOUD_SAVE_LIMITS.maximumUserBytes },
     skills: skills.rows.map(({ key, versionCount, deletedLocallyAt, ...version }) => ({
       key,
@@ -227,12 +281,16 @@ async function requireSavingEnabled(db: Database, userId: string, skillKey?: str
   }
 }
 
-/** Stores one file's contents, named by its git blob hash. Saving the same file again is a no-op. */
+/**
+ * Stores one file's contents, named by its git blob hash. Saving the same file again is a no-op.
+ * A file that looks like it contains a key or password is held back, unless the user has
+ * confirmed it (here with confirmSecrets, or earlier through its skill's review).
+ */
 export async function storeCloudBlob(
   pool: Pool,
   store: CloudObjectStore,
-  input: { userId: string; blobSha: unknown; data: Uint8Array }
-): Promise<{ blobSha: string; stored: boolean }> {
+  input: { userId: string; deviceId?: string | null; blobSha: unknown; data: Uint8Array; confirmSecrets?: boolean }
+): Promise<{ blobSha: string; stored: boolean; labels: SkillLabel[] }> {
   const blobSha = requireBlobSha(input.blobSha);
   if (input.data.byteLength > CLOUD_SAVE_LIMITS.maximumFileBytes) {
     throw new CloudSaveError("file_too_large", "File is too large to save");
@@ -240,21 +298,50 @@ export async function storeCloudBlob(
   if (gitObjectSha("blob", input.data) !== blobSha) {
     throw new CloudSaveError("blob_mismatch", "File contents do not match their hash");
   }
+  // Checked again under the upload lock; this keeps a turned-off account from recording holds.
+  await requireSavingEnabled(pool, input.userId);
+  const existing = await pool.query(
+    "SELECT 1 FROM cloud_blobs WHERE user_id = $1 AND blob_sha = $2",
+    [input.userId, blobSha]
+  );
+  if (existing.rowCount) return { blobSha, stored: false, labels: [] };
+  const scan = scanFileContents(input.data);
+  const labels: SkillLabel[] = [...scan.labels];
+  if (scan.secrets.length) {
+    // Recorded outside the upload's transaction: a held file's review must outlive the refusal.
+    const hold = await pool.query<{ confirmed: boolean }>(
+      `
+        INSERT INTO cloud_secret_holds (user_id, blob_sha, findings, confirmed_at, confirmed_by_device_id)
+        VALUES ($1, $2, $3::jsonb, CASE WHEN $4 THEN now() END, CASE WHEN $4 THEN $5::uuid END)
+        ON CONFLICT (user_id, blob_sha) DO UPDATE SET
+          findings = EXCLUDED.findings,
+          confirmed_at = COALESCE(cloud_secret_holds.confirmed_at, EXCLUDED.confirmed_at),
+          confirmed_by_device_id = COALESCE(cloud_secret_holds.confirmed_by_device_id, EXCLUDED.confirmed_by_device_id)
+        RETURNING confirmed_at IS NOT NULL AS confirmed
+      `,
+      [input.userId, blobSha, JSON.stringify(scan.secrets), input.confirmSecrets === true, input.deviceId ?? null]
+    );
+    if (!hold.rows[0].confirmed) {
+      throw new CloudSaveError("needs_review", "This file looks like it contains a key or password", undefined, scan.secrets);
+    }
+    labels.push("confirmed_secret");
+  }
+  const blobLabels = combineLabels([labels]);
   return withUploadLock(pool, input.userId, async (client) => {
-    const existing = await client.query(
+    const stored = await client.query(
       "SELECT 1 FROM cloud_blobs WHERE user_id = $1 AND blob_sha = $2",
       [input.userId, blobSha]
     );
-    if (existing.rowCount) return { blobSha, stored: false };
+    if (stored.rowCount) return { blobSha, stored: false, labels: [] };
     if (await usedBytes(client, input.userId) + input.data.byteLength > CLOUD_SAVE_LIMITS.maximumUserBytes) {
       throw new CloudSaveError("quota_exceeded", "Cloud storage is full");
     }
     await store.put(cloudBlobKey(input.userId, blobSha), input.data);
     await client.query(
-      "INSERT INTO cloud_blobs (user_id, blob_sha, byte_size) VALUES ($1, $2, $3)",
-      [input.userId, blobSha, input.data.byteLength]
+      "INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels) VALUES ($1, $2, $3, $4)",
+      [input.userId, blobSha, input.data.byteLength, blobLabels]
     );
-    return { blobSha, stored: true };
+    return { blobSha, stored: true, labels: blobLabels };
   });
 }
 
@@ -347,17 +434,37 @@ export async function saveCloudVersion(
   }
 
   const hashes = [...new Set(input.files.map((file) => file.blobSha))];
-  const stored = await pool.query<{ blob_sha: string; byte_size: number }>(
-    "SELECT blob_sha, byte_size FROM cloud_blobs WHERE user_id = $1 AND blob_sha = ANY($2::text[])",
+  const stored = await pool.query<{ blob_sha: string; byte_size: number; labels: string[] }>(
+    "SELECT blob_sha, byte_size, labels FROM cloud_blobs WHERE user_id = $1 AND blob_sha = ANY($2::text[])",
     [input.userId, hashes]
   );
   const sizes = new Map(stored.rows.map((row) => [row.blob_sha, row.byte_size]));
   const missing = hashes.filter((hash) => !sizes.has(hash));
-  if (missing.length) return { status: "missing_files", missing };
+  if (missing.length) {
+    const held = await heldFiles(pool, input.userId, input.files.filter((file) => missing.includes(file.blobSha)));
+    if (held.length) {
+      await pool.query(
+        `
+          INSERT INTO cloud_skill_reviews (user_id, skill_key, device_id, files)
+          VALUES ($1, $2, $3, $4::jsonb)
+          ON CONFLICT (user_id, skill_key) DO UPDATE SET
+            device_id = EXCLUDED.device_id, files = EXCLUDED.files, updated_at = now()
+        `,
+        [input.userId, skillKey, input.deviceId, JSON.stringify(held)]
+      );
+      throw new CloudSaveError("needs_review", "This skill has files that look like they contain a key or password", undefined, held);
+    }
+    return { status: "missing_files", missing };
+  }
   const wrongSize = input.files.find((file) => sizes.get(file.blobSha) !== file.byteSize);
   if (wrongSize) {
     throw new CloudSaveError("invalid_package", "A file's size does not match its stored contents", wrongSize.path);
   }
+
+  const labels = combineLabels([
+    ...stored.rows.map((row) => row.labels),
+    ...input.files.map((file) => pathLabels(file.path, file.mode))
+  ]);
 
   const client = await pool.connect();
   try {
@@ -383,6 +490,11 @@ export async function saveCloudVersion(
       [sourceId]
     );
     if (current.rows[0]?.treeSha === manifest.treeSha) {
+      // Only this Mac's own waiting copy is settled by matching the current version.
+      await client.query(
+        "DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2 AND device_id IS NOT DISTINCT FROM $3",
+        [input.userId, skillKey, input.deviceId]
+      );
       await client.query("COMMIT");
       return { status: "saved", created: false,
         skill: { key: skillKey, currentVersion: await readVersion(pool, current.rows[0].releaseId) } };
@@ -397,10 +509,10 @@ export async function saveCloudVersion(
     });
     await client.query(
       `
-        INSERT INTO cloud_releases (release_id, source_id, device_id, file_count, total_bytes)
-        VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO cloud_releases (release_id, source_id, device_id, file_count, total_bytes, labels)
+        VALUES ($1, $2, $3, $4, $5, $6)
       `,
-      [releaseId, sourceId, input.deviceId, manifest.fileCount, manifest.totalBytes]
+      [releaseId, sourceId, input.deviceId, manifest.fileCount, manifest.totalBytes, labels]
     );
     await client.query(
       `
@@ -428,6 +540,7 @@ export async function saveCloudVersion(
       `,
       [sourceId, input.userId, skillKey, releaseId]
     );
+    await client.query("DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2", [input.userId, skillKey]);
     await client.query("COMMIT");
     return { status: "saved", created: true, skill: { key: skillKey, currentVersion: await readVersion(pool, releaseId) } };
   } catch (error) {
@@ -436,6 +549,57 @@ export async function saveCloudVersion(
   } finally {
     client.release();
   }
+}
+
+/** Missing files still waiting for the user. Confirmed ones are ordinary missing files: the Mac uploads them next. */
+async function heldFiles(db: Database, userId: string, files: SkillManifestEntry[]): Promise<HeldFile[]> {
+  if (!files.length) return [];
+  const holds = await db.query<{ blob_sha: string; findings: SecretFinding[] }>(
+    `
+      SELECT blob_sha, findings FROM cloud_secret_holds
+      WHERE user_id = $1 AND blob_sha = ANY($2::text[]) AND confirmed_at IS NULL
+    `,
+    [userId, files.map((file) => file.blobSha)]
+  );
+  const findings = new Map(holds.rows.map((row) => [row.blob_sha, row.findings]));
+  return files
+    .filter((file) => findings.has(file.blobSha))
+    .map((file) => ({ path: file.path, blobSha: file.blobSha, findings: findings.get(file.blobSha)! }));
+}
+
+/** Removes the review for this Mac's waiting copy of a skill, if there is one. Saved copies are untouched. */
+export async function dropSkillReview(
+  db: Database,
+  input: { userId: string; deviceId: string | null; skillKey: unknown }
+): Promise<void> {
+  await db.query(
+    "DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2 AND device_id IS NOT DISTINCT FROM $3",
+    [input.userId, normalizeSkillKey(input.skillKey), input.deviceId]
+  );
+}
+
+/** The user confirms a held skill is safe; its held files then save on the next try. */
+export async function confirmSkillReview(
+  db: Database,
+  input: { userId: string; deviceId: string | null; skillKey: unknown }
+): Promise<CloudSkillReview> {
+  const skillKey = normalizeSkillKey(input.skillKey);
+  const result = await db.query(
+    `
+      UPDATE cloud_secret_holds hold
+      SET confirmed_at = COALESCE(hold.confirmed_at, now()),
+          confirmed_by_device_id = COALESCE(hold.confirmed_by_device_id, $3::uuid)
+      FROM cloud_skill_reviews review, jsonb_array_elements(review.files) AS file
+      WHERE review.user_id = $1 AND review.skill_key = $2
+        AND hold.user_id = review.user_id AND hold.blob_sha = file->>'blobSha'
+      RETURNING hold.blob_sha
+    `,
+    [input.userId, skillKey, input.deviceId]
+  );
+  if (!result.rowCount) throw new CloudSaveError("not_found", "Nothing is waiting for review for this skill");
+  const review = (await readReviews(db, input.userId)).find((candidate) => candidate.key === skillKey);
+  if (!review) throw new CloudSaveError("not_found", "Nothing is waiting for review for this skill");
+  return review;
 }
 
 async function lockCloudSource(client: PoolClient, userId: string, skillKey: string): Promise<string> {
@@ -459,13 +623,22 @@ async function lockCloudSource(client: PoolClient, userId: string, skillKey: str
   return result.rows[0].id;
 }
 
-/** Marks a saved skill as deleted (or back) on the user's Mac. Its cloud copy is kept. */
+/**
+ * Marks a saved skill as deleted (or back) on the user's Mac. Its cloud copy is kept. A skill
+ * deleted while waiting for review no longer waits; a review alone is enough to find it.
+ */
 export async function markDeletedLocally(
   db: Database,
-  input: { userId: string; skillKey: unknown; deleted: unknown }
+  input: { userId: string; deviceId?: string | null; skillKey: unknown; deleted: unknown }
 ): Promise<{ key: string; deletedLocallyAt: string | null }> {
   const skillKey = normalizeSkillKey(input.skillKey);
   if (typeof input.deleted !== "boolean") throw new CloudSaveError("invalid_request", "deleted must be true or false");
+  // Only the review for this Mac's copy; another Mac may still have the skill waiting.
+  const review = input.deleted
+    ? await db.query(
+      "DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2 AND device_id IS NOT DISTINCT FROM $3",
+      [input.userId, skillKey, input.deviceId ?? null])
+    : { rowCount: 0 };
   const result = await db.query<{ deletedLocallyAt: string | null }>(
     `
       UPDATE cloud_saved_skills
@@ -476,7 +649,10 @@ export async function markDeletedLocally(
     `,
     [input.userId, skillKey, input.deleted]
   );
-  if (!result.rows[0]) throw new CloudSaveError("not_found", "Saved skill not found");
+  if (!result.rows[0]) {
+    if (review.rowCount) return { key: skillKey, deletedLocallyAt: null };
+    throw new CloudSaveError("not_found", "Saved skill not found");
+  }
   return { key: skillKey, deletedLocallyAt: result.rows[0].deletedLocallyAt };
 }
 

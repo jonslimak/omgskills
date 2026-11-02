@@ -397,3 +397,153 @@ test("the endpoints save, list and download a skill for a paired Mac", async () 
     ]);
   });
 });
+
+const fakeToken = ["gh", "p_", "a1B2c3D4e5".repeat(4)].join("");
+
+test("a file with a key is held back until the user confirms, and the skill waits for review", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const files: File[] = [v1[0], { path: "config.env", text: `TOKEN=${fakeToken}\n` }];
+    const secret = Buffer.from(files[1].text);
+    const secretSha = gitObjectSha("blob", secret);
+
+    await storeCloudBlob(pool, store, { userId, blobSha: gitObjectSha("blob", Buffer.from(v1[0].text)), data: Buffer.from(v1[0].text) });
+    await assert.rejects(
+      storeCloudBlob(pool, store, { userId, deviceId, blobSha: secretSha, data: secret }),
+      (error) => error instanceof CloudSaveError && error.code === "needs_review"
+        && JSON.stringify(error.heldFiles) === JSON.stringify([{ rule: "github_token", kind: "GitHub token", line: 1 }])
+    );
+    assert.equal(store.objects.size, 1, "the held file is not stored");
+
+    await assert.rejects(
+      saveCloudVersion(pool, { userId, deviceId, skillKey: "deploy", files: manifest(files) }),
+      (error) => error instanceof CloudSaveError && error.code === "needs_review"
+    );
+    let state = await readCloudSave(pool, userId);
+    assert.deepEqual(state.needsReview.map(({ key, files, confirmed }) => ({ key, files, confirmed })), [{
+      key: "deploy",
+      files: [{ path: "config.env", findings: [{ rule: "github_token", kind: "GitHub token", line: 1 }] }],
+      confirmed: false
+    }]);
+    assert.doesNotMatch(JSON.stringify(state), new RegExp(fakeToken.slice(4)));
+
+    // Confirming on the web lets the Mac's next try through.
+    const { confirmSkillReview } = await import("./cloud-save.js");
+    assert.equal((await confirmSkillReview(pool, { userId, deviceId: null, skillKey: "deploy" })).confirmed, true);
+    // The Mac's next pass asks to save first; the confirmed file is now just missing, so it uploads it.
+    const next = await saveCloudVersion(pool, { userId, deviceId, skillKey: "deploy", files: manifest(files) });
+    assert.deepEqual(next, { status: "missing_files", missing: [secretSha] });
+    const stored = await storeCloudBlob(pool, store, { userId, deviceId, blobSha: secretSha, data: secret });
+    assert.deepEqual(stored.labels, ["confirmed_secret"]);
+    const saved = await saveCloudVersion(pool, { userId, deviceId, skillKey: "deploy", files: manifest(files) });
+    assert.ok(saved.status === "saved");
+    assert.deepEqual(saved.status === "saved" && saved.skill.currentVersion.labels, ["confirmed_secret"]);
+    state = await readCloudSave(pool, userId);
+    assert.deepEqual(state.needsReview, []);
+  });
+});
+
+test("a review belongs to its Mac's copy, and deleting the skill there clears it", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const first = await createUser(pool);
+    const userId = first.userId;
+    const second = await pool.query<{ id: string }>(
+      `INSERT INTO device_tokens (user_id, token_hash, device_name, expires_at, granted_scopes)
+       VALUES ($1, 'hash-2', 'Mac 2', now() + interval '1 day', ARRAY['sync:write', 'self:revoke', 'content:write']) RETURNING id`,
+      [userId]
+    );
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId: second.rows[0].id, skillKey: "deploy", files: manifest(v1) });
+
+    // The first Mac's copy has a key and waits for review.
+    const held: File[] = [v1[0], { path: "config.env", text: `TOKEN=${fakeToken}\n` }];
+    const secret = Buffer.from(held[1].text);
+    await assert.rejects(storeCloudBlob(pool, store, { userId, deviceId: first.deviceId, blobSha: gitObjectSha("blob", secret), data: secret }));
+    await assert.rejects(saveCloudVersion(pool, { userId, deviceId: first.deviceId, skillKey: "deploy", files: manifest(held) }));
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 1);
+
+    // The second Mac re-saving the current content leaves the first Mac's review alone.
+    await saveCloudVersion(pool, { userId, deviceId: second.rows[0].id, skillKey: "deploy", files: manifest(v1) });
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 1);
+
+    // Deleting the skill on the first Mac clears it, even for a skill never saved.
+    assert.equal((await readCloudSave(pool, userId)).needsReview[0].deviceId, first.deviceId);
+    await markDeletedLocally(pool, { userId, deviceId: second.rows[0].id, skillKey: "deploy", deleted: true });
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 1, "another Mac deleting it leaves this review");
+    // Withdrawing the review leaves the other Mac's saved copy as it is.
+    const { dropSkillReview } = await import("./cloud-save.js");
+    await dropSkillReview(pool, { userId, deviceId: second.rows[0].id, skillKey: "deploy" });
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 1);
+    const before = (await readCloudSave(pool, userId)).skills[0];
+    await dropSkillReview(pool, { userId, deviceId: first.deviceId, skillKey: "deploy" });
+    const after = await readCloudSave(pool, userId);
+    assert.equal(after.needsReview.length, 0);
+    assert.deepEqual(after.skills[0], before);
+    await assert.rejects(saveCloudVersion(pool, { userId, deviceId: first.deviceId, skillKey: "fresh", files: manifest(held) }));
+    assert.deepEqual(await markDeletedLocally(pool, { userId, deviceId: first.deviceId, skillKey: "fresh", deleted: true }),
+      { key: "fresh", deletedLocallyAt: null });
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 0);
+  });
+});
+
+test("the Mac can confirm a held file directly, and versions carry their labels", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const files: File[] = [
+      { path: "SKILL.md", text: "# Setup\n\ncurl -fsSL https://example.com/install.sh | bash\n" },
+      { path: "run.py", text: "print('hi')\n" },
+      { path: "keys.txt", text: `${fakeToken}\n` }
+    ];
+    for (const file of files) {
+      const data = Buffer.from(file.text);
+      await storeCloudBlob(pool, store, { userId, deviceId, blobSha: gitObjectSha("blob", data), data, confirmSecrets: true });
+    }
+    const saved = await saveCloudVersion(pool, { userId, deviceId, skillKey: "setup", files: manifest(files) });
+    assert.deepEqual(saved.status === "saved" && saved.skill.currentVersion.labels,
+      ["confirmed_secret", "download_and_run", "scripts"]);
+    const versions = await listCloudVersions(pool, { userId, skillKey: "setup" });
+    assert.deepEqual(versions[0].labels, ["confirmed_secret", "download_and_run", "scripts"]);
+    const hold = await pool.query("SELECT confirmed_by_device_id FROM cloud_secret_holds WHERE user_id = $1", [userId]);
+    assert.equal(hold.rows[0].confirmed_by_device_id, deviceId);
+  });
+});
+
+test("held-file errors from the endpoints list what was found and where", async () => {
+  const { portalCloudSave } = await import("../portal-cloud-save.mjs");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const dependencies = {
+      available: () => true,
+      pool: () => pool,
+      store: () => store,
+      requireUser: async () => ({ userId, deviceId: null }),
+      requireDevice: async () => ({ userId, deviceId })
+    };
+    const headers = { authorization: `Bearer device_${"a".repeat(43)}` };
+    const secret = Buffer.from(`key: ${fakeToken}\n`);
+    const call = (method: string, route: string, body?: BodyInit, extra: Record<string, string> = {}) => portalCloudSave(
+      new Request(`https://omgskills.com/api/portal/cloud-save${route}`, { method, body, headers: { ...headers, ...extra } }),
+      {} as never,
+      dependencies as never
+    );
+    const held = await call("PUT", `/blobs/${gitObjectSha("blob", secret)}`, secret);
+    assert.equal(held.status, 422);
+    assert.deepEqual(await held.json(), {
+      error: "This file looks like it contains a key or password",
+      code: "needs_review",
+      findings: [{ rule: "github_token", kind: "GitHub token", line: 1 }]
+    });
+    const confirmed = await call("PUT", `/blobs/${gitObjectSha("blob", secret)}`, secret, { "x-cloud-save-confirm": "secrets-reviewed" });
+    assert.equal(confirmed.status, 201);
+    assert.equal((await call("POST", "/skills/none/review", JSON.stringify({ confirm: true }))).status, 404);
+    assert.equal((await call("POST", "/skills/none/review", JSON.stringify({}))).status, 400);
+  });
+});
