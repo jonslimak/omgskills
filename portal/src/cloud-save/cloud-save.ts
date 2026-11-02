@@ -43,9 +43,9 @@ export function confirmCloudReview(api: PortalApi, key: string) {
   return api(`${base}/skills/${encodeURIComponent(key)}/review`, { method: "POST", body: JSON.stringify({ confirm: true }) });
 }
 
-/** A skill's identity across agents and Macs, matching the server: the folder name, NFC and lower case. */
+/** A skill's identity across agents and Macs, matching the server and the Mac: the folder name, NFC and lower case, untrimmed. */
 export function cloudSkillKey(name: string) {
-  return name.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  return name.normalize("NFC").toLowerCase();
 }
 
 export type CloudSkillRow = {

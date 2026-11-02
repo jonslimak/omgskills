@@ -22,7 +22,8 @@ const saved = (key: string, deletedLocallyAt: string | null = null) => ({
 });
 
 test("skill keys match the server's folder-name identity", () => {
-  assert.equal(cloudSkillKey("  My-Notes "), "my-notes");
+  assert.equal(cloudSkillKey("My-Notes"), "my-notes");
+  assert.equal(cloudSkillKey(" padded"), " padded");
   assert.equal(cloudSkillKey("Café"), "café");
 });
 
