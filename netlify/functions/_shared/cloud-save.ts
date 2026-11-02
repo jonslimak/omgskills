@@ -157,6 +157,7 @@ async function usedBytes(db: Database, userId: string): Promise<number> {
   return Number(result.rows[0].bytes);
 }
 
+// Times are ISO 8601 in UTC with milliseconds, which every browser and the Mac parse.
 const versionColumns = `
   release.id,
   release.tree_sha AS "treeSha",
@@ -164,7 +165,7 @@ const versionColumns = `
   cloud.file_count AS "fileCount",
   cloud.total_bytes AS "totalBytes",
   cloud.device_id AS "deviceId",
-  release.created_at::text AS "savedAt",
+  to_char(release.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "savedAt",
   cloud.labels
 `;
 
@@ -174,7 +175,7 @@ async function readReviews(db: Database, userId: string): Promise<CloudSkillRevi
       SELECT
         review.skill_key AS key,
         review.files,
-        review.updated_at::text AS "updatedAt",
+        to_char(review.updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "updatedAt",
         NOT EXISTS (
           SELECT 1
           FROM jsonb_array_elements(review.files) AS file
@@ -204,7 +205,7 @@ export async function readCloudSave(db: Database, userId: string): Promise<Cloud
       `
         SELECT
           saved.skill_key AS key,
-          saved.deleted_locally_at::text AS "deletedLocallyAt",
+          to_char(saved.deleted_locally_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "deletedLocallyAt",
           (SELECT count(*)::int FROM skill_releases WHERE source_id = saved.source_id) AS "versionCount",
           ${versionColumns}
         FROM cloud_saved_skills saved
@@ -615,7 +616,7 @@ export async function markDeletedLocally(
       SET deleted_locally_at = CASE WHEN $3 THEN COALESCE(deleted_locally_at, now()) ELSE NULL END,
           updated_at = now()
       WHERE user_id = $1 AND skill_key = $2
-      RETURNING deleted_locally_at::text AS "deletedLocallyAt"
+      RETURNING to_char(deleted_locally_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "deletedLocallyAt"
     `,
     [input.userId, skillKey, input.deleted]
   );
