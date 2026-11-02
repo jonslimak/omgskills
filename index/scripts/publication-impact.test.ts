@@ -27,7 +27,7 @@ function fixture(t: TestContext, input: {
   track?: PublicationTrack;
 } = {}) {
   const root = mkdtempSync(join(tmpdir(), "publication-impact-"));
-  const dataDir = input.track === "v2" ? join(root, "site/data/v2") : join(root, "data");
+  const dataDir = input.track && input.track !== "root" ? join(root, "site/data", input.track) : join(root, "data");
   mkdirSync(dataDir, { recursive: true });
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const manifest: Record<string, unknown> = {
@@ -67,26 +67,28 @@ function fixture(t: TestContext, input: {
   };
 }
 
-test("content report refresh has no catalog churn and passes v2 impact without overriding removals", (t) => {
-  const f = fixture(t, { track: "v2", skills: ["owner/repo:one", "owner/repo:two"] });
-  mkdirSync(join(f.root, "index"));
-  writeFileSync(join(f.root, "index/skills.json"), readFileSync(join(f.dataDir, "skills.json")));
-  writeFileSync(join(f.root, "index/trending.json"), '[{"id":"owner/repo:one"}]\n');
-  const baseline = f.snapshot();
-  const script = new URL("../../scripts/publish-content-data.mjs", import.meta.url).href;
-  execFileSync(process.execPath, ["--input-type=module", "-e", `
-    import { publishContentData } from ${JSON.stringify(script)};
-    publishContentData({ repoRoot: process.argv[1], generatedAt: "2026-11-02T14:00:00Z" });
-  `, f.root]);
-  const next = f.snapshot();
-  const report = evaluatePublicationImpact({ baseline, proposed: next });
-  assert.equal(report.blocked, false, JSON.stringify(report.issues));
-  assert.equal(report.skills.addedCount, 0);
-  assert.equal(report.skills.removedCount, 0);
-  assert.equal(report.override.enabled, false);
-  assert.deepEqual(next.assets.skills, baseline.assets.skills);
-  assert.deepEqual(next.skills, baseline.skills);
-});
+for (const track of ["v2", "crawl4"] as const) {
+  test(`content report refresh has no catalog churn and passes ${track} impact without overriding removals`, (t) => {
+    const f = fixture(t, { track, skills: ["owner/repo:one", "owner/repo:two"] });
+    mkdirSync(join(f.root, "index"));
+    writeFileSync(join(f.root, "index/skills.json"), readFileSync(join(f.dataDir, "skills.json")));
+    writeFileSync(join(f.root, "index/trending.json"), '[{"id":"owner/repo:one"}]\n');
+    const baseline = f.snapshot();
+    const script = new URL("../../scripts/publish-content-data.mjs", import.meta.url).href;
+    execFileSync(process.execPath, ["--input-type=module", "-e", `
+      import { publishContentData } from ${JSON.stringify(script)};
+      publishContentData({ repoRoot: process.argv[1], track: ${JSON.stringify(track)}, generatedAt: "2026-11-02T14:00:00Z" });
+    `, f.root]);
+    const next = f.snapshot();
+    const report = evaluatePublicationImpact({ baseline, proposed: next });
+    assert.equal(report.blocked, false, JSON.stringify(report.issues));
+    assert.equal(report.skills.addedCount, 0);
+    assert.equal(report.skills.removedCount, 0);
+    assert.equal(report.override.enabled, false);
+    assert.deepEqual(next.assets.skills, baseline.assets.skills);
+    assert.deepEqual(next.skills, baseline.skills);
+  });
+}
 
 function proposed(
   snapshot: PublicationSnapshot,
