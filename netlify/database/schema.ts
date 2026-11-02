@@ -575,3 +575,16 @@ export const cloudSkillReviews = pgTable(
     check("cloud_skill_reviews_files_check", sql`jsonb_typeof(${table.files}) = 'array'`)
   ]
 );
+
+export const cloudPurgeQueue = pgTable(
+  "cloud_purge_queue",
+  {
+    userId: uuid("user_id").notNull(),
+    blobSha: text("blob_sha").notNull(),
+    queuedAt: timestamp("queued_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.blobSha] }),
+    check("cloud_purge_queue_sha_check", sql`${table.blobSha} ~ '^[0-9a-f]{40}$'`)
+  ]
+);

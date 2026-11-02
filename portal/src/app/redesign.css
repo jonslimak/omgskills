@@ -1247,3 +1247,17 @@ button.rd-skill-title:hover {
   gap: 12px;
   margin-top: 8px;
 }
+.cloud-save-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.cloud-save-delete-all {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}

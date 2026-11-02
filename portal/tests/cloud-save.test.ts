@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { PortalApiError } from "../src/api-error";
-import { cloudSkillKey, cloudSkillRows, formatBytes, loadCloudSave, type CloudSaveState } from "../src/cloud-save/cloud-save";
+import { cloudSkillKey, cloudSkillRows, deleteCloudSaved, formatBytes, loadCloudSave, type CloudSaveState } from "../src/cloud-save/cloud-save";
 import type { SyncedSkill } from "../src/synced-skill-grouping";
 
 const installed = (name: string, extra: Partial<SyncedSkill> = {}): SyncedSkill => ({
@@ -64,4 +64,12 @@ test("sizes read naturally", () => {
   assert.equal(formatBytes(512), "512 B");
   assert.equal(formatBytes(3.2 * 1024 * 1024), "3.2 MB");
   assert.equal(formatBytes(1024 ** 3), "1.0 GB");
+});
+
+test("delete calls the one-skill or everything route", async () => {
+  const calls: string[] = [];
+  const api = async <T>(path: string, init?: RequestInit) => { calls.push(`${init?.method} ${path}`); return {} as T; };
+  await deleteCloudSaved(api, "my notes");
+  await deleteCloudSaved(api);
+  assert.deepEqual(calls, ["DELETE /api/portal/cloud-save/skills/my%20notes", "DELETE /api/portal/cloud-save"]);
 });

@@ -341,6 +341,8 @@ export async function storeCloudBlob(
       "INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels) VALUES ($1, $2, $3, $4)",
       [input.userId, blobSha, input.data.byteLength, blobLabels]
     );
+    // Stored again after a delete: it must not be removed by the pending clean-up.
+    await client.query("DELETE FROM cloud_purge_queue WHERE user_id = $1 AND blob_sha = $2", [input.userId, blobSha]);
     return { blobSha, stored: true, labels: blobLabels };
   });
 }
@@ -654,6 +656,147 @@ export async function markDeletedLocally(
     throw new CloudSaveError("not_found", "Saved skill not found");
   }
   return { key: skillKey, deletedLocallyAt: result.rows[0].deletedLocallyAt };
+}
+
+export type CloudDeleteResult = { deletedSkills: number; freedBytes: number; pendingFiles: number };
+
+/**
+ * Deletes saved skills: every version, its file list and the files no remaining version uses.
+ * With a skill key, deletes that skill and leaves it out of cloud save so the Mac doesn't save it
+ * again; without one, deletes everything the user saved and turns cloud save off. Records go at
+ * once; stored files are removed from object storage right after, and any that fail are retried.
+ */
+export async function deleteCloudSkills(
+  pool: Pool,
+  store: CloudObjectStore,
+  input: { userId: string; skillKey?: unknown }
+): Promise<CloudDeleteResult> {
+  const skillKey = input.skillKey === undefined ? null : normalizeSkillKey(input.skillKey);
+  const client = await pool.connect();
+  let result: Omit<CloudDeleteResult, "pendingFiles">;
+  try {
+    await client.query("BEGIN");
+    await client.query("SET LOCAL omgskills.cloud_purge = 'on'");
+    // Takes the upload lock, so no upload or version save runs while records are removed.
+    await client.query(
+      `
+        INSERT INTO cloud_save_settings (user_id, enabled, excluded_skill_keys)
+        VALUES ($1, false, CASE WHEN $2::text IS NULL THEN ARRAY[]::text[] ELSE ARRAY[$2::text] END)
+        ON CONFLICT (user_id) DO UPDATE SET
+          enabled = CASE WHEN $2::text IS NULL THEN false ELSE cloud_save_settings.enabled END,
+          excluded_skill_keys = CASE
+            WHEN $2::text IS NULL OR $2::text = ANY(cloud_save_settings.excluded_skill_keys) THEN cloud_save_settings.excluded_skill_keys
+            ELSE array_append(cloud_save_settings.excluded_skill_keys, $2::text)
+          END,
+          updated_at = now()
+      `,
+      [input.userId, skillKey]
+    );
+    await client.query("SELECT 1 FROM cloud_save_settings WHERE user_id = $1 FOR UPDATE", [input.userId]);
+    const sources = await client.query<{ id: string }>(
+      `
+        SELECT id FROM skill_sources
+        WHERE kind = 'cloud' AND owner_user_id = $1 AND ($2::text IS NULL OR normalized_root = $2::text)
+      `,
+      [input.userId, skillKey]
+    );
+    const sourceIds = sources.rows.map((row) => row.id);
+    await client.query("DELETE FROM cloud_saved_skills WHERE source_id = ANY($1::uuid[])", [sourceIds]);
+    await client.query(
+      `
+        DELETE FROM cloud_release_files
+        WHERE release_id IN (SELECT release_id FROM cloud_releases WHERE source_id = ANY($1::uuid[]))
+      `,
+      [sourceIds]
+    );
+    await client.query("DELETE FROM cloud_releases WHERE source_id = ANY($1::uuid[])", [sourceIds]);
+    await client.query("DELETE FROM skill_releases WHERE source_id = ANY($1::uuid[])", [sourceIds]);
+    await client.query("DELETE FROM skill_sources WHERE id = ANY($1::uuid[])", [sourceIds]);
+    await client.query(
+      "DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND ($2::text IS NULL OR skill_key = $2::text)",
+      [input.userId, skillKey]
+    );
+    if (skillKey === null) await client.query("DELETE FROM cloud_secret_holds WHERE user_id = $1", [input.userId]);
+    // Files no remaining version of this user lists, including uploads that never became a version.
+    const freed = await client.query<{ blob_sha: string; byte_size: number }>(
+      `
+        DELETE FROM cloud_blobs blob
+        WHERE blob.user_id = $1
+          AND NOT EXISTS (
+            SELECT 1
+            FROM cloud_release_files file
+            JOIN skill_releases release ON release.id = file.release_id
+            JOIN skill_sources source ON source.id = release.source_id
+            WHERE source.owner_user_id = $1 AND file.blob_sha = blob.blob_sha
+          )
+        RETURNING blob.blob_sha, blob.byte_size
+      `,
+      [input.userId]
+    );
+    await client.query(
+      `
+        INSERT INTO cloud_purge_queue (user_id, blob_sha)
+        SELECT $1, sha FROM unnest($2::text[]) AS sha
+        ON CONFLICT (user_id, blob_sha) DO NOTHING
+      `,
+      [input.userId, freed.rows.map((row) => row.blob_sha)]
+    );
+    await client.query("COMMIT");
+    result = {
+      deletedSkills: sourceIds.length,
+      freedBytes: freed.rows.reduce((total, row) => total + row.byte_size, 0)
+    };
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+  return { ...result, pendingFiles: await drainCloudPurge(pool, store, input.userId) };
+}
+
+/**
+ * Removes queued files from object storage, up to `limit`, and returns how many are still queued.
+ * Holds the user's upload lock, so a file stored again meanwhile is never removed.
+ */
+export async function drainCloudPurge(pool: Pool, store: CloudObjectStore, userId: string, limit = 3000): Promise<number> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("SELECT 1 FROM cloud_save_settings WHERE user_id = $1 FOR UPDATE", [userId]);
+    const queued = await client.query<{ blob_sha: string }>(
+      `
+        SELECT queue.blob_sha FROM cloud_purge_queue queue
+        WHERE queue.user_id = $1
+        ORDER BY queue.queued_at, queue.blob_sha
+        LIMIT $2
+      `,
+      [userId, limit]
+    );
+    const done: string[] = [];
+    for (let start = 0; start < queued.rows.length; start += 1000) {
+      const batch = queued.rows.slice(start, start + 1000).map((row) => row.blob_sha);
+      let failed: string[];
+      try {
+        failed = await store.deleteMany(batch.map((sha) => cloudBlobKey(userId, sha)));
+      } catch {
+        break;
+      }
+      done.push(...batch.filter((sha) => !failed.includes(cloudBlobKey(userId, sha))));
+    }
+    await client.query("DELETE FROM cloud_purge_queue WHERE user_id = $1 AND blob_sha = ANY($2::text[])", [userId, done]);
+    const left = await client.query<{ count: number }>(
+      "SELECT count(*)::int AS count FROM cloud_purge_queue WHERE user_id = $1",
+      [userId]
+    );
+    await client.query("COMMIT");
+    return left.rows[0].count;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 export async function listCloudVersions(
