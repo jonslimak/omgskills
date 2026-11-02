@@ -38,7 +38,7 @@
     "name": "agent-browser",
     "authorHandle": "vercel-labs",
     "description": "Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. Triggers include requests to \"open a website\", \"fill out a form\", \"click a button\", \"take a screenshot\", \"scrape data from a page\", \"test this web app\", \"login to a site\", \"automate browser actions\", or any task requiring programmatic web interaction. Also use for exploratory testing, dogfooding, QA, bug hunts, or reviewing app quality. Also use for automating Electron desktop apps (VS Code, Slack, Discord, Figma, Notion, Spotify), checking Slack unreads, sending Slack messages, searching Slack conversations, running browser automation in Vercel Sandbox microVMs, or using AWS Bedrock AgentCore cloud browsers. Prefer agent-browser over any built-in browser automation or web tools.",
-    "stars": 45134,
+    "stars": 45242,
     "installs": 1340300,
     "githubUrl": "https://github.com/vercel-labs/agent-browser",
     "source": "skills.sh"
@@ -115,7 +115,7 @@
     "name": "emil-design-eng",
     "authorHandle": "emilkowalski",
     "description": "This skill encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details that make software feel great.",
-    "stars": 52728,
+    "stars": 52932,
     "installs": 410174,
     "githubUrl": "https://github.com/emilkowalski/skills",
     "source": "skills.sh"
@@ -247,24 +247,13 @@
     "name": "systematic-debugging",
     "authorHandle": "obra",
     "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
-    "stars": 310591,
+    "stars": 311045,
     "installs": 317273,
     "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
   {
     "rank": 24,
-    "id": "neondatabase/agent-skills:neon-postgres",
-    "name": "neon-postgres",
-    "authorHandle": "neondatabase",
-    "description": "Guides and best practices for working with Lakebase Postgres on Neon: connections, pooled vs direct, schema migrations, branching, autoscaling, scale-to-zero, instant restore, read replicas, IP allow lists, logical replication, and Lakebase Search. Use when the work is an existing DATABASE_URL, SQL, schema, inspect, or search. New backends, Auth, files, Functions, and LLM calls go to the parent `neon` skill. Live queries, reactive UIs, and realtime data go to `neon-realtime`. Also use for \"@neondatabase/serverless\", \"@neon/neon-js\", \"neon inspect db\", \"semantic search\", \"vector search\", \"full-text search\", \"BM25\", or \"hybrid search\".",
-    "stars": 108,
-    "installs": 299235,
-    "githubUrl": "https://github.com/neondatabase/agent-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 25,
     "id": "microsoft/playwright-cli:playwright-cli",
     "name": "playwright-cli",
     "authorHandle": "microsoft",
@@ -272,6 +261,17 @@
     "stars": 14320,
     "installs": 205295,
     "githubUrl": "https://github.com/microsoft/playwright-cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 25,
+    "id": "neondatabase/agent-skills:neon-postgres",
+    "name": "neon-postgres",
+    "authorHandle": "neondatabase",
+    "description": "Guides and best practices for working with Lakebase Postgres on Neon: connections, pooled vs direct, schema migrations, branching, autoscaling, scale-to-zero, instant restore, read replicas, IP allow lists, logical replication, and Lakebase Search. Use when the work is an existing DATABASE_URL, SQL, schema, inspect, or search. New backends, Auth, files, Functions, and LLM calls go to the parent `neon` skill. Live queries, reactive UIs, and realtime data go to `neon-realtime`. Also use for \"@neondatabase/serverless\", \"@neon/neon-js\", \"neon inspect db\", \"semantic search\", \"vector search\", \"full-text search\", \"BM25\", or \"hybrid search\".",
+    "stars": 108,
+    "installs": 299235,
+    "githubUrl": "https://github.com/neondatabase/agent-skills",
     "source": "skills.sh"
   },
   {
@@ -287,17 +287,6 @@
   },
   {
     "rank": 27,
-    "id": "higgsfield-ai/skills:higgsfield-generate",
-    "name": "higgsfield-generate",
-    "authorHandle": "higgsfield-ai",
-    "description": "Generate images/videos/3D assets/audio via Higgsfield AI. Defaults: GPT Image 2.5 for image/design/text, Seedance 2.5 for video, Nano Banana 2 for cartoon characters, Marketing Studio for ads, Seed Audio 1.0 for audio. Use when: \"generate an image\", \"make a video\", \"animate this photo\", \"image-to-video\", \"edit/stylize/remix this image\", \"reframe this video\", \"edit this video from a sketch\", \"create a 3D model/GLB\", \"create a sound effect\", \"make music\", \"text-to-audio\", \"create an ad\", \"make a UGC video\", \"unboxing\", \"presenter video\", \"import product from URL\", or \"analyze video virality\". Supports generic generation, workflows, Marketing Studio, and Virality Predictor. Chain with higgsfield-soul-id for face/identity consistency. NOT for: Soul training, brand systems/brandbooks (use higgsfield-brandkit), photoshoots, cards, YouTube thumbnails (use higgsfield-youtube-thumbnail), explainers (use higgsfield-video-explainer), playable games/assets (use higgsfield-websites), or TTS.",
-    "stars": 1769,
-    "installs": 227292,
-    "githubUrl": "https://github.com/higgsfield-ai/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 28,
     "id": "lllllllama/rigorpilot-skills:ai-research-explore",
     "name": "ai-research-explore",
     "authorHandle": "lllllllama",
@@ -308,7 +297,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 29,
+    "rank": 28,
     "id": "lllllllama/rigorpilot-skills:analyze-project",
     "name": "analyze-project",
     "authorHandle": "lllllllama",
@@ -319,24 +308,35 @@
     "source": "skills.sh"
   },
   {
+    "rank": 29,
+    "id": "higgsfield-ai/skills:higgsfield-generate",
+    "name": "higgsfield-generate",
+    "authorHandle": "higgsfield-ai",
+    "description": "Generate images/videos/3D assets/audio via Higgsfield AI. Defaults: GPT Image 2.5 for image/design/text, Seedance 2.5 for video, Nano Banana 2 for cartoon characters, Marketing Studio for ads, Seed Audio 1.0 for audio. Use when: \"generate an image\", \"make a video\", \"animate this photo\", \"image-to-video\", \"edit/stylize/remix this image\", \"reframe this video\", \"edit this video from a sketch\", \"create a 3D model/GLB\", \"create a sound effect\", \"make music\", \"text-to-audio\", \"create an ad\", \"make a UGC video\", \"unboxing\", \"presenter video\", \"import product from URL\", or \"analyze video virality\". Supports generic generation, workflows, Marketing Studio, and Virality Predictor. Chain with higgsfield-soul-id for face/identity consistency. NOT for: Soul training, brand systems/brandbooks (use higgsfield-brandkit), photoshoots, cards, YouTube thumbnails (use higgsfield-youtube-thumbnail), explainers (use higgsfield-video-explainer), playable games/assets (use higgsfield-websites), or TTS.",
+    "stars": 1769,
+    "installs": 227292,
+    "githubUrl": "https://github.com/higgsfield-ai/skills",
+    "source": "skills.sh"
+  },
+  {
     "rank": 30,
+    "id": "obra/superpowers:verification-before-completion",
+    "name": "verification-before-completion",
+    "authorHandle": "obra",
+    "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
+    "stars": 301369,
+    "installs": 261749,
+    "githubUrl": "https://github.com/obra/superpowers",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 31,
     "id": "autonnel/autonnel-skills:post-purchase-upsell-flow",
     "name": "post-purchase-upsell-flow",
     "authorHandle": "autonnel",
     "description": "Design and implement one-click post-purchase upsells and downsells that raise average order value without hurting the main conversion rate. Use when asked to increase AOV, add an upsell, cross-sell or downsell after checkout, build a one-click upsell flow, monetize the thank-you page, or when someone asks how to make more revenue per customer from the same ad spend.",
     "stars": 190,
     "installs": 111480,
-    "githubUrl": "https://github.com/autonnel/autonnel-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 31,
-    "id": "autonnel/autonnel-skills:sales-funnel-blueprint",
-    "name": "sales-funnel-blueprint",
-    "authorHandle": "autonnel",
-    "description": "Turn an offer into a concrete multi-step sales funnel spec - page-by-page structure, price ladder, copy outline and the metrics each step must hit. Use when asked to build a sales funnel, marketing funnel, landing page flow, lead magnet funnel, webinar funnel, tripwire or VSL funnel, when planning a product launch page flow, or when someone asks \"what pages do I need\" for selling something online.",
-    "stars": 190,
-    "installs": 111795,
     "githubUrl": "https://github.com/autonnel/autonnel-skills",
     "source": "skills.sh"
   },
@@ -353,13 +353,13 @@
   },
   {
     "rank": 33,
-    "id": "obra/superpowers:verification-before-completion",
-    "name": "verification-before-completion",
-    "authorHandle": "obra",
-    "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
-    "stars": 301369,
-    "installs": 261749,
-    "githubUrl": "https://github.com/obra/superpowers",
+    "id": "autonnel/autonnel-skills:sales-funnel-blueprint",
+    "name": "sales-funnel-blueprint",
+    "authorHandle": "autonnel",
+    "description": "Turn an offer into a concrete multi-step sales funnel spec - page-by-page structure, price ladder, copy outline and the metrics each step must hit. Use when asked to build a sales funnel, marketing funnel, landing page flow, lead magnet funnel, webinar funnel, tripwire or VSL funnel, when planning a product launch page flow, or when someone asks \"what pages do I need\" for selling something online.",
+    "stars": 190,
+    "installs": 111795,
+    "githubUrl": "https://github.com/autonnel/autonnel-skills",
     "source": "skills.sh"
   },
   {
@@ -408,17 +408,6 @@
   },
   {
     "rank": 38,
-    "id": "iannuttall/seo:seo",
-    "name": "seo",
-    "authorHandle": "iannuttall",
-    "description": "Free Google Search Console MCP server and CLI for AI agents. Reads your real Search Console, Google Analytics, Bing Webmaster Tools and Clicky data, plus DataForSEO and Ahrefs keyword research. Use it for any SEO question - why Google traffic or clicks dropped, organic traffic decline, quick wins, low CTR, striking distance keywords, content decay and declining pages, keyword cannibalization, indexing and URL inspection, one page's queries, Google update impact, the questions people ask AI that show in Search Console, competitor keywords, backlinks, technical SEO crawls, redirects, internal links and client SEO reports. Returns facts from your own data, never guesses.",
-    "stars": 601,
-    "installs": 18823,
-    "githubUrl": "https://github.com/iannuttall/seo",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 39,
     "id": "microsoft/azure-skills:azure-diagnostics",
     "name": "azure-diagnostics",
     "authorHandle": "microsoft",
@@ -429,7 +418,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 40,
+    "rank": 39,
     "id": "microsoft/azure-skills:azure-validate",
     "name": "azure-validate",
     "authorHandle": "microsoft",
@@ -437,6 +426,17 @@
     "stars": 1603,
     "installs": 574952,
     "githubUrl": "https://github.com/microsoft/azure-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 40,
+    "id": "supabase/agent-skills:supabase",
+    "name": "supabase",
+    "authorHandle": "supabase",
+    "description": "Use when doing ANY task involving Supabase. Triggers: Supabase products (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); client libraries and SSR integrations (supabase-js, @supabase/ssr) in Next.js, React, SvelteKit, Astro, Remix; auth issues (login, logout, sessions, JWT, cookies, getSession, getUser, getClaims, RLS); Supabase CLI or MCP server; schema changes, migrations, declarative schemas, security audits, Postgres extensions (pg_graphql, pg_cron, pg_vector); debugging and troubleshooting errors or unexpected behavior on Supabase projects (HTTP errors, Postgres errors, RLS surprises, permission denied, schema cache issues, timeouts, Edge Function crashes, Realtime drops, Storage failures) and reading or querying logs (Logs Explorer, ClickHouse).",
+    "stars": 2944,
+    "installs": 353639,
+    "githubUrl": "https://github.com/supabase/agent-skills",
     "source": "skills.sh"
   },
   {
@@ -452,13 +452,13 @@
   },
   {
     "rank": 42,
-    "id": "supabase/agent-skills:supabase",
-    "name": "supabase",
-    "authorHandle": "supabase",
-    "description": "Use when doing ANY task involving Supabase. Triggers: Supabase products (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); client libraries and SSR integrations (supabase-js, @supabase/ssr) in Next.js, React, SvelteKit, Astro, Remix; auth issues (login, logout, sessions, JWT, cookies, getSession, getUser, getClaims, RLS); Supabase CLI or MCP server; schema changes, migrations, declarative schemas, security audits, Postgres extensions (pg_graphql, pg_cron, pg_vector); debugging and troubleshooting errors or unexpected behavior on Supabase projects (HTTP errors, Postgres errors, RLS surprises, permission denied, schema cache issues, timeouts, Edge Function crashes, Realtime drops, Storage failures) and reading or querying logs (Logs Explorer, ClickHouse).",
-    "stars": 2944,
-    "installs": 353639,
-    "githubUrl": "https://github.com/supabase/agent-skills",
+    "id": "iannuttall/seo:seo",
+    "name": "seo",
+    "authorHandle": "iannuttall",
+    "description": "Free Google Search Console MCP server and CLI for AI agents. Reads your real Search Console, Google Analytics, Bing Webmaster Tools and Clicky data, plus DataForSEO and Ahrefs keyword research. Use it for any SEO question - why Google traffic or clicks dropped, organic traffic decline, quick wins, low CTR, striking distance keywords, content decay and declining pages, keyword cannibalization, indexing and URL inspection, one page's queries, Google update impact, the questions people ask AI that show in Search Console, competitor keywords, backlinks, technical SEO crawls, redirects, internal links and client SEO reports. Returns facts from your own data, never guesses.",
+    "stars": 601,
+    "installs": 18823,
+    "githubUrl": "https://github.com/iannuttall/seo",
     "source": "skills.sh"
   },
   {
@@ -511,7 +511,7 @@
     "name": "archify",
     "authorHandle": "tt-a1i",
     "description": "Create validated architecture, workflow, sequence, data-flow, lifecycle/state, ERD, class, tree, timeline, and waterfall diagrams as explorable standalone HTML with dark/light themes, motion and image/SVG/WebM export. Accept requirements or Mermaid; inspect repository evidence for code-backed diagrams. Use when visualizing systems, API calls, pipelines, schemas, histories, timings, or everyday steps, parts, relationships and states. Also turn an answer into a one-page explainer, with the conclusion first, structured panels, native diagrams and charts, when the user asks for a page, an explainer or an answer to share (做成一页, 用页面讲), or proactively when the user's rules opt in with an [archify explainer: ...] line. Not for dashboards.",
-    "stars": 91981,
+    "stars": 92652,
     "installs": 186813,
     "githubUrl": "https://github.com/tt-a1i/archify",
     "source": "skills.sh"
@@ -522,7 +522,7 @@
     "name": "pptx",
     "authorHandle": "anthropics",
     "description": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill.",
-    "stars": 186329,
+    "stars": 186656,
     "installs": 247156,
     "githubUrl": "https://github.com/anthropics/skills",
     "source": "skills.sh"
@@ -687,7 +687,7 @@
     "name": "implement-spec",
     "authorHandle": "mattpocock",
     "description": "Implement the result of /to-spec and /to-tickets in code.",
-    "stars": 309189,
+    "stars": 309918,
     "installs": 321368,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
@@ -738,17 +738,6 @@
   },
   {
     "rank": 68,
-    "id": "mattpocock/skills:wait-what",
-    "name": "wait-what",
-    "authorHandle": "mattpocock",
-    "description": "Stop. That last message did not land: re-pitch it.",
-    "stars": 305783,
-    "installs": 485207,
-    "githubUrl": "https://github.com/mattpocock/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 69,
     "id": "google/agents-cli:google-agents-cli-publish",
     "name": "google-agents-cli-publish",
     "authorHandle": "google",
@@ -759,18 +748,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 70,
-    "id": "heygen-com/hyperframes:slideshow",
-    "name": "slideshow",
-    "authorHandle": "heygen-com",
-    "description": "Build a HyperFrames slideshow to present live - slides, fragment reveals, branching hotspots and presenter mode with speaker notes, served by `hyperframes present` - or turn an existing page into one. Use when the person wants a deck or presentation rather than a rendered video.",
-    "stars": 74702,
-    "installs": 462561,
-    "githubUrl": "https://github.com/heygen-com/hyperframes",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 71,
+    "rank": 69,
     "id": "google/agents-cli:google-agents-cli-eval",
     "name": "google-agents-cli-eval",
     "authorHandle": "google",
@@ -781,18 +759,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 72,
-    "id": "google/agents-cli:google-agents-cli-workflow",
-    "name": "google-agents-cli-workflow",
-    "authorHandle": "google",
-    "description": "This skill should be used when the user wants to \"develop an agent\", \"build an agent using ADK\", \"run the agent locally\", \"debug agent code\", \"test an agent\", \"deploy an agent\", \"publish an agent\", \"monitor an agent\", or needs the ADK (Agent Development Kit) development lifecycle and coding guidelines. Entrypoint for building ADK agents. Always active — provides the full workflow (scaffold, build, evaluate, deploy, publish, observe), code preservation rules, model selection guidance, and troubleshooting steps for ADK or any agent development.",
-    "stars": 5964,
-    "installs": 535516,
-    "githubUrl": "https://github.com/google/agents-cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 73,
+    "rank": 70,
     "id": "google/agents-cli:google-agents-cli-scaffold",
     "name": "google-agents-cli-scaffold",
     "authorHandle": "google",
@@ -803,7 +770,18 @@
     "source": "skills.sh"
   },
   {
-    "rank": 74,
+    "rank": 71,
+    "id": "google/agents-cli:google-agents-cli-workflow",
+    "name": "google-agents-cli-workflow",
+    "authorHandle": "google",
+    "description": "This skill should be used when the user wants to \"develop an agent\", \"build an agent using ADK\", \"run the agent locally\", \"debug agent code\", \"test an agent\", \"deploy an agent\", \"publish an agent\", \"monitor an agent\", or needs the ADK (Agent Development Kit) development lifecycle and coding guidelines. Entrypoint for building ADK agents. Always active — provides the full workflow (scaffold, build, evaluate, deploy, publish, observe), code preservation rules, model selection guidance, and troubleshooting steps for ADK or any agent development.",
+    "stars": 5964,
+    "installs": 535516,
+    "githubUrl": "https://github.com/google/agents-cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 72,
     "id": "google/agents-cli:google-agents-cli-observability",
     "name": "google-agents-cli-observability",
     "authorHandle": "google",
@@ -811,6 +789,28 @@
     "stars": 5968,
     "installs": 535349,
     "githubUrl": "https://github.com/google/agents-cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 73,
+    "id": "mattpocock/skills:wait-what",
+    "name": "wait-what",
+    "authorHandle": "mattpocock",
+    "description": "Stop. That last message did not land: re-pitch it.",
+    "stars": 305783,
+    "installs": 485207,
+    "githubUrl": "https://github.com/mattpocock/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 74,
+    "id": "heygen-com/hyperframes:slideshow",
+    "name": "slideshow",
+    "authorHandle": "heygen-com",
+    "description": "Build a HyperFrames slideshow to present live - slides, fragment reveals, branching hotspots and presenter mode with speaker notes, served by `hyperframes present` - or turn an existing page into one. Use when the person wants a deck or presentation rather than a rendered video.",
+    "stars": 74702,
+    "installs": 462561,
+    "githubUrl": "https://github.com/heygen-com/hyperframes",
     "source": "skills.sh"
   },
   {
@@ -870,23 +870,23 @@
   },
   {
     "rank": 80,
-    "id": "mattpocock/skills:setup-ts-deep-modules",
-    "name": "setup-ts-deep-modules",
-    "authorHandle": "mattpocock",
-    "description": "Wire dependency-cruiser into a TypeScript repo so each package is a deep module, with implementation hidden in subfolders and reachable only through its entry-point files. User-invoked.",
-    "stars": 269921,
-    "installs": 394399,
-    "githubUrl": "https://github.com/mattpocock/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 81,
     "id": "mattpocock/skills:migrate-to-shoehorn",
     "name": "migrate-to-shoehorn",
     "authorHandle": "mattpocock",
     "description": "Migrate test files from `as` type assertions to @total-typescript/shoehorn. Use when user mentions shoehorn, wants to replace `as` in tests, or needs partial test data.",
     "stars": 199282,
     "installs": 502524,
+    "githubUrl": "https://github.com/mattpocock/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 81,
+    "id": "mattpocock/skills:setup-ts-deep-modules",
+    "name": "setup-ts-deep-modules",
+    "authorHandle": "mattpocock",
+    "description": "Wire dependency-cruiser into a TypeScript repo so each package is a deep module, with implementation hidden in subfolders and reachable only through its entry-point files. User-invoked.",
+    "stars": 269921,
+    "installs": 394399,
     "githubUrl": "https://github.com/mattpocock/skills",
     "source": "skills.sh"
   },
@@ -958,23 +958,23 @@
   },
   {
     "rank": 88,
-    "id": "emilkowalski/skills:pick-ui-library",
-    "name": "pick-ui-library",
-    "authorHandle": "emilkowalski",
-    "description": "Pick the right library for a given frontend task from a curated, opinionated list — numbers, OTP inputs, charts, command menus, virtualization, drag and drop, toasts, state, styling, and more. Only runs when explicitly invoked; it does not trigger on its own.",
-    "stars": 41203,
-    "installs": 201843,
-    "githubUrl": "https://github.com/emilkowalski/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 89,
     "id": "emilkowalski/skills:prototype",
     "name": "prototype",
     "authorHandle": "emilkowalski",
     "description": "Build multiple genuinely different versions of a UI piece you describe, rendered behind a visual picker so you can flip through them live and promote the one that feels right. Only runs when explicitly invoked; it does not trigger on its own.",
     "stars": 41203,
     "installs": 190738,
+    "githubUrl": "https://github.com/emilkowalski/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 89,
+    "id": "emilkowalski/skills:pick-ui-library",
+    "name": "pick-ui-library",
+    "authorHandle": "emilkowalski",
+    "description": "Pick the right library for a given frontend task from a curated, opinionated list — numbers, OTP inputs, charts, command menus, virtualization, drag and drop, toasts, state, styling, and more. Only runs when explicitly invoked; it does not trigger on its own.",
+    "stars": 41203,
+    "installs": 201843,
     "githubUrl": "https://github.com/emilkowalski/skills",
     "source": "skills.sh"
   },
@@ -1101,6 +1101,17 @@
   },
   {
     "rank": 101,
+    "id": "larksuite/cli:lark-apps",
+    "name": "lark-apps",
+    "authorHandle": "larksuite",
+    "description": "妙搭（Spark/Miaoda）应用开发与托管：应用创建、本地全栈开发、云端生成迭代、创意设计（UI mockup / 可交互原型 / 线框图 / 落地页 / 仪表盘 / 幻灯片 deck / 视觉探索）、AI相关能力和飞书平台能力或者其他外部能力集成、日志/Trace/监控指标/PV/UV 查询、环境变量管理、应用协作者与协作权限设置、应用角色与成员管理、自动化触发器（定时/记录变更/Webhook/飞书审批）。当用户要开发/新建一个系统·工具·平台·应用，或要本地开发 / 云端开发 / 修改 / 部署 / 发布 / 上线 / 拿可分享链接，或用 HTML 做页面·网站·部署到妙搭，或要设计 / design / mockup / prototype / wireframe / 做 PPT / deck / 视觉探索，或提到妙搭/Spark/Miaoda 应用（链接形如 `/app/app_xxx` 或 `/page/<token>`，运行时域名形如 *.aiforce.cloud）、应用数据库、应用文件存储、开放 API Key、可见范围、应用协作者/开发权限、应用角色/角色成员、线上日志、接口请求量、错误量、延迟、访问量、环境变量、给妙搭应用配自动化任务/定时触发/审批通过后自动触发时使用。不负责普通云盘文件上传（lark-drive）、飞书文档编辑（lark-doc）、原生幻灯片创建（lark-slides）。",
+    "stars": 17933,
+    "installs": 322198,
+    "githubUrl": "https://github.com/larksuite/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 102,
     "id": "larksuite/cli:lark-task",
     "name": "lark-task",
     "authorHandle": "larksuite",
@@ -1111,24 +1122,13 @@
     "source": "skills.sh"
   },
   {
-    "rank": 102,
+    "rank": 103,
     "id": "larksuite/cli:lark-base",
     "name": "lark-base",
     "authorHandle": "larksuite",
     "description": "飞书多维表格（Base）操作：建表、字段、记录、视图、统计、公式/lookup、表单、仪表盘、应用模式（BaseApp/AppMode 页面与组件）、Workspace 目录、workflow、角色权限、模板中心（多维表格模板分类/列表/搜索）；遇到 Base/多维表格/bitable、BaseApp/AppMode、/base/ 或 /app/ 链接时使用。BaseApp 不走 lark-apps；文件导入/导出转 lark-drive，认证/授权转 lark-shared。",
     "stars": 17872,
     "installs": 482518,
-    "githubUrl": "https://github.com/larksuite/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 103,
-    "id": "larksuite/cli:lark-apps",
-    "name": "lark-apps",
-    "authorHandle": "larksuite",
-    "description": "妙搭（Spark/Miaoda）应用开发与托管：应用创建、本地全栈开发、云端生成迭代、创意设计（UI mockup / 可交互原型 / 线框图 / 落地页 / 仪表盘 / 幻灯片 deck / 视觉探索）、AI相关能力和飞书平台能力或者其他外部能力集成、日志/Trace/监控指标/PV/UV 查询、环境变量管理、应用协作者与协作权限设置、应用角色与成员管理、自动化触发器（定时/记录变更/Webhook/飞书审批）。当用户要开发/新建一个系统·工具·平台·应用，或要本地开发 / 云端开发 / 修改 / 部署 / 发布 / 上线 / 拿可分享链接，或用 HTML 做页面·网站·部署到妙搭，或要设计 / design / mockup / prototype / wireframe / 做 PPT / deck / 视觉探索，或提到妙搭/Spark/Miaoda 应用（链接形如 `/app/app_xxx` 或 `/page/<token>`，运行时域名形如 *.aiforce.cloud）、应用数据库、应用文件存储、开放 API Key、可见范围、应用协作者/开发权限、应用角色/角色成员、线上日志、接口请求量、错误量、延迟、访问量、环境变量、给妙搭应用配自动化任务/定时触发/审批通过后自动触发时使用。不负责普通云盘文件上传（lark-drive）、飞书文档编辑（lark-doc）、原生幻灯片创建（lark-slides）。",
-    "stars": 17893,
-    "installs": 322198,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
   },
@@ -1145,23 +1145,23 @@
   },
   {
     "rank": 105,
-    "id": "larksuite/cli:lark-im",
-    "name": "lark-im",
-    "authorHandle": "larksuite",
-    "description": "飞书即时通讯：收发消息和管理群聊。发送和回复消息、搜索聊天记录、管理群聊成员、上传下载图片和文件、管理表情回复、发送应用内/短信/电话加急、发送和处理交互卡片（Interactive Card）、监听卡片按钮回调（card.action.trigger）。当用户需要发消息、查看或搜索聊天记录、下载聊天中的文件、查看群成员、搜索群、创建群聊或话题群、管理标记数据、管理 Feed 置顶（添加/移除/查询置顶会话）、管理标签数据、处理卡片回调时使用。",
-    "stars": 17872,
-    "installs": 479309,
-    "githubUrl": "https://github.com/larksuite/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 106,
     "id": "larksuite/cli:lark-drive",
     "name": "lark-drive",
     "authorHandle": "larksuite",
     "description": "飞书云空间（云盘/云存储）：管理 Drive 文件和文件夹，包含上传/下载、创建文件夹、复制/移动/删除、查看元数据、查询权限设置、评论/权限/订阅、标题、版本、飞书文档密级标签（secure labels）和本地文件导入。用户需要整理云盘目录、处理云空间资源 URL/token、判断链接类型/真实 token/标题，或导入 Word/Markdown/Excel/CSV/PPTX/.base 为 docx/sheet/bitable/slides 时使用；doubao.com 云空间 URL/token 也按资源路径和 token 路由，不回退 WebFetch。不负责：文档内容编辑（走 lark-doc）、表格/Base 表内数据操作（走 lark-sheets/lark-base）、知识空间节点/成员管理（走 lark-wiki）、原生 Markdown 文件读写/patch/diff（走 lark-markdown）。",
     "stars": 17872,
     "installs": 479281,
+    "githubUrl": "https://github.com/larksuite/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 106,
+    "id": "larksuite/cli:lark-im",
+    "name": "lark-im",
+    "authorHandle": "larksuite",
+    "description": "飞书即时通讯：收发消息和管理群聊。发送和回复消息、搜索聊天记录、管理群聊成员、上传下载图片和文件、管理表情回复、发送应用内/短信/电话加急、发送和处理交互卡片（Interactive Card）、监听卡片按钮回调（card.action.trigger）。当用户需要发消息、查看或搜索聊天记录、下载聊天中的文件、查看群成员、搜索群、创建群聊或话题群、管理标记数据、管理 Feed 置顶（添加/移除/查询置顶会话）、管理标签数据、处理卡片回调时使用。",
+    "stars": 17872,
+    "installs": 479309,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
   },
@@ -1178,23 +1178,23 @@
   },
   {
     "rank": 108,
-    "id": "larksuite/cli:lark-markdown",
-    "name": "lark-markdown",
-    "authorHandle": "larksuite",
-    "description": "飞书 Markdown：查看、创建、上传、编辑和比较飞书中的原生 Markdown 文件。当用户要操作飞书 Markdown 文件，或比较其远端版本及本地草稿时使用。纯本地 Markdown 文件操作不触发本 skill。不负责将 Markdown 导入为飞书在线文档，也不负责文件搜索、权限、评论、移动、删除等云空间管理操作。",
-    "stars": 17872,
-    "installs": 391838,
-    "githubUrl": "https://github.com/larksuite/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 109,
     "id": "larksuite/cli:lark-slides",
     "name": "lark-slides",
     "authorHandle": "larksuite",
     "description": "飞书幻灯片：创建和编辑幻灯片。创建演示文稿、读取幻灯片内容、管理幻灯片页面（创建、删除、读取、局部替换）。当用户需要创建或编辑幻灯片、读取或修改单个页面时使用。当用户给出 doubao.com 的 /slides/ URL/token 时，也应直接使用本 skill，不要因为域名不是飞书而回退到 WebFetch；路由依据是 URL 路径模式和 token，而不是域名。不负责：云文档内容编辑（走 lark-doc）、云文档里的独立画板对象（走 lark-whiteboard）、上传或下载普通文件（走 lark-drive）。",
     "stars": 17872,
     "installs": 427159,
+    "githubUrl": "https://github.com/larksuite/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 109,
+    "id": "larksuite/cli:lark-markdown",
+    "name": "lark-markdown",
+    "authorHandle": "larksuite",
+    "description": "飞书 Markdown：查看、创建、上传、编辑和比较飞书中的原生 Markdown 文件。当用户要操作飞书 Markdown 文件，或比较其远端版本及本地草稿时使用。纯本地 Markdown 文件操作不触发本 skill。不负责将 Markdown 导入为飞书在线文档，也不负责文件搜索、权限、评论、移动、删除等云空间管理操作。",
+    "stars": 17872,
+    "installs": 391838,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
   },
@@ -1211,34 +1211,34 @@
   },
   {
     "rank": 111,
-    "id": "larksuite/cli:lark-whiteboard",
-    "name": "lark-whiteboard",
-    "authorHandle": "larksuite",
-    "description": "飞书画板：查询和编辑飞书云文档中的画板。支持导出画板为预览图片、导出原始节点结构、使用多种格式更新画板内容。 当用户需要查看画板内容、导出画板图片、编辑画板时使用此 skill。不负责：飞书云文档内容编辑（lark-doc）、文档内嵌电子表格/Base（lark-sheets / lark-base）。",
-    "stars": 17872,
-    "installs": 476364,
-    "githubUrl": "https://github.com/larksuite/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 112,
-    "id": "larksuite/cli:lark-vc",
-    "name": "lark-vc",
-    "authorHandle": "larksuite",
-    "description": "仅当用户或上游配置显式指定 lark-vc 时使用，相关请求统一交由 lark-meeting 技能处理。",
-    "stars": 17872,
-    "installs": 473047,
-    "githubUrl": "https://github.com/larksuite/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 113,
     "id": "larksuite/cli:lark-workflow-meeting-summary",
     "name": "lark-workflow-meeting-summary",
     "authorHandle": "larksuite",
     "description": "会议纪要整理工作流：汇总指定时间范围内的会议纪要并生成结构化报告。当用户需要整理会议纪要、生成会议周报、回顾一段时间内的会议内容时使用。",
     "stars": 17872,
     "installs": 471997,
+    "githubUrl": "https://github.com/larksuite/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 112,
+    "id": "larksuite/cli:lark-mail",
+    "name": "lark-mail",
+    "authorHandle": "larksuite",
+    "description": "飞书邮箱：Use when user mentions 起草邮件、写邮件、草稿、发送/回复/转发邮件、查阅邮件、看邮件、搜索邮件、邮件文件夹、邮件标签、邮件联系人、监听新邮件、邮件收信规则等；use for mail/email intent only. Do not use for docs/sheets/calendar/auth setup/pure contact lookup/IM chat tasks.",
+    "stars": 17872,
+    "installs": 473741,
+    "githubUrl": "https://github.com/larksuite/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 113,
+    "id": "larksuite/cli:lark-vc",
+    "name": "lark-vc",
+    "authorHandle": "larksuite",
+    "description": "仅当用户或上游配置显式指定 lark-vc 时使用，相关请求统一交由 lark-meeting 技能处理。",
+    "stars": 17872,
+    "installs": 473047,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
   },
@@ -1255,12 +1255,12 @@
   },
   {
     "rank": 115,
-    "id": "larksuite/cli:lark-mail",
-    "name": "lark-mail",
+    "id": "larksuite/cli:lark-whiteboard",
+    "name": "lark-whiteboard",
     "authorHandle": "larksuite",
-    "description": "飞书邮箱：Use when user mentions 起草邮件、写邮件、草稿、发送/回复/转发邮件、查阅邮件、看邮件、搜索邮件、邮件文件夹、邮件标签、邮件联系人、监听新邮件、邮件收信规则等；use for mail/email intent only. Do not use for docs/sheets/calendar/auth setup/pure contact lookup/IM chat tasks.",
+    "description": "飞书画板：查询和编辑飞书云文档中的画板。支持导出画板为预览图片、导出原始节点结构、使用多种格式更新画板内容。 当用户需要查看画板内容、导出画板图片、编辑画板时使用此 skill。不负责：飞书云文档内容编辑（lark-doc）、文档内嵌电子表格/Base（lark-sheets / lark-base）。",
     "stars": 17872,
-    "installs": 473741,
+    "installs": 476364,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
   },
@@ -1277,12 +1277,12 @@
   },
   {
     "rank": 117,
-    "id": "larksuite/cli:lark-vc-agent",
-    "name": "lark-vc-agent",
+    "id": "larksuite/cli:lark-event",
+    "name": "lark-event",
     "authorHandle": "larksuite",
-    "description": "仅当用户或上游配置显式指定 lark-vc-agent 时使用，相关请求统一交由 lark-meeting 技能处理。",
-    "stars": 17719,
-    "installs": 361361,
+    "description": "Lark/Feishu real-time event listening / subscribing / consuming: stream events as NDJSON via `lark-cli event consume <EventKey>` (covers IM messages/reactions/chat changes, Approval status changes, Task updates, VC meeting started/joined/ended, Minutes generated, Whiteboard updated, etc.). Use for Lark bots, real-time message processing, long-running subscribers, streaming webhook/push handlers. Supports `--max-events` / `--timeout` bounded runs and a stderr ready-marker contract — designed for AI agents running as subprocesses.",
+    "stars": 17872,
+    "installs": 473056,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
   },
@@ -1299,23 +1299,23 @@
   },
   {
     "rank": 119,
-    "id": "larksuite/cli:lark-event",
-    "name": "lark-event",
-    "authorHandle": "larksuite",
-    "description": "Lark/Feishu real-time event listening / subscribing / consuming: stream events as NDJSON via `lark-cli event consume <EventKey>` (covers IM messages/reactions/chat changes, Approval status changes, Task updates, VC meeting started/joined/ended, Minutes generated, Whiteboard updated, etc.). Use for Lark bots, real-time message processing, long-running subscribers, streaming webhook/push handlers. Supports `--max-events` / `--timeout` bounded runs and a stderr ready-marker contract — designed for AI agents running as subprocesses.",
-    "stars": 17872,
-    "installs": 473056,
-    "githubUrl": "https://github.com/larksuite/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 120,
     "id": "larksuite/cli:lark-okr",
     "name": "lark-okr",
     "authorHandle": "larksuite",
     "description": "飞书 OKR：管理目标与关键结果。查看和编辑 OKR 周期、目标、关键结果、对齐关系、量化指标和进展记录。当用户需要查看或创建 OKR、管理目标和关键结果、查看对齐关系时使用。不负责：待办任务管理（lark-task）、日程/会议安排（lark-calendar）、绩效评估",
     "stars": 17872,
     "installs": 410318,
+    "githubUrl": "https://github.com/larksuite/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 120,
+    "id": "larksuite/cli:lark-vc-agent",
+    "name": "lark-vc-agent",
+    "authorHandle": "larksuite",
+    "description": "仅当用户或上游配置显式指定 lark-vc-agent 时使用，相关请求统一交由 lark-meeting 技能处理。",
+    "stars": 17719,
+    "installs": 361361,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
   },
@@ -1365,23 +1365,23 @@
   },
   {
     "rank": 125,
-    "id": "larksuite/cli:lark-workflow-standup-report",
-    "name": "lark-workflow-standup-report",
-    "authorHandle": "larksuite",
-    "description": "日程待办摘要：编排 calendar +agenda 和 task +get-my-tasks，生成指定日期的日程与未完成任务摘要。适用于了解今天/明天/本周的安排。",
-    "stars": 17872,
-    "installs": 471148,
-    "githubUrl": "https://github.com/larksuite/cli",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 126,
     "id": "larksuite/cli:lark-note",
     "name": "lark-note",
     "authorHandle": "larksuite",
     "description": "仅当用户或上游配置显式指定 lark-note 时使用，相关请求统一交由 lark-meeting 技能处理。",
     "stars": 17719,
     "installs": 248404,
+    "githubUrl": "https://github.com/larksuite/cli",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 126,
+    "id": "larksuite/cli:lark-workflow-standup-report",
+    "name": "lark-workflow-standup-report",
+    "authorHandle": "larksuite",
+    "description": "日程待办摘要：编排 calendar +agenda 和 task +get-my-tasks，生成指定日期的日程与未完成任务摘要。适用于了解今天/明天/本周的安排。",
+    "stars": 17872,
+    "installs": 471148,
     "githubUrl": "https://github.com/larksuite/cli",
     "source": "skills.sh"
   },
@@ -1398,17 +1398,6 @@
   },
   {
     "rank": 128,
-    "id": "lllllllama/rigorpilot-skills:ai-research-reproduction",
-    "name": "ai-research-reproduction",
-    "authorHandle": "lllllllama",
-    "description": "Rigor Reproduce compatible skill slug for README-first deep learning repository reproduction. Use when the user wants an end-to-end, minimal-trustworthy flow that reads the repository first, selects the smallest documented inference or evaluation target, coordinates intake, setup, trusted execution, optional trusted training, optional repository analysis, and optional paper-gap resolution, enforces conservative patch rules, records evidence assumptions deviations and human decision points, and writes the standardized `repro_outputs/` bundle. Do not use for paper summary, generic environment setup, isolated repo scanning, standalone command execution, silent protocol changes, score chasing, or broad research assistance outside repository-grounded reproduction.",
-    "stars": 484,
-    "installs": 345775,
-    "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 129,
     "id": "lllllllama/rigorpilot-skills:safe-debug",
     "name": "safe-debug",
     "authorHandle": "lllllllama",
@@ -1419,13 +1408,24 @@
     "source": "skills.sh"
   },
   {
-    "rank": 130,
+    "rank": 129,
     "id": "lllllllama/rigorpilot-skills:explore-code",
     "name": "explore-code",
     "authorHandle": "lllllllama",
     "description": "Rigor Improve implementation leaf skill for auditable candidate implementation in deep learning research repositories. Use when the researcher explicitly authorizes exploratory work on an isolated branch or worktree to transplant modules, adapt a backbone, add LoRA or adapter layers, replace a head, or stitch together meaningful low-risk migration ideas with rollback-aware records in `explore_outputs/`. Do not use for end-to-end exploration orchestration on top of `current_research`, trusted baseline reproduction, conservative debugging, environment setup, verified contribution claims, or default repository analysis.",
     "stars": 484,
     "installs": 345430,
+    "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 130,
+    "id": "lllllllama/rigorpilot-skills:ai-research-reproduction",
+    "name": "ai-research-reproduction",
+    "authorHandle": "lllllllama",
+    "description": "Rigor Reproduce compatible skill slug for README-first deep learning repository reproduction. Use when the user wants an end-to-end, minimal-trustworthy flow that reads the repository first, selects the smallest documented inference or evaluation target, coordinates intake, setup, trusted execution, optional trusted training, optional repository analysis, and optional paper-gap resolution, enforces conservative patch rules, records evidence assumptions deviations and human decision points, and writes the standardized `repro_outputs/` bundle. Do not use for paper summary, generic environment setup, isolated repo scanning, standalone command execution, silent protocol changes, score chasing, or broad research assistance outside repository-grounded reproduction.",
+    "stars": 484,
+    "installs": 345775,
     "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
     "source": "skills.sh"
   },
@@ -1453,23 +1453,23 @@
   },
   {
     "rank": 133,
-    "id": "lllllllama/rigorpilot-skills:explore-run",
-    "name": "explore-run",
-    "authorHandle": "lllllllama",
-    "description": "Rigor Improve / Rigor Explore run leaf skill for bounded exploratory evidence in deep learning research repositories. Use when the researcher explicitly authorizes exploratory runs such as small-subset validation, short-cycle guess-and-check, batch sweeps, idle-GPU search, or quick transfer-learning trials, with fair-comparison caveats and no-overclaim summaries in `explore_outputs/`. Do not use for end-to-end exploration orchestration on top of `current_research`, trusted baseline execution, conservative training verification, default routing, verified SOTA claims, or implicit experimentation.",
-    "stars": 484,
-    "installs": 345168,
-    "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 134,
     "id": "lllllllama/rigorpilot-skills:env-and-assets-bootstrap",
     "name": "env-and-assets-bootstrap",
     "authorHandle": "lllllllama",
     "description": "Rigor Setup skill for README-first deep learning repo reproduction. Use when the task is specifically to prepare a conservative conda-first environment, checkpoint and dataset path assumptions, cache location hints, and setup notes before any run on a README-documented repository. Do not use for repo scanning, full orchestration, paper interpretation, final run reporting, or generic environment setup that is not tied to a specific reproduction target.",
     "stars": 486,
     "installs": 484752,
+    "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 134,
+    "id": "lllllllama/rigorpilot-skills:explore-run",
+    "name": "explore-run",
+    "authorHandle": "lllllllama",
+    "description": "Rigor Improve / Rigor Explore run leaf skill for bounded exploratory evidence in deep learning research repositories. Use when the researcher explicitly authorizes exploratory runs such as small-subset validation, short-cycle guess-and-check, batch sweeps, idle-GPU search, or quick transfer-learning trials, with fair-comparison caveats and no-overclaim summaries in `explore_outputs/`. Do not use for end-to-end exploration orchestration on top of `current_research`, trusted baseline execution, conservative training verification, default routing, verified SOTA claims, or implicit experimentation.",
+    "stars": 484,
+    "installs": 345168,
     "githubUrl": "https://github.com/lllllllama/RigorPilot-Skills",
     "source": "skills.sh"
   },
@@ -1486,17 +1486,6 @@
   },
   {
     "rank": 136,
-    "id": "autonnel/autonnel-skills:landing-page-conversion-audit",
-    "name": "landing-page-conversion-audit",
-    "authorHandle": "autonnel",
-    "description": "Audit a landing page, sales page or checkout page for conversion leaks and return a fix list ordered by expected revenue impact. Use when asked to review, critique or improve a landing page, sales page, opt-in page, product page or checkout flow, when conversion rate is low, when paid traffic is not converting, or when someone asks \"why isn't this page converting\" or wants a CRO / landing page review.",
-    "stars": 190,
-    "installs": 113351,
-    "githubUrl": "https://github.com/autonnel/autonnel-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 137,
     "id": "autonnel/autonnel-skills:server-side-conversion-tracking",
     "name": "server-side-conversion-tracking",
     "authorHandle": "autonnel",
@@ -1507,14 +1496,25 @@
     "source": "skills.sh"
   },
   {
-    "rank": 138,
-    "id": "autonnel/autonnel-skills:funnel-platform-picker",
-    "name": "funnel-platform-picker",
+    "rank": 137,
+    "id": "autonnel/autonnel-skills:landing-page-conversion-audit",
+    "name": "landing-page-conversion-audit",
     "authorHandle": "autonnel",
-    "description": "Choose a landing page or sales funnel platform by working out the real total cost and lock-in for a specific case - comparing ClickFunnels, CartFlows, FunnelKit, systeme.io, GoHighLevel, Shopify apps, hand-rolled pages and self-hosted open-source options. Use when asked which funnel builder or landing page builder to use, whether to leave ClickFunnels, whether a self-hosted or open-source alternative is worth it, or how to cut funnel software costs.",
+    "description": "Audit a landing page, sales page or checkout page for conversion leaks and return a fix list ordered by expected revenue impact. Use when asked to review, critique or improve a landing page, sales page, opt-in page, product page or checkout flow, when conversion rate is low, when paid traffic is not converting, or when someone asks \"why isn't this page converting\" or wants a CRO / landing page review.",
     "stars": 190,
-    "installs": 111445,
+    "installs": 113351,
     "githubUrl": "https://github.com/autonnel/autonnel-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 138,
+    "id": "obra/superpowers:brainstorming",
+    "name": "brainstorming",
+    "authorHandle": "obra",
+    "description": "You MUST use this before any creative work - creating features, building components, adding functionality, modifying behavior, or planning anything new, in software or out of it (a talk, a business, a renovation).",
+    "stars": 301369,
+    "installs": 414690,
+    "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
   {
@@ -1530,6 +1530,17 @@
   },
   {
     "rank": 140,
+    "id": "autonnel/autonnel-skills:funnel-platform-picker",
+    "name": "funnel-platform-picker",
+    "authorHandle": "autonnel",
+    "description": "Choose a landing page or sales funnel platform by working out the real total cost and lock-in for a specific case - comparing ClickFunnels, CartFlows, FunnelKit, systeme.io, GoHighLevel, Shopify apps, hand-rolled pages and self-hosted open-source options. Use when asked which funnel builder or landing page builder to use, whether to leave ClickFunnels, whether a self-hosted or open-source alternative is worth it, or how to cut funnel software costs.",
+    "stars": 190,
+    "installs": 111445,
+    "githubUrl": "https://github.com/autonnel/autonnel-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 141,
     "id": "autonnel/autonnel-skills:self-hosted-funnel-launch",
     "name": "self-hosted-funnel-launch",
     "authorHandle": "autonnel",
@@ -1537,17 +1548,6 @@
     "stars": 5,
     "installs": 111339,
     "githubUrl": "https://github.com/autonnel/autonnel-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 141,
-    "id": "obra/superpowers:brainstorming",
-    "name": "brainstorming",
-    "authorHandle": "obra",
-    "description": "You MUST use this before any creative work - creating features, building components, adding functionality, modifying behavior, or planning anything new, in software or out of it (a talk, a business, a renovation).",
-    "stars": 301369,
-    "installs": 414690,
-    "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
   {
@@ -1644,7 +1644,7 @@
     "name": "cavecrew",
     "authorHandle": "juliusbrussee",
     "description": "When to delegate to `cavecrew-investigator` (locate code), `cavecrew-builder` (1-2 file edit) or `cavecrew-reviewer` (diff review) instead of working inline or using `Explore`. Their output is compressed, so main context lasts longer.",
-    "stars": 116619,
+    "stars": 116867,
     "installs": 366791,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
     "source": "skills.sh"
@@ -1684,13 +1684,13 @@
   },
   {
     "rank": 154,
-    "id": "juliusbrussee/caveman:megacave",
-    "name": "megacave",
-    "authorHandle": "juliusbrussee",
-    "description": "Caveman in Classical Chinese: 文言文 register, far fewer characters, technical terms verbatim. Invoke only with /megacave or /caveman wenyan. Stays on until \"stop caveman\" or \"normal mode\".",
-    "stars": 113355,
-    "installs": 32872,
-    "githubUrl": "https://github.com/JuliusBrussee/caveman",
+    "id": "microsoft/azure-skills:microsoft-foundry",
+    "name": "microsoft-foundry",
+    "authorHandle": "microsoft",
+    "description": "Build, deploy, evaluate, optimize, fine-tune, and manage Microsoft Foundry agents, models, and resources end to end. USE FOR: foundry, azd ai agent, azd provision/deploy, hosted agent scaffold/develop/run/deploy/troubleshoot, prompt agent, managed harness agent, Copilot harness, voice agent, create/update/invoke/evaluate agent, add tool to agent, agent insights, batch/continuous eval, continuous monitoring, agent CI/CD, optimize/improve prompt, optimize agent instructions, Agent Optimizer, dataset curation from traces, deploy model, model fine-tuning (SFT/DPO/RFT), Foundry project, RBAC, role assignment, permissions, quota, capacity, region, deployment failure, AI Services, create Foundry resource, knowledge index, customize deployment, onboard, availability, training-data, grader, distillation, large file upload. DO NOT USE FOR: Azure Functions, App Service, general Azure deploy (use azure-deploy), general Azure prep (use azure-prepare).",
+    "stars": 1603,
+    "installs": 586431,
+    "githubUrl": "https://github.com/microsoft/azure-skills",
     "source": "skills.sh"
   },
   {
@@ -1706,23 +1706,23 @@
   },
   {
     "rank": 156,
+    "id": "juliusbrussee/caveman:megacave",
+    "name": "megacave",
+    "authorHandle": "juliusbrussee",
+    "description": "Caveman in Classical Chinese: 文言文 register, far fewer characters, technical terms verbatim. Invoke only with /megacave or /caveman wenyan. Stays on until \"stop caveman\" or \"normal mode\".",
+    "stars": 113355,
+    "installs": 32872,
+    "githubUrl": "https://github.com/JuliusBrussee/caveman",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 157,
     "id": "juliusbrussee/caveman:investigate-first",
     "name": "investigate-first",
     "authorHandle": "juliusbrussee",
     "description": "Diagnose ambiguous failures before editing. Use for unknown causes, intermittent behavior, performance regressions, or investigations needing evidence-ranked hypotheses.",
     "stars": 113355,
     "installs": 112922,
-    "githubUrl": "https://github.com/JuliusBrussee/caveman",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 157,
-    "id": "juliusbrussee/caveman:lean-build",
-    "name": "lean-build",
-    "authorHandle": "juliusbrussee",
-    "description": "Build feature work with high overbuilding risk. Use for new behavior, product slices, or integrations where repository reuse, strict scope, and an explicit stop condition matter.",
-    "stars": 113355,
-    "installs": 111948,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
     "source": "skills.sh"
   },
@@ -1750,23 +1750,23 @@
   },
   {
     "rank": 160,
+    "id": "juliusbrussee/caveman:lean-build",
+    "name": "lean-build",
+    "authorHandle": "juliusbrussee",
+    "description": "Build feature work with high overbuilding risk. Use for new behavior, product slices, or integrations where repository reuse, strict scope, and an explicit stop condition matter.",
+    "stars": 113355,
+    "installs": 111948,
+    "githubUrl": "https://github.com/JuliusBrussee/caveman",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 161,
     "id": "juliusbrussee/caveman:verify-and-stop",
     "name": "verify-and-stop",
     "authorHandle": "juliusbrussee",
     "description": "Prove existing work meets acceptance conditions without expanding scope. Use for validation-only tasks, completion checks, focused gate runs, and last-mile proof.",
     "stars": 113355,
     "installs": 112426,
-    "githubUrl": "https://github.com/JuliusBrussee/caveman",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 161,
-    "id": "juliusbrussee/caveman:migration",
-    "name": "migration",
-    "authorHandle": "juliusbrussee",
-    "description": "Implement reversible compatibility-safe transitions. Use for schema, data, API, protocol, configuration, or dependency migrations requiring rollback and preservation proof.",
-    "stars": 113355,
-    "installs": 111267,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
     "source": "skills.sh"
   },
@@ -1783,6 +1783,17 @@
   },
   {
     "rank": 163,
+    "id": "juliusbrussee/caveman:migration",
+    "name": "migration",
+    "authorHandle": "juliusbrussee",
+    "description": "Implement reversible compatibility-safe transitions. Use for schema, data, API, protocol, configuration, or dependency migrations requiring rollback and preservation proof.",
+    "stars": 113355,
+    "installs": 111267,
+    "githubUrl": "https://github.com/JuliusBrussee/caveman",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 164,
     "id": "juliusbrussee/caveman:caveman-discover",
     "name": "caveman-discover",
     "authorHandle": "juliusbrussee",
@@ -1793,7 +1804,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 164,
+    "rank": 165,
     "id": "juliusbrussee/caveman:caveman-setup",
     "name": "caveman-setup",
     "authorHandle": "juliusbrussee",
@@ -1804,7 +1815,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 165,
+    "rank": 166,
     "id": "juliusbrussee/caveman:caveman-manage",
     "name": "caveman-manage",
     "authorHandle": "juliusbrussee",
@@ -1812,17 +1823,6 @@
     "stars": 113355,
     "installs": 111643,
     "githubUrl": "https://github.com/JuliusBrussee/caveman",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 166,
-    "id": "microsoft/azure-skills:microsoft-foundry",
-    "name": "microsoft-foundry",
-    "authorHandle": "microsoft",
-    "description": "Build, deploy, evaluate, optimize, fine-tune, and manage Microsoft Foundry agents, models, and resources end to end. USE FOR: foundry, azd ai agent, azd provision/deploy, hosted agent scaffold/develop/run/deploy/troubleshoot, prompt agent, managed harness agent, Copilot harness, voice agent, create/update/invoke/evaluate agent, add tool to agent, agent insights, batch/continuous eval, continuous monitoring, agent CI/CD, optimize/improve prompt, optimize agent instructions, Agent Optimizer, dataset curation from traces, deploy model, model fine-tuning (SFT/DPO/RFT), Foundry project, RBAC, role assignment, permissions, quota, capacity, region, deployment failure, AI Services, create Foundry resource, knowledge index, customize deployment, onboard, availability, training-data, grader, distillation, large file upload. DO NOT USE FOR: Azure Functions, App Service, general Azure deploy (use azure-deploy), general Azure prep (use azure-prepare).",
-    "stars": 1603,
-    "installs": 586431,
-    "githubUrl": "https://github.com/microsoft/azure-skills",
     "source": "skills.sh"
   },
   {
@@ -1849,17 +1849,6 @@
   },
   {
     "rank": 169,
-    "id": "cloudflare/skills:wrangler",
-    "name": "wrangler",
-    "authorHandle": "cloudflare",
-    "description": "Run or troubleshoot Wrangler CLI commands in projects that have a wrangler.jsonc, wrangler.json, or wrangler.toml file, including local development, Previews, deployment, and resource management. For new projects and projects without a Wrangler configuration file, use the cf CLI instead.",
-    "stars": 3093,
-    "installs": 136681,
-    "githubUrl": "https://github.com/cloudflare/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 170,
     "id": "microsoft/azure-skills:azure-compliance",
     "name": "azure-compliance",
     "authorHandle": "microsoft",
@@ -1870,7 +1859,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 171,
+    "rank": 170,
     "id": "microsoft/azure-skills:azure-ai",
     "name": "azure-ai",
     "authorHandle": "microsoft",
@@ -1881,7 +1870,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 172,
+    "rank": 171,
     "id": "microsoft/azure-skills:azure-upgrade",
     "name": "azure-upgrade",
     "authorHandle": "microsoft",
@@ -1892,7 +1881,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 173,
+    "rank": 172,
     "id": "microsoft/azure-skills:azure-storage",
     "name": "azure-storage",
     "authorHandle": "microsoft",
@@ -1903,7 +1892,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 174,
+    "rank": 173,
     "id": "microsoft/azure-skills:azure-enterprise-infra-planner",
     "name": "azure-enterprise-infra-planner",
     "authorHandle": "microsoft",
@@ -1914,29 +1903,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 175,
-    "id": "microsoft/azure-skills:azure-kusto",
-    "name": "azure-kusto",
-    "authorHandle": "microsoft",
-    "description": "Query and analyze data in Azure Data Explorer (Kusto/ADX) using KQL for log analytics, telemetry, and time series analysis. WHEN: KQL queries, Kusto database queries, Azure Data Explorer, ADX clusters, log analytics, time series data, IoT telemetry, anomaly detection.",
-    "stars": 1603,
-    "installs": 573144,
-    "githubUrl": "https://github.com/microsoft/azure-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 176,
-    "id": "microsoft/azure-skills:azure-quotas",
-    "name": "azure-quotas",
-    "authorHandle": "microsoft",
-    "description": "Check/manage Azure quotas and usage across providers. For deployment planning, capacity validation, region selection. WHEN: \"check quotas\", \"service limits\", \"current usage\", \"request quota increase\", \"quota exceeded\", \"validate capacity\", \"regional availability\", \"provisioning limits\", \"vCPU limit\", \"how many vCPUs available in my subscription\".",
-    "stars": 1603,
-    "installs": 477768,
-    "githubUrl": "https://github.com/microsoft/azure-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 177,
+    "rank": 174,
     "id": "microsoft/azure-skills:azure-deploy",
     "name": "azure-deploy",
     "authorHandle": "microsoft",
@@ -1947,13 +1914,46 @@
     "source": "skills.sh"
   },
   {
-    "rank": 178,
-    "id": "microsoft/azure-skills:azure-resource-lookup",
-    "name": "azure-resource-lookup",
+    "rank": 175,
+    "id": "microsoft/azure-skills:appinsights-instrumentation",
+    "name": "appinsights-instrumentation",
     "authorHandle": "microsoft",
-    "description": "List, find, and show Azure resources across subscriptions or resource groups. Handles prompts like \"list the websites in my subscription\", \"list my web apps\", \"show my app services\", \"list virtual machines\", \"list my VMs\", \"show storage accounts\", \"find container apps\", and \"what resources do I have\". USE FOR: list websites, list web apps, list app services, show websites in subscription, resource inventory, find resources by tag, tag analysis, orphaned resource discovery (not for cost analysis), unattached disks, count resources by type, cross-subscription lookup, and Azure Resource Graph queries. DO NOT USE FOR: deploying/changing resources (use azure-deploy), cost optimization (use cost-optimization from the optional azure-cost plugin), or non-Azure clouds.",
+    "description": "Guidance for instrumenting webapps with Azure Application Insights. Provides telemetry patterns, SDK setup, and configuration references. WHEN: how to instrument app, App Insights SDK, telemetry patterns, what is App Insights, Application Insights guidance, instrumentation examples, APM best practices.",
     "stars": 1603,
-    "installs": 573475,
+    "installs": 573526,
+    "githubUrl": "https://github.com/microsoft/azure-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 176,
+    "id": "microsoft/azure-skills:azure-kusto",
+    "name": "azure-kusto",
+    "authorHandle": "microsoft",
+    "description": "Query and analyze data in Azure Data Explorer (Kusto/ADX) using KQL for log analytics, telemetry, and time series analysis. WHEN: KQL queries, Kusto database queries, Azure Data Explorer, ADX clusters, log analytics, time series data, IoT telemetry, anomaly detection.",
+    "stars": 1603,
+    "installs": 573144,
+    "githubUrl": "https://github.com/microsoft/azure-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 177,
+    "id": "microsoft/azure-skills:azure-quotas",
+    "name": "azure-quotas",
+    "authorHandle": "microsoft",
+    "description": "Check/manage Azure quotas and usage across providers. For deployment planning, capacity validation, region selection. WHEN: \"check quotas\", \"service limits\", \"current usage\", \"request quota increase\", \"quota exceeded\", \"validate capacity\", \"regional availability\", \"provisioning limits\", \"vCPU limit\", \"how many vCPUs available in my subscription\".",
+    "stars": 1603,
+    "installs": 477768,
+    "githubUrl": "https://github.com/microsoft/azure-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 178,
+    "id": "microsoft/azure-skills:azure-resource-visualizer",
+    "name": "azure-resource-visualizer",
+    "authorHandle": "microsoft",
+    "description": "Analyze Azure resource groups and generate detailed Mermaid architecture diagrams showing the relationships between individual resources. WHEN: create architecture diagram, visualize Azure resources, show resource relationships, generate Mermaid diagram, analyze resource group, diagram my resources, architecture visualization, resource topology, map Azure infrastructure.",
+    "stars": 1603,
+    "installs": 573435,
     "githubUrl": "https://github.com/microsoft/azure-skills",
     "source": "skills.sh"
   },
@@ -1970,23 +1970,23 @@
   },
   {
     "rank": 180,
-    "id": "microsoft/azure-skills:azure-resource-visualizer",
-    "name": "azure-resource-visualizer",
-    "authorHandle": "microsoft",
-    "description": "Analyze Azure resource groups and generate detailed Mermaid architecture diagrams showing the relationships between individual resources. WHEN: create architecture diagram, visualize Azure resources, show resource relationships, generate Mermaid diagram, analyze resource group, diagram my resources, architecture visualization, resource topology, map Azure infrastructure.",
-    "stars": 1603,
-    "installs": 573435,
-    "githubUrl": "https://github.com/microsoft/azure-skills",
+    "id": "cloudflare/skills:wrangler",
+    "name": "wrangler",
+    "authorHandle": "cloudflare",
+    "description": "Run or troubleshoot Wrangler CLI commands in projects that have a wrangler.jsonc, wrangler.json, or wrangler.toml file, including local development, Previews, deployment, and resource management. For new projects and projects without a Wrangler configuration file, use the cf CLI instead.",
+    "stars": 3093,
+    "installs": 136681,
+    "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
   {
     "rank": 181,
-    "id": "microsoft/azure-skills:appinsights-instrumentation",
-    "name": "appinsights-instrumentation",
+    "id": "microsoft/azure-skills:azure-resource-lookup",
+    "name": "azure-resource-lookup",
     "authorHandle": "microsoft",
-    "description": "Guidance for instrumenting webapps with Azure Application Insights. Provides telemetry patterns, SDK setup, and configuration references. WHEN: how to instrument app, App Insights SDK, telemetry patterns, what is App Insights, Application Insights guidance, instrumentation examples, APM best practices.",
+    "description": "List, find, and show Azure resources across subscriptions or resource groups. Handles prompts like \"list the websites in my subscription\", \"list my web apps\", \"show my app services\", \"list virtual machines\", \"list my VMs\", \"show storage accounts\", \"find container apps\", and \"what resources do I have\". USE FOR: list websites, list web apps, list app services, show websites in subscription, resource inventory, find resources by tag, tag analysis, orphaned resource discovery (not for cost analysis), unattached disks, count resources by type, cross-subscription lookup, and Azure Resource Graph queries. DO NOT USE FOR: deploying/changing resources (use azure-deploy), cost optimization (use cost-optimization from the optional azure-cost plugin), or non-Azure clouds.",
     "stars": 1603,
-    "installs": 573526,
+    "installs": 573475,
     "githubUrl": "https://github.com/microsoft/azure-skills",
     "source": "skills.sh"
   },
@@ -2003,28 +2003,6 @@
   },
   {
     "rank": 183,
-    "id": "obra/superpowers:writing-plans",
-    "name": "writing-plans",
-    "authorHandle": "obra",
-    "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
-    "stars": 301369,
-    "installs": 291280,
-    "githubUrl": "https://github.com/obra/superpowers",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 184,
-    "id": "microsoft/azure-skills:azure-messaging",
-    "name": "azure-messaging",
-    "authorHandle": "microsoft",
-    "description": "Troubleshoot and resolve issues with Azure Messaging SDKs for Event Hubs and Service Bus. Covers connection failures, authentication errors, message processing issues, and SDK configuration problems. WHEN: event hub SDK error, service bus SDK issue, messaging connection failure, AMQP error, event processor host issue, message lock lost, message lock expired, lock renewal, lock renewal batch, send timeout, receiver disconnected, SDK troubleshooting, azure messaging SDK, event hub consumer, service bus queue issue, topic subscription error, enable logging event hub, service bus logging, eventhub python, servicebus java, eventhub javascript, servicebus dotnet, event hub checkpoint, event hub not receiving messages, service bus dead letter, batch processing lock, session lock expired, idle timeout, connection inactive, link detach, slow reconnect, session error, duplicate events, offset reset, receive batch.",
-    "stars": 1603,
-    "installs": 564395,
-    "githubUrl": "https://github.com/microsoft/azure-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 185,
     "id": "microsoft/azure-skills:azure-compute",
     "name": "azure-compute",
     "authorHandle": "microsoft",
@@ -2035,18 +2013,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 186,
-    "id": "microsoft/azure-skills:azure-cloud-migrate",
-    "name": "azure-cloud-migrate",
-    "authorHandle": "microsoft",
-    "description": "Assess and migrate cross-cloud workloads to Azure with reports and code conversion. Supports Lambda→Functions, Beanstalk/Heroku/App Engine→App Service, Fargate/Kubernetes/Cloud Run/Spring Boot→Container Apps. WHEN: migrate Lambda to Functions, AWS to Azure, migrate Beanstalk, migrate Heroku, migrate App Engine, Cloud Run migration, Fargate to ACA, ECS/Kubernetes/GKE/EKS to Container Apps, Spring Boot to Container Apps, cross-cloud migration.",
-    "stars": 1603,
-    "installs": 521992,
-    "githubUrl": "https://github.com/microsoft/azure-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 187,
+    "rank": 184,
     "id": "microsoft/azure-skills:azure-aigateway",
     "name": "azure-aigateway",
     "authorHandle": "microsoft",
@@ -2057,7 +2024,29 @@
     "source": "skills.sh"
   },
   {
-    "rank": 188,
+    "rank": 185,
+    "id": "microsoft/azure-skills:azure-cloud-migrate",
+    "name": "azure-cloud-migrate",
+    "authorHandle": "microsoft",
+    "description": "Assess and migrate cross-cloud workloads to Azure with reports and code conversion. Supports Lambda→Functions, Beanstalk/Heroku/App Engine→App Service, Fargate/Kubernetes/Cloud Run/Spring Boot→Container Apps. WHEN: migrate Lambda to Functions, AWS to Azure, migrate Beanstalk, migrate Heroku, migrate App Engine, Cloud Run migration, Fargate to ACA, ECS/Kubernetes/GKE/EKS to Container Apps, Spring Boot to Container Apps, cross-cloud migration.",
+    "stars": 1603,
+    "installs": 521992,
+    "githubUrl": "https://github.com/microsoft/azure-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 186,
+    "id": "microsoft/azure-skills:azure-messaging",
+    "name": "azure-messaging",
+    "authorHandle": "microsoft",
+    "description": "Troubleshoot and resolve issues with Azure Messaging SDKs for Event Hubs and Service Bus. Covers connection failures, authentication errors, message processing issues, and SDK configuration problems. WHEN: event hub SDK error, service bus SDK issue, messaging connection failure, AMQP error, event processor host issue, message lock lost, message lock expired, lock renewal, lock renewal batch, send timeout, receiver disconnected, SDK troubleshooting, azure messaging SDK, event hub consumer, service bus queue issue, topic subscription error, enable logging event hub, service bus logging, eventhub python, servicebus java, eventhub javascript, servicebus dotnet, event hub checkpoint, event hub not receiving messages, service bus dead letter, batch processing lock, session lock expired, idle timeout, connection inactive, link detach, slow reconnect, session error, duplicate events, offset reset, receive batch.",
+    "stars": 1603,
+    "installs": 564395,
+    "githubUrl": "https://github.com/microsoft/azure-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 187,
     "id": "microsoft/azure-skills:entra-agent-id",
     "name": "entra-agent-id",
     "authorHandle": "microsoft",
@@ -2065,6 +2054,17 @@
     "stars": 1536,
     "installs": 343190,
     "githubUrl": "https://github.com/microsoft/azure-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 188,
+    "id": "obra/superpowers:writing-plans",
+    "name": "writing-plans",
+    "authorHandle": "obra",
+    "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
+    "stars": 301369,
+    "installs": 291280,
+    "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
   {
@@ -2157,23 +2157,23 @@
   },
   {
     "rank": 197,
-    "id": "cloudflare/skills:cloudflare-email-service",
-    "name": "cloudflare-email-service",
-    "authorHandle": "cloudflare",
-    "description": "Implement or troubleshoot Cloudflare Email Sending and Email Routing integrations and their delivery configuration.",
-    "stars": 3093,
-    "installs": 108382,
-    "githubUrl": "https://github.com/cloudflare/skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 198,
     "id": "cloudflare/skills:turnstile-spin",
     "name": "turnstile-spin",
     "authorHandle": "cloudflare",
     "description": "Set up, repair, or migrate to Cloudflare Turnstile bot verification in an existing frontend and backend, including server-side Siteverify.",
     "stars": 3093,
     "installs": 99109,
+    "githubUrl": "https://github.com/cloudflare/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 198,
+    "id": "cloudflare/skills:cloudflare-email-service",
+    "name": "cloudflare-email-service",
+    "authorHandle": "cloudflare",
+    "description": "Implement or troubleshoot Cloudflare Email Sending and Email Routing integrations and their delivery configuration.",
+    "stars": 3093,
+    "installs": 108382,
     "githubUrl": "https://github.com/cloudflare/skills",
     "source": "skills.sh"
   },
@@ -2212,17 +2212,6 @@
   },
   {
     "rank": 202,
-    "id": "obra/superpowers:using-superpowers",
-    "name": "using-superpowers",
-    "authorHandle": "obra",
-    "description": "Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions",
-    "stars": 301369,
-    "installs": 277301,
-    "githubUrl": "https://github.com/obra/superpowers",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 203,
     "id": "addyosmani/agent-skills:frontend-ui-engineering",
     "name": "frontend-ui-engineering",
     "authorHandle": "addyosmani",
@@ -2230,6 +2219,17 @@
     "stars": 111381,
     "installs": 72912,
     "githubUrl": "https://github.com/addyosmani/agent-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 203,
+    "id": "obra/superpowers:using-superpowers",
+    "name": "using-superpowers",
+    "authorHandle": "obra",
+    "description": "Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions",
+    "stars": 301369,
+    "installs": 277301,
+    "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
   {
@@ -2245,17 +2245,6 @@
   },
   {
     "rank": 205,
-    "id": "obra/superpowers:dispatching-parallel-agents",
-    "name": "dispatching-parallel-agents",
-    "authorHandle": "obra",
-    "description": "Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies",
-    "stars": 301369,
-    "installs": 225108,
-    "githubUrl": "https://github.com/obra/superpowers",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 206,
     "id": "addyosmani/agent-skills:code-simplification",
     "name": "code-simplification",
     "authorHandle": "addyosmani",
@@ -2266,7 +2255,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 207,
+    "rank": 206,
     "id": "cloudflare/skills:sandbox-stable",
     "name": "sandbox-stable",
     "authorHandle": "cloudflare",
@@ -2274,6 +2263,17 @@
     "stars": 3093,
     "installs": 74289,
     "githubUrl": "https://github.com/cloudflare/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 207,
+    "id": "obra/superpowers:dispatching-parallel-agents",
+    "name": "dispatching-parallel-agents",
+    "authorHandle": "obra",
+    "description": "Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies",
+    "stars": 301369,
+    "installs": 225108,
+    "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
   {
@@ -2333,28 +2333,6 @@
   },
   {
     "rank": 213,
-    "id": "addyosmani/agent-skills:context-engineering",
-    "name": "context-engineering",
-    "authorHandle": "addyosmani",
-    "description": "Optimizes agent context setup. Use when starting a new session, when agent output quality degrades, when switching between tasks, or when you need to configure rules files and context for a project.",
-    "stars": 111381,
-    "installs": 66715,
-    "githubUrl": "https://github.com/addyosmani/agent-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 214,
-    "id": "addyosmani/agent-skills:performance-optimization",
-    "name": "performance-optimization",
-    "authorHandle": "addyosmani",
-    "description": "Optimizes application performance across frontend, backend, queries, and databases. Use when performance requirements exist, when you suspect performance regressions, when Core Web Vitals or load times need improvement, when N+1 query patterns need fixing, or when profiling reveals bottlenecks.",
-    "stars": 111381,
-    "installs": 70543,
-    "githubUrl": "https://github.com/addyosmani/agent-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 215,
     "id": "cloudflare/skills:workers-profiling",
     "name": "workers-profiling",
     "authorHandle": "cloudflare",
@@ -2365,13 +2343,35 @@
     "source": "skills.sh"
   },
   {
-    "rank": 216,
+    "rank": 214,
+    "id": "addyosmani/agent-skills:context-engineering",
+    "name": "context-engineering",
+    "authorHandle": "addyosmani",
+    "description": "Optimizes agent context setup. Use when starting a new session, when agent output quality degrades, when switching between tasks, or when you need to configure rules files and context for a project.",
+    "stars": 111381,
+    "installs": 66715,
+    "githubUrl": "https://github.com/addyosmani/agent-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 215,
     "id": "addyosmani/agent-skills:git-workflow-and-versioning",
     "name": "git-workflow-and-versioning",
     "authorHandle": "addyosmani",
     "description": "Structures git workflow practices. Use when making any code change. Use when committing, branching, resolving conflicts, splitting uncommitted work in a messy working tree into clean atomic commits, opening or reviewing a pull request (PR), pushing to a remote, or when you need to organize work across multiple parallel streams. Use when cutting a release, choosing a semantic version bump, tagging, or writing a changelog.",
     "stars": 111381,
     "installs": 64471,
+    "githubUrl": "https://github.com/addyosmani/agent-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 216,
+    "id": "addyosmani/agent-skills:performance-optimization",
+    "name": "performance-optimization",
+    "authorHandle": "addyosmani",
+    "description": "Optimizes application performance across frontend, backend, queries, and databases. Use when performance requirements exist, when you suspect performance regressions, when Core Web Vitals or load times need improvement, when N+1 query patterns need fixing, or when profiling reveals bottlenecks.",
+    "stars": 111381,
+    "installs": 70543,
     "githubUrl": "https://github.com/addyosmani/agent-skills",
     "source": "skills.sh"
   },
@@ -2388,17 +2388,6 @@
   },
   {
     "rank": 218,
-    "id": "addyosmani/agent-skills:browser-testing-with-devtools",
-    "name": "browser-testing-with-devtools",
-    "authorHandle": "addyosmani",
-    "description": "Tests in real browsers via Chrome DevTools MCP. Use when building or debugging anything that runs in a browser. Use when you need to inspect the DOM, capture console errors, analyze network requests, profile performance, or verify visual output with real runtime data. Requires the chrome-devtools MCP server to be configured.",
-    "stars": 86053,
-    "installs": 63417,
-    "githubUrl": "https://github.com/addyosmani/agent-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 219,
     "id": "cloudflare/skills:k2",
     "name": "k2",
     "authorHandle": "cloudflare",
@@ -2409,7 +2398,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 220,
+    "rank": 219,
     "id": "cloudflare/skills:gateway-workers",
     "name": "gateway-workers",
     "authorHandle": "cloudflare",
@@ -2417,6 +2406,17 @@
     "stars": 3093,
     "installs": 14054,
     "githubUrl": "https://github.com/cloudflare/skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 220,
+    "id": "addyosmani/agent-skills:browser-testing-with-devtools",
+    "name": "browser-testing-with-devtools",
+    "authorHandle": "addyosmani",
+    "description": "Tests in real browsers via Chrome DevTools MCP. Use when building or debugging anything that runs in a browser. Use when you need to inspect the DOM, capture console errors, analyze network requests, profile performance, or verify visual output with real runtime data. Requires the chrome-devtools MCP server to be configured.",
+    "stars": 86053,
+    "installs": 63417,
+    "githubUrl": "https://github.com/addyosmani/agent-skills",
     "source": "skills.sh"
   },
   {
@@ -2443,6 +2443,17 @@
   },
   {
     "rank": 223,
+    "id": "dietrichgebert/ponytail:ponytail-audit",
+    "name": "ponytail-audit",
+    "authorHandle": "dietrichgebert",
+    "description": "Quality audit of a whole repo: bugs, security holes, what breaks under real load, risky code without tests, slow paths, and what to delete, merge or split. Ranked, each finding explained in plain English. One-shot report, changes nothing. Use for \"audit this codebase\", \"review the whole repo\", \"find bloat\", \"what can I delete\", /ponytail-audit.",
+    "stars": 166501,
+    "installs": 51044,
+    "githubUrl": "https://github.com/DietrichGebert/ponytail",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 224,
     "id": "addyosmani/agent-skills:documentation-and-adrs",
     "name": "documentation-and-adrs",
     "authorHandle": "addyosmani",
@@ -2453,7 +2464,7 @@
     "source": "skills.sh"
   },
   {
-    "rank": 224,
+    "rank": 225,
     "id": "addyosmani/agent-skills:debugging-and-error-recovery",
     "name": "debugging-and-error-recovery",
     "authorHandle": "addyosmani",
@@ -2461,17 +2472,6 @@
     "stars": 111381,
     "installs": 67949,
     "githubUrl": "https://github.com/addyosmani/agent-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 225,
-    "id": "dietrichgebert/ponytail:ponytail-audit",
-    "name": "ponytail-audit",
-    "authorHandle": "dietrichgebert",
-    "description": "Quality audit of a whole repo: bugs, security holes, what breaks under real load, risky code without tests, slow paths, and what to delete, merge or split. Ranked, each finding explained in plain English. One-shot report, changes nothing. Use for \"audit this codebase\", \"review the whole repo\", \"find bloat\", \"what can I delete\", /ponytail-audit.",
-    "stars": 166501,
-    "installs": 51044,
-    "githubUrl": "https://github.com/DietrichGebert/ponytail",
     "source": "skills.sh"
   },
   {
@@ -2520,13 +2520,13 @@
   },
   {
     "rank": 230,
-    "id": "dietrichgebert/ponytail:ponytail-gain",
-    "name": "ponytail-gain",
-    "authorHandle": "dietrichgebert",
-    "description": "Show ponytail's measured savings (code, cost, speed) from the benchmark. One-shot display. Use for /ponytail-gain, \"what does ponytail save\", \"ponytail impact\".",
-    "stars": 166501,
-    "installs": 46228,
-    "githubUrl": "https://github.com/DietrichGebert/ponytail",
+    "id": "addyosmani/agent-skills:idea-refine",
+    "name": "idea-refine",
+    "authorHandle": "addyosmani",
+    "description": "Refines raw ideas into sharp, actionable concepts through structured divergent and convergent thinking. Use when an idea is still vague, when you need to stress-test assumptions before committing to a plan, or when you want to expand options before converging on one. Triggers on \"ideate\", \"refine this idea\", or \"stress-test my plan\".",
+    "stars": 111381,
+    "installs": 64115,
+    "githubUrl": "https://github.com/addyosmani/agent-skills",
     "source": "skills.sh"
   },
   {
@@ -2542,23 +2542,23 @@
   },
   {
     "rank": 232,
-    "id": "addyosmani/agent-skills:idea-refine",
-    "name": "idea-refine",
-    "authorHandle": "addyosmani",
-    "description": "Refines raw ideas into sharp, actionable concepts through structured divergent and convergent thinking. Use when an idea is still vague, when you need to stress-test assumptions before committing to a plan, or when you want to expand options before converging on one. Triggers on \"ideate\", \"refine this idea\", or \"stress-test my plan\".",
-    "stars": 111381,
-    "installs": 64115,
-    "githubUrl": "https://github.com/addyosmani/agent-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 233,
     "id": "dietrichgebert/ponytail:ponytail-help",
     "name": "ponytail-help",
     "authorHandle": "dietrichgebert",
     "description": "Quick reference for ponytail levels, skills and commands. One-shot display. Use for /ponytail-help, \"ponytail help\", \"how do I use ponytail\".",
     "stars": 166501,
     "installs": 48314,
+    "githubUrl": "https://github.com/DietrichGebert/ponytail",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 233,
+    "id": "dietrichgebert/ponytail:ponytail-gain",
+    "name": "ponytail-gain",
+    "authorHandle": "dietrichgebert",
+    "description": "Show ponytail's measured savings (code, cost, speed) from the benchmark. One-shot display. Use for /ponytail-gain, \"what does ponytail save\", \"ponytail impact\".",
+    "stars": 166501,
+    "installs": 46228,
     "githubUrl": "https://github.com/DietrichGebert/ponytail",
     "source": "skills.sh"
   },
@@ -2575,17 +2575,6 @@
   },
   {
     "rank": 235,
-    "id": "addyosmani/agent-skills:incremental-implementation",
-    "name": "incremental-implementation",
-    "authorHandle": "addyosmani",
-    "description": "Delivers changes incrementally in thin, verifiable slices. Use when implementing any feature or change that touches more than one file, or when picking up the next task from a plan. Use when rolling a change out behind a feature flag, when you're about to write a large amount of code at once, or when a task feels too big to land in one step.",
-    "stars": 111381,
-    "installs": 66665,
-    "githubUrl": "https://github.com/addyosmani/agent-skills",
-    "source": "skills.sh"
-  },
-  {
-    "rank": 236,
     "id": "anthropics/skills:pdf",
     "name": "pdf",
     "authorHandle": "anthropics",
@@ -2596,18 +2585,18 @@
     "source": "skills.sh"
   },
   {
-    "rank": 237,
-    "id": "obra/superpowers:diagnosing-superpowers",
-    "name": "diagnosing-superpowers",
-    "authorHandle": "obra",
-    "description": "Use when a superpowers session went wrong and your human partner wants to know why — repeated work, ignored plans, stumbles, poor results, a skill that didn't fire, \"it took too long\", \"why is it so expensive\", \"what is it doing\" — or wants to build a bug report for the superpowers maintainers, for the current session or a past one identified by id or path, on any harness.",
-    "stars": 301369,
-    "installs": 25680,
-    "githubUrl": "https://github.com/obra/superpowers",
+    "rank": 236,
+    "id": "addyosmani/agent-skills:incremental-implementation",
+    "name": "incremental-implementation",
+    "authorHandle": "addyosmani",
+    "description": "Delivers changes incrementally in thin, verifiable slices. Use when implementing any feature or change that touches more than one file, or when picking up the next task from a plan. Use when rolling a change out behind a feature flag, when you're about to write a large amount of code at once, or when a task feels too big to land in one step.",
+    "stars": 111381,
+    "installs": 66665,
+    "githubUrl": "https://github.com/addyosmani/agent-skills",
     "source": "skills.sh"
   },
   {
-    "rank": 238,
+    "rank": 237,
     "id": "coreyhaines31/marketingskills:cold-email",
     "name": "cold-email",
     "authorHandle": "coreyhaines31",
@@ -2615,6 +2604,17 @@
     "stars": 57106,
     "installs": 132152,
     "githubUrl": "https://github.com/coreyhaines31/marketingskills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 238,
+    "id": "obra/superpowers:diagnosing-superpowers",
+    "name": "diagnosing-superpowers",
+    "authorHandle": "obra",
+    "description": "Use when a superpowers session went wrong and your human partner wants to know why — repeated work, ignored plans, stumbles, poor results, a skill that didn't fire, \"it took too long\", \"why is it so expensive\", \"what is it doing\" — or wants to build a bug report for the superpowers maintainers, for the current session or a past one identified by id or path, on any harness.",
+    "stars": 301369,
+    "installs": 25680,
+    "githubUrl": "https://github.com/obra/superpowers",
     "source": "skills.sh"
   },
   {
@@ -2626,6 +2626,17 @@
     "stars": 111381,
     "installs": 63799,
     "githubUrl": "https://github.com/addyosmani/agent-skills",
+    "source": "skills.sh"
+  },
+  {
+    "rank": 240,
+    "id": "coreyhaines31/marketingskills:video",
+    "name": "video",
+    "authorHandle": "coreyhaines31",
+    "description": "When the user wants to create, generate, or produce video content using AI tools or programmatic frameworks. Also use when the user mentions 'video production,' 'AI video,' 'Remotion,' 'Hyperframes,' 'HeyGen,' 'Synthesia,' 'Veo,' 'Sora,' 'Runway,' 'Kling,' 'Seedance,' 'Hailuo,' 'MiniMax,' 'Pika,' 'Hunyuan,' 'Wan,' 'video generation,' 'AI avatar,' 'talking head video,' 'programmatic video,' 'video template,' 'explainer video,' 'product demo video,' 'record a product demo,' 'feature demo video,' 'in-app demo,' 'video pipeline,' 'copy this edit,' 'match this video style,' 'reverse-engineer this video,' 'edit like this reference,' or 'make me a video.' Use this for video creation, generation, and production workflows. For video content strategy and what to post, see social. For paid video ad creative, see ad-creative.",
+    "stars": 57106,
+    "installs": 90356,
+    "githubUrl": "https://github.com/coreyhaines31/marketingskills",
     "source": "skills.sh"
   }
 ]
