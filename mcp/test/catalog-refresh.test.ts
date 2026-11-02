@@ -81,9 +81,14 @@ test("a trending-only publication refreshes even when skills are unchanged", asy
   const manifest = { ...fixture.manifest, trending: { path: `trending-${hash.slice(0, 12)}.json`, sha256: hash, bytes: bytes.length } };
   fixture.files.set(fixture.url, Buffer.from(JSON.stringify(manifest)));
   fixture.files.set(`https://catalog.test/${manifest.trending.path}`, bytes);
+  fixture.requested.length = 0;
   await catalog.refresh();
   assert.notEqual(catalog.get(), old);
   assert.equal((await catalog.get().listTrending(1))[0].id, rows[1].id);
+  assert.equal((await old.listTrending(1))[0].id, rows[0].id);
+  assert.deepEqual(manifest.skills, fixture.manifest.skills);
+  assert.deepEqual(manifest.searchCatalog, fixture.manifest.searchCatalog);
+  assert.ok(!fixture.requested.includes(`https://catalog.test/${manifest.skills.path}`));
 });
 
 test("failed refresh of a chosen remote catalog does not silently switch tracks", async context => {
