@@ -139,6 +139,7 @@ test("a skill saves in two steps, keeps every version, and loads back byte for b
     assert.equal(state.skills[0].versionCount, 2);
     assert.equal(state.skills[0].currentVersion.id, edited.status === "saved" && edited.skill.currentVersion.id);
     assert.equal(state.skills[0].currentVersion.deviceId, deviceId);
+    assert.match(state.skills[0].currentVersion.savedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     // Unchanged files are stored once: three distinct blobs for two versions.
     assert.equal(store.objects.size, 3);
     assert.equal(state.usage.limitBytes, CLOUD_SAVE_LIMITS.maximumUserBytes);
