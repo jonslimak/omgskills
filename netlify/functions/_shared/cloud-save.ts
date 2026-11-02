@@ -567,6 +567,17 @@ async function heldFiles(db: Database, userId: string, files: SkillManifestEntry
     .map((file) => ({ path: file.path, blobSha: file.blobSha, findings: findings.get(file.blobSha)! }));
 }
 
+/** Removes the review for this Mac's waiting copy of a skill, if there is one. Saved copies are untouched. */
+export async function dropSkillReview(
+  db: Database,
+  input: { userId: string; deviceId: string | null; skillKey: unknown }
+): Promise<void> {
+  await db.query(
+    "DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2 AND device_id IS NOT DISTINCT FROM $3",
+    [input.userId, normalizeSkillKey(input.skillKey), input.deviceId]
+  );
+}
+
 /** The user confirms a held skill is safe; its held files then save on the next try. */
 export async function confirmSkillReview(
   db: Database,
