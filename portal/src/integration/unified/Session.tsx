@@ -14,6 +14,7 @@ import { useSetCatalog } from "../../app/unified/use-set-catalog";
 import { useManagement } from "./useManagement";
 import { DevicesPanel } from "../DevicesPanel";
 import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
+import { CloudSavePanel } from "../../cloud-save/CloudSavePanel";
 import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation, staticPageAddress, unknownAppAddress } from "./entry-navigation";
 import { renderPublicFirst } from "./public-first";
@@ -180,7 +181,8 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
       blocked={!!snapshot.error || !snapshot.data || snapshot.accessDenied}
       error={snapshot.profileError || snapshot.error} save={account.saveProfile} settings={() => clerk.openUserProfile()} />
       : view === "devices" ? <div className="portal-design ua-connected-panel"><DevicesPanel key={accountKey} sessionKey={accountKey} api={api} local={local} readOnly={composition?.readOnly} browserConnection={productionInstall} denied={account.invalidate} theme={theme} inventoryDevices={connectedInventory ? data.devices : undefined} /></div>
-      : view === "github" && !composition?.readOnly ? <div className="portal-design ua-connected-panel"><PrivateSourcesPanel api={api} local={local} denied={account.invalidate} /></div> : undefined : undefined}
+      : view === "github" && !composition?.readOnly ? <div className="portal-design ua-connected-panel"><PrivateSourcesPanel api={api} local={local} denied={account.invalidate} /></div>
+      : view === "cloud" && !composition?.readOnly && !local ? <div className="portal-design ua-connected-panel"><CloudSavePanel key={accountKey} api={api} skills={data.skills} denied={account.invalidate} /></div> : undefined : undefined}
     previewBar={(local || sessionError || (available && (snapshot.error || composition?.readOnly))) && <div className="ua-preview">
       {local && <span>Local test · Unified app</span>}
       <div>

@@ -1190,3 +1190,60 @@ button.rd-skill-title:hover {
     transition: none;
   }
 }
+.cloud-save-switch {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.cloud-save-switch p {
+  margin-top: 4px;
+}
+.cloud-save-reviews,
+.cloud-save-choose form,
+.cloud-save-list {
+  display: grid;
+  gap: 12px;
+}
+.cloud-save-reviews h3,
+.cloud-save-choose h3 {
+  font-size: 13px;
+  font-weight: 600;
+}
+.cloud-save-choose > .rd-action {
+  justify-self: start;
+}
+.cloud-save-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 6px 16px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.cloud-save-choices label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+.cloud-save-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.cloud-save-labels span {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 11px;
+  padding: 1px 8px;
+}
+.cloud-save-list .rd-source-release[data-status="review"] strong {
+  color: var(--destructive, #b91c1c);
+}
+.cloud-save-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
