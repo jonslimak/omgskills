@@ -139,20 +139,26 @@ test("a skill saves in two steps, keeps every version, and loads back byte for b
     assert.equal(state.skills[0].versionCount, 2);
     assert.equal(state.skills[0].currentVersion.id, edited.status === "saved" && edited.skill.currentVersion.id);
     assert.equal(state.skills[0].currentVersion.deviceId, deviceId);
+    assert.match(state.skills[0].currentVersion.savedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     // Unchanged files are stored once: three distinct blobs for two versions.
     assert.equal(store.objects.size, 3);
     assert.equal(state.usage.limitBytes, CLOUD_SAVE_LIMITS.maximumUserBytes);
 
-    // Saving the earlier content again makes it current without a new version.
+    // Going back to earlier content records a new version from this save, with its own time and Mac.
     const restored = await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
-    assert.ok(restored.status === "saved" && !restored.created);
-    assert.equal((await readCloudSave(pool, userId)).skills[0].currentVersion.id,
-      saved.status === "saved" && saved.skill.currentVersion.id);
+    assert.ok(restored.status === "saved" && restored.created);
+    const history = await listCloudVersions(pool, { userId, skillKey: "notes" });
+    assert.equal(history.length, 3);
+    assert.equal(history[0].id, restored.status === "saved" && restored.skill.currentVersion.id);
+    assert.equal(history[0].treeSha, history[2].treeSha);
+    assert.notEqual(history[0].id, history[2].id);
+    assert.equal((await readCloudSave(pool, userId)).skills[0].currentVersion.id, history[0].id);
 
     const loaded = await loadCloudVersionPackage(pool, store, {
       userId,
       releaseId: edited.status === "saved" ? edited.skill.currentVersion.id : ""
     });
+    assert.notEqual(loaded.package.coordinates.commitSha, loaded.package.coordinates.treeSha);
     validateSkillPackage(loaded.package, loaded.package.coordinates);
     assert.deepEqual(
       loaded.package.entries.map((entry) => [entry.path, entry.mode, entry.data.toString()]),
@@ -260,6 +266,34 @@ test("simultaneous uploads can't go past the storage limit together", async () =
   });
 });
 
+test("turning cloud save off or leaving a skill out stops a version save already under way", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    // The setting changes after the save's first check, just as its transaction begins.
+    const changingPool = (update: Parameters<typeof updateCloudSaveSettings>[2]) => ({
+      query: (text: string, values?: unknown[]) => pool.query(text, values),
+      async connect() {
+        const client = await pool.connect();
+        const query = client.query;
+        client.query = (async (text: string, values?: unknown[]) => {
+          // Back to normal before anything else runs: the client returns to the shared pool.
+          client.query = query;
+          if (text === "BEGIN") await updateCloudSaveSettings(pool, userId, update);
+          return client.query(text, values);
+        }) as typeof client.query;
+        return client;
+      }
+    }) as unknown as Pool;
+    await rejects(saveCloudVersion(changingPool({ enabled: false }), { userId, deviceId, skillKey: "notes", files: manifest(v1) }), "disabled");
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await rejects(saveCloudVersion(changingPool({ excludedSkillKeys: ["notes"] }), { userId, deviceId, skillKey: "notes", files: manifest(v1) }), "excluded");
+    assert.deepEqual((await readCloudSave(pool, userId)).skills, []);
+  });
+});
+
 test("a skill deleted on the Mac keeps its cloud copy until it is saved again", async () => {
   await withMigratedSchema(async (pool) => {
     const store = new MemoryStore();
@@ -273,7 +307,15 @@ test("a skill deleted on the Mac keeps its cloud copy until it is saved again", 
     assert.equal((await readCloudSave(pool, userId)).skills[0].deletedLocallyAt, deleted.deletedLocallyAt);
     await rejects(markDeletedLocally(pool, { userId, skillKey: "missing", deleted: true }), "not_found");
 
+    // Saving the same content changes nothing; the Mac that has it clears the mark itself.
     await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    assert.equal((await readCloudSave(pool, userId)).skills[0].deletedLocallyAt, deleted.deletedLocallyAt);
+    await markDeletedLocally(pool, { userId, skillKey: "notes", deleted: false });
+    assert.equal((await readCloudSave(pool, userId)).skills[0].deletedLocallyAt, null);
+    // A new version clears it too.
+    await markDeletedLocally(pool, { userId, skillKey: "notes", deleted: true });
+    await uploadAll(pool, store, userId, v2);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v2) });
     assert.equal((await readCloudSave(pool, userId)).skills[0].deletedLocallyAt, null);
 
     // Turning cloud save off keeps what is saved.
@@ -390,6 +432,9 @@ test("a file with a key is held back until the user confirms, and the skill wait
     // Confirming on the web lets the Mac's next try through.
     const { confirmSkillReview } = await import("./cloud-save.js");
     assert.equal((await confirmSkillReview(pool, { userId, deviceId: null, skillKey: "deploy" })).confirmed, true);
+    // The Mac's next pass asks to save first; the confirmed file is now just missing, so it uploads it.
+    const next = await saveCloudVersion(pool, { userId, deviceId, skillKey: "deploy", files: manifest(files) });
+    assert.deepEqual(next, { status: "missing_files", missing: [secretSha] });
     const stored = await storeCloudBlob(pool, store, { userId, deviceId, blobSha: secretSha, data: secret });
     assert.deepEqual(stored.labels, ["confirmed_secret"]);
     const saved = await saveCloudVersion(pool, { userId, deviceId, skillKey: "deploy", files: manifest(files) });
