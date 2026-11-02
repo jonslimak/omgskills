@@ -60,6 +60,7 @@ import {
   SearchCheck,
   SearchX,
   Server,
+  Cloud,
   Shapes,
   Share,
   ShieldCheck,
@@ -779,6 +780,9 @@ export function UnifiedApp({
       {supportsView("github") && <MenuItem icon={Code} onSelect={() => goFromAccount("github")}>
         GitHub sources
       </MenuItem>}
+      {supportsView("cloud") && accountPages && <MenuItem icon={Cloud} onSelect={() => goFromAccount("cloud")}>
+        Cloud save
+      </MenuItem>}
       {supportsView("mcp") && <MenuItem icon={Server} onSelect={() => goFromAccount("mcp")}>
         MCP server
       </MenuItem>}
@@ -1126,6 +1130,7 @@ export function UnifiedApp({
     devices: "devices",
     profile: "profile",
     github: "GitHub sources",
+    cloud: "Cloud save",
     mcp: "MCP server",
   };
   const title = nav.query
@@ -1634,7 +1639,7 @@ export function UnifiedApp({
                     </Empty>
                   )}
                 </div>
-              ) : ["agents", "devices", "profile", "github", "mcp"].includes(
+              ) : ["agents", "devices", "profile", "github", "cloud", "mcp"].includes(
                   nav.view,
                 ) ? (
                 accountPages?.(nav.view, theme) ?? <div className="ua-account-page">
@@ -1683,6 +1688,9 @@ export function UnifiedApp({
                           : "Unpublished profile"}
                       </p>
                     </>
+                  )}
+                  {nav.view === "cloud" && (
+                    <Empty title="Cloud save">Sign in to save your skills to the cloud.</Empty>
                   )}
                   {nav.view === "github" && (
                     <Empty
