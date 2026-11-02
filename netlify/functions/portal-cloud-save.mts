@@ -166,10 +166,11 @@ export async function portalCloudSave(
         return secretJsonResponse(req, result, { status: result.created ? 201 : 200 });
       }
       case "deleted-locally": {
-        const { userId } = await dependencies.requireDevice(req, "content:write");
+        const { userId, deviceId } = await dependencies.requireDevice(req, "content:write");
         const body = await requireJsonObject(req);
         return secretJsonResponse(req, await markDeletedLocally(dependencies.pool(), {
           userId,
+          deviceId,
           skillKey: route.skillKey,
           deleted: body.deleted
         }));
