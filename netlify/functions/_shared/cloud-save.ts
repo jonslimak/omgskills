@@ -686,6 +686,8 @@ export async function deleteCloudSkills(
           enabled = CASE WHEN $2::text IS NULL THEN false ELSE cloud_save_settings.enabled END,
           excluded_skill_keys = CASE
             WHEN $2::text IS NULL OR $2::text = ANY(cloud_save_settings.excluded_skill_keys) THEN cloud_save_settings.excluded_skill_keys
+            -- At the list's limit the skill is still deleted; it just isn't added to the left-out list.
+            WHEN cardinality(cloud_save_settings.excluded_skill_keys) >= 5000 THEN cloud_save_settings.excluded_skill_keys
             ELSE array_append(cloud_save_settings.excluded_skill_keys, $2::text)
           END,
           updated_at = now()
@@ -753,6 +755,11 @@ export async function deleteCloudSkills(
     client.release();
   }
   return { ...result, pendingFiles: await drainCloudPurge(pool, store, input.userId) };
+}
+
+/** A cheap check without locks, so ordinary reads don't wait on uploads. */
+export async function hasPendingPurge(db: Database, userId: string): Promise<boolean> {
+  return Boolean((await db.query("SELECT 1 FROM cloud_purge_queue WHERE user_id = $1 LIMIT 1", [userId])).rowCount);
 }
 
 /**

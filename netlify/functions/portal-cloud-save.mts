@@ -7,6 +7,7 @@ import {
   confirmSkillReview,
   deleteCloudSkills,
   drainCloudPurge,
+  hasPendingPurge,
   dropSkillReview,
   isCloudSaveAvailable,
   listCloudVersions,
@@ -144,8 +145,13 @@ export async function portalCloudSave(
           return secretJsonResponse(req, await deleteCloudSkills(dependencies.pool(), dependencies.store(), { userId }));
         }
         const { userId } = await actor(req, dependencies, "sync:write");
-        // Finishes removing files left over from an earlier delete; never blocks reading.
-        await drainCloudPurge(dependencies.pool(), dependencies.store(), userId, 1000).catch(() => undefined);
+        // Finishes removing files left over from an earlier delete; never blocks or fails a read.
+        try {
+          const pool = dependencies.pool();
+          if (await hasPendingPurge(pool, userId)) await drainCloudPurge(pool, dependencies.store(), userId, 1000);
+        } catch {
+          // Retried on the next read.
+        }
         return secretJsonResponse(req, await readCloudSave(dependencies.pool(), userId));
       }
       case "skill": {

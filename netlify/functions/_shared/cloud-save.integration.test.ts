@@ -663,3 +663,44 @@ test("versions of shared and GitHub sources stay append-only, even inside a clou
     await assert.rejects(pool.query("DELETE FROM skill_sources WHERE kind = 'cloud'"), /tombstoned/);
   });
 });
+
+test("reading cloud save finishes a pending clean-up, and never fails because of it", async () => {
+  const { portalCloudSave } = await import("../portal-cloud-save.mjs");
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    store.failing = new Set(store.objects.keys());
+    assert.equal((await deleteCloudSkills(pool, store, { userId })).pendingFiles, 2);
+
+    const read = (storeFor: () => MemoryStore) => portalCloudSave(new Request("https://omgskills.com/api/portal/cloud-save"), {} as never, {
+      available: () => true, pool: () => pool, store: storeFor,
+      requireUser: async () => ({ userId, deviceId: null }), requireDevice: async () => ({ userId, deviceId })
+    } as never);
+    // Storage unreachable: the read still answers, and the files stay queued.
+    assert.equal((await read(() => { throw new Error("not configured"); })).status, 200);
+    assert.equal(store.objects.size, 2);
+    store.failing = new Set();
+    assert.equal((await read(() => store)).status, 200);
+    assert.equal(store.objects.size, 0);
+    const queued = await pool.query("SELECT 1 FROM cloud_purge_queue WHERE user_id = $1", [userId]);
+    assert.equal(queued.rowCount, 0);
+  });
+});
+
+test("deleting a skill works even when the left-out list is full", async () => {
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    await updateCloudSaveSettings(pool, userId, { excludedSkillKeys: Array.from({ length: 5000 }, (_, index) => `skill-${index}`) });
+    assert.equal((await deleteCloudSkills(pool, store, { userId, skillKey: "notes" })).deletedSkills, 1);
+    assert.deepEqual((await readCloudSave(pool, userId)).skills, []);
+  });
+});
