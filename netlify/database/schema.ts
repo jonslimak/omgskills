@@ -470,12 +470,17 @@ export const cloudBlobs = pgTable(
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     blobSha: text("blob_sha").notNull(),
     byteSize: integer("byte_size").notNull(),
+    labels: text("labels").array().notNull().default(sql`ARRAY[]::text[]`),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
   },
   (table) => [
     primaryKey({ columns: [table.userId, table.blobSha] }),
     check("cloud_blobs_sha_check", sql`${table.blobSha} ~ '^[0-9a-f]{40}$'`),
-    check("cloud_blobs_size_check", sql`${table.byteSize} >= 0`)
+    check("cloud_blobs_size_check", sql`${table.byteSize} >= 0`),
+    check(
+      "cloud_blobs_labels_check",
+      sql`${table.labels} <@ ARRAY['download_and_run', 'invisible_characters', 'hidden_instructions', 'confirmed_secret']::text[]`
+    )
   ]
 );
 
@@ -487,6 +492,7 @@ export const cloudReleases = pgTable(
     deviceId: uuid("device_id").references(() => deviceTokens.id, { onDelete: "set null" }),
     fileCount: integer("file_count").notNull(),
     totalBytes: integer("total_bytes").notNull(),
+    labels: text("labels").array().notNull().default(sql`ARRAY[]::text[]`),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
   },
   (table) => [
@@ -494,7 +500,11 @@ export const cloudReleases = pgTable(
       columns: [table.releaseId, table.sourceId],
       foreignColumns: [skillReleases.id, skillReleases.sourceId]
     }).onDelete("restrict"),
-    check("cloud_releases_size_check", sql`${table.fileCount} > 0 AND ${table.totalBytes} >= 0`)
+    check("cloud_releases_size_check", sql`${table.fileCount} > 0 AND ${table.totalBytes} >= 0`),
+    check(
+      "cloud_releases_labels_check",
+      sql`${table.labels} <@ ARRAY['scripts', 'download_and_run', 'invisible_characters', 'hidden_instructions', 'confirmed_secret']::text[]`
+    )
   ]
 );
 
@@ -531,5 +541,36 @@ export const cloudSavedSkills = pgTable(
       foreignColumns: [skillReleases.id, skillReleases.sourceId]
     }).onDelete("restrict"),
     uniqueIndex("cloud_saved_skills_user_key_unique").on(table.userId, table.skillKey)
+  ]
+);
+
+export const cloudSecretHolds = pgTable(
+  "cloud_secret_holds",
+  {
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    blobSha: text("blob_sha").notNull(),
+    findings: jsonb("findings").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
+    confirmedByDeviceId: uuid("confirmed_by_device_id").references(() => deviceTokens.id, { onDelete: "set null" })
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.blobSha] }),
+    check("cloud_secret_holds_sha_check", sql`${table.blobSha} ~ '^[0-9a-f]{40}$'`),
+    check("cloud_secret_holds_findings_check", sql`jsonb_typeof(${table.findings}) = 'array'`)
+  ]
+);
+
+export const cloudSkillReviews = pgTable(
+  "cloud_skill_reviews",
+  {
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    skillKey: text("skill_key").notNull(),
+    files: jsonb("files").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.skillKey] }),
+    check("cloud_skill_reviews_files_check", sql`jsonb_typeof(${table.files}) = 'array'`)
   ]
 );

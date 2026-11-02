@@ -4,6 +4,7 @@ import {
   CLOUD_SAVE_LIMITS,
   CloudSaveError,
   cloudSaveErrorStatus,
+  confirmSkillReview,
   isCloudSaveAvailable,
   listCloudVersions,
   loadCloudVersionPackage,
@@ -31,6 +32,7 @@ type Route =
   | { action: "blob"; blobSha: string }
   | { action: "versions"; skillKey: string }
   | { action: "deleted-locally"; skillKey: string }
+  | { action: "review"; skillKey: string }
   | { action: "package"; releaseId: string };
 
 const methods: Record<Route["action"], string[]> = {
@@ -39,6 +41,7 @@ const methods: Record<Route["action"], string[]> = {
   blob: ["PUT"],
   versions: ["GET", "POST"],
   "deleted-locally": ["PUT"],
+  review: ["POST"],
   package: ["GET"]
 };
 
@@ -52,14 +55,14 @@ function parseRoute(req: Request): Route | null {
   if (rest.length === 3 && rest[0] === "versions" && rest[2] === "package") {
     return /^[0-9a-f-]{16,100}$/i.test(rest[1]) ? { action: "package", releaseId: rest[1] } : null;
   }
-  if (rest.length === 3 && rest[0] === "skills" && (rest[2] === "versions" || rest[2] === "deleted-locally")) {
+  if (rest.length === 3 && rest[0] === "skills" && ["versions", "deleted-locally", "review"].includes(rest[2])) {
     let skillKey: string;
     try {
       skillKey = decodeURIComponent(rest[1]);
     } catch {
       return null;
     }
-    return { action: rest[2], skillKey };
+    return { action: rest[2] as "versions" | "deleted-locally" | "review", skillKey };
   }
   return null;
 }
@@ -131,12 +134,15 @@ export async function portalCloudSave(
         return secretJsonResponse(req, { settings: await updateCloudSaveSettings(dependencies.pool(), userId, update) });
       }
       case "blob": {
-        const { userId } = await dependencies.requireDevice(req, "content:write");
+        const { userId, deviceId } = await dependencies.requireDevice(req, "content:write");
         const data = await requireBody(req);
         const result = await storeCloudBlob(dependencies.pool(), dependencies.store(), {
           userId,
+          deviceId,
           blobSha: route.blobSha,
-          data
+          data,
+          // Sent by the Mac only after the user confirms a held file is safe to save.
+          confirmSecrets: req.headers.get("x-cloud-save-confirm") === "secrets-reviewed"
         });
         return secretJsonResponse(req, result, { status: result.stored ? 201 : 200 });
       }
@@ -167,6 +173,16 @@ export async function portalCloudSave(
           deleted: body.deleted
         }));
       }
+      case "review": {
+        const { userId, deviceId } = await actor(req, dependencies, "content:write");
+        const body = await requireJsonObject(req);
+        if (body.confirm !== true) throw new CloudSaveError("invalid_request", "Send confirm: true to save the held files");
+        return secretJsonResponse(req, { review: await confirmSkillReview(dependencies.pool(), {
+          userId,
+          deviceId,
+          skillKey: route.skillKey
+        }) });
+      }
       case "package": {
         const { userId } = await dependencies.requireDevice(req, "content:read");
         const loaded = await loadCloudVersionPackage(dependencies.pool(), dependencies.store(), {
@@ -191,7 +207,12 @@ export async function portalCloudSave(
     if (error instanceof CloudSaveError) {
       return secretJsonResponse(
         req,
-        { error: error.message, code: error.code, ...(error.detail ? { detail: error.detail } : {}) },
+        {
+          error: error.message,
+          code: error.code,
+          ...(error.detail ? { detail: error.detail } : {}),
+          ...(error.heldFiles ? { [error.heldFiles.some((item) => "path" in item) ? "files" : "findings"]: error.heldFiles } : {})
+        },
         { status: cloudSaveErrorStatus(error) }
       );
     }
@@ -221,6 +242,7 @@ export const config: Config = {
     "/api/portal/cloud-save/blobs/:blobSha",
     "/api/portal/cloud-save/skills/:skillKey/versions",
     "/api/portal/cloud-save/skills/:skillKey/deleted-locally",
+    "/api/portal/cloud-save/skills/:skillKey/review",
     "/api/portal/cloud-save/versions/:releaseId/package"
   ],
   rateLimit: {
