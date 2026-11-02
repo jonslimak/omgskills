@@ -21,12 +21,14 @@ final class CloudSaveController {
     @ObservationIgnored private let credential: @MainActor () -> StoredDeviceCredential?
     @ObservationIgnored private let scan: Scan
     @ObservationIgnored private let folderKeys: FolderKeys
+    @ObservationIgnored private let treeRecord: URL?
     @ObservationIgnored private var task: Task<Void, Never>?
     @ObservationIgnored private var taskID: UUID?
     @ObservationIgnored private var rerun = false
 
     init(api: any CloudSaveServing, credential: @escaping @MainActor () -> StoredDeviceCredential?, scan: @escaping Scan,
-         folderKeys: @escaping FolderKeys, pace: CloudSaveSync.Pace? = nil) {
+         folderKeys: @escaping FolderKeys, treeRecord: URL? = CloudSaveController.defaultTreeRecord,
+         pace: CloudSaveSync.Pace? = nil) {
         self.api = api
         var sync = CloudSaveSync(api: api)
         if let pace { sync.pace = pace }
@@ -34,6 +36,30 @@ final class CloudSaveController {
         self.credential = credential
         self.scan = scan
         self.folderKeys = folderKeys
+        self.treeRecord = treeRecord
+    }
+
+    nonisolated static var defaultTreeRecord: URL? {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("omgskills/cloud-save-trees.json")
+    }
+
+    /// What each skill looked like here after the last pass, for this connection only.
+    private struct TreeRecord: Codable {
+        let deviceID: String
+        let trees: [String: String]
+    }
+
+    private func lastTrees(for deviceID: String) -> [String: String] {
+        guard let treeRecord, let data = try? Data(contentsOf: treeRecord),
+              let record = try? JSONDecoder().decode(TreeRecord.self, from: data), record.deviceID == deviceID else { return [:] }
+        return record.trees
+    }
+
+    private func remember(_ trees: [String: String], for deviceID: String) {
+        guard let treeRecord else { return }
+        try? FileManager.default.createDirectory(at: treeRecord.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? JSONEncoder().encode(TreeRecord(deviceID: deviceID, trees: trees)).write(to: treeRecord, options: .atomic)
     }
 
     /// Folder names in the given skills folders as cloud keys. A missing folder has none; one that
@@ -101,9 +127,12 @@ final class CloudSaveController {
         defer { isRunning = false }
         do {
             let result = try await scan()
+            let deviceID = record.connection.deviceID
             let next = try await sync.run(installations: result.installations, localFolderKeys: folderKeys(),
-                deviceID: record.connection.deviceID, credential: record)
+                lastTrees: lastTrees(for: deviceID), deviceID: deviceID, credential: record)
             guard !Task.isCancelled else { return }
+            // Only a pass that reached every skill can say what this Mac's copies look like now.
+            if [.upToDate, .incomplete].contains(next.status) { remember(next.localTrees, for: deviceID) }
             if next.status != .unavailable { isAvailable = true }
             summary = next
             message = nil

@@ -90,6 +90,10 @@ private actor FakeCloudSave: CloudSaveServing {
     }
 
     func hold(_ sha: String) { held[sha] = [CloudSaveFinding(rule: "github_token", kind: "GitHub token", line: 1)] }
+    func release(_ sha: String) { held[sha] = nil }
+    func waiting(_ reviews: [CloudSaveState.Review]) {
+        state = CloudSaveState(settings: state.settings, usage: state.usage, skills: state.skills, needsReview: reviews)
+    }
 
     func state(credential: StoredDeviceCredential) async throws -> CloudSaveState { calls.append("state"); return state }
     func setEnabled(_ enabled: Bool, credential: StoredDeviceCredential) async throws { calls.append("enabled:\(enabled)") }
@@ -325,6 +329,67 @@ struct CloudSaveReviewFixTests {
         try FileManager.default.createDirectory(at: root.appendingPathComponent(".omgskills"), withIntermediateDirectories: true)
         #expect(CloudSaveController.folderKeys(in: [root, root.appendingPathComponent("missing")]) == ["notes"])
         #expect(CloudSaveController.folderKeys(in: [root.appendingPathComponent("Notes/SKILL.md")]) == nil)
+    }
+
+    @Test func thisMacsOwnEditsAlwaysSaveAndAnotherMacsSaveWaitsForAnEditHere() async throws {
+        let root = try temporaryRoot()
+        let notes = try makeSkill(root, "notes", files: ["a.txt": "a"])
+        try touch(notes.appendingPathComponent("SKILL.md"), "2026-01-01T00:00:00Z")
+        try touch(notes.appendingPathComponent("a.txt"), "2026-01-01T00:00:00Z")
+        let other = String(repeating: "b", count: 40)
+        func cloud(by device: String) -> FakeCloudSave {
+            FakeCloudSave(skills: [.init(key: "notes", currentVersion: .init(id: "r1", treeSha: other, deviceId: device,
+                savedAt: "2026-11-01T00:00:00.000Z", labels: []), deletedLocallyAt: nil)])
+        }
+        // Old file times, but the cloud copy is this Mac's own: a deletion or chmod here still saves.
+        let mine = try await sync(cloud(by: "device-1")).run(installations: [installation(notes)], localFolderKeys: ["notes"],
+            deviceID: "device-1", credential: credential())
+        #expect(mine.uploadedCount == 1)
+
+        let tree = try CloudSaveFolder.read(directory: notes).treeSha
+        let unchanged = try await sync(cloud(by: "device-2")).run(installations: [installation(notes)], localFolderKeys: ["notes"],
+            lastTrees: ["notes": tree], deviceID: "device-1", credential: credential())
+        #expect(unchanged.olderHereCount == 1 && unchanged.uploadedCount == 0)
+        #expect(unchanged.localTrees == ["notes": tree])
+
+        // A file deleted here since the last pass changes the tree even though no file time moved on.
+        try FileManager.default.removeItem(at: notes.appendingPathComponent("a.txt"))
+        let deleted = try await sync(cloud(by: "device-2")).run(installations: [installation(notes)], localFolderKeys: ["notes"],
+            lastTrees: ["notes": tree], deviceID: "device-1", credential: credential())
+        #expect(deleted.uploadedCount == 1)
+    }
+
+    @Test func aHeldEditIsRetriedAfterConfirmationEvenOverAnotherMacsSave() async throws {
+        let root = try temporaryRoot()
+        let deploy = try makeSkill(root, "deploy", files: ["config.env": "TOKEN=x"])
+        let api = FakeCloudSave(skills: [.init(key: "deploy", currentVersion: .init(id: "r1", treeSha: String(repeating: "c", count: 40),
+            deviceId: "device-2", savedAt: "2026-11-01T00:00:00.000Z", labels: []), deletedLocallyAt: nil)])
+        let secret = try #require(try CloudSaveFolder.read(directory: deploy).entries.first { $0.path == "config.env" })
+        await api.hold(secret.blobSha)
+        let previous = ["deploy": String(repeating: "d", count: 40)]
+        let first = try await sync(api).run(installations: [installation(deploy)], localFolderKeys: ["deploy"],
+            lastTrees: previous, deviceID: "device-1", credential: credential())
+        #expect(first.needsReview == ["deploy"])
+        #expect(first.localTrees == previous, "an unsettled copy keeps its earlier record")
+        await api.release(secret.blobSha)
+        let second = try await sync(api).run(installations: [installation(deploy)], localFolderKeys: ["deploy"],
+            lastTrees: first.localTrees, deviceID: "device-1", credential: credential())
+        #expect(second.uploadedCount == 1)
+    }
+
+    @Test func aReviewForASkillDeletedOnThisMacIsCleared() async throws {
+        let api = FakeCloudSave()
+        await api.waiting([.init(key: "gone", deviceId: "device-1", files: [], confirmed: false),
+                           .init(key: "elsewhere", deviceId: "device-2", files: [], confirmed: false)])
+        _ = try await sync(api).run(installations: [], localFolderKeys: [], deviceID: "device-1", credential: credential())
+        #expect(await api.deleted == ["gone": true])
+    }
+
+    @Test func keysMatchTheServerAndWebIncludingFinalSigma() {
+        // Expected values come from JavaScript's toLowerCase(), which the server and web use.
+        let names = ["ΟΔΟΣ", "ΟΔΟΣ-notes", "Σ", "ΑΣ'Β", "my ΣΟΦΙΑ", "İstanbul", "Straße", "ǅemal", "ΌΣΟΣ ΚΑΙ ΟΣΟΣ", "AΣ.b", "ΑΣ1"]
+        let expected = ["οδος", "οδος-notes", "σ", "ασ'β", "my σοφια", "i̇stanbul", "straße", "ǆemal", "όσος και οσος", "aσ.b", "ας1"]
+        #expect(names.map(CloudSaveFolder.key(forFolderName:)) == expected)
     }
 
     @Test func keysAreNotTrimmed() {
