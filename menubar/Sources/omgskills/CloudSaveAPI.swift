@@ -33,6 +33,8 @@ struct CloudSaveState: Decodable, Equatable, Sendable {
             let findings: [CloudSaveFinding]
         }
         let key: String
+        /// The Mac whose copy is waiting.
+        let deviceId: String?
         let files: [File]
         let confirmed: Bool
     }

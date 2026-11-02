@@ -31,7 +31,16 @@ struct CloudSaveFolder: Equatable, Sendable {
     /// A skill's identity across agents and Macs, matching the server: the folder name, NFC and lower case.
     /// Nothing is trimmed; the server refuses names it can't store, and that skill is reported, not saved.
     static func key(forFolderName name: String) -> String {
-        name.precomposedStringWithCanonicalMapping.lowercased()
+        // JavaScript lowercases a word-final capital sigma to ς, Swift to σ; match the server and web.
+        let characters = Array(name.precomposedStringWithCanonicalMapping)
+        var result = ""
+        for (index, character) in characters.enumerated() {
+            guard character == "Σ" else { result += character.lowercased(); continue }
+            let afterLetter = characters[..<index].last(where: { !$0.isCaseIgnorable })?.isCased == true
+            let beforeLetter = characters[(index + 1)...].first(where: { !$0.isCaseIgnorable })?.isCased == true
+            result += afterLetter && !beforeLetter ? "ς" : "σ"
+        }
+        return result
     }
 
     static func read(directory: URL, fileManager: FileManager = .default) throws -> CloudSaveFolder {
@@ -79,4 +88,9 @@ struct CloudSaveFolder: Equatable, Sendable {
                 data: data, blobSha: SkillIdentityResolver.gitBlobSHA(for: data)))
         }
     }
+}
+
+private extension Character {
+    var isCased: Bool { unicodeScalars.contains { $0.properties.isCased } }
+    var isCaseIgnorable: Bool { unicodeScalars.allSatisfy { $0.properties.isCaseIgnorable } }
 }

@@ -24,6 +24,8 @@ struct CloudSaveSummary: Equatable, Sendable {
     var needsReview: [String] = []
     /// Skills that can't be saved, by key, with the reason.
     var skipped: [String: String] = [:]
+    /// The tree of every skill folder read in this pass, to tell next time whether it changed here.
+    var localTrees: [String: String] = [:]
 }
 
 /// Saves this Mac's own and edited skills to the cloud. One pass compares every
@@ -37,7 +39,8 @@ struct CloudSaveSync: Sendable {
 
     /// `localFolderKeys` lists every skill folder name on this Mac, valid or not, or nil when a
     /// skills folder couldn't be read; deletions are only marked when it is known.
-    func run(installations: [Skill], localFolderKeys: Set<String>?, deviceID: String,
+    /// `lastTrees` is what each skill looked like on this Mac at the end of the previous pass.
+    func run(installations: [Skill], localFolderKeys: Set<String>?, lastTrees: [String: String] = [:], deviceID: String,
              credential: StoredDeviceCredential) async throws -> CloudSaveSummary {
         let state: CloudSaveState
         do { state = try await api.state(credential: credential) }
@@ -51,11 +54,15 @@ struct CloudSaveSync: Sendable {
         let excluded = Set(state.settings.excludedSkillKeys)
         let saved = Dictionary(state.skills.map { ($0.key, $0) }, uniquingKeysWith: { first, _ in first })
         let folders = candidates(installations, summary: &summary)
+        // A copy that isn't settled (not saved, waiting for review) keeps its earlier record,
+        // so it still counts as changed here next time.
+        summary.localTrees = lastTrees.filter { key, _ in folders.contains { $0.key == key } }
 
         for folder in folders where !excluded.contains(folder.key) {
             try Task.checkCancellation()
             if let current = saved[folder.key], current.currentVersion.treeSha == folder.treeSha {
                 summary.savedCount += 1
+                summary.localTrees[folder.key] = folder.treeSha
                 // Only the Mac that saved it clears its "deleted" mark; another Mac's copy would flip it back and forth.
                 if current.deletedLocallyAt != nil && current.currentVersion.deviceId == deviceID {
                     do {
@@ -68,14 +75,16 @@ struct CloudSaveSync: Sendable {
                 continue
             }
             // A stale copy on this Mac must not replace a newer save from another Mac.
-            if let current = saved[folder.key], let savedAt = Self.date(current.currentVersion.savedAt),
-               folder.modifiedAt <= savedAt {
+            if let current = saved[folder.key], !Self.isNewerHere(folder, than: current, lastTree: lastTrees[folder.key],
+                                                                   deviceID: deviceID) {
                 summary.olderHereCount += 1
+                summary.localTrees[folder.key] = folder.treeSha
                 continue
             }
             do {
                 if try await save(folder, credential: credential) { summary.uploadedCount += 1 }
                 summary.savedCount += 1
+                summary.localTrees[folder.key] = folder.treeSha
             } catch let error as CloudSaveAPIError {
                 if let stop = Self.stopStatus(error) { summary.status = stop; return summary }
                 switch error {
@@ -98,6 +107,13 @@ struct CloudSaveSync: Sendable {
                 } catch let error as CloudSaveAPIError {
                     if let stop = Self.stopStatus(error) { summary.status = stop; return summary }
                 }
+            }
+            // A skill this Mac had waiting for review and has since deleted no longer waits.
+            let savedKeys = Set(state.skills.map(\.key))
+            for review in state.needsReview where review.deviceId == deviceID
+                && !localFolderKeys.contains(review.key) && !savedKeys.contains(review.key) {
+                try? await pace()
+                try? await api.markDeletedLocally(key: review.key, deleted: true, credential: credential)
             }
         }
         if !summary.needsReview.isEmpty || !summary.skipped.isEmpty { summary.status = .incomplete }
@@ -159,6 +175,18 @@ struct CloudSaveSync: Sendable {
             summary.skipped[key] = nil
         }
         return chosen.values.sorted { $0.key < $1.key }
+    }
+
+    /// Whether this Mac's copy should replace the cloud's current version, which differs from it.
+    /// This Mac's own save is always replaced. Another Mac's is replaced only by an edit made here:
+    /// the copy changed since the last pass, or, for a skill not seen here before, a file was
+    /// modified after that save.
+    static func isNewerHere(_ folder: CloudSaveFolder, than current: CloudSaveState.SavedSkill, lastTree: String?,
+                            deviceID: String) -> Bool {
+        if current.currentVersion.deviceId == deviceID { return true }
+        if let lastTree { return lastTree != folder.treeSha }
+        guard let savedAt = date(current.currentVersion.savedAt) else { return true }
+        return folder.modifiedAt > savedAt
     }
 
     static func date(_ value: String) -> Date? {

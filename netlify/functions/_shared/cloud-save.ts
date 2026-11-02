@@ -129,6 +129,8 @@ export type CloudSavedSkill = {
 
 export type CloudSkillReview = {
   key: string;
+  /** The Mac whose copy is waiting. */
+  deviceId: string | null;
   files: { path: string; findings: SecretFinding[] }[];
   confirmed: boolean;
   updatedAt: string;
@@ -170,10 +172,11 @@ const versionColumns = `
 `;
 
 async function readReviews(db: Database, userId: string): Promise<CloudSkillReview[]> {
-  const result = await db.query<{ key: string; files: HeldFile[]; confirmed: boolean; updatedAt: string }>(
+  const result = await db.query<{ key: string; deviceId: string | null; files: HeldFile[]; confirmed: boolean; updatedAt: string }>(
     `
       SELECT
         review.skill_key AS key,
+        review.device_id AS "deviceId",
         review.files,
         to_char(review.updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "updatedAt",
         NOT EXISTS (
@@ -191,6 +194,7 @@ async function readReviews(db: Database, userId: string): Promise<CloudSkillRevi
   );
   return result.rows.map((row) => ({
     key: row.key,
+    deviceId: row.deviceId,
     files: row.files.map(({ path, findings }) => ({ path, findings })),
     confirmed: row.confirmed,
     updatedAt: row.updatedAt
@@ -441,11 +445,12 @@ export async function saveCloudVersion(
     if (held.length) {
       await pool.query(
         `
-          INSERT INTO cloud_skill_reviews (user_id, skill_key, files)
-          VALUES ($1, $2, $3::jsonb)
-          ON CONFLICT (user_id, skill_key) DO UPDATE SET files = EXCLUDED.files, updated_at = now()
+          INSERT INTO cloud_skill_reviews (user_id, skill_key, device_id, files)
+          VALUES ($1, $2, $3, $4::jsonb)
+          ON CONFLICT (user_id, skill_key) DO UPDATE SET
+            device_id = EXCLUDED.device_id, files = EXCLUDED.files, updated_at = now()
         `,
-        [input.userId, skillKey, JSON.stringify(held)]
+        [input.userId, skillKey, input.deviceId, JSON.stringify(held)]
       );
       throw new CloudSaveError("needs_review", "This skill has files that look like they contain a key or password", undefined, held);
     }
@@ -485,7 +490,11 @@ export async function saveCloudVersion(
       [sourceId]
     );
     if (current.rows[0]?.treeSha === manifest.treeSha) {
-      await client.query("DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2", [input.userId, skillKey]);
+      // Only this Mac's own waiting copy is settled by matching the current version.
+      await client.query(
+        "DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2 AND device_id IS NOT DISTINCT FROM $3",
+        [input.userId, skillKey, input.deviceId]
+      );
       await client.query("COMMIT");
       return { status: "saved", created: false,
         skill: { key: skillKey, currentVersion: await readVersion(pool, current.rows[0].releaseId) } };
@@ -603,13 +612,22 @@ async function lockCloudSource(client: PoolClient, userId: string, skillKey: str
   return result.rows[0].id;
 }
 
-/** Marks a saved skill as deleted (or back) on the user's Mac. Its cloud copy is kept. */
+/**
+ * Marks a saved skill as deleted (or back) on the user's Mac. Its cloud copy is kept. A skill
+ * deleted while waiting for review no longer waits; a review alone is enough to find it.
+ */
 export async function markDeletedLocally(
   db: Database,
-  input: { userId: string; skillKey: unknown; deleted: unknown }
+  input: { userId: string; deviceId?: string | null; skillKey: unknown; deleted: unknown }
 ): Promise<{ key: string; deletedLocallyAt: string | null }> {
   const skillKey = normalizeSkillKey(input.skillKey);
   if (typeof input.deleted !== "boolean") throw new CloudSaveError("invalid_request", "deleted must be true or false");
+  // Only the review for this Mac's copy; another Mac may still have the skill waiting.
+  const review = input.deleted
+    ? await db.query(
+      "DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2 AND device_id IS NOT DISTINCT FROM $3",
+      [input.userId, skillKey, input.deviceId ?? null])
+    : { rowCount: 0 };
   const result = await db.query<{ deletedLocallyAt: string | null }>(
     `
       UPDATE cloud_saved_skills
@@ -620,7 +638,10 @@ export async function markDeletedLocally(
     `,
     [input.userId, skillKey, input.deleted]
   );
-  if (!result.rows[0]) throw new CloudSaveError("not_found", "Saved skill not found");
+  if (!result.rows[0]) {
+    if (review.rowCount) return { key: skillKey, deletedLocallyAt: null };
+    throw new CloudSaveError("not_found", "Saved skill not found");
+  }
   return { key: skillKey, deletedLocallyAt: result.rows[0].deletedLocallyAt };
 }
 

@@ -27,6 +27,8 @@ CREATE TABLE cloud_secret_holds (
 CREATE TABLE cloud_skill_reviews (
   user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   skill_key text NOT NULL,
+  -- The Mac whose copy is waiting; another Mac's save of other content doesn't clear it.
+  device_id uuid,
   files jsonb NOT NULL,
   updated_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (user_id, skill_key),

@@ -445,6 +445,44 @@ test("a file with a key is held back until the user confirms, and the skill wait
   });
 });
 
+test("a review belongs to its Mac's copy, and deleting the skill there clears it", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const first = await createUser(pool);
+    const userId = first.userId;
+    const second = await pool.query<{ id: string }>(
+      `INSERT INTO device_tokens (user_id, token_hash, device_name, expires_at, granted_scopes)
+       VALUES ($1, 'hash-2', 'Mac 2', now() + interval '1 day', ARRAY['sync:write', 'self:revoke', 'content:write']) RETURNING id`,
+      [userId]
+    );
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId: second.rows[0].id, skillKey: "deploy", files: manifest(v1) });
+
+    // The first Mac's copy has a key and waits for review.
+    const held: File[] = [v1[0], { path: "config.env", text: `TOKEN=${fakeToken}\n` }];
+    const secret = Buffer.from(held[1].text);
+    await assert.rejects(storeCloudBlob(pool, store, { userId, deviceId: first.deviceId, blobSha: gitObjectSha("blob", secret), data: secret }));
+    await assert.rejects(saveCloudVersion(pool, { userId, deviceId: first.deviceId, skillKey: "deploy", files: manifest(held) }));
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 1);
+
+    // The second Mac re-saving the current content leaves the first Mac's review alone.
+    await saveCloudVersion(pool, { userId, deviceId: second.rows[0].id, skillKey: "deploy", files: manifest(v1) });
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 1);
+
+    // Deleting the skill on the first Mac clears it, even for a skill never saved.
+    assert.equal((await readCloudSave(pool, userId)).needsReview[0].deviceId, first.deviceId);
+    await markDeletedLocally(pool, { userId, deviceId: second.rows[0].id, skillKey: "deploy", deleted: true });
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 1, "another Mac deleting it leaves this review");
+    await markDeletedLocally(pool, { userId, deviceId: first.deviceId, skillKey: "deploy", deleted: true });
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 0);
+    await assert.rejects(saveCloudVersion(pool, { userId, deviceId: first.deviceId, skillKey: "fresh", files: manifest(held) }));
+    assert.deepEqual(await markDeletedLocally(pool, { userId, deviceId: first.deviceId, skillKey: "fresh", deleted: true }),
+      { key: "fresh", deletedLocallyAt: null });
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 0);
+  });
+});
+
 test("the Mac can confirm a held file directly, and versions carry their labels", async () => {
   await withMigratedSchema(async (pool) => {
     const store = new MemoryStore();
