@@ -55,9 +55,16 @@ jobs:
         working-directory: index
         run: npm ci
 
+      - name: Restore v2 publication assets
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: node ./scripts/data-store.mjs pull --dir site/data/v2
+
       - name: Capture publication baseline
         working-directory: index
-        run: npm run publication:impact -- snapshot --track root --output "$RUNNER_TEMP/publication-impact-root.json"
+        run: npm run publication:impact -- snapshot --track v2 --output "$RUNNER_TEMP/publication-impact-v2.json"
 
       - name: Build fresh trending snapshot
         working-directory: index
@@ -83,14 +90,8 @@ jobs:
           npm run content:proposed-creators
           npm run content:leaderboard-view-data
 
-      - name: Publish hosted app data
-        env:
-          HEALTH_STATUS: ok
-          HEALTH_MESSAGE: Latest content reports published
-          HEALTH_WORKFLOW: content-reports
-          HEALTH_RUN_ID: ${{ github.run_id }}
-          HEALTH_GIT_SHA: ${{ github.sha }}
-        run: ./scripts/publish-data.sh
+      - name: Publish hosted v2 content data
+        run: node ./scripts/publish-content-data.mjs
 
       - name: Stamp content success time
         run: |
@@ -103,7 +104,7 @@ jobs:
           node ./scripts/build-health.mjs
 
       - name: Verify published data
-        run: node ./scripts/verify-published-data.mjs
+        run: OMGSKILLS_DATA_SUBDIR=v2 node ./scripts/verify-published-data.mjs
 
       - name: Reset transient health snapshot
         run: |
@@ -115,35 +116,42 @@ jobs:
 
       - name: Check publication impact
         working-directory: index
-        run: npm run publication:impact -- check --track root --baseline "$RUNNER_TEMP/publication-impact-root.json" --json shadow/publication-impact.root.json --markdown shadow/publication-impact.root.md
+        run: npm run publication:impact -- check --track v2 --baseline "$RUNNER_TEMP/publication-impact-v2.json" --json shadow/publication-impact.v2.json --markdown shadow/publication-impact.v2.md
 
       - name: Summarize publication impact
         if: always()
         run: |
-          if [ -f index/shadow/publication-impact.root.md ]; then
-            cat index/shadow/publication-impact.root.md >> "$GITHUB_STEP_SUMMARY"
+          if [ -f index/shadow/publication-impact.v2.md ]; then
+            cat index/shadow/publication-impact.v2.md >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload publication impact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: publication-impact-root-${{ github.run_id }}
+          name: publication-impact-v2-${{ github.run_id }}
           path: |
-            index/shadow/publication-impact.root.json
-            index/shadow/publication-impact.root.md
+            index/shadow/publication-impact.v2.json
+            index/shadow/publication-impact.v2.md
           if-no-files-found: error
           retention-days: 14
+
+      - name: Upload v2 report assets to R2
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: node ./scripts/data-store.mjs push --dir site/data/v2
 
       - name: Commit if changed
         run: |
           git config user.name "omgskills-bot"
           git config user.email "actions@users.noreply.github.com"
-          if git diff --quiet -- index/external-essentials.json index/gold-basket.json index/proposed-creators.json index/proposed-creators.md index/stats.json index/trending.json index/trending.backup.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots index/stats-report.html index/leaderboards.html index/growth-report.html index/gold-basket-review.html index/dashboard.html site/data/manifest.json site/data/trending-*.json site/data/trending-leaderboard-*.json site/data/leaderboard-view-data-*.json site/data/skill-signals-*.json site/data/author-signals-*.json site/data/author-leaderboards-*.json; then
+          git add index/external-essentials.json index/gold-basket.json index/proposed-creators.json index/proposed-creators.md index/stats.json index/trending.json index/trending.backup.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots index/stats-report.html index/leaderboards.html index/growth-report.html index/gold-basket-review.html index/dashboard.html
+          git add -A -- site/data/v2
+          if git diff --cached --quiet; then
             echo "No content report changes"
           else
-            git add index/external-essentials.json index/gold-basket.json index/proposed-creators.json index/proposed-creators.md index/stats.json index/trending.json index/trending.backup.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots index/stats-report.html index/leaderboards.html index/growth-report.html index/gold-basket-review.html index/dashboard.html
-            git add -A -- site/data
             git commit -m "content: update reports ($(date -u +%Y-%m-%d))"
             git pull --rebase --autostash origin main
             git push
@@ -155,6 +163,10 @@ jobs:
         run: node ./scripts/restore-health-snapshot.mjs
 
       - name: Prepare release assets for Netlify deploy
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: node ./scripts/prepare-netlify-site-deploy.mjs
 
       - name: Install site dependencies
