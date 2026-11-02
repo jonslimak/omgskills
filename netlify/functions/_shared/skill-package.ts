@@ -151,6 +151,18 @@ function validateMode(mode: string, path: string): void {
   throw failure("unsupported_entry_type", path);
 }
 
+function requirePortablePath(components: string[], path: string, portableOwners: Map<string, string>): void {
+  for (let index = 0; index < components.length; index += 1) {
+    const prefix = components.slice(0, index + 1).join("/");
+    const portable = components.slice(0, index + 1)
+      .map((component) => component.normalize("NFC").toLocaleLowerCase("en-US"))
+      .join("/");
+    const owner = portableOwners.get(portable);
+    if (owner !== undefined && owner !== prefix) throw failure("case_collision", path);
+    portableOwners.set(portable, prefix);
+  }
+}
+
 export function gitObjectSha(type: "blob" | "tree", data: Uint8Array): string {
   return createHash("sha1")
     .update(Buffer.from(`${type} ${data.byteLength}\0`))
@@ -181,15 +193,7 @@ export function validateSkillPackage(
     if (exactPaths.has(entry.path)) throw failure("duplicate_path", entry.path);
     exactPaths.add(entry.path);
 
-    for (let index = 0; index < components.length; index += 1) {
-      const prefix = components.slice(0, index + 1).join("/");
-      const portable = components.slice(0, index + 1)
-        .map((component) => component.normalize("NFC").toLocaleLowerCase("en-US"))
-        .join("/");
-      const owner = portableOwners.get(portable);
-      if (owner !== undefined && owner !== prefix) throw failure("case_collision", entry.path);
-      portableOwners.set(portable, prefix);
-    }
+    requirePortablePath(components, entry.path, portableOwners);
 
     validateMode(entry.mode, entry.path);
     if (entry.data.byteLength > limits.maximumFileBytes) throw failure("file_too_large", entry.path);
@@ -252,4 +256,52 @@ export function skillPackageNdjson(
       }
     })
   };
+}
+
+export type SkillManifestEntry = {
+  path: string;
+  mode: string;
+  blobSha: string;
+  byteSize: number;
+};
+
+export type ValidatedSkillManifest = {
+  treeSha: string;
+  skillMdSha: string;
+  fileCount: number;
+  totalBytes: number;
+};
+
+/** Checks a package's file list before its contents are present, and computes its git tree hash. */
+export function validateSkillManifest(
+  entries: SkillManifestEntry[],
+  limits: SkillPackageValidationLimits = BROKER_SKILL_PACKAGE_LIMITS
+): ValidatedSkillManifest {
+  if (entries.length > limits.maximumFileCount) throw failure("too_many_files");
+  const exactPaths = new Set<string>();
+  const portableOwners = new Map<string, string>();
+  const tree = new TreeDirectory();
+  let totalBytes = 0;
+  let skillMdSha: string | undefined;
+
+  for (const entry of entries) {
+    const components = validatedPathComponents(entry.path);
+    if (exactPaths.has(entry.path)) throw failure("duplicate_path", entry.path);
+    exactPaths.add(entry.path);
+    requirePortablePath(components, entry.path, portableOwners);
+    validateMode(entry.mode, entry.path);
+    if (!Number.isSafeInteger(entry.byteSize) || entry.byteSize < 0) throw failure("invalid_path", entry.path);
+    if (entry.byteSize > limits.maximumFileBytes) throw failure("file_too_large", entry.path);
+    if (entry.path === "SKILL.md" && entry.byteSize > limits.maximumSkillMdBytes) {
+      throw failure("skill_md_too_large", entry.path);
+    }
+    totalBytes += entry.byteSize;
+    if (totalBytes > limits.maximumTotalBytes) throw failure("package_too_large");
+    const blobSha = normalizedSha(entry.blobSha, entry.path);
+    if (entry.path === "SKILL.md") skillMdSha = blobSha;
+    tree.insert(components, { mode: entry.mode, sha: blobSha }, entry.path);
+  }
+
+  if (!skillMdSha) throw failure("missing_skill_md");
+  return { treeSha: tree.sha(), skillMdSha, fileCount: entries.length, totalBytes };
 }

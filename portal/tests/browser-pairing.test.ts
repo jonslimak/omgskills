@@ -33,7 +33,7 @@ test("rejects malformed or duplicate browser pairing values", () => {
   );
   assert.equal(
     parseBrowserPairingRequest(
-      `#state=${state}&code_challenge=${challenge}&scope=sync%3Awrite&scope=self%3Arevoke&scope=content%3Awrite`
+      `#state=${state}&code_challenge=${challenge}&scope=sync%3Awrite&scope=self%3Arevoke&scope=content%3Adelete`
     ),
     null
   );

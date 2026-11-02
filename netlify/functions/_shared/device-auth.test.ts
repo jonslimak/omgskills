@@ -87,10 +87,20 @@ test("normalizes allow-listed device scopes and requires metadata access", () =>
     ["sync:write", "self:revoke", "content:read"]
   );
   assert.throws(() => normalizeDeviceScopes(["content:read"]), DeviceScopeError);
+  assert.deepEqual(
+    normalizeDeviceScopes(["content:write", "sync:write", "self:revoke"]),
+    ["sync:write", "self:revoke", "content:write"]
+  );
   assert.throws(
-    () => normalizeDeviceScopes(["sync:write", "self:revoke", "content:write"]),
+    () => normalizeDeviceScopes(["sync:write", "self:revoke", "content:delete"]),
     DeviceScopeError
   );
+});
+
+test("cloud save upload scope also requires the browser approval flow", () => {
+  const uploadScopes = ["sync:write", "self:revoke", "content:write"];
+  assert.deepEqual(normalizeApprovedDeviceScopes(uploadScopes, true), uploadScopes);
+  assert.throws(() => normalizeApprovedDeviceScopes(uploadScopes, false), DeviceScopeError);
 });
 
 test("private content scope requires the browser approval flow", () => {
