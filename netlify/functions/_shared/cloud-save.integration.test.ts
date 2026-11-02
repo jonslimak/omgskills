@@ -704,3 +704,47 @@ test("deleting a skill works even when the left-out list is full", async () => {
     assert.deepEqual((await readCloudSave(pool, userId)).skills, []);
   });
 });
+
+test("a version save that lands during a delete asks for its files again instead of saving a broken version", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    // Files disappear after the save's first check, just as its transaction begins.
+    const racingPool = {
+      query: (text: string, values?: unknown[]) => pool.query(text, values),
+      async connect() {
+        const client = await pool.connect();
+        const query = client.query;
+        client.query = (async (text: string, values?: unknown[]) => {
+          client.query = query;
+          if (text === "BEGIN") await pool.query("DELETE FROM cloud_blobs WHERE user_id = $1", [userId]);
+          return client.query(text, values);
+        }) as typeof client.query;
+        return client;
+      }
+    } as unknown as Pool;
+    const result = await saveCloudVersion(racingPool, { userId, deviceId, skillKey: "beta", files: manifest(v1) });
+    assert.equal(result.status, "missing_files");
+    assert.equal(result.status === "missing_files" && result.missing.length, 2);
+    assert.deepEqual((await readCloudSave(pool, userId)).skills, []);
+  });
+});
+
+test("deleting one skill keeps files just uploaded for another skill", async () => {
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "alpha", files: manifest(v1) });
+    const beta: File[] = [{ path: "SKILL.md", text: "# Beta\n" }];
+    await uploadAll(pool, store, userId, beta);
+    await deleteCloudSkills(pool, store, { userId, skillKey: "alpha" });
+    const saved = await saveCloudVersion(pool, { userId, deviceId, skillKey: "beta", files: manifest(beta) });
+    assert.equal(saved.status, "saved");
+    assert.ok(store.objects.has(`cloud/${userId}/${gitObjectSha("blob", Buffer.from(beta[0].text))}`));
+  });
+});

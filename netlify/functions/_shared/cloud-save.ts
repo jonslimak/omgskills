@@ -481,6 +481,17 @@ export async function saveCloudVersion(
     if (settings.rows[0].excluded.includes(skillKey)) {
       throw new CloudSaveError("excluded", "This skill is not chosen for cloud save");
     }
+    // A delete may have removed files between the check above and this lock; never record a
+    // version whose files are gone. The device uploads them again.
+    const stillStored = await client.query<{ blob_sha: string }>(
+      "SELECT blob_sha FROM cloud_blobs WHERE user_id = $1 AND blob_sha = ANY($2::text[])",
+      [input.userId, hashes]
+    );
+    if (stillStored.rows.length !== hashes.length) {
+      const present = new Set(stillStored.rows.map((row) => row.blob_sha));
+      await client.query("ROLLBACK");
+      return { status: "missing_files", missing: hashes.filter((hash) => !present.has(hash)) };
+    }
     const sourceId = await lockCloudSource(client, input.userId, skillKey);
     const current = await client.query<{ releaseId: string; treeSha: string }>(
       `
@@ -703,6 +714,17 @@ export async function deleteCloudSkills(
       [input.userId, skillKey]
     );
     const sourceIds = sources.rows.map((row) => row.id);
+    // Deleting one skill frees only the files its versions used; files uploaded for other skills
+    // and not yet part of a version must stay. Deleting everything frees every file.
+    const skillFiles = await client.query<{ blob_sha: string }>(
+      `
+        SELECT DISTINCT file.blob_sha FROM cloud_release_files file
+        JOIN cloud_releases release ON release.release_id = file.release_id
+        WHERE release.source_id = ANY($1::uuid[])
+      `,
+      [sourceIds]
+    );
+    const candidates = skillKey === null ? null : skillFiles.rows.map((row) => row.blob_sha);
     await client.query("DELETE FROM cloud_saved_skills WHERE source_id = ANY($1::uuid[])", [sourceIds]);
     await client.query(
       `
@@ -719,11 +741,12 @@ export async function deleteCloudSkills(
       [input.userId, skillKey]
     );
     if (skillKey === null) await client.query("DELETE FROM cloud_secret_holds WHERE user_id = $1", [input.userId]);
-    // Files no remaining version of this user lists, including uploads that never became a version.
+    // Files no remaining version of this user lists.
     const freed = await client.query<{ blob_sha: string; byte_size: number }>(
       `
         DELETE FROM cloud_blobs blob
         WHERE blob.user_id = $1
+          AND ($2::text[] IS NULL OR blob.blob_sha = ANY($2::text[]))
           AND NOT EXISTS (
             SELECT 1
             FROM cloud_release_files file
@@ -733,7 +756,7 @@ export async function deleteCloudSkills(
           )
         RETURNING blob.blob_sha, blob.byte_size
       `,
-      [input.userId]
+      [input.userId, candidates]
     );
     await client.query(
       `

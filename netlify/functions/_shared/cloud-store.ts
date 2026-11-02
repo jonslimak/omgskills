@@ -98,6 +98,8 @@ export function createCloudObjectStore(
       try {
         const response = await fetchImpl(`https://${host}${path.split("/").map(encode).join("/")}${search ? `?${search}` : ""}`, {
           method,
+          // A slow store must not hold the upload lock or outlast the function's time limit.
+          signal: AbortSignal.timeout(8_000),
           headers: { ...headers, ...(body ? { "content-type": "application/octet-stream" } : {}), ...options.headers },
           body: body ? Buffer.from(body) : undefined
         });
