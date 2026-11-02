@@ -566,6 +566,7 @@ export const cloudSkillReviews = pgTable(
   {
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     skillKey: text("skill_key").notNull(),
+    deviceId: uuid("device_id"),
     files: jsonb("files").notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
   },
