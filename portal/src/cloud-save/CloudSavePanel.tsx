@@ -5,8 +5,8 @@ import type { PortalApi } from "../portal-api";
 import type { SyncedSkill } from "../synced-skill-grouping";
 import { Action, EmptyState, IconAction, Toggle } from "../app/ui";
 import {
-  cloudSkillRows, confirmCloudReview, deleteCloudSaved, formatBytes, labelText, loadCloudSave, saveCloudSettings, statusText,
-  type CloudSaveView,
+  cloudSkillRows, confirmCloudReview, deleteCloudSaved, formatBytes, isDeletingAllCloudSkills, isDeletingCloudSkill, labelText, loadCloudSave, saveCloudSettings, statusText,
+  type CloudDeleteSelection, type CloudSaveView,
 } from "./cloud-save";
 
 export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills: SyncedSkill[]; denied: () => void }) {
@@ -17,8 +17,7 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
   const [error, setError] = useState("");
   const [choosing, setChoosing] = useState(false);
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
-  // The skill key whose delete is being confirmed, or "*" for everything.
-  const [deleting, setDeleting] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<CloudDeleteSelection>(null);
   const [notice, setNotice] = useState("");
   const generation = useRef(0);
 
@@ -150,19 +149,19 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
           {row.labels.length > 0 && <p className="cloud-save-labels">{row.labels.map(label =>
             <span key={label}>{labelText[label]}</span>)}</p>}
         </div>
-        {row.versionCount > 0 && (deleting === row.key
+        {row.versionCount > 0 && (isDeletingCloudSkill(deleting, row.key)
           ? <div className="cloud-save-confirm">
             <span>Delete all {row.versionCount} {row.versionCount === 1 ? "version" : "versions"} and stop saving it?</span>
             <Action disabled={saving} onClick={() => void change(() => deleteCloudSaved(callbacks.current.api, row.key),
               "The skill could not be deleted.").then(done => { setDeleting(null); if (done) setNotice(`${row.name} was deleted from the cloud. It stays on your Mac.`); })}>Delete</Action>
             <Action variant="outline" disabled={saving} onClick={() => setDeleting(null)}>Cancel</Action>
           </div>
-          : <Action variant="outline" disabled={saving || deleting !== null} onClick={() => setDeleting(row.key)}>Delete from cloud</Action>)}
+          : <Action variant="outline" disabled={saving || deleting !== null} onClick={() => setDeleting({ kind: "skill", key: row.key })}>Delete from cloud</Action>)}
       </div>)}
     </div>}
 
     {(state.skills.length > 0 || state.usage.bytes > 0) && <div className="cloud-save-delete-all">
-      {deleting === "*"
+      {isDeletingAllCloudSkills(deleting)
         ? <>
           <p><strong>Delete everything you saved?</strong> Every version of every skill is removed from the cloud and
             cloud save is turned off. Skills on your Macs aren't touched. This can't be undone.</p>
@@ -172,7 +171,7 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
             <Action variant="outline" disabled={saving} onClick={() => setDeleting(null)}>Cancel</Action>
           </div>
         </>
-        : <Action variant="outline" disabled={saving || deleting !== null} onClick={() => setDeleting("*")}>Delete all my saved skills</Action>}
+        : <Action variant="outline" disabled={saving || deleting !== null} onClick={() => setDeleting({ kind: "all" })}>Delete all my saved skills</Action>}
     </div>}
   </section>;
 }

@@ -55,6 +55,16 @@ export function cloudSkillKey(name: string) {
   return name.normalize("NFC").toLowerCase();
 }
 
+export type CloudDeleteSelection = { kind: "skill"; key: string } | { kind: "all" } | null;
+
+export function isDeletingCloudSkill(selection: CloudDeleteSelection, key: string): boolean {
+  return selection?.kind === "skill" && selection.key === key;
+}
+
+export function isDeletingAllCloudSkills(selection: CloudDeleteSelection): boolean {
+  return selection?.kind === "all";
+}
+
 export type CloudSkillRow = {
   key: string;
   name: string;

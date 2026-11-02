@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { PortalApiError } from "../src/api-error";
-import { cloudSkillKey, cloudSkillRows, deleteCloudSaved, formatBytes, loadCloudSave, type CloudSaveState } from "../src/cloud-save/cloud-save";
+import { cloudSkillKey, cloudSkillRows, deleteCloudSaved, formatBytes, isDeletingAllCloudSkills, isDeletingCloudSkill, loadCloudSave, type CloudSaveState } from "../src/cloud-save/cloud-save";
 import type { SyncedSkill } from "../src/synced-skill-grouping";
 
 const installed = (name: string, extra: Partial<SyncedSkill> = {}): SyncedSkill => ({
@@ -72,4 +72,16 @@ test("delete calls the one-skill or everything route", async () => {
   await deleteCloudSaved(api, "my notes");
   await deleteCloudSaved(api);
   assert.deepEqual(calls, ["DELETE /api/portal/cloud-save/skills/my%20notes", "DELETE /api/portal/cloud-save"]);
+});
+
+test("deleting a skill named * never selects delete all, and vice versa", () => {
+  const one = { kind: "skill", key: "*" } as const;
+  const all = { kind: "all" } as const;
+  assert.equal(isDeletingCloudSkill(one, "*"), true);
+  assert.equal(isDeletingCloudSkill(one, "other"), false);
+  assert.equal(isDeletingAllCloudSkills(one), false);
+  assert.equal(isDeletingCloudSkill(all, "*"), false);
+  assert.equal(isDeletingAllCloudSkills(all), true);
+  assert.equal(isDeletingCloudSkill(null, "*"), false);
+  assert.equal(isDeletingAllCloudSkills(null), false);
 });
