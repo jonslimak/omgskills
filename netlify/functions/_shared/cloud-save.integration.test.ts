@@ -474,8 +474,15 @@ test("a review belongs to its Mac's copy, and deleting the skill there clears it
     assert.equal((await readCloudSave(pool, userId)).needsReview[0].deviceId, first.deviceId);
     await markDeletedLocally(pool, { userId, deviceId: second.rows[0].id, skillKey: "deploy", deleted: true });
     assert.equal((await readCloudSave(pool, userId)).needsReview.length, 1, "another Mac deleting it leaves this review");
-    await markDeletedLocally(pool, { userId, deviceId: first.deviceId, skillKey: "deploy", deleted: true });
-    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 0);
+    // Withdrawing the review leaves the other Mac's saved copy as it is.
+    const { dropSkillReview } = await import("./cloud-save.js");
+    await dropSkillReview(pool, { userId, deviceId: second.rows[0].id, skillKey: "deploy" });
+    assert.equal((await readCloudSave(pool, userId)).needsReview.length, 1);
+    const before = (await readCloudSave(pool, userId)).skills[0];
+    await dropSkillReview(pool, { userId, deviceId: first.deviceId, skillKey: "deploy" });
+    const after = await readCloudSave(pool, userId);
+    assert.equal(after.needsReview.length, 0);
+    assert.deepEqual(after.skills[0], before);
     await assert.rejects(saveCloudVersion(pool, { userId, deviceId: first.deviceId, skillKey: "fresh", files: manifest(held) }));
     assert.deepEqual(await markDeletedLocally(pool, { userId, deviceId: first.deviceId, skillKey: "fresh", deleted: true }),
       { key: "fresh", deletedLocallyAt: null });

@@ -5,6 +5,7 @@ import {
   CloudSaveError,
   cloudSaveErrorStatus,
   confirmSkillReview,
+  dropSkillReview,
   isCloudSaveAvailable,
   listCloudVersions,
   loadCloudVersionPackage,
@@ -41,7 +42,7 @@ const methods: Record<Route["action"], string[]> = {
   blob: ["PUT"],
   versions: ["GET", "POST"],
   "deleted-locally": ["PUT"],
-  review: ["POST"],
+  review: ["POST", "DELETE"],
   package: ["GET"]
 };
 
@@ -176,6 +177,12 @@ export async function portalCloudSave(
         }));
       }
       case "review": {
+        if (req.method === "DELETE") {
+          // The Mac withdraws its own waiting copy, for example after the skill was deleted there.
+          const device = await dependencies.requireDevice(req, "content:write");
+          await dropSkillReview(dependencies.pool(), { ...device, skillKey: route.skillKey });
+          return new Response(null, { status: 204, headers: corsHeaders(req) });
+        }
         const { userId, deviceId } = await actor(req, dependencies, "content:write");
         const body = await requireJsonObject(req);
         if (body.confirm !== true) throw new CloudSaveError("invalid_request", "Send confirm: true to save the held files");
