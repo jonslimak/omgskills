@@ -5,6 +5,9 @@ import {
   CloudSaveError,
   cloudSaveErrorStatus,
   confirmSkillReview,
+  deleteCloudSkills,
+  drainCloudPurge,
+  hasPendingPurge,
   dropSkillReview,
   isCloudSaveAvailable,
   listCloudVersions,
@@ -29,6 +32,7 @@ import { requireJsonObject } from "./_shared/validation.js";
 
 type Route =
   | { action: "state" }
+  | { action: "skill"; skillKey: string }
   | { action: "settings" }
   | { action: "blob"; blobSha: string }
   | { action: "versions"; skillKey: string }
@@ -37,7 +41,8 @@ type Route =
   | { action: "package"; releaseId: string };
 
 const methods: Record<Route["action"], string[]> = {
-  state: ["GET"],
+  state: ["GET", "DELETE"],
+  skill: ["DELETE"],
   settings: ["PUT"],
   blob: ["PUT"],
   versions: ["GET", "POST"],
@@ -56,6 +61,13 @@ function parseRoute(req: Request): Route | null {
   if (rest.length === 3 && rest[0] === "versions" && rest[2] === "package") {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rest[1])
       ? { action: "package", releaseId: rest[1] } : null;
+  }
+  if (rest.length === 2 && rest[0] === "skills") {
+    try {
+      return { action: "skill", skillKey: decodeURIComponent(rest[1]) };
+    } catch {
+      return null;
+    }
   }
   if (rest.length === 3 && rest[0] === "skills" && ["versions", "deleted-locally", "review"].includes(rest[2])) {
     let skillKey: string;
@@ -127,8 +139,25 @@ export async function portalCloudSave(
 
     switch (route.action) {
       case "state": {
+        if (req.method === "DELETE") {
+          // Deleting everything is a choice made on the web, never by a Mac.
+          const { userId } = await dependencies.requireUser(req);
+          return secretJsonResponse(req, await deleteCloudSkills(dependencies.pool(), dependencies.store(), { userId }));
+        }
         const { userId } = await actor(req, dependencies, "sync:write");
+        // Finishes removing files left over from an earlier delete; never blocks or fails a read.
+        try {
+          const pool = dependencies.pool();
+          if (await hasPendingPurge(pool, userId)) await drainCloudPurge(pool, dependencies.store(), userId, 1000);
+        } catch {
+          // Retried on the next read.
+        }
         return secretJsonResponse(req, await readCloudSave(dependencies.pool(), userId));
+      }
+      case "skill": {
+        const { userId } = await dependencies.requireUser(req);
+        return secretJsonResponse(req, await deleteCloudSkills(dependencies.pool(), dependencies.store(),
+          { userId, skillKey: route.skillKey }));
       }
       case "settings": {
         const { userId } = await actor(req, dependencies, "content:write");
@@ -249,6 +278,7 @@ export const config: Config = {
     "/api/portal/cloud-save",
     "/api/portal/cloud-save/settings",
     "/api/portal/cloud-save/blobs/:blobSha",
+    "/api/portal/cloud-save/skills/:skillKey",
     "/api/portal/cloud-save/skills/:skillKey/versions",
     "/api/portal/cloud-save/skills/:skillKey/deleted-locally",
     "/api/portal/cloud-save/skills/:skillKey/review",

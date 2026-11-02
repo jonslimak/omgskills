@@ -64,6 +64,11 @@ class MemoryStore implements CloudObjectStore {
     if (!object) throw new CloudStoreError("not_found", "Saved file is missing");
     return object;
   }
+  failing = new Set<string>();
+  async deleteMany(keys: string[]) {
+    for (const key of keys) if (!this.failing.has(key)) this.objects.delete(key);
+    return keys.filter((key) => this.failing.has(key));
+  }
 }
 
 async function createUser(pool: Pool) {
@@ -545,5 +550,201 @@ test("held-file errors from the endpoints list what was found and where", async 
     assert.equal(confirmed.status, 201);
     assert.equal((await call("POST", "/skills/none/review", JSON.stringify({ confirm: true }))).status, 404);
     assert.equal((await call("POST", "/skills/none/review", JSON.stringify({}))).status, 400);
+  });
+});
+
+test("deleting one skill removes every version and its own files, and stops saving it", async () => {
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const other: File[] = [v1[0], { path: "other.txt", text: "kept\n" }];
+    await uploadAll(pool, store, userId, [...v1, ...v2, ...other]);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v2) });
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "other", files: manifest(other) });
+    const before = (await readCloudSave(pool, userId)).usage.bytes;
+
+    const result = await deleteCloudSkills(pool, store, { userId, skillKey: "Notes" });
+    assert.equal(result.deletedSkills, 1);
+    assert.equal(result.pendingFiles, 0);
+    const state = await readCloudSave(pool, userId);
+    assert.deepEqual(state.skills.map((skill) => skill.key), ["other"]);
+    assert.deepEqual(state.settings, { enabled: true, excludedSkillKeys: ["notes"] });
+    assert.equal(state.usage.bytes, before - result.freedBytes);
+    // SKILL.md v1 is shared with "other" and stays; run.sh and SKILL.md v2 go.
+    const blob = (text: string) => `cloud/${userId}/${gitObjectSha("blob", Buffer.from(text))}`;
+    assert.ok(store.objects.has(blob(v1[0].text)));
+    assert.ok(!store.objects.has(blob(v1[1].text)));
+    assert.ok(!store.objects.has(blob(v2[0].text)));
+    await rejects(listCloudVersions(pool, { userId, skillKey: "notes" }), "not_found");
+    await rejects(saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) }), "excluded");
+  });
+});
+
+test("deleting everything removes all saved skills, files and reviews, and turns cloud save off", async () => {
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    const other = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await updateCloudSaveSettings(pool, other.userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await uploadAll(pool, store, other.userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    await saveCloudVersion(pool, { ...other, skillKey: "notes", files: manifest(v1) });
+    const secret = Buffer.from(`TOKEN=${fakeToken}\n`);
+    await assert.rejects(storeCloudBlob(pool, store, { userId, deviceId, blobSha: gitObjectSha("blob", secret), data: secret }));
+
+    const result = await deleteCloudSkills(pool, store, { userId });
+    assert.equal(result.deletedSkills, 1);
+    const state = await readCloudSave(pool, userId);
+    assert.deepEqual(state.skills, []);
+    assert.equal(state.usage.bytes, 0);
+    assert.equal(state.settings.enabled, false);
+    assert.deepEqual([...store.objects.keys()].filter((key) => key.includes(userId)), []);
+    const holds = await pool.query("SELECT 1 FROM cloud_secret_holds WHERE user_id = $1", [userId]);
+    assert.equal(holds.rowCount, 0);
+    // Another user's copy is untouched.
+    assert.equal((await readCloudSave(pool, other.userId)).skills.length, 1);
+    assert.equal([...store.objects.keys()].filter((key) => key.includes(other.userId)).length, 2);
+  });
+});
+
+test("files that fail to delete are retried, and a file stored again is never removed", async () => {
+  const { deleteCloudSkills, drainCloudPurge } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    const keys = [...store.objects.keys()];
+    store.failing = new Set(keys);
+
+    const result = await deleteCloudSkills(pool, store, { userId, skillKey: "notes" });
+    assert.equal(result.pendingFiles, 2);
+    assert.equal(store.objects.size, 2);
+
+    // One file comes back before the clean-up runs again: it must stay.
+    await updateCloudSaveSettings(pool, userId, { excludedSkillKeys: [] });
+    await uploadAll(pool, store, userId, [v1[0]]);
+    store.failing = new Set();
+    assert.equal(await drainCloudPurge(pool, store, userId), 0);
+    assert.deepEqual([...store.objects.keys()], [`cloud/${userId}/${gitObjectSha("blob", Buffer.from(v1[0].text))}`]);
+  });
+});
+
+test("versions of shared and GitHub sources stay append-only, even inside a cloud delete", async () => {
+  await withMigratedSchema(async (pool) => {
+    const { userId, deviceId } = await createUser(pool);
+    const store = new MemoryStore();
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    const source = await pool.query<{ id: string }>(
+      "INSERT INTO skill_sources (kind, normalized_root, catalog_skill_id) VALUES ('catalog', '.', 'a/b:c') RETURNING id");
+    await pool.query(
+      "INSERT INTO skill_releases (source_id, commit_sha, tree_sha, skill_md_sha, created_by) VALUES ($1, $2, $2, $2, 'x')",
+      [source.rows[0].id, "a".repeat(40)]);
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query("SET LOCAL omgskills.cloud_purge = 'on'");
+      await assert.rejects(client.query("DELETE FROM skill_releases WHERE source_id = $1", [source.rows[0].id]), /append-only/);
+      await client.query("ROLLBACK");
+    } finally {
+      client.release();
+    }
+    // Without the delete flag, cloud versions can't be removed either.
+    await assert.rejects(pool.query("DELETE FROM cloud_releases"), /append-only/);
+    await assert.rejects(pool.query("DELETE FROM skill_sources WHERE kind = 'cloud'"), /tombstoned/);
+  });
+});
+
+test("reading cloud save finishes a pending clean-up, and never fails because of it", async () => {
+  const { portalCloudSave } = await import("../portal-cloud-save.mjs");
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    store.failing = new Set(store.objects.keys());
+    assert.equal((await deleteCloudSkills(pool, store, { userId })).pendingFiles, 2);
+
+    const read = (storeFor: () => MemoryStore) => portalCloudSave(new Request("https://omgskills.com/api/portal/cloud-save"), {} as never, {
+      available: () => true, pool: () => pool, store: storeFor,
+      requireUser: async () => ({ userId, deviceId: null }), requireDevice: async () => ({ userId, deviceId })
+    } as never);
+    // Storage unreachable: the read still answers, and the files stay queued.
+    assert.equal((await read(() => { throw new Error("not configured"); })).status, 200);
+    assert.equal(store.objects.size, 2);
+    store.failing = new Set();
+    assert.equal((await read(() => store)).status, 200);
+    assert.equal(store.objects.size, 0);
+    const queued = await pool.query("SELECT 1 FROM cloud_purge_queue WHERE user_id = $1", [userId]);
+    assert.equal(queued.rowCount, 0);
+  });
+});
+
+test("deleting a skill works even when the left-out list is full", async () => {
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    await updateCloudSaveSettings(pool, userId, { excludedSkillKeys: Array.from({ length: 5000 }, (_, index) => `skill-${index}`) });
+    assert.equal((await deleteCloudSkills(pool, store, { userId, skillKey: "notes" })).deletedSkills, 1);
+    assert.deepEqual((await readCloudSave(pool, userId)).skills, []);
+  });
+});
+
+test("a version save that lands during a delete asks for its files again instead of saving a broken version", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    // Files disappear after the save's first check, just as its transaction begins.
+    const racingPool = {
+      query: (text: string, values?: unknown[]) => pool.query(text, values),
+      async connect() {
+        const client = await pool.connect();
+        const query = client.query;
+        client.query = (async (text: string, values?: unknown[]) => {
+          client.query = query;
+          if (text === "BEGIN") await pool.query("DELETE FROM cloud_blobs WHERE user_id = $1", [userId]);
+          return client.query(text, values);
+        }) as typeof client.query;
+        return client;
+      }
+    } as unknown as Pool;
+    const result = await saveCloudVersion(racingPool, { userId, deviceId, skillKey: "beta", files: manifest(v1) });
+    assert.equal(result.status, "missing_files");
+    assert.equal(result.status === "missing_files" && result.missing.length, 2);
+    assert.deepEqual((await readCloudSave(pool, userId)).skills, []);
+  });
+});
+
+test("deleting one skill keeps files just uploaded for another skill", async () => {
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "alpha", files: manifest(v1) });
+    const beta: File[] = [{ path: "SKILL.md", text: "# Beta\n" }];
+    await uploadAll(pool, store, userId, beta);
+    await deleteCloudSkills(pool, store, { userId, skillKey: "alpha" });
+    const saved = await saveCloudVersion(pool, { userId, deviceId, skillKey: "beta", files: manifest(beta) });
+    assert.equal(saved.status, "saved");
+    assert.ok(store.objects.has(`cloud/${userId}/${gitObjectSha("blob", Buffer.from(beta[0].text))}`));
   });
 });

@@ -118,3 +118,37 @@ test("the object store signs requests and never sends files to another user's ke
   });
   assert.equal(fixed["x-amz-date"], "20261102T000000Z");
 });
+
+test("batch delete signs the delete query, sends an MD5, and reports only the keys that failed", async () => {
+  const requests: { url: string; init: RequestInit }[] = [];
+  const env: Record<string, string> = {
+    CLOUD_SAVE_R2_ACCOUNT_ID: "acct", CLOUD_SAVE_R2_ACCESS_KEY_ID: "id",
+    CLOUD_SAVE_R2_SECRET_ACCESS_KEY: "secret", CLOUD_SAVE_R2_BUCKET: "bucket"
+  };
+  const store = createCloudObjectStore((key) => env[key], (async (url: string, init: RequestInit) => {
+    requests.push({ url, init });
+    return new Response("<DeleteResult><Error><Key>cloud/u/b&amp;</Key><Code>InternalError</Code></Error></DeleteResult>", { status: 200 });
+  }) as typeof fetch);
+  assert.deepEqual(await store.deleteMany([]), []);
+  assert.equal(requests.length, 0);
+  assert.deepEqual(await store.deleteMany(["cloud/u/a", "cloud/u/b&"]), ["cloud/u/b&"]);
+  assert.equal(requests[0].url, "https://acct.r2.cloudflarestorage.com/bucket?delete=");
+  assert.equal(requests[0].init.method, "POST");
+  const headers = requests[0].init.headers as Record<string, string>;
+  assert.match(headers["content-md5"], /^[A-Za-z0-9+/]+=*$/);
+  assert.match(String(requests[0].init.body), /<Key>cloud\/u\/b&amp;<\/Key>/);
+  await assert.rejects(store.deleteMany(Array.from({ length: 1001 }, (_, index) => `k${index}`)), /at most 1000/);
+});
+
+test("deleting is a web action: a Mac's credential can't delete saved skills", async () => {
+  const seen: string[] = [];
+  const deps = dependencies({
+    requireUser: async () => { seen.push("user"); throw new Response("Unauthorized", { status: 401 }); },
+    requireDevice: async () => { seen.push("device"); return { userId: "u", deviceId: "d" }; }
+  });
+  const device = { authorization: `Bearer device_${"a".repeat(43)}` };
+  assert.equal((await call("DELETE", "", deps, device)).status, 401);
+  assert.equal((await call("DELETE", "/skills/notes", deps, device)).status, 401);
+  assert.deepEqual(seen, ["user", "user"]);
+  assert.equal((await call("POST", "/skills/notes")).status, 405);
+});

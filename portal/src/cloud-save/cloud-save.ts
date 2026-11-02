@@ -39,6 +39,13 @@ export function saveCloudSettings(api: PortalApi, update: { enabled?: boolean; e
   return api<{ settings: CloudSaveState["settings"] }>(`${base}/settings`, { method: "PUT", body: JSON.stringify(update) });
 }
 
+export type CloudDeleteResult = { deletedSkills: number; freedBytes: number; pendingFiles: number };
+
+/** Deletes one saved skill and stops saving it, or, with no key, everything saved and turns cloud save off. */
+export function deleteCloudSaved(api: PortalApi, key?: string) {
+  return api<CloudDeleteResult>(key === undefined ? base : `${base}/skills/${encodeURIComponent(key)}`, { method: "DELETE" });
+}
+
 export function confirmCloudReview(api: PortalApi, key: string) {
   return api(`${base}/skills/${encodeURIComponent(key)}/review`, { method: "POST", body: JSON.stringify({ confirm: true }) });
 }
@@ -46,6 +53,16 @@ export function confirmCloudReview(api: PortalApi, key: string) {
 /** A skill's identity across agents and Macs, matching the server and the Mac: the folder name, NFC and lower case, untrimmed. */
 export function cloudSkillKey(name: string) {
   return name.normalize("NFC").toLowerCase();
+}
+
+export type CloudDeleteSelection = { kind: "skill"; key: string } | { kind: "all" } | null;
+
+export function isDeletingCloudSkill(selection: CloudDeleteSelection, key: string): boolean {
+  return selection?.kind === "skill" && selection.key === key;
+}
+
+export function isDeletingAllCloudSkills(selection: CloudDeleteSelection): boolean {
+  return selection?.kind === "all";
 }
 
 export type CloudSkillRow = {

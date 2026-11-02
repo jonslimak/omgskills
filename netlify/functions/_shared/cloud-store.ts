@@ -1,4 +1,6 @@
 import { createHash, createHmac } from "node:crypto";
+
+const MAX_DELETE_KEYS = 1000;
 import { getEnv } from "./env.js";
 
 // Private object store for cloud-saved skill files: a Cloudflare R2 bucket reached
@@ -9,6 +11,8 @@ import { getEnv } from "./env.js";
 export type CloudObjectStore = {
   put(key: string, body: Uint8Array): Promise<void>;
   get(key: string): Promise<Buffer>;
+  /** Deletes up to 1000 objects; returns the keys that could not be deleted. Missing objects count as deleted. */
+  deleteMany(keys: string[]): Promise<string[]>;
 };
 
 export class CloudStoreError extends Error {
@@ -32,6 +36,7 @@ export function signS3Request(input: {
   method: string;
   host: string;
   path: string;
+  query?: Record<string, string>;
   payloadHash: string;
   accessKeyId: string;
   secretAccessKey: string;
@@ -50,7 +55,9 @@ export function signS3Request(input: {
   const names = Object.keys(headers).sort();
   const signedHeaders = names.join(";");
   const canonicalHeaders = names.map((name) => `${name}:${headers[name]}\n`).join("");
-  const canonicalRequest = [input.method, canonicalPath, "", canonicalHeaders, signedHeaders, input.payloadHash].join("\n");
+  const query = input.query ?? {};
+  const canonicalQuery = Object.keys(query).sort().map((key) => `${encode(key)}=${encode(query[key])}`).join("&");
+  const canonicalRequest = [input.method, canonicalPath, canonicalQuery, canonicalHeaders, signedHeaders, input.payloadHash].join("\n");
   const scope = `${day}/${region}/s3/aws4_request`;
   const stringToSign = ["AWS4-HMAC-SHA256", amzDate, scope, sha256(canonicalRequest)].join("\n");
   const key = hmac(hmac(hmac(hmac(`AWS4${input.secretAccessKey}`, day), region), "s3"), "aws4_request");
@@ -74,21 +81,26 @@ export function createCloudObjectStore(
   }
   const host = `${accountId}.r2.cloudflarestorage.com`;
 
-  async function request(method: "GET" | "PUT", key: string, body?: Uint8Array): Promise<Response> {
-    const path = `/${bucket}/${key}`;
+  async function request(method: "GET" | "PUT" | "POST", key: string, body?: Uint8Array,
+                         options: { query?: Record<string, string>; headers?: Record<string, string> } = {}): Promise<Response> {
+    const path = key ? `/${bucket}/${key}` : `/${bucket}`;
+    const search = Object.entries(options.query ?? {}).map(([name, value]) => `${encode(name)}=${encode(value)}`).join("&");
     for (let attempt = 1; ; attempt += 1) {
       const headers = signS3Request({
         method,
         host,
         path,
+        query: options.query,
         payloadHash: sha256(body ?? ""),
         accessKeyId: accessKeyId!,
         secretAccessKey: secretAccessKey!
       });
       try {
-        const response = await fetchImpl(`https://${host}${path.split("/").map(encode).join("/")}`, {
+        const response = await fetchImpl(`https://${host}${path.split("/").map(encode).join("/")}${search ? `?${search}` : ""}`, {
           method,
-          headers: body ? { ...headers, "content-type": "application/octet-stream" } : headers,
+          // A slow store must not hold the upload lock or outlast the function's time limit.
+          signal: AbortSignal.timeout(8_000),
+          headers: { ...headers, ...(body ? { "content-type": "application/octet-stream" } : {}), ...options.headers },
           body: body ? Buffer.from(body) : undefined
         });
         if (response.status >= 500 && attempt < 3) throw new Error(`R2 ${method} returned ${response.status}`);
@@ -105,6 +117,21 @@ export function createCloudObjectStore(
       const response = await request("PUT", key, body);
       if (!response.ok) throw new CloudStoreError("unavailable", "Cloud storage is unavailable");
     },
+    async deleteMany(keys) {
+      if (keys.length === 0) return [];
+      if (keys.length > MAX_DELETE_KEYS) throw new Error(`deleteMany takes at most ${MAX_DELETE_KEYS} keys`);
+      const xml = Buffer.from(`<?xml version="1.0" encoding="UTF-8"?><Delete><Quiet>true</Quiet>${
+        keys.map((key) => `<Object><Key>${escapeXml(key)}</Key></Object>`).join("")}</Delete>`);
+      const response = await request("POST", "", xml, {
+        query: { delete: "" },
+        headers: { "content-type": "application/xml", "content-md5": createHash("md5").update(xml).digest("base64") }
+      });
+      if (!response.ok) return keys;
+      // Quiet mode lists only the keys that failed.
+      const failed = [...(await response.text()).matchAll(/<Error>[\s\S]*?<Key>([^<]*)<\/Key>[\s\S]*?<\/Error>/g)]
+        .map((match) => unescapeXml(match[1]));
+      return keys.filter((key) => failed.includes(key));
+    },
     async get(key) {
       const response = await request("GET", key);
       if (response.status === 404) throw new CloudStoreError("not_found", "Saved file is missing");
@@ -112,4 +139,12 @@ export function createCloudObjectStore(
       return Buffer.from(await response.arrayBuffer());
     }
   };
+}
+
+function escapeXml(value: string): string {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function unescapeXml(value: string): string {
+  return value.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 }
