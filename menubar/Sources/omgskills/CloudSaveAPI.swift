@@ -19,6 +19,7 @@ struct CloudSaveState: Decodable, Equatable, Sendable {
         let id: String
         let treeSha: String
         let deviceId: String?
+        let savedAt: String
         let labels: [String]?
     }
     struct SavedSkill: Decodable, Equatable, Sendable {
@@ -183,7 +184,8 @@ struct CloudSaveAPI: CloudSaveServing {
         case (413, "quota_exceeded"): throw CloudSaveAPIError.storageFull
         case (413, _): throw CloudSaveAPIError.tooLarge
         case (429, _): throw CloudSaveAPIError.rateLimited
-        case (503, _), (502, _), (500, _): throw CloudSaveAPIError.unavailable
+        // A 500 is one request's problem (say, a skill the server can't store); it is reported per skill.
+        case (503, _), (502, _), (504, _): throw CloudSaveAPIError.unavailable
         default: throw CloudSaveAPIError.rejected(error?.error ?? "Cloud save request failed (\(http.statusCode))")
         }
     }

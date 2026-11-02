@@ -13,36 +13,56 @@ final class CloudSaveController {
     private(set) var message: String?
 
     typealias Scan = @Sendable () async throws -> InstalledSkillsScanner.ScanResult
+    /// Every folder name in the skills folders, or nil when one of them couldn't be read.
+    typealias FolderKeys = @Sendable () -> Set<String>?
 
     @ObservationIgnored private let api: any CloudSaveServing
     @ObservationIgnored private let sync: CloudSaveSync
     @ObservationIgnored private let credential: @MainActor () -> StoredDeviceCredential?
     @ObservationIgnored private let scan: Scan
+    @ObservationIgnored private let folderKeys: FolderKeys
     @ObservationIgnored private var task: Task<Void, Never>?
+    @ObservationIgnored private var taskID: UUID?
     @ObservationIgnored private var rerun = false
 
     init(api: any CloudSaveServing, credential: @escaping @MainActor () -> StoredDeviceCredential?, scan: @escaping Scan,
-         pace: CloudSaveSync.Pace? = nil) {
+         folderKeys: @escaping FolderKeys, pace: CloudSaveSync.Pace? = nil) {
         self.api = api
         var sync = CloudSaveSync(api: api)
         if let pace { sync.pace = pace }
         self.sync = sync
         self.credential = credential
         self.scan = scan
+        self.folderKeys = folderKeys
+    }
+
+    /// Folder names in the given skills folders as cloud keys. A missing folder has none; one that
+    /// exists but can't be read makes the answer unknown.
+    nonisolated static func folderKeys(in roots: [URL], fileManager: FileManager = .default) -> Set<String>? {
+        var keys = Set<String>()
+        for root in roots {
+            guard fileManager.fileExists(atPath: root.path) else { continue }
+            guard let names = try? fileManager.contentsOfDirectory(atPath: root.path) else { return nil }
+            for name in names where !name.hasPrefix(".") { keys.insert(CloudSaveFolder.key(forFolderName: name)) }
+        }
+        return keys
     }
 
     @discardableResult
     func requestRun() -> Task<Void, Never>? {
         if let task { rerun = true; return task }
+        let id = UUID()
         let task = Task { @MainActor [weak self] in
             guard let self else { return }
             repeat {
                 rerun = false
                 await runOnce()
             } while rerun && !Task.isCancelled
-            self.task = nil
+            // A pass cancelled and replaced must not forget its replacement.
+            if taskID == id { self.task = nil; taskID = nil }
         }
         self.task = task
+        taskID = id
         return task
     }
 
@@ -50,6 +70,8 @@ final class CloudSaveController {
     func setEnabled(_ enabled: Bool) -> Task<Void, Never>? {
         guard let record = credential() else { return nil }
         message = nil
+        // Turning it off stops a pass in progress; the server refuses anything after the change.
+        if !enabled { cancel() }
         return Task { @MainActor [weak self] in
             guard let self else { return }
             do {
@@ -69,6 +91,7 @@ final class CloudSaveController {
     func cancel() {
         task?.cancel()
         task = nil
+        taskID = nil
         rerun = false
     }
 
@@ -78,9 +101,7 @@ final class CloudSaveController {
         defer { isRunning = false }
         do {
             let result = try await scan()
-            let complete = result.issues.isEmpty
-                && result.roots.allSatisfy { $0.state == .complete || $0.reason == .missing }
-            let next = try await sync.run(installations: result.installations, scanComplete: complete,
+            let next = try await sync.run(installations: result.installations, localFolderKeys: folderKeys(),
                 deviceID: record.connection.deviceID, credential: record)
             guard !Task.isCancelled else { return }
             if next.status != .unavailable { isAvailable = true }
@@ -103,6 +124,7 @@ final class CloudSaveController {
             var parts = ["\(summary.savedCount) \(summary.savedCount == 1 ? "skill" : "skills") saved"]
             if !summary.needsReview.isEmpty { parts.append("\(summary.needsReview.count) need review on the web") }
             if !summary.skipped.isEmpty { parts.append("\(summary.skipped.count) can't be saved") }
+            if summary.olderHereCount > 0 { parts.append("\(summary.olderHereCount) newer in the cloud") }
             return parts.joined(separator: " · ")
         }
     }
