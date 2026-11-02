@@ -35,10 +35,12 @@ struct CloudSaveFolder: Equatable, Sendable {
         let characters = Array(name.precomposedStringWithCanonicalMapping)
         var result = ""
         for (index, character) in characters.enumerated() {
-            guard character == "Σ" else { result += character.lowercased(); continue }
+            // A capital sigma may carry accents in the same character ("Σ́").
+            guard character.unicodeScalars.first == "Σ" else { result += character.lowercased(); continue }
             let afterLetter = characters[..<index].last(where: { !$0.isCaseIgnorable })?.isCased == true
             let beforeLetter = characters[(index + 1)...].first(where: { !$0.isCaseIgnorable })?.isCased == true
             result += afterLetter && !beforeLetter ? "ς" : "σ"
+            result += String(String.UnicodeScalarView(character.unicodeScalars.dropFirst())).lowercased()
         }
         return result
     }

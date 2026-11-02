@@ -88,6 +88,7 @@ protocol CloudSaveServing: Sendable {
     func uploadFile(_ entry: SkillPackageEntry, confirmSecrets: Bool, credential: StoredDeviceCredential) async throws
     func saveVersion(_ folder: CloudSaveFolder, credential: StoredDeviceCredential) async throws -> CloudSaveVersionResult
     func markDeletedLocally(key: String, deleted: Bool, credential: StoredDeviceCredential) async throws
+    func withdrawReview(key: String, credential: StoredDeviceCredential) async throws
 }
 
 struct CloudSaveAPI: CloudSaveServing {
@@ -135,6 +136,11 @@ struct CloudSaveAPI: CloudSaveServing {
     func markDeletedLocally(key: String, deleted: Bool, credential: StoredDeviceCredential) async throws {
         try requireUploadScope(credential)
         _ = try await send("PUT", path: ["skills", key, "deleted-locally"], json: ["deleted": deleted], credential: credential)
+    }
+
+    func withdrawReview(key: String, credential: StoredDeviceCredential) async throws {
+        try requireUploadScope(credential)
+        _ = try await send("DELETE", path: ["skills", key, "review"], credential: credential)
     }
 
     private struct SavedBody: Decodable { let created: Bool }

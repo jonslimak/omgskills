@@ -109,11 +109,9 @@ struct CloudSaveSync: Sendable {
                 }
             }
             // A skill this Mac had waiting for review and has since deleted no longer waits.
-            let savedKeys = Set(state.skills.map(\.key))
-            for review in state.needsReview where review.deviceId == deviceID
-                && !localFolderKeys.contains(review.key) && !savedKeys.contains(review.key) {
+            for review in state.needsReview where review.deviceId == deviceID && !localFolderKeys.contains(review.key) {
                 try? await pace()
-                try? await api.markDeletedLocally(key: review.key, deleted: true, credential: credential)
+                try? await api.withdrawReview(key: review.key, credential: credential)
             }
         }
         if !summary.needsReview.isEmpty || !summary.skipped.isEmpty { summary.status = .incomplete }

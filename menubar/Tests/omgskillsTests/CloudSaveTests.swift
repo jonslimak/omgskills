@@ -114,6 +114,8 @@ private actor FakeCloudSave: CloudSaveServing {
         calls.append("deleted:\(key):\(deleted)")
         self.deleted[key] = deleted
     }
+    var withdrawn: [String] = []
+    func withdrawReview(key: String, credential: StoredDeviceCredential) async throws { withdrawn.append(key) }
 }
 
 struct CloudSaveSyncTests {
@@ -232,6 +234,7 @@ struct CloudSaveSyncTests {
             func uploadFile(_ entry: SkillPackageEntry, confirmSecrets: Bool, credential: StoredDeviceCredential) async throws {}
             func saveVersion(_ folder: CloudSaveFolder, credential: StoredDeviceCredential) async throws -> CloudSaveVersionResult { .saved(created: false) }
             func markDeletedLocally(key: String, deleted: Bool, credential: StoredDeviceCredential) async throws {}
+            func withdrawReview(key: String, credential: StoredDeviceCredential) async throws {}
         }
         let summary = try await CloudSaveSync(api: Down(), pace: {}).run(installations: [], localFolderKeys: [],
             deviceID: "device-1", credential: credential())
@@ -280,6 +283,7 @@ struct CloudSaveReviewFixTests {
                 return .saved(created: true)
             }
             func markDeletedLocally(key: String, deleted: Bool, credential: StoredDeviceCredential) async throws {}
+            func withdrawReview(key: String, credential: StoredDeviceCredential) async throws {}
         }
         let root = try temporaryRoot()
         let api = Refusing()
@@ -377,18 +381,20 @@ struct CloudSaveReviewFixTests {
         #expect(second.uploadedCount == 1)
     }
 
-    @Test func aReviewForASkillDeletedOnThisMacIsCleared() async throws {
-        let api = FakeCloudSave()
+    @Test func aReviewForASkillDeletedOnThisMacIsWithdrawnEvenWhenAnotherMacSavedIt() async throws {
+        let api = FakeCloudSave(skills: [.init(key: "gone", currentVersion: .init(id: "r1", treeSha: "a", deviceId: "device-2",
+            savedAt: "2026-11-01T00:00:00.000Z", labels: nil), deletedLocallyAt: nil)])
         await api.waiting([.init(key: "gone", deviceId: "device-1", files: [], confirmed: false),
                            .init(key: "elsewhere", deviceId: "device-2", files: [], confirmed: false)])
         _ = try await sync(api).run(installations: [], localFolderKeys: [], deviceID: "device-1", credential: credential())
-        #expect(await api.deleted == ["gone": true])
+        #expect(await api.withdrawn == ["gone"])
+        #expect(await api.deleted.isEmpty, "the other Mac's saved copy isn't marked deleted")
     }
 
     @Test func keysMatchTheServerAndWebIncludingFinalSigma() {
         // Expected values come from JavaScript's toLowerCase(), which the server and web use.
-        let names = ["ΟΔΟΣ", "ΟΔΟΣ-notes", "Σ", "ΑΣ'Β", "my ΣΟΦΙΑ", "İstanbul", "Straße", "ǅemal", "ΌΣΟΣ ΚΑΙ ΟΣΟΣ", "AΣ.b", "ΑΣ1"]
-        let expected = ["οδος", "οδος-notes", "σ", "ασ'β", "my σοφια", "i̇stanbul", "straße", "ǆemal", "όσος και οσος", "aσ.b", "ας1"]
+        let names = ["ΟΔΟΣ\u{301}", "ΟΔΟΣ\u{301}Α", "ΟΔΟΣ", "ΟΔΟΣ-notes", "Σ", "ΑΣ'Β", "my ΣΟΦΙΑ", "İstanbul", "Straße", "ǅemal", "ΌΣΟΣ ΚΑΙ ΟΣΟΣ", "AΣ.b", "ΑΣ1"]
+        let expected = ["οδος\u{301}", "οδοσ\u{301}α", "οδος", "οδος-notes", "σ", "ασ'β", "my σοφια", "i̇stanbul", "straße", "ǆemal", "όσος και οσος", "aσ.b", "ας1"]
         #expect(names.map(CloudSaveFolder.key(forFolderName:)) == expected)
     }
 
