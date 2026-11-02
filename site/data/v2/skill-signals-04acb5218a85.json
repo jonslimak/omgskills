@@ -5806,112 +5806,112 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 158
+    "trendingRank": 218
   },
   {
     "id": "addyosmani/agent-skills:ci-cd-and-automation",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 170
+    "trendingRank": 227
   },
   {
     "id": "addyosmani/agent-skills:code-review-and-quality",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 41
+    "trendingRank": 43
   },
   {
     "id": "addyosmani/agent-skills:code-simplification",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 159
+    "trendingRank": 206
   },
   {
     "id": "addyosmani/agent-skills:context-engineering",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 157
+    "trendingRank": 213
   },
   {
     "id": "addyosmani/agent-skills:debugging-and-error-recovery",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 166
+    "trendingRank": 224
   },
   {
     "id": "addyosmani/agent-skills:deprecation-and-migration",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 173
+    "trendingRank": 231
   },
   {
     "id": "addyosmani/agent-skills:documentation-and-adrs",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 165
+    "trendingRank": 223
   },
   {
     "id": "addyosmani/agent-skills:frontend-ui-engineering",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 156
+    "trendingRank": 203
   },
   {
     "id": "addyosmani/agent-skills:git-workflow-and-versioning",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 160
+    "trendingRank": 216
   },
   {
     "id": "addyosmani/agent-skills:idea-refine",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 171
+    "trendingRank": 232
   },
   {
     "id": "addyosmani/agent-skills:incremental-implementation",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 176
+    "trendingRank": 235
   },
   {
     "id": "addyosmani/agent-skills:performance-optimization",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 162
+    "trendingRank": 214
   },
   {
     "id": "addyosmani/agent-skills:planning-and-task-breakdown",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 175
+    "trendingRank": 234
   },
   {
     "id": "addyosmani/agent-skills:security-and-hardening",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 40
+    "trendingRank": 44
   },
   {
     "id": "addyosmani/agent-skills:shipping-and-launch",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 163
+    "trendingRank": 226
   },
   {
     "id": "addyosmani/agent-skills:skills/api-and-interface-design",
@@ -5954,27 +5954,28 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 172
+    "trendingRank": 228
   },
   {
     "id": "addyosmani/agent-skills:spec-driven-development",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 167
+    "trendingRank": 221
   },
   {
     "id": "addyosmani/agent-skills:test-driven-development",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 161
+    "trendingRank": 222
   },
   {
     "id": "addyosmani/agent-skills:using-agent-skills",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 239
   },
   {
     "id": "addyosmani/clarity:clarity",
@@ -28648,10 +28649,9 @@
   },
   {
     "id": "anthropics/skills:brand-guidelines",
-    "isTrending": true,
+    "isTrending": false,
     "isOfficial": true,
-    "hasXSignal": false,
-    "trendingRank": 44
+    "hasXSignal": false
   },
   {
     "id": "anthropics/skills:canvas-design",
@@ -28697,15 +28697,17 @@
   },
   {
     "id": "anthropics/skills:pdf",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 236
   },
   {
     "id": "anthropics/skills:pptx",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 48
   },
   {
     "id": "anthropics/skills:skills/frontend-design",
@@ -28750,7 +28752,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 35
+    "trendingRank": 45
   },
   {
     "id": "anthropics/skills:xlsx",
@@ -28769,7 +28771,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 24
+    "trendingRank": 32
   },
   {
     "id": "anticipate218/math-modeling-skill",
@@ -36878,42 +36880,42 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 109
+    "trendingRank": 138
   },
   {
     "id": "autonnel/autonnel-skills:landing-page-conversion-audit",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 22
+    "trendingRank": 136
   },
   {
     "id": "autonnel/autonnel-skills:post-purchase-upsell-flow",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 108
+    "trendingRank": 30
   },
   {
     "id": "autonnel/autonnel-skills:sales-funnel-blueprint",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 23
+    "trendingRank": 31
   },
   {
     "id": "autonnel/autonnel-skills:self-hosted-funnel-launch",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 107
+    "trendingRank": 140
   },
   {
     "id": "autonnel/autonnel-skills:server-side-conversion-tracking",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 110
+    "trendingRank": 137
   },
   {
     "id": "autonomous-ai/autonomous-intern:org-planning",
@@ -45602,7 +45604,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 9
+    "trendingRank": 14
   },
   {
     "id": "binance/binance-skills-hub:binance-sports-ai-analyzer",
@@ -63135,133 +63137,133 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 132
+    "trendingRank": 196
   },
   {
     "id": "cloudflare/skills:basin",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 151
+    "trendingRank": 217
   },
   {
     "id": "cloudflare/skills:cf-cli",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 145
+    "trendingRank": 204
   },
   {
     "id": "cloudflare/skills:cloudflare",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 29
+    "trendingRank": 35
   },
   {
     "id": "cloudflare/skills:cloudflare-email-service",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 136
+    "trendingRank": 197
   },
   {
     "id": "cloudflare/skills:cloudflare-one",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 124
+    "trendingRank": 192
   },
   {
     "id": "cloudflare/skills:cloudflare-one-migrations",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 144
+    "trendingRank": 200
   },
   {
     "id": "cloudflare/skills:durable-objects",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 123
+    "trendingRank": 193
   },
   {
     "id": "cloudflare/skills:gateway-workers",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 155
+    "trendingRank": 220
   },
   {
     "id": "cloudflare/skills:k2",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 152
+    "trendingRank": 219
   },
   {
     "id": "cloudflare/skills:nextjs-on-cloudflare",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 146
+    "trendingRank": 211
   },
   {
     "id": "cloudflare/skills:sandbox-migrate-to-next",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 149
+    "trendingRank": 209
   },
   {
     "id": "cloudflare/skills:sandbox-next",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 148
+    "trendingRank": 210
   },
   {
     "id": "cloudflare/skills:sandbox-stable",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 147
+    "trendingRank": 207
   },
   {
     "id": "cloudflare/skills:turnstile-spin",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 143
+    "trendingRank": 198
   },
   {
     "id": "cloudflare/skills:web-perf",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 122
+    "trendingRank": 190
   },
   {
     "id": "cloudflare/skills:workers-best-practices",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 37
+    "trendingRank": 41
   },
   {
     "id": "cloudflare/skills:workers-profiling",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 153
+    "trendingRank": 215
   },
   {
     "id": "cloudflare/skills:wrangler",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 117
+    "trendingRank": 169
   },
   {
     "id": "cloudflare/vibesdk:worker/agents/think/skills/app-file-structure",
@@ -68287,9 +68289,10 @@
   },
   {
     "id": "coreyhaines31/marketingskills:cold-email",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 238
   },
   {
     "id": "coreyhaines31/marketingskills:community-marketing",
@@ -68299,15 +68302,17 @@
   },
   {
     "id": "coreyhaines31/marketingskills:competitor-profiling",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 50
   },
   {
     "id": "coreyhaines31/marketingskills:customer-research",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 49
   },
   {
     "id": "coreyhaines31/marketingskills:directory-submissions",
@@ -83288,38 +83293,42 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 33
+    "trendingRank": 26
   },
   {
     "id": "dietrichgebert/ponytail:ponytail-audit",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 225
   },
   {
     "id": "dietrichgebert/ponytail:ponytail-debt",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 229
   },
   {
     "id": "dietrichgebert/ponytail:ponytail-gain",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 230
   },
   {
     "id": "dietrichgebert/ponytail:ponytail-help",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 233
   },
   {
     "id": "dietrichgebert/ponytail:ponytail-review",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 45
+    "trendingRank": 46
   },
   {
     "id": "diffbot/diffbot-skills:skills/diffbot-crawl",
@@ -94460,91 +94469,91 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 69
+    "trendingRank": 83
   },
   {
     "id": "emilkowalski/skills:animate-expo",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 83
+    "trendingRank": 90
   },
   {
     "id": "emilkowalski/skills:animation-vocabulary",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 72
+    "trendingRank": 85
   },
   {
     "id": "emilkowalski/skills:apple-design",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 11
+    "trendingRank": 82
   },
   {
     "id": "emilkowalski/skills:ask-sonner",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 82
+    "trendingRank": 91
   },
   {
     "id": "emilkowalski/skills:emil-design-eng",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 10
+    "trendingRank": 11
   },
   {
     "id": "emilkowalski/skills:find-animation-opportunities",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 71
+    "trendingRank": 86
   },
   {
     "id": "emilkowalski/skills:improve-animations",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 70
+    "trendingRank": 84
   },
   {
     "id": "emilkowalski/skills:mobile-native",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 73
+    "trendingRank": 87
   },
   {
     "id": "emilkowalski/skills:pick-ui-library",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 77
+    "trendingRank": 88
   },
   {
     "id": "emilkowalski/skills:prototype",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 78
+    "trendingRank": 89
   },
   {
     "id": "emilkowalski/skills:review-animations",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 68
+    "trendingRank": 12
   },
   {
     "id": "emilkowalski/skills:write-swift",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 84
+    "trendingRank": 92
   },
   {
     "id": "EmilLindfors/claude-marketplace:plugins/rust-lambda/skills/async-sync-advisor",
@@ -101868,10 +101877,9 @@
   },
   {
     "id": "firebase/agent-skills:firebase-security-rules-auditor",
-    "isTrending": true,
+    "isTrending": false,
     "isOfficial": true,
-    "hasXSignal": false,
-    "trendingRank": 42
+    "hasXSignal": false
   },
   {
     "id": "firebase/agent-skills:skills/extension-to-functions-codebase",
@@ -120604,49 +120612,49 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 14
+    "trendingRank": 9
   },
   {
     "id": "google/agents-cli:google-agents-cli-deploy",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 85
+    "trendingRank": 10
   },
   {
     "id": "google/agents-cli:google-agents-cli-eval",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 87
+    "trendingRank": 71
   },
   {
     "id": "google/agents-cli:google-agents-cli-observability",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 89
+    "trendingRank": 74
   },
   {
     "id": "google/agents-cli:google-agents-cli-publish",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 13
+    "trendingRank": 69
   },
   {
     "id": "google/agents-cli:google-agents-cli-scaffold",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 86
+    "trendingRank": 73
   },
   {
     "id": "google/agents-cli:google-agents-cli-workflow",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 88
+    "trendingRank": 72
   },
   {
     "id": "google/android-cuttlefish:podcvd",
@@ -129329,7 +129337,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 59
+    "trendingRank": 75
   },
   {
     "id": "heygen-com/hyperframes:frost-sequence-camera-orbit",
@@ -129348,21 +129356,21 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 48
+    "trendingRank": 3
   },
   {
     "id": "heygen-com/hyperframes:hyperframes-cli",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 1
+    "trendingRank": 2
   },
   {
     "id": "heygen-com/hyperframes:hyperframes-registry",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 2
+    "trendingRank": 51
   },
   {
     "id": "heygen-com/hyperframes:motion-doctrine",
@@ -129405,7 +129413,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 58
+    "trendingRank": 70
   },
   {
     "id": "heygen-com/hyperframes:website-to-hyperframes",
@@ -129886,56 +129894,56 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 116
+    "trendingRank": 146
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-generate",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 28
+    "trendingRank": 27
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-marketplace-cards",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 113
+    "trendingRank": 142
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-product-photoshoot",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 30
+    "trendingRank": 34
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-soul-id",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 112
+    "trendingRank": 139
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-video-explainer",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 115
+    "trendingRank": 145
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-websites",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 114
+    "trendingRank": 144
   },
   {
     "id": "higgsfield-ai/skills:higgsfield-youtube-thumbnail",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 111
+    "trendingRank": 143
   },
   {
     "id": "highcharts/highcharts:tooling",
@@ -134115,10 +134123,9 @@
   },
   {
     "id": "hypit-ai/hypit:hypit",
-    "isTrending": true,
+    "isTrending": false,
     "isOfficial": false,
-    "hasXSignal": false,
-    "trendingRank": 43
+    "hasXSignal": false
   },
   {
     "id": "hypnosdesign/claude-skill-scrittura-italiana",
@@ -134719,7 +134726,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 27
+    "trendingRank": 38
   },
   {
     "id": "ianphil/prism:.claude/skills/autopilot",
@@ -149336,91 +149343,91 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 125
+    "trendingRank": 150
   },
   {
     "id": "juliusbrussee/caveman:caveman",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 20
+    "trendingRank": 19
   },
   {
     "id": "juliusbrussee/caveman:caveman-commit",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 39
+    "trendingRank": 36
   },
   {
     "id": "juliusbrussee/caveman:caveman-discover",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 138
+    "trendingRank": 163
   },
   {
     "id": "juliusbrussee/caveman:caveman-evidence-review",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 142
+    "trendingRank": 162
   },
   {
     "id": "juliusbrussee/caveman:caveman-explore",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 126
+    "trendingRank": 152
   },
   {
     "id": "juliusbrussee/caveman:caveman-help",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 121
+    "trendingRank": 148
   },
   {
     "id": "juliusbrussee/caveman:caveman-learn",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 128
+    "trendingRank": 153
   },
   {
     "id": "juliusbrussee/caveman:caveman-manage",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 140
+    "trendingRank": 165
   },
   {
     "id": "juliusbrussee/caveman:caveman-optimize",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 129
+    "trendingRank": 155
   },
   {
     "id": "juliusbrussee/caveman:caveman-review",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 120
+    "trendingRank": 147
   },
   {
     "id": "juliusbrussee/caveman:caveman-setup",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 139
+    "trendingRank": 164
   },
   {
     "id": "juliusbrussee/caveman:caveman-stats",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 119
+    "trendingRank": 149
   },
   {
     "id": "juliusbrussee/caveman:compress",
@@ -149433,28 +149440,28 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 130
+    "trendingRank": 156
   },
   {
     "id": "juliusbrussee/caveman:lean-build",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 134
+    "trendingRank": 157
   },
   {
     "id": "juliusbrussee/caveman:megacave",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 137
+    "trendingRank": 154
   },
   {
     "id": "juliusbrussee/caveman:migration",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 141
+    "trendingRank": 161
   },
   {
     "id": "JuliusBrussee/caveman:plugins/caveman/skills/cavecrew",
@@ -149479,28 +149486,28 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 135
+    "trendingRank": 158
   },
   {
     "id": "juliusbrussee/caveman:surgical-patch",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 131
+    "trendingRank": 159
   },
   {
     "id": "juliusbrussee/caveman:ultracave",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 127
+    "trendingRank": 151
   },
   {
     "id": "juliusbrussee/caveman:verify-and-stop",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 133
+    "trendingRank": 160
   },
   {
     "id": "JuliusBrussee/Loop-Factory:.agents/skills/backpropagate-specs",
@@ -159716,173 +159723,199 @@
   },
   {
     "id": "larksuite/cli:lark-approval",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 122
   },
   {
     "id": "larksuite/cli:lark-apps",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 103
   },
   {
     "id": "larksuite/cli:lark-attendance",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 118
   },
   {
     "id": "larksuite/cli:lark-base",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 102
   },
   {
     "id": "larksuite/cli:lark-calendar",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 110
   },
   {
     "id": "larksuite/cli:lark-contact",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 116
   },
   {
     "id": "larksuite/cli:lark-doc",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 46
+    "trendingRank": 22
   },
   {
     "id": "larksuite/cli:lark-drive",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 106
   },
   {
     "id": "larksuite/cli:lark-event",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 119
   },
   {
     "id": "larksuite/cli:lark-im",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 105
   },
   {
     "id": "larksuite/cli:lark-mail",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 115
   },
   {
     "id": "larksuite/cli:lark-markdown",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 108
   },
   {
     "id": "larksuite/cli:lark-meeting",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 121
   },
   {
     "id": "larksuite/cli:lark-minutes",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 114
   },
   {
     "id": "larksuite/cli:lark-note",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 126
   },
   {
     "id": "larksuite/cli:lark-okr",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 120
   },
   {
     "id": "larksuite/cli:lark-openapi-explorer",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 124
   },
   {
     "id": "larksuite/cli:lark-shared",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 47
+    "trendingRank": 21
   },
   {
     "id": "larksuite/cli:lark-sheets",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 107
   },
   {
     "id": "larksuite/cli:lark-skill-maker",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 123
   },
   {
     "id": "larksuite/cli:lark-slides",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 109
   },
   {
     "id": "larksuite/cli:lark-task",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 101
   },
   {
     "id": "larksuite/cli:lark-vc",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 112
   },
   {
     "id": "larksuite/cli:lark-vc-agent",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 117
   },
   {
     "id": "larksuite/cli:lark-whiteboard",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 111
   },
   {
     "id": "larksuite/cli:lark-wiki",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 104
   },
   {
     "id": "larksuite/cli:lark-workflow-meeting-summary",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 113
   },
   {
     "id": "larksuite/cli:lark-workflow-standup-report",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 125
   },
   {
     "id": "larksuite/meegle-cli:meegle",
@@ -164449,77 +164482,77 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 93
+    "trendingRank": 28
   },
   {
     "id": "lllllllama/rigorpilot-skills:ai-research-reproduction",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 90
+    "trendingRank": 128
   },
   {
     "id": "lllllllama/rigorpilot-skills:analyze-project",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 16
+    "trendingRank": 29
   },
   {
     "id": "lllllllama/rigorpilot-skills:env-and-assets-bootstrap",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 97
+    "trendingRank": 134
   },
   {
     "id": "lllllllama/rigorpilot-skills:explore-code",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 91
+    "trendingRank": 130
   },
   {
     "id": "lllllllama/rigorpilot-skills:explore-run",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 92
+    "trendingRank": 133
   },
   {
     "id": "lllllllama/rigorpilot-skills:minimal-run-and-audit",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 96
+    "trendingRank": 132
   },
   {
     "id": "lllllllama/rigorpilot-skills:paper-context-resolver",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 94
+    "trendingRank": 127
   },
   {
     "id": "lllllllama/rigorpilot-skills:repo-intake-and-plan",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 98
+    "trendingRank": 131
   },
   {
     "id": "lllllllama/rigorpilot-skills:run-train",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 95
+    "trendingRank": 135
   },
   {
     "id": "lllllllama/rigorpilot-skills:safe-debug",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 17
+    "trendingRank": 129
   },
   {
     "id": "llm011/ethan-agent:code-review",
@@ -173382,7 +173415,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 74
+    "trendingRank": 76
   },
   {
     "id": "mattpocock/skills:design-an-interface",
@@ -173395,7 +173428,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 75
+    "trendingRank": 77
   },
   {
     "id": "mattpocock/skills:grill-with-docs",
@@ -173409,7 +173442,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 64
+    "trendingRank": 63
   },
   {
     "id": "mattpocock/skills:improve-codebase-architecture",
@@ -173430,21 +173463,21 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 65
+    "trendingRank": 67
   },
   {
     "id": "mattpocock/skills:prototype",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 61
+    "trendingRank": 62
   },
   {
     "id": "mattpocock/skills:retro",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 63
+    "trendingRank": 65
   },
   {
     "id": "mattpocock/skills:review",
@@ -173457,28 +173490,28 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 80
+    "trendingRank": 79
   },
   {
     "id": "mattpocock/skills:setup-matt-pocock-skills",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 60
+    "trendingRank": 61
   },
   {
     "id": "mattpocock/skills:setup-pre-commit",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 76
+    "trendingRank": 78
   },
   {
     "id": "mattpocock/skills:setup-ts-deep-modules",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 79
+    "trendingRank": 80
   },
   {
     "id": "mattpocock/skills:skills",
@@ -173624,14 +173657,14 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 67
+    "trendingRank": 68
   },
   {
     "id": "mattpocock/skills:writing-for-agents",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 62
+    "trendingRank": 64
   },
   {
     "id": "mattpocock/ts-reset:.claude/skills/research-ts-decisions",
@@ -179597,45 +179630,52 @@
   },
   {
     "id": "microsoft/azure-skills:airunway-aks-setup",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 179
   },
   {
     "id": "microsoft/azure-skills:appinsights-instrumentation",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 181
   },
   {
     "id": "microsoft/azure-skills:azure-ai",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 171
   },
   {
     "id": "microsoft/azure-skills:azure-aigateway",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 187
   },
   {
     "id": "microsoft/azure-skills:azure-cloud-migrate",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 186
   },
   {
     "id": "microsoft/azure-skills:azure-compliance",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 170
   },
   {
     "id": "microsoft/azure-skills:azure-compute",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 185
   },
   {
     "id": "microsoft/azure-skills:azure-cost",
@@ -179645,99 +179685,115 @@
   },
   {
     "id": "microsoft/azure-skills:azure-deploy",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 177
   },
   {
     "id": "microsoft/azure-skills:azure-diagnostics",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 39
   },
   {
     "id": "microsoft/azure-skills:azure-enterprise-infra-planner",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 174
   },
   {
     "id": "microsoft/azure-skills:azure-kubernetes",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 167
   },
   {
     "id": "microsoft/azure-skills:azure-kusto",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 175
   },
   {
     "id": "microsoft/azure-skills:azure-messaging",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 184
   },
   {
     "id": "microsoft/azure-skills:azure-prepare",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 168
   },
   {
     "id": "microsoft/azure-skills:azure-quotas",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 176
   },
   {
     "id": "microsoft/azure-skills:azure-resource-lookup",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 178
   },
   {
     "id": "microsoft/azure-skills:azure-resource-visualizer",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 180
   },
   {
     "id": "microsoft/azure-skills:azure-storage",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 173
   },
   {
     "id": "microsoft/azure-skills:azure-upgrade",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 172
   },
   {
     "id": "microsoft/azure-skills:azure-validate",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 40
   },
   {
     "id": "microsoft/azure-skills:entra-agent-id",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 188
   },
   {
     "id": "microsoft/azure-skills:entra-app-registration",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 182
   },
   {
     "id": "microsoft/azure-skills:microsoft-foundry",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": true,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 166
   },
   {
     "id": "microsoft/azure-skills:skills/azure-app-onboard",
@@ -194015,14 +194071,14 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 26
+    "trendingRank": 24
   },
   {
     "id": "neondatabase/agent-skills:neon-postgres-egress-optimizer",
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 36
+    "trendingRank": 37
   },
   {
     "id": "neondatabase/agent-skills:skills/neon",
@@ -206934,100 +206990,105 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 118
+    "trendingRank": 141
   },
   {
     "id": "obra/superpowers:diagnosing-superpowers",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 237
   },
   {
     "id": "obra/superpowers:dispatching-parallel-agents",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 205
   },
   {
     "id": "obra/superpowers:executing-plans",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 164
+    "trendingRank": 191
   },
   {
     "id": "obra/superpowers:finishing-a-development-branch",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 212
   },
   {
     "id": "obra/superpowers:receiving-code-review",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 177
+    "trendingRank": 201
   },
   {
     "id": "obra/superpowers:requesting-code-review",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 168
+    "trendingRank": 194
   },
   {
     "id": "obra/superpowers:subagent-driven-development",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 169
+    "trendingRank": 195
   },
   {
     "id": "obra/superpowers:systematic-debugging",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 32
+    "trendingRank": 23
   },
   {
     "id": "obra/superpowers:test-driven-development",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 150
+    "trendingRank": 189
   },
   {
     "id": "obra/superpowers:using-git-worktrees",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 208
   },
   {
     "id": "obra/superpowers:using-superpowers",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 174
+    "trendingRank": 202
   },
   {
     "id": "obra/superpowers:verification-before-completion",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 34
+    "trendingRank": 33
   },
   {
     "id": "obra/superpowers:writing-plans",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 154
+    "trendingRank": 183
   },
   {
     "id": "obra/superpowers:writing-skills",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 199
   },
   {
     "id": "obra/the-elements-of-style:writing-clearly-and-concisely",
@@ -219682,7 +219743,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 12
+    "trendingRank": 13
   },
   {
     "id": "pbc-os/smb-starter-kit:data-lake-starter",
@@ -228817,70 +228878,70 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 19
+    "trendingRank": 18
   },
   {
     "id": "prisma/skills:prisma-client-api",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 18
+    "trendingRank": 17
   },
   {
     "id": "prisma/skills:prisma-compute",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 105
+    "trendingRank": 99
   },
   {
     "id": "prisma/skills:prisma-database-setup",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 99
+    "trendingRank": 94
   },
   {
     "id": "prisma/skills:prisma-driver-adapter-implementation",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 104
+    "trendingRank": 97
   },
   {
     "id": "prisma/skills:prisma-mongodb-upgrade",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 106
+    "trendingRank": 100
   },
   {
     "id": "prisma/skills:prisma-orm-setup",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 103
+    "trendingRank": 93
   },
   {
     "id": "prisma/skills:prisma-postgres",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 100
+    "trendingRank": 96
   },
   {
     "id": "prisma/skills:prisma-postgres-setup",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 101
+    "trendingRank": 95
   },
   {
     "id": "prisma/skills:prisma-upgrade-v7",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 102
+    "trendingRank": 98
   },
   {
     "id": "pritesh-crypto/content-researcher-skill",
@@ -235656,42 +235717,42 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 49
+    "trendingRank": 52
   },
   {
     "id": "remotion-dev/skills:remotion-create",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 50
+    "trendingRank": 53
   },
   {
     "id": "remotion-dev/skills:remotion-interactivity",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 55
+    "trendingRank": 57
   },
   {
     "id": "remotion-dev/skills:remotion-maps",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 56
+    "trendingRank": 58
   },
   {
     "id": "remotion-dev/skills:remotion-markup",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 51
+    "trendingRank": 54
   },
   {
     "id": "remotion-dev/skills:remotion-multimedia",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 53
+    "trendingRank": 56
   },
   {
     "id": "remotion-dev/skills:remotion-render",
@@ -235705,21 +235766,21 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 57
+    "trendingRank": 60
   },
   {
     "id": "remotion-dev/skills:remotion-studio",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 52
+    "trendingRank": 55
   },
   {
     "id": "remotion-dev/skills:remotion-upgrade",
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 54
+    "trendingRank": 59
   },
   {
     "id": "remotion-dev/skills:skills/remotion",
@@ -249616,7 +249677,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 21
+    "trendingRank": 20
   },
   {
     "id": "shadcn/improve:improve",
@@ -258923,7 +258984,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 38
+    "trendingRank": 42
   },
   {
     "id": "supabase/server:supabase-server",
@@ -273699,9 +273760,10 @@
   },
   {
     "id": "tt-a1i/archify:archify",
-    "isTrending": false,
+    "isTrending": true,
     "isOfficial": false,
-    "hasXSignal": false
+    "hasXSignal": false,
+    "trendingRank": 47
   },
   {
     "id": "tt-a1i/simplify-codebase",
@@ -279439,7 +279501,7 @@
     "isTrending": true,
     "isOfficial": true,
     "hasXSignal": false,
-    "trendingRank": 3
+    "trendingRank": 1
   },
   {
     "id": "vercel-labs/slack-agent-skill",
@@ -287322,7 +287384,7 @@
     "isTrending": true,
     "isOfficial": false,
     "hasXSignal": false,
-    "trendingRank": 31
+    "trendingRank": 16
   },
   {
     "id": "windaddict/impasse",
