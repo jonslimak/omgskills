@@ -14,6 +14,10 @@ export type PortalGroupItemRow = {
   skillDescription: string | null;
   githubUrl: string | null;
   source: string | null;
+  sourceKind?: string | null;
+  releaseId?: string | null;
+  /** The owner's newest saved version, for owners only. */
+  savedReleaseId?: string | null;
 };
 
 export function portalGroupItem(row: PortalGroupItemRow, role: GroupAccessRole) {
@@ -27,5 +31,9 @@ export function portalGroupItem(row: PortalGroupItemRow, role: GroupAccessRole) 
     githubUrl: row.githubUrl || row.itemGithubUrl || null,
     source: row.source || row.kind,
     position: row.position,
+    // Shared from the owner's cloud save; the owner also learns when a newer version is saved.
+    ...(row.sourceKind === "cloud" ? { cloudShared: true } : {}),
+    ...(role === "owner" && row.sourceKind === "cloud" && row.savedReleaseId && row.savedReleaseId !== row.releaseId
+      ? { updateAvailable: true } : {}),
   };
 }

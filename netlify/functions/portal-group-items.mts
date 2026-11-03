@@ -12,8 +12,11 @@ import {
   deleteGroupItemWithClient,
   type GroupItemInput,
   type GroupItemPublication,
-  reorderGroupItemsWithClient
+  reorderGroupItemsWithClient,
+  updateCloudGroupItemWithClient
 } from "./_shared/group-items.js";
+import { normalizeSkillKey } from "./_shared/cloud-save.js";
+import { installationFolderFromKey } from "./_shared/sync-skill.js";
 import { errorResponse, jsonResponse, optionsResponse, secretJsonResponse, withTimeout } from "./_shared/http.js";
 import { portalGroupItem, type PortalGroupItemRow } from "./_shared/portal-group-item.js";
 import { loadPublishedCatalogIdentity } from "./_shared/published-catalog.js";
@@ -42,7 +45,18 @@ type SyncedSkill = {
   identityStatus: string;
   catalogSkillId: string | null;
   skillMdSha: string;
+  stableKey: string;
+  source: string;
 };
+
+/** Cloud save names a skill by its folder on the Mac. */
+function cloudKeyOf(skill: SyncedSkill): string | null {
+  try {
+    return normalizeSkillKey(installationFolderFromKey(skill.stableKey, skill.source) ?? skill.name);
+  } catch {
+    return null;
+  }
+}
 
 type QueryClient = Pick<ReturnType<typeof getPgPool>, "query">;
 
@@ -60,7 +74,9 @@ async function getSyncedSkill(
         description,
         identity_status AS "identityStatus",
         catalog_skill_id AS "catalogSkillId",
-        skill_md_sha AS "skillMdSha"
+        skill_md_sha AS "skillMdSha",
+        stable_key AS "stableKey",
+        source
       FROM synced_skills
       WHERE id = $1
         AND user_id = $2
@@ -128,9 +144,14 @@ export async function listGroupItems(req: Request, groupId: string, dependencies
         s.name AS "skillName",
         s.description AS "skillDescription",
         s.github_url AS "githubUrl",
-        s.source
+        s.source,
+        src.kind AS "sourceKind",
+        i.release_id AS "releaseId",
+        CASE WHEN $2 = 'owner' THEN saved.current_release_id ELSE NULL END AS "savedReleaseId"
       FROM skill_group_items i
       LEFT JOIN synced_skills s ON s.id = i.synced_skill_id
+      LEFT JOIN skill_sources src ON src.id = i.source_id
+      LEFT JOIN cloud_saved_skills saved ON saved.source_id = i.source_id
       WHERE i.group_id = $1
       ORDER BY i.position ASC
     `,
@@ -180,6 +201,12 @@ export default async (req: Request, _context: Context) => {
         }
 
         const body = await requireJsonObject(req);
+        if (body.updateItemId !== undefined) {
+          const update = await updateCloudGroupItemWithClient(
+            client, groupId, requireGroupItemId(body.updateItemId), user.id);
+          await client.query("COMMIT");
+          return jsonResponse(req, update);
+        }
         const { itemIds } = await reorderGroupItemsWithClient(client, groupId, body.itemIds);
         await client.query("COMMIT");
         return jsonResponse(req, { itemIds });
@@ -202,7 +229,12 @@ export default async (req: Request, _context: Context) => {
         throw new Response("Synced skill is unavailable", { status: 400 });
       }
       const note = optionalString(body?.note, 1000);
-      const publication = await prepareSyncedGroupPublication(available);
+      const prepared = await prepareSyncedGroupPublication(available);
+      // A skill only on the owner's Macs is shared from its cloud save copy, when there is one.
+      const cloudKey = prepared.kind === "metadata_only" ? cloudKeyOf(available) : null;
+      const publication: GroupItemPublication = prepared.kind === "metadata_only" && cloudKey
+        ? { kind: "cloud", ownerUserId: user.id, skillKey: cloudKey, fallback: prepared.reason }
+        : prepared;
       const item = await persistGroupItem(
         user,
         groupId,
