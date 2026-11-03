@@ -594,6 +594,23 @@ test("a batch upload stores a skill's files in one request and reports a held fi
     const saved = await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
     assert.equal(saved.status, "saved");
 
+    // Confirmed on the web, the held file goes through in the next batch; a repeated file is stored once.
+    const { confirmSkillReview } = await import("./cloud-save.js");
+    await assert.rejects(saveCloudVersion(pool, { userId, deviceId, skillKey: "deploy",
+      files: manifest([v1[0], { path: "config.env", text: files[2].toString() }]) }));
+    await confirmSkillReview(pool, { userId, deviceId: null, skillKey: "deploy" });
+    const fresh = Buffer.from("new file\n");
+    const confirmed = await (await call({ files: [files[2], fresh, fresh].map(entry) })).json();
+    assert.deepEqual(confirmed.files.map((result: { status: string }) => result.status), ["stored", "stored", "stored"]);
+    assert.deepEqual(confirmed.files[0].labels, ["confirmed_secret"]);
+    assert.equal(store.objects.size, 4);
+
+    // Many files fit in one request.
+    const many = Array.from({ length: 200 }, (_, index) => Buffer.from(`file ${index}\n`));
+    const all = await (await call({ files: many.map(entry) })).json();
+    assert.equal(all.files.filter((result: { status: string }) => result.status === "stored").length, 200);
+    assert.equal((await call({ files: [...many, fresh].map(entry) })).status, 400);
+
     assert.equal((await call({ files: [{ ...entry(files[0]), blobSha: "0".repeat(40) }] })).status, 422);
     assert.equal((await call({ files: [] })).status, 400);
     assert.equal((await call({ files: [{ blobSha: gitObjectSha("blob", files[0]) }] })).status, 400);
