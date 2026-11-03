@@ -1,7 +1,8 @@
-import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from "react";
+import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowUpRight, RefreshCw } from "lucide-react";
 import type { SkillDisplay } from "./model";
 import { PublicReadmeClient, publicReadmeId, readmeBrowseUrl, readmeTitle, type SkillDocuments } from "./public-readme";
+import { cloudSkillKey, type SavedSkillMd, type SavedSkillMdLoader } from "../../cloud-save/cloud-save";
 
 const MarkdownBody = lazy(() => import("./ReadmeMarkdown"));
 const publicClient = new PublicReadmeClient();
@@ -66,6 +67,56 @@ export function SkillReadme({ skill, client = publicClient }: { skill: SkillDisp
         {shown.truncated && <p className="ua-muted">Preview shortened.</p>}
         <a className="ua-link" href={shown.sourceUrl} target="_blank" rel="noopener noreferrer">{kind === "skill" ? "View full SKILL.md" : "View full README"} <ArrowUpRight /></a>
         {kind === "skill" && !docs?.readme && <a className="ua-link" href={readmeBrowseUrl(shown)} target="_blank" rel="noopener noreferrer">View on GitHub <ArrowUpRight /></a>}
+      </div>}
+  </section>;
+}
+
+/** Folder keys of a skill on the user's Macs, which is how cloud save names it. */
+export function savedSkillKeys(skill: SkillDisplay): string[] {
+  const sources = skill.installed?.sourceSkills ?? [];
+  return [...new Set(sources.map(source => cloudSkillKey(source.installationFolder || source.name)))];
+}
+
+type SavedState = { id: string; status: "loading" | "ready" | "error"; doc: SavedSkillMd | null };
+
+/** A local skill's instructions, read from its cloud save copy; nothing leaves the Mac for this. */
+export function SavedSkillReadme({ skill, load }: { skill: SkillDisplay; load: SavedSkillMdLoader }) {
+  const keys = publicReadmeId(skill) ? [] : savedSkillKeys(skill);
+  const id = keys.join("\n");
+  const [revision, setRevision] = useState(0);
+  // The account's API changes identity on re-render; reading it through a ref keeps one request per skill.
+  const loader = useRef(load);
+  loader.current = load;
+  const [state, setState] = useState<SavedState>({ id: "", status: "loading", doc: null });
+  useEffect(() => {
+    if (!id) return;
+    const controller = new AbortController();
+    setState({ id, status: "loading", doc: null });
+    void loader.current(id.split("\n"), controller.signal).then(doc => {
+      if (!controller.signal.aborted) setState({ id, status: "ready", doc });
+    }).catch(() => {
+      if (!controller.signal.aborted) setState({ id, status: "error", doc: null });
+    });
+    return () => controller.abort();
+  }, [id, revision]);
+
+  if (!id) return null;
+  const current = state.id === id ? state : { id, status: "loading", doc: null };
+  return <section className="ua-readme" aria-label="Skill instructions" aria-busy={current.status === "loading"}>
+    <h3>Skill instructions</h3>
+    {current.status === "loading" ? <p className="ua-muted" role="status">Loading...</p>
+      : current.status === "error" ? <div className="ua-readme-error">
+        <p className="ua-muted" role="status">Skill instructions unavailable.</p>
+        <button className="ua-icon" type="button" title="Retry" aria-label="Retry loading skill instructions" onClick={() => setRevision(value => value + 1)}><RefreshCw /></button>
+      </div> : !current.doc ? <p className="ua-muted">Turn on cloud save to read this skill's instructions here.</p>
+      : <div>
+        <ReadmeRenderBoundary key={`${id}:${revision}`}>
+          <Suspense fallback={<p className="ua-muted" role="status">Loading...</p>}>
+            {/* No source page: relative links have nowhere to go, so they show as text. */}
+            <MarkdownBody markdown={current.doc.markdown} sourceUrl="about:blank" />
+          </Suspense>
+        </ReadmeRenderBoundary>
+        <p className="ua-muted">{current.doc.truncated ? "Preview shortened. " : ""}From your cloud save, saved {new Date(current.doc.savedAt).toLocaleDateString()}.</p>
       </div>}
   </section>;
 }

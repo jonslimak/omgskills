@@ -118,7 +118,8 @@ import { isMacDevice } from "./install-command";
 import { SiteFooter } from "./SiteFooter";
 import { saveTheme, storedTheme, type Theme } from "./theme-preference";
 import { trackEvent } from "./analytics";
-import { SkillReadme } from "./SkillReadme";
+import { SavedSkillReadme, SkillReadme } from "./SkillReadme";
+import type { SavedSkillMdLoader } from "../../cloud-save/cloud-save";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
@@ -147,6 +148,8 @@ type Props = {
   onSignIn?: () => void;
   management?: UnifiedManagement;
   accountPages?: (view: View, theme: string) => ReactNode;
+  /** Reads a local skill's instructions from the user's cloud save, when signed in. */
+  savedSkillMd?: SavedSkillMdLoader;
   publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
   /** Clears a saved install request when the user cancels from the Install button. */
   onInstallCancel?: () => void;
@@ -449,6 +452,7 @@ export function UnifiedApp({
   onSignIn,
   management,
   accountPages,
+  savedSkillMd,
   publicInstallAction,
   onInstallCancel,
   supportedAccountViews,
@@ -1980,6 +1984,7 @@ export function UnifiedApp({
                   )}
                 </div>
                 <SkillReadme skill={detail} />
+                {savedSkillMd && <SavedSkillReadme skill={detail} load={savedSkillMd} />}
                 {detail.installed && (
                   <section className="ua-detail-account">
                     <h3>On this account</h3>
