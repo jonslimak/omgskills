@@ -260,10 +260,15 @@ export async function loadGroupManifestInput(
   };
 }
 
+/** Private GitHub releases and the owner's cloud-saved skills never reach public viewers. */
+function isPrivateSource(item: GroupManifestInput["items"][number]): boolean {
+  return item.source?.kind === "private_github" || item.source?.kind === "cloud";
+}
+
 function publicInput(input: GroupManifestInput): GroupManifestInput {
   return {
     group: input.group,
-    items: input.items.map((item) => item.source?.kind === "private_github"
+    items: input.items.map((item) => isPrivateSource(item)
       ? {
           ...item,
           source: null,
@@ -280,7 +285,7 @@ function publicLinkHints(
 ): Map<string, PublicManifestLinkHint> {
   const privateItemIds = new Set(
     input.items
-      .filter((item) => item.source?.kind === "private_github")
+      .filter(isPrivateSource)
       .map((item) => item.id)
   );
   return new Map([...hints].map(([itemId, hint]) => [
