@@ -50,6 +50,22 @@ export function deleteCloudSaved(api: PortalApi, key?: string) {
   return api<CloudDeleteResult>(key === undefined ? base : `${base}/skills/${encodeURIComponent(key)}`, { method: "DELETE" });
 }
 
+export type SavedSkillMd = { key: string; markdown: string; truncated: boolean; savedAt: string };
+export type SavedSkillMdLoader = (keys: string[], signal: AbortSignal) => Promise<SavedSkillMd | null>;
+
+/** The first of these skill keys with a saved copy, or null when none is saved. */
+export async function loadSavedSkillMd(api: PortalApi, keys: string[], signal: AbortSignal): Promise<SavedSkillMd | null> {
+  for (const key of keys) {
+    try {
+      return await api<SavedSkillMd>(`${base}/skills/${encodeURIComponent(key)}/skill-md`, { signal, cache: "no-store" });
+    } catch (error) {
+      if (error instanceof PortalApiError && (error.status === 404 || error.status === 503)) continue;
+      throw error;
+    }
+  }
+  return null;
+}
+
 export function confirmCloudReview(api: PortalApi, key: string) {
   return api(`${base}/skills/${encodeURIComponent(key)}/review`, { method: "POST", body: JSON.stringify({ confirm: true }) });
 }

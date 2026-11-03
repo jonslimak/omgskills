@@ -996,6 +996,38 @@ export async function listCloudVersions(
 }
 
 /** Loads one of the user's saved versions with its files, ready to stream to a device. */
+const SKILL_MD_CHARACTER_LIMIT = 20_000;
+
+/** The saved SKILL.md of a skill's current version, for reading on the web; shortened like a library README. */
+export async function readCloudSkillMd(
+  db: Database,
+  store: CloudObjectStore,
+  input: { userId: string; skillKey: unknown }
+): Promise<{ key: string; markdown: string; truncated: boolean; savedAt: string }> {
+  const skillKey = normalizeSkillKey(input.skillKey);
+  const file = await db.query<{ blobSha: string; storageKey: string | null; savedAt: string }>(
+    `
+      SELECT file.blob_sha AS "blobSha", blob.storage_key AS "storageKey",
+        to_char(release.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "savedAt"
+      FROM cloud_saved_skills saved
+      JOIN skill_releases release ON release.id = saved.current_release_id
+      JOIN cloud_release_files file ON file.release_id = saved.current_release_id AND file.path = 'SKILL.md'
+      LEFT JOIN cloud_blobs blob ON blob.user_id = saved.user_id AND blob.blob_sha = file.blob_sha
+      WHERE saved.user_id = $1 AND saved.skill_key = $2
+    `,
+    [input.userId, skillKey]
+  );
+  const row = file.rows[0];
+  if (!row) throw new CloudSaveError("not_found", "Saved skill not found");
+  const text = new TextDecoder().decode(await store.get(row.storageKey ?? cloudBlobKey(input.userId, row.blobSha)));
+  return {
+    key: skillKey,
+    markdown: text.slice(0, SKILL_MD_CHARACTER_LIMIT).replace(/[\uD800-\uDBFF]$/, ""),
+    truncated: text.length > SKILL_MD_CHARACTER_LIMIT,
+    savedAt: row.savedAt
+  };
+}
+
 export async function loadCloudVersionPackage(
   db: Database,
   store: CloudObjectStore,
