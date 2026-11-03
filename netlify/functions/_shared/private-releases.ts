@@ -221,9 +221,13 @@ export async function loadAuthorizedPrivateReleasePackage(
   broker: PrivateReleaseBroker,
   grant: PrivateReleaseGrant
 ): Promise<SkillPackage> {
-  const repository = await liveRepository(broker, grant);
+  const { installationId, repositoryId, repositorySlug } = grant;
+  if (grant.sourceKind !== "private_github" || !installationId || !repositoryId || !repositorySlug) {
+    throw new PrivateReleaseError("release_unavailable", "Private release is unavailable");
+  }
+  const repository = await liveRepository(broker, { ...grant, installationId, repositoryId, repositorySlug });
   return broker.fetchPinnedSkillPackage(
-    grant.installationId,
+    installationId,
     repository,
     grant.normalizedRoot,
     {

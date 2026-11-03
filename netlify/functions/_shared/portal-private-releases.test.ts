@@ -42,6 +42,7 @@ const release = {
 };
 const grant: PrivateReleaseGrant = {
   accessRole: "owner",
+  sourceKind: "private_github",
   actorUserId: actor.id,
   deviceId: deviceActor.deviceId,
   ownerUserId: actor.id,
