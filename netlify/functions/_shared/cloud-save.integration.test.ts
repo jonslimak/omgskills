@@ -10,6 +10,7 @@ import {
   CloudSaveError,
   listCloudVersions,
   loadCloudVersionPackage,
+  loadSharedCloudPackage,
   markDeletedLocally,
   readCloudSave,
   saveCloudVersion,
@@ -17,6 +18,7 @@ import {
   updateCloudSaveSettings
 } from "./cloud-save.js";
 import { CloudStoreError, type CloudObjectStore } from "./cloud-store.js";
+import { requirePrivateReleaseAccess } from "./private-release-access.js";
 import { gitObjectSha, validateSkillPackage, type SkillManifestEntry } from "./skill-package.js";
 
 const connectionString = process.env.AUTH_TEST_DATABASE_URL;
@@ -1273,6 +1275,69 @@ test("each Mac reports why it didn't save skills, and its next report replaces t
       { method: "PUT", body: JSON.stringify({ skipped: {} }) }), {} as never,
       { ...dependencies, requireDevice: async () => { throw new Response("no", { status: 401 }); } } as never);
     assert.equal(web.status, 401);
+  });
+});
+
+test("someone invited to a Set downloads the owner's saved version; nobody else does", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const owner = await createUser(pool);
+    const member = await createUser(pool);
+    const stranger = await createUser(pool);
+    const email = async (userId: string) =>
+      (await pool.query<{ email: string }>("SELECT email FROM users WHERE id = $1", [userId])).rows[0].email;
+    await updateCloudSaveSettings(pool, owner.userId, { enabled: true });
+    await uploadAll(pool, store, owner.userId, v1);
+    const saved = await saveCloudVersion(pool, { ...owner, skillKey: "notes", files: manifest(v1) });
+    assert.ok(saved.status === "saved");
+    const releaseId = saved.skill.currentVersion.id;
+    const sourceId = (await pool.query<{ id: string }>("SELECT source_id AS id FROM skill_releases WHERE id = $1", [releaseId])).rows[0].id;
+
+    const asMember = { userId: member.userId, email: await email(member.userId), deviceId: member.deviceId };
+    // Not in any Set yet: only the owner can read it.
+    await assert.rejects(requirePrivateReleaseAccess(pool, asMember, releaseId));
+    const ownerGrant = await requirePrivateReleaseAccess(pool, { userId: owner.userId, email: await email(owner.userId) }, releaseId);
+    assert.equal(ownerGrant.sourceKind, "cloud");
+
+    const group = (await pool.query<{ id: string }>(
+      "INSERT INTO skill_groups (owner_user_id, name, slug, visibility) VALUES ($1, 'Team', 'team', 'restricted') RETURNING id",
+      [owner.userId])).rows[0].id;
+    await pool.query(
+      "INSERT INTO skill_group_items (group_id, kind, name, source_id, release_id, position) VALUES ($1, 'synced', 'notes', $2, $3, 0)",
+      [group, sourceId, releaseId]);
+    await pool.query("INSERT INTO skill_group_allowed_emails (group_id, email) VALUES ($1, $2)", [group, asMember.email]);
+
+    const grant = await requirePrivateReleaseAccess(pool, asMember, releaseId);
+    assert.equal(grant.accessRole, "invited");
+    assert.equal(grant.groupId, group);
+    const shared = await loadSharedCloudPackage(pool, store, grant);
+    assert.deepEqual(shared.entries.map((entry) => entry.path).sort(), ["SKILL.md", "scripts/run.sh"]);
+    assert.equal(shared.coordinates.treeSha, grant.treeSha);
+
+    // Not invited, or the Set made public: no access.
+    await assert.rejects(requirePrivateReleaseAccess(pool, { userId: stranger.userId, email: await email(stranger.userId) }, releaseId));
+    await pool.query("UPDATE skill_groups SET visibility = 'public' WHERE id = $1", [group]);
+    await assert.rejects(requirePrivateReleaseAccess(pool, asMember, releaseId));
+    await pool.query("UPDATE skill_groups SET visibility = 'restricted' WHERE id = $1", [group]);
+
+    // A version the owner confirmed has a key is never shared, even if it ends up in the Set.
+    const keyed: File[] = [{ path: "SKILL.md", text: "---\nname: keys\ndescription: Keys.\n---\n" }, { path: "config.env", text: `TOKEN=${fakeToken}\n` }];
+    for (const file of keyed) {
+      const data = Buffer.from(file.text);
+      await storeCloudBlob(pool, store, { userId: owner.userId, blobSha: gitObjectSha("blob", data), data, confirmSecrets: true });
+    }
+    const keyedSave = await saveCloudVersion(pool, { ...owner, skillKey: "keys", files: manifest(keyed) });
+    assert.ok(keyedSave.status === "saved" && keyedSave.skill.currentVersion.labels.includes("confirmed_secret"));
+    const keyedRelease = keyedSave.skill.currentVersion.id;
+    const keyedSource = (await pool.query<{ id: string }>("SELECT source_id AS id FROM skill_releases WHERE id = $1", [keyedRelease])).rows[0].id;
+    await pool.query(
+      "INSERT INTO skill_group_items (group_id, kind, name, source_id, release_id, position) VALUES ($1, 'synced', 'keys', $2, $3, 1)",
+      [group, keyedSource, keyedRelease]);
+    await assert.rejects(requirePrivateReleaseAccess(pool, asMember, keyedRelease));
+
+    // A grant can't be pointed at someone else's storage.
+    await rejects(loadSharedCloudPackage(pool, store, { ...grant, ownerUserId: stranger.userId }), "not_found");
+    await rejects(loadSharedCloudPackage(pool, store, { ...grant, treeSha: "0".repeat(40) }), "not_found");
   });
 });
 

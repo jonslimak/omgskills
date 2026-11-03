@@ -5,6 +5,8 @@ import {
   requireDeviceActor as authenticateDevice
 } from "./_shared/device-auth.js";
 import { GitHubBrokerClient } from "./_shared/github-broker.js";
+import { CloudSaveError, loadSharedCloudPackage } from "./_shared/cloud-save.js";
+import { CloudStoreError, createCloudObjectStore } from "./_shared/cloud-store.js";
 import { requireSkillGroupsFeature } from "./_shared/feature-flags.js";
 import { corsHeaders, optionsResponse, secretJsonResponse } from "./_shared/http.js";
 import {
@@ -85,7 +87,10 @@ function defaultDependencies(): PortalPrivateReleasesDependencies {
       return requirePrivateReleaseAccess(pool, actor, releaseId);
     },
     loadPackage(grant) {
-      return loadAuthorizedPrivateReleasePackage(broker, grant);
+      // A version saved to the cloud comes from the owner's storage, not GitHub.
+      return grant.sourceKind === "cloud"
+        ? loadSharedCloudPackage(pool, createCloudObjectStore(), grant)
+        : loadAuthorizedPrivateReleasePackage(broker, grant);
     },
     recordContentFetch(grant) {
       return writeContentFetchAudit(pool, grant);
@@ -156,7 +161,13 @@ export async function portalPrivateReleases(
     if (error instanceof Response) {
       return secretJsonResponse(req, { error: await error.text() }, { status: error.status });
     }
-    const failure = privateReleaseResponse(error);
+    if (error instanceof CloudStoreError && error.code !== "not_found") {
+      return secretJsonResponse(req, { error: "Cloud storage is unavailable" }, { status: 503 });
+    }
+    // A shared cloud version that's gone looks the same as one never shared.
+    const failure = privateReleaseResponse(
+      error instanceof CloudSaveError || error instanceof CloudStoreError ? new PrivateReleaseAccessError() : error
+    );
     const retryAfter = failure.headers.get("retry-after");
     return secretJsonResponse(
       req,

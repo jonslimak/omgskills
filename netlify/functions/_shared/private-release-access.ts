@@ -7,16 +7,21 @@ export type PrivateReleaseActor = {
   deviceId?: string | null;
 };
 
+/** A private GitHub release, or a version the owner saved to the cloud. */
+export type PrivateSourceKind = "private_github" | "cloud";
+
 export type PrivateReleaseGrant = {
   accessRole: "owner" | "invited";
   actorUserId: string;
   deviceId: string | null;
+  sourceKind: PrivateSourceKind;
   sourceId: string;
   releaseId: string;
   ownerUserId: string;
-  installationId: string;
-  repositoryId: string;
-  repositorySlug: string;
+  /** GitHub only; null for a cloud version. */
+  installationId: string | null;
+  repositoryId: string | null;
+  repositorySlug: string | null;
   normalizedRoot: string;
   commitSha: string;
   treeSha: string;
@@ -27,12 +32,13 @@ export type PrivateReleaseGrant = {
 };
 
 export type PrivateReleaseAccessRow = {
+  sourceKind: PrivateSourceKind;
   sourceId: string;
   releaseId: string;
   ownerUserId: string;
-  installationId: string;
-  repositoryId: string;
-  repositorySlug: string;
+  installationId: string | null;
+  repositoryId: string | null;
+  repositorySlug: string | null;
   normalizedRoot: string;
   commitSha: string;
   treeSha: string;
@@ -47,6 +53,8 @@ export type PrivateReleaseAccessRow = {
   groupDisabledAt: string | null;
   invited: boolean;
   skillItemId: string | null;
+  /** A cloud version where the owner confirmed a key or password is never shared. */
+  confirmedSecret?: boolean;
 };
 
 type PrivateReleaseAccessDatabase = {
@@ -96,6 +104,7 @@ function grant(
     accessRole,
     actorUserId: actor.userId,
     deviceId: actor.deviceId ?? null,
+    sourceKind: row.sourceKind,
     sourceId: row.sourceId,
     releaseId: row.releaseId,
     ownerUserId: row.ownerUserId,
@@ -129,6 +138,7 @@ export function decidePrivateReleaseAccess(
   }
 
   for (const row of rows) {
+    if (row.confirmedSecret) continue;
     const group = linkedGroup(row);
     if (!group) continue;
     const role = decideGroupAccess(
@@ -152,6 +162,7 @@ export async function requirePrivateReleaseAccess(
     `
       SELECT
         release.id AS "releaseId",
+        source.kind AS "sourceKind",
         release.source_id AS "sourceId",
         release.commit_sha AS "commitSha",
         release.tree_sha AS "treeSha",
@@ -178,9 +189,11 @@ export async function requirePrivateReleaseAccess(
               AND allowed.email = $2
           )
         END AS invited,
-        CASE WHEN group_row.id IS NULL THEN NULL ELSE item.id END AS "skillItemId"
+        CASE WHEN group_row.id IS NULL THEN NULL ELSE item.id END AS "skillItemId",
+        COALESCE('confirmed_secret' = ANY(cloud.labels), false) AS "confirmedSecret"
       FROM skill_releases release
       JOIN skill_sources source ON source.id = release.source_id
+      LEFT JOIN cloud_releases cloud ON cloud.release_id = release.id
       LEFT JOIN skill_group_items item
         ON item.release_id = release.id
         AND item.source_id = source.id
@@ -188,7 +201,7 @@ export async function requirePrivateReleaseAccess(
         ON group_row.id = item.group_id
         AND group_row.owner_user_id = source.owner_user_id
       WHERE release.id = $1
-        AND source.kind = 'private_github'
+        AND source.kind IN ('private_github', 'cloud')
         AND source.tombstoned_at IS NULL
       ORDER BY group_row.id NULLS LAST, item.id NULLS LAST
     `,

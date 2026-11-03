@@ -995,7 +995,23 @@ export async function listCloudVersions(
   return result.rows;
 }
 
-/** Loads one of the user's saved versions with its files, ready to stream to a device. */
+/**
+ * A saved version for someone its owner shared it with through a Set. The caller has already
+ * checked access (private-release-access.ts); files are read from the owner's storage.
+ */
+export async function loadSharedCloudPackage(
+  db: Database,
+  store: CloudObjectStore,
+  grant: { sourceKind: string; ownerUserId: string; sourceId: string; releaseId: string; treeSha: string }
+): Promise<SkillPackage> {
+  if (grant.sourceKind !== "cloud") throw new CloudSaveError("not_found", "Saved version not found");
+  const loaded = await loadCloudVersionPackage(db, store, { userId: grant.ownerUserId, releaseId: grant.releaseId });
+  if (loaded.sourceId !== grant.sourceId || loaded.package.coordinates.treeSha !== grant.treeSha) {
+    throw new CloudSaveError("not_found", "Saved version not found");
+  }
+  return loaded.package;
+}
+
 const SKILL_MD_CHARACTER_LIMIT = 20_000;
 
 /** The saved SKILL.md of a skill's current version, for reading on the web; shortened like a library README. */
@@ -1028,6 +1044,7 @@ export async function readCloudSkillMd(
   };
 }
 
+/** Loads one of the user's saved versions with its files, ready to stream to a device. */
 export async function loadCloudVersionPackage(
   db: Database,
   store: CloudObjectStore,

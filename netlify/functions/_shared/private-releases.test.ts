@@ -32,6 +32,7 @@ const releaseRow = {
 };
 const grant: PrivateReleaseGrant = {
   accessRole: "invited",
+  sourceKind: "private_github",
   actorUserId: "recipient-a",
   deviceId: null,
   ownerUserId: "owner-a",
@@ -179,7 +180,7 @@ test("authorized recipient package loading uses only server-resolved grant coord
   const broker = {
     async listRepositories() {
       return [{
-        id: grant.repositoryId,
+        id: grant.repositoryId!,
         fullName: "renamed/private-skills",
         name: "private-skills",
         isPrivate: true,

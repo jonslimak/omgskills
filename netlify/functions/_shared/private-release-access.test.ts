@@ -17,6 +17,7 @@ const actor: PrivateReleaseActor = {
 
 function row(overrides: Partial<PrivateReleaseAccessRow> = {}): PrivateReleaseAccessRow {
   return {
+    sourceKind: "private_github",
     sourceId: "11111111-1111-4111-8111-111111111111",
     releaseId: "22222222-2222-4222-8222-222222222222",
     ownerUserId: "owner-id",
@@ -65,6 +66,18 @@ test("verified allow-list membership grants only active restricted-group access"
     decidePrivateReleaseAccess([row({ groupDisabledAt: "2026-08-28T12:01:00Z" })], actor),
     null
   );
+});
+
+test("a saved cloud version is shared like a private release, except one with a confirmed key", () => {
+  const cloud = { sourceKind: "cloud" as const, installationId: null, repositoryId: null, repositorySlug: null };
+  const invited = decidePrivateReleaseAccess([row(cloud)], actor);
+  assert.equal(invited?.accessRole, "invited");
+  assert.equal(invited?.sourceKind, "cloud");
+  assert.equal(decidePrivateReleaseAccess([row({ ...cloud, groupVisibility: "public" })], actor), null);
+  assert.equal(decidePrivateReleaseAccess([row({ ...cloud, confirmedSecret: true })], actor), null);
+  // The owner still reads their own version.
+  const owner = { userId: "owner-id", email: "owner@example.com" };
+  assert.equal(decidePrivateReleaseAccess([row({ ...cloud, confirmedSecret: true })], owner)?.accessRole, "owner");
 });
 
 test("cross-owner group substitution never grants release access", () => {
