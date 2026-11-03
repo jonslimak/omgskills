@@ -438,13 +438,17 @@ export async function storeCloudBlobs(
         await Promise.all(fresh.slice(index, index + BLOB_UPLOAD_CONCURRENCY)
           .map((file) => store.put(cloudBlobKey(input.userId, file.blobSha), file.data)));
       }
-      for (const file of fresh) {
-        await client.query(
-          "INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels) VALUES ($1, $2, $3, $4)",
-          [input.userId, file.blobSha, file.data.byteLength, file.labels]
-        );
-        results.set(file.blobSha, { blobSha: file.blobSha, status: "stored", labels: file.labels });
-      }
+      await client.query(
+        `
+          INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels)
+          SELECT $1, file.blob_sha, file.byte_size, ARRAY(SELECT jsonb_array_elements_text(file.labels))
+          FROM jsonb_to_recordset($2::jsonb) AS file(blob_sha text, byte_size integer, labels jsonb)
+        `,
+        [input.userId, JSON.stringify(fresh.map((file) => ({
+          blob_sha: file.blobSha, byte_size: file.data.byteLength, labels: file.labels
+        })))]
+      );
+      for (const file of fresh) results.set(file.blobSha, { blobSha: file.blobSha, status: "stored", labels: file.labels });
       // Stored again after a delete: they must not be removed by the pending clean-up.
       await client.query("DELETE FROM cloud_purge_queue WHERE user_id = $1 AND blob_sha = ANY($2::text[])",
         [input.userId, fresh.map((file) => file.blobSha)]);
@@ -453,7 +457,7 @@ export async function storeCloudBlobs(
   return input.files.map((file) => results.get(requireBlobSha(file.blobSha))!);
 }
 
-const BLOB_UPLOAD_CONCURRENCY = 8;
+const BLOB_UPLOAD_CONCURRENCY = 16;
 
 /**
  * Runs one upload while holding the user's cloud save settings row, so uploads from

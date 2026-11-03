@@ -93,22 +93,20 @@ protocol CloudSaveServing: Sendable {
     func withdrawReview(key: String, credential: StoredDeviceCredential) async throws
 }
 
+/// The server has no batch upload; files go one at a time.
+struct CloudSaveBatchUnsupported: Error {}
+
 extension CloudSaveServing {
     func uploadFiles(_ entries: [SkillPackageEntry], credential: StoredDeviceCredential) async throws -> [CloudSaveFinding] {
-        var held: [CloudSaveFinding] = []
-        for entry in entries {
-            try Task.checkCancellation()
-            do { try await uploadFile(entry, confirmSecrets: false, credential: credential) }
-            catch CloudSaveAPIError.needsReview(let findings) { held += findings }
-        }
-        return held
+        throw CloudSaveBatchUnsupported()
     }
 }
 
 struct CloudSaveAPI: CloudSaveServing {
     /// Raw bytes per batch: base64 adds a third, and the server takes at most 4 MB of files per request.
     static let batchBytes = 3 * 1024 * 1024
-    static let batchFiles = 200
+    /// Keeps each request well inside the server's time limit.
+    static let batchFiles = 50
 
     private let origin: URL
     private let session: any DeviceHTTPSession
@@ -137,7 +135,7 @@ struct CloudSaveAPI: CloudSaveServing {
     }
 
     /// Sends a skill's files in as few requests as fit; a file too big for a batch goes on its own.
-    /// A server without batch upload gets the rest one file at a time.
+    /// Throws CloudSaveBatchUnsupported, before sending anything else, if the server has no batch upload.
     func uploadFiles(_ entries: [SkillPackageEntry], credential: StoredDeviceCredential) async throws -> [CloudSaveFinding] {
         try requireUploadScope(credential)
         var held: [CloudSaveFinding] = []
@@ -153,19 +151,18 @@ struct CloudSaveAPI: CloudSaveServing {
             batches[batches.count - 1].append(entry)
             bytes += entry.data.count
         }
-        for (index, batch) in batches.enumerated() {
+        for batch in batches {
             try Task.checkCancellation()
             let files = batch.map { ["blobSha": $0.blobSha, "data": $0.data.base64EncodedString()] }
-            let results: [BatchResult]
-            do {
-                let data = try await send("POST", path: ["blobs"], json: ["files": files], credential: credential)
-                guard let decoded = try? JSONDecoder().decode(BatchBody.self, from: data) else { throw CloudSaveAPIError.invalidResponse }
-                results = decoded.files
-            } catch CloudSaveAPIError.rejected, CloudSaveAPIError.invalidResponse {
-                single += batches[index...].joined()
-                break
+            let data: Data
+            do { data = try await send("POST", path: ["blobs"], json: ["files": files], credential: credential) }
+            catch is RouteMissing { throw CloudSaveBatchUnsupported() }
+            // Without the route, some servers answer with the web page instead.
+            guard let decoded = try? JSONDecoder().decode(BatchBody.self, from: data) else {
+                if batch == batches.first { throw CloudSaveBatchUnsupported() }
+                throw CloudSaveAPIError.invalidResponse
             }
-            held += results.flatMap { $0.findings ?? [] }
+            held += decoded.files.flatMap { $0.findings ?? [] }
         }
         for entry in single {
             try Task.checkCancellation()
@@ -210,6 +207,7 @@ struct CloudSaveAPI: CloudSaveServing {
         let findings: [CloudSaveFinding]?
     }
     private struct MissingFiles: Error { let hashes: [String] }
+    private struct RouteMissing: Error {}
 
     private func requireUploadScope(_ credential: StoredDeviceCredential) throws {
         guard credential.connection.grantedScopes.contains(.contentWrite) else { throw CloudSaveAPIError.permissionRequired }
@@ -244,6 +242,8 @@ struct CloudSaveAPI: CloudSaveServing {
         let error = try? JSONDecoder().decode(ErrorBody.self, from: data)
         switch (http.statusCode, error?.code) {
         case (409, _) where error?.missing != nil: throw MissingFiles(hashes: error?.missing ?? [])
+        // A route this server doesn't have; its own "not found" answers carry a code.
+        case (404, nil) where path == ["blobs"], (405, nil) where path == ["blobs"]: throw RouteMissing()
         case (401, _): throw CloudSaveAPIError.reconnectRequired
         case (403, "disabled"): throw CloudSaveAPIError.disabled
         case (403, "excluded"): throw CloudSaveAPIError.excluded

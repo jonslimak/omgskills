@@ -134,7 +134,16 @@ struct CloudSaveSync: Sendable {
         }
         try Task.checkCancellation()
         try await pace()
-        let held = try await api.uploadFiles(upload, credential: credential)
+        var held: [CloudSaveFinding] = []
+        do { held = try await api.uploadFiles(upload, credential: credential) }
+        catch is CloudSaveBatchUnsupported {
+            for entry in upload {
+                try Task.checkCancellation()
+                try await pace()
+                do { try await api.uploadFile(entry, confirmSecrets: false, credential: credential) }
+                catch CloudSaveAPIError.needsReview(let findings) { held += findings }
+            }
+        }
         if !held.isEmpty {
             // Asking to save again records the skill for review on the web now, not on the next pass.
             try await pace()

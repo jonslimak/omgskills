@@ -477,11 +477,18 @@ struct CloudSaveAPITests {
         #expect(files.map { $0["data"] } == ["YQ==", "Yg=="])
     }
 
-    @Test func aServerWithoutBatchUploadGetsFilesOneAtATime() async throws {
-        let files = [entry("a", Data("a".utf8)), entry("b", Data("b".utf8))]
-        let session = CloudSaveHTTPSession([(404, #"{"error":"Not found"}"#), (201, #"{"stored":true}"#), (201, #"{"stored":true}"#)])
-        #expect(try await CloudSaveAPI(origin: origin, session: session).uploadFiles(files, credential: credential()).isEmpty)
-        #expect(await session.requests.map { $0.url?.lastPathComponent } == ["blobs"] + files.map(\.blobSha))
+    @Test func aServerWithoutBatchUploadIsToldApartFromAFailingOne() async throws {
+        let files = [entry("a", Data("a".utf8))]
+        for (status, body) in [(404, #"{"error":"Not found"}"#), (200, "<!doctype html>")] {
+            let session = CloudSaveHTTPSession([(status, body)])
+            await #expect(throws: CloudSaveBatchUnsupported.self) {
+                try await CloudSaveAPI(origin: origin, session: session).uploadFiles(files, credential: credential())
+            }
+        }
+        let failing = CloudSaveHTTPSession([(422, #"{"error":"File contents do not match their hash","code":"blob_mismatch"}"#)])
+        await #expect(throws: CloudSaveAPIError.rejected("File contents do not match their hash")) {
+            try await CloudSaveAPI(origin: origin, session: failing).uploadFiles(files, credential: credential())
+        }
     }
 
     @Test func decodesStateFromServersWithAndWithoutTheSafetyScan() async throws {
