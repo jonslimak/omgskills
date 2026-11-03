@@ -260,9 +260,16 @@ export async function loadGroupManifestInput(
   };
 }
 
+function isCloudItem(item: GroupManifestInput["items"][number]): boolean {
+  return item.source?.kind === "cloud"
+    || item.metadataOnlyReason === "cloud_deleted"
+    || item.metadataOnlyReason === "cloud_confirmed_secret"
+    || item.metadataOnlyReason === "synced_local_only";
+}
+
 /** Private GitHub releases and the owner's cloud-saved skills never reach public viewers. */
 function isPrivateSource(item: GroupManifestInput["items"][number]): boolean {
-  return item.source?.kind === "private_github" || item.source?.kind === "cloud";
+  return item.source?.kind === "private_github" || isCloudItem(item);
 }
 
 function publicInput(input: GroupManifestInput): GroupManifestInput {
@@ -271,6 +278,7 @@ function publicInput(input: GroupManifestInput): GroupManifestInput {
     items: input.items.map((item) => isPrivateSource(item)
       ? {
           ...item,
+          ...(isCloudItem(item) ? { description: null, note: null } : {}),
           source: null,
           release: null,
           metadataOnlyReason: "source_unavailable"

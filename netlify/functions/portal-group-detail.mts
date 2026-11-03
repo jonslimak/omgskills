@@ -83,6 +83,7 @@ export async function portalGroupDetail(req: Request, _context: Context, depende
             s.github_url AS "githubUrl",
             s.source,
             src.kind AS "sourceKind",
+            i.metadata_only_reason AS "metadataOnlyReason",
             i.release_id AS "releaseId",
             CASE WHEN $2 = 'owner' THEN saved.current_release_id ELSE NULL END AS "savedReleaseId"
           FROM skill_group_items i

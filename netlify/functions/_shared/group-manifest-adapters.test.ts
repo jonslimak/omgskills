@@ -297,7 +297,23 @@ test("a skill shared from cloud save installs for invited Macs as a private item
     sequenceClient([[{ id: "group-id" }], [accessFacts({ visibility: "public", invited: false })], [cloudRow]])
   );
   assert.deepEqual(publicView.manifest.items[0].installability, { status: "metadata_only", reason: "source_unavailable" });
+  assert.equal(publicView.manifest.items[0].description, null);
+  assert.equal(publicView.manifest.items[0].note, null);
   assert.equal(publicView.linkHints.get("item-id")?.isLocalOnly, true);
+});
+
+test("a deleted or withheld cloud skill remains name-only in a public Set", async () => {
+  for (const reason of ["cloud_deleted", "cloud_confirmed_secret", "synced_local_only"]) {
+    const cloudRow = manifestRow({ itemKind: "synced", sourceId: null, sourceKind: null,
+      releaseId: null, metadataOnlyReason: reason, itemNote: "private note" });
+    const publicView = await buildPublicGroupManifestByRoute(
+      "jon", "team-skills",
+      sequenceClient([[{ id: "group-id" }], [accessFacts({ visibility: "public", invited: false })], [cloudRow]])
+    );
+    assert.equal(publicView.manifest.items[0].description, null);
+    assert.equal(publicView.manifest.items[0].note, null);
+    assert.deepEqual(publicView.linkHints.get("item-id"), { catalogSkillId: null, githubUrl: null, isLocalOnly: true });
+  }
 });
 
 test("device manifest keeps inaccessible and absent routes indistinguishable", async () => {

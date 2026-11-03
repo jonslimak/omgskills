@@ -18,3 +18,17 @@ test("a skill shared from cloud save says so, and only its owner hears about a n
   assert.equal(portalGroupItem(shared, "public").cloudShared, undefined);
   assert.equal(portalGroupItem(row(), "owner").cloudShared, undefined);
 });
+
+test("public Set viewers see only the name of a cloud skill, including after deletion", () => {
+  for (const fields of [{ sourceKind: "cloud" }, { metadataOnlyReason: "cloud_deleted" },
+    { metadataOnlyReason: "cloud_confirmed_secret" }, { metadataOnlyReason: "synced_local_only" }]) {
+    const item = row({ ...fields, skillDescription: "private description", note: "private note",
+      githubUrl: "https://github.com/example/private", source: "codex" });
+    const publicItem = portalGroupItem(item, "public");
+    assert.equal(publicItem.name, "notes");
+    assert.equal(publicItem.description, "");
+    assert.equal(publicItem.githubUrl, null);
+    assert.equal(publicItem.source, "synced");
+    assert.equal(portalGroupItem(item, "owner").description, "private description");
+  }
+});
