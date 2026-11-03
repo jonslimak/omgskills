@@ -6,7 +6,7 @@ import { metadata, recipe, release, website, updateFeed } from './prepare-connec
 const key = Buffer.from(Array.from({ length: 32 }, (_, index) => index + 1)).toString('base64');
 
 test('production packaging preserves identity with production-only account and manual update settings', () => {
-  assert.deepEqual(release, { version: '0.0.30', build: '30' });
+  assert.deepEqual(release, { version: '0.0.31', build: '31' });
   const info = metadata(key);
   assert.equal(info.CFBundleIdentifier, 'com.jonslimak.omgskills');
   assert.equal(info.CFBundleDisplayName, 'OMGSkills');
