@@ -140,6 +140,29 @@ test("batch delete signs the delete query, sends an MD5, and reports only the ke
   await assert.rejects(store.deleteMany(Array.from({ length: 1001 }, (_, index) => `k${index}`)), /at most 1000/);
 });
 
+test("storage listing parses pages and rejects malformed responses", async () => {
+  const env: Record<string, string> = {
+    CLOUD_SAVE_R2_ACCOUNT_ID: "acct", CLOUD_SAVE_R2_ACCESS_KEY_ID: "id",
+    CLOUD_SAVE_R2_SECRET_ACCESS_KEY: "secret", CLOUD_SAVE_R2_BUCKET: "bucket"
+  };
+  const responses = [
+    "<ListBucketResult><IsTruncated>true</IsTruncated><NextContinuationToken>next&amp;page</NextContinuationToken><Contents><Key>cloud%2Fu%2Fa</Key><LastModified>2026-11-01T00:00:00Z</LastModified></Contents></ListBucketResult>",
+    "<ListBucketResult><IsTruncated>false</IsTruncated></ListBucketResult>",
+    "<ListBucketResult><IsTruncated>true</IsTruncated></ListBucketResult>"
+  ];
+  const urls: string[] = [];
+  const store = createCloudObjectStore((key) => env[key], (async (url: string) => {
+    urls.push(url);
+    return new Response(responses.shift(), { status: 200 });
+  }) as typeof fetch);
+  const first = await store.listCloudObjects(null, 20);
+  assert.equal(first.objects[0].key, "cloud/u/a");
+  assert.equal(first.next, "next&page");
+  assert.deepEqual(await store.listCloudObjects(first.next, 20), { objects: [], next: null });
+  assert.match(urls[1], /continuation-token=next%26page/);
+  await assert.rejects(store.listCloudObjects(null, 20), /continuation token/);
+});
+
 test("deleting is a web action: a Mac's credential can't delete saved skills", async () => {
   const seen: string[] = [];
   const deps = dependencies({

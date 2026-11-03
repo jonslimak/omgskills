@@ -336,14 +336,14 @@ export async function storeCloudBlob(
     if (await usedBytes(client, input.userId) + input.data.byteLength > CLOUD_SAVE_LIMITS.maximumUserBytes) {
       throw new CloudSaveError("quota_exceeded", "Cloud storage is full");
     }
-    await queueCleanupFirst(pool, input.userId, [blobSha]);
-    await store.put(cloudBlobKey(input.userId, blobSha), input.data);
+    const storageKey = `${cloudBlobKey(input.userId, blobSha)}/${randomUUID()}`;
+    await queueCleanupFirst(pool, input.userId, [storageKey]);
+    await store.put(storageKey, input.data);
     await client.query(
-      "INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels) VALUES ($1, $2, $3, $4)",
-      [input.userId, blobSha, input.data.byteLength, blobLabels]
+      "INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels, storage_key) VALUES ($1, $2, $3, $4, $5)",
+      [input.userId, blobSha, input.data.byteLength, blobLabels, storageKey]
     );
-    // Stored again after a delete: it must not be removed by the pending clean-up.
-    await client.query("DELETE FROM cloud_purge_queue WHERE user_id = $1 AND blob_sha = $2", [input.userId, blobSha]);
+    await client.query("DELETE FROM cloud_storage_purge_queue WHERE user_id = $1 AND storage_key = $2", [input.userId, storageKey]);
     return { blobSha, stored: true, labels: blobLabels };
   });
 }
@@ -435,27 +435,27 @@ export async function storeCloudBlobs(
       if (await usedBytes(client, input.userId) + bytes > CLOUD_SAVE_LIMITS.maximumUserBytes) {
         throw new CloudSaveError("quota_exceeded", "Cloud storage is full");
       }
-      await queueCleanupFirst(pool, input.userId, fresh.map((file) => file.blobSha));
+      const storageKeys = new Map(fresh.map((file) => [file.blobSha, `${cloudBlobKey(input.userId, file.blobSha)}/${randomUUID()}`]));
+      await queueCleanupFirst(pool, input.userId, [...storageKeys.values()]);
       for (let index = 0; index < fresh.length; index += BLOB_UPLOAD_CONCURRENCY) {
         const uploads = await Promise.allSettled(fresh.slice(index, index + BLOB_UPLOAD_CONCURRENCY)
-          .map((file) => store.put(cloudBlobKey(input.userId, file.blobSha), file.data)));
+          .map((file) => store.put(storageKeys.get(file.blobSha)!, file.data)));
         const failed = uploads.find((upload): upload is PromiseRejectedResult => upload.status === "rejected");
         if (failed) throw failed.reason;
       }
       await client.query(
         `
-          INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels)
-          SELECT $1, file.blob_sha, file.byte_size, ARRAY(SELECT jsonb_array_elements_text(file.labels))
-          FROM jsonb_to_recordset($2::jsonb) AS file(blob_sha text, byte_size integer, labels jsonb)
+          INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels, storage_key)
+          SELECT $1, file.blob_sha, file.byte_size, ARRAY(SELECT jsonb_array_elements_text(file.labels)), file.storage_key
+          FROM jsonb_to_recordset($2::jsonb) AS file(blob_sha text, byte_size integer, labels jsonb, storage_key text)
         `,
         [input.userId, JSON.stringify(fresh.map((file) => ({
-          blob_sha: file.blobSha, byte_size: file.data.byteLength, labels: file.labels
+          blob_sha: file.blobSha, byte_size: file.data.byteLength, labels: file.labels, storage_key: storageKeys.get(file.blobSha)
         })))]
       );
       for (const file of fresh) results.set(file.blobSha, { blobSha: file.blobSha, status: "stored", labels: file.labels });
-      // Stored again after a delete: they must not be removed by the pending clean-up.
-      await client.query("DELETE FROM cloud_purge_queue WHERE user_id = $1 AND blob_sha = ANY($2::text[])",
-        [input.userId, fresh.map((file) => file.blobSha)]);
+      await client.query("DELETE FROM cloud_storage_purge_queue WHERE user_id = $1 AND storage_key = ANY($2::text[])",
+        [input.userId, [...storageKeys.values()]]);
     });
   }
   return input.files.map((file) => results.get(requireBlobSha(file.blobSha))!);
@@ -469,14 +469,14 @@ const BLOB_UPLOAD_CONCURRENCY = 16;
  * are removed by the next read. A finished upload takes them off the queue again.
  * Called under the upload lock, which the clean-up also takes, so it can't run in between.
  */
-async function queueCleanupFirst(pool: Pool, userId: string, blobShas: string[]): Promise<void> {
-  if (!blobShas.length) return;
+async function queueCleanupFirst(pool: Pool, userId: string, storageKeys: string[]): Promise<void> {
+  if (!storageKeys.length) return;
   const queueClient = new pg.Client(pool.options);
   try {
     await queueClient.connect();
     await queueClient.query(
-      "INSERT INTO cloud_purge_queue (user_id, blob_sha) SELECT $1, unnest($2::text[]) ON CONFLICT DO NOTHING",
-      [userId, blobShas]
+      "INSERT INTO cloud_storage_purge_queue (user_id, storage_key) SELECT $1, unnest($2::text[]) ON CONFLICT DO NOTHING",
+      [userId, storageKeys]
     );
   } finally {
     await queueClient.end();
@@ -878,7 +878,7 @@ export async function deleteCloudSkills(
     );
     if (skillKey === null) await client.query("DELETE FROM cloud_secret_holds WHERE user_id = $1", [input.userId]);
     // Files no remaining version of this user lists.
-    const freed = await client.query<{ blob_sha: string; byte_size: number }>(
+    const freed = await client.query<{ blob_sha: string; byte_size: number; storage_key: string | null }>(
       `
         DELETE FROM cloud_blobs blob
         WHERE blob.user_id = $1
@@ -890,17 +890,17 @@ export async function deleteCloudSkills(
             JOIN skill_sources source ON source.id = release.source_id
             WHERE source.owner_user_id = $1 AND file.blob_sha = blob.blob_sha
           )
-        RETURNING blob.blob_sha, blob.byte_size
+        RETURNING blob.blob_sha, blob.byte_size, blob.storage_key
       `,
       [input.userId, candidates]
     );
     await client.query(
       `
-        INSERT INTO cloud_purge_queue (user_id, blob_sha)
-        SELECT $1, sha FROM unnest($2::text[]) AS sha
-        ON CONFLICT (user_id, blob_sha) DO NOTHING
+        INSERT INTO cloud_storage_purge_queue (user_id, storage_key)
+        SELECT $1, key FROM unnest($2::text[]) AS key
+        ON CONFLICT (storage_key) DO NOTHING
       `,
-      [input.userId, freed.rows.map((row) => row.blob_sha)]
+      [input.userId, freed.rows.map((row) => row.storage_key ?? cloudBlobKey(input.userId, row.blob_sha))]
     );
     await client.query("COMMIT");
     result = {
@@ -918,7 +918,9 @@ export async function deleteCloudSkills(
 
 /** A cheap check without locks, so ordinary reads don't wait on uploads. */
 export async function hasPendingPurge(db: Database, userId: string): Promise<boolean> {
-  return Boolean((await db.query("SELECT 1 FROM cloud_purge_queue WHERE user_id = $1 LIMIT 1", [userId])).rowCount);
+  return Boolean((await db.query(
+    "SELECT 1 FROM cloud_purge_queue WHERE user_id = $1 UNION ALL SELECT 1 FROM cloud_storage_purge_queue WHERE user_id = $1 LIMIT 1", [userId]
+  )).rowCount);
 }
 
 /**
@@ -933,7 +935,10 @@ export async function drainCloudPurge(pool: Pool, store: CloudObjectStore, userI
     const queued = await client.query<{ blob_sha: string }>(
       `
         SELECT queue.blob_sha FROM cloud_purge_queue queue
-        WHERE queue.user_id = $1
+        WHERE queue.user_id = $1 AND NOT EXISTS (
+          SELECT 1 FROM cloud_blobs blob WHERE blob.user_id = queue.user_id
+            AND blob.blob_sha = queue.blob_sha AND blob.storage_key IS NULL
+        )
         ORDER BY queue.queued_at, queue.blob_sha
         LIMIT $2
       `,
@@ -951,8 +956,29 @@ export async function drainCloudPurge(pool: Pool, store: CloudObjectStore, userI
       done.push(...batch.filter((sha) => !failed.includes(cloudBlobKey(userId, sha))));
     }
     await client.query("DELETE FROM cloud_purge_queue WHERE user_id = $1 AND blob_sha = ANY($2::text[])", [userId, done]);
+    const remainingLimit = Math.max(0, limit - queued.rows.length);
+    const exact = await client.query<{ storage_key: string }>(
+      `SELECT queue.storage_key FROM cloud_storage_purge_queue queue
+       WHERE queue.user_id = $1 AND NOT EXISTS (
+         SELECT 1 FROM cloud_blobs blob WHERE blob.user_id = queue.user_id AND
+           (blob.storage_key = queue.storage_key OR
+            (blob.storage_key IS NULL AND queue.storage_key = 'cloud/' || blob.user_id::text || '/' || blob.blob_sha))
+       ) ORDER BY queue.queued_at, queue.storage_key LIMIT $2`,
+      [userId, remainingLimit]
+    );
+    const keys = exact.rows.map((row) => row.storage_key);
+    for (let start = 0; start < keys.length; start += 1000) {
+      const batch = keys.slice(start, start + 1000);
+      try {
+        const failed = new Set(await store.deleteMany(batch));
+        await client.query("DELETE FROM cloud_storage_purge_queue WHERE user_id = $1 AND storage_key = ANY($2::text[])",
+          [userId, batch.filter((key) => !failed.has(key))]);
+      } catch {
+        break;
+      }
+    }
     const left = await client.query<{ count: number }>(
-      "SELECT count(*)::int AS count FROM cloud_purge_queue WHERE user_id = $1",
+      "SELECT ((SELECT count(*) FROM cloud_purge_queue WHERE user_id = $1) + (SELECT count(*) FROM cloud_storage_purge_queue WHERE user_id = $1))::int AS count",
       [userId]
     );
     await client.query("COMMIT");
@@ -1003,18 +1029,19 @@ export async function loadCloudVersionPackage(
   );
   const row = release.rows[0];
   if (!row) throw new CloudSaveError("not_found", "Saved version not found");
-  const files = await db.query<{ path: string; mode: string; blobSha: string }>(
+  const files = await db.query<{ path: string; mode: string; blobSha: string; storageKey: string | null }>(
     `
-      SELECT path, mode, blob_sha AS "blobSha"
-      FROM cloud_release_files
-      WHERE release_id = $1
-      ORDER BY path COLLATE "C"
+      SELECT file.path, file.mode, file.blob_sha AS "blobSha", blob.storage_key AS "storageKey"
+      FROM cloud_release_files file
+      LEFT JOIN cloud_blobs blob ON blob.user_id = $2 AND blob.blob_sha = file.blob_sha
+      WHERE file.release_id = $1
+      ORDER BY file.path COLLATE "C"
     `,
-    [input.releaseId]
+    [input.releaseId, input.userId]
   );
   const entries = await Promise.all(files.rows.map(async (file) => ({
-    ...file,
-    data: await store.get(cloudBlobKey(input.userId, file.blobSha))
+    path: file.path, mode: file.mode, blobSha: file.blobSha,
+    data: await store.get(file.storageKey ?? cloudBlobKey(input.userId, file.blobSha))
   })));
   return {
     sourceId: row.sourceId,
