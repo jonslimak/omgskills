@@ -15,6 +15,7 @@ import {
   parseCloudManifest,
   parseCloudSaveSettingsUpdate,
   readCloudSave,
+  readCloudSkillMd,
   parseCloudSkipReport,
   reportCloudSkips,
   saveCloudVersion,
@@ -40,6 +41,7 @@ type Route =
   | { action: "blobs" }
   | { action: "skipped" }
   | { action: "versions"; skillKey: string }
+  | { action: "skill-md"; skillKey: string }
   | { action: "deleted-locally"; skillKey: string }
   | { action: "review"; skillKey: string }
   | { action: "package"; releaseId: string };
@@ -52,6 +54,7 @@ const methods: Record<Route["action"], string[]> = {
   blobs: ["POST"],
   skipped: ["PUT"],
   versions: ["GET", "POST"],
+  "skill-md": ["GET"],
   "deleted-locally": ["PUT"],
   review: ["POST", "DELETE"],
   package: ["GET"]
@@ -77,14 +80,14 @@ function parseRoute(req: Request): Route | null {
       return null;
     }
   }
-  if (rest.length === 3 && rest[0] === "skills" && ["versions", "deleted-locally", "review"].includes(rest[2])) {
+  if (rest.length === 3 && rest[0] === "skills" && ["versions", "deleted-locally", "review", "skill-md"].includes(rest[2])) {
     let skillKey: string;
     try {
       skillKey = decodeURIComponent(rest[1]);
     } catch {
       return null;
     }
-    return { action: rest[2] as "versions" | "deleted-locally" | "review", skillKey };
+    return { action: rest[2] as "versions" | "deleted-locally" | "review" | "skill-md", skillKey };
   }
   return null;
 }
@@ -197,6 +200,12 @@ export async function portalCloudSave(
         await reportCloudSkips(dependencies.pool(), { userId, deviceId, skipped });
         return new Response(null, { status: 204, headers: corsHeaders(req) });
       }
+      case "skill-md": {
+        // Reading a saved skill's contents is a web view of the user's own copy.
+        const { userId } = await dependencies.requireUser(req);
+        return secretJsonResponse(req, await readCloudSkillMd(dependencies.pool(), dependencies.store(),
+          { userId, skillKey: route.skillKey }));
+      }
       case "versions": {
         if (req.method === "GET") {
           const { userId } = await actor(req, dependencies, "sync:write");
@@ -302,6 +311,7 @@ export const config: Config = {
     "/api/portal/cloud-save/blobs/:blobSha",
     "/api/portal/cloud-save/skills/:skillKey",
     "/api/portal/cloud-save/skills/:skillKey/versions",
+    "/api/portal/cloud-save/skills/:skillKey/skill-md",
     "/api/portal/cloud-save/skills/:skillKey/deleted-locally",
     "/api/portal/cloud-save/skills/:skillKey/review",
     "/api/portal/cloud-save/versions/:releaseId/package"

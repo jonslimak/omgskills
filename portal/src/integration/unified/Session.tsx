@@ -15,6 +15,7 @@ import { useManagement } from "./useManagement";
 import { DevicesPanel } from "../DevicesPanel";
 import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
 import { CloudSavePanel } from "../../cloud-save/CloudSavePanel";
+import { loadSavedSkillMd } from "../../cloud-save/cloud-save";
 import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation, staticPageAddress, unknownAppAddress } from "./entry-navigation";
 import { renderPublicFirst } from "./public-first";
@@ -176,6 +177,8 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     onFavorite={rejectEdit} onCreateSet={rejectEdit} onMembership={rejectEdit} onVisibility={rejectEdit}
     state={!available || snapshot.data ? "ready" : snapshot.error ? "error" : "loading"}
     retry={account.refresh}
+    savedSkillMd={available && !snapshot.accessDenied && !composition?.readOnly && !local
+      ? (keys, signal) => loadSavedSkillMd(api, keys, signal) : undefined}
     accountPages={available && !snapshot.accessDenied ? (view, theme) => view === "profile" && !composition?.readOnly ? <ProfilePanel profile={data.profile} theme={theme}
       busy={snapshot.profileSaving || snapshot.setSaving || snapshot.refreshing}
       blocked={!!snapshot.error || !snapshot.data || snapshot.accessDenied}
