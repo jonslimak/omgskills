@@ -3,7 +3,7 @@ import type { PortalData } from "../app/model";
 import { isAccessError, PortalApiError } from "../api-error";
 import { loadAccountData, readOnlyApi, saveProfileData, type AccountIdentity } from "./data";
 import { saveSetData, type SetCommand } from "./set-data";
-import { changeMembership, changeFavorites, createSelectedSet, removeMembershipItem, reorderMembership, emptyMembershipResult, type MembershipCommand } from "./membership-data";
+import { changeMembership, changeFavorites, createSelectedSet, removeMembershipItem, reorderMembership, updateMembershipItem, emptyMembershipResult, type MembershipCommand } from "./membership-data";
 import { groupSyncedSkills, type GroupedSyncedSkill, type SyncedSkill } from "../synced-skill-grouping";
 import type { MembershipResult } from "../app/model";
 import { addCatalogMembership, removeFavoriteMembership } from "./membership-data";
@@ -224,6 +224,7 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
       try {
         if (command.kind === "remove-item") await removeMembershipItem(scoped, command.id, command.itemId, signal);
         else if (command.kind === "reorder") await reorderMembership(scoped, command.id, command.itemIds, signal);
+        else if (command.kind === "update-item") await updateMembershipItem(scoped, command.id, command.itemId, signal);
         else if (command.kind === "catalog") result = await addCatalogMembership(scoped, current.sets, command, signal);
         else if (command.kind === "remove-favorite") {
           const skill = command.skillId ? membershipRows(current.skills).get(command.skillId) : undefined;

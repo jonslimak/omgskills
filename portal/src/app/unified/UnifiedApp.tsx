@@ -98,6 +98,7 @@ import {
   catalogSkillPath,
   discoverCollectionPage,
   inventorySummary,
+  cloudSharedLabel,
   type CatalogDisplay,
   type Navigation,
   type SkillDisplay,
@@ -934,6 +935,9 @@ export function UnifiedApp({
               </>}
               {management && skill.setItemId && activeSet && (editableSet || (activeSet.isFavorites && activeSet.role === "owner")) && <MenuItem icon={X} disabled={!canManage} onSelect={() => management.remove(activeSet, skill)}>
                 Remove from set
+              </MenuItem>}
+              {management?.updateItem && skill.setItemId && skill.setItemUpdateAvailable && activeSet && editableSet && <MenuItem icon={RefreshCw} disabled={!canManage} onSelect={() => management.updateItem!(activeSet, skill.setItemId!)}>
+                Update to newest saved version
               </MenuItem>}
               {management && skill.setItemId && activeSet && editableSet && <>
                 <MenuItem icon={ArrowUp} disabled={!canManage || activeSet.items[0]?.id === skill.setItemId} onSelect={() => management.reorder(activeSet, skill.setItemId!, -1)}>Move up</MenuItem>
@@ -1907,7 +1911,8 @@ export function UnifiedApp({
                   ) : !(onMac && signedIn && publicInstallAction && detail.catalogId) && (
                     <span className="ua-pill">
                       {detail.installed?.isLocalOnly && <Lock />}
-                      {detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Local skill" : "Source unavailable"}
+                      {detail.setItemCloudShared ? cloudSharedLabel(detail, activeSet?.role)
+                        : detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Local skill" : "Source unavailable"}
                     </span>
                   )}
                   <span className="ua-detail-icons">

@@ -220,6 +220,8 @@ export async function loadSetData(api: PortalApi, groupId: string): Promise<Port
       description: item.description,
       githubUrl: item.githubUrl,
       kind: item.kind as "synced" | "catalog" | "github",
+      ...(item.cloudShared === true ? { cloudShared: true } : {}),
+      ...(group.accessRole === "owner" && item.updateAvailable === true ? { updateAvailable: true } : {}),
     })),
   };
 }

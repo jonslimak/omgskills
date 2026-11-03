@@ -26,6 +26,8 @@ export type SkillGroupItem = {
   githubUrl: string | null;
   source: string;
   position: number;
+  cloudShared?: boolean;
+  updateAvailable?: boolean;
 };
 
 export type SkillGroupDetail = SkillGroup & {

@@ -15,5 +15,6 @@ test("a skill shared from cloud save says so, and only its owner hears about a n
   assert.equal(portalGroupItem(shared, "invited").cloudShared, true);
   assert.equal(portalGroupItem(shared, "invited").updateAvailable, undefined);
   assert.equal(portalGroupItem({ ...shared, savedReleaseId: "r1" }, "owner").updateAvailable, undefined);
+  assert.equal(portalGroupItem(shared, "public").cloudShared, undefined);
   assert.equal(portalGroupItem(row(), "owner").cloudShared, undefined);
 });

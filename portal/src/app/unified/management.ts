@@ -14,6 +14,8 @@ export type UnifiedManagement = {
   visibility: (set: PortalSet, visibility: Visibility) => void;
   remove: (set: PortalSet, skill: SkillDisplay) => void;
   reorder: (set: PortalSet, itemId: string, offset: -1 | 1) => void;
+  /** Moves a skill shared from cloud save to the owner's newest saved version. */
+  updateItem?: (set: PortalSet, itemId: string) => void;
   moderate: (set: PortalSet) => void;
   copyLink: (set: PortalSet) => void;
   /** The companion's Set install link, or null while Mac Set installs are off. */

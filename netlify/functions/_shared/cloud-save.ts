@@ -126,6 +126,8 @@ export type CloudSavedSkill = {
   currentVersion: CloudSavedVersion;
   versionCount: number;
   deletedLocallyAt: string | null;
+  /** Sets that share this skill; deleting it takes it out of them. */
+  setCount: number;
 };
 
 export type CloudSkillReview = {
@@ -255,12 +257,13 @@ export async function readCloudSave(db: Database, userId: string): Promise<Cloud
   const [settings, bytes, skills, needsReview, skipped] = await Promise.all([
     readCloudSaveSettings(db, userId),
     usedBytes(db, userId),
-    db.query<CloudSavedVersion & { key: string; versionCount: number; deletedLocallyAt: string | null }>(
+    db.query<CloudSavedVersion & { key: string; versionCount: number; deletedLocallyAt: string | null; setCount: number }>(
       `
         SELECT
           saved.skill_key AS key,
           to_char(saved.deleted_locally_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "deletedLocallyAt",
           (SELECT count(*)::int FROM skill_releases WHERE source_id = saved.source_id) AS "versionCount",
+          (SELECT count(DISTINCT item.group_id)::int FROM skill_group_items item WHERE item.source_id = saved.source_id) AS "setCount",
           ${versionColumns}
         FROM cloud_saved_skills saved
         JOIN skill_releases release ON release.id = saved.current_release_id
@@ -278,10 +281,11 @@ export async function readCloudSave(db: Database, userId: string): Promise<Cloud
     needsReview,
     skipped,
     usage: { bytes, limitBytes: CLOUD_SAVE_LIMITS.maximumUserBytes },
-    skills: skills.rows.map(({ key, versionCount, deletedLocallyAt, ...version }) => ({
+    skills: skills.rows.map(({ key, versionCount, deletedLocallyAt, setCount, ...version }) => ({
       key,
       versionCount,
       deletedLocallyAt,
+      setCount,
       currentVersion: version
     }))
   };

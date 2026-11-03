@@ -50,6 +50,7 @@ export function useMembershipControls({ data, busy, blocked, save, refresh, noti
     const result = await write(command);
     if (active.current && window.location.pathname === path) notify(command.kind === "remove-item" ? "Item removed from the set."
       : command.kind === "reorder" ? "Set order saved."
+      : command.kind === "update-item" ? "The Set now has your newest saved version."
       : `${result.added} added, ${result.removed} removed, ${result.unchanged} already up to date${result.failed.length ? `, ${result.failed.length} failed` : ""}.`);
     return result;
   }

@@ -167,6 +167,15 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
       }, error => { if (generation.current === version) setNotice(error instanceof Error ? error.message : "Could not reorder."); })
         .finally(() => { pending.current = false; });
     },
+    updateItem: (set, itemId) => {
+      if (disabled || pending.current || set.role !== "owner" || !set.items.some(item => item.id === itemId && item.updateAvailable)) return;
+      pending.current = true;
+      const version = generation.current;
+      void saveMembership({ kind: "update-item", id: set.id, itemId }).then(result => {
+        if (generation.current === version) setNotice(result.uncertain ? "Refresh to confirm the update." : "The Set now has your newest saved version.");
+      }, error => { if (generation.current === version) setNotice(error instanceof Error ? error.message : "Could not update."); })
+        .finally(() => { pending.current = false; });
+    },
     copyLink,
     installLink: set => setInstallLink(set.appDeepLink, installEnabled, local),
     dialog: theme => request?.kind === "access" ? <SetPermissions key={request.set.id} theme={theme} close={close}

@@ -5,7 +5,7 @@ import type { PortalApi } from "../portal-api";
 import type { SyncedSkill } from "../synced-skill-grouping";
 import { Action, EmptyState, IconAction, Toggle } from "../app/ui";
 import {
-  cloudSkillRows, confirmCloudReview, deleteCloudSaved, formatBytes, isDeletingAllCloudSkills, isDeletingCloudSkill, labelText, loadCloudSave, saveCloudSettings, statusText,
+  cloudSkillRows, confirmCloudReview, deleteCloudSaved, formatBytes, setsNote, isDeletingAllCloudSkills, isDeletingCloudSkill, labelText, loadCloudSave, saveCloudSettings, statusText,
   type CloudDeleteSelection, type CloudSaveView,
 } from "./cloud-save";
 
@@ -151,7 +151,7 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
         </div>
         {row.versionCount > 0 && (isDeletingCloudSkill(deleting, row.key)
           ? <div className="cloud-save-confirm">
-            <span>Delete all {row.versionCount} {row.versionCount === 1 ? "version" : "versions"} and stop saving it?</span>
+            <span>Delete all {row.versionCount} {row.versionCount === 1 ? "version" : "versions"} and stop saving it?{setsNote(row.setCount)}</span>
             <Action disabled={saving} onClick={() => void change(() => deleteCloudSaved(callbacks.current.api, row.key),
               "The skill could not be deleted.").then(done => { setDeleting(null); if (done) setNotice(`${row.name} was deleted from the cloud. It stays on your Mac.`); })}>Delete</Action>
             <Action variant="outline" disabled={saving} onClick={() => setDeleting(null)}>Cancel</Action>
@@ -164,7 +164,9 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
       {isDeletingAllCloudSkills(deleting)
         ? <>
           <p><strong>Delete everything you saved?</strong> Every version of every skill is removed from the cloud and
-            cloud save is turned off. Skills on your Macs aren't touched. This can't be undone.</p>
+            cloud save is turned off. Skills on your Macs aren't touched.
+            {state.skills.some(skill => (skill.setCount ?? 0) > 0) && " Skills you share in Sets are taken out of them; people keep what they installed."}
+            {" "}This can't be undone.</p>
           <div className="rd-account-actions">
             <Action disabled={saving} onClick={() => void change(() => deleteCloudSaved(callbacks.current.api),
               "Your saved skills could not be deleted.").then(done => { setDeleting(null); if (done) setNotice("Everything you saved was deleted, and cloud save is off."); })}>Delete everything</Action>

@@ -12,6 +12,8 @@ export type CloudSaveState = {
     key: string;
     versionCount: number;
     deletedLocallyAt: string | null;
+    /** Sets that share this skill; older servers leave it out. */
+    setCount?: number;
     currentVersion: { id: string; savedAt: string; fileCount: number; totalBytes: number; labels?: CloudLabel[] };
   }[];
   needsReview: { key: string; files: { path: string; findings: CloudFinding[] }[]; confirmed: boolean; updatedAt: string }[];
@@ -91,6 +93,7 @@ export type CloudSkillRow = {
   status: "saved" | "deleted" | "review" | "confirmed" | "excluded" | "library" | "waiting" | "off"
     | "links" | "too_large" | "unreadable" | "failed";
   versionCount: number;
+  setCount: number;
   savedAt: string | null;
   labels: CloudLabel[];
   findings: { path: string; findings: CloudFinding[] }[];
@@ -138,6 +141,7 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
       name: label(key),
       status,
       versionCount: copy?.versionCount ?? 0,
+      setCount: copy?.setCount ?? 0,
       savedAt: copy?.currentVersion.savedAt ?? null,
       labels: copy?.currentVersion.labels ?? [],
       findings: review?.files ?? [],
@@ -172,6 +176,12 @@ export const labelText: Record<CloudLabel, string> = {
   invisible_characters: "Contains invisible characters",
   scripts: "Contains scripts",
 };
+
+/** What deleting also does to Sets, for the confirmation; empty when no Set shares it. */
+export function setsNote(setCount: number) {
+  if (setCount <= 0) return "";
+  return ` It's also taken out of ${setCount === 1 ? "1 Set" : `${setCount} Sets`}; people keep what they installed.`;
+}
 
 export function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;

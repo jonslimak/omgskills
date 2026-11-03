@@ -32,7 +32,7 @@ export function portalGroupItem(row: PortalGroupItemRow, role: GroupAccessRole) 
     source: row.source || row.kind,
     position: row.position,
     // Shared from the owner's cloud save; the owner also learns when a newer version is saved.
-    ...(row.sourceKind === "cloud" ? { cloudShared: true } : {}),
+    ...(row.sourceKind === "cloud" && role !== "public" ? { cloudShared: true } : {}),
     ...(role === "owner" && row.sourceKind === "cloud" && row.savedReleaseId && row.savedReleaseId !== row.releaseId
       ? { updateAvailable: true } : {}),
   };
