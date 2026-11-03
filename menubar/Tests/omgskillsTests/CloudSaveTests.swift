@@ -64,6 +64,66 @@ struct CloudSaveFolderTests {
         #expect(throws: CloudSaveFolder.ReadError.invalid(.missingSkillMd)) { try CloudSaveFolder.read(directory: empty) }
     }
 
+    @Test func followsLinksToYourOwnFilesButNotToTheLibraryOrPrivatePlaces() throws {
+        let home = try temporaryRoot()
+        let fm = FileManager.default
+        let library = home.appendingPathComponent("Library/Application Support/omgskills/repos", isDirectory: true)
+        let policy = CloudSaveFolder.LinkPolicy(home: home, libraryRoot: library)
+        let skills = home.appendingPathComponent(".claude/skills", isDirectory: true)
+        try fm.createDirectory(at: skills, withIntermediateDirectories: true)
+        func link(_ name: String, in folder: URL, to target: URL) throws {
+            try fm.createSymbolicLink(at: folder.appendingPathComponent(name), withDestinationURL: target)
+        }
+
+        // An older omgskills install: the files live in its library folder.
+        let repo = try makeSkill(library.appendingPathComponent("garrytan--gstack"), "ship", files: ["sections/a.md": "a"])
+        let ship = skills.appendingPathComponent("ship", isDirectory: true)
+        try fm.createDirectory(at: ship, withIntermediateDirectories: true)
+        try link("SKILL.md", in: ship, to: repo.appendingPathComponent("SKILL.md"))
+        try link("sections", in: ship, to: repo.appendingPathComponent("sections"))
+        #expect(throws: CloudSaveFolder.ReadError.libraryInstall) { try CloudSaveFolder.read(directory: ship, links: policy) }
+        try link("gstack-ship", in: skills, to: repo)
+        #expect(throws: CloudSaveFolder.ReadError.libraryInstall) {
+            try CloudSaveFolder.read(directory: skills.appendingPathComponent("gstack-ship"), links: policy)
+        }
+
+        // Your own skill kept elsewhere in your home folder is saved as if the files were here.
+        let project = try makeSkill(home.appendingPathComponent("Projects/notes"), "skill",
+                                    files: ["docs/guide.md": "guide", "run.sh": "echo hi\n"], executable: ["run.sh"])
+        let mine = skills.appendingPathComponent("mine", isDirectory: true)
+        try fm.createDirectory(at: mine, withIntermediateDirectories: true)
+        try link("SKILL.md", in: mine, to: project.appendingPathComponent("SKILL.md"))
+        try link("docs", in: mine, to: project.appendingPathComponent("docs"))
+        try link("run.sh", in: mine, to: project.appendingPathComponent("run.sh"))
+        let followed = try CloudSaveFolder.read(directory: mine, links: policy)
+        #expect(followed.entries.map(\.path) == ["SKILL.md", "docs/guide.md", "run.sh"])
+        #expect(followed.entries.map(\.mode) == ["100644", "100644", "100755"])
+        #expect(followed.treeSha == (try CloudSaveFolder.read(directory: project)).treeSha)
+        // Without a policy, links still stop a folder being saved.
+        #expect(throws: CloudSaveFolder.ReadError.containsLink("SKILL.md")) { try CloudSaveFolder.read(directory: mine) }
+
+        // Keys, settings and other apps' data are never followed.
+        for (name, target) in [("keys", ".ssh/id_ed25519"), ("env", "Projects/app/.env"), ("prefs", "Library/Preferences/x.plist")] {
+            let file = home.appendingPathComponent(target)
+            try fm.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try Data("secret".utf8).write(to: file)
+            let skill = try makeSkill(skills, "private-\(name)")
+            try link(name, in: skill, to: file)
+            #expect(throws: CloudSaveFolder.ReadError.privateLink(name)) { try CloudSaveFolder.read(directory: skill, links: policy) }
+        }
+        let outside = try makeSkill(skills, "outside")
+        try link("hosts", in: outside, to: URL(fileURLWithPath: "/etc/hosts"))
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("hosts")) { try CloudSaveFolder.read(directory: outside, links: policy) }
+
+        // A link back up the tree, or to nothing, isn't followed.
+        let loop = try makeSkill(skills, "loop")
+        try link("again", in: loop, to: loop)
+        #expect(throws: CloudSaveFolder.ReadError.containsLink("again")) { try CloudSaveFolder.read(directory: loop, links: policy) }
+        let broken = try makeSkill(skills, "broken")
+        try link("gone", in: broken, to: home.appendingPathComponent("Projects/missing.md"))
+        #expect(throws: CloudSaveFolder.ReadError.containsLink("gone")) { try CloudSaveFolder.read(directory: broken, links: policy) }
+    }
+
     @Test func aLinkedSkillFolderIsReadThroughItsLink() throws {
         let root = try temporaryRoot()
         let target = try makeSkill(root, "real")
@@ -188,6 +248,25 @@ struct CloudSaveSyncTests {
             deviceID: "device-1", credential: credential())
         #expect(edited.uploadedCount == 1)
         #expect(await api.reported.last == [:])
+    }
+
+    @Test func skillsLinkedIntoTheOldLibraryFolderCountAsLibraryInstalls() async throws {
+        let home = try temporaryRoot()
+        let library = home.appendingPathComponent("Library/Application Support/omgskills/repos", isDirectory: true)
+        let repo = try makeSkill(library.appendingPathComponent("garrytan--gstack"), "ship")
+        let skills = home.appendingPathComponent(".claude/skills", isDirectory: true)
+        let ship = skills.appendingPathComponent("ship", isDirectory: true)
+        try FileManager.default.createDirectory(at: ship, withIntermediateDirectories: true)
+        try FileManager.default.createSymbolicLink(at: ship.appendingPathComponent("SKILL.md"),
+                                                   withDestinationURL: repo.appendingPathComponent("SKILL.md"))
+        let api = FakeCloudSave()
+        var sync = CloudSaveSync(api: api, pace: {})
+        sync.links = CloudSaveFolder.LinkPolicy(home: home, libraryRoot: library)
+        let summary = try await sync.run(installations: [installation(ship)], localFolderKeys: [], deviceID: "device-1",
+                                         credential: credential())
+        #expect(summary.library == ["ship"])
+        #expect(summary.skipped.isEmpty)
+        #expect(await api.reported == [["ship": .library]])
     }
 
     @Test func tellsTheWebWhySkillsWereNotSavedOnlyAfterAFinishedPass() async throws {

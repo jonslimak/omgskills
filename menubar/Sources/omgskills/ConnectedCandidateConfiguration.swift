@@ -92,7 +92,8 @@ extension ConnectedCandidateConfiguration {
         runtime.cloudSave = CloudSaveController(api: CloudSaveAPI(origin: profile.origin),
             credential: { [weak connection] in connection?.currentCredential },
             scan: { try await InstalledSkillsScanner.scanForReconciliation(filesystemPaths: paths, pathAnchor: paths.homeDirectory) },
-            folderKeys: { CloudSaveController.folderKeys(in: paths.allSkillsRoots) })
+            folderKeys: { CloudSaveController.folderKeys(in: paths.allSkillsRoots) },
+            links: CloudSaveFolder.LinkPolicy(home: paths.homeDirectory, libraryRoot: paths.legacyRepoCacheRoot))
         return runtime
     }
 }
