@@ -106,6 +106,9 @@ test('release workflow reuses known signing/journal checks and has no hosting, r
   const source = readFileSync(new URL('./release-catalog-candidate.mjs', import.meta.url), 'utf8');
   for (const part of ['assemblePackage', 'FinalizationJournal', 'verifyEntitlements', 'parseSignature',
     'unsignedExecutableHash', 'archiveRoundtripVerified', 'backup-verification.bin', 'privateBackupSHA256']) assert.ok(source.includes(part));
+  assert.match(source, /'--norsrc', '--noextattr', '--keepParent'/);
+  assert.match(source, /x\.startsWith\('\._'\)/);
+  assert.match(source, /spctl/);
   assert.doesNotMatch(source, /lsregister|hdiutil|netlify deploy|release-mac\.sh|\/usr\/bin\/open|\/Applications\/omgskills/);
   assert.match(source, /hosted: false, installed: false, launched: false, registered: false/);
 });

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { runPreparationSequence } from "./prepare-netlify-site-deploy.mjs";
+import "./connected-feed-signature.test.mjs";
 
 test("restores release assets before building and verifying web pages", async () => {
   const calls = [];

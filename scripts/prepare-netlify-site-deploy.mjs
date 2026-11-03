@@ -12,6 +12,7 @@ import {
 import { pullMissing } from "./data-store.mjs";
 import { ensureHealthSnapshot } from "./health-snapshot-guard.mjs";
 import { verifyHelperReleaseAssets } from "./helper-release-assets.mjs";
+import { verifyConnectedFeed } from "./connected-feed-signature.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const siteDir = path.resolve(process.env.SITE_DIR || path.join(repoRoot, "site"));
@@ -187,6 +188,7 @@ async function restoreRequiredAssets() {
 }
 
 async function main() {
+  await verifyConnectedFeed(siteDir, repoRoot);
   let requiredAssets = [];
   await runPreparationSequence({
     verifyPolicy,
