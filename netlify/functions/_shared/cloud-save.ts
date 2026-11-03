@@ -917,6 +917,16 @@ export async function deleteCloudSkills(
     const candidates = skillKey === null ? null : skillFiles.rows.map((row) => row.blob_sha);
     await client.query("DELETE FROM cloud_saved_skills WHERE source_id = ANY($1::uuid[])", [sourceIds]);
     // Sets keep the skill's name, and members keep what they installed; a Set can't keep a deleted version.
+    // Lock those Sets before their items, the same order Set edits use, so the two can't deadlock.
+    await client.query(
+      `
+        SELECT id FROM skill_groups
+        WHERE id IN (SELECT group_id FROM skill_group_items WHERE source_id = ANY($1::uuid[]))
+        ORDER BY id
+        FOR UPDATE
+      `,
+      [sourceIds]
+    );
     await client.query(
       `
         WITH detached AS (

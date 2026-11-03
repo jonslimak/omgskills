@@ -1473,3 +1473,38 @@ test("the web reads a saved skill's current SKILL.md, only for its owner", async
     assert.equal(shortened.truncated, true);
   });
 });
+
+test("deleting a skill while its Set is being edited waits its turn instead of deadlocking", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const owner = await createUser(pool);
+    await updateCloudSaveSettings(pool, owner.userId, { enabled: true });
+    await uploadAll(pool, store, owner.userId, v1);
+    const saved = await saveCloudVersion(pool, { ...owner, skillKey: "notes", files: manifest(v1) });
+    assert.ok(saved.status === "saved");
+    const sourceId = (await pool.query<{ id: string }>("SELECT source_id AS id FROM skill_releases WHERE id = $1",
+      [saved.skill.currentVersion.id])).rows[0].id;
+    const group = (await pool.query<{ id: string }>(
+      "INSERT INTO skill_groups (owner_user_id, name, slug, visibility) VALUES ($1, 'Team', 'team', 'restricted') RETURNING id",
+      [owner.userId])).rows[0].id;
+    await pool.query(
+      "INSERT INTO skill_group_items (group_id, kind, name, source_id, release_id, position) VALUES ($1, 'synced', 'notes', $2, $3, 0)",
+      [group, sourceId, saved.skill.currentVersion.id]);
+
+    // A Set edit locks the Set, then its items (like reordering).
+    const edit = await pool.connect();
+    try {
+      await edit.query("BEGIN");
+      await edit.query("SELECT revision FROM skill_groups WHERE id = $1 FOR UPDATE", [group]);
+      const deleting = deleteCloudSkills(pool, store, { userId: owner.userId, skillKey: "notes" });
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      await edit.query("UPDATE skill_group_items SET position = position WHERE group_id = $1", [group]);
+      await edit.query("COMMIT");
+      assert.equal((await deleting).deletedSkills, 1);
+    } finally {
+      edit.release();
+    }
+    const item = (await pool.query<{ reason: string }>("SELECT metadata_only_reason AS reason FROM skill_group_items WHERE group_id = $1", [group])).rows[0];
+    assert.equal(item.reason, "cloud_deleted");
+  });
+});
