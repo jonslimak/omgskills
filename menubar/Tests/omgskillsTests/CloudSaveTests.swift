@@ -227,6 +227,19 @@ struct CloudSaveSyncTests {
         #expect(await api.saved == ["notes": newest])
     }
 
+    @Test func filesSentOneAtATimeArePacedLikeEveryOtherRequest() async throws {
+        actor Counter { var count = 0; func tick() { count += 1 } }
+        let root = try temporaryRoot()
+        let api = FakeCloudSave()
+        let paces = Counter()
+        let skill = try makeSkill(root, "notes", files: ["a.md": "a", "b.md": "b"])
+        _ = try await CloudSaveSync(api: api, pace: { await paces.tick() }).run(installations: [installation(skill)],
+            localFolderKeys: ["notes"], deviceID: "device-1", credential: credential())
+        // Without batch upload: the first version request, one per batch attempt, one per file, the final save.
+        #expect(await api.calls.filter { $0.hasPrefix("upload:") }.count == 3)
+        #expect(await paces.count == 1 + 1 + 3 + 1)
+    }
+
     @Test func stopsWhenTheServerIsUnavailable() async throws {
         struct Down: CloudSaveServing {
             func state(credential: StoredDeviceCredential) async throws -> CloudSaveState { throw CloudSaveAPIError.unavailable }

@@ -135,14 +135,18 @@ struct CloudSaveSync: Sendable {
         try Task.checkCancellation()
         try await pace()
         var held: [CloudSaveFinding] = []
-        do { held = try await api.uploadFiles(upload, credential: credential) }
-        catch is CloudSaveBatchUnsupported {
-            for entry in upload {
-                try Task.checkCancellation()
-                try await pace()
-                do { try await api.uploadFile(entry, confirmSecrets: false, credential: credential) }
-                catch CloudSaveAPIError.needsReview(let findings) { held += findings }
-            }
+        // Files too big for a batch, or every file on a server without batch upload, go one at a time.
+        var oneByOne = upload.filter { $0.data.count > CloudSaveAPI.batchBytes }
+        let batched = upload.filter { $0.data.count <= CloudSaveAPI.batchBytes }
+        if !batched.isEmpty {
+            do { held = try await api.uploadFiles(batched, credential: credential) }
+            catch is CloudSaveBatchUnsupported { oneByOne = upload }
+        }
+        for entry in oneByOne {
+            try Task.checkCancellation()
+            try await pace()
+            do { try await api.uploadFile(entry, confirmSecrets: false, credential: credential) }
+            catch CloudSaveAPIError.needsReview(let findings) { held += findings }
         }
         if !held.isEmpty {
             // Asking to save again records the skill for review on the web now, not on the next pass.

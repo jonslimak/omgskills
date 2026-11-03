@@ -336,6 +336,7 @@ export async function storeCloudBlob(
     if (await usedBytes(client, input.userId) + input.data.byteLength > CLOUD_SAVE_LIMITS.maximumUserBytes) {
       throw new CloudSaveError("quota_exceeded", "Cloud storage is full");
     }
+    await queueCleanupFirst(pool, input.userId, [blobSha]);
     await store.put(cloudBlobKey(input.userId, blobSha), input.data);
     await client.query(
       "INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels) VALUES ($1, $2, $3, $4)",
@@ -434,6 +435,7 @@ export async function storeCloudBlobs(
       if (await usedBytes(client, input.userId) + bytes > CLOUD_SAVE_LIMITS.maximumUserBytes) {
         throw new CloudSaveError("quota_exceeded", "Cloud storage is full");
       }
+      await queueCleanupFirst(pool, input.userId, fresh.map((file) => file.blobSha));
       for (let index = 0; index < fresh.length; index += BLOB_UPLOAD_CONCURRENCY) {
         await Promise.all(fresh.slice(index, index + BLOB_UPLOAD_CONCURRENCY)
           .map((file) => store.put(cloudBlobKey(input.userId, file.blobSha), file.data)));
@@ -458,6 +460,20 @@ export async function storeCloudBlobs(
 }
 
 const BLOB_UPLOAD_CONCURRENCY = 16;
+
+/**
+ * Queues files about to be uploaded for clean-up, on a connection of its own so the entry
+ * outlives the upload's transaction: if the upload fails or is cut off, files already sent
+ * are removed by the next read. A finished upload takes them off the queue again.
+ * Called under the upload lock, which the clean-up also takes, so it can't run in between.
+ */
+async function queueCleanupFirst(pool: Pool, userId: string, blobShas: string[]): Promise<void> {
+  if (!blobShas.length) return;
+  await pool.query(
+    "INSERT INTO cloud_purge_queue (user_id, blob_sha) SELECT $1, unnest($2::text[]) ON CONFLICT DO NOTHING",
+    [userId, blobShas]
+  );
+}
 
 /**
  * Runs one upload while holding the user's cloud save settings row, so uploads from

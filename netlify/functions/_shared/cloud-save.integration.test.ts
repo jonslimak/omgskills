@@ -56,7 +56,9 @@ async function withMigratedSchema(run: (pool: Pool) => Promise<void>) {
 
 class MemoryStore implements CloudObjectStore {
   readonly objects = new Map<string, Buffer>();
+  failingPuts = new Set<string>();
   async put(key: string, body: Uint8Array) {
+    if (this.failingPuts.has(key)) throw new CloudStoreError("unavailable", "Storage is unavailable");
     this.objects.set(key, Buffer.from(body));
   }
   async get(key: string) {
@@ -617,6 +619,32 @@ test("a batch upload stores a skill's files in one request and reports a held fi
     const big = Buffer.alloc(CLOUD_SAVE_LIMITS.maximumFileBytes / 2 + 1, 97);
     assert.equal((await call({ files: [entry(big), entry(Buffer.concat([big, Buffer.from("b")]))] })).status, 413);
     assert.ok(scopes.every((scope) => scope === "content:write"));
+  });
+});
+
+test("files sent before an upload fails are cleaned up, and a retry stores them", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const { cloudBlobKey } = await import("./cloud-store.js");
+    const { drainCloudPurge, storeCloudBlobs } = await import("./cloud-save.js");
+    const files = Array.from({ length: 40 }, (_, index) => {
+      const data = Buffer.from(`part ${index}\n`);
+      return { blobSha: gitObjectSha("blob", data), data };
+    });
+    store.failingPuts.add(cloudBlobKey(userId, files[39].blobSha));
+    await assert.rejects(storeCloudBlobs(pool, store, { userId, deviceId, files }));
+    assert.ok(store.objects.size > 0, "some files reached storage before the failure");
+    assert.equal((await readCloudSave(pool, userId)).usage.bytes, 0);
+    assert.equal(await drainCloudPurge(pool, store, userId), 0);
+    assert.equal(store.objects.size, 0, "untracked files are removed");
+
+    store.failingPuts.clear();
+    const stored = await storeCloudBlobs(pool, store, { userId, deviceId, files });
+    assert.ok(stored.every((result) => result.status === "stored"));
+    assert.equal(await drainCloudPurge(pool, store, userId), 0);
+    assert.equal(store.objects.size, 40, "a finished upload is never cleaned up");
   });
 });
 
