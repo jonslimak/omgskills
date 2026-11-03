@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import type { Pool, PoolClient, QueryResult, QueryResultRow } from "pg";
+import pg, { type Pool, type PoolClient, type QueryResult, type QueryResultRow } from "pg";
 import { appendSkillRelease } from "./group-storage.js";
 import { cloudBlobKey, type CloudObjectStore } from "./cloud-store.js";
 import { combineLabels, pathLabels, scanFileContents, type SecretFinding, type SkillLabel } from "./skill-scan.js";
@@ -336,6 +336,7 @@ export async function storeCloudBlob(
     if (await usedBytes(client, input.userId) + input.data.byteLength > CLOUD_SAVE_LIMITS.maximumUserBytes) {
       throw new CloudSaveError("quota_exceeded", "Cloud storage is full");
     }
+    await queueCleanupFirst(pool, input.userId, [blobSha]);
     await store.put(cloudBlobKey(input.userId, blobSha), input.data);
     await client.query(
       "INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels) VALUES ($1, $2, $3, $4)",
@@ -345,6 +346,141 @@ export async function storeCloudBlob(
     await client.query("DELETE FROM cloud_purge_queue WHERE user_id = $1 AND blob_sha = $2", [input.userId, blobSha]);
     return { blobSha, stored: true, labels: blobLabels };
   });
+}
+
+export const MAX_BLOB_BATCH_FILES = 200;
+
+export type CloudBlobBatchResult =
+  | { blobSha: string; status: "stored" | "exists"; labels: SkillLabel[] }
+  | { blobSha: string; status: "needs_review"; findings: SecretFinding[] };
+
+/** Reads a batch upload: up to MAX_BLOB_BATCH_FILES files, base64, together no larger than one file upload. */
+export function parseCloudBlobBatch(body: Record<string, unknown>): { blobSha: string; data: Uint8Array }[] {
+  const files = body.files;
+  if (!Array.isArray(files) || files.length === 0 || files.length > MAX_BLOB_BATCH_FILES) {
+    throw new CloudSaveError("invalid_request", `Send 1 to ${MAX_BLOB_BATCH_FILES} files`);
+  }
+  let total = 0;
+  return files.map((file) => {
+    if (typeof file !== "object" || file === null || typeof file.data !== "string") {
+      throw new CloudSaveError("invalid_request", "Each file needs blobSha and base64 data");
+    }
+    const data = new Uint8Array(Buffer.from(file.data, "base64"));
+    total += data.byteLength;
+    if (total > CLOUD_SAVE_LIMITS.maximumFileBytes) throw new CloudSaveError("file_too_large", "Batch is too large to save");
+    return { blobSha: requireBlobSha(file.blobSha), data };
+  });
+}
+
+/**
+ * Stores several files in one request, each checked as storeCloudBlob checks one, with one
+ * lookup, one storage check and parallel uploads so a big skill fits in one request's time.
+ * A held file is reported in its result and doesn't stop the others; anything else stops the batch.
+ */
+export async function storeCloudBlobs(
+  pool: Pool,
+  store: CloudObjectStore,
+  input: { userId: string; deviceId?: string | null; files: { blobSha: string; data: Uint8Array }[] }
+): Promise<CloudBlobBatchResult[]> {
+  const files = new Map<string, Uint8Array>();
+  for (const file of input.files) {
+    const blobSha = requireBlobSha(file.blobSha);
+    if (file.data.byteLength > CLOUD_SAVE_LIMITS.maximumFileBytes) {
+      throw new CloudSaveError("file_too_large", "File is too large to save");
+    }
+    if (gitObjectSha("blob", file.data) !== blobSha) {
+      throw new CloudSaveError("blob_mismatch", "File contents do not match their hash");
+    }
+    files.set(blobSha, file.data);
+  }
+  await requireSavingEnabled(pool, input.userId);
+  const storedAlready = async (db: Database) => new Set((await db.query<{ blob_sha: string }>(
+    "SELECT blob_sha FROM cloud_blobs WHERE user_id = $1 AND blob_sha = ANY($2::text[])",
+    [input.userId, [...files.keys()]]
+  )).rows.map((row) => row.blob_sha));
+
+  const existing = await storedAlready(pool);
+  const results = new Map<string, CloudBlobBatchResult>();
+  const pending: { blobSha: string; data: Uint8Array; labels: SkillLabel[] }[] = [];
+  for (const [blobSha, data] of files) {
+    if (existing.has(blobSha)) { results.set(blobSha, { blobSha, status: "exists", labels: [] }); continue; }
+    const scan = scanFileContents(data);
+    const labels: SkillLabel[] = [...scan.labels];
+    if (scan.secrets.length) {
+      // Recorded outside the upload's transaction: a held file's review must outlive the refusal.
+      const hold = await pool.query<{ confirmed: boolean }>(
+        `
+          INSERT INTO cloud_secret_holds (user_id, blob_sha, findings)
+          VALUES ($1, $2, $3::jsonb)
+          ON CONFLICT (user_id, blob_sha) DO UPDATE SET findings = EXCLUDED.findings
+          RETURNING confirmed_at IS NOT NULL AS confirmed
+        `,
+        [input.userId, blobSha, JSON.stringify(scan.secrets)]
+      );
+      if (!hold.rows[0].confirmed) {
+        results.set(blobSha, { blobSha, status: "needs_review", findings: scan.secrets });
+        continue;
+      }
+      labels.push("confirmed_secret");
+    }
+    pending.push({ blobSha, data, labels: combineLabels([labels]) });
+  }
+
+  if (pending.length) {
+    await withUploadLock(pool, input.userId, async (client) => {
+      const stored = await storedAlready(client);
+      const fresh = pending.filter((file) => !stored.has(file.blobSha));
+      for (const file of pending) if (stored.has(file.blobSha)) results.set(file.blobSha, { blobSha: file.blobSha, status: "exists", labels: [] });
+      const bytes = fresh.reduce((sum, file) => sum + file.data.byteLength, 0);
+      if (await usedBytes(client, input.userId) + bytes > CLOUD_SAVE_LIMITS.maximumUserBytes) {
+        throw new CloudSaveError("quota_exceeded", "Cloud storage is full");
+      }
+      await queueCleanupFirst(pool, input.userId, fresh.map((file) => file.blobSha));
+      for (let index = 0; index < fresh.length; index += BLOB_UPLOAD_CONCURRENCY) {
+        const uploads = await Promise.allSettled(fresh.slice(index, index + BLOB_UPLOAD_CONCURRENCY)
+          .map((file) => store.put(cloudBlobKey(input.userId, file.blobSha), file.data)));
+        const failed = uploads.find((upload): upload is PromiseRejectedResult => upload.status === "rejected");
+        if (failed) throw failed.reason;
+      }
+      await client.query(
+        `
+          INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels)
+          SELECT $1, file.blob_sha, file.byte_size, ARRAY(SELECT jsonb_array_elements_text(file.labels))
+          FROM jsonb_to_recordset($2::jsonb) AS file(blob_sha text, byte_size integer, labels jsonb)
+        `,
+        [input.userId, JSON.stringify(fresh.map((file) => ({
+          blob_sha: file.blobSha, byte_size: file.data.byteLength, labels: file.labels
+        })))]
+      );
+      for (const file of fresh) results.set(file.blobSha, { blobSha: file.blobSha, status: "stored", labels: file.labels });
+      // Stored again after a delete: they must not be removed by the pending clean-up.
+      await client.query("DELETE FROM cloud_purge_queue WHERE user_id = $1 AND blob_sha = ANY($2::text[])",
+        [input.userId, fresh.map((file) => file.blobSha)]);
+    });
+  }
+  return input.files.map((file) => results.get(requireBlobSha(file.blobSha))!);
+}
+
+const BLOB_UPLOAD_CONCURRENCY = 16;
+
+/**
+ * Queues files about to be uploaded for clean-up, on a connection of its own so the entry
+ * outlives the upload's transaction: if the upload fails or is cut off, files already sent
+ * are removed by the next read. A finished upload takes them off the queue again.
+ * Called under the upload lock, which the clean-up also takes, so it can't run in between.
+ */
+async function queueCleanupFirst(pool: Pool, userId: string, blobShas: string[]): Promise<void> {
+  if (!blobShas.length) return;
+  const queueClient = new pg.Client(pool.options);
+  try {
+    await queueClient.connect();
+    await queueClient.query(
+      "INSERT INTO cloud_purge_queue (user_id, blob_sha) SELECT $1, unnest($2::text[]) ON CONFLICT DO NOTHING",
+      [userId, blobShas]
+    );
+  } finally {
+    await queueClient.end();
+  }
 }
 
 /**

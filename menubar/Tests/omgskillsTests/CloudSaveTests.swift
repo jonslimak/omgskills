@@ -227,6 +227,19 @@ struct CloudSaveSyncTests {
         #expect(await api.saved == ["notes": newest])
     }
 
+    @Test func filesSentOneAtATimeArePacedLikeEveryOtherRequest() async throws {
+        actor Counter { var count = 0; func tick() { count += 1 } }
+        let root = try temporaryRoot()
+        let api = FakeCloudSave()
+        let paces = Counter()
+        let skill = try makeSkill(root, "notes", files: ["a.md": "a", "b.md": "b"])
+        _ = try await CloudSaveSync(api: api, pace: { await paces.tick() }).run(installations: [installation(skill)],
+            localFolderKeys: ["notes"], deviceID: "device-1", credential: credential())
+        // Without batch upload: the first version request, one per batch attempt, one per file, the final save.
+        #expect(await api.calls.filter { $0.hasPrefix("upload:") }.count == 3)
+        #expect(await paces.count == 1 + 1 + 3 + 1)
+    }
+
     @Test func stopsWhenTheServerIsUnavailable() async throws {
         struct Down: CloudSaveServing {
             func state(credential: StoredDeviceCredential) async throws -> CloudSaveState { throw CloudSaveAPIError.unavailable }
@@ -450,6 +463,44 @@ struct CloudSaveAPITests {
         #expect(confirmed.url?.path == "/api/portal/cloud-save/blobs/\(entry.blobSha)")
         await #expect(throws: CloudSaveAPIError.permissionRequired) {
             try await api.uploadFile(entry, confirmSecrets: false, credential: credential(scopes: [.syncWrite, .selfRevoke]))
+        }
+    }
+
+    private func entry(_ path: String, _ data: Data) -> SkillPackageEntry {
+        SkillPackageEntry(path: path, mode: "100644", data: data, blobSha: SkillIdentityResolver.gitBlobSHA(for: data))
+    }
+
+    @Test func uploadsASkillsFilesInOneRequestAndBigFilesOnTheirOwn() async throws {
+        let small = [entry("a", Data("a".utf8)), entry("b", Data("b".utf8))]
+        let big = entry("big", Data(repeating: 1, count: CloudSaveAPI.batchBytes + 1))
+        let session = CloudSaveHTTPSession([
+            (200, #"{"files":[{"blobSha":"x","status":"stored","labels":[]},{"blobSha":"y","status":"needs_review","findings":[{"rule":"github_token","kind":"GitHub token","line":2}]}]}"#),
+            (201, #"{"stored":true}"#)
+        ])
+        let held = try await CloudSaveAPI(origin: origin, session: session).uploadFiles(small + [big], credential: credential())
+        #expect(held == [.init(rule: "github_token", kind: "GitHub token", line: 2)])
+        let requests = await session.requests
+        #expect(requests.map { "\($0.httpMethod ?? "") \($0.url?.path ?? "")" } == [
+            "POST /api/portal/cloud-save/blobs", "PUT /api/portal/cloud-save/blobs/\(big.blobSha)"
+        ])
+        let sent = try #require(requests[0].httpBody)
+        let body = try #require(JSONSerialization.jsonObject(with: sent) as? [String: Any])
+        let files = try #require(body["files"] as? [[String: String]])
+        #expect(files.map { $0["blobSha"] } == small.map(\.blobSha))
+        #expect(files.map { $0["data"] } == ["YQ==", "Yg=="])
+    }
+
+    @Test func aServerWithoutBatchUploadIsToldApartFromAFailingOne() async throws {
+        let files = [entry("a", Data("a".utf8))]
+        for (status, body) in [(404, #"{"error":"Not found"}"#), (200, "<!doctype html>")] {
+            let session = CloudSaveHTTPSession([(status, body)])
+            await #expect(throws: CloudSaveBatchUnsupported.self) {
+                try await CloudSaveAPI(origin: origin, session: session).uploadFiles(files, credential: credential())
+            }
+        }
+        let failing = CloudSaveHTTPSession([(422, #"{"error":"File contents do not match their hash","code":"blob_mismatch"}"#)])
+        await #expect(throws: CloudSaveAPIError.rejected("File contents do not match their hash")) {
+            try await CloudSaveAPI(origin: origin, session: failing).uploadFiles(files, credential: credential())
         }
     }
 

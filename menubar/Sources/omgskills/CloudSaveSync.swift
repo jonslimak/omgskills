@@ -128,9 +128,21 @@ struct CloudSaveSync: Sendable {
         case .missingFiles(let hashes): missing = hashes
         }
         let entries = Dictionary(folder.entries.map { ($0.blobSha, $0) }, uniquingKeysWith: { first, _ in first })
-        var held: [CloudSaveFinding] = []
-        for hash in missing {
+        let upload = try missing.map { hash in
             guard let entry = entries[hash] else { throw CloudSaveAPIError.invalidResponse }
+            return entry
+        }
+        try Task.checkCancellation()
+        try await pace()
+        var held: [CloudSaveFinding] = []
+        // Files too big for a batch, or every file on a server without batch upload, go one at a time.
+        var oneByOne = upload.filter { $0.data.count > CloudSaveAPI.batchBytes }
+        let batched = upload.filter { $0.data.count <= CloudSaveAPI.batchBytes }
+        if !batched.isEmpty {
+            do { held = try await api.uploadFiles(batched, credential: credential) }
+            catch is CloudSaveBatchUnsupported { oneByOne = upload }
+        }
+        for entry in oneByOne {
             try Task.checkCancellation()
             try await pace()
             do { try await api.uploadFile(entry, confirmSecrets: false, credential: credential) }

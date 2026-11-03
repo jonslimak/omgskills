@@ -26,7 +26,7 @@ if (!connectionString) {
 
 const migrationsDirectory = fileURLToPath(new URL("../../database/migrations", import.meta.url));
 
-async function withMigratedSchema(run: (pool: Pool) => Promise<void>) {
+async function withMigratedSchema(run: (pool: Pool) => Promise<void>, maxConnections?: number) {
   const schema = `cloud_save_${randomUUID().replaceAll("-", "")}`;
   const admin = new pg.Pool({ connectionString });
   const client = await admin.connect();
@@ -44,7 +44,7 @@ async function withMigratedSchema(run: (pool: Pool) => Promise<void>) {
   } finally {
     client.release();
   }
-  const pool = new pg.Pool({ connectionString, options: `-c search_path=${schema},public` });
+  const pool = new pg.Pool({ connectionString, options: `-c search_path=${schema},public`, max: maxConnections, connectionTimeoutMillis: 2000 });
   try {
     await run(pool);
   } finally {
@@ -56,7 +56,9 @@ async function withMigratedSchema(run: (pool: Pool) => Promise<void>) {
 
 class MemoryStore implements CloudObjectStore {
   readonly objects = new Map<string, Buffer>();
+  failingPuts = new Set<string>();
   async put(key: string, body: Uint8Array) {
+    if (this.failingPuts.has(key)) throw new CloudStoreError("unavailable", "Storage is unavailable");
     this.objects.set(key, Buffer.from(body));
   }
   async get(key: string) {
@@ -550,6 +552,160 @@ test("held-file errors from the endpoints list what was found and where", async 
     assert.equal(confirmed.status, 201);
     assert.equal((await call("POST", "/skills/none/review", JSON.stringify({ confirm: true }))).status, 404);
     assert.equal((await call("POST", "/skills/none/review", JSON.stringify({}))).status, 400);
+  });
+});
+
+test("a batch upload stores a skill's files in one request and reports a held file without stopping the rest", async () => {
+  const { portalCloudSave } = await import("../portal-cloud-save.mjs");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    const scopes: string[] = [];
+    const dependencies = {
+      available: () => true,
+      pool: () => pool,
+      store: () => store,
+      requireUser: async () => ({ userId, deviceId: null }),
+      requireDevice: async (_req: Request, scope: string) => {
+        scopes.push(scope);
+        return { userId, deviceId };
+      }
+    };
+    const call = (body: unknown) => portalCloudSave(new Request("https://omgskills.com/api/portal/cloud-save/blobs", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: { authorization: `Bearer device_${"a".repeat(43)}` }
+    }), {} as never, dependencies as never);
+    const entry = (data: Buffer) => ({ blobSha: gitObjectSha("blob", data), data: data.toString("base64") });
+    const files = [...v1.map((file) => Buffer.from(file.text)), Buffer.from(`TOKEN=${fakeToken}\n`)];
+
+    const off = await call({ files: files.map(entry) });
+    assert.equal(off.status, 403);
+    assert.equal(store.objects.size, 0);
+
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const first = await call({ files: files.map(entry) });
+    assert.equal(first.status, 200);
+    assert.deepEqual((await first.json()).files.map((result: { status: string }) => result.status), ["stored", "stored", "needs_review"]);
+    assert.equal(store.objects.size, 2, "the held file is not stored");
+
+    const again = await (await call({ files: files.slice(0, 1).map(entry) })).json();
+    assert.equal(again.files[0].status, "exists");
+    assert.deepEqual((await readCloudSave(pool, userId)).usage.bytes, files[0].byteLength + files[1].byteLength);
+
+    const saved = await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    assert.equal(saved.status, "saved");
+
+    // Confirmed on the web, the held file goes through in the next batch; a repeated file is stored once.
+    const { confirmSkillReview } = await import("./cloud-save.js");
+    await assert.rejects(saveCloudVersion(pool, { userId, deviceId, skillKey: "deploy",
+      files: manifest([v1[0], { path: "config.env", text: files[2].toString() }]) }));
+    await confirmSkillReview(pool, { userId, deviceId: null, skillKey: "deploy" });
+    const fresh = Buffer.from("new file\n");
+    const confirmed = await (await call({ files: [files[2], fresh, fresh].map(entry) })).json();
+    assert.deepEqual(confirmed.files.map((result: { status: string }) => result.status), ["stored", "stored", "stored"]);
+    assert.deepEqual(confirmed.files[0].labels, ["confirmed_secret"]);
+    assert.equal(store.objects.size, 4);
+
+    // Many files fit in one request.
+    const many = Array.from({ length: 200 }, (_, index) => Buffer.from(`file ${index}\n`));
+    const all = await (await call({ files: many.map(entry) })).json();
+    assert.equal(all.files.filter((result: { status: string }) => result.status === "stored").length, 200);
+    assert.equal((await call({ files: [...many, fresh].map(entry) })).status, 400);
+
+    assert.equal((await call({ files: [{ ...entry(files[0]), blobSha: "0".repeat(40) }] })).status, 422);
+    assert.equal((await call({ files: [] })).status, 400);
+    assert.equal((await call({ files: [{ blobSha: gitObjectSha("blob", files[0]) }] })).status, 400);
+    const big = Buffer.alloc(CLOUD_SAVE_LIMITS.maximumFileBytes / 2 + 1, 97);
+    assert.equal((await call({ files: [entry(big), entry(Buffer.concat([big, Buffer.from("b")]))] })).status, 413);
+    assert.ok(scopes.every((scope) => scope === "content:write"));
+  });
+});
+
+test("uploads can queue cleanup even when the pool has only one connection", async () => {
+  await withMigratedSchema(async (pool) => {
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const { storeCloudBlobs } = await import("./cloud-save.js");
+    const data = Buffer.from("one connection");
+    const blobSha = gitObjectSha("blob", data);
+    const store = new MemoryStore();
+    const result = await storeCloudBlobs(pool, store, { userId, deviceId, files: [{ blobSha, data }] });
+    assert.equal(result[0].status, "stored");
+    assert.equal(store.objects.size, 1);
+  }, 1);
+});
+
+test("failed batches wait for in-flight uploads before cleanup", async () => {
+  await withMigratedSchema(async (pool) => {
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const { cloudBlobKey } = await import("./cloud-store.js");
+    const { drainCloudPurge, storeCloudBlobs } = await import("./cloud-save.js");
+    const files = ["slow", "fail"].map((text) => {
+      const data = Buffer.from(text);
+      return { blobSha: gitObjectSha("blob", data), data };
+    });
+    const store = new MemoryStore();
+    const originalPut = store.put.bind(store);
+    let releaseSlow!: () => void;
+    let slowStarted!: () => void;
+    let failureStarted!: () => void;
+    const slowGate = new Promise<void>((resolve) => { releaseSlow = resolve; });
+    const started = new Promise<void>((resolve) => { slowStarted = resolve; });
+    const failed = new Promise<void>((resolve) => { failureStarted = resolve; });
+    store.put = async (key, data) => {
+      if (key === cloudBlobKey(userId, files[0].blobSha)) {
+        slowStarted();
+        await slowGate;
+        return originalPut(key, data);
+      }
+      failureStarted();
+      throw new CloudStoreError("unavailable", "Storage is unavailable");
+    };
+    let settled = false;
+    const upload = storeCloudBlobs(pool, store, { userId, deviceId, files })
+      .then(() => { settled = true; return null; }, (error: unknown) => { settled = true; return error; });
+    let cleanupFinished = false;
+    let cleanup: Promise<number> | undefined;
+    try {
+      await Promise.all([started, failed]);
+      cleanup = drainCloudPurge(pool, store, userId).then((left) => { cleanupFinished = true; return left; });
+      await new Promise<void>((resolve) => setTimeout(resolve, 200));
+      assert.equal(settled, false, "the upload lock must remain held until the slow write ends");
+      assert.equal(cleanupFinished, false, "cleanup must wait for the in-flight write");
+    } finally {
+      releaseSlow();
+    }
+    assert.ok(await upload instanceof CloudStoreError);
+    assert.equal(await cleanup, 0);
+    assert.equal(store.objects.size, 0, "cleanup removes the completed slow write");
+  });
+});
+
+test("files sent before an upload fails are cleaned up, and a retry stores them", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const { cloudBlobKey } = await import("./cloud-store.js");
+    const { drainCloudPurge, storeCloudBlobs } = await import("./cloud-save.js");
+    const files = Array.from({ length: 40 }, (_, index) => {
+      const data = Buffer.from(`part ${index}\n`);
+      return { blobSha: gitObjectSha("blob", data), data };
+    });
+    store.failingPuts.add(cloudBlobKey(userId, files[39].blobSha));
+    await assert.rejects(storeCloudBlobs(pool, store, { userId, deviceId, files }));
+    assert.ok(store.objects.size > 0, "some files reached storage before the failure");
+    assert.equal((await readCloudSave(pool, userId)).usage.bytes, 0);
+    assert.equal(await drainCloudPurge(pool, store, userId), 0);
+    assert.equal(store.objects.size, 0, "untracked files are removed");
+
+    store.failingPuts.clear();
+    const stored = await storeCloudBlobs(pool, store, { userId, deviceId, files });
+    assert.ok(stored.every((result) => result.status === "stored"));
+    assert.equal(await drainCloudPurge(pool, store, userId), 0);
+    assert.equal(store.objects.size, 40, "a finished upload is never cleaned up");
   });
 });
 
