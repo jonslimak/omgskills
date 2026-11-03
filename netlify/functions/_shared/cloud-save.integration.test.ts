@@ -1420,3 +1420,55 @@ test("adding your own skill to a Set shares its saved version; Update Set moves 
     assert.equal(all.deletedSkills, 1);
   });
 });
+
+test("the web reads a saved skill's current SKILL.md, only for its owner", async () => {
+  const { portalCloudSave } = await import("../portal-cloud-save.mjs");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    const stranger = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "Notes", files: manifest(v1) });
+    await uploadAll(pool, store, userId, v2);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v2) });
+
+    let web = userId;
+    const dependencies = {
+      available: () => true,
+      pool: () => pool,
+      store: () => store,
+      requireUser: async () => ({ userId: web, deviceId: null }),
+      requireDevice: async () => ({ userId, deviceId })
+    };
+    const read = (key: string, headers: Record<string, string> = {}) => portalCloudSave(new Request(
+      `https://omgskills.com/api/portal/cloud-save/skills/${encodeURIComponent(key)}/skill-md`, { headers }),
+      {} as never, dependencies as never);
+
+    const response = await read("Notes");
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    const body = await response.json();
+    assert.equal(body.key, "notes");
+    assert.equal(body.markdown, v2[0].text);
+    assert.equal(body.truncated, false);
+
+    assert.equal((await read("missing")).status, 404);
+    web = stranger.userId;
+    assert.equal((await read("notes")).status, 404);
+    // A Mac's credential reads files through its own download route, not this one.
+    const mac = await portalCloudSave(new Request("https://omgskills.com/api/portal/cloud-save/skills/notes/skill-md",
+      { headers: { authorization: `Bearer device_${"a".repeat(43)}` } }), {} as never,
+      { ...dependencies, requireUser: async () => { throw new Response("no", { status: 401 }); } } as never);
+    assert.equal(mac.status, 401);
+
+    // Long instructions are shortened like a library README.
+    const long: File[] = [{ path: "SKILL.md", text: `---\nname: long\ndescription: Long.\n---\n${"x".repeat(25_000)}` }];
+    web = userId;
+    await uploadAll(pool, store, userId, long);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "long", files: manifest(long) });
+    const shortened = await (await read("long")).json();
+    assert.equal(shortened.markdown.length, 20_000);
+    assert.equal(shortened.truncated, true);
+  });
+});

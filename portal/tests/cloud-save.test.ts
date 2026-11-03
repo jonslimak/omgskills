@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { PortalApiError } from "../src/api-error";
-import { cloudSkillKey, cloudSkillRows, deleteCloudSaved, formatBytes, isDeletingAllCloudSkills, isDeletingCloudSkill, loadCloudSave, type CloudSaveState } from "../src/cloud-save/cloud-save";
+import { cloudSkillKey, cloudSkillRows, deleteCloudSaved, loadSavedSkillMd, formatBytes, isDeletingAllCloudSkills, isDeletingCloudSkill, loadCloudSave, type CloudSaveState } from "../src/cloud-save/cloud-save";
 import type { SyncedSkill } from "../src/synced-skill-grouping";
+import { savedSkillKeys } from "../src/app/unified/SkillReadme";
 
 const installed = (name: string, extra: Partial<SyncedSkill> = {}): SyncedSkill => ({
   id: name, name, description: null, githubUrl: null, isLocalOnly: true, source: "claude", lastSeenAt: "2026-11-01", ...extra,
@@ -113,4 +114,28 @@ test("deleting a skill named * never selects delete all, and vice versa", () => 
   assert.equal(isDeletingAllCloudSkills(all), true);
   assert.equal(isDeletingCloudSkill(null, "*"), false);
   assert.equal(isDeletingAllCloudSkills(null), false);
+});
+
+test("a local skill's instructions come from the first folder with a saved copy", async () => {
+  const calls: string[] = [];
+  const api = async <T>(path: string) => {
+    calls.push(path);
+    if (path.includes("/connect-chrome/")) throw new PortalApiError("Saved skill not found", 404);
+    return { key: "open-gstack-browser", markdown: "# Hi", truncated: false, savedAt: "2026-11-03T10:00:00Z" } as T;
+  };
+  const doc = await loadSavedSkillMd(api, ["connect-chrome", "open-gstack-browser"], new AbortController().signal);
+  assert.equal(doc?.markdown, "# Hi");
+  assert.deepEqual(calls, ["/api/portal/cloud-save/skills/connect-chrome/skill-md", "/api/portal/cloud-save/skills/open-gstack-browser/skill-md"]);
+
+  const none = await loadSavedSkillMd(async () => { throw new PortalApiError("Saved skill not found", 404); }, ["a"], new AbortController().signal);
+  assert.equal(none, null);
+  await assert.rejects(loadSavedSkillMd(async () => { throw new PortalApiError("Denied", 401); }, ["a"], new AbortController().signal));
+});
+
+test("a skill's cloud keys are its folders on every Mac, once each", () => {
+  const source = (name: string, installationFolder?: string) => installed(name, { installationFolder });
+  const keys = savedSkillKeys({ key: "x", name: "Notes", githubUrl: null,
+    installed: { ...source("Notes", "notes"), allSkillIds: [], sources: [], sourceSkills: [source("Notes", "Notes"), source("Notes", "notes"), source("Other")] },
+  } as never);
+  assert.deepEqual(keys, ["notes", "other"]);
 });
