@@ -70,6 +70,7 @@ test("merged release stages all reviewed migrations without changing their SQL",
     "20261030170000_add_inventory_set_origin", "20261102120000_add_cloud_save",
     "20261102130000_add_cloud_save_scan",
     "20261102140000_add_cloud_save_delete",
+    "20261103120000_cloud_storage_keys",
   ];
   const destinationDir = path.join(root, "staged");
   assert.deepEqual(await stageNetlifyDbMigrations({ destinationDir }), expected);

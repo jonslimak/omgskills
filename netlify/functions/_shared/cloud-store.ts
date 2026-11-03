@@ -1,4 +1,5 @@
 import { createHash, createHmac } from "node:crypto";
+import { XMLParser, XMLValidator } from "fast-xml-parser";
 
 const MAX_DELETE_KEYS = 1000;
 import { getEnv } from "./env.js";
@@ -14,6 +15,9 @@ export type CloudObjectStore = {
   /** Deletes up to 1000 objects; returns the keys that could not be deleted. Missing objects count as deleted. */
   deleteMany(keys: string[]): Promise<string[]>;
 };
+
+export type CloudObjectPage = { objects: { key: string; modifiedAt: Date }[]; next: string | null };
+export type CloudSweepStore = CloudObjectStore & { listCloudObjects(token: string | null, limit: number): Promise<CloudObjectPage> };
 
 export class CloudStoreError extends Error {
   constructor(readonly code: "not_configured" | "not_found" | "unavailable", message: string) {
@@ -71,7 +75,7 @@ export function signS3Request(input: {
 export function createCloudObjectStore(
   env: (key: string) => string | undefined = getEnv,
   fetchImpl: typeof fetch = fetch
-): CloudObjectStore {
+): CloudSweepStore {
   const accountId = env("CLOUD_SAVE_R2_ACCOUNT_ID");
   const accessKeyId = env("CLOUD_SAVE_R2_ACCESS_KEY_ID");
   const secretAccessKey = env("CLOUD_SAVE_R2_SECRET_ACCESS_KEY");
@@ -113,6 +117,27 @@ export function createCloudObjectStore(
   }
 
   return {
+    async listCloudObjects(token, limit) {
+      const query: Record<string, string> = { "list-type": "2", prefix: "cloud/", "max-keys": String(limit), "encoding-type": "url" };
+      if (token) query["continuation-token"] = token;
+      const response = await request("GET", "", undefined, { query });
+      if (!response.ok) throw new CloudStoreError("unavailable", "Cloud storage listing is unavailable");
+      const xml = await response.text();
+      if (XMLValidator.validate(xml) !== true) throw new CloudStoreError("unavailable", "Invalid cloud storage listing");
+      const root = new XMLParser({ parseTagValue: false }).parse(xml)?.ListBucketResult;
+      if (!root || !["true", "false"].includes(root.IsTruncated)) throw new CloudStoreError("unavailable", "Invalid cloud storage listing");
+      const contents = root.Contents === undefined ? [] : Array.isArray(root.Contents) ? root.Contents : [root.Contents];
+      const objects = contents.map((entry: { Key?: unknown; LastModified?: unknown }) => {
+        if (typeof entry.Key !== "string" || typeof entry.LastModified !== "string") throw new CloudStoreError("unavailable", "Invalid cloud storage object");
+        const key = decodeURIComponent(entry.Key);
+        const modifiedAt = new Date(entry.LastModified);
+        if (!key.startsWith("cloud/") || Number.isNaN(modifiedAt.getTime())) throw new CloudStoreError("unavailable", "Invalid cloud storage object");
+        return { key, modifiedAt };
+      });
+      const next = root.IsTruncated === "true" ? root.NextContinuationToken : null;
+      if (root.IsTruncated === "true" && (typeof next !== "string" || !next)) throw new CloudStoreError("unavailable", "Missing cloud storage continuation token");
+      return { objects, next };
+    },
     async put(key, body) {
       const response = await request("PUT", key, body);
       if (!response.ok) throw new CloudStoreError("unavailable", "Cloud storage is unavailable");
