@@ -1418,6 +1418,8 @@ test("adding your own skill to a Set shares its saved version; Update Set moves 
     assert.equal(await revision(group), beforeDelete + 1);
     const all = await deleteCloudSkills(pool, store, { userId: owner.userId });
     assert.equal(all.deletedSkills, 1);
+  });
+});
 
 test("the web reads a saved skill's current SKILL.md, only for its owner", async () => {
   const { portalCloudSave } = await import("../portal-cloud-save.mjs");
