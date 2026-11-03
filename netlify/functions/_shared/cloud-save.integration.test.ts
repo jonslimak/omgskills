@@ -1263,9 +1263,10 @@ test("each Mac reports why it didn't save skills, and its next report replaces t
     assert.equal((await report({ ship: "links" })).status, 204);
     assert.deepEqual((await readCloudSave(pool, userId)).skipped, { pdf: "failed", ship: "links" });
 
-    assert.equal((await report({ ship: "because" })).status, 400);
+    // One odd folder name or a reason from a newer Mac drops only that entry.
+    assert.equal((await report({ ship: "links", ".hidden": "links", "a/b": "failed", new: "because" })).status, 204);
+    assert.deepEqual((await readCloudSave(pool, userId)).skipped, { pdf: "failed", ship: "links" });
     assert.equal((await report(["ship"])).status, 400);
-    assert.equal((await report({ "../x": "links" })).status, 400);
     assert.equal((await report(Object.fromEntries(Array.from({ length: 2001 }, (_, i) => [`s${i}`, "links"])))).status, 400);
     // A web session can't report for a Mac.
     const web = await portalCloudSave(new Request("https://omgskills.com/api/portal/cloud-save/skipped",
