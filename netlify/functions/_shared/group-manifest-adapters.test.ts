@@ -278,6 +278,28 @@ test("device manifest gives public-role readers the public-safe view", async () 
   }
 });
 
+test("a skill shared from cloud save installs for invited Macs as a private item, and never shows to the public", async () => {
+  const cloudRow = manifestRow({
+    itemKind: "synced", itemGithubUrl: null, sourceKind: "cloud", sourceNormalizedRoot: "notes",
+    sourceRepositoryId: null, sourceRepositorySlug: null,
+  });
+  const invited = await buildDeviceGroupManifestByRoute(
+    { id: "reader-id", email: "reader@example.com" }, "jon", "team-skills",
+    sequenceClient([[{ id: "group-id" }], [accessFacts()], [cloudRow]])
+  );
+  assert.deepEqual(invited.manifest.items[0].installability, {
+    status: "installable",
+    source: { id: "source-id", kind: "private_github" },
+    release: { id: "release-id", commitSha: sha.commit, treeSha: sha.tree, skillMdSha: sha.skill },
+  });
+  const publicView = await buildPublicGroupManifestByRoute(
+    "jon", "team-skills",
+    sequenceClient([[{ id: "group-id" }], [accessFacts({ visibility: "public", invited: false })], [cloudRow]])
+  );
+  assert.deepEqual(publicView.manifest.items[0].installability, { status: "metadata_only", reason: "source_unavailable" });
+  assert.equal(publicView.linkHints.get("item-id")?.isLocalOnly, true);
+});
+
 test("device manifest keeps inaccessible and absent routes indistinguishable", async () => {
   const failures: Array<{ status: number; body: string }> = [];
   for (const rows of [

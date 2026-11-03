@@ -278,6 +278,14 @@ function normalizeInstallability(
       return metadataOnly("source_mismatch");
     }
     manifestSource = { id: sourceId, kind: "private_github" };
+  } else if (source.kind === "cloud") {
+    // The owner's own skill, shared from cloud save. Macs fetch it exactly like a private GitHub
+    // release (same package route, same invite check), so it goes out as one: Macs that install
+    // private Set items already install it.
+    if (item.kind !== "synced") {
+      return metadataOnly("source_mismatch");
+    }
+    manifestSource = { id: sourceId, kind: "private_github" };
   } else {
     return metadataOnly("source_mismatch");
   }

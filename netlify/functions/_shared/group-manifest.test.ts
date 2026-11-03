@@ -256,6 +256,23 @@ test("private releases require complete source coordinates without exposing them
   });
 });
 
+test("only a local skill can be shared from cloud save", () => {
+  const cloudSource = { id: ids.privateSource, kind: "cloud", normalizedRoot: "notes" };
+  const item = (kind: "synced" | "catalog" | "github") => ({
+    id: ids.privateItem, kind, position: 0, name: "Notes", catalogSkillId: kind === "catalog" ? "owner/repo:notes" : null,
+    source: cloudSource, release: release(ids.privateRelease, ids.privateSource),
+  });
+  assert.deepEqual(buildGroupManifest(baseInput([item("synced")])).items[0].installability, {
+    status: "installable",
+    source: { id: ids.privateSource, kind: "private_github" },
+    release: manifestRelease(ids.privateRelease),
+  });
+  for (const kind of ["catalog", "github"] as const) {
+    assert.deepEqual(buildGroupManifest(baseInput([item(kind)])).items[0].installability,
+      { status: "metadata_only", reason: "source_mismatch" });
+  }
+});
+
 test("normalizes unresolved legacy and synced items to stable metadata-only reasons", () => {
   const cases: Array<{
     name: string;
