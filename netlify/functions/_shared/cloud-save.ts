@@ -1,7 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
-import pg, { type Pool, type PoolClient, type QueryResult, type QueryResultRow } from "pg";
+import { type Pool, type PoolClient, type QueryResult, type QueryResultRow } from "pg";
 import { appendSkillRelease } from "./group-storage.js";
 import { cloudBlobKey, type CloudObjectStore } from "./cloud-store.js";
+import { drainCloudPurge, queuedFileCount, releaseStorageKeys, reserveStorageKeys } from "./cloud-storage-purge.js";
 import { combineLabels, pathLabels, scanFileContents, type SecretFinding, type SkillLabel } from "./skill-scan.js";
 import {
   BROKER_SKILL_PACKAGE_LIMITS,
@@ -327,7 +328,8 @@ export async function storeCloudBlob(
     labels.push("confirmed_secret");
   }
   const blobLabels = combineLabels([labels]);
-  return withUploadLock(pool, input.userId, async (client) => {
+  const reserved: string[] = [];
+  return withReservedUpload(pool, input.userId, reserved, async (client) => {
     const stored = await client.query(
       "SELECT 1 FROM cloud_blobs WHERE user_id = $1 AND blob_sha = $2",
       [input.userId, blobSha]
@@ -337,7 +339,8 @@ export async function storeCloudBlob(
       throw new CloudSaveError("quota_exceeded", "Cloud storage is full");
     }
     const storageKey = `${cloudBlobKey(input.userId, blobSha)}/${randomUUID()}`;
-    await queueCleanupFirst(pool, input.userId, [storageKey]);
+    await reserveStorageKeys(pool, input.userId, [storageKey]);
+    reserved.push(storageKey);
     await store.put(storageKey, input.data);
     await client.query(
       "INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels, storage_key) VALUES ($1, $2, $3, $4, $5)",
@@ -427,7 +430,8 @@ export async function storeCloudBlobs(
   }
 
   if (pending.length) {
-    await withUploadLock(pool, input.userId, async (client) => {
+    const reserved: string[] = [];
+    await withReservedUpload(pool, input.userId, reserved, async (client) => {
       const stored = await storedAlready(client);
       const fresh = pending.filter((file) => !stored.has(file.blobSha));
       for (const file of pending) if (stored.has(file.blobSha)) results.set(file.blobSha, { blobSha: file.blobSha, status: "exists", labels: [] });
@@ -436,7 +440,8 @@ export async function storeCloudBlobs(
         throw new CloudSaveError("quota_exceeded", "Cloud storage is full");
       }
       const storageKeys = new Map(fresh.map((file) => [file.blobSha, `${cloudBlobKey(input.userId, file.blobSha)}/${randomUUID()}`]));
-      await queueCleanupFirst(pool, input.userId, [...storageKeys.values()]);
+      await reserveStorageKeys(pool, input.userId, [...storageKeys.values()]);
+      reserved.push(...storageKeys.values());
       for (let index = 0; index < fresh.length; index += BLOB_UPLOAD_CONCURRENCY) {
         const uploads = await Promise.allSettled(fresh.slice(index, index + BLOB_UPLOAD_CONCURRENCY)
           .map((file) => store.put(storageKeys.get(file.blobSha)!, file.data)));
@@ -464,22 +469,16 @@ export async function storeCloudBlobs(
 const BLOB_UPLOAD_CONCURRENCY = 16;
 
 /**
- * Queues files about to be uploaded for clean-up, on a connection of its own so the entry
- * outlives the upload's transaction: if the upload fails or is cut off, files already sent
- * are removed by the next read. A finished upload takes them off the queue again.
- * Called under the upload lock, which the clean-up also takes, so it can't run in between.
+ * Runs an upload under the upload lock. Names it reserves (see reserveStorageKeys) go in
+ * `reserved`. If the upload fails, every write it started has finished by then (each batch
+ * of writes is awaited in full), so its reserved names are made due for removal at once.
  */
-async function queueCleanupFirst(pool: Pool, userId: string, storageKeys: string[]): Promise<void> {
-  if (!storageKeys.length) return;
-  const queueClient = new pg.Client(pool.options);
+async function withReservedUpload<T>(pool: Pool, userId: string, reserved: string[], run: (client: PoolClient) => Promise<T>): Promise<T> {
   try {
-    await queueClient.connect();
-    await queueClient.query(
-      "INSERT INTO cloud_storage_purge_queue (user_id, storage_key) SELECT $1, unnest($2::text[]) ON CONFLICT DO NOTHING",
-      [userId, storageKeys]
-    );
-  } finally {
-    await queueClient.end();
+    return await withUploadLock(pool, userId, run);
+  } catch (error) {
+    await releaseStorageKeys(pool, userId, reserved);
+    throw error;
   }
 }
 
@@ -913,83 +912,17 @@ export async function deleteCloudSkills(
   } finally {
     client.release();
   }
-  return { ...result, pendingFiles: await drainCloudPurge(pool, store, input.userId) };
-}
-
-/** A cheap check without locks, so ordinary reads don't wait on uploads. */
-export async function hasPendingPurge(db: Database, userId: string): Promise<boolean> {
-  return Boolean((await db.query(
-    "SELECT 1 FROM cloud_purge_queue WHERE user_id = $1 UNION ALL SELECT 1 FROM cloud_storage_purge_queue WHERE user_id = $1 LIMIT 1", [userId]
-  )).rowCount);
-}
-
-/**
- * Removes queued files from object storage, up to `limit`, and returns how many are still queued.
- * Holds the user's upload lock, so a file stored again meanwhile is never removed.
- */
-export async function drainCloudPurge(pool: Pool, store: CloudObjectStore, userId: string, limit = 3000): Promise<number> {
-  const client = await pool.connect();
+  // The delete is done; removing its files right away is best effort, and the hourly run finishes the rest.
+  let pendingFiles: number;
   try {
-    await client.query("BEGIN");
-    await client.query("SELECT 1 FROM cloud_save_settings WHERE user_id = $1 FOR UPDATE", [userId]);
-    const queued = await client.query<{ blob_sha: string }>(
-      `
-        SELECT queue.blob_sha FROM cloud_purge_queue queue
-        WHERE queue.user_id = $1 AND NOT EXISTS (
-          SELECT 1 FROM cloud_blobs blob WHERE blob.user_id = queue.user_id
-            AND blob.blob_sha = queue.blob_sha AND blob.storage_key IS NULL
-        )
-        ORDER BY queue.queued_at, queue.blob_sha
-        LIMIT $2
-      `,
-      [userId, limit]
-    );
-    const done: string[] = [];
-    for (let start = 0; start < queued.rows.length; start += 1000) {
-      const batch = queued.rows.slice(start, start + 1000).map((row) => row.blob_sha);
-      let failed: string[];
-      try {
-        failed = await store.deleteMany(batch.map((sha) => cloudBlobKey(userId, sha)));
-      } catch {
-        break;
-      }
-      done.push(...batch.filter((sha) => !failed.includes(cloudBlobKey(userId, sha))));
-    }
-    await client.query("DELETE FROM cloud_purge_queue WHERE user_id = $1 AND blob_sha = ANY($2::text[])", [userId, done]);
-    const remainingLimit = Math.max(0, limit - queued.rows.length);
-    const exact = await client.query<{ storage_key: string }>(
-      `SELECT queue.storage_key FROM cloud_storage_purge_queue queue
-       WHERE queue.user_id = $1 AND NOT EXISTS (
-         SELECT 1 FROM cloud_blobs blob WHERE blob.user_id = queue.user_id AND
-           (blob.storage_key = queue.storage_key OR
-            (blob.storage_key IS NULL AND queue.storage_key = 'cloud/' || blob.user_id::text || '/' || blob.blob_sha))
-       ) ORDER BY queue.queued_at, queue.storage_key LIMIT $2`,
-      [userId, remainingLimit]
-    );
-    const keys = exact.rows.map((row) => row.storage_key);
-    for (let start = 0; start < keys.length; start += 1000) {
-      const batch = keys.slice(start, start + 1000);
-      try {
-        const failed = new Set(await store.deleteMany(batch));
-        await client.query("DELETE FROM cloud_storage_purge_queue WHERE user_id = $1 AND storage_key = ANY($2::text[])",
-          [userId, batch.filter((key) => !failed.has(key))]);
-      } catch {
-        break;
-      }
-    }
-    const left = await client.query<{ count: number }>(
-      "SELECT ((SELECT count(*) FROM cloud_purge_queue WHERE user_id = $1) + (SELECT count(*) FROM cloud_storage_purge_queue WHERE user_id = $1))::int AS count",
-      [userId]
-    );
-    await client.query("COMMIT");
-    return left.rows[0].count;
-  } catch (error) {
-    await client.query("ROLLBACK");
-    throw error;
-  } finally {
-    client.release();
+    pendingFiles = await drainCloudPurge(pool, store, input.userId);
+  } catch {
+    pendingFiles = await queuedFileCount(pool, input.userId);
   }
+  return { ...result, pendingFiles };
 }
+
+export { drainCloudPurge } from "./cloud-storage-purge.js";
 
 export async function listCloudVersions(
   db: Database,

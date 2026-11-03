@@ -26,7 +26,11 @@ if (!connectionString) {
 
 const migrationsDirectory = fileURLToPath(new URL("../../database/migrations", import.meta.url));
 
-async function withMigratedSchema(run: (pool: Pool) => Promise<void>, maxConnections?: number) {
+async function withMigratedSchema(
+  run: (pool: Pool) => Promise<void>,
+  maxConnections?: number,
+  beforeMigration?: { name: string; run: (client: pg.PoolClient) => Promise<void> }
+) {
   const schema = `cloud_save_${randomUUID().replaceAll("-", "")}`;
   const admin = new pg.Pool({ connectionString });
   const client = await admin.connect();
@@ -39,6 +43,7 @@ async function withMigratedSchema(run: (pool: Pool) => Promise<void>, maxConnect
       .map((entry) => entry.name)
       .sort();
     for (const name of entries) {
+      if (name === beforeMigration?.name) await beforeMigration.run(client);
       await client.query(await readFile(path.join(migrationsDirectory, name, "migration.sql"), "utf8"));
     }
   } finally {
@@ -643,7 +648,7 @@ test("uploads can queue cleanup even when the pool has only one connection", asy
   }, 1);
 });
 
-test("failed batches wait for in-flight uploads before cleanup", async () => {
+test("a clean-up during an upload leaves its files alone, and a failed upload is cleaned up after", async () => {
   await withMigratedSchema(async (pool) => {
     const { userId, deviceId } = await createUser(pool);
     await updateCloudSaveSettings(pool, userId, { enabled: true });
@@ -673,20 +678,18 @@ test("failed batches wait for in-flight uploads before cleanup", async () => {
     let settled = false;
     const upload = storeCloudBlobs(pool, store, { userId, deviceId, files })
       .then(() => { settled = true; return null; }, (error: unknown) => { settled = true; return error; });
-    let cleanupFinished = false;
-    let cleanup: Promise<number> | undefined;
     try {
       await Promise.all([started, failed]);
-      cleanup = drainCloudPurge(pool, store, userId).then((left) => { cleanupFinished = true; return left; });
-      await new Promise<void>((resolve) => setTimeout(resolve, 200));
-      assert.equal(settled, false, "the upload lock must remain held until the slow write ends");
-      assert.equal(cleanupFinished, false, "cleanup must wait for the in-flight write");
+      // Runs at once, without waiting for the upload, and leaves its reserved names alone.
+      assert.equal(await drainCloudPurge(pool, store, userId), 2);
+      assert.equal(settled, false, "the upload is still writing");
     } finally {
       releaseSlow();
     }
     assert.ok(await upload instanceof CloudStoreError);
-    assert.equal(await cleanup, 0);
-    assert.equal(store.objects.size, 0, "cleanup removes the completed slow write");
+    assert.equal(store.objects.size, 1, "the slow write landed after the clean-up ran");
+    assert.equal(await drainCloudPurge(pool, store, userId), 0);
+    assert.equal(store.objects.size, 0, "a failed upload's files are removed once its writes finish");
   });
 });
 
@@ -791,10 +794,17 @@ test("files that fail to delete are retried, and a file stored again is never re
     assert.equal(result.pendingFiles, 2);
     assert.equal(store.objects.size, 2);
 
-    // One file comes back before the clean-up runs again: it must stay.
+    // Failed files wait an hour before the next try.
+    store.failing = new Set();
+    assert.equal(await drainCloudPurge(pool, store, userId), 2);
+    assert.equal(store.objects.size, 2);
+    const retry = await pool.query<{ attempts: number }>("SELECT attempts FROM cloud_storage_purge_queue WHERE user_id = $1", [userId]);
+    assert.deepEqual(retry.rows.map((row) => row.attempts), [1, 1]);
+
+    // One file comes back before the clean-up runs again: its new copy must stay.
     await updateCloudSaveSettings(pool, userId, { excludedSkillKeys: [] });
     await uploadAll(pool, store, userId, [v1[0]]);
-    store.failing = new Set();
+    await pool.query("UPDATE cloud_storage_purge_queue SET not_before = now() WHERE user_id = $1", [userId]);
     assert.equal(await drainCloudPurge(pool, store, userId), 0);
     assert.equal(store.objects.size, 1);
     assert.ok([...store.objects.keys()][0].startsWith(`cloud/${userId}/${gitObjectSha("blob", Buffer.from(v1[0].text))}/`));
@@ -828,9 +838,10 @@ test("versions of shared and GitHub sources stay append-only, even inside a clou
   });
 });
 
-test("reading cloud save finishes a pending clean-up, and never fails because of it", async () => {
+test("reading cloud save does no clean-up work, and the hourly run finishes a delete", async () => {
   const { portalCloudSave } = await import("../portal-cloud-save.mjs");
   const { deleteCloudSkills } = await import("./cloud-save.js");
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
   await withMigratedSchema(async (pool) => {
     const store = new MemoryStore();
     const { userId, deviceId } = await createUser(pool);
@@ -839,19 +850,20 @@ test("reading cloud save finishes a pending clean-up, and never fails because of
     await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
     store.failing = new Set(store.objects.keys());
     assert.equal((await deleteCloudSkills(pool, store, { userId })).pendingFiles, 2);
+    store.failing = new Set();
 
-    const read = (storeFor: () => MemoryStore) => portalCloudSave(new Request("https://omgskills.com/api/portal/cloud-save"), {} as never, {
-      available: () => true, pool: () => pool, store: storeFor,
+    const read = await portalCloudSave(new Request("https://omgskills.com/api/portal/cloud-save"), {} as never, {
+      available: () => true, pool: () => pool, store: () => { throw new Error("reads must not use storage"); },
       requireUser: async () => ({ userId, deviceId: null }), requireDevice: async () => ({ userId, deviceId })
     } as never);
-    // Storage unreachable: the read still answers, and the files stay queued.
-    assert.equal((await read(() => { throw new Error("not configured"); })).status, 200);
+    assert.equal(read.status, 200);
     assert.equal(store.objects.size, 2);
-    store.failing = new Set();
-    assert.equal((await read(() => store)).status, 200);
+
+    await pool.query("UPDATE cloud_storage_purge_queue SET not_before = now() - interval '1 second'");
+    const result = await sweepCloudStorage(pool, store);
+    assert.equal(result.purged.deleted, 2);
     assert.equal(store.objects.size, 0);
-    const queued = await pool.query("SELECT 1 FROM cloud_purge_queue WHERE user_id = $1", [userId]);
-    assert.equal(queued.rowCount, 0);
+    assert.equal((await pool.query("SELECT 1 FROM cloud_storage_purge_queue")).rowCount, 0);
   });
 });
 
@@ -976,7 +988,8 @@ test("the sweep removes a late upload and keeps saved files, then delete-all lea
     await store.put(lateKey, lateData);
     for (const key of store.objects.keys()) store.modified.set(key, new Date(Date.now() - 7200000));
     const result = await sweepCloudStorage(pool, store);
-    assert.equal(result.deleted, 1);
+    assert.equal(result.queued, 1);
+    assert.equal(result.purged.deleted, 1);
     assert.equal(store.objects.has(lateKey), false);
     assert.equal(store.objects.size, 2);
     await deleteCloudSkills(pool, store, { userId });
@@ -1022,5 +1035,199 @@ test("the sweep removes untracked files after an account is gone", async () => {
     store.modified.set(key, new Date(Date.now() - 7200000));
     await sweepCloudStorage(pool, store);
     assert.equal(store.objects.size, 0);
+  });
+});
+
+const twoHoursAgo = () => new Date(Date.now() - 2 * 60 * 60 * 1000);
+
+async function putOrphan(store: MemoryStore, userId: string, text: string) {
+  const { cloudBlobKey } = await import("./cloud-store.js");
+  const data = Buffer.from(text);
+  const key = `${cloudBlobKey(userId, gitObjectSha("blob", data))}/${randomUUID()}`;
+  await store.put(key, data);
+  store.modified.set(key, twoHoursAgo());
+  return key;
+}
+
+test("an upload still under way is never removed, even if its file looks old", async () => {
+  const { reserveStorageKeys } = await import("./cloud-storage-purge.js");
+  const { drainCloudPurge } = await import("./cloud-save.js");
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId } = await createUser(pool);
+    const key = await putOrphan(store, userId, "in flight");
+    await reserveStorageKeys(pool, userId, [key]);
+    const result = await sweepCloudStorage(pool, store);
+    assert.equal(result.queued, 0, "already reserved");
+    assert.equal(await drainCloudPurge(pool, store, userId), 1);
+    assert.ok(store.objects.has(key));
+  });
+});
+
+test("a crashed upload's files are removed once its reservation runs out", async () => {
+  const { reserveStorageKeys } = await import("./cloud-storage-purge.js");
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId } = await createUser(pool);
+    const key = await putOrphan(store, userId, "crashed");
+    await reserveStorageKeys(pool, userId, [key]);
+    await sweepCloudStorage(pool, store);
+    assert.ok(store.objects.has(key), "kept for the hour");
+    await pool.query("UPDATE cloud_storage_purge_queue SET not_before = now() - interval '1 second'");
+    assert.equal((await sweepCloudStorage(pool, store)).purged.deleted, 1);
+    assert.equal(store.objects.has(key), false);
+  });
+});
+
+test("a file that keeps failing to delete never holds up the others", async () => {
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const userId = randomUUID();
+    const bad = await putOrphan(store, userId, "bad");
+    store.failing.add(bad);
+    let result = await sweepCloudStorage(pool, store);
+    assert.equal(result.purged.failed, 1);
+    for (let i = 0; i < 3; i++) await putOrphan(store, userId, `good ${i}`);
+    await pool.query("UPDATE cloud_storage_purge_queue SET not_before = now() - interval '1 second'");
+    // The scan position wrapped after the full pass; the next run starts a new one.
+    result = await sweepCloudStorage(pool, store);
+    assert.equal(result.purged.deleted, 3);
+    assert.deepEqual([...store.objects.keys()], [bad]);
+    const row = await pool.query<{ attempts: number; last_error: string }>("SELECT attempts, last_error FROM cloud_storage_purge_queue");
+    assert.deepEqual(row.rows, [{ attempts: 2, last_error: "delete failed" }]);
+  });
+});
+
+test("storage being down stops a run without losing queued files", async () => {
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    await putOrphan(store, randomUUID(), "waiting");
+    store.deleteMany = async () => { throw new CloudStoreError("unavailable", "down"); };
+    const result = await sweepCloudStorage(pool, store);
+    assert.equal(result.purged.storageDown, true);
+    assert.equal(store.objects.size, 1);
+    const row = await pool.query<{ last_error: string }>("SELECT last_error FROM cloud_storage_purge_queue");
+    assert.deepEqual(row.rows, [{ last_error: "storage unavailable" }]);
+  });
+});
+
+test("only one sweep runs at a time, and a crashed run's lease runs out by itself", async () => {
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const key = await putOrphan(store, randomUUID(), "orphan");
+    const list = store.listCloudObjects.bind(store);
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    let listing!: () => void;
+    const listed = new Promise<void>((resolve) => { listing = resolve; });
+    store.listCloudObjects = async (token, limit) => { listing(); await gate; return list(token, limit); };
+    const first = sweepCloudStorage(pool, store);
+    await listed;
+    assert.equal((await sweepCloudStorage(pool, store)).skippedRun, true);
+    release();
+    assert.equal((await first).purged.deleted, 1);
+    assert.equal(store.objects.has(key), false);
+
+    // A run that died while holding the lease: the next run waits for it to run out.
+    store.listCloudObjects = list;
+    await pool.query("UPDATE cloud_storage_sweep_cursor SET lease_token = gen_random_uuid(), lease_until = now() + interval '1 minute'");
+    assert.equal((await sweepCloudStorage(pool, store)).skippedRun, true);
+    await pool.query("UPDATE cloud_storage_sweep_cursor SET lease_until = now() - interval '1 second'");
+    const result = await sweepCloudStorage(pool, store);
+    assert.equal(result.skippedRun, false);
+    assert.equal(result.passComplete, true);
+    const cursor = await pool.query("SELECT lease_token, last_pass_completed_at IS NOT NULL AS done FROM cloud_storage_sweep_cursor");
+    assert.deepEqual(cursor.rows, [{ lease_token: null, done: true }]);
+  });
+});
+
+test("a run that runs out of time carries on from the same place next hour", async () => {
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const userId = randomUUID();
+    for (let i = 0; i < 30; i++) await putOrphan(store, userId, `orphan ${i}`);
+    const list = store.listCloudObjects.bind(store);
+    let calls = 0;
+    store.listCloudObjects = async (token, limit) => {
+      calls += 1;
+      // Each page uses up the run's time.
+      if (calls === 1) await new Promise((resolve) => setTimeout(resolve, 60));
+      return list(token, limit);
+    };
+    const first = await sweepCloudStorage(pool, store, { pageSize: 10, budgetMs: 50 });
+    assert.equal(first.scanned, 10);
+    assert.equal(first.passComplete, false);
+    const second = await sweepCloudStorage(pool, store, { pageSize: 10 });
+    assert.equal(second.scanned, 20, "starts after the saved page");
+    assert.equal(second.passComplete, true);
+    assert.equal(store.objects.size, 0);
+  });
+});
+
+test("the sweep handles thousands of files in a handful of database calls", async () => {
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
+  const { storeCloudBlobs } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const kept = Array.from({ length: 200 }, (_, i) => {
+      const data = Buffer.from(`kept ${i}`);
+      return { blobSha: gitObjectSha("blob", data), data };
+    });
+    await storeCloudBlobs(pool, store, { userId, deviceId, files: kept });
+    for (const key of store.objects.keys()) store.modified.set(key, twoHoursAgo());
+    for (let i = 0; i < 4800; i++) await putOrphan(store, userId, `orphan ${i}`);
+
+    // Counts every statement sent on any connection the pool hands out.
+    let queries = 0;
+    const counted = new WeakSet<object>();
+    pool.on("acquire", (client) => {
+      if (counted.has(client)) return;
+      counted.add(client);
+      const clientQuery = client.query.bind(client);
+      client.query = ((...args: Parameters<typeof client.query>) => { queries += 1; return clientQuery(...args); }) as typeof client.query;
+    });
+
+    const result = await sweepCloudStorage(pool, store);
+    assert.equal(result.scanned, 5000);
+    assert.equal(result.queued, 4800);
+    assert.equal(result.purged.deleted, 4800);
+    assert.equal(store.objects.size, 200);
+    assert.ok(queries < 60, `used ${queries} database calls`);
+  });
+});
+
+test("the old clean-up queue moves over, leaving out files still in use", async () => {
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
+  const userId = randomUUID();
+  const live = "a".repeat(40), dead = "b".repeat(40);
+  await withMigratedSchema(async (pool) => {
+    const queue = await pool.query<{ storage_key: string; due: boolean }>(
+      "SELECT storage_key, not_before <= now() AS due FROM cloud_storage_purge_queue ORDER BY storage_key");
+    assert.deepEqual(queue.rows, [{ storage_key: `cloud/${userId}/${dead}`, due: true }, { storage_key: `cloud/${userId}/reserved`, due: false }]);
+    assert.equal((await pool.query("SELECT 1 FROM cloud_purge_queue")).rowCount, 0);
+
+    const store = new MemoryStore();
+    for (const sha of [live, dead]) {
+      await store.put(`cloud/${userId}/${sha}`, Buffer.from(sha));
+      store.modified.set(`cloud/${userId}/${sha}`, twoHoursAgo());
+    }
+    await sweepCloudStorage(pool, store);
+    assert.deepEqual([...store.objects.keys()], [`cloud/${userId}/${live}`]);
+  }, undefined, {
+    name: "20261103180000_cloud_storage_cleanup",
+    run: async (client) => {
+      await client.query("INSERT INTO users (id, clerk_user_id, email) VALUES ($1, $2, $3)", [userId, `cloud-${userId}`, `${userId}@example.com`]);
+      await client.query("INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels) VALUES ($1, $2, 1, ARRAY[]::text[])", [userId, live]);
+      await client.query("INSERT INTO cloud_purge_queue (user_id, blob_sha, queued_at) VALUES ($1, $2, now() - interval '2 hours'), ($1, $3, now() - interval '2 hours')", [userId, live, dead]);
+      await client.query("INSERT INTO cloud_storage_purge_queue (user_id, storage_key) VALUES ($1, $2)", [userId, `cloud/${userId}/reserved`]);
+    }
   });
 });

@@ -471,10 +471,13 @@ export const cloudBlobs = pgTable(
     blobSha: text("blob_sha").notNull(),
     byteSize: integer("byte_size").notNull(),
     labels: text("labels").array().notNull().default(sql`ARRAY[]::text[]`),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    // Where the file is stored; null for files stored before per-upload names (cloud/<user>/<sha>).
+    storageKey: text("storage_key")
   },
   (table) => [
     primaryKey({ columns: [table.userId, table.blobSha] }),
+    uniqueIndex("cloud_blobs_storage_key").on(table.storageKey).where(sql`${table.storageKey} IS NOT NULL`),
     check("cloud_blobs_sha_check", sql`${table.blobSha} ~ '^[0-9a-f]{40}$'`),
     check("cloud_blobs_size_check", sql`${table.byteSize} >= 0`),
     check(
@@ -576,6 +579,7 @@ export const cloudSkillReviews = pgTable(
   ]
 );
 
+/** No longer used: replaced by cloud_storage_purge_queue, and dropped in a later release. */
 export const cloudPurgeQueue = pgTable(
   "cloud_purge_queue",
   {
@@ -587,4 +591,34 @@ export const cloudPurgeQueue = pgTable(
     primaryKey({ columns: [table.userId, table.blobSha] }),
     check("cloud_purge_queue_sha_check", sql`${table.blobSha} ~ '^[0-9a-f]{40}$'`)
   ]
+);
+
+/** Stored files to remove; see netlify/functions/_shared/cloud-storage-purge.ts. */
+export const cloudStoragePurgeQueue = pgTable(
+  "cloud_storage_purge_queue",
+  {
+    userId: uuid("user_id").notNull(),
+    storageKey: text("storage_key").primaryKey(),
+    queuedAt: timestamp("queued_at", { withTimezone: true }).notNull().defaultNow(),
+    notBefore: timestamp("not_before", { withTimezone: true }).notNull().defaultNow(),
+    attempts: integer("attempts").notNull().default(0),
+    lastError: text("last_error")
+  },
+  (table) => [
+    index("cloud_storage_purge_queue_user").on(table.userId, table.queuedAt),
+    index("cloud_storage_purge_queue_due").on(table.notBefore)
+  ]
+);
+
+/** The hourly sweep's single row: scan position and the lease that lets one run work at a time. */
+export const cloudStorageSweepCursor = pgTable(
+  "cloud_storage_sweep_cursor",
+  {
+    id: boolean("id").primaryKey().default(true),
+    continuationToken: text("continuation_token"),
+    leaseToken: uuid("lease_token"),
+    leaseUntil: timestamp("lease_until", { withTimezone: true }),
+    lastPassCompletedAt: timestamp("last_pass_completed_at", { withTimezone: true })
+  },
+  (table) => [check("cloud_storage_sweep_cursor_id_check", sql`${table.id}`)]
 );
