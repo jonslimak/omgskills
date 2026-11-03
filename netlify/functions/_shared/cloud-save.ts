@@ -217,7 +217,10 @@ async function readSkips(db: Database, userId: string): Promise<Record<string, C
   return Object.assign({}, ...result.rows.map((row) => row.skipped));
 }
 
-/** A Mac's report of the skills it didn't save and why: `{ skipped: { [skillKey]: reason } }`. */
+/**
+ * A Mac's report of the skills it didn't save and why: `{ skipped: { [skillKey]: reason } }`.
+ * A folder name that isn't a valid key, or a reason this server doesn't know, drops only that entry.
+ */
 export function parseCloudSkipReport(body: Record<string, unknown>): Record<string, CloudSkipReason> {
   const skipped = body.skipped;
   if (!skipped || typeof skipped !== "object" || Array.isArray(skipped)) {
@@ -227,8 +230,8 @@ export function parseCloudSkipReport(body: Record<string, unknown>): Record<stri
   if (entries.length > MAX_SKIP_REPORT_KEYS) throw new CloudSaveError("invalid_request", "Too many skipped skills");
   const report: Record<string, CloudSkipReason> = {};
   for (const [key, reason] of entries) {
-    if (!SKIP_REASONS.includes(reason as CloudSkipReason)) throw new CloudSaveError("invalid_request", "Unknown skip reason");
-    report[normalizeSkillKey(key)] = reason as CloudSkipReason;
+    if (!SKIP_REASONS.includes(reason as CloudSkipReason)) continue;
+    try { report[normalizeSkillKey(key)] = reason as CloudSkipReason; } catch { continue; }
   }
   return report;
 }
