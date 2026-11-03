@@ -1,0 +1,118 @@
+{
+  "id": "video1-stripe",
+  "title": "How to Connect Stripe to Claude Code",
+  "displayTitle": "Stripe Skills for Claude Code",
+  "subtitle": "5 Official Stripe Skills",
+  "audio": "audio/video1.mp3",
+  "authorLogo": "logos/stripe.png",
+  "authorHandle": "stripe",
+  "audioDurationSec": 130.1,
+  "segments": [
+    {
+      "type": "intro",
+      "startSec": 0
+    },
+    {
+      "type": "skill",
+      "index": 0,
+      "startSec": 21
+    },
+    {
+      "type": "skill",
+      "index": 1,
+      "startSec": 43
+    },
+    {
+      "type": "skill",
+      "index": 2,
+      "startSec": 61
+    },
+    {
+      "type": "skill",
+      "index": 3,
+      "startSec": 73
+    },
+    {
+      "type": "skill",
+      "index": 4,
+      "startSec": 93
+    },
+    {
+      "type": "wrap",
+      "startSec": 109
+    }
+  ],
+  "skills": [
+    {
+      "name": "stripe-best-practices",
+      "icon": "route",
+      "author": "stripe",
+      "stars": "1.8k",
+      "installs": "84k",
+      "tagline": "Stripe's own answers to integration decisions",
+      "points": [
+        "Checkout Sessions vs PaymentIntents",
+        "Connect platform setup",
+        "The recommended pattern, not a guess"
+      ],
+      "url": "omgskills.com/skills/stripe/ai/stripe-best-practices"
+    },
+    {
+      "name": "connect-recommend",
+      "icon": "network",
+      "author": "stripe",
+      "stars": "1.8k",
+      "installs": "212k",
+      "tagline": "Stripe Connect, configured right",
+      "points": [
+        "Charge patterns",
+        "Dashboard access",
+        "Platform & marketplace setup"
+      ],
+      "url": "omgskills.com/skills/stripe/ai/connect-recommend"
+    },
+    {
+      "name": "upgrade-stripe",
+      "icon": "refresh",
+      "author": "stripe",
+      "stars": "1.8k",
+      "installs": "",
+      "tagline": "API upgrades in a single session",
+      "points": [
+        "Version changes, walked through",
+        "SDK updates included"
+      ],
+      "url": "omgskills.com/skills/stripe/ai/upgrade-stripe"
+    },
+    {
+      "name": "create-payment-credential",
+      "icon": "card",
+      "author": "stripe",
+      "stars": "746",
+      "installs": "",
+      "tagline": "What agents can do themselves",
+      "points": [
+        "One-time-use payment credentials",
+        "From a Link wallet",
+        "A card that works exactly once"
+      ],
+      "url": "omgskills.com/skills/stripe/link-cli/create-payment-credential"
+    },
+    {
+      "name": "pay-for-http-request",
+      "icon": "zap",
+      "author": "stripe",
+      "stars": "178",
+      "installs": "",
+      "tagline": "Agents that pay as they go",
+      "points": [
+        "x402 payment standard",
+        "Via the purl command line",
+        "Hit a paid endpoint, pay, continue"
+      ],
+      "url": "omgskills.com/skills/stripe/purl/pay-for-http-request"
+    }
+  ],
+  "brandColor": "#635BFF",
+  "wrapTitle": "5 official Stripe skills"
+}

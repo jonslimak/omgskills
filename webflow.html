@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>omgskills — system before vs after</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #18181b; background: #fff; }
+  main { max-width: 1200px; margin: 0 auto; padding: 32px 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  h2 { margin: 0 0 10px; font-size: 18px; }
+  svg { width: 100%; height: auto; display: block; }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 18px; font-size: 13px; color: #52525b; }
+  .sw { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; border: 1.5px solid; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+  .region { fill: #fafafa; stroke: #e4e4e7; stroke-width: 1.5; }
+  .rlabel { font-size: 12px; font-weight: 700; fill: #71717a; letter-spacing: .06em; }
+  .node { fill: #fff; stroke: #a1a1aa; stroke-width: 1.5; }
+  .node.mac { fill: #fff7ed; stroke: #fb923c; }
+  .node.new { fill: #f0fdf4; stroke: #22c55e; }
+  .node.opt { fill: #fff; stroke: #d4d4d8; stroke-dasharray: 5 4; }
+  .t { font-size: 14px; font-weight: 600; fill: #18181b; }
+  .s { font-size: 11.5px; fill: #71717a; }
+  .e { fill: none; stroke: #52525b; stroke-width: 1.6; marker-end: url(#arr); }
+  .e.mac { stroke: #ea580c; marker-end: url(#arrMac); }
+  .e.new { stroke: #16a34a; marker-end: url(#arrNew); }
+  .e.dash { stroke-dasharray: 5 4; }
+  .el { font-size: 11px; fill: #3f3f46; paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+  .el.mac { fill: #c2410c; }
+  .el.new { fill: #15803d; }
+</style>
+</head>
+<body>
+<main>
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52525b"/></marker>
+      <marker id="arrMac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
+      <marker id="arrNew" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
+    </defs>
+  </svg>
+
+  <div class="grid">
+    <!-- BEFORE -->
+    <section>
+      <h2>Before: Mac-first</h2>
+      <svg viewBox="0 0 540 580" role="img" aria-label="Before architecture">
+        <!-- regions -->
+        <rect class="region" x="6" y="6" width="528" height="216" rx="14"/>
+        <text class="rlabel" x="20" y="28">YOUR COMPUTER</text>
+        <rect class="region" x="6" y="246" width="528" height="214" rx="14"/>
+        <text class="rlabel" x="20" y="268">OMGSKILLS CLOUD</text>
+        <rect class="region" x="6" y="484" width="528" height="88" rx="14"/>
+        <text class="rlabel" x="20" y="506">GITHUB</text>
+
+        <!-- edges -->
+        <path class="e" d="M90,90 L90,278"/>
+        <text class="el" x="98" y="238">browse, manage Sets</text>
+
+        <path class="e" d="M270,90 L270,148"/>
+        <text class="el" x="262" y="124" text-anchor="end">reads skills</text>
+
+        <path class="e dash" d="M300,90 C330,170 390,220 430,278"/>
+        <text class="el" x="352" y="240">search only</text>
+
+        <path class="e mac" d="M400,90 L342,160"/>
+        <text class="el mac" x="376" y="140">writes files</text>
+
+        <path class="e mac" d="M440,90 C440,200 330,300 300,388"/>
+        <text class="el mac" x="378" y="198">Sets, private skills,</text>
+        <text class="el mac" x="378" y="212">uploads installed list</text>
+
+        <path class="e" d="M140,330 C170,370 180,405 198,412"/>
+        <text class="el" x="112" y="378">/app</text>
+
+        <path class="e" d="M342,414 L378,414"/>
+        <path class="e" d="M270,440 L270,512"/>
+        <text class="el" x="278" y="480">gatekeeper (read-only)</text>
+
+        <!-- nodes -->
+        <rect class="node" x="20" y="40" width="140" height="50" rx="10"/>
+        <text class="t" x="34" y="62">Browser</text><text class="s" x="34" y="79">any device</text>
+
+        <rect class="node" x="200" y="40" width="140" height="50" rx="10"/>
+        <text class="t" x="214" y="62">Agent</text><text class="s" x="214" y="79">Claude · Codex</text>
+
+        <rect class="node mac" x="380" y="40" width="140" height="50" rx="10"/>
+        <text class="t" x="394" y="62">Mac app</text><text class="s" x="394" y="79">Swift install engine</text>
+
+        <rect class="node" x="200" y="150" width="140" height="50" rx="10"/>
+        <text class="t" x="214" y="172">Skill folders</text><text class="s" x="214" y="189">~/.claude/skills …</text>
+
+        <rect class="node" x="20" y="280" width="140" height="50" rx="10"/>
+        <text class="t" x="34" y="302">Website + /app</text><text class="s" x="34" y="319">library, Sets UI</text>
+
+        <rect class="node" x="380" y="280" width="140" height="50" rx="10"/>
+        <text class="t" x="394" y="302">Hosted /mcp</text><text class="s" x="394" y="319">public catalog search</text>
+
+        <rect class="node" x="200" y="390" width="140" height="50" rx="10"/>
+        <text class="t" x="214" y="412">API</text><text class="s" x="214" y="429">Sets · access check</text>
+
+        <rect class="node" x="380" y="390" width="140" height="50" rx="10"/>
+        <text class="t" x="394" y="412">Database</text><text class="s" x="394" y="429">Sets, versions, uploads</text>
+
+        <rect class="node" x="200" y="512" width="140" height="50" rx="10"/>
+        <text class="t" x="214" y="534">Skill repos</text><text class="s" x="214" y="551">public + private</text>
+      </svg>
+    </section>
+
+    <!-- AFTER -->
+    <section>
+      <h2>After: web-first + agent</h2>
+      <svg viewBox="0 0 540 580" role="img" aria-label="After architecture">
+        <rect class="region" x="6" y="6" width="528" height="216" rx="14"/>
+        <text class="rlabel" x="20" y="28">YOUR COMPUTER (MAC, WINDOWS, LINUX)</text>
+        <rect class="region" x="6" y="246" width="528" height="214" rx="14"/>
+        <text class="rlabel" x="20" y="268">OMGSKILLS CLOUD</text>
+        <rect class="region" x="6" y="484" width="528" height="88" rx="14"/>
+        <text class="rlabel" x="20" y="506">GITHUB</text>
+
+        <!-- edges -->
+        <path class="e" d="M90,90 L90,278"/>
+        <text class="el" x="98" y="238">browse, manage Sets</text>
+
+        <path class="e" d="M250,90 L250,148"/>
+        <text class="el" x="242" y="124" text-anchor="end">reads skills</text>
+
+        <path class="e new" d="M320,90 C340,130 355,160 378,170"/>
+        <text class="el new" x="346" y="124" text-anchor="end">"install X"</text>
+
+        <path class="e new" d="M380,184 L342,184"/>
+        <text class="el new" x="340" y="214">writes files +</text>
+        <text class="el new" x="340" y="228">install record</text>
+
+        <path class="e new" d="M450,202 L450,278"/>
+        <text class="el new" x="458" y="236">versions,</text>
+        <text class="el new" x="458" y="250">Sets, sign-in</text>
+
+        <path class="e" d="M410,330 C380,370 360,395 342,408"/>
+        <text class="el" x="390" y="372">access check</text>
+
+        <path class="e" d="M140,330 C170,370 180,405 198,412"/>
+        <text class="el" x="112" y="378">/app</text>
+
+        <path class="e" d="M342,424 L378,424"/>
+        <path class="e" d="M270,440 L270,512"/>
+        <text class="el" x="278" y="480">gatekeeper (read-only)</text>
+
+        <!-- nodes -->
+        <rect class="node" x="20" y="40" width="140" height="50" rx="10"/>
+        <text class="t" x="34" y="62">Browser</text><text class="s" x="34" y="79">any device</text>
+
+        <rect class="node new" x="200" y="40" width="140" height="50" rx="10"/>
+        <text class="t" x="214" y="62">Agent</text><text class="s" x="214" y="79">Claude, Codex, Cursor</text>
+
+        <rect class="node opt" x="380" y="40" width="140" height="50" rx="10"/>
+        <text class="t" x="394" y="62">Mac app</text><text class="s" x="394" y="79">optional, frozen</text>
+
+        <rect class="node" x="200" y="150" width="140" height="50" rx="10"/>
+        <text class="t" x="214" y="172">Skill folders</text><text class="s" x="214" y="189">+ install record</text>
+
+        <rect class="node new" x="380" y="150" width="140" height="52" rx="10"/>
+        <text class="t" x="394" y="172">Local MCP</text><text class="s" x="394" y="189">npm · TS install engine</text>
+
+        <rect class="node" x="20" y="280" width="140" height="50" rx="10"/>
+        <text class="t" x="34" y="302">Website + /app</text><text class="s" x="34" y="319">main place to manage</text>
+
+        <rect class="node new" x="380" y="280" width="140" height="50" rx="10"/>
+        <text class="t" x="394" y="302">Hosted /mcp</text><text class="s" x="394" y="319">+ versions · Sets · login</text>
+
+        <rect class="node" x="200" y="390" width="140" height="50" rx="10"/>
+        <text class="t" x="214" y="412">API</text><text class="s" x="214" y="429">Sets · access check</text>
+
+        <rect class="node" x="380" y="390" width="140" height="50" rx="10"/>
+        <text class="t" x="394" y="412">Database</text><text class="s" x="394" y="429">Sets, versions, agents</text>
+
+        <rect class="node" x="200" y="512" width="140" height="50" rx="10"/>
+        <text class="t" x="214" y="534">Skill repos</text><text class="s" x="214" y="551">public + private</text>
+      </svg>
+    </section>
+  </div>
+
+  <div class="legend">
+    <span><span class="sw" style="background:#fff7ed;border-color:#fb923c"></span>Mac-only path today</span>
+    <span><span class="sw" style="background:#f0fdf4;border-color:#22c55e"></span>New or extended</span>
+    <span><span class="sw" style="background:#fff;border-color:#a1a1aa"></span>Unchanged</span>
+    <span><span class="sw" style="background:#fff;border-color:#d4d4d8;border-style:dashed"></span>Optional</span>
+  </div>
+</main>
+</body>
+</html>
