@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>OMGSkills Connected Updates</title>
+    <item>
+      <title>OMGSkills 0.0.31</title>
+      <sparkle:version>31</sparkle:version>
+      <sparkle:shortVersionString>0.0.31</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+      <enclosure url="https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.31/OMGSkills-Connected-0.0.31-31-arm64.zip" sparkle:installationType="application" sparkle:edSignature="HP4E7/13f0v1qNpXohWHaI2SQgPcSBv5cwvL4h5OLu71BhqOxkAmMO9JPIlyGBa19WcJZVd3gQ1DlgVRAVC2Dg==" length="6119248" type="application/octet-stream" />
+    </item>
+  </channel>
+</rss>
