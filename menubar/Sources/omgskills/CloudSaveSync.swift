@@ -128,14 +128,13 @@ struct CloudSaveSync: Sendable {
         case .missingFiles(let hashes): missing = hashes
         }
         let entries = Dictionary(folder.entries.map { ($0.blobSha, $0) }, uniquingKeysWith: { first, _ in first })
-        var held: [CloudSaveFinding] = []
-        for hash in missing {
+        let upload = try missing.map { hash in
             guard let entry = entries[hash] else { throw CloudSaveAPIError.invalidResponse }
-            try Task.checkCancellation()
-            try await pace()
-            do { try await api.uploadFile(entry, confirmSecrets: false, credential: credential) }
-            catch CloudSaveAPIError.needsReview(let findings) { held += findings }
+            return entry
         }
+        try Task.checkCancellation()
+        try await pace()
+        let held = try await api.uploadFiles(upload, credential: credential)
         if !held.isEmpty {
             // Asking to save again records the skill for review on the web now, not on the next pass.
             try await pace()

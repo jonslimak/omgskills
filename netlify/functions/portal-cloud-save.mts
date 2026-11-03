@@ -13,11 +13,13 @@ import {
   listCloudVersions,
   loadCloudVersionPackage,
   markDeletedLocally,
+  parseCloudBlobBatch,
   parseCloudManifest,
   parseCloudSaveSettingsUpdate,
   readCloudSave,
   saveCloudVersion,
   storeCloudBlob,
+  storeCloudBlobs,
   updateCloudSaveSettings
 } from "./_shared/cloud-save.js";
 import { CloudStoreError, createCloudObjectStore, type CloudObjectStore } from "./_shared/cloud-store.js";
@@ -35,6 +37,7 @@ type Route =
   | { action: "skill"; skillKey: string }
   | { action: "settings" }
   | { action: "blob"; blobSha: string }
+  | { action: "blobs" }
   | { action: "versions"; skillKey: string }
   | { action: "deleted-locally"; skillKey: string }
   | { action: "review"; skillKey: string }
@@ -45,6 +48,7 @@ const methods: Record<Route["action"], string[]> = {
   skill: ["DELETE"],
   settings: ["PUT"],
   blob: ["PUT"],
+  blobs: ["POST"],
   versions: ["GET", "POST"],
   "deleted-locally": ["PUT"],
   review: ["POST", "DELETE"],
@@ -57,6 +61,7 @@ function parseRoute(req: Request): Route | null {
   const rest = parts.slice(3);
   if (rest.length === 0) return { action: "state" };
   if (rest.length === 1 && rest[0] === "settings") return { action: "settings" };
+  if (rest.length === 1 && rest[0] === "blobs") return { action: "blobs" };
   if (rest.length === 2 && rest[0] === "blobs") return { action: "blob", blobSha: rest[1] };
   if (rest.length === 3 && rest[0] === "versions" && rest[2] === "package") {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rest[1])
@@ -177,6 +182,18 @@ export async function portalCloudSave(
         });
         return secretJsonResponse(req, result, { status: result.stored ? 201 : 200 });
       }
+      case "blobs": {
+        const { userId, deviceId } = await dependencies.requireDevice(req, "content:write");
+        const declared = Number(req.headers.get("content-length"));
+        // Base64 grows the files by a third; Netlify refuses bodies over 6 MB anyway.
+        if (Number.isFinite(declared) && declared > 6 * 1024 * 1024) {
+          throw new CloudSaveError("file_too_large", "Batch is too large to save");
+        }
+        const files = parseCloudBlobBatch(await requireJsonObject(req));
+        return secretJsonResponse(req, { files: await storeCloudBlobs(dependencies.pool(), dependencies.store(), {
+          userId, deviceId, files
+        }) });
+      }
       case "versions": {
         if (req.method === "GET") {
           const { userId } = await actor(req, dependencies, "sync:write");
@@ -277,6 +294,7 @@ export const config: Config = {
   path: [
     "/api/portal/cloud-save",
     "/api/portal/cloud-save/settings",
+    "/api/portal/cloud-save/blobs",
     "/api/portal/cloud-save/blobs/:blobSha",
     "/api/portal/cloud-save/skills/:skillKey",
     "/api/portal/cloud-save/skills/:skillKey/versions",

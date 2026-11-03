@@ -86,12 +86,30 @@ protocol CloudSaveServing: Sendable {
     func state(credential: StoredDeviceCredential) async throws -> CloudSaveState
     func setEnabled(_ enabled: Bool, credential: StoredDeviceCredential) async throws
     func uploadFile(_ entry: SkillPackageEntry, confirmSecrets: Bool, credential: StoredDeviceCredential) async throws
+    /// Uploads several files, returning what was found in any that were held back for review.
+    func uploadFiles(_ entries: [SkillPackageEntry], credential: StoredDeviceCredential) async throws -> [CloudSaveFinding]
     func saveVersion(_ folder: CloudSaveFolder, credential: StoredDeviceCredential) async throws -> CloudSaveVersionResult
     func markDeletedLocally(key: String, deleted: Bool, credential: StoredDeviceCredential) async throws
     func withdrawReview(key: String, credential: StoredDeviceCredential) async throws
 }
 
+extension CloudSaveServing {
+    func uploadFiles(_ entries: [SkillPackageEntry], credential: StoredDeviceCredential) async throws -> [CloudSaveFinding] {
+        var held: [CloudSaveFinding] = []
+        for entry in entries {
+            try Task.checkCancellation()
+            do { try await uploadFile(entry, confirmSecrets: false, credential: credential) }
+            catch CloudSaveAPIError.needsReview(let findings) { held += findings }
+        }
+        return held
+    }
+}
+
 struct CloudSaveAPI: CloudSaveServing {
+    /// Raw bytes per batch: base64 adds a third, and the server takes at most 4 MB of files per request.
+    static let batchBytes = 3 * 1024 * 1024
+    static let batchFiles = 200
+
     private let origin: URL
     private let session: any DeviceHTTPSession
 
@@ -116,6 +134,45 @@ struct CloudSaveAPI: CloudSaveServing {
         var headers = ["Content-Type": "application/octet-stream"]
         if confirmSecrets { headers["X-Cloud-Save-Confirm"] = "secrets-reviewed" }
         _ = try await send("PUT", path: ["blobs", entry.blobSha], body: entry.data, headers: headers, credential: credential)
+    }
+
+    /// Sends a skill's files in as few requests as fit; a file too big for a batch goes on its own.
+    /// A server without batch upload gets the rest one file at a time.
+    func uploadFiles(_ entries: [SkillPackageEntry], credential: StoredDeviceCredential) async throws -> [CloudSaveFinding] {
+        try requireUploadScope(credential)
+        var held: [CloudSaveFinding] = []
+        var batches: [[SkillPackageEntry]] = []
+        var single: [SkillPackageEntry] = []
+        var bytes = 0
+        for entry in entries {
+            if entry.data.count > Self.batchBytes { single.append(entry); continue }
+            if batches.isEmpty || bytes + entry.data.count > Self.batchBytes || batches[batches.count - 1].count >= Self.batchFiles {
+                batches.append([])
+                bytes = 0
+            }
+            batches[batches.count - 1].append(entry)
+            bytes += entry.data.count
+        }
+        for (index, batch) in batches.enumerated() {
+            try Task.checkCancellation()
+            let files = batch.map { ["blobSha": $0.blobSha, "data": $0.data.base64EncodedString()] }
+            let results: [BatchResult]
+            do {
+                let data = try await send("POST", path: ["blobs"], json: ["files": files], credential: credential)
+                guard let decoded = try? JSONDecoder().decode(BatchBody.self, from: data) else { throw CloudSaveAPIError.invalidResponse }
+                results = decoded.files
+            } catch CloudSaveAPIError.rejected, CloudSaveAPIError.invalidResponse {
+                single += batches[index...].joined()
+                break
+            }
+            held += results.flatMap { $0.findings ?? [] }
+        }
+        for entry in single {
+            try Task.checkCancellation()
+            do { try await uploadFile(entry, confirmSecrets: false, credential: credential) }
+            catch CloudSaveAPIError.needsReview(let findings) { held += findings }
+        }
+        return held
     }
 
     func saveVersion(_ folder: CloudSaveFolder, credential: StoredDeviceCredential) async throws -> CloudSaveVersionResult {
@@ -144,6 +201,8 @@ struct CloudSaveAPI: CloudSaveServing {
     }
 
     private struct SavedBody: Decodable { let created: Bool }
+    private struct BatchResult: Decodable { let findings: [CloudSaveFinding]? }
+    private struct BatchBody: Decodable { let files: [BatchResult] }
     private struct ErrorBody: Decodable {
         let error: String?
         let code: String?

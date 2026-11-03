@@ -453,6 +453,37 @@ struct CloudSaveAPITests {
         }
     }
 
+    private func entry(_ path: String, _ data: Data) -> SkillPackageEntry {
+        SkillPackageEntry(path: path, mode: "100644", data: data, blobSha: SkillIdentityResolver.gitBlobSHA(for: data))
+    }
+
+    @Test func uploadsASkillsFilesInOneRequestAndBigFilesOnTheirOwn() async throws {
+        let small = [entry("a", Data("a".utf8)), entry("b", Data("b".utf8))]
+        let big = entry("big", Data(repeating: 1, count: CloudSaveAPI.batchBytes + 1))
+        let session = CloudSaveHTTPSession([
+            (200, #"{"files":[{"blobSha":"x","status":"stored","labels":[]},{"blobSha":"y","status":"needs_review","findings":[{"rule":"github_token","kind":"GitHub token","line":2}]}]}"#),
+            (201, #"{"stored":true}"#)
+        ])
+        let held = try await CloudSaveAPI(origin: origin, session: session).uploadFiles(small + [big], credential: credential())
+        #expect(held == [.init(rule: "github_token", kind: "GitHub token", line: 2)])
+        let requests = await session.requests
+        #expect(requests.map { "\($0.httpMethod ?? "") \($0.url?.path ?? "")" } == [
+            "POST /api/portal/cloud-save/blobs", "PUT /api/portal/cloud-save/blobs/\(big.blobSha)"
+        ])
+        let sent = try #require(requests[0].httpBody)
+        let body = try #require(JSONSerialization.jsonObject(with: sent) as? [String: Any])
+        let files = try #require(body["files"] as? [[String: String]])
+        #expect(files.map { $0["blobSha"] } == small.map(\.blobSha))
+        #expect(files.map { $0["data"] } == ["YQ==", "Yg=="])
+    }
+
+    @Test func aServerWithoutBatchUploadGetsFilesOneAtATime() async throws {
+        let files = [entry("a", Data("a".utf8)), entry("b", Data("b".utf8))]
+        let session = CloudSaveHTTPSession([(404, #"{"error":"Not found"}"#), (201, #"{"stored":true}"#), (201, #"{"stored":true}"#)])
+        #expect(try await CloudSaveAPI(origin: origin, session: session).uploadFiles(files, credential: credential()).isEmpty)
+        #expect(await session.requests.map { $0.url?.lastPathComponent } == ["blobs"] + files.map(\.blobSha))
+    }
+
     @Test func decodesStateFromServersWithAndWithoutTheSafetyScan() async throws {
         let older = #"{"settings":{"enabled":true,"excludedSkillKeys":[]},"usage":{"bytes":1,"limitBytes":2},"skills":[]}"#
         let session = CloudSaveHTTPSession([(200, older), (503, #"{"error":"Cloud save is not available yet","code":"unavailable"}"#)])

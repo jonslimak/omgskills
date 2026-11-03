@@ -347,6 +347,52 @@ export async function storeCloudBlob(
   });
 }
 
+export const MAX_BLOB_BATCH_FILES = 200;
+
+export type CloudBlobBatchResult =
+  | { blobSha: string; status: "stored" | "exists"; labels: SkillLabel[] }
+  | { blobSha: string; status: "needs_review"; findings: SecretFinding[] };
+
+/** Reads a batch upload: up to MAX_BLOB_BATCH_FILES files, base64, together no larger than one file upload. */
+export function parseCloudBlobBatch(body: Record<string, unknown>): { blobSha: string; data: Uint8Array }[] {
+  const files = body.files;
+  if (!Array.isArray(files) || files.length === 0 || files.length > MAX_BLOB_BATCH_FILES) {
+    throw new CloudSaveError("invalid_request", `Send 1 to ${MAX_BLOB_BATCH_FILES} files`);
+  }
+  let total = 0;
+  return files.map((file) => {
+    if (typeof file !== "object" || file === null || typeof file.data !== "string") {
+      throw new CloudSaveError("invalid_request", "Each file needs blobSha and base64 data");
+    }
+    const data = new Uint8Array(Buffer.from(file.data, "base64"));
+    total += data.byteLength;
+    if (total > CLOUD_SAVE_LIMITS.maximumFileBytes) throw new CloudSaveError("file_too_large", "Batch is too large to save");
+    return { blobSha: requireBlobSha(file.blobSha), data };
+  });
+}
+
+/**
+ * Stores several files in one request, each checked exactly as storeCloudBlob checks one.
+ * A held file is reported in its result and doesn't stop the others; anything else stops the batch.
+ */
+export async function storeCloudBlobs(
+  pool: Pool,
+  store: CloudObjectStore,
+  input: { userId: string; deviceId?: string | null; files: { blobSha: string; data: Uint8Array }[] }
+): Promise<CloudBlobBatchResult[]> {
+  const results: CloudBlobBatchResult[] = [];
+  for (const file of input.files) {
+    try {
+      const stored = await storeCloudBlob(pool, store, { userId: input.userId, deviceId: input.deviceId, ...file });
+      results.push({ blobSha: stored.blobSha, status: stored.stored ? "stored" : "exists", labels: stored.labels });
+    } catch (error) {
+      if (!(error instanceof CloudSaveError) || error.code !== "needs_review") throw error;
+      results.push({ blobSha: file.blobSha, status: "needs_review", findings: (error.heldFiles ?? []) as SecretFinding[] });
+    }
+  }
+  return results;
+}
+
 /**
  * Runs one upload while holding the user's cloud save settings row, so uploads from
  * several requests take turns: the storage limit is checked and the file recorded

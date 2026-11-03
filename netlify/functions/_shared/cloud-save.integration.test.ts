@@ -553,6 +553,56 @@ test("held-file errors from the endpoints list what was found and where", async 
   });
 });
 
+test("a batch upload stores a skill's files in one request and reports a held file without stopping the rest", async () => {
+  const { portalCloudSave } = await import("../portal-cloud-save.mjs");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    const scopes: string[] = [];
+    const dependencies = {
+      available: () => true,
+      pool: () => pool,
+      store: () => store,
+      requireUser: async () => ({ userId, deviceId: null }),
+      requireDevice: async (_req: Request, scope: string) => {
+        scopes.push(scope);
+        return { userId, deviceId };
+      }
+    };
+    const call = (body: unknown) => portalCloudSave(new Request("https://omgskills.com/api/portal/cloud-save/blobs", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: { authorization: `Bearer device_${"a".repeat(43)}` }
+    }), {} as never, dependencies as never);
+    const entry = (data: Buffer) => ({ blobSha: gitObjectSha("blob", data), data: data.toString("base64") });
+    const files = [...v1.map((file) => Buffer.from(file.text)), Buffer.from(`TOKEN=${fakeToken}\n`)];
+
+    const off = await call({ files: files.map(entry) });
+    assert.equal(off.status, 403);
+    assert.equal(store.objects.size, 0);
+
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const first = await call({ files: files.map(entry) });
+    assert.equal(first.status, 200);
+    assert.deepEqual((await first.json()).files.map((result: { status: string }) => result.status), ["stored", "stored", "needs_review"]);
+    assert.equal(store.objects.size, 2, "the held file is not stored");
+
+    const again = await (await call({ files: files.slice(0, 1).map(entry) })).json();
+    assert.equal(again.files[0].status, "exists");
+    assert.deepEqual((await readCloudSave(pool, userId)).usage.bytes, files[0].byteLength + files[1].byteLength);
+
+    const saved = await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    assert.equal(saved.status, "saved");
+
+    assert.equal((await call({ files: [{ ...entry(files[0]), blobSha: "0".repeat(40) }] })).status, 422);
+    assert.equal((await call({ files: [] })).status, 400);
+    assert.equal((await call({ files: [{ blobSha: gitObjectSha("blob", files[0]) }] })).status, 400);
+    const big = Buffer.alloc(CLOUD_SAVE_LIMITS.maximumFileBytes / 2 + 1, 97);
+    assert.equal((await call({ files: [entry(big), entry(Buffer.concat([big, Buffer.from("b")]))] })).status, 413);
+    assert.ok(scopes.every((scope) => scope === "content:write"));
+  });
+});
+
 test("deleting one skill removes every version and its own files, and stops saving it", async () => {
   const { deleteCloudSkills } = await import("./cloud-save.js");
   await withMigratedSchema(async (pool) => {
