@@ -81,9 +81,15 @@ export async function portalGroupDetail(req: Request, _context: Context, depende
             s.name AS "skillName",
             s.description AS "skillDescription",
             s.github_url AS "githubUrl",
-            s.source
+            s.source,
+            src.kind AS "sourceKind",
+            i.metadata_only_reason AS "metadataOnlyReason",
+            i.release_id AS "releaseId",
+            CASE WHEN $2 = 'owner' THEN saved.current_release_id ELSE NULL END AS "savedReleaseId"
           FROM skill_group_items i
           LEFT JOIN synced_skills s ON s.id = i.synced_skill_id
+          LEFT JOIN skill_sources src ON src.id = i.source_id
+          LEFT JOIN cloud_saved_skills saved ON saved.source_id = i.source_id
           WHERE i.group_id = $1
           ORDER BY i.position ASC
         `,

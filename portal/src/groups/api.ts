@@ -131,6 +131,14 @@ export async function removeGroupItem(api: PortalApi, groupId: string, itemId: s
   });
 }
 
+/** Moves a skill shared from cloud save to the owner's newest saved version. */
+export async function updateGroupItem(api: PortalApi, groupId: string, itemId: string) {
+  return api(`/api/portal/groups/${groupId}/items`, {
+    method: "PATCH",
+    body: JSON.stringify({ updateItemId: itemId }),
+  });
+}
+
 export async function reorderGroupItems(api: PortalApi, groupId: string, itemIds: string[]) {
   return api(`/api/portal/groups/${groupId}/items`, {
     method: "PATCH",

@@ -14,6 +14,10 @@ export type SetItem = {
   description: string;
   githubUrl: string | null;
   kind: "synced" | "catalog" | "github" | "private-release";
+  /** Shared from the owner's cloud save: members install the saved version with the Set. */
+  cloudShared?: boolean;
+  /** Owner only: a newer version is saved than the one in the Set. */
+  updateAvailable?: boolean;
 };
 export type PortalSet = {
   id: string;

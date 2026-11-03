@@ -1,6 +1,6 @@
 import type { PortalApi } from "../portal-api";
 import { PortalApiError, isAccessError } from "../api-error";
-import { addSyncedSkillToGroup, createCatalogFavoritesGroup, createFavoritesGroup, createGroup, listOwnedGroups, removeGroupItem, reorderGroupItems } from "../groups/api";
+import { addSyncedSkillToGroup, createCatalogFavoritesGroup, createFavoritesGroup, createGroup, listOwnedGroups, removeGroupItem, reorderGroupItems, updateGroupItem } from "../groups/api";
 import type { GroupedSyncedSkill } from "../synced-skill-grouping";
 import { isMember, type MembershipResult, type PortalSet } from "../app/model";
 import { loadSetData } from "./data";
@@ -13,7 +13,8 @@ export type MembershipCommand =
   | { kind: "remove-favorite"; catalogId?: string; skillId?: string }
   | { kind: "create-selected"; name: string; skills: GroupedSyncedSkill[] }
   | { kind: "remove-item"; id: string; itemId: string }
-  | { kind: "reorder"; id: string; itemIds: string[] };
+  | { kind: "reorder"; id: string; itemIds: string[] }
+  | { kind: "update-item"; id: string; itemId: string };
 const message = (error: unknown) => error instanceof Error ? error.message : "Could not update this skill.";
 const uncertain = (error: unknown) => !(error instanceof PortalApiError) || error.status >= 500;
 function checkSignal(signal: AbortSignal) { if (signal.aborted) throw new DOMException("Account changed", "AbortError"); }
@@ -148,6 +149,12 @@ export async function reorderMembership(api: PortalApi, id: string, itemIds: str
   if (!Array.isArray(value?.itemIds) || value.itemIds.length !== itemIds.length || value.itemIds.some((item, index) => item !== itemIds[index])) {
     throw new Error("Unexpected order response. Refresh before trying again.");
   }
+}
+
+export async function updateMembershipItem(api: PortalApi, id: string, itemId: string, signal: AbortSignal) {
+  const value = await updateGroupItem(api, id, itemId) as { itemId?: unknown; releaseId?: unknown };
+  checkSignal(signal);
+  if (value?.itemId !== itemId || typeof value.releaseId !== "string") throw new Error("Unexpected update response. Refresh before trying again.");
 }
 
 export async function createSelectedSet(api: PortalApi, name: string, skills: GroupedSyncedSkill[], signal: AbortSignal): Promise<MembershipResult> {

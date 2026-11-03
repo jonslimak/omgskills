@@ -1378,6 +1378,7 @@ test("adding your own skill to a Set shares its saved version; Update Set moves 
 
     const added = await inTransaction((client) => addGroupItemWithClient(client, group, { kind: "synced", name: "notes" }, cloud("notes")));
     assert.equal((await item(added.itemId)).release_id, first.skill.currentVersion.id);
+    assert.equal((await readCloudSave(pool, owner.userId)).skills.find((skill) => skill.key === "notes")?.setCount, 1);
     // Not saved: the Set gets the name only, as before.
     const unsaved = await inTransaction((client) => addGroupItemWithClient(client, group, { kind: "synced", name: "other" }, cloud("other")));
     assert.deepEqual(await item(unsaved.itemId), { source_id: null, release_id: null, reason: "synced_local_only" });

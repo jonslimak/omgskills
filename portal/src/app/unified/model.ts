@@ -41,6 +41,9 @@ export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
   installed?: GroupedSyncedSkill;
   setItemId?: string;
   setItemKind?: PortalSet["items"][number]["kind"];
+  /** The Set shares the owner's cloud-saved version of this skill. */
+  setItemCloudShared?: boolean;
+  setItemUpdateAvailable?: boolean;
 };
 
 export function inventorySummary(skill: SyncedSkill) {
@@ -338,6 +341,8 @@ export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[], catalog: 
     const publicSkill = item.kind === "catalog" && item.catalogSkillId ? byId.get(item.catalogSkillId) : undefined;
     const installation = installed?.installed?.sourceSkills.find(skill => skill.id === item.syncedSkillId);
     return { key: `set-item:${item.id}`, setItemId: item.id, setItemKind: item.kind, name: publicSkill?.name || item.name,
+      ...(item.cloudShared ? { setItemCloudShared: true } : {}),
+      ...(item.updateAvailable ? { setItemUpdateAvailable: true } : {}),
       catalogId: item.catalogSkillId ?? undefined,
       description: publicSkill?.description || item.description || installed?.description || "",
       githubUrl: publicSkill?.githubUrl || item.githubUrl || installed?.githubUrl || null,
@@ -347,6 +352,12 @@ export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[], catalog: 
         ? groupSyncedSkills([installation])[0] : installed?.installed };
   });
 }
+/** How a skill shared from its owner's cloud save reads in a Set. */
+export function cloudSharedLabel(skill: SkillDisplay, role: PortalSet["role"] | undefined) {
+  if (role === "owner") return skill.setItemUpdateAvailable ? "Shared from your cloud save · newer version saved" : "Shared from your cloud save";
+  return "Private skill · installs with the Set";
+}
+
 export function isFavorite(data: PortalData, skill: SkillDisplay) {
   return data.sets.some(set => set.isFavorites && set.role === "owner" && (
     (skill.installed && isMember(set, skill.installed)) ||
