@@ -73,6 +73,15 @@ test("a Mac's reason for not saving a skill wins over guessing", () => {
   assert.deepEqual(off.map(row => row.status), ["off"]);
 });
 
+test("two folders with the same skill name show which folder is which", () => {
+  const rows = cloudSkillRows(state(), [
+    installed("open-gstack-browser", { installationFolder: "open-gstack-browser" }),
+    installed("open-gstack-browser", { installationFolder: "connect-chrome" }),
+    installed("Notes", { installationFolder: "notes" }),
+  ]);
+  assert.deepEqual(rows.map(row => row.name), ["Notes", "open-gstack-browser", "open-gstack-browser (folder connect-chrome)"]);
+});
+
 test("a 503 means cloud save isn't switched on yet; other errors surface", async () => {
   assert.deepEqual(await loadCloudSave(async () => { throw new PortalApiError("off", 503); }), { status: "unavailable" });
   await assert.rejects(loadCloudSave(async () => { throw new PortalApiError("nope", 500); }), /nope/);

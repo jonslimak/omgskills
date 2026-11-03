@@ -99,6 +99,16 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
   const reviews = new Map(state.needsReview.map(review => [review.key, review]));
   const excluded = new Set(state.settings.excludedSkillKeys);
   const keys = [...new Set([...names.keys(), ...saved.keys(), ...reviews.keys()])];
+  // Two folders can hold skills with the same name; they're saved apart, so say which folder is which.
+  const nameCounts = new Map<string, number>();
+  for (const key of keys) {
+    const name = names.get(key) ?? key;
+    nameCounts.set(name, (nameCounts.get(name) ?? 0) + 1);
+  }
+  const label = (key: string) => {
+    const name = names.get(key) ?? key;
+    return (nameCounts.get(name) ?? 0) > 1 && cloudSkillKey(name) !== key ? `${name} (folder ${key})` : name;
+  };
   return keys.map((key): CloudSkillRow => {
     const copy = saved.get(key);
     const review = reviews.get(key);
@@ -109,7 +119,7 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
       : state.skipped[key] ?? (fromLibrary.has(key) ? "library" : "waiting");
     return {
       key,
-      name: names.get(key) ?? key,
+      name: label(key),
       status,
       versionCount: copy?.versionCount ?? 0,
       savedAt: copy?.currentVersion.savedAt ?? null,
