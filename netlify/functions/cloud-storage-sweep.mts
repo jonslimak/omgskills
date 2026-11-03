@@ -10,8 +10,8 @@ export default async () => {
     const result = await sweepCloudStorage(getPgPool(), createCloudObjectStore());
     console.info("cloud storage sweep", result);
     return new Response(null, { status: 204 });
-  } catch {
-    console.error("cloud storage sweep failed; retrying next hour");
+  } catch (error) {
+    console.error("cloud storage sweep failed; retrying next hour", { error: error instanceof Error ? error.message : String(error) });
     return new Response(null, { status: 500 });
   }
 };
