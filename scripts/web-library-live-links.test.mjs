@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import http from "node:http";
 import test from "node:test";
 import { runInNewContext } from "node:vm";
-import { createLiveLinkVerifier } from "./web-library-live-links.mjs";
+import { createLiveLinkVerifier, sampleLinks } from "./web-library-live-links.mjs";
 import { skillPathForId } from "./web-library-skill-urls.mjs";
 
 const origin = "https://preview.example";
@@ -227,4 +227,27 @@ test("llms.txt example comes from generated pages even when an old example remai
     includedSkills: [generated],
   });
   assert.equal(result, generated);
+});
+
+test("a page with thousands of links is checked by an even, repeatable spread", async () => {
+  const paths = Array.from({ length: 4128 }, (_, i) => `/skills/s-${i}/`);
+  const spread = sampleLinks(paths, 250);
+  assert.equal(spread.length, 250);
+  assert.equal(new Set(spread).size, 250);
+  assert.equal(spread[0], paths[0]);
+  assert.ok(spread.at(-1) >= paths[4100] || paths.indexOf(spread.at(-1)) > 4100);
+  assert.deepEqual(sampleLinks(paths, 250), spread);
+  assert.deepEqual(sampleLinks(paths.slice(0, 10), 250), paths.slice(0, 10));
+
+  const calls = [];
+  const lines = [];
+  const verify = createLiveLinkVerifier({
+    origin: "https://example.test",
+    fetchLive: async (url) => { calls.push(url); return new Response(null, { status: 200 }); },
+    log: (line) => lines.push(line),
+    sleep: async () => {},
+  });
+  await verify(paths, { label: "/skills/", acceptStatus: (status) => status === 200 });
+  assert.equal(calls.length, 250);
+  assert.match(lines[0], /links 0\/250 \(spread of 4128\)/);
 });
