@@ -56,10 +56,12 @@ async function withMigratedSchema(run: (pool: Pool) => Promise<void>, maxConnect
 
 class MemoryStore implements CloudObjectStore {
   readonly objects = new Map<string, Buffer>();
+  readonly modified = new Map<string, Date>();
   failingPuts = new Set<string>();
   async put(key: string, body: Uint8Array) {
-    if (this.failingPuts.has(key)) throw new CloudStoreError("unavailable", "Storage is unavailable");
+    if ([...this.failingPuts].some((prefix) => key === prefix || key.startsWith(`${prefix}/`))) throw new CloudStoreError("unavailable", "Storage is unavailable");
     this.objects.set(key, Buffer.from(body));
+    this.modified.set(key, new Date());
   }
   async get(key: string) {
     const object = this.objects.get(key);
@@ -68,8 +70,13 @@ class MemoryStore implements CloudObjectStore {
   }
   failing = new Set<string>();
   async deleteMany(keys: string[]) {
-    for (const key of keys) if (!this.failing.has(key)) this.objects.delete(key);
+    for (const key of keys) if (!this.failing.has(key)) { this.objects.delete(key); this.modified.delete(key); }
     return keys.filter((key) => this.failing.has(key));
+  }
+  async listCloudObjects(token: string | null, limit: number) {
+    const keys = [...this.objects.keys()].sort().filter((key) => !token || key > token);
+    const page = keys.slice(0, limit);
+    return { objects: page.map((key) => ({ key, modifiedAt: this.modified.get(key)! })), next: keys.length > limit ? page.at(-1)! : null };
   }
 }
 
@@ -655,7 +662,7 @@ test("failed batches wait for in-flight uploads before cleanup", async () => {
     const started = new Promise<void>((resolve) => { slowStarted = resolve; });
     const failed = new Promise<void>((resolve) => { failureStarted = resolve; });
     store.put = async (key, data) => {
-      if (key === cloudBlobKey(userId, files[0].blobSha)) {
+      if (key.startsWith(`${cloudBlobKey(userId, files[0].blobSha)}/`)) {
         slowStarted();
         await slowGate;
         return originalPut(key, data);
@@ -730,10 +737,10 @@ test("deleting one skill removes every version and its own files, and stops savi
     assert.deepEqual(state.settings, { enabled: true, excludedSkillKeys: ["notes"] });
     assert.equal(state.usage.bytes, before - result.freedBytes);
     // SKILL.md v1 is shared with "other" and stays; run.sh and SKILL.md v2 go.
-    const blob = (text: string) => `cloud/${userId}/${gitObjectSha("blob", Buffer.from(text))}`;
-    assert.ok(store.objects.has(blob(v1[0].text)));
-    assert.ok(!store.objects.has(blob(v1[1].text)));
-    assert.ok(!store.objects.has(blob(v2[0].text)));
+    const hasBlob = (text: string) => [...store.objects.keys()].some((key) => key.startsWith(`cloud/${userId}/${gitObjectSha("blob", Buffer.from(text))}/`));
+    assert.ok(hasBlob(v1[0].text));
+    assert.ok(!hasBlob(v1[1].text));
+    assert.ok(!hasBlob(v2[0].text));
     await rejects(listCloudVersions(pool, { userId, skillKey: "notes" }), "not_found");
     await rejects(saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) }), "excluded");
   });
@@ -789,7 +796,8 @@ test("files that fail to delete are retried, and a file stored again is never re
     await uploadAll(pool, store, userId, [v1[0]]);
     store.failing = new Set();
     assert.equal(await drainCloudPurge(pool, store, userId), 0);
-    assert.deepEqual([...store.objects.keys()], [`cloud/${userId}/${gitObjectSha("blob", Buffer.from(v1[0].text))}`]);
+    assert.equal(store.objects.size, 1);
+    assert.ok([...store.objects.keys()][0].startsWith(`cloud/${userId}/${gitObjectSha("blob", Buffer.from(v1[0].text))}/`));
   });
 });
 
@@ -901,6 +909,118 @@ test("deleting one skill keeps files just uploaded for another skill", async () 
     await deleteCloudSkills(pool, store, { userId, skillKey: "alpha" });
     const saved = await saveCloudVersion(pool, { userId, deviceId, skillKey: "beta", files: manifest(beta) });
     assert.equal(saved.status, "saved");
-    assert.ok(store.objects.has(`cloud/${userId}/${gitObjectSha("blob", Buffer.from(beta[0].text))}`));
+    assert.ok([...store.objects.keys()].some((key) => key.startsWith(`cloud/${userId}/${gitObjectSha("blob", Buffer.from(beta[0].text))}/`)));
+  });
+});
+
+test("legacy files still load and delete", async () => {
+  const { cloudBlobKey } = await import("./cloud-store.js");
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    for (const file of v1) {
+      const data = Buffer.from(file.text), sha = gitObjectSha("blob", data);
+      await store.put(cloudBlobKey(userId, sha), data);
+      await pool.query("INSERT INTO cloud_blobs (user_id, blob_sha, byte_size, labels) VALUES ($1, $2, $3, ARRAY[]::text[])", [userId, sha, data.length]);
+    }
+    const saved = await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    assert.equal(saved.status, "saved");
+    if (saved.status !== "saved") throw new Error("save failed");
+    const loaded = await loadCloudVersionPackage(pool, store, { userId, releaseId: saved.skill.currentVersion.id });
+    assert.deepEqual(loaded.package.entries.map((entry) => entry.data.toString()), v1.map((file) => file.text));
+    await deleteCloudSkills(pool, store, { userId });
+    assert.equal(store.objects.size, 0);
+  });
+});
+
+test("a late delete only removes the old upload, never its replacement", async () => {
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    const oldKeys = [...store.objects.keys()];
+    store.failing = new Set(oldKeys);
+    await deleteCloudSkills(pool, store, { userId, skillKey: "notes" });
+    await updateCloudSaveSettings(pool, userId, { excludedSkillKeys: [] });
+    await uploadAll(pool, store, userId, v1);
+    const saved = await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    assert.equal(saved.status, "saved");
+    const newKeys = [...store.objects.keys()].filter((key) => !oldKeys.includes(key));
+    assert.equal(newKeys.length, 2);
+    store.failing.clear();
+    await store.deleteMany(oldKeys);
+    assert.ok(newKeys.every((key) => store.objects.has(key)));
+    if (saved.status !== "saved") throw new Error("save failed");
+    const loaded = await loadCloudVersionPackage(pool, store, { userId, releaseId: saved.skill.currentVersion.id });
+    assert.equal(loaded.package.entries.length, 2);
+  });
+});
+
+test("the sweep removes a late upload and keeps saved files, then delete-all leaves nothing", async () => {
+  const { cloudBlobKey } = await import("./cloud-store.js");
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    const lateData = Buffer.from("late upload");
+    const lateKey = `${cloudBlobKey(userId, gitObjectSha("blob", lateData))}/${randomUUID()}`;
+    await store.put(lateKey, lateData);
+    for (const key of store.objects.keys()) store.modified.set(key, new Date(Date.now() - 7200000));
+    const result = await sweepCloudStorage(pool, store);
+    assert.equal(result.deleted, 1);
+    assert.equal(store.objects.has(lateKey), false);
+    assert.equal(store.objects.size, 2);
+    await deleteCloudSkills(pool, store, { userId });
+    assert.equal(store.objects.size, 0);
+  });
+});
+
+test("an upload during a sweep is kept and later pages are processed", async () => {
+  const { cloudBlobKey } = await import("./cloud-store.js");
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    for (let i = 0; i < 25; i++) {
+      const data = Buffer.from(`orphan ${i}`);
+      const key = `${cloudBlobKey(userId, gitObjectSha("blob", data))}/${randomUUID()}`;
+      await store.put(key, data);
+      store.modified.set(key, new Date(Date.now() - 7200000));
+    }
+    let added = false;
+    const list = store.listCloudObjects.bind(store);
+    store.listCloudObjects = async (token, limit) => {
+      const page = await list(token, limit);
+      if (!added) { added = true; await uploadAll(pool, store, userId, v1); }
+      return page;
+    };
+    await sweepCloudStorage(pool, store);
+    await sweepCloudStorage(pool, store);
+    assert.equal(store.objects.size, 2);
+    assert.equal((await pool.query("SELECT count(*)::int AS count FROM cloud_blobs WHERE user_id = $1", [userId])).rows[0].count, 2);
+  });
+});
+
+test("the sweep removes untracked files after an account is gone", async () => {
+  const { cloudBlobKey } = await import("./cloud-store.js");
+  const { sweepCloudStorage } = await import("./cloud-storage-sweep.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const userId = randomUUID(), data = Buffer.from("leftover");
+    const key = `${cloudBlobKey(userId, gitObjectSha("blob", data))}/${randomUUID()}`;
+    await store.put(key, data);
+    store.modified.set(key, new Date(Date.now() - 7200000));
+    await sweepCloudStorage(pool, store);
+    assert.equal(store.objects.size, 0);
   });
 });
