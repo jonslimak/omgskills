@@ -15,7 +15,11 @@ export type CloudSaveState = {
     currentVersion: { id: string; savedAt: string; fileCount: number; totalBytes: number; labels?: CloudLabel[] };
   }[];
   needsReview: { key: string; files: { path: string; findings: CloudFinding[] }[]; confirmed: boolean; updatedAt: string }[];
+  /** Why a Mac didn't save each skill on its last pass. */
+  skipped: Record<string, CloudSkipReason>;
 };
+
+export type CloudSkipReason = "library" | "links" | "too_large" | "unreadable" | "failed";
 
 export type CloudSaveView =
   | { status: "loading" }
@@ -28,7 +32,7 @@ const base = "/api/portal/cloud-save";
 export async function loadCloudSave(api: PortalApi, signal?: AbortSignal): Promise<CloudSaveView> {
   try {
     const state = await api<CloudSaveState>(base, { signal, cache: "no-store" });
-    return { status: "ready", state: { ...state, needsReview: state.needsReview ?? [] } };
+    return { status: "ready", state: { ...state, needsReview: state.needsReview ?? [], skipped: state.skipped ?? {} } };
   } catch (error) {
     if (error instanceof PortalApiError && error.status === 503) return { status: "unavailable" };
     throw error;
@@ -68,7 +72,8 @@ export function isDeletingAllCloudSkills(selection: CloudDeleteSelection): boole
 export type CloudSkillRow = {
   key: string;
   name: string;
-  status: "saved" | "deleted" | "review" | "confirmed" | "excluded" | "library" | "waiting" | "off";
+  status: "saved" | "deleted" | "review" | "confirmed" | "excluded" | "library" | "waiting" | "off"
+    | "links" | "too_large" | "unreadable" | "failed";
   versionCount: number;
   savedAt: string | null;
   labels: CloudLabel[];
@@ -78,6 +83,7 @@ export type CloudSkillRow = {
 /**
  * One row per skill: every skill seen on a Mac, plus any saved skill no longer there.
  * Library and Set installs aren't uploaded while unchanged, since they can be fetched again.
+ * A Mac's own reason for not saving a skill wins over guessing from the inventory.
  */
 export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]): CloudSkillRow[] {
   const names = new Map<string, string>();
@@ -99,8 +105,8 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
     const status: CloudSkillRow["status"] = excluded.has(key) ? "excluded"
       : review ? (review.confirmed ? "confirmed" : "review")
       : copy ? (copy.deletedLocallyAt ? "deleted" : "saved")
-      : fromLibrary.has(key) ? "library"
-      : state.settings.enabled ? "waiting" : "off";
+      : !state.settings.enabled ? (fromLibrary.has(key) ? "library" : "off")
+      : state.skipped[key] ?? (fromLibrary.has(key) ? "library" : "waiting");
     return {
       key,
       name: names.get(key) ?? key,
@@ -114,7 +120,8 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
 }
 
 const statusOrder: Record<CloudSkillRow["status"], number> = {
-  review: 0, confirmed: 1, saved: 2, deleted: 3, waiting: 4, off: 5, library: 6, excluded: 7,
+  review: 0, confirmed: 1, saved: 2, deleted: 3, failed: 4, links: 5, too_large: 6, unreadable: 7, waiting: 8, off: 9,
+  library: 10, excluded: 11,
 };
 
 export const statusText: Record<CloudSkillRow["status"], string> = {
@@ -126,6 +133,10 @@ export const statusText: Record<CloudSkillRow["status"], string> = {
   library: "From the library, not uploaded",
   waiting: "Not saved yet",
   off: "Not saved",
+  links: "Not saved: links to files outside the skill",
+  too_large: "Not saved: too large",
+  unreadable: "Not saved: couldn't be read",
+  failed: "Not saved yet: the last try failed, trying again",
 };
 
 export const labelText: Record<CloudLabel, string> = {

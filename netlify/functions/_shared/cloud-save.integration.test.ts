@@ -1231,3 +1231,46 @@ test("the old clean-up queue moves over, leaving out files still in use", async 
     }
   });
 });
+
+test("each Mac reports why it didn't save skills, and its next report replaces the last", async () => {
+  const { portalCloudSave } = await import("../portal-cloud-save.mjs");
+  await withMigratedSchema(async (pool) => {
+    const { userId, deviceId } = await createUser(pool);
+    const other = (await pool.query<{ id: string }>(
+      `INSERT INTO device_tokens (user_id, token_hash, device_name, expires_at, granted_scopes)
+       VALUES ($1, $2, 'Mac 2', now() + interval '1 day', ARRAY['sync:write', 'self:revoke', 'content:read', 'content:write']) RETURNING id`,
+      [userId, `hash-2-${userId}`]
+    )).rows[0].id;
+    let mac = deviceId;
+    const dependencies = {
+      available: () => true,
+      pool: () => pool,
+      store: () => new MemoryStore(),
+      requireUser: async () => ({ userId, deviceId: null }),
+      requireDevice: async () => ({ userId, deviceId: mac })
+    };
+    const device = { authorization: `Bearer device_${"a".repeat(43)}` };
+    const report = (skipped: unknown, headers: Record<string, string> = device) =>
+      portalCloudSave(new Request("https://omgskills.com/api/portal/cloud-save/skipped",
+        { method: "PUT", body: JSON.stringify({ skipped }), headers }), {} as never, dependencies as never);
+
+    assert.equal((await report({ "Ship": "links", pdf: "library", big: "too_large" })).status, 204);
+    mac = other;
+    assert.equal((await report({ pdf: "failed" })).status, 204);
+    assert.deepEqual((await readCloudSave(pool, userId)).skipped, { ship: "links", pdf: "failed", big: "too_large" });
+
+    mac = deviceId;
+    assert.equal((await report({ ship: "links" })).status, 204);
+    assert.deepEqual((await readCloudSave(pool, userId)).skipped, { pdf: "failed", ship: "links" });
+
+    assert.equal((await report({ ship: "because" })).status, 400);
+    assert.equal((await report(["ship"])).status, 400);
+    assert.equal((await report({ "../x": "links" })).status, 400);
+    assert.equal((await report(Object.fromEntries(Array.from({ length: 2001 }, (_, i) => [`s${i}`, "links"])))).status, 400);
+    // A web session can't report for a Mac.
+    const web = await portalCloudSave(new Request("https://omgskills.com/api/portal/cloud-save/skipped",
+      { method: "PUT", body: JSON.stringify({ skipped: {} }) }), {} as never,
+      { ...dependencies, requireDevice: async () => { throw new Response("no", { status: 401 }); } } as never);
+    assert.equal(web.status, 401);
+  });
+});

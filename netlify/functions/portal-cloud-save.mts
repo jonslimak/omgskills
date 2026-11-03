@@ -15,6 +15,8 @@ import {
   parseCloudManifest,
   parseCloudSaveSettingsUpdate,
   readCloudSave,
+  parseCloudSkipReport,
+  reportCloudSkips,
   saveCloudVersion,
   storeCloudBlob,
   storeCloudBlobs,
@@ -36,6 +38,7 @@ type Route =
   | { action: "settings" }
   | { action: "blob"; blobSha: string }
   | { action: "blobs" }
+  | { action: "skipped" }
   | { action: "versions"; skillKey: string }
   | { action: "deleted-locally"; skillKey: string }
   | { action: "review"; skillKey: string }
@@ -47,6 +50,7 @@ const methods: Record<Route["action"], string[]> = {
   settings: ["PUT"],
   blob: ["PUT"],
   blobs: ["POST"],
+  skipped: ["PUT"],
   versions: ["GET", "POST"],
   "deleted-locally": ["PUT"],
   review: ["POST", "DELETE"],
@@ -60,6 +64,7 @@ function parseRoute(req: Request): Route | null {
   if (rest.length === 0) return { action: "state" };
   if (rest.length === 1 && rest[0] === "settings") return { action: "settings" };
   if (rest.length === 1 && rest[0] === "blobs") return { action: "blobs" };
+  if (rest.length === 1 && rest[0] === "skipped") return { action: "skipped" };
   if (rest.length === 2 && rest[0] === "blobs") return { action: "blob", blobSha: rest[1] };
   if (rest.length === 3 && rest[0] === "versions" && rest[2] === "package") {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rest[1])
@@ -186,6 +191,12 @@ export async function portalCloudSave(
           userId, deviceId, files
         }) });
       }
+      case "skipped": {
+        const { userId, deviceId } = await dependencies.requireDevice(req, "content:write");
+        const skipped = parseCloudSkipReport(await requireJsonObject(req));
+        await reportCloudSkips(dependencies.pool(), { userId, deviceId, skipped });
+        return new Response(null, { status: 204, headers: corsHeaders(req) });
+      }
       case "versions": {
         if (req.method === "GET") {
           const { userId } = await actor(req, dependencies, "sync:write");
@@ -287,6 +298,7 @@ export const config: Config = {
     "/api/portal/cloud-save",
     "/api/portal/cloud-save/settings",
     "/api/portal/cloud-save/blobs",
+    "/api/portal/cloud-save/skipped",
     "/api/portal/cloud-save/blobs/:blobSha",
     "/api/portal/cloud-save/skills/:skillKey",
     "/api/portal/cloud-save/skills/:skillKey/versions",

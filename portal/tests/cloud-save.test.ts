@@ -13,6 +13,7 @@ const state = (overrides: Partial<CloudSaveState> = {}): CloudSaveState => ({
   usage: { bytes: 0, limitBytes: 1024 ** 3 },
   skills: [],
   needsReview: [],
+  skipped: {},
   ...overrides,
 });
 
@@ -51,6 +52,25 @@ test("every skill gets one row with an honest status, reviews first", () => {
 test("with cloud save off, unsaved skills read as not saved", () => {
   const rows = cloudSkillRows(state({ settings: { enabled: false, excludedSkillKeys: [] } }), [installed("notes")]);
   assert.deepEqual(rows.map(row => row.status), ["off"]);
+});
+
+test("a Mac's reason for not saving a skill wins over guessing", () => {
+  const rows = cloudSkillRows(state({
+    skills: [saved("notes")],
+    skipped: { ship: "links", pdf: "failed", huge: "too_large", odd: "unreadable", spec: "library", notes: "failed" },
+  }), [
+    installed("ship", { catalogSkillId: "garrytan/gstack:ship", isLocalOnly: false }),
+    installed("pdf", { catalogSkillId: "anthropics/skills:pdf", isLocalOnly: false }),
+    installed("huge"), installed("odd"), installed("spec"), installed("notes"), installed("fresh"),
+  ]);
+  assert.deepEqual(rows.map(row => [row.key, row.status]), [
+    ["notes", "saved"], ["pdf", "failed"], ["ship", "links"], ["huge", "too_large"], ["odd", "unreadable"],
+    ["fresh", "waiting"], ["spec", "library"],
+  ]);
+  // With cloud save off, nothing is being saved, so old reasons don't show.
+  const off = cloudSkillRows(state({ settings: { enabled: false, excludedSkillKeys: [] }, skipped: { ship: "links" } }),
+    [installed("ship")]);
+  assert.deepEqual(off.map(row => row.status), ["off"]);
 });
 
 test("a 503 means cloud save isn't switched on yet; other errors surface", async () => {
