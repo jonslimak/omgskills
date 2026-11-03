@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><!-- sparkle-sign-warning:
+IMPORTANT: This file was signed by Sparkle. Any modifications to this file requires re-signing this file with generate_appcast or sign_update! The signed signature will be embedded at the end of this file.
+--><rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
   <channel>
     <title>OMGSkills Connected Updates</title>
     <item>
@@ -8,7 +9,10 @@
       <sparkle:shortVersionString>0.0.31</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
       <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-      <enclosure url="https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.31/OMGSkills-Connected-0.0.31-31-arm64.zip" sparkle:installationType="application" sparkle:edSignature="HP4E7/13f0v1qNpXohWHaI2SQgPcSBv5cwvL4h5OLu71BhqOxkAmMO9JPIlyGBa19WcJZVd3gQ1DlgVRAVC2Dg==" length="6119248" type="application/octet-stream" />
+      <enclosure url="https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.31/OMGSkills-Connected-0.0.31-31-arm64.zip" sparkle:installationType="application" sparkle:edSignature="cZlpzoT0FlUf8mkrjb46NxK/SEb/vEXBKnV7XT0qqyFMLc8oHv2uZghzFmFheqKaVM9D0iWLCl/GOvoY9zepDg==" length="6041310" type="application/octet-stream"></enclosure>
     </item>
   </channel>
-</rss>
+</rss><!-- sparkle-signatures:
+edSignature: fRDMjY7cH4bfqzuZf+E5VKSFA5kYkzxWQI9UVIb/Z71PwAhUswH+np88e+BQ3W7IQwA48xE2g5odrp7RwGk4CQ==
+length: 1127
+-->

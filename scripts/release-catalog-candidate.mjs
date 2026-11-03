@@ -170,7 +170,7 @@ function inspect(app, c, p, stapled = false) {
 
 function cleanZip(app, destination) {
   assert.ok(!existsSync(destination), 'Refuse to overwrite an archive');
-  run('/usr/bin/ditto', ['-c', '-k', '--norsrc', '--keepParent', app, destination]);
+  run('/usr/bin/ditto', ['-c', '-k', '--norsrc', '--noextattr', '--keepParent', app, destination]);
   const entries = run('/usr/bin/unzip', ['-Z1', destination]).trim().split('\n');
   assert.ok(entries.every(path => path.startsWith(`${appName}/`) && !path.split('/').some(x => ['..', '__MACOSX'].includes(x) || x.startsWith('._'))));
 }
