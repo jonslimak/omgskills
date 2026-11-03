@@ -1,8 +1,19 @@
 import { consumeVerificationBody } from "./verification-fetch.mjs";
 
+/**
+ * An even spread of a page's links, always the same ones for the same page. The build already
+ * checks every generated link exists offline; the live sweep only has to show the deploy serves
+ * them, so a page with thousands of links (the /skills/ index) doesn't hold every deploy up.
+ */
+export function sampleLinks(paths, limit) {
+  if (paths.length <= limit) return paths;
+  return Array.from({ length: limit }, (_, i) => paths[Math.floor((i * paths.length) / limit)]);
+}
+
 export function createLiveLinkVerifier({
   origin, fetchLive, log = console.log,
   sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds)),
+  maxLinksPerPage = 250,
 }) {
   // Cache status only: callers still apply their own rules, and content checks fetch afresh.
   const statusByUrl = new Map();
@@ -21,13 +32,14 @@ export function createLiveLinkVerifier({
   }
 
   return async function verifyLinks(paths, { label, acceptStatus }) {
-    const uniquePaths = [...new Set(paths)];
+    const allPaths = [...new Set(paths)];
+    const uniquePaths = sampleLinks(allPaths, maxLinksPerPage);
     const started = Date.now();
     let next = 0;
     let completed = 0;
     let failed = false;
     let failure;
-    log(`[web-library] ${label}: links 0/${uniquePaths.length}`);
+    log(`[web-library] ${label}: links 0/${uniquePaths.length}${uniquePaths.length < allPaths.length ? ` (spread of ${allPaths.length})` : ""}`);
 
     async function worker() {
       while (!failed && next < uniquePaths.length) {
