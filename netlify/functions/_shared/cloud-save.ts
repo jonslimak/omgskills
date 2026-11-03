@@ -912,6 +912,20 @@ export async function deleteCloudSkills(
     );
     const candidates = skillKey === null ? null : skillFiles.rows.map((row) => row.blob_sha);
     await client.query("DELETE FROM cloud_saved_skills WHERE source_id = ANY($1::uuid[])", [sourceIds]);
+    // Sets keep the skill's name, and members keep what they installed; a Set can't keep a deleted version.
+    await client.query(
+      `
+        WITH detached AS (
+          UPDATE skill_group_items
+          SET source_id = NULL, release_id = NULL, metadata_only_reason = 'cloud_deleted'
+          WHERE source_id = ANY($1::uuid[])
+          RETURNING group_id
+        )
+        UPDATE skill_groups SET revision = revision + 1, updated_at = now()
+        WHERE id IN (SELECT group_id FROM detached)
+      `,
+      [sourceIds]
+    );
     await client.query(
       `
         DELETE FROM cloud_release_files

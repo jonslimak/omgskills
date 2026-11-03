@@ -27,7 +27,34 @@ export type GroupItemPublication =
       coordinates: SkillPackageCoordinates;
       createdBy: string;
     }
-  | { kind: "metadata_only"; reason: string };
+  | { kind: "metadata_only"; reason: string }
+  /** The owner's own skill: its saved cloud version when there is one, otherwise `fallback`. */
+  | { kind: "cloud"; ownerUserId: string; skillKey: string; fallback: string };
+
+type CloudVersion = { sourceId: string; releaseId: string; confirmedSecret: boolean };
+
+/**
+ * The owner's current saved version of a skill, locked against a delete until the caller commits.
+ * Callers take this before the group lock: a cloud delete locks the saved row first, then groups.
+ */
+async function lockCurrentCloudVersion(
+  client: PoolClient,
+  where: { ownerUserId: string; skillKey: string } | { ownerUserId: string; sourceId: string }
+): Promise<CloudVersion | null> {
+  const bySource = "sourceId" in where;
+  const result = await client.query<CloudVersion>(
+    `
+      SELECT saved.source_id AS "sourceId", saved.current_release_id AS "releaseId",
+        COALESCE('confirmed_secret' = ANY(cloud.labels), false) AS "confirmedSecret"
+      FROM cloud_saved_skills saved
+      JOIN cloud_releases cloud ON cloud.release_id = saved.current_release_id
+      WHERE saved.user_id = $1 AND ${bySource ? "saved.source_id = $2::uuid" : "saved.skill_key = $2"}
+      FOR SHARE OF saved
+    `,
+    [where.ownerUserId, bySource ? where.sourceId : where.skillKey]
+  );
+  return result.rows[0] ?? null;
+}
 
 export async function addGroupItemWithClient(
   client: PoolClient,
@@ -36,6 +63,9 @@ export async function addGroupItemWithClient(
   publication?: GroupItemPublication,
   options: { incrementRevision?: boolean } = {},
 ) {
+  const cloud = publication?.kind === "cloud"
+    ? await lockCurrentCloudVersion(client, publication)
+    : null;
   await lockGroupForMutation(client, groupId);
   let snapshotName = item.name ?? null;
   let snapshotDescription = item.description ?? null;
@@ -84,6 +114,14 @@ export async function addGroupItemWithClient(
     });
   } else if (publication?.kind === "metadata_only") {
     metadataOnlyReason = publication.reason.trim();
+  } else if (publication?.kind === "cloud") {
+    // A version with a key or password the owner confirmed is never shared.
+    if (cloud && !cloud.confirmedSecret) {
+      sourceId = cloud.sourceId;
+      releaseId = cloud.releaseId;
+    } else {
+      metadataOnlyReason = cloud ? "cloud_confirmed_secret" : publication.fallback;
+    }
   }
   const result = await client.query<{ id: string }>(
     `
@@ -222,4 +260,41 @@ export async function recordAnalytics(eventName: string, fields: {
     `,
     [eventName, fields.groupId ?? null, fields.profileUserId ?? null, fields.skillItemId ?? null]
   );
+}
+
+export type CloudGroupItemUpdate = { itemId: string; releaseId: string; updated: boolean };
+
+/** Moves a Set's copy of the owner's saved skill to its newest saved version ("Update Set"). */
+export async function updateCloudGroupItemWithClient(
+  client: PoolClient,
+  groupId: string,
+  itemId: string,
+  ownerUserId: string
+): Promise<CloudGroupItemUpdate> {
+  const item = await client.query<{ sourceId: string; releaseId: string }>(
+    `
+      SELECT item.source_id AS "sourceId", item.release_id AS "releaseId"
+      FROM skill_group_items item
+      JOIN skill_sources source ON source.id = item.source_id
+      WHERE item.id = $1 AND item.group_id = $2 AND source.kind = 'cloud' AND source.owner_user_id = $3
+    `,
+    [itemId, groupId, ownerUserId]
+  );
+  const found = item.rows[0];
+  if (!found) throw new Response("Saved skill not found in this Set", { status: 404 });
+  const current = await lockCurrentCloudVersion(client, { ownerUserId, sourceId: found.sourceId });
+  if (!current) throw new Response("Saved skill not found in this Set", { status: 404 });
+  if (current.confirmedSecret) {
+    throw new Response("The newest version has a key or password, so it can't be shared", { status: 409 });
+  }
+  await lockGroupForMutation(client, groupId);
+  const moved = await client.query(
+    `
+      UPDATE skill_group_items SET release_id = $3
+      WHERE id = $1 AND group_id = $2 AND source_id = $4 AND release_id IS DISTINCT FROM $3
+    `,
+    [itemId, groupId, current.releaseId, found.sourceId]
+  );
+  if (moved.rowCount) await incrementGroupRevision(client, groupId);
+  return { itemId, releaseId: current.releaseId, updated: Boolean(moved.rowCount) };
 }

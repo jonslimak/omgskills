@@ -8,6 +8,7 @@ import pg, { type Pool } from "pg";
 import {
   CLOUD_SAVE_LIMITS,
   CloudSaveError,
+  deleteCloudSkills,
   listCloudVersions,
   loadCloudVersionPackage,
   loadSharedCloudPackage,
@@ -19,6 +20,7 @@ import {
 } from "./cloud-save.js";
 import { CloudStoreError, type CloudObjectStore } from "./cloud-store.js";
 import { requirePrivateReleaseAccess } from "./private-release-access.js";
+import { addGroupItemWithClient, updateCloudGroupItemWithClient, type GroupItemPublication } from "./group-items.js";
 import { gitObjectSha, validateSkillPackage, type SkillManifestEntry } from "./skill-package.js";
 
 const connectionString = process.env.AUTH_TEST_DATABASE_URL;
@@ -1338,5 +1340,83 @@ test("someone invited to a Set downloads the owner's saved version; nobody else 
     // A grant can't be pointed at someone else's storage.
     await rejects(loadSharedCloudPackage(pool, store, { ...grant, ownerUserId: stranger.userId }), "not_found");
     await rejects(loadSharedCloudPackage(pool, store, { ...grant, treeSha: "0".repeat(40) }), "not_found");
+  });
+});
+
+test("adding your own skill to a Set shares its saved version; Update Set moves it; deleting detaches it", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const owner = await createUser(pool);
+    const inTransaction = async <T>(run: (client: pg.PoolClient) => Promise<T>) => {
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        const value = await run(client);
+        await client.query("COMMIT");
+        return value;
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    };
+    const item = async (id: string) => (await pool.query<{ source_id: string | null; release_id: string | null; reason: string | null }>(
+      "SELECT source_id, release_id, metadata_only_reason AS reason FROM skill_group_items WHERE id = $1", [id])).rows[0];
+    const revision = async (groupId: string) =>
+      (await pool.query<{ revision: number }>("SELECT revision FROM skill_groups WHERE id = $1", [groupId])).rows[0].revision;
+
+    await updateCloudSaveSettings(pool, owner.userId, { enabled: true });
+    await uploadAll(pool, store, owner.userId, v1);
+    const first = await saveCloudVersion(pool, { ...owner, skillKey: "notes", files: manifest(v1) });
+    assert.ok(first.status === "saved");
+    const group = (await pool.query<{ id: string }>(
+      "INSERT INTO skill_groups (owner_user_id, name, slug, visibility) VALUES ($1, 'Team', 'team', 'restricted') RETURNING id",
+      [owner.userId])).rows[0].id;
+    const cloud = (skillKey: string): GroupItemPublication =>
+      ({ kind: "cloud", ownerUserId: owner.userId, skillKey, fallback: "synced_local_only" });
+
+    const added = await inTransaction((client) => addGroupItemWithClient(client, group, { kind: "synced", name: "notes" }, cloud("notes")));
+    assert.equal((await item(added.itemId)).release_id, first.skill.currentVersion.id);
+    // Not saved: the Set gets the name only, as before.
+    const unsaved = await inTransaction((client) => addGroupItemWithClient(client, group, { kind: "synced", name: "other" }, cloud("other")));
+    assert.deepEqual(await item(unsaved.itemId), { source_id: null, release_id: null, reason: "synced_local_only" });
+
+    // A newer save doesn't change the Set until the owner updates it.
+    await uploadAll(pool, store, owner.userId, v2);
+    const second = await saveCloudVersion(pool, { ...owner, skillKey: "notes", files: manifest(v2) });
+    assert.ok(second.status === "saved");
+    assert.equal((await item(added.itemId)).release_id, first.skill.currentVersion.id);
+    const before = await revision(group);
+    const update = await inTransaction((client) => updateCloudGroupItemWithClient(client, group, added.itemId, owner.userId));
+    assert.deepEqual(update, { itemId: added.itemId, releaseId: second.skill.currentVersion.id, updated: true });
+    assert.equal(await revision(group), before + 1);
+    const again = await inTransaction((client) => updateCloudGroupItemWithClient(client, group, added.itemId, owner.userId));
+    assert.equal(again.updated, false);
+    // Only the skill's owner can move it, and only items shared from the cloud.
+    const stranger = await createUser(pool);
+    await assert.rejects(inTransaction((client) => updateCloudGroupItemWithClient(client, group, added.itemId, stranger.userId)),
+      (error) => error instanceof Response && error.status === 404);
+    await assert.rejects(inTransaction((client) => updateCloudGroupItemWithClient(client, group, unsaved.itemId, owner.userId)),
+      (error) => error instanceof Response && error.status === 404);
+
+    // A version with a confirmed key is never put in a Set.
+    const keyed: File[] = [{ path: "SKILL.md", text: "---\nname: keys\ndescription: Keys.\n---\n" }, { path: "config.env", text: `TOKEN=${fakeToken}\n` }];
+    for (const file of keyed) {
+      const data = Buffer.from(file.text);
+      await storeCloudBlob(pool, store, { userId: owner.userId, blobSha: gitObjectSha("blob", data), data, confirmSecrets: true });
+    }
+    await saveCloudVersion(pool, { ...owner, skillKey: "keys", files: manifest(keyed) });
+    const keyedItem = await inTransaction((client) => addGroupItemWithClient(client, group, { kind: "synced", name: "keys" }, cloud("keys")));
+    assert.deepEqual(await item(keyedItem.itemId), { source_id: null, release_id: null, reason: "cloud_confirmed_secret" });
+
+    // Deleting the skill from the cloud works even though a Set uses it; the Set keeps the name.
+    const beforeDelete = await revision(group);
+    const deleted = await deleteCloudSkills(pool, store, { userId: owner.userId, skillKey: "notes" });
+    assert.equal(deleted.deletedSkills, 1);
+    assert.deepEqual(await item(added.itemId), { source_id: null, release_id: null, reason: "cloud_deleted" });
+    assert.equal(await revision(group), beforeDelete + 1);
+    const all = await deleteCloudSkills(pool, store, { userId: owner.userId });
+    assert.equal(all.deletedSkills, 1);
   });
 });
