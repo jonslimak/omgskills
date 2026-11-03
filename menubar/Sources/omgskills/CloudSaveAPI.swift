@@ -91,12 +91,16 @@ protocol CloudSaveServing: Sendable {
     func saveVersion(_ folder: CloudSaveFolder, credential: StoredDeviceCredential) async throws -> CloudSaveVersionResult
     func markDeletedLocally(key: String, deleted: Bool, credential: StoredDeviceCredential) async throws
     func withdrawReview(key: String, credential: StoredDeviceCredential) async throws
+    /// Tells the web why each skill wasn't saved, replacing this Mac's last report.
+    func reportSkipped(_ skipped: [String: CloudSaveSkipReason], credential: StoredDeviceCredential) async throws
 }
 
 /// The server has no batch upload; files go one at a time.
 struct CloudSaveBatchUnsupported: Error {}
 
 extension CloudSaveServing {
+    func reportSkipped(_ skipped: [String: CloudSaveSkipReason], credential: StoredDeviceCredential) async throws {}
+
     func uploadFiles(_ entries: [SkillPackageEntry], credential: StoredDeviceCredential) async throws -> [CloudSaveFinding] {
         throw CloudSaveBatchUnsupported()
     }
@@ -195,6 +199,11 @@ struct CloudSaveAPI: CloudSaveServing {
     func withdrawReview(key: String, credential: StoredDeviceCredential) async throws {
         try requireUploadScope(credential)
         _ = try await send("DELETE", path: ["skills", key, "review"], credential: credential)
+    }
+
+    func reportSkipped(_ skipped: [String: CloudSaveSkipReason], credential: StoredDeviceCredential) async throws {
+        try requireUploadScope(credential)
+        _ = try await send("PUT", path: ["skipped"], json: ["skipped": skipped.mapValues(\.rawValue)], credential: credential)
     }
 
     private struct SavedBody: Decodable { let created: Bool }

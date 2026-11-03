@@ -137,11 +137,18 @@ export type CloudSkillReview = {
   updatedAt: string;
 };
 
+/** Why a Mac didn't save a skill on its last pass. */
+export type CloudSkipReason = "library" | "links" | "too_large" | "unreadable" | "failed";
+const SKIP_REASONS: readonly CloudSkipReason[] = ["library", "links", "too_large", "unreadable", "failed"];
+const MAX_SKIP_REPORT_KEYS = 2000;
+
 export type CloudSaveState = {
   settings: CloudSaveSettings;
   usage: { bytes: number; limitBytes: number };
   skills: CloudSavedSkill[];
   needsReview: CloudSkillReview[];
+  /** Skill key to reason, from every Mac's last report; a newer report wins. */
+  skipped: Record<string, CloudSkipReason>;
 };
 
 export async function readCloudSaveSettings(db: Database, userId: string): Promise<CloudSaveSettings> {
@@ -202,8 +209,47 @@ async function readReviews(db: Database, userId: string): Promise<CloudSkillRevi
   }));
 }
 
+async function readSkips(db: Database, userId: string): Promise<Record<string, CloudSkipReason>> {
+  const result = await db.query<{ skipped: Record<string, CloudSkipReason> }>(
+    "SELECT skipped FROM cloud_skip_reports WHERE user_id = $1 ORDER BY reported_at, device_id",
+    [userId]
+  );
+  return Object.assign({}, ...result.rows.map((row) => row.skipped));
+}
+
+/** A Mac's report of the skills it didn't save and why: `{ skipped: { [skillKey]: reason } }`. */
+export function parseCloudSkipReport(body: Record<string, unknown>): Record<string, CloudSkipReason> {
+  const skipped = body.skipped;
+  if (!skipped || typeof skipped !== "object" || Array.isArray(skipped)) {
+    throw new CloudSaveError("invalid_request", "skipped must map skill keys to reasons");
+  }
+  const entries = Object.entries(skipped);
+  if (entries.length > MAX_SKIP_REPORT_KEYS) throw new CloudSaveError("invalid_request", "Too many skipped skills");
+  const report: Record<string, CloudSkipReason> = {};
+  for (const [key, reason] of entries) {
+    if (!SKIP_REASONS.includes(reason as CloudSkipReason)) throw new CloudSaveError("invalid_request", "Unknown skip reason");
+    report[normalizeSkillKey(key)] = reason as CloudSkipReason;
+  }
+  return report;
+}
+
+/** Replaces this Mac's last report. */
+export async function reportCloudSkips(
+  db: Database,
+  input: { userId: string; deviceId: string | null; skipped: Record<string, CloudSkipReason> }
+): Promise<void> {
+  if (!input.deviceId) throw new CloudSaveError("invalid_request", "Only a Mac reports skipped skills");
+  await db.query(
+    `
+      INSERT INTO cloud_skip_reports (user_id, device_id, skipped) VALUES ($1, $2, $3::jsonb)
+      ON CONFLICT (user_id, device_id) DO UPDATE SET skipped = EXCLUDED.skipped, reported_at = now()
+    `,
+    [input.userId, input.deviceId, JSON.stringify(input.skipped)]
+  );
+}
+
 export async function readCloudSave(db: Database, userId: string): Promise<CloudSaveState> {
-  const [settings, bytes, skills, needsReview] = await Promise.all([
+  const [settings, bytes, skills, needsReview, skipped] = await Promise.all([
     readCloudSaveSettings(db, userId),
     usedBytes(db, userId),
     db.query<CloudSavedVersion & { key: string; versionCount: number; deletedLocallyAt: string | null }>(
@@ -221,11 +267,13 @@ export async function readCloudSave(db: Database, userId: string): Promise<Cloud
       `,
       [userId]
     ),
-    readReviews(db, userId)
+    readReviews(db, userId),
+    readSkips(db, userId)
   ]);
   return {
     settings,
     needsReview,
+    skipped,
     usage: { bytes, limitBytes: CLOUD_SAVE_LIMITS.maximumUserBytes },
     skills: skills.rows.map(({ key, versionCount, deletedLocallyAt, ...version }) => ({
       key,

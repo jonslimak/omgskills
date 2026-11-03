@@ -1,5 +1,15 @@
 import Foundation
 
+/// Why a skill wasn't saved, as the web shows it.
+enum CloudSaveSkipReason: String, Equatable, Sendable {
+    /// An unchanged library or Set install, which can be fetched again.
+    case library
+    case links
+    case tooLarge = "too_large"
+    case unreadable
+    case failed
+}
+
 /// The outcome of one cloud save pass, for the companion's status line.
 struct CloudSaveSummary: Equatable, Sendable {
     enum Status: Equatable, Sendable {
@@ -18,12 +28,13 @@ struct CloudSaveSummary: Equatable, Sendable {
     /// New versions saved in this pass.
     var uploadedCount = 0
     /// Library and Set installs left unchanged, which are not uploaded.
-    var libraryCount = 0
+    var library: Set<String> = []
+    var libraryCount: Int { library.count }
     /// Skills whose copy here is older than the one already in the cloud, so it isn't saved over it.
     var olderHereCount = 0
     var needsReview: [String] = []
     /// Skills that can't be saved, by key, with the reason.
-    var skipped: [String: String] = [:]
+    var skipped: [String: CloudSaveSkipReason] = [:]
     /// The tree of every skill folder read in this pass, to tell next time whether it changed here.
     var localTrees: [String: String] = [:]
 }
@@ -89,9 +100,9 @@ struct CloudSaveSync: Sendable {
                 if let stop = Self.stopStatus(error) { summary.status = stop; return summary }
                 switch error {
                 case .needsReview: summary.needsReview.append(folder.key)
-                case .tooLarge: summary.skipped[folder.key] = "Too large to save"
+                case .tooLarge: summary.skipped[folder.key] = .tooLarge
                 case .excluded: break
-                default: summary.skipped[folder.key] = "Could not be saved"
+                default: summary.skipped[folder.key] = .failed
                 }
             }
         }
@@ -114,6 +125,11 @@ struct CloudSaveSync: Sendable {
                 try? await api.withdrawReview(key: review.key, credential: credential)
             }
         }
+        // Only a finished pass knows every reason; the web keeps the last full report until then.
+        let report = summary.skipped.merging(summary.library.map { ($0, .library) }, uniquingKeysWith: { reason, _ in reason })
+            .filter { !excluded.contains($0.key) }
+        try? await pace()
+        try? await api.reportSkipped(report, credential: credential)
         if !summary.needsReview.isEmpty || !summary.skipped.isEmpty { summary.status = .incomplete }
         summary.needsReview.sort()
         return summary
@@ -170,20 +186,23 @@ struct CloudSaveSync: Sendable {
             let key = CloudSaveFolder.key(forFolderName: directory.lastPathComponent)
             let folder: CloudSaveFolder
             do { folder = try CloudSaveFolder.read(directory: directory) }
-            catch CloudSaveFolder.ReadError.containsLink { summary.skipped[key] = "Contains links to other files"; continue }
+            catch CloudSaveFolder.ReadError.containsLink { summary.skipped[key] = .links; continue }
             catch CloudSaveFolder.ReadError.invalid(let code) where [.fileTooLarge, .packageTooLarge, .tooManyFiles].contains(code) {
-                summary.skipped[key] = "Too large to save"; continue
+                summary.skipped[key] = .tooLarge; continue
             }
-            catch { summary.skipped[key] = "Could not be read"; continue }
+            catch { summary.skipped[key] = .unreadable; continue }
             if Self.isUnchangedInstall(folder) {
-                summary.libraryCount += 1
+                summary.library.insert(key)
                 continue
             }
             // Any file counts as an edit, not just SKILL.md.
             if let existing = chosen[key], existing.modifiedAt >= folder.modifiedAt { continue }
             chosen[key] = folder
             summary.skipped[key] = nil
+            summary.library.remove(key)
         }
+        // An edited copy on another agent is saved, even when this one is unchanged.
+        summary.library.subtract(chosen.keys)
         return chosen.values.sorted { $0.key < $1.key }
     }
 

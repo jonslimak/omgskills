@@ -579,6 +579,21 @@ export const cloudSkillReviews = pgTable(
   ]
 );
 
+/** Why each Mac didn't save a skill, replaced by its next report. */
+export const cloudSkipReports = pgTable(
+  "cloud_skip_reports",
+  {
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    deviceId: uuid("device_id").notNull().references(() => deviceTokens.id, { onDelete: "cascade" }),
+    skipped: jsonb("skipped").notNull(),
+    reportedAt: timestamp("reported_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.deviceId] }),
+    check("cloud_skip_reports_skipped_check", sql`jsonb_typeof(${table.skipped}) = 'object'`)
+  ]
+);
+
 /** No longer used: replaced by cloud_storage_purge_queue, and dropped in a later release. */
 export const cloudPurgeQueue = pgTable(
   "cloud_purge_queue",

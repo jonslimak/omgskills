@@ -116,6 +116,10 @@ private actor FakeCloudSave: CloudSaveServing {
     }
     var withdrawn: [String] = []
     func withdrawReview(key: String, credential: StoredDeviceCredential) async throws { withdrawn.append(key) }
+    var reported: [[String: CloudSaveSkipReason]] = []
+    func reportSkipped(_ skipped: [String: CloudSaveSkipReason], credential: StoredDeviceCredential) async throws {
+        reported.append(skipped)
+    }
 }
 
 struct CloudSaveSyncTests {
@@ -175,12 +179,45 @@ struct CloudSaveSyncTests {
         #expect(summary.libraryCount == 1)
         #expect(summary.uploadedCount == 0)
         #expect(await api.calls == ["state"])
+        // The web hears why; a left-out skill already shows as left out.
+        #expect(await api.reported == [["pdf": .library]])
 
         // Editing the library skill makes it the user's own copy.
         try Data("---\nname: pdf\ndescription: mine\n---\n".utf8).write(to: library.appendingPathComponent("SKILL.md"))
         let edited = try await sync(api).run(installations: [installation(library)], localFolderKeys: [],
             deviceID: "device-1", credential: credential())
         #expect(edited.uploadedCount == 1)
+        #expect(await api.reported.last == [:])
+    }
+
+    @Test func tellsTheWebWhySkillsWereNotSavedOnlyAfterAFinishedPass() async throws {
+        let root = try temporaryRoot()
+        let linked = try makeSkill(root, "ship")
+        try FileManager.default.createSymbolicLink(at: linked.appendingPathComponent("extra.md"),
+                                                   withDestinationURL: root.appendingPathComponent("elsewhere.md"))
+        let big = try makeSkill(root, "big", files: ["data.bin": String(repeating: "x", count: CloudSaveFolder.limits.maximumFileBytes + 1)])
+        let api = FakeCloudSave()
+        let summary = try await sync(api).run(installations: [installation(linked), installation(big)],
+            localFolderKeys: [], deviceID: "device-1", credential: credential())
+        #expect(summary.skipped == ["ship": .links, "big": .tooLarge])
+        #expect(await api.reported == [["ship": .links, "big": .tooLarge]])
+
+        // A pass that stops early leaves the last full report in place.
+        struct Offline: CloudSaveServing {
+            func state(credential: StoredDeviceCredential) async throws -> CloudSaveState { throw CloudSaveAPIError.unavailable }
+            func setEnabled(_ enabled: Bool, credential: StoredDeviceCredential) async throws {}
+            func uploadFile(_ entry: SkillPackageEntry, confirmSecrets: Bool, credential: StoredDeviceCredential) async throws {}
+            func saveVersion(_ folder: CloudSaveFolder, credential: StoredDeviceCredential) async throws -> CloudSaveVersionResult {
+                .saved(created: false)
+            }
+            func markDeletedLocally(key: String, deleted: Bool, credential: StoredDeviceCredential) async throws {}
+            func withdrawReview(key: String, credential: StoredDeviceCredential) async throws {}
+            func reportSkipped(_ skipped: [String: CloudSaveSkipReason], credential: StoredDeviceCredential) async throws {
+                Issue.record("a stopped pass must not report")
+            }
+        }
+        _ = try await CloudSaveSync(api: Offline(), pace: {}).run(installations: [installation(linked)],
+            localFolderKeys: [], deviceID: "device-1", credential: credential())
     }
 
     @Test func heldFilesLeaveTheSkillForReviewWhileOthersSave() async throws {
@@ -235,9 +272,10 @@ struct CloudSaveSyncTests {
         let skill = try makeSkill(root, "notes", files: ["a.md": "a", "b.md": "b"])
         _ = try await CloudSaveSync(api: api, pace: { await paces.tick() }).run(installations: [installation(skill)],
             localFolderKeys: ["notes"], deviceID: "device-1", credential: credential())
-        // Without batch upload: the first version request, one per batch attempt, one per file, the final save.
+        // Without batch upload: the first version request, one per batch attempt, one per file, the final save,
+        // and the report of skills not saved.
         #expect(await api.calls.filter { $0.hasPrefix("upload:") }.count == 3)
-        #expect(await paces.count == 1 + 1 + 3 + 1)
+        #expect(await paces.count == 1 + 1 + 3 + 1 + 1)
     }
 
     @Test func stopsWhenTheServerIsUnavailable() async throws {
