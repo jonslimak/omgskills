@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import type { Pool, PoolClient, QueryResult, QueryResultRow } from "pg";
+import pg, { type Pool, type PoolClient, type QueryResult, type QueryResultRow } from "pg";
 import { appendSkillRelease } from "./group-storage.js";
 import { cloudBlobKey, type CloudObjectStore } from "./cloud-store.js";
 import { combineLabels, pathLabels, scanFileContents, type SecretFinding, type SkillLabel } from "./skill-scan.js";
@@ -437,8 +437,10 @@ export async function storeCloudBlobs(
       }
       await queueCleanupFirst(pool, input.userId, fresh.map((file) => file.blobSha));
       for (let index = 0; index < fresh.length; index += BLOB_UPLOAD_CONCURRENCY) {
-        await Promise.all(fresh.slice(index, index + BLOB_UPLOAD_CONCURRENCY)
+        const uploads = await Promise.allSettled(fresh.slice(index, index + BLOB_UPLOAD_CONCURRENCY)
           .map((file) => store.put(cloudBlobKey(input.userId, file.blobSha), file.data)));
+        const failed = uploads.find((upload): upload is PromiseRejectedResult => upload.status === "rejected");
+        if (failed) throw failed.reason;
       }
       await client.query(
         `
@@ -469,10 +471,16 @@ const BLOB_UPLOAD_CONCURRENCY = 16;
  */
 async function queueCleanupFirst(pool: Pool, userId: string, blobShas: string[]): Promise<void> {
   if (!blobShas.length) return;
-  await pool.query(
-    "INSERT INTO cloud_purge_queue (user_id, blob_sha) SELECT $1, unnest($2::text[]) ON CONFLICT DO NOTHING",
-    [userId, blobShas]
-  );
+  const queueClient = new pg.Client(pool.options);
+  try {
+    await queueClient.connect();
+    await queueClient.query(
+      "INSERT INTO cloud_purge_queue (user_id, blob_sha) SELECT $1, unnest($2::text[]) ON CONFLICT DO NOTHING",
+      [userId, blobShas]
+    );
+  } finally {
+    await queueClient.end();
+  }
 }
 
 /**

@@ -26,7 +26,7 @@ if (!connectionString) {
 
 const migrationsDirectory = fileURLToPath(new URL("../../database/migrations", import.meta.url));
 
-async function withMigratedSchema(run: (pool: Pool) => Promise<void>) {
+async function withMigratedSchema(run: (pool: Pool) => Promise<void>, maxConnections?: number) {
   const schema = `cloud_save_${randomUUID().replaceAll("-", "")}`;
   const admin = new pg.Pool({ connectionString });
   const client = await admin.connect();
@@ -44,7 +44,7 @@ async function withMigratedSchema(run: (pool: Pool) => Promise<void>) {
   } finally {
     client.release();
   }
-  const pool = new pg.Pool({ connectionString, options: `-c search_path=${schema},public` });
+  const pool = new pg.Pool({ connectionString, options: `-c search_path=${schema},public`, max: maxConnections, connectionTimeoutMillis: 2000 });
   try {
     await run(pool);
   } finally {
@@ -619,6 +619,67 @@ test("a batch upload stores a skill's files in one request and reports a held fi
     const big = Buffer.alloc(CLOUD_SAVE_LIMITS.maximumFileBytes / 2 + 1, 97);
     assert.equal((await call({ files: [entry(big), entry(Buffer.concat([big, Buffer.from("b")]))] })).status, 413);
     assert.ok(scopes.every((scope) => scope === "content:write"));
+  });
+});
+
+test("uploads can queue cleanup even when the pool has only one connection", async () => {
+  await withMigratedSchema(async (pool) => {
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const { storeCloudBlobs } = await import("./cloud-save.js");
+    const data = Buffer.from("one connection");
+    const blobSha = gitObjectSha("blob", data);
+    const store = new MemoryStore();
+    const result = await storeCloudBlobs(pool, store, { userId, deviceId, files: [{ blobSha, data }] });
+    assert.equal(result[0].status, "stored");
+    assert.equal(store.objects.size, 1);
+  }, 1);
+});
+
+test("failed batches wait for in-flight uploads before cleanup", async () => {
+  await withMigratedSchema(async (pool) => {
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    const { cloudBlobKey } = await import("./cloud-store.js");
+    const { drainCloudPurge, storeCloudBlobs } = await import("./cloud-save.js");
+    const files = ["slow", "fail"].map((text) => {
+      const data = Buffer.from(text);
+      return { blobSha: gitObjectSha("blob", data), data };
+    });
+    const store = new MemoryStore();
+    const originalPut = store.put.bind(store);
+    let releaseSlow!: () => void;
+    let slowStarted!: () => void;
+    let failureStarted!: () => void;
+    const slowGate = new Promise<void>((resolve) => { releaseSlow = resolve; });
+    const started = new Promise<void>((resolve) => { slowStarted = resolve; });
+    const failed = new Promise<void>((resolve) => { failureStarted = resolve; });
+    store.put = async (key, data) => {
+      if (key === cloudBlobKey(userId, files[0].blobSha)) {
+        slowStarted();
+        await slowGate;
+        return originalPut(key, data);
+      }
+      failureStarted();
+      throw new CloudStoreError("unavailable", "Storage is unavailable");
+    };
+    let settled = false;
+    const upload = storeCloudBlobs(pool, store, { userId, deviceId, files })
+      .then(() => { settled = true; return null; }, (error: unknown) => { settled = true; return error; });
+    let cleanupFinished = false;
+    let cleanup: Promise<number> | undefined;
+    try {
+      await Promise.all([started, failed]);
+      cleanup = drainCloudPurge(pool, store, userId).then((left) => { cleanupFinished = true; return left; });
+      await new Promise<void>((resolve) => setTimeout(resolve, 200));
+      assert.equal(settled, false, "the upload lock must remain held until the slow write ends");
+      assert.equal(cleanupFinished, false, "cleanup must wait for the in-flight write");
+    } finally {
+      releaseSlow();
+    }
+    assert.ok(await upload instanceof CloudStoreError);
+    assert.equal(await cleanup, 0);
+    assert.equal(store.objects.size, 0, "cleanup removes the completed slow write");
   });
 });
 
