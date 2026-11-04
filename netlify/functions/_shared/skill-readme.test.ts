@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createSkillReadmeHandler } from "./skill-readme.js";
+import { createSkillReadmeHandler, skillMdBody } from "./skill-readme.js";
 
 const id = "owner/repo:skills/design";
 const skill = { id, github_url: "https://github.com/owner/repo" };
@@ -299,4 +299,10 @@ test("a failed document with no usable alternative remains a retryable error", a
   assert.equal((await handler(request())).status, 503);
   recovered = true;
   assert.equal((await handler(request())).status, 200);
+});
+
+test("a saved or catalog SKILL.md drops its frontmatter, which already shows as name and description", () => {
+  assert.equal(skillMdBody("---\nname: curate\ndescription: Use when...\n---\n\n# Curator\n\nBody"), "# Curator\n\nBody");
+  assert.equal(skillMdBody("﻿---\r\nname: x\r\n---\r\n# X"), "# X");
+  assert.equal(skillMdBody("# No frontmatter\n---\nnot: yaml"), "# No frontmatter\n---\nnot: yaml");
 });
