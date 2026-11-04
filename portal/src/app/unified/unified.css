@@ -956,12 +956,16 @@
   height: 100%;
   object-fit: cover;
 }
-.ua-agent-tiles {
+.ua-agent-list {
   display: flex;
-  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 12px;
 }
-.ua-agent-count {
-  display: none;
+.ua-agent-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .ua-agent-tile {
   display: inline-flex;
@@ -988,9 +992,6 @@
 }
 .ua-agent-logo[data-agent="codex"] {
   --agent-logo: url("../../../../web-handoff/app/assets/agent-codex.png");
-}
-.ua-agent-tile[data-present="false"] {
-  background: transparent;
 }
 .ua-bulk {
   display: flex;
@@ -2443,19 +2444,6 @@
     min-height: 58px;
   }
   .ua-row-name { font-size: 14px; }
-  .ua-agent-tiles { display: none; }
-  .ua-agent-count {
-    display: inline-flex;
-    justify-content: center;
-    min-width: 20px;
-    flex-shrink: 0;
-    color: var(--ua-muted);
-    font-size: 12px;
-    font-variant-numeric: tabular-nums;
-  }
-  .ua-main[data-view="all"] .ua-agent-count {
-    color: var(--ua-faint);
-  }
   .ua-row-compact {
     min-height: 52px;
   }

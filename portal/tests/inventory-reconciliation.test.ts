@@ -319,7 +319,6 @@ test("rendered My skills and Set rows retain missing history separately from lat
     // The Claude copy is no longer on any Mac, so it is not offered as an agent.
     assert.equal([...filtered.matchAll(/<option[^>]*>Claude<\/option>/g)].length, 0);
     assert.doesNotMatch(filtered, /<option[^>]*>(?:codex|Claude Code)<\/option>/);
-    assert.match(filtered, /aria-label="Observed in 1 agent"/);
     const grouped = skillDisplays(data, catalog).mine;
     assert.equal(grouped.length, 1);
     assert.equal(isMember(data.sets[0], grouped[0].installed!), true);
