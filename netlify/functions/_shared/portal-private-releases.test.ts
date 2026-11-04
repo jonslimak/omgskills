@@ -368,3 +368,61 @@ test("private package delivery uses the bounded Netlify edge rate limit", () => 
     windowSize: 60
   });
 });
+
+const skillMdUrl = `https://omgskills.com/api/portal/private-releases/${releaseId}/skill-md`;
+const invitedWebGrant: PrivateReleaseGrant = {
+  ...grant, accessRole: "invited", sourceKind: "cloud", actorUserId: "recipient-id", deviceId: null,
+  groupId: "33333333-3333-4333-8333-333333333333", skillItemId: "44444444-4444-4444-8444-444444444444"
+};
+
+test("an invitee reads a shared skill's instructions on the web, without frontmatter, under the download check", async () => {
+  const data = Buffer.from("---\nname: example\ndescription: Example\n---\n\n# Example\n\nDo the thing.\n");
+  const pkg = { ...fixturePackage(), entries: [{ ...fixturePackage().entries[0], data }] };
+  const actors: unknown[] = [];
+  let audited = false, deviceAuth = 0;
+  const response = await portalPrivateReleases(new Request(skillMdUrl), context, dependencies({
+    async requirePortalUser() { return { ...actor, id: "recipient-id", email: "recipient@example.com" }; },
+    async requireDeviceActor() { deviceAuth += 1; return deviceActor; },
+    async authorize(receivedActor) { actors.push(receivedActor); return invitedWebGrant; },
+    async loadPackage() { return pkg; },
+    async recordContentFetch(receivedGrant) { assert.equal(receivedGrant.accessRole, "invited"); audited = true; }
+  }));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.deepEqual(await response.json(), { markdown: "# Example\n\nDo the thing.\n", truncated: false });
+  assert.deepEqual(actors, [
+    { userId: "recipient-id", email: "recipient@example.com", deviceId: null },
+    { userId: "recipient-id", email: "recipient@example.com", deviceId: null }
+  ], "Checked before and after loading");
+  assert.equal(audited, true);
+  assert.equal(deviceAuth, 0, "Web reads use the signed-in account, not a Mac");
+});
+
+test("instructions for people not invited look the same as a release that doesn't exist", async () => {
+  let loaded = false;
+  const denied = await portalPrivateReleases(new Request(skillMdUrl), context, dependencies({
+    async authorize() { throw new PrivateReleaseAccessError(); },
+    async loadPackage() { loaded = true; return fixturePackage(); }
+  }));
+  assert.equal(denied.status, 404);
+  assert.equal(loaded, false);
+  // Access removed while the files load: nothing is returned or audited.
+  let calls = 0, audited = false;
+  const revoked = await portalPrivateReleases(new Request(skillMdUrl), context, dependencies({
+    async authorize() { calls += 1; if (calls > 1) throw new PrivateReleaseAccessError(); return invitedWebGrant; },
+    async recordContentFetch() { audited = true; }
+  }));
+  assert.equal(revoked.status, 404);
+  assert.equal(audited, false);
+  const post = await portalPrivateReleases(new Request(skillMdUrl, { method: "POST" }), context, dependencies());
+  assert.equal(post.status, 405);
+  const { config: skillMdConfig } = await import("../portal-shared-skill-md.mjs");
+  assert.equal(skillMdConfig.path, "/api/portal/private-releases/:releaseId/skill-md");
+  assert.ok(!([config.path].flat() as string[]).includes(skillMdConfig.path as string), "Its own function and rate limit");
+  let gated = false;
+  const off = await portalPrivateReleases(new Request(skillMdUrl), context, dependencies({
+    requireMacFeature() { gated = true; throw new Response("Not found", { status: 404 }); }
+  }));
+  assert.equal(gated, true);
+  assert.equal(off.status, 404, "The sharing switch stops web reads too");
+});

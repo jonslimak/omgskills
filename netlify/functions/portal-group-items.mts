@@ -148,6 +148,8 @@ export async function listGroupItems(req: Request, groupId: string, dependencies
         src.kind AS "sourceKind",
         i.metadata_only_reason AS "metadataOnlyReason",
         i.release_id AS "releaseId",
+        -- A duplicated Set holds someone else's version, which only that person's Sets can share.
+        (src.owner_user_id = (SELECT owner_user_id FROM skill_groups WHERE id = $1)) AS "sharedByOwner",
         CASE WHEN $2 = 'owner' THEN saved.current_release_id ELSE NULL END AS "savedReleaseId"
       FROM skill_group_items i
       LEFT JOIN synced_skills s ON s.id = i.synced_skill_id

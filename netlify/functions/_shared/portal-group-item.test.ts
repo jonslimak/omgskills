@@ -32,3 +32,16 @@ test("public Set viewers see only the name of a cloud skill, including after del
     assert.equal(portalGroupItem(item, "owner").description, "private description");
   }
 });
+
+test("people who can install a private item can find its instructions; public viewers can't", () => {
+  for (const sourceKind of ["cloud", "private_github"]) {
+    const item = row({ sourceKind, releaseId: "r1", sharedByOwner: true });
+    assert.equal(portalGroupItem(item, "invited").sharedReleaseId, "r1");
+    assert.equal(portalGroupItem(item, "owner").sharedReleaseId, "r1");
+    assert.equal(portalGroupItem(item, "public").sharedReleaseId, undefined);
+    assert.equal(portalGroupItem({ ...item, metadataOnlyReason: "cloud_deleted" }, "invited").sharedReleaseId, undefined);
+  }
+  assert.equal(portalGroupItem(row({ releaseId: "r1" }), "invited").sharedReleaseId, undefined);
+  // A duplicated Set holds someone else's version: no instructions to show.
+  assert.equal(portalGroupItem(row({ sourceKind: "cloud", releaseId: "r1", sharedByOwner: false }), "owner").sharedReleaseId, undefined);
+});

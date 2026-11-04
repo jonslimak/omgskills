@@ -18,6 +18,8 @@ export type SetItem = {
   cloudShared?: boolean;
   /** Owner only: a newer version is saved than the one in the Set. */
   updateAvailable?: boolean;
+  /** Private items: the version people with access install; its instructions can be read on the web. */
+  sharedReleaseId?: string;
 };
 export type PortalSet = {
   id: string;
