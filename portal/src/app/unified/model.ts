@@ -457,3 +457,8 @@ export function removeFromMacLink(names: string[]) {
   const unique = names.map(name => name.trim()).filter(name => name && !seen.has(name.toLowerCase()) && seen.add(name.toLowerCase()));
   return `omgskills://remove?${unique.map(name => `name=${encodeURIComponent(name)}`).join("&")}`;
 }
+
+/** Opens the Mac app, which shows this skill's versions (newest picked) and makes every copy match the chosen one. */
+export function matchVersionsLink(name: string) {
+  return `omgskills://match?name=${encodeURIComponent(name.trim())}`;
+}

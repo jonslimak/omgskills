@@ -93,6 +93,7 @@ import {
   matchesSearch,
   skillDisplays,
   liveSkill,
+  matchVersionsLink,
   maxRemoveFromMac,
   removeFromMacLink,
   liveMine,
@@ -945,6 +946,10 @@ export function UnifiedApp({
               >
                 Copy source link
               </MenuItem>
+              {(!readOnlyAccount || management) && liveCopies && versionCount > 1 && <MenuItem icon={RefreshCw}
+                onSelect={() => window.location.assign(matchVersionsLink(liveCopies.name))}>
+                Make versions match…
+              </MenuItem>}
               {(!readOnlyAccount || management) && liveCopies && <MenuItem icon={Trash2} danger
                 onSelect={() => window.location.assign(removeFromMacLink([liveCopies.name]))}>
                 Delete from my Mac…
@@ -2014,6 +2019,10 @@ export function UnifiedApp({
                       <span>{detailVersions.length} versions</span>
                       <strong>{detailVersions.map(sources => sources.join(", ")).join(" · ")}</strong>
                     </div>}
+                    {detailVersions.length > 1 && detailLive && (!readOnlyAccount || management) && <button type="button"
+                      className="ua-pill ua-detail-match" onClick={() => window.location.assign(matchVersionsLink(detailLive.name))}>
+                      <RefreshCw />Make versions match
+                    </button>}
                     {(!readOnlyAccount || management) && <div className="ua-set-chips">
                       {data.sets
                         .filter((set) => isMember(set, detail.installed!))

@@ -18,6 +18,7 @@ struct CatalogInstallView: View {
     var connectionSetupError: String? = nil
     var setInstall: CompanionSetInstallController? = nil
     var removal: SkillRemovalController? = nil
+    var versionMatch: SkillVersionMatchController? = nil
 
     static let connectionSetupFailureMessage = "Account connection is unavailable. Skill installation is still available."
     static let panelWidth: CGFloat = 210
@@ -61,6 +62,7 @@ struct CatalogInstallView: View {
         Group {
             if model.phase != .idle { installContent }
             else if let removal, removal.isActive { SkillRemovalView(controller: removal) }
+            else if let versionMatch, versionMatch.isActive { SkillVersionMatchView(controller: versionMatch) }
             else if let setInstall, setInstall.isActive {
                 CompanionSetInstallView(controller: setInstall, reconnect: reconnect)
             } else { accountContent }
@@ -225,6 +227,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     private var connectedRuntime: ConnectedInventoryRuntime?
     private var setInstall: CompanionSetInstallController?
     private var removal: SkillRemovalController?
+    private var versionMatch: SkillVersionMatchController?
 
     #if DEBUG
     convenience init(root: URL, website: URL, coordinator: UpdateInstallCoordinator,
@@ -306,6 +309,11 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
                     trash: { try InstalledSkillUninstaller.uninstall($0, filesystemPaths: paths) })
                 removal.onRemoved = { [weak runtime] in runtime?.installed() }
                 self.removal = removal
+                let versionMatch = SkillVersionMatchController(
+                    installations: { InstalledSkillsScanner.scanWithSummary(filesystemPaths: paths).installations },
+                    trash: { _ = try InstalledSkillUninstaller.uninstall($0, filesystemPaths: paths) })
+                versionMatch.onChanged = { [weak runtime] in runtime?.installed() }
+                self.versionMatch = versionMatch
                 setContent(connection: runtime.connection, inventoryRuntime: runtime)
                 runtime.start()
             } catch {
@@ -350,7 +358,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
             openWebsite: { [weak self] in self?.openWebsite() }, quit: { [weak self] in self?.quit() },
             appUpdater: appUpdater, resizePanel: { [weak self] in self?.resizePanel(to: $0) }, connection: connection,
             inventoryRuntime: inventoryRuntime, connectionSetupError: connectionSetupError, setInstall: setInstall,
-            removal: removal)
+            removal: removal, versionMatch: versionMatch)
     }
 
     private func browserPresentationAnchor() -> NSWindow? {
@@ -393,7 +401,11 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
         }
         // Delete links never reach the installer; without a connected account they are dropped.
         if url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "remove" {
-            if !model.appReplacementBlocksRequest, removal?.receive(url) == true { showStatus() }
+            if !model.appReplacementBlocksRequest, removal?.receive(url) == true { versionMatch?.close(); showStatus() }
+            return
+        }
+        if url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "match" {
+            if !model.appReplacementBlocksRequest, versionMatch?.receive(url) == true { removal?.close(); showStatus() }
             return
         }
         model.receive(url)
