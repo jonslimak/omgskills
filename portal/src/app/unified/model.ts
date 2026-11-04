@@ -46,6 +46,8 @@ export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
   /** The Set shares the owner's cloud-saved version of this skill. */
   setItemCloudShared?: boolean;
   setItemUpdateAvailable?: boolean;
+  /** A private Set item's version, whose instructions people with access can read. */
+  setItemReleaseId?: string;
 };
 
 export function inventorySummary(skill: SyncedSkill) {
@@ -386,6 +388,7 @@ export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[], catalog: 
     return { key: `set-item:${item.id}`, setItemId: item.id, setItemKind: item.kind, name: publicSkill?.name || item.name,
       ...(item.cloudShared ? { setItemCloudShared: true } : {}),
       ...(item.updateAvailable ? { setItemUpdateAvailable: true } : {}),
+      ...(item.sharedReleaseId ? { setItemReleaseId: item.sharedReleaseId } : {}),
       catalogId: item.catalogSkillId ?? undefined,
       description: publicSkill?.description || item.description || installed?.description || "",
       githubUrl: publicSkill?.githubUrl || item.githubUrl || installed?.githubUrl || null,

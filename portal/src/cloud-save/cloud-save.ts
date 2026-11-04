@@ -55,6 +55,14 @@ export function deleteCloudSaved(api: PortalApi, key?: string) {
 export type SavedSkillMd = { key: string; markdown: string; truncated: boolean; savedAt: string };
 export type SavedSkillMdLoader = (keys: string[], signal: AbortSignal) => Promise<SavedSkillMd | null>;
 
+export type SharedSkillMd = { markdown: string; truncated: boolean };
+export type SharedSkillMdLoader = (releaseId: string, signal: AbortSignal) => Promise<SharedSkillMd>;
+
+/** A private Set item's instructions, for people the Set is shared with (checked like the Mac download). */
+export function loadSharedSkillMd(api: PortalApi, releaseId: string, signal: AbortSignal): Promise<SharedSkillMd> {
+  return api<SharedSkillMd>(`/api/portal/private-releases/${encodeURIComponent(releaseId)}/skill-md`, { signal, cache: "no-store" });
+}
+
 /** The first of these skill keys with a saved copy, or null when none is saved. */
 export async function loadSavedSkillMd(api: PortalApi, keys: string[], signal: AbortSignal): Promise<SavedSkillMd | null> {
   for (const key of keys) {

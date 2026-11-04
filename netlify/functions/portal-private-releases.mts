@@ -24,11 +24,13 @@ import {
   type PrivateSkillRelease
 } from "./_shared/private-releases.js";
 import { skillPackageNdjson, type SkillPackage } from "./_shared/skill-package.js";
+import { skillMdBody } from "./_shared/skill-readme.js";
 import { requirePortalUser, type PortalUser } from "./_shared/user.js";
 
 type PrivateReleaseRoute =
   | { action: "register"; sourceId: string }
-  | { action: "package"; releaseId: string };
+  | { action: "package"; releaseId: string }
+  | { action: "skill-md"; releaseId: string };
 
 function parseRoute(req: Request): PrivateReleaseRoute | null {
   const parts = new URL(req.url).pathname.split("/").filter(Boolean);
@@ -39,8 +41,25 @@ function parseRoute(req: Request): PrivateReleaseRoute | null {
     if (parts[2] === "private-releases" && parts[4] === "package") {
       return { action: "package", releaseId: parts[3] };
     }
+    if (parts[2] === "private-releases" && parts[4] === "skill-md") {
+      return { action: "skill-md", releaseId: parts[3] };
+    }
   }
   return null;
+}
+
+const SKILL_MD_CHARACTER_LIMIT = 20_000;
+
+/** A shared skill's SKILL.md for reading on the web, without its frontmatter; shortened like a library README. */
+export function sharedSkillMd(skillPackage: SkillPackage): { markdown: string; truncated: boolean } | null {
+  const entry = skillPackage.entries.find(file => file.path === "SKILL.md")
+    ?? skillPackage.entries.find(file => file.path.toLowerCase() === "skill.md");
+  if (!entry) return null;
+  const text = skillMdBody(new TextDecoder().decode(entry.data));
+  return {
+    markdown: text.slice(0, SKILL_MD_CHARACTER_LIMIT).replace(/[\uD800-\uDBFF]$/, ""),
+    truncated: text.length > SKILL_MD_CHARACTER_LIMIT
+  };
 }
 
 function requireOpaqueId(value: string, label: string): string {
@@ -108,7 +127,7 @@ export async function portalPrivateReleases(
   if (!route) return secretJsonResponse(req, { error: "Not found" }, { status: 404 });
   if (
     (route.action === "register" && req.method !== "POST")
-    || (route.action === "package" && req.method !== "GET")
+    || (route.action !== "register" && req.method !== "GET")
   ) {
     return secretJsonResponse(req, { error: "Method not allowed" }, { status: 405 });
   }
@@ -128,6 +147,17 @@ export async function portalPrivateReleases(
     }
 
     const releaseId = requireOpaqueId(route.releaseId, "release id");
+    if (route.action === "skill-md") {
+      // Invitees read a shared skill's instructions on the web under the same invite check as the Mac download.
+      const user = await resolved.requirePortalUser(req);
+      const actor = { userId: user.id, email: user.email, deviceId: null };
+      const grant = await resolved.authorize(actor, releaseId);
+      const document = sharedSkillMd(await resolved.loadPackage(grant));
+      const finalGrant = await resolved.authorize(actor, releaseId);
+      if (!document || !samePrivateRelease(grant, finalGrant)) throw new PrivateReleaseAccessError();
+      await resolved.recordContentFetch(finalGrant);
+      return secretJsonResponse(req, document);
+    }
     const initialActor = await resolved.requireDeviceActor(req);
     const initialGrant = await resolved.authorize(initialActor, releaseId);
     const skillPackage = await resolved.loadPackage(initialGrant);
@@ -185,7 +215,8 @@ export default async (req: Request, context: Context) => portalPrivateReleases(r
 export const config: Config = {
   path: [
     "/api/portal/private-sources/:sourceId/releases",
-    "/api/portal/private-releases/:releaseId/package"
+    "/api/portal/private-releases/:releaseId/package",
+    "/api/portal/private-releases/:releaseId/skill-md"
   ],
   rateLimit: {
     action: "rate_limit",

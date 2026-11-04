@@ -27,6 +27,8 @@ export type SkillGroupItem = {
   source: string;
   position: number;
   cloudShared?: boolean;
+  /** Private items: the version invitees install; its instructions can be read on the web. */
+  sharedReleaseId?: string;
   updateAvailable?: boolean;
 };
 

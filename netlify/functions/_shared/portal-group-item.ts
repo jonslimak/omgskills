@@ -38,6 +38,9 @@ export function portalGroupItem(row: PortalGroupItemRow, role: GroupAccessRole) 
     position: row.position,
     // Shared from the owner's cloud save; the owner also learns when a newer version is saved.
     ...(row.sourceKind === "cloud" && role !== "public" ? { cloudShared: true } : {}),
+    // Invitees and the owner can read a private item's instructions on the web (same check as the download).
+    ...(role !== "public" && (row.sourceKind === "cloud" || row.sourceKind === "private_github") && row.releaseId
+      && !row.metadataOnlyReason ? { sharedReleaseId: row.releaseId } : {}),
     ...(role === "owner" && row.sourceKind === "cloud" && row.savedReleaseId && row.savedReleaseId !== row.releaseId
       ? { updateAvailable: true } : {}),
   };

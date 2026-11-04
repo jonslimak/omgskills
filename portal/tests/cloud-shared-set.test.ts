@@ -49,3 +49,18 @@ test("deleting a skill shared in Sets says so", () => {
   };
   assert.equal(cloudSkillRows(state, [])[0].setCount, 2);
 });
+
+test("people a Set is shared with can read a private item's instructions from its version", async () => {
+  const releaseId = "22222222-2222-4222-8222-222222222222";
+  const shared = [{ ...items[0], sharedReleaseId: releaseId }, { ...items[1], sharedReleaseId: "not an id" }];
+  const member = await loadSetData(async <T>() => ({ group, accessRole: "invited", items: shared }) as T, "set-1");
+  assert.equal(member.items[0].sharedReleaseId, releaseId);
+  assert.equal(member.items[1].sharedReleaseId, undefined, "Only a well-formed version ID is kept");
+  const [row] = setSkillDisplays(member, []);
+  assert.equal(row.setItemReleaseId, releaseId);
+  const paths: string[] = [];
+  const { loadSharedSkillMd } = await import("../src/cloud-save/cloud-save");
+  await loadSharedSkillMd(async <T>(path: string) => { paths.push(path); return { markdown: "# x", truncated: false } as T; },
+    releaseId, new AbortController().signal);
+  assert.deepEqual(paths, [`/api/portal/private-releases/${releaseId}/skill-md`]);
+});

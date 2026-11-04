@@ -2,7 +2,7 @@ import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode 
 import { ArrowUpRight, RefreshCw } from "lucide-react";
 import type { SkillDisplay } from "./model";
 import { PublicReadmeClient, publicReadmeId, readmeBrowseUrl, readmeTitle, type SkillDocuments } from "./public-readme";
-import { cloudSkillKey, type SavedSkillMd, type SavedSkillMdLoader } from "../../cloud-save/cloud-save";
+import { cloudSkillKey, type SavedSkillMd, type SavedSkillMdLoader, type SharedSkillMd, type SharedSkillMdLoader } from "../../cloud-save/cloud-save";
 
 const MarkdownBody = lazy(() => import("./ReadmeMarkdown"));
 const publicClient = new PublicReadmeClient();
@@ -118,6 +118,45 @@ export function SavedSkillReadme({ skill, load }: { skill: SkillDisplay; load: S
           </Suspense>
         </ReadmeRenderBoundary>
         <p className="ua-muted">{current.doc.truncated ? "Preview shortened. " : ""}From your cloud save, saved {new Date(current.doc.savedAt).toLocaleDateString()}.</p>
+      </div>}
+  </section>;
+}
+
+type SharedState = { id: string; status: "loading" | "ready" | "error"; doc: SharedSkillMd | null };
+
+/** A private Set item's instructions, for people the Set is shared with; checked like the Mac download. */
+export function SharedSkillReadme({ releaseId, load }: { releaseId: string; load: SharedSkillMdLoader }) {
+  const [revision, setRevision] = useState(0);
+  const loader = useRef(load);
+  loader.current = load;
+  const [state, setState] = useState<SharedState>({ id: "", status: "loading", doc: null });
+  useEffect(() => {
+    const controller = new AbortController();
+    setState({ id: releaseId, status: "loading", doc: null });
+    void loader.current(releaseId, controller.signal).then(doc => {
+      if (!controller.signal.aborted) setState({ id: releaseId, status: "ready", doc });
+    }).catch(() => {
+      if (!controller.signal.aborted) setState({ id: releaseId, status: "error", doc: null });
+    });
+    return () => controller.abort();
+  }, [releaseId, revision]);
+
+  const current = state.id === releaseId ? state : { id: releaseId, status: "loading", doc: null };
+  return <section className="ua-readme" aria-label="Skill instructions" aria-busy={current.status === "loading"}>
+    <h3>Skill instructions</h3>
+    {current.status === "loading" ? <p className="ua-muted" role="status">Loading...</p>
+      : current.status === "error" || !current.doc ? <div className="ua-readme-error">
+        <p className="ua-muted" role="status">Skill instructions unavailable.</p>
+        <button className="ua-icon" type="button" title="Retry" aria-label="Retry loading skill instructions" onClick={() => setRevision(value => value + 1)}><RefreshCw /></button>
+      </div> : !current.doc.markdown.trim() ? <p className="ua-muted">No instructions beyond the name and description.</p>
+      : <div>
+        <ReadmeRenderBoundary key={`${releaseId}:${revision}`}>
+          <Suspense fallback={<p className="ua-muted" role="status">Loading...</p>}>
+            {/* No source page: relative links have nowhere to go, so they show as text. */}
+            <MarkdownBody markdown={current.doc.markdown} sourceUrl="about:blank" />
+          </Suspense>
+        </ReadmeRenderBoundary>
+        <p className="ua-muted">{current.doc.truncated ? "Preview shortened. " : ""}The version this Set installs.</p>
       </div>}
   </section>;
 }
