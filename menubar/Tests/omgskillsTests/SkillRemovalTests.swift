@@ -46,10 +46,17 @@ struct SkillRemovalTests {
         #expect(!removal.isActive)
     }
 
-    @Test func reportsMissingInvalidAndPartialFailures() {
+    @Test func reportsMissingInvalidAndPartialFailures() throws {
         struct Blocked: Error {}
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let codex = root.appendingPathComponent("codex/humanizer")
+        try FileManager.default.createDirectory(at: codex, withIntermediateDirectories: true)
+        let codexCopy = Skill(id: "c", name: "humanizer", description: "", githubUrl: "", installCmd: codex.path,
+            authorHandle: "", tags: [], readmeSnippet: nil, stars: 0, lastUpdated: "", firstSeen: "", skillMdSha: nil,
+            installs: nil, trendingRank: nil, trendingSource: nil, origin: "Codex", isSymlink: false, isLocalOnly: true)
         let removal = SkillRemovalController(
-            installations: { [self] in [copy("humanizer", "Claude"), copy("humanizer", "Codex")] },
+            installations: { [self] in [copy("humanizer", "Claude"), codexCopy] },
             trash: { if $0.origin == "Codex" { throw Blocked() }; return .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
         #expect(removal.receive(URL(string: "omgskills://remove?name=pdf")!))
         #expect(removal.state == .notFound(name: "pdf"))
@@ -62,5 +69,39 @@ struct SkillRemovalTests {
         removal.confirm()
         #expect(removal.state == .failed(name: "humanizer",
             message: "Couldn't delete the Codex copy. Other copies were moved to the Trash."))
+    }
+
+    @Test func aNewerLinkReplacesAnOpenQuestion() {
+        let removal = SkillRemovalController(installations: { [self] in [copy("a", "Claude"), copy("b", "Codex")] },
+            trash: { _ in .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
+        _ = removal.receive(URL(string: "omgskills://remove?name=a")!)
+        _ = removal.receive(URL(string: "omgskills://remove?name=b")!)
+        guard case .confirm(let name, _) = removal.state else { Issue.record("expected confirmation"); return }
+        #expect(name == "b")
+    }
+
+    @Test func oneFolderReachedThroughTwoAgentFoldersIsTrashedOnce() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let agents = root.appendingPathComponent("agents")
+        try FileManager.default.createDirectory(at: agents.appendingPathComponent("pdf"), withIntermediateDirectories: true)
+        try FileManager.default.createSymbolicLink(at: root.appendingPathComponent("claude"), withDestinationURL: agents)
+        func at(_ folder: String, _ origin: String) -> Skill {
+            Skill(id: origin, name: "pdf", description: "", githubUrl: "", installCmd: root.appendingPathComponent("\(folder)/pdf").path,
+                authorHandle: "", tags: [], readmeSnippet: nil, stars: 0, lastUpdated: "", firstSeen: "", skillMdSha: nil,
+                installs: nil, trendingRank: nil, trendingSource: nil, origin: origin, isSymlink: false, isLocalOnly: true)
+        }
+        #expect(SkillRemoval.copies(named: "pdf", in: [at("agents", "Agents"), at("claude", "Claude")]).count == 1)
+        #expect(SkillRemoval.displayPath(at("agents", "Agents"), home: root.path) == "~/agents/pdf")
+    }
+
+    @Test func confirmingTrashesOnlyCopiesThatWereShown() {
+        var current = [copy("pdf", "Claude")], trashed: [String] = []
+        let removal = SkillRemovalController(installations: { current },
+            trash: { trashed.append($0.origin!); return .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
+        _ = removal.receive(URL(string: "omgskills://remove?name=pdf")!)
+        current.append(copy("pdf", "Codex"))
+        removal.confirm()
+        #expect(trashed == ["Claude"], "A copy added after the question is left alone")
     }
 }

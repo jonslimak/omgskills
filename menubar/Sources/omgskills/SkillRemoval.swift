@@ -25,10 +25,24 @@ enum SkillRemoval {
     }
 
     /// This Mac's copies of the skill; links go first so a linked folder is never emptied under them.
+    /// A folder reached through two agent folders (one agent folder linked to another) counts once.
     static func copies(named name: String, in installations: [Skill]) -> [Skill] {
         let target = normalizedName(name)
+        var seen = Set<String>()
         return installations.filter { normalizedName($0.name) == target }
             .sorted { ($0.isSymlink == true ? 0 : 1, $0.installCmd) < ($1.isSymlink == true ? 0 : 1, $1.installCmd) }
+            .filter { seen.insert(location($0)).inserted }
+    }
+
+    /// Where a copy really is: its folder's resolved parent plus its own name (a linked copy is the link itself).
+    static func location(_ copy: Skill) -> String {
+        let url = URL(fileURLWithPath: copy.installCmd)
+        return url.deletingLastPathComponent().resolvingSymlinksInPath().appendingPathComponent(url.lastPathComponent).path
+    }
+
+    /// A copy's folder for the confirmation, with the home folder shortened to ~.
+    static func displayPath(_ copy: Skill, home: String = NSHomeDirectory()) -> String {
+        copy.installCmd.hasPrefix(home + "/") ? "~" + copy.installCmd.dropFirst(home.count) : copy.installCmd
     }
 
     /// Agent names for the copies, e.g. "Agents, Claude, Codex".
@@ -63,9 +77,9 @@ final class SkillRemovalController {
     var isActive: Bool { state != .idle }
 
     /// Returns true for any removal link, so it never reaches the installer.
+    /// A newer link replaces any question still open, so the panel always asks about the skill last clicked.
     func receive(_ url: URL) -> Bool {
         guard url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "remove" else { return false }
-        if case .confirm = state { return true }
         guard let name = SkillRemoval.name(from: url) else {
             state = .failed(name: "", message: "This delete link is invalid.")
             return true
@@ -76,11 +90,18 @@ final class SkillRemovalController {
     }
 
     func confirm() {
-        guard case .confirm(let name, let copies) = state else { return }
+        guard case .confirm(let name, let asked) = state else { return }
+        // Only copies that are still there and were shown; anything new since the question is left alone.
+        let shown = Set(asked.map(SkillRemoval.location))
+        let copies = SkillRemoval.copies(named: name, in: installations()).filter { shown.contains(SkillRemoval.location($0)) }
         var removed = 0, failures: [String] = []
         for copy in copies {
             do { _ = try trash(copy); removed += 1 }
-            catch { failures.append(copy.origin ?? "Agent") }
+            catch {
+                // Already gone (e.g. trashed through a linked folder) is what was asked for.
+                if (try? FileManager.default.attributesOfItem(atPath: copy.installCmd)) == nil { removed += 1 }
+                else { failures.append(copy.origin ?? "Agent") }
+            }
         }
         if removed > 0 { onRemoved() }
         state = failures.isEmpty
@@ -105,8 +126,14 @@ struct SkillRemovalView: View {
                 EmptyView()
             case .confirm(let name, let copies):
                 Text("Delete \(name) from this Mac?").font(.headline)
-                Text("Moves \(copies.count == 1 ? "1 copy" : "\(copies.count) copies") (\(SkillRemoval.agents(copies))) to the Trash.")
+                Text("Moves \(copies.count == 1 ? "1 copy" : "\(copies.count) copies") (\(SkillRemoval.agents(copies))) to the Trash:")
                     .font(.callout).foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(copies, id: \.installCmd) { copy in
+                        Text(SkillRemoval.displayPath(copy)).font(.caption.monospaced()).foregroundStyle(.secondary)
+                            .lineLimit(1).truncationMode(.middle).help(copy.installCmd)
+                    }
+                }
                 HStack {
                     Button("Cancel") { controller.close() }.keyboardShortcut(.cancelAction)
                         .frame(maxWidth: .infinity)
