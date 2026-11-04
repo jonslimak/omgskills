@@ -1698,6 +1698,9 @@
   outline: none;
   cursor: pointer;
 }
+.ua-pill.ua-pill-danger:not(:disabled) {
+  color: var(--ua-danger);
+}
 .ua-menu-item[data-danger] {
   color: var(--ua-danger);
 }

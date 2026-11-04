@@ -445,7 +445,12 @@ export function discoverCollectionPage(collections: CatalogDisplay["collections"
   };
 }
 
-/** Opens the Mac app, which asks first and then moves every copy of the skill on that Mac to the Trash. */
-export function removeFromMacLink(name: string) {
-  return `omgskills://remove?name=${encodeURIComponent(name)}`;
+/** The most skills one delete link carries; the Mac app rejects longer links. */
+export const maxRemoveFromMac = 200;
+
+/** Opens the Mac app, which asks once and then moves every copy of these skills on that Mac to the Trash. */
+export function removeFromMacLink(names: string[]) {
+  const seen = new Set<string>();
+  const unique = names.map(name => name.trim()).filter(name => name && !seen.has(name.toLowerCase()) && seen.add(name.toLowerCase()));
+  return `omgskills://remove?${unique.map(name => `name=${encodeURIComponent(name)}`).join("&")}`;
 }
