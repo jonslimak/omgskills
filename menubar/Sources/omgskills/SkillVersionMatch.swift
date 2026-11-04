@@ -40,21 +40,35 @@ enum SkillVersionMatch {
         return (try? FileManager.default.attributesOfItem(atPath: file.path))?[.modificationDate] as? Date
     }
 
-    /// Replaces `target` with a copy of `source`: copy beside it first, then trash the old one, then move the copy in.
-    /// If anything fails the old copy stays (or is in the Trash), never half-written.
-    static func replace(_ target: Skill, with source: URL, fileManager: FileManager = .default,
-                        trash: (Skill) throws -> Void) throws {
+    enum ReplaceError: Error, Equatable {
+        /// The old copy is in the Trash but the new one couldn't be put in its place.
+        case trashedNotReplaced
+    }
+
+    /// Replaces `target` with `source`: prepare beside it first, then trash the old one, then move the new one in.
+    /// A linked copy stays a link (now to `source`), so whatever kept it linked keeps working; a folder gets a copy.
+    /// If anything fails the old copy stays, or is in the Trash and the error says so; nothing half-written is left.
+    nonisolated static func replace(_ target: Skill, with source: URL, fileManager: FileManager = .default,
+                                    trash: (Skill) throws -> Void) throws {
         let destination = URL(fileURLWithPath: target.installCmd)
+        let isLink = (try? destination.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) == true
         let staged = destination.deletingLastPathComponent()
             .appendingPathComponent(".omgskills-match-\(UUID().uuidString)", isDirectory: true)
-        try fileManager.copyItem(at: source, to: staged)
-        do {
-            try trash(target)
-            try fileManager.moveItem(at: staged, to: destination)
-        } catch {
+        if isLink { try fileManager.createSymbolicLink(at: staged, withDestinationURL: source) }
+        else { try fileManager.copyItem(at: source, to: staged) }
+        do { try trash(target) } catch {
             try? fileManager.removeItem(at: staged)
             throw error
         }
+        do { try fileManager.moveItem(at: staged, to: destination) } catch {
+            try? fileManager.removeItem(at: staged)
+            throw ReplaceError.trashedNotReplaced
+        }
+    }
+
+    /// Copies of the skill whose SKILL.md couldn't be read; they are never changed.
+    static func unreadable(named name: String, in installations: [Skill]) -> Int {
+        SkillRemoval.copies(named: [name], in: installations).filter { $0.skillMdSha?.isEmpty != false }.count
     }
 }
 
@@ -64,6 +78,7 @@ final class SkillVersionMatchController {
     enum State: Equatable {
         case idle
         case choose(name: String, versions: [SkillVersionMatch.Version])
+        case working(name: String)
         case alreadyMatching(name: String)
         case notFound(name: String)
         case done(name: String, message: String)
@@ -75,13 +90,11 @@ final class SkillVersionMatchController {
     var onChanged: () -> Void = {}
 
     @ObservationIgnored private let installations: () -> [Skill]
-    @ObservationIgnored private let trash: (Skill) throws -> Void
-    @ObservationIgnored private let replace: (Skill, URL) throws -> Void
+    @ObservationIgnored private let replace: @Sendable (Skill, URL) throws -> Void
 
-    init(installations: @escaping () -> [Skill], trash: @escaping (Skill) throws -> Void,
-         replace: ((Skill, URL) throws -> Void)? = nil) {
+    init(installations: @escaping () -> [Skill], trash: @escaping @Sendable (Skill) throws -> Void,
+         replace: (@Sendable (Skill, URL) throws -> Void)? = nil) {
         self.installations = installations
-        self.trash = trash
         self.replace = replace ?? { target, source in try SkillVersionMatch.replace(target, with: source, trash: trash) }
     }
 
@@ -101,7 +114,8 @@ final class SkillVersionMatchController {
         return true
     }
 
-    func confirm() {
+    /// File work runs off the main thread so a large skill never freezes the menu bar.
+    func confirm() async {
         guard case .choose(let name, let asked) = state, let keep = selected else { return }
         // Read again: only replace copies that were shown and are still there; never touch anything new.
         let shown = Set(asked.flatMap(\.copies).map(SkillRemoval.location))
@@ -110,17 +124,30 @@ final class SkillVersionMatchController {
               let source = chosen.copies.first.map({ URL(fileURLWithPath: $0.installCmd).resolvingSymlinksInPath() })
         else { state = .failed(message: "That version is no longer on this Mac. Nothing was changed."); return }
         let targets = now.filter { $0.sha != keep }.flatMap(\.copies).filter { shown.contains(SkillRemoval.location($0)) }
-        var replaced = 0, failures: [String] = []
-        for target in targets {
-            do { try replace(target, source); replaced += 1 }
-            catch { failures.append(target.origin ?? "Agent") }
+        let skipped = SkillVersionMatch.unreadable(named: name, in: installations())
+        state = .working(name: name)
+        let replace = self.replace
+        let outcome = await Task.detached { () -> (replaced: Int, failed: [String], lost: [String]) in
+            var replaced = 0, failed: [String] = [], lost: [String] = []
+            for target in targets {
+                do { try replace(target, source); replaced += 1 }
+                catch SkillVersionMatch.ReplaceError.trashedNotReplaced { lost.append(target.origin ?? "Agent") }
+                catch { failed.append(target.origin ?? "Agent") }
+            }
+            return (replaced, failed, lost)
+        }.value
+        if outcome.replaced > 0 || !outcome.lost.isEmpty { onChanged() }
+        let agents = { (list: [String]) in Set(list).sorted().joined(separator: ", ") }
+        if !outcome.lost.isEmpty {
+            state = .failed(message: "The old \(agents(outcome.lost)) copy is in the Trash, but the new one couldn't be "
+                + "put in its place. Put it back from the Trash.")
+        } else if !outcome.failed.isEmpty {
+            state = .failed(message: "Couldn't update the \(agents(outcome.failed)) copy. "
+                + (outcome.replaced > 0 ? "The others were updated." : "Nothing was changed."))
+        } else {
+            state = .done(name: name, message: "These copies now have the chosen version. Old copies are in the Trash."
+                + (skipped > 0 ? " \(skipped == 1 ? "1 copy" : "\(skipped) copies") without a readable SKILL.md were left alone." : ""))
         }
-        if replaced > 0 { onChanged() }
-        state = failures.isEmpty
-            ? .done(name: name, message: "Every copy now has the same version. Old copies are in the Trash.")
-            : .failed(message: "Couldn't update \(failures.count == 1 ? "1 copy" : "\(failures.count) copies") "
-                + "(\(Set(failures).sorted().joined(separator: ", "))). "
-                + (replaced > 0 ? "The others were updated." : "Nothing was changed."))
     }
 
     func close() { state = .idle; selected = nil }
@@ -139,7 +166,7 @@ struct SkillVersionMatchView: View {
                 EmptyView()
             case .choose(let name, let versions):
                 Text("Make \(name) match").font(.headline)
-                Text("Pick the version every agent should use. Other copies go to the Trash.")
+                Text("Pick the version every agent should use. Other copies go to the Trash; linked copies will link to it.")
                     .font(.callout).foregroundStyle(.secondary)
                 ForEach(Array(versions.enumerated()), id: \.element.sha) { index, version in
                     Button { controller.selected = version.sha } label: {
@@ -156,11 +183,13 @@ struct SkillVersionMatchView: View {
                         .help(version.copies.map(\.installCmd).joined(separator: "\n"))
                 }
                 VStack(spacing: 6) {
-                    Button { controller.confirm() } label: { Text("Use this version").frame(maxWidth: .infinity) }
+                    Button { Task { await controller.confirm() } } label: { Text("Use this version").frame(maxWidth: .infinity) }
                         .keyboardShortcut(.defaultAction)
                     Button { controller.close() } label: { Text("Cancel").frame(maxWidth: .infinity) }
                         .keyboardShortcut(.cancelAction)
                 }
+            case .working(let name):
+                ProgressView("Updating \(name)…").controlSize(.small)
             case .alreadyMatching(let name):
                 Text("\(name) already matches").font(.headline)
                 Text("Every copy on this Mac has the same version.").font(.callout).foregroundStyle(.secondary)
