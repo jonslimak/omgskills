@@ -197,7 +197,8 @@ export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) 
       credential,
       deviceId: device.rows[0].id,
       expiresAt,
-      accountLabel: pairing.display_name || pairing.email,
+      // The Mac shows which account it is connected to; the email tells two accounts apart.
+      accountLabel: pairing.email || pairing.display_name || "",
       grantedScopes,
       ...(reconnectHash === null ? {} : { reconnectSupported: true as const })
     };

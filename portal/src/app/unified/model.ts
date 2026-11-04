@@ -1,4 +1,5 @@
 import {
+  displaySourceNames,
   groupSyncedSkills,
   type GroupedSyncedSkill,
   type SyncedSkill,
@@ -294,9 +295,36 @@ function catalogOwner(id: string | null | undefined) {
   return /^[a-zA-Z0-9][a-zA-Z0-9-]{0,99}$/.test(owner) && id!.includes("/") ? owner : "";
 }
 
-/** Some Mac still reports this skill; a skill every Mac stopped reporting only lives on in Sets. */
-export function onAMac(skill: SkillDisplay) {
-  return !!skill.installed?.sourceSkills.some((copy) => copy.isCurrent !== false);
+/**
+ * Some Mac still reports this skill; a skill every Mac stopped reporting only lives on in Sets.
+ * Once a Mac reports per device, copies from the older account-wide sync (no device) are history too.
+ */
+export function onAMac(skill: SkillDisplay, macsReport = false) {
+  return !!skill.installed?.sourceSkills.some((copy) => isLive(copy, macsReport));
+}
+
+function isLive(copy: SyncedSkill, macsReport: boolean) {
+  return copy.isCurrent !== false && (!macsReport || copy.deviceId != null);
+}
+
+/**
+ * The skill as Macs have it now: agents, actions and details use only live copies.
+ * Set membership still matches every copy it ever had.
+ */
+export function liveSkill(skill: SkillDisplay, macsReport = false): SkillDisplay {
+  const installed = skill.installed;
+  if (!installed) return skill;
+  const live = installed.sourceSkills.filter((copy) => isLive(copy, macsReport));
+  if (!live.length) return { ...skill, installed: undefined };
+  if (live.length === installed.sourceSkills.length) return skill;
+  const [current] = groupSyncedSkills(live, { groupInstallations: true });
+  return { ...skill, installed: { ...current, sourceSkills: live,
+    sources: displaySourceNames(live.map((copy) => copy.source)), allSkillIds: installed.allSkillIds } };
+}
+
+/** Whether any Mac reports its skills per device. */
+export function macsReport(skills: PortalData["skills"]) {
+  return skills.some((skill) => skill.deviceId != null && skill.isCurrent !== false);
 }
 
 export function skillDisplays(data: PortalData, catalog: CatalogDisplay) {

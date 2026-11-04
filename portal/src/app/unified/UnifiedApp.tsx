@@ -91,7 +91,8 @@ import {
   isFavorite,
   matchesSearch,
   skillDisplays,
-  onAMac,
+  liveSkill,
+  macsReport,
   setSkillDisplays,
   setAccessSummary,
   starCount,
@@ -501,21 +502,25 @@ export function UnifiedApp({
   const main = useRef<HTMLElement>(null);
   const detailTrigger = useRef<HTMLElement | null>(null);
   const models = useMemo(() => skillDisplays(data, catalog), [data, catalog]);
-  const sources = useMemo(
-    () => displaySourceNames(data.skills.map((s) => s.source)),
-    [data.skills],
-  );
-  // Sets still match skills no Mac reports any more; the lists and counts show only skills on a Mac.
+  const perMac = useMemo(() => macsReport(data.skills), [data.skills]);
+  // Sets still match skills no Mac reports any more; the lists, agents and counts show only what Macs have now.
   const everMine = signedIn ? models.mine : [];
-  const mine = everMine.filter(onAMac);
+  const mine = useMemo(
+    () => (signedIn ? models.mine : []).map((skill) => liveSkill(skill, perMac)).filter((skill) => skill.installed),
+    [signedIn, models, perMac],
+  );
+  const sources = useMemo(
+    () => displaySourceNames(mine.flatMap((s) => s.installed?.sourceSkills.map((copy) => copy.source) ?? [])),
+    [mine],
+  );
   const setRows = management?.detail.set ? setSkillDisplays(management.detail.set, everMine, catalog.skills) : [];
-  const library = signedIn
-    ? models.library
-    : models.library.map((skill) => ({ ...skill, installed: undefined }));
+  // A Discover skill counts as yours only while a Mac has it, so Favorites and Sets get a live copy.
+  const library = models.library.map((skill) =>
+    signedIn ? liveSkill(skill, perMac) : { ...skill, installed: undefined });
   const pendingSelection: SkillDisplay | undefined = publicStatus && nav.selected.startsWith("catalog:")
     ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
-  const selected = [...everMine, ...library, ...setRows].find((s) => s.key === nav.selected
+  const selected = [...mine, ...library, ...setRows, ...everMine].find((s) => s.key === nav.selected
     || (nav.selected.startsWith("synced:") && s.key.startsWith("synced:")
       && s.installed?.allSkillIds.includes(nav.selected.slice(7)))) || pendingSelection;
   const detailOpen = useRef(false);

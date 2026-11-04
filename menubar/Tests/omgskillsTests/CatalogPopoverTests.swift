@@ -140,7 +140,7 @@ struct CatalogPopoverTests {
         #expect(code.contains("height: Self.iconButtonSize, alignment: .leading)"))
         #expect(code.contains("height: Self.iconButtonSize, alignment: .trailing)"))
         let inventory = try source("ConnectedInventoryView.swift")
-        #expect(inventory.contains("Text(\"\\(count) Skills\").font(.body)"))
+        #expect(inventory.contains("Text(\"\\(model.skillCount ?? count) Skills\").font(.body)"))
         #expect(!inventory.contains(".font(.title2)"))
     }
 

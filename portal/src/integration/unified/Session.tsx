@@ -2,7 +2,7 @@ import { useEffect, useState, type ComponentProps } from "react";
 import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
 import { RefreshCw } from "lucide-react";
 import { UnifiedApp } from "../../app/unified/UnifiedApp";
-import { initialNavigation, isDiscovery, navigationLocation, navigationSearch, skillDisplays, onAMac, type Navigation } from "../../app/unified/model";
+import { initialNavigation, isDiscovery, navigationLocation, navigationSearch, skillDisplays, liveSkill, macsReport, type Navigation } from "../../app/unified/model";
 import { PublicCatalogClient } from "../../app/unified/public-catalog";
 import { usePublicCatalog, usePublicCatalogPreload } from "../../app/unified/use-public-catalog";
 import { usePortalApi, type PortalApi } from "../../portal-api";
@@ -146,7 +146,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const [syncMetadata] = useState(() => cleanPaths ? createPageMetadata(document, takeover) : null);
   const title = pageTitle(nav, catalog);
   useEffect(() => { syncMetadata?.(location.pathname + location.search, title); }, [syncMetadata, current, title]);
-  const management = useManagement({ data, mine: skillDisplays(data, publicData.catalog).mine.filter(onAMac),
+  const management = useManagement({ data, mine: skillDisplays(data, publicData.catalog).mine.map(skill => liveSkill(skill, macsReport(data.skills))).filter(skill => skill.installed),
     busy: snapshot.setSaving || snapshot.profileSaving, blocked: !!composition?.readOnly || !available || !snapshot.data || !!snapshot.error || snapshot.accessDenied,
     scope: `${nav.view}:${nav.id}:${nav.query}`, saveSet: account.saveSet, saveMembership: account.saveMembership,
     detail: { ...detail, catalog: setCatalog }, base, local,
