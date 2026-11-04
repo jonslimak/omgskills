@@ -47,6 +47,8 @@ struct CloudSaveSync: Sendable {
     let api: any CloudSaveServing
     /// Spaces requests out to stay well under the server's rate limit.
     var pace: Pace = { try await Task.sleep(for: .milliseconds(250)) }
+    /// Which links inside skill folders are followed; without one, a folder with a link isn't saved.
+    var links: CloudSaveFolder.LinkPolicy?
 
     /// `localFolderKeys` lists every skill folder name on this Mac, valid or not, or nil when a
     /// skills folder couldn't be read; deletions are only marked when it is known.
@@ -185,8 +187,10 @@ struct CloudSaveSync: Sendable {
             let directory = URL(fileURLWithPath: skill.installCmd, isDirectory: true)
             let key = CloudSaveFolder.key(forFolderName: directory.lastPathComponent)
             let folder: CloudSaveFolder
-            do { folder = try CloudSaveFolder.read(directory: directory) }
+            do { folder = try CloudSaveFolder.read(directory: directory, links: links) }
+            catch CloudSaveFolder.ReadError.libraryInstall { summary.library.insert(key); continue }
             catch CloudSaveFolder.ReadError.containsLink { summary.skipped[key] = .links; continue }
+            catch CloudSaveFolder.ReadError.privateLink { summary.skipped[key] = .links; continue }
             catch CloudSaveFolder.ReadError.invalid(let code) where [.fileTooLarge, .packageTooLarge, .tooManyFiles].contains(code) {
                 summary.skipped[key] = .tooLarge; continue
             }

@@ -25,7 +25,52 @@ struct CloudSaveFolder: Equatable, Sendable {
     enum ReadError: Error, Equatable, Sendable {
         case unreadable
         case containsLink(String)
+        /// The folder links into the library copies older omgskills versions kept; it can be installed again.
+        case libraryInstall
+        /// A link points somewhere cloud save never reads, such as keys, settings or other apps' data.
+        case privateLink(String)
         case invalid(SkillPackageValidationFailureCode)
+    }
+
+    /// Which links a skill folder may follow. Without one, any link inside a folder stops it being saved.
+    struct LinkPolicy: Equatable, Sendable {
+        let home: URL
+        /// Where older omgskills versions kept library repos and linked skills into.
+        let libraryRoot: URL
+
+        /// Hidden folders in the home folder that hold skills; any other hidden folder holds settings or keys.
+        private static let agentFolders: Set<String> = [".claude", ".codex", ".agents", ".cursor"]
+
+        enum Target: Equatable { case library, own, privateFile }
+
+        func reachesThroughLink(_ url: URL) -> Bool {
+            let homePath = home.standardizedFileURL.path
+            let path = url.standardizedFileURL.path
+            guard path.hasPrefix(homePath + "/") else {
+                return (try? url.resourceValues(forKeys: [.isSymbolicLinkKey]))?.isSymbolicLink == true
+            }
+            var current = home.standardizedFileURL
+            for component in path.dropFirst(homePath.count + 1).split(separator: "/") {
+                current.appendPathComponent(String(component))
+                if (try? current.resourceValues(forKeys: [.isSymbolicLinkKey]))?.isSymbolicLink == true { return true }
+            }
+            return false
+        }
+
+        func classify(_ target: URL) -> Target {
+            let path = target.resolvingSymlinksInPath().standardizedFileURL.path
+            let library = libraryRoot.resolvingSymlinksInPath().standardizedFileURL.path
+            if path == library || path.hasPrefix(library + "/") { return .library }
+            let homePath = home.resolvingSymlinksInPath().standardizedFileURL.path
+            guard path.hasPrefix(homePath + "/") else { return .privateFile }
+            let parts = path.dropFirst(homePath.count + 1).split(separator: "/").map(String.init)
+            guard let first = parts.first, first != "Library" else { return .privateFile }
+            for (index, part) in parts.enumerated() where part.hasPrefix(".") {
+                if index == 0 && Self.agentFolders.contains(part) { continue }
+                return .privateFile
+            }
+            return .own
+        }
     }
 
     /// A skill's identity across agents and Macs, matching the server: the folder name, NFC and lower case.
@@ -45,15 +90,24 @@ struct CloudSaveFolder: Equatable, Sendable {
         return result
     }
 
-    static func read(directory: URL, fileManager: FileManager = .default) throws -> CloudSaveFolder {
+    static func read(directory: URL, links: LinkPolicy? = nil, fileManager: FileManager = .default) throws -> CloudSaveFolder {
         let root = directory.resolvingSymlinksInPath()
         var isDirectory: ObjCBool = false
         guard fileManager.fileExists(atPath: root.path, isDirectory: &isDirectory), isDirectory.boolValue else {
             throw ReadError.unreadable
         }
-        var entries: [SkillPackageEntry] = []
-        var modifiedAt = Date.distantPast
-        try collect(root, prefix: "", into: &entries, modifiedAt: &modifiedAt, fileManager: fileManager)
+        let rootIsLink = links?.reachesThroughLink(directory) ?? false
+        if let links {
+            switch links.classify(root) {
+            case .library: throw ReadError.libraryInstall
+            case .privateFile where rootIsLink: throw ReadError.privateLink(directory.lastPathComponent)
+            default: break
+            }
+        }
+        var reader = Reader(links: links, fileManager: fileManager, visited: [root.standardizedFileURL.path])
+        try reader.collect(root, prefix: "", throughLink: links != nil && rootIsLink)
+        if reader.linksIntoLibrary { throw ReadError.libraryInstall }
+        let entries = reader.entries, modifiedAt = reader.modifiedAt
         do {
             let coordinates = try SkillPackageValidator.unpinnedCoordinates(for: entries, limits: limits)
             return CloudSaveFolder(key: key(forFolderName: directory.lastPathComponent), directory: directory,
@@ -63,31 +117,57 @@ struct CloudSaveFolder: Equatable, Sendable {
         }
     }
 
-    private static func collect(_ directory: URL, prefix: String, into entries: inout [SkillPackageEntry],
-                                modifiedAt: inout Date, fileManager: FileManager) throws {
-        let names: [String]
-        do { names = try fileManager.contentsOfDirectory(atPath: directory.path) }
-        catch { throw ReadError.unreadable }
-        for name in names.sorted() where !ignoredNames.contains(name) {
-            let url = directory.appendingPathComponent(name)
-            let path = prefix.isEmpty ? name : "\(prefix)/\(name)"
-            let values = try? url.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey, .isRegularFileKey])
-            if values?.isSymbolicLink == true { throw ReadError.containsLink(path) }
-            if values?.isDirectory == true {
-                try collect(url, prefix: path, into: &entries, modifiedAt: &modifiedAt, fileManager: fileManager)
-                continue
+    private struct Reader {
+        let links: LinkPolicy?
+        let fileManager: FileManager
+        /// Folders already read, so a link back up the tree can't loop.
+        var visited: Set<String>
+        var entries: [SkillPackageEntry] = []
+        var modifiedAt = Date.distantPast
+        var linksIntoLibrary = false
+
+        /// `throughLink`: this folder was reached by following a link, so it may be a project folder
+        /// holding hidden files such as .env; those are never read.
+        mutating func collect(_ directory: URL, prefix: String, throughLink: Bool) throws {
+            let names: [String]
+            do { names = try fileManager.contentsOfDirectory(atPath: directory.path) }
+            catch { throw ReadError.unreadable }
+            for name in names.sorted() where !ignoredNames.contains(name) && !(throughLink && name.hasPrefix(".")) {
+                var url = directory.appendingPathComponent(name)
+                let path = prefix.isEmpty ? name : "\(prefix)/\(name)"
+                var values = try? url.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey, .isRegularFileKey])
+                var followed = throughLink
+                if values?.isSymbolicLink == true {
+                    guard let links else { throw ReadError.containsLink(path) }
+                    let target = url.resolvingSymlinksInPath()
+                    switch links.classify(target) {
+                    case .library: linksIntoLibrary = true; continue
+                    case .privateFile: throw ReadError.privateLink(path)
+                    case .own: break
+                    }
+                    // Read what the link points to as if it were here.
+                    url = target
+                    followed = true
+                    values = try? url.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey, .isRegularFileKey])
+                    guard values?.isDirectory == true || values?.isRegularFile == true else { throw ReadError.containsLink(path) }
+                }
+                if values?.isDirectory == true {
+                    guard visited.insert(url.standardizedFileURL.path).inserted else { throw ReadError.containsLink(path) }
+                    try collect(url, prefix: path, throughLink: followed)
+                    continue
+                }
+                guard values?.isRegularFile == true else { throw ReadError.invalid(.unsupportedEntryType) }
+                if entries.count >= limits.maximumFileCount { throw ReadError.invalid(.tooManyFiles) }
+                let attributes = try? fileManager.attributesOfItem(atPath: url.path)
+                if let size = attributes?[.size] as? Int, size > limits.maximumFileBytes {
+                    throw ReadError.invalid(.fileTooLarge)
+                }
+                guard let data = try? Data(contentsOf: url) else { throw ReadError.unreadable }
+                let permissions = (attributes?[.posixPermissions] as? Int) ?? 0
+                if let changed = attributes?[.modificationDate] as? Date, changed > modifiedAt { modifiedAt = changed }
+                entries.append(SkillPackageEntry(path: path, mode: permissions & 0o111 != 0 ? "100755" : "100644",
+                    data: data, blobSha: SkillIdentityResolver.gitBlobSHA(for: data)))
             }
-            guard values?.isRegularFile == true else { throw ReadError.invalid(.unsupportedEntryType) }
-            if entries.count >= limits.maximumFileCount { throw ReadError.invalid(.tooManyFiles) }
-            let attributes = try? fileManager.attributesOfItem(atPath: url.path)
-            if let size = attributes?[.size] as? Int, size > limits.maximumFileBytes {
-                throw ReadError.invalid(.fileTooLarge)
-            }
-            guard let data = try? Data(contentsOf: url) else { throw ReadError.unreadable }
-            let permissions = (attributes?[.posixPermissions] as? Int) ?? 0
-            if let changed = attributes?[.modificationDate] as? Date, changed > modifiedAt { modifiedAt = changed }
-            entries.append(SkillPackageEntry(path: path, mode: permissions & 0o111 != 0 ? "100755" : "100644",
-                data: data, blobSha: SkillIdentityResolver.gitBlobSHA(for: data)))
         }
     }
 }

@@ -28,10 +28,11 @@ final class CloudSaveController {
 
     init(api: any CloudSaveServing, credential: @escaping @MainActor () -> StoredDeviceCredential?, scan: @escaping Scan,
          folderKeys: @escaping FolderKeys, treeRecord: URL? = CloudSaveController.defaultTreeRecord,
-         pace: CloudSaveSync.Pace? = nil) {
+         pace: CloudSaveSync.Pace? = nil, links: CloudSaveFolder.LinkPolicy? = nil) {
         self.api = api
         var sync = CloudSaveSync(api: api)
         if let pace { sync.pace = pace }
+        sync.links = links
         self.sync = sync
         self.credential = credential
         self.scan = scan
