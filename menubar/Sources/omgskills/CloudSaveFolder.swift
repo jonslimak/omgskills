@@ -82,9 +82,16 @@ struct CloudSaveFolder: Equatable, Sendable {
         guard fileManager.fileExists(atPath: root.path, isDirectory: &isDirectory), isDirectory.boolValue else {
             throw ReadError.unreadable
         }
-        if links?.classify(root) == .library { throw ReadError.libraryInstall }
+        let rootIsLink = (try? directory.resourceValues(forKeys: [.isSymbolicLinkKey]))?.isSymbolicLink == true
+        if let links {
+            switch links.classify(root) {
+            case .library: throw ReadError.libraryInstall
+            case .privateFile where rootIsLink: throw ReadError.privateLink(directory.lastPathComponent)
+            default: break
+            }
+        }
         var reader = Reader(links: links, fileManager: fileManager, visited: [root.standardizedFileURL.path])
-        try reader.collect(root, prefix: "")
+        try reader.collect(root, prefix: "", throughLink: links != nil && rootIsLink)
         if reader.linksIntoLibrary { throw ReadError.libraryInstall }
         let entries = reader.entries, modifiedAt = reader.modifiedAt
         do {
@@ -105,14 +112,17 @@ struct CloudSaveFolder: Equatable, Sendable {
         var modifiedAt = Date.distantPast
         var linksIntoLibrary = false
 
-        mutating func collect(_ directory: URL, prefix: String) throws {
+        /// `throughLink`: this folder was reached by following a link, so it may be a project folder
+        /// holding hidden files such as .env; those are never read.
+        mutating func collect(_ directory: URL, prefix: String, throughLink: Bool) throws {
             let names: [String]
             do { names = try fileManager.contentsOfDirectory(atPath: directory.path) }
             catch { throw ReadError.unreadable }
-            for name in names.sorted() where !ignoredNames.contains(name) {
+            for name in names.sorted() where !ignoredNames.contains(name) && !(throughLink && name.hasPrefix(".")) {
                 var url = directory.appendingPathComponent(name)
                 let path = prefix.isEmpty ? name : "\(prefix)/\(name)"
                 var values = try? url.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey, .isRegularFileKey])
+                var followed = throughLink
                 if values?.isSymbolicLink == true {
                     guard let links else { throw ReadError.containsLink(path) }
                     let target = url.resolvingSymlinksInPath()
@@ -123,12 +133,13 @@ struct CloudSaveFolder: Equatable, Sendable {
                     }
                     // Read what the link points to as if it were here.
                     url = target
+                    followed = true
                     values = try? url.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey, .isRegularFileKey])
                     guard values?.isDirectory == true || values?.isRegularFile == true else { throw ReadError.containsLink(path) }
                 }
                 if values?.isDirectory == true {
                     guard visited.insert(url.standardizedFileURL.path).inserted else { throw ReadError.containsLink(path) }
-                    try collect(url, prefix: path)
+                    try collect(url, prefix: path, throughLink: followed)
                     continue
                 }
                 guard values?.isRegularFile == true else { throw ReadError.invalid(.unsupportedEntryType) }

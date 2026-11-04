@@ -111,6 +111,23 @@ struct CloudSaveFolderTests {
             try link(name, in: skill, to: file)
             #expect(throws: CloudSaveFolder.ReadError.privateLink(name)) { try CloudSaveFolder.read(directory: skill, links: policy) }
         }
+        // Hidden files in a linked folder, such as a project's .env, are never read.
+        let app = try makeSkill(home.appendingPathComponent("Projects/app-skill"), "skill",
+                                files: [".env": "TOKEN=secret", ".config/keys.json": "{}", "docs/.env": "x", "docs/a.md": "a"])
+        let viaFolder = try makeSkill(skills, "via-folder")
+        try link("docs", in: viaFolder, to: app.appendingPathComponent("docs"))
+        #expect(try CloudSaveFolder.read(directory: viaFolder, links: policy).entries.map(\.path) == ["SKILL.md", "docs/a.md"])
+        try link("app-skill", in: skills, to: app)
+        let viaRoot = try CloudSaveFolder.read(directory: skills.appendingPathComponent("app-skill"), links: policy)
+        #expect(viaRoot.entries.map(\.path) == ["SKILL.md", "docs/a.md"])
+        // A skill folder that is itself a link to a private place isn't read.
+        let sshFolder = home.appendingPathComponent(".ssh", isDirectory: true)
+        try Data("# s".utf8).write(to: sshFolder.appendingPathComponent("SKILL.md"))
+        try link("keys-skill", in: skills, to: sshFolder)
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("keys-skill")) {
+            try CloudSaveFolder.read(directory: skills.appendingPathComponent("keys-skill"), links: policy)
+        }
+
         let outside = try makeSkill(skills, "outside")
         try link("hosts", in: outside, to: URL(fileURLWithPath: "/etc/hosts"))
         #expect(throws: CloudSaveFolder.ReadError.privateLink("hosts")) { try CloudSaveFolder.read(directory: outside, links: policy) }
