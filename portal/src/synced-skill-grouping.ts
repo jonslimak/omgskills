@@ -111,11 +111,9 @@ export function displaySourceNames(sources: string[]) {
   return [...new Set(sources.map(displaySourceName))].sort((a, b) => a.localeCompare(b));
 }
 
-function contentIdentity(skill: SyncedSkill) {
-  const name = normalizedSkillText(skill.name);
-  const fingerprint = skill.skillMdSha?.trim().toLowerCase();
-  return name && fingerprint && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(fingerprint)
-    ? JSON.stringify([name, fingerprint]) : null;
+/** One skill per name: copies in different agents or with different content are the same skill. */
+function nameIdentity(skill: SyncedSkill) {
+  return normalizedSkillText(skill.name) || null;
 }
 
 export function hasSource(skill: GroupedSyncedSkill, source: string) {
@@ -153,7 +151,7 @@ export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = 
   for (const skill of skills) {
     if (groupInstallations) {
       const catalogId = skill.catalogSkillId?.trim();
-      const identity = catalogId || contentIdentity(skill);
+      const identity = catalogId || nameIdentity(skill);
       if (identity) {
         const groups = catalogId ? catalogGroups : displayGroups;
         const group = groups.get(identity) ?? [];
@@ -178,19 +176,19 @@ export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = 
   }
 
   if (groupInstallations) {
-    const catalogIdsByContent = new Map<string, Set<string>>();
+    const catalogIdsByName = new Map<string, Set<string>>();
     for (const [catalogId, group] of catalogGroups) {
       for (const skill of group) {
-        const key = contentIdentity(skill);
+        const key = nameIdentity(skill);
         if (!key) continue;
-        const matches = catalogIdsByContent.get(key) ?? new Set<string>();
+        const matches = catalogIdsByName.get(key) ?? new Set<string>();
         matches.add(catalogId);
-        catalogIdsByContent.set(key, matches);
+        catalogIdsByName.set(key, matches);
       }
     }
-    // An exact copy may join one known identity, but must never bridge conflicting catalog IDs.
+    // A same-named copy may join one known identity, but must never bridge conflicting catalog IDs.
     for (const [key, group] of displayGroups) {
-      const matches = catalogIdsByContent.get(key);
+      const matches = catalogIdsByName.get(key);
       if (matches?.size !== 1) continue;
       const [catalogId] = matches;
       catalogGroups.get(catalogId)!.push(...group);

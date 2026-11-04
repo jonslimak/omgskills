@@ -13,10 +13,11 @@ struct UniqueSkillCountTests {
         let a = String(repeating: "a", count: 40), b = String(repeating: "b", count: 40)
         let installs = [
             skill("Review", a), skill("review", a.uppercased(), origin: "Codex"), // same skill in two agents
-            skill("review", b, origin: "Codex"), // same name, different SKILL.md: shown twice on the web
-            skill("notes", nil), skill("notes", nil, origin: "Codex"), // no hash: each stands alone
-            skill("ship  it", a), skill("ship it", a, origin: "Codex"),
+            skill("review", b, origin: "Codex"), // different version of the same skill: still one
+            skill("notes", nil), skill("notes", nil, origin: "Codex"), // no hash: still one by name
+            skill("ship  it", a), skill("ship it", b, origin: "Codex"),
+            skill("", nil), // no name: stands alone
         ]
-        #expect(DeviceConnectionModel.uniqueSkillCount(installs) == 5)
+        #expect(DeviceConnectionModel.uniqueSkillCount(installs) == 4)
     }
 }

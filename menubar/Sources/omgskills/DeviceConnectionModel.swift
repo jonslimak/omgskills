@@ -32,17 +32,14 @@ final class DeviceConnectionModel {
         case uncertain(String)
     }
 
-    /// Copies with the same name and SKILL.md are one skill, as on the web; a copy without a SKILL.md hash stands alone.
+    /// One skill per name, the way the web counts them: copies in other agents or with different content count once.
     nonisolated static func uniqueSkillCount(_ installations: [Skill]) -> Int {
-        var seen = Set<String>(), alone = 0
+        var seen = Set<String>(), unnamed = 0
         for skill in installations {
             let name = skill.name.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ")
-            guard let sha = skill.skillMdSha?.lowercased(), !name.isEmpty,
-                  sha.range(of: "^([a-f0-9]{40}|[a-f0-9]{64})$", options: .regularExpression) != nil
-            else { alone += 1; continue }
-            seen.insert(name + "\n" + sha)
+            if name.isEmpty { unnamed += 1 } else { seen.insert(name) }
         }
-        return seen.count + alone
+        return seen.count + unnamed
     }
 
     typealias InventoryScanner = @Sendable () async throws -> InstalledSkillsScanner.ScanResult
