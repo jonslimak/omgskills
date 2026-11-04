@@ -834,6 +834,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.ua-row-versions {
+  flex-shrink: 0;
+  color: var(--ua-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
 .ua-row-heading:has(.ua-row-author) .ua-row-name {
   flex-shrink: 0;
   max-width: 70%;
@@ -2006,6 +2012,12 @@
   padding-bottom: 2px;
 }
 .ua-detail-account > div:first-of-type {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  color: var(--ua-muted);
+}
+.ua-detail-versions {
   display: flex;
   justify-content: space-between;
   gap: 15px;

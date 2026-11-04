@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { groupSyncedSkills, hasCatalogId, installedSetNames, type SyncedSkill } from "../src/synced-skill-grouping.js";
+import { groupSyncedSkills, hasCatalogId, installedSetNames, skillVersions, type SyncedSkill } from "../src/synced-skill-grouping.js";
 
 test("Set origins include every grouped installation, without inventing membership", () => {
   const base: SyncedSkill = { id: "first", name: "review", description: "Review", githubUrl: null,
@@ -259,4 +259,16 @@ test("display deduplicates known agent labels without changing physical sources"
   assert.deepEqual(group.sources, ["Agents", "Claude", "Codex"]);
   assert.deepEqual(group.sourceSkills, before);
   assert.deepEqual(rows, before);
+});
+
+test("versions list each SKILL.md a skill's current copies have, with their agents", () => {
+  const base: SyncedSkill = { inventoryVersion: 3, deviceId: "mac-a", id: "claude", name: "humanizer", description: "",
+    skillMdSha: "a".repeat(40), catalogSkillId: null, githubUrl: null, isLocalOnly: true,
+    source: "claude", lastSeenAt: "2026-10-30T12:00:00Z", isCurrent: true };
+  const rows = [base, { ...base, id: "agents", source: "agents" },
+    { ...base, id: "codex", source: "codex", skillMdSha: "B".repeat(40), catalogSkillId: "blader/humanizer" },
+    { ...base, id: "gone", source: "codex", skillMdSha: "c".repeat(40), isCurrent: false }];
+  const [group] = groupSyncedSkills(rows, { groupInstallations: true });
+  assert.deepEqual(skillVersions(group), [["Agents", "Claude"], ["Codex"]]);
+  assert.equal(skillVersions(groupSyncedSkills([base], { groupInstallations: true })[0]).length, 1);
 });

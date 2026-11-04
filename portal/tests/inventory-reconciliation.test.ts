@@ -329,6 +329,13 @@ test("rendered My skills and Set rows retain missing history separately from lat
     assert.match(render({ ...setNav, source: "codex" }, management), /aria-label="Open Saved snapshot"/);
     assert.deepEqual(data.skills.map(inventorySummary), histories);
     assert.deepEqual(data, beforeGrouping);
+    assert.doesNotMatch(render(), /\d versions/);
+
+    // Copies on a Mac with different SKILL.md content are one skill with two versions.
+    data.skills = [data.skills[1], { ...data.skills[1], id: "claude-v2", source: "claude", skillMdSha: "b".repeat(64) }];
+    const twoVersions = render();
+    assert.equal([...twoVersions.matchAll(/aria-label="Open Removal fixture"/g)].length, 1);
+    assert.match(twoVersions, /class="ua-row-versions"[^>]*>2 versions</);
   } finally {
     if (descriptor) Object.defineProperty(globalThis, "window", descriptor); else Reflect.deleteProperty(globalThis, "window");
   }
