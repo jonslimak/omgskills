@@ -227,7 +227,9 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
         else if (command.kind === "update-item") await updateMembershipItem(scoped, command.id, command.itemId, signal);
         else if (command.kind === "catalog") result = await addCatalogMembership(scoped, current.sets, command, signal);
         else if (command.kind === "remove-favorite") {
-          const skill = command.skillId ? membershipRows(current.skills).get(command.skillId) : undefined;
+          const skill = command.skillId
+            ? groupSyncedSkills(current.skills, { groupInstallations: true }).find(group => group.allSkillIds.includes(command.skillId!))
+            : undefined;
           if (command.skillId && !skill) throw new PortalApiError("Your selected skill changed. Refresh and select it again.", 409);
           result = await removeFavoriteMembership(scoped, current.sets, command.catalogId, skill, signal);
         }
