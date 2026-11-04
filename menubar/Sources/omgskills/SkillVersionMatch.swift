@@ -99,6 +99,7 @@ final class SkillVersionMatchController {
     }
 
     var isActive: Bool { state != .idle }
+    var isWorking: Bool { if case .working = state { true } else { false } }
 
     /// Returns true for any match link, so it never reaches the installer. A newer link replaces an open question.
     func receive(_ url: URL) -> Bool {
@@ -150,7 +151,11 @@ final class SkillVersionMatchController {
         }
     }
 
-    func close() { state = .idle; selected = nil }
+    func close() {
+        guard !isWorking else { return }
+        state = .idle
+        selected = nil
+    }
 }
 
 #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE

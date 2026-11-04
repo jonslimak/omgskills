@@ -55,8 +55,8 @@ struct SkillRestoreTests {
         restore.onChanged = { changed += 1 }
         #expect(restore.receive(URL(string: "omgskills://restore?name=notes&key=notes&version=\(versionID)")!))
         for _ in 0..<50 where !{ if case .confirm = restore.state { true } else { false } }() { await Task.yield() }
-        guard case .confirm(_, let savedAt, let shown) = restore.state else { Issue.record("expected confirmation: \(restore.state)"); return }
-        #expect(savedAt == "2026-11-01T09:00:00.000Z" && shown.count == 3)
+        guard case .confirm(_, let version, let shown) = restore.state else { Issue.record("expected confirmation: \(restore.state)"); return }
+        #expect(version.savedAt == "2026-11-01T09:00:00.000Z" && shown.count == 3)
         #expect(downloads == 0, "Nothing is downloaded or changed before confirming")
         await restore.confirm()
         guard case .done = restore.state else { Issue.record("expected done: \(restore.state)"); return }
@@ -76,9 +76,10 @@ struct SkillRestoreTests {
         _ = restore.receive(URL(string: "omgskills://restore?name=notes&key=notes&version=33333333-3333-4333-8333-333333333333")!)
         for _ in 0..<50 { await Task.yield() }
         #expect(restore.state == .failed(message: "That saved version wasn't found. Nothing was changed."))
-        _ = restore.receive(URL(string: "omgskills://restore?name=notes&key=notes&version=\(versionID)")!)
+        // Another skill's saved files can never land on this one.
+        _ = restore.receive(URL(string: "omgskills://restore?name=notes&key=other&version=\(versionID)")!)
         for _ in 0..<50 { await Task.yield() }
-        #expect(restore.state == .alreadyRestored(name: "notes"))
+        #expect(restore.state == .failed(message: "notes isn't on this Mac, so there's nothing to restore into."))
         _ = restore.receive(URL(string: "omgskills://restore?name=gone&key=gone&version=\(versionID)")!)
         for _ in 0..<50 { await Task.yield() }
         #expect(restore.state == .failed(message: "gone isn't on this Mac, so there's nothing to restore into."))

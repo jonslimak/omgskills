@@ -33,6 +33,14 @@ enum SkillRestore {
         return Request(name: name, key: key, versionID: version)
     }
 
+    /// The copies a restore link may replace: same skill name and saved under the link's key (its folder name),
+    /// so one skill's saved files can never land on another skill.
+    static func copies(for request: Request, in installations: [Skill]) -> [Skill] {
+        SkillRemoval.copies(named: [request.name], in: installations).filter {
+            CloudSaveFolder.key(forFolderName: URL(fileURLWithPath: $0.installCmd).lastPathComponent) == request.key
+        }
+    }
+
     /// Writes a downloaded version to a new folder (already checked by the download).
     nonisolated static func write(_ package: SkillPackage, to folder: URL, fileManager: FileManager = .default) throws {
         try fileManager.createDirectory(at: folder, withIntermediateDirectories: true)
@@ -78,9 +86,8 @@ final class SkillRestoreController {
     enum State: Equatable {
         case idle
         case checking(name: String)
-        case confirm(request: SkillRestore.Request, savedAt: String, copies: [Skill])
+        case confirm(request: SkillRestore.Request, version: CloudSavedVersion, copies: [Skill])
         case working(name: String)
-        case alreadyRestored(name: String)
         case done(name: String, message: String)
         case failed(message: String)
     }
@@ -93,7 +100,6 @@ final class SkillRestoreController {
     @ObservationIgnored private let versions: (String, StoredDeviceCredential) async throws -> [CloudSavedVersion]
     @ObservationIgnored private let download: (String, GroupManifestRelease, StoredDeviceCredential) async throws -> SkillPackage
     @ObservationIgnored private let trash: @Sendable (Skill) throws -> Void
-    @ObservationIgnored private var pending: CloudSavedVersion?
     @ObservationIgnored private var attempt = UUID()
 
     init(installations: @escaping () -> [Skill],
@@ -109,10 +115,13 @@ final class SkillRestoreController {
     }
 
     var isActive: Bool { state != .idle }
+    /// While files are being replaced nothing else may start or close this.
+    var isWorking: Bool { if case .working = state { true } else { false } }
 
-    /// Returns true for any restore link. A newer link replaces an open question.
+    /// Returns true for any restore link. A newer link replaces an open question, never a restore in progress.
     func receive(_ url: URL) -> Bool {
         guard url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "restore" else { return false }
+        guard !isWorking else { return true }
         guard let request = SkillRestore.request(from: url) else {
             state = .failed(message: "This restore link is invalid.")
             return true
@@ -128,7 +137,7 @@ final class SkillRestoreController {
         guard let credential = credential() else {
             return finish(id, .failed(message: "Connect this Mac to your account to restore skills."))
         }
-        let copies = SkillRemoval.copies(named: [request.name], in: installations())
+        let copies = SkillRestore.copies(for: request, in: installations())
         guard !copies.isEmpty else {
             return finish(id, .failed(message: "\(request.name) isn't on this Mac, so there's nothing to restore into."))
         }
@@ -137,11 +146,7 @@ final class SkillRestoreController {
             guard let version = try await versions(request.key, credential).first(where: { $0.id == request.versionID }) else {
                 return finish(id, .failed(message: "That saved version wasn't found. Nothing was changed."))
             }
-            if copies.allSatisfy({ $0.skillMdSha?.lowercased() == version.skillMdSha.lowercased() }) {
-                return finish(id, .alreadyRestored(name: request.name))
-            }
-            pending = version
-            finish(id, .confirm(request: request, savedAt: version.savedAt, copies: copies))
+            finish(id, .confirm(request: request, version: version, copies: copies))
         } catch {
             finish(id, .failed(message: "Couldn't reach your saved versions. Check your connection and try again."))
         }
@@ -153,14 +158,16 @@ final class SkillRestoreController {
     }
 
     func confirm() async {
-        guard case .confirm(let request, _, let asked) = state, let version = pending, let credential = credential() else { return }
+        guard case .confirm(let request, let version, let asked) = state, let credential = credential() else { return }
         let id = attempt
         state = .working(name: request.name)
         let shown = Set(asked.map(SkillRemoval.location))
-        let copies = SkillRemoval.copies(named: [request.name], in: installations()).filter { shown.contains(SkillRemoval.location($0)) }
+        let copies = SkillRestore.copies(for: request, in: installations()).filter { shown.contains(SkillRemoval.location($0)) }
         let package: SkillPackage
         do { package = try await download(version.sourceId, version.release, credential) }
-        catch { return finish(id, .failed(message: "Couldn't download that version. Nothing was changed.")) }
+        catch GroupSkillPackageLoaderError.contentReadRequired {
+            return finish(id, .failed(message: "Reconnect this Mac to your account to allow downloads, then try again."))
+        } catch { return finish(id, .failed(message: "Couldn't download that version. Nothing was changed.")) }
         let trash = self.trash
         let outcome = await Task.detached { () -> (replaced: Int, failed: [String], lost: [String])? in
             let folder = FileManager.default.temporaryDirectory.appendingPathComponent("omgskills-restore-\(UUID().uuidString)")
@@ -182,7 +189,11 @@ final class SkillRestoreController {
         }
     }
 
-    func close() { attempt = UUID(); pending = nil; state = .idle }
+    func close() {
+        guard !isWorking else { return }
+        attempt = UUID()
+        state = .idle
+    }
 }
 
 #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
@@ -199,9 +210,9 @@ struct SkillRestoreView: View {
             case .checking(let name):
                 ProgressView("Checking \(name)…").controlSize(.small)
                 Button("Cancel") { controller.close() }.keyboardShortcut(.cancelAction)
-            case .confirm(let request, let savedAt, let copies):
+            case .confirm(let request, let version, let copies):
                 Text("Restore \(request.name)?").font(.headline)
-                Text("Puts the version saved \(Self.date(savedAt)) in place of the copies in \(SkillRemoval.agents(copies)). "
+                Text("Puts the version saved \(Self.date(version.savedAt)) in place of the copies in \(SkillRemoval.agents(copies)). "
                     + "Current copies go to the Trash.")
                     .font(.callout).foregroundStyle(.secondary)
                     .help(copies.map(\.installCmd).joined(separator: "\n"))
@@ -213,9 +224,6 @@ struct SkillRestoreView: View {
                 }
             case .working(let name):
                 ProgressView("Restoring \(name)…").controlSize(.small)
-            case .alreadyRestored(let name):
-                Text("\(name) already has that version").font(.headline)
-                Button("Done") { controller.close() }.keyboardShortcut(.defaultAction)
             case .done(let name, let message):
                 Text("Restored \(name)").font(.headline)
                 Text(message).font(.callout).foregroundStyle(.secondary)
