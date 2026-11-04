@@ -122,6 +122,21 @@ test("unfavorite removes matching catalog and synced representations, not simila
   assert.equal(refreshed.sets[0].items.length, 2);
 });
 
+test("unfavorite removes a Favorite saved under another copy's catalog ID of the same skill", async () => {
+  const f = fixture();
+  const data = await loadAccountData(f.api, identity, true);
+  data.skills = [
+    { id: "codex", name: "Skill", description: "", source: "codex", catalogSkillId: catalogId, githubUrl: null },
+    { id: "claude", name: "Skill", description: "", source: "claude", catalogSkillId: "fork/repo:skill", githubUrl: null },
+  ];
+  const displayed = skillDisplays(data, { skills: [], collections: [], creators: [], categories: [], trendingIds: [] }).mine[0];
+  f.setItems([item("fork", { catalogSkillId: "fork/repo:skill" }), item("unrelated", { catalogSkillId: "other/repo:skill" })]);
+  const refreshed = await loadAccountData(f.api, identity, true);
+  assert.equal(isFavorite(refreshed, displayed), true);
+  await removeFavoriteMembership(f.api, data.sets, displayed.catalogId, displayed.installed, new AbortController().signal);
+  assert.deepEqual(f.calls.filter(call => call.method === "DELETE").map(call => call.body.itemId), ["fork"]);
+});
+
 test("unfavorite protects ownership, hidden sets, Favorites identity, and missing item mappings", async () => {
   const sets = (await loadAccountData(fixture().api, identity, true)).sets;
   for (const options of [{ role: "invited" }, { role: "public" }, { hidden: true }, { isFavorites: false }, { missingIdentity: true }]) {
