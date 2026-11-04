@@ -32,6 +32,7 @@ import {
   Code,
   Compass,
   Copy,
+  Trash2,
   Download,
   FileText,
   FileSearch,
@@ -92,6 +93,7 @@ import {
   matchesSearch,
   skillDisplays,
   liveSkill,
+  removeFromMacLink,
   liveMine,
   setSkillDisplays,
   setAccessSummary,
@@ -241,15 +243,18 @@ function MenuItem({
   children,
   onSelect,
   disabled,
+  danger,
 }: {
   icon?: LucideIcon;
   children: ReactNode;
   onSelect: () => void;
   disabled?: boolean;
+  danger?: boolean;
 }) {
   return (
     <DropdownMenu.Item
       className="ua-menu-item"
+      data-danger={danger || undefined}
       onSelect={onSelect}
       disabled={disabled}
     >
@@ -936,6 +941,10 @@ export function UnifiedApp({
               >
                 Copy source link
               </MenuItem>
+              {(!readOnlyAccount || management) && liveCopies && <MenuItem icon={Trash2} danger
+                onSelect={() => window.location.assign(removeFromMacLink(liveCopies.name))}>
+                Delete from my Mac…
+              </MenuItem>}
             </Menu>
           ))}
       </div>

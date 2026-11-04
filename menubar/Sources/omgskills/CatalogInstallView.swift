@@ -17,6 +17,7 @@ struct CatalogInstallView: View {
     var inventoryRuntime: ConnectedInventoryRuntime? = nil
     var connectionSetupError: String? = nil
     var setInstall: CompanionSetInstallController? = nil
+    var removal: SkillRemovalController? = nil
 
     static let connectionSetupFailureMessage = "Account connection is unavailable. Skill installation is still available."
     static let panelWidth: CGFloat = 210
@@ -59,6 +60,7 @@ struct CatalogInstallView: View {
     private var statusContent: some View {
         Group {
             if model.phase != .idle { installContent }
+            else if let removal, removal.isActive { SkillRemovalView(controller: removal) }
             else if let setInstall, setInstall.isActive {
                 CompanionSetInstallView(controller: setInstall, reconnect: reconnect)
             } else { accountContent }
@@ -222,6 +224,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     private var appUpdater: CatalogCandidateUpdater?
     private var connectedRuntime: ConnectedInventoryRuntime?
     private var setInstall: CompanionSetInstallController?
+    private var removal: SkillRemovalController?
 
     #if DEBUG
     convenience init(root: URL, website: URL, coordinator: UpdateInstallCoordinator,
@@ -297,6 +300,12 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
                 connectedRuntime = runtime
                 runtime.observeInstalls(in: model)
                 setInstall?.onInstalled = { [weak runtime] in runtime?.installed() }
+                let paths = candidate.paths
+                let removal = SkillRemovalController(
+                    installations: { InstalledSkillsScanner.scanWithSummary(filesystemPaths: paths).installations },
+                    trash: { try InstalledSkillUninstaller.uninstall($0, filesystemPaths: paths) })
+                removal.onRemoved = { [weak runtime] in runtime?.installed() }
+                self.removal = removal
                 setContent(connection: runtime.connection, inventoryRuntime: runtime)
                 runtime.start()
             } catch {
@@ -340,7 +349,8 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
             showAppMenu: { [weak self] in self?.showAppMenu() }, showStatus: { [weak self] in self?.showStatus() },
             openWebsite: { [weak self] in self?.openWebsite() }, quit: { [weak self] in self?.quit() },
             appUpdater: appUpdater, resizePanel: { [weak self] in self?.resizePanel(to: $0) }, connection: connection,
-            inventoryRuntime: inventoryRuntime, connectionSetupError: connectionSetupError, setInstall: setInstall)
+            inventoryRuntime: inventoryRuntime, connectionSetupError: connectionSetupError, setInstall: setInstall,
+            removal: removal)
     }
 
     private func browserPresentationAnchor() -> NSWindow? {
@@ -379,6 +389,11 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
             }
             // Set links never reach the single-skill installer; with the gates off they are dropped.
             if model.phase == .idle, setInstall?.receive(url) == true { showStatus() }
+            return
+        }
+        // Delete links never reach the installer; without a connected account they are dropped.
+        if url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "remove" {
+            if !model.appReplacementBlocksRequest, removal?.receive(url) == true { showStatus() }
             return
         }
         model.receive(url)

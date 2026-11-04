@@ -93,7 +93,7 @@ struct CatalogPopoverTests {
         let missing = SkillSyncResult(syncRunId: "missing", syncedSkillCount: 104, reportVersion: 3,
             mode: "reconciled", deviceId: "device", completedAt: "2026-10-26T12:00:00Z",
             missingSkillCount: 1, complete: true)
-        #expect(ConnectedInventoryView.reportAttention(.reported(missing, scanIssueCount: 0)) == "1 newly not found on last scan.")
+        #expect(ConnectedInventoryView.reportAttention(.reported(missing, scanIssueCount: 0)) == nil)
     }
     #endif
 
