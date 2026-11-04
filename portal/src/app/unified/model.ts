@@ -1,6 +1,7 @@
 import {
   displaySourceNames,
   groupSyncedSkills,
+  hasCatalogId,
   type GroupedSyncedSkill,
   type SyncedSkill,
 } from "../../synced-skill-grouping";
@@ -361,7 +362,7 @@ export function skillDisplays(data: PortalData, catalog: CatalogDisplay) {
     ...skill,
     key: `catalog:${id}`,
     catalogId: id,
-    installed: grouped.find((item) => item.catalogSkillId === id),
+    installed: grouped.find((item) => hasCatalogId(item, id)),
   }));
   return { mine, library };
 }
@@ -378,7 +379,8 @@ export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[], catalog: 
   return set.items.map(item => {
     const installed = item.syncedSkillId
       ? mine.find(skill => skill.installed?.allSkillIds.includes(item.syncedSkillId!))
-      : item.catalogSkillId ? mine.find(skill => skill.catalogId === item.catalogSkillId) : undefined;
+      : item.catalogSkillId ? mine.find(skill => skill.catalogId === item.catalogSkillId
+        || (skill.installed && hasCatalogId(skill.installed, item.catalogSkillId!))) : undefined;
     const publicSkill = item.kind === "catalog" && item.catalogSkillId ? byId.get(item.catalogSkillId) : undefined;
     const installation = installed?.installed?.sourceSkills.find(skill => skill.id === item.syncedSkillId);
     return { key: `set-item:${item.id}`, setItemId: item.id, setItemKind: item.kind, name: publicSkill?.name || item.name,
@@ -412,7 +414,8 @@ export function cloudSharedLabel(skill: SkillDisplay, role: PortalSet["role"] | 
 export function isFavorite(data: PortalData, skill: SkillDisplay) {
   return data.sets.some(set => set.isFavorites && set.role === "owner" && (
     (skill.installed && isMember(set, skill.installed)) ||
-    (skill.catalogId && set.items.some(item => item.kind === "catalog" && item.catalogSkillId === skill.catalogId))
+    set.items.some(item => item.kind === "catalog" && item.catalogSkillId && (item.catalogSkillId === skill.catalogId
+      || (skill.installed && hasCatalogId(skill.installed, item.catalogSkillId))))
   ));
 }
 export function starCount(value: number | undefined) {

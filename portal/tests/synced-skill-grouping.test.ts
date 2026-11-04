@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { groupSyncedSkills, installedSetNames, type SyncedSkill } from "../src/synced-skill-grouping.js";
+import { groupSyncedSkills, hasCatalogId, installedSetNames, type SyncedSkill } from "../src/synced-skill-grouping.js";
 
 test("Set origins include every grouped installation, without inventing membership", () => {
   const base: SyncedSkill = { id: "first", name: "review", description: "Review", githubUrl: null,
@@ -148,28 +148,23 @@ test("display-only grouping combines exact catalog matches and preserves every i
   assert.deepEqual(skills, before);
   assert.equal(groupSyncedSkills(skills).length, 3, "Mutation callers still see separate records");
   assert.equal(groupSyncedSkills([...skills, { ...base, id: "different", catalogSkillId: "other/repo:review" }],
-    { groupInstallations: true }).length, 2);
+    { groupInstallations: true }).length, 1, "One skill per name, even across catalog IDs, as the Mac counts it");
 });
 
-test("unresolved display groups require identical fingerprints and names, not descriptions or catalog hints", () => {
+test("display groups are one skill per name, whatever the content or agent", () => {
   const base: SyncedSkill = { inventoryVersion: 3, id: "claude", deviceId: "mac-a", name: "Review",
     description: "Review changes", skillMdSha: "a".repeat(64), catalogSkillId: null, identityStatus: "localOnly",
     catalogSkillIdHint: "owner/repo:review", githubUrl: null, isLocalOnly: true, source: "claude",
     lastSeenAt: "2026-10-23T12:00:00Z", isCurrent: true };
-  const skills = [base, { ...base, id: "codex", name: " review ", source: "codex" }];
-  for (const length of [40, 64]) {
-    assert.equal(groupSyncedSkills(skills.map(skill => ({ ...skill, skillMdSha: "a".repeat(length) })),
-      { groupInstallations: true }).length, 1, `Group the ${length}-character fingerprint accepted by inventory uploads`);
+  const codex = { ...base, id: "codex", name: " review ", source: "codex" };
+  for (const change of [{}, { skillMdSha: "b".repeat(64) }, { skillMdSha: null }, { skillMdSha: "invalid" }]) {
+    assert.equal(groupSyncedSkills([base, { ...codex, ...change }], { groupInstallations: true }).length, 1);
   }
-  for (const change of [{ skillMdSha: "b".repeat(64) }, { skillMdSha: null }, { skillMdSha: "invalid" },
-    { name: "other" }]) {
-    assert.equal(groupSyncedSkills([base, { ...skills[1], ...change }], { groupInstallations: true }).length, 2);
-  }
-  assert.equal(groupSyncedSkills(skills.map(skill => ({ ...skill, skillMdSha: null })),
-    { groupInstallations: true }).length, 2, "Names and hints alone cannot merge installations");
+  assert.equal(groupSyncedSkills([base, { ...codex, name: "other" }], { groupInstallations: true }).length, 2);
+  assert.equal(groupSyncedSkills([base, codex]).length, 2, "physical grouping remains unchanged");
 });
 
-test("display joins catalog and unresolved copies only with an exact fingerprint and name", () => {
+test("display joins a catalog skill and same-named copies, even when their content differs", () => {
   const current: SyncedSkill = { inventoryVersion: 3, id: "current", deviceId: "mac-a", name: "Review",
     description: "Review changes", skillMdSha: "a".repeat(64), catalogSkillId: null, identityStatus: "localOnly",
     githubUrl: null, isLocalOnly: true, source: "codex", lastSeenAt: "2026-10-30T12:00:00Z", isCurrent: true };
@@ -195,10 +190,10 @@ test("display joins catalog and unresolved copies only with an exact fingerprint
     assert.deepEqual(rows, before);
     assert.equal(groupSyncedSkills(rows).length, 2, "physical grouping remains unchanged");
   }
-  for (const change of [{ skillMdSha: "b".repeat(64) }, { skillMdSha: "a".repeat(40) },
-    { skillMdSha: null }, { name: "other" }]) {
-    assert.equal(groupSyncedSkills([current, { ...historical, ...change }], { groupInstallations: true }).length, 2);
+  for (const change of [{ skillMdSha: "b".repeat(64) }, { skillMdSha: "a".repeat(40) }, { skillMdSha: null }]) {
+    assert.equal(groupSyncedSkills([current, { ...historical, ...change }], { groupInstallations: true }).length, 1);
   }
+  assert.equal(groupSyncedSkills([current, { ...historical, name: "other" }], { groupInstallations: true }).length, 2);
 });
 
 test("display groups exact copies across legacy and device-aware upload formats", () => {
@@ -240,14 +235,17 @@ test("display representatives prefer confirmed current copies over missing or le
   assert.equal(missing.isCurrent, false, "A missing-only group must not be reported as current");
 });
 
-test("a shared fingerprint cannot bridge conflicting catalog identities", () => {
-  const base: SyncedSkill = { inventoryVersion: 3, id: "unresolved", name: "Review", description: "Review",
+test("same-named copies with different catalog IDs are one skill, found by either ID", () => {
+  const base: SyncedSkill = { inventoryVersion: 3, deviceId: "mac-a", id: "unresolved", name: "Review", description: "Review",
     skillMdSha: "a".repeat(64), catalogSkillId: null, githubUrl: null, isLocalOnly: true,
-    source: "codex", lastSeenAt: "2026-10-30T12:00:00Z" };
+    source: "codex", lastSeenAt: "2026-10-30T12:00:00Z", isCurrent: true };
   const rows = [base, { ...base, id: "a", catalogSkillId: "a/repo:review" },
-    { ...base, id: "b", catalogSkillId: "b/repo:review" }];
+    { ...base, id: "b", source: "claude", skillMdSha: "b".repeat(64), catalogSkillId: "b/repo:review" }];
   for (const input of [rows, [...rows].reverse()]) {
-    assert.equal(groupSyncedSkills(input, { groupInstallations: true }).length, 3);
+    const groups = groupSyncedSkills(input, { groupInstallations: true });
+    assert.equal(groups.length, 1);
+    assert.ok(hasCatalogId(groups[0], "a/repo:review") && hasCatalogId(groups[0], "b/repo:review"));
+    assert.equal(groups[0].skillMdSha, "a".repeat(64), "Actions use the version most agents have");
   }
 });
 

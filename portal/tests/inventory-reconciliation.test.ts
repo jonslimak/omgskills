@@ -324,7 +324,7 @@ test("rendered My skills and Set rows retain missing history separately from lat
     assert.equal(grouped.length, 1);
     assert.equal(isMember(data.sets[0], grouped[0].installed!), true);
     const saved = setSkillDisplays(data.sets[0], grouped)[0];
-    assert.deepEqual(saved.installed?.allSkillIds, ["missing-id", "claude-copy", "other-mac"]);
+    assert.deepEqual(new Set(saved.installed?.allSkillIds), new Set(["missing-id", "claude-copy", "other-mac"]));
     assert.deepEqual(saved.installed?.sourceSkills, [data.skills[1]]);
     assert.match(render({ ...setNav, source: "codex" }, management), /aria-label="Open Saved snapshot"/);
     assert.deepEqual(data.skills.map(inventorySummary), histories);
@@ -420,8 +420,9 @@ test("disposed, switched and unauthorized v3 accounts cannot accept late retaine
 test("linked skills outside the loaded catalog still show their GitHub owner", () => {
   const base = { id: "linked", stableKey: "k", skillMdSha: null, identityStatus: "resolved", name: "remotion-render", description: "",
     githubUrl: null, isLocalOnly: false, source: "codex", isCurrent: true, lastSeenAt: null };
-  const data = { skills: [{ ...base, catalogSkillId: "remotion-dev/skills:remotion-render" }, { ...base, id: "local", catalogSkillId: null }], sets: [] } as unknown as PortalData;
-  const [linked, local] = skillDisplays(data, catalog).mine;
+  const data = { skills: [{ ...base, catalogSkillId: "remotion-dev/skills:remotion-render" }, { ...base, id: "local", name: "my-render", catalogSkillId: null }], sets: [] } as unknown as PortalData;
+  const mine = skillDisplays(data, catalog).mine;
+  const linked = mine.find(skill => skill.name === "remotion-render")!, local = mine.find(skill => skill.name === "my-render")!;
   assert.equal(linked.author, "remotion-dev");
   assert.equal(linked.avatar, "https://github.com/remotion-dev.png?size=80");
   assert.equal(local.author, "");
