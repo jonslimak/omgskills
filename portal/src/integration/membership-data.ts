@@ -1,7 +1,7 @@
 import type { PortalApi } from "../portal-api";
 import { PortalApiError, isAccessError } from "../api-error";
 import { addSyncedSkillToGroup, createCatalogFavoritesGroup, createFavoritesGroup, createGroup, listOwnedGroups, removeGroupItem, reorderGroupItems, updateGroupItem } from "../groups/api";
-import type { GroupedSyncedSkill } from "../synced-skill-grouping";
+import { hasCatalogId, type GroupedSyncedSkill } from "../synced-skill-grouping";
 import { isMember, type MembershipResult, type PortalSet } from "../app/model";
 import { loadSetData } from "./data";
 
@@ -207,7 +207,8 @@ export async function removeFavoriteMembership(api: PortalApi, sets: PortalSet[]
     throw new PortalApiError("Membership information is incomplete. Refresh Favorites.", 409);
   }
   const matches = set.items.filter(item =>
-    (catalogId && item.kind === "catalog" && item.catalogSkillId === catalogId) ||
+    (item.kind === "catalog" && item.catalogSkillId && (item.catalogSkillId === catalogId
+      || (skill && hasCatalogId(skill, item.catalogSkillId)))) ||
     (skill && item.kind === "synced" && item.syncedSkillId && skill.allSkillIds.includes(item.syncedSkillId)));
   for (const item of matches) await removeMembershipItem(api, id, item.id, signal);
   return { ...result, removed: matches.length ? 1 : 0, unchanged: matches.length ? 0 : 1 };
