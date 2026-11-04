@@ -511,9 +511,9 @@ export function UnifiedApp({
   const perMac = useMemo(() => macsReport(data.skills), [data.skills]);
   const mine = everMine.filter((skill) => onAMac(skill, perMac));
   const setRows = management?.detail.set ? setSkillDisplays(management.detail.set, everMine, catalog.skills) : [];
-  const library = signedIn
-    ? models.library
-    : models.library.map((skill) => ({ ...skill, installed: undefined }));
+  // A Discover skill counts as yours only while a Mac has it, so Favorites and Sets get a live copy.
+  const library = models.library.map((skill) =>
+    signedIn && onAMac(skill, perMac) ? skill : { ...skill, installed: undefined });
   const pendingSelection: SkillDisplay | undefined = publicStatus && nav.selected.startsWith("catalog:")
     ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
