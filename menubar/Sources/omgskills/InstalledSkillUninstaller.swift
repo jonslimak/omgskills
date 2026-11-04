@@ -33,11 +33,8 @@ enum InstalledSkillUninstaller {
             throw UninstallError.unexpectedSkillPath
         }
 
-        let isSymlink = skill.isSymlink == true ||
-            ((try? installationURL.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) ?? false)
-        if isSymlink {
-            try fileManager.removeItem(at: installationURL)
-        } else if let trashItem {
+        // A linked copy goes to the Trash too (the link itself, never its target), so every delete can be undone.
+        if let trashItem {
             try trashItem(installationURL)
         } else {
             var trashedURL: NSURL?

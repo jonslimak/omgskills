@@ -36,7 +36,7 @@ final class DeviceConnectionModel {
     nonisolated static func uniqueSkillCount(_ installations: [Skill]) -> Int {
         var seen = Set<String>(), unnamed = 0
         for skill in installations {
-            let name = skill.name.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ")
+            let name = SkillRemoval.normalizedName(skill.name)
             if name.isEmpty { unnamed += 1 } else { seen.insert(name) }
         }
         return seen.count + unnamed

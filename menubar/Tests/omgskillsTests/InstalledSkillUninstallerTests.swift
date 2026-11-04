@@ -18,13 +18,21 @@ struct InstalledSkillUninstallerTests {
         try FileManager.default.createSymbolicLink(at: installation, withDestinationURL: source)
         try writeProvenance(targetRoot: skillsRoot, targetName: "example")
 
+        var trashed: [URL] = []
         let result = try InstalledSkillUninstaller.uninstall(
             installedSkill(at: installation, isSymlink: true),
-            allowedRoots: [skillsRoot]
+            allowedRoots: [skillsRoot],
+            trashItem: { url in
+                trashed.append(url)
+                try FileManager.default.removeItem(at: url)
+            }
         )
 
         #expect(result == .init(provenanceRemoved: true, provenanceCleanupWarning: nil))
-        #expect(!FileManager.default.fileExists(atPath: installation.path))
+        // The link goes to the Trash (so it can be put back), not deleted for good; its target stays.
+        #expect(trashed == [installation])
+        #expect((try? FileManager.default.destinationOfSymbolicLink(atPath: installation.path)) == nil)
+        #expect(FileManager.default.fileExists(atPath: source.appendingPathComponent("SKILL.md").path))
         #expect(!FileManager.default.fileExists(
             atPath: SkillInstallProvenanceStore.metadataURL(
                 targetRoot: skillsRoot,

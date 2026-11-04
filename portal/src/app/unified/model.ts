@@ -444,3 +444,8 @@ export function discoverCollectionPage(collections: CatalogDisplay["collections"
     end: Math.min(offset + size, collections.length),
   };
 }
+
+/** Opens the Mac app, which asks first and then moves every copy of the skill on that Mac to the Trash. */
+export function removeFromMacLink(name: string) {
+  return `omgskills://remove?name=${encodeURIComponent(name)}`;
+}

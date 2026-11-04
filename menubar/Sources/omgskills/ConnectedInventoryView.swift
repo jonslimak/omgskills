@@ -97,7 +97,7 @@ struct ConnectedInventoryView: View {
         if case .reported(let result, let issues) = status {
             if issues > 0 { return "Partial inventory reported. \(issues) scan issues need attention. Resync to retry." }
             if result.reportVersion == 3 && result.complete != true { return reportMessage(status) }
-            if let missing = result.missingSkillCount, missing > 0 { return "\(missing) newly not found on last scan." }
+            // Skills that left this Mac (often deleted on purpose) need no attention; the count shows it.
             return nil
         }
         return reportMessage(status)
