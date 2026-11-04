@@ -39,6 +39,17 @@ export function hasCatalogId(skill: GroupedSyncedSkill, catalogId: string) {
   return skill.catalogSkillId === catalogId || skill.sourceSkills.some(copy => copy.catalogSkillId?.trim() === catalogId);
 }
 
+/** The different SKILL.md versions a skill's copies have now, each with the agents that have it. */
+export function skillVersions(skill: GroupedSyncedSkill): string[][] {
+  const bySha = new Map<string, string[]>();
+  for (const copy of skill.sourceSkills) {
+    const sha = copy.skillMdSha?.trim().toLowerCase();
+    if (copy.isCurrent === false || !sha || !/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(sha)) continue;
+    bySha.set(sha, [...(bySha.get(sha) ?? []), copy.source]);
+  }
+  return [...bySha.values()].map(displaySourceNames).sort((a, b) => b.length - a.length || a.join().localeCompare(b.join()));
+}
+
 export function installedSetNames(skill: GroupedSyncedSkill): string[] {
   return [...new Set(skill.sourceSkills.flatMap(source => {
     const name = source.installedFromSet?.trim();

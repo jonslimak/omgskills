@@ -110,7 +110,7 @@ import "./unified.css";
 import type { PublicStatus } from "./use-public-catalog";
 import type { UnifiedManagement } from "./management";
 import { publicPageRequest, publicSorts, type PublicSort } from "./public-paging";
-import { displaySourceName, displaySourceNames, installedSetNames } from "../../synced-skill-grouping";
+import { displaySourceName, displaySourceNames, installedSetNames, skillVersions } from "../../synced-skill-grouping";
 import { CreatorSocialLinks, CreatorProfileDetails } from "./CreatorProfileDetails";
 import { discoveryCreatorGroups, featuredProfiles, isCompany } from "./discovery-presentation";
 import { descriptionParagraphs, descriptionSummary, whenLead } from "./description-paragraphs";
@@ -528,6 +528,11 @@ export function UnifiedApp({
   if (selected) closingDetail.current = { skill: selected, pending: detailPending };
   const detail = selected ?? closingDetail.current?.skill;
   const selectedInstallations = detail?.installed?.sourceSkills ?? [];
+  // A Set or Favorites row holds the saved copy; versions come from all of that skill's copies Macs have now.
+  const liveCopiesOf = (skill: SkillDisplay) => skill.installed && (mine.find(mineSkill =>
+    mineSkill.installed?.allSkillIds.includes(skill.installed!.id))?.installed ?? liveSkill(skill).installed);
+  const detailLive = detail ? liveCopiesOf(detail) : undefined;
+  const detailVersions = detailLive ? skillVersions(detailLive) : [];
   const panelPending = selected ? detailPending : !!closingDetail.current?.pending;
   // List rows already carry the name and avatar; only the direct-link placeholder (no author) waits.
   const detailHeadingKnown = !!detail && !(panelPending && !detail.author);
@@ -817,6 +822,8 @@ export function UnifiedApp({
   function renderRow(skill: SkillDisplay, rank?: number, compact = false) {
     const canSelect = editing && !!skill.installed;
     const installedSources = displaySourceNames(skill.installed?.sources ?? []);
+    const liveCopies = !discovery ? liveCopiesOf(skill) : undefined;
+    const versionCount = liveCopies ? skillVersions(liveCopies).length : 0;
     const fromSets = !discovery && skill.installed ? installedSetNames(skill.installed) : [];
     return (
       <div
@@ -851,7 +858,7 @@ export function UnifiedApp({
                 )
               : event.detail < 2 ? open(skill) : undefined
           }
-          aria-label={`Open ${skill.name}`}
+          aria-label={`Open ${skill.name}${versionCount > 1 ? `, ${versionCount} versions` : ""}`}
           aria-expanded={selected?.key === skill.key}
         >
           <Avatar src={skill.avatar} name={skill.author || skill.name} />
@@ -862,6 +869,9 @@ export function UnifiedApp({
                 <span className="ua-row-author">@{skill.author}</span>
               )}
               {skill.installed?.isLocalOnly && <Lock aria-label="Local skill" />}
+              {versionCount > 1 && <span className="ua-row-versions" title="Your agents have different versions of this skill">
+                {versionCount} versions
+              </span>}
               {skill.stars !== undefined && (
                 <span className="ua-row-stars ua-row-stars-mobile" aria-label={`${starCount(skill.stars)} stars`}>
                   <Star aria-hidden="true" />{starCount(skill.stars)}
@@ -2002,6 +2012,10 @@ export function UnifiedApp({
                       <span>Observed on</span>
                       <strong>{displaySourceNames(detail.installed.sources).join(", ")}</strong>
                     </div>
+                    {detailVersions.length > 1 && <div className="ua-detail-versions">
+                      <span>{detailVersions.length} versions</span>
+                      <strong>{detailVersions.map(sources => sources.join(", ")).join(" · ")}</strong>
+                    </div>}
                     {(!readOnlyAccount || management) && <div className="ua-set-chips">
                       {data.sets
                         .filter((set) => isMember(set, detail.installed!))

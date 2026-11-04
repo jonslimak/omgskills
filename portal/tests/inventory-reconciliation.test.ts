@@ -329,6 +329,23 @@ test("rendered My skills and Set rows retain missing history separately from lat
     assert.match(render({ ...setNav, source: "codex" }, management), /aria-label="Open Saved snapshot"/);
     assert.deepEqual(data.skills.map(inventorySummary), histories);
     assert.deepEqual(data, beforeGrouping);
+    assert.doesNotMatch(render(), /\d versions/);
+
+    // Copies on a Mac with different SKILL.md content are one skill with two versions.
+    const savedCopy = { ...data.skills[1], id: "missing-id", isCurrent: true, deviceId: "mac-a" };
+    data.skills = [savedCopy, { ...savedCopy, id: "claude-v2", source: "claude", skillMdSha: "b".repeat(64) }];
+    const twoVersions = render();
+    assert.equal([...twoVersions.matchAll(/aria-label="Open Removal fixture/g)].length, 1);
+    assert.match(twoVersions, /class="ua-row-versions"[^>]*>2 versions</);
+    assert.match(twoVersions, /aria-label="Open Removal fixture, 2 versions"/);
+    assert.doesNotMatch(render({ ...initialNavigation, view: "discover" }), /\d versions/);
+    assert.match(render(setNav), /class="ua-row-versions"[^>]*>2 versions</,
+      "A Set row counts every current copy of the skill, not only the saved one");
+    // Copies no Mac has now are not versions.
+    data.skills = [savedCopy, { ...data.skills[1], deviceId: null, isCurrent: undefined, lastSeenAt: "2020-01-01T00:00:00Z" }];
+    const staleSet = render(setNav);
+    assert.match(staleSet, /aria-label="Open Removal fixture"/);
+    assert.doesNotMatch(staleSet, /\d versions/);
   } finally {
     if (descriptor) Object.defineProperty(globalThis, "window", descriptor); else Reflect.deleteProperty(globalThis, "window");
   }
