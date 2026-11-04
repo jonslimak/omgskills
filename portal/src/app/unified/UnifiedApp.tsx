@@ -1764,8 +1764,9 @@ export function UnifiedApp({
                         Add to set
                       </button>
                       {(!readOnlyAccount || management) && (() => {
-                        const names = visible.filter(skill => picked.includes(skill.key))
-                          .flatMap(skill => liveCopiesOf(skill)?.name ?? []);
+                        const names = [...new Map(visible.filter(skill => picked.includes(skill.key))
+                          .flatMap(skill => liveCopiesOf(skill)?.name ?? [])
+                          .map(name => [name.trim().toLowerCase(), name] as const)).values()];
                         const tooMany = names.length > maxRemoveFromMac;
                         return <button type="button" className="ua-pill ua-pill-danger" disabled={!names.length || tooMany}
                           title={tooMany ? `Select up to ${maxRemoveFromMac} skills` : undefined}

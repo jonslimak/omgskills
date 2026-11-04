@@ -104,6 +104,10 @@ struct SkillRemovalTests {
         current.append(copy("pdf", "Codex"))
         removal.confirm()
         #expect(trashed == ["Claude"], "A copy added after the question is left alone")
+        _ = removal.receive(URL(string: "omgskills://remove?name=pdf")!)
+        current = []
+        removal.confirm()
+        #expect(removal.state == .notFound(names: ["pdf"]), "Nothing left to delete is not reported as deleted")
     }
 
     @Test func oneQuestionForSeveralSkillsTrashesThemAll() {

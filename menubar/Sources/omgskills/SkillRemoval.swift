@@ -116,19 +116,22 @@ final class SkillRemovalController {
         // Only copies that are still there and were shown; anything new since the question is left alone.
         let shown = Set(asked.map(SkillRemoval.location))
         let copies = SkillRemoval.copies(named: names, in: installations()).filter { shown.contains(SkillRemoval.location($0)) }
-        var removed = 0, failures: [String] = []
+        guard !copies.isEmpty else { state = .notFound(names: names); return }
+        var removed = 0, failures: [String] = [], removedNames = Set<String>()
         for copy in copies {
-            do { _ = try trash(copy); removed += 1 }
+            do { _ = try trash(copy); removed += 1; removedNames.insert(SkillRemoval.normalizedName(copy.name)) }
             catch {
                 // Already gone (e.g. trashed through a linked folder) is what was asked for.
-                if (try? FileManager.default.attributesOfItem(atPath: copy.installCmd)) == nil { removed += 1 }
-                else { failures.append(copy.origin ?? "Agent") }
+                if (try? FileManager.default.attributesOfItem(atPath: copy.installCmd)) == nil {
+                    removed += 1; removedNames.insert(SkillRemoval.normalizedName(copy.name))
+                } else { failures.append(copy.origin ?? "Agent") }
             }
         }
+        let deleted = names.filter { removedNames.contains(SkillRemoval.normalizedName($0)) }
         if removed > 0 { onRemoved() }
         state = failures.isEmpty
-            ? .done(title: "Deleted \(SkillRemoval.title(names))",
-                    message: "Moved to the Trash. To undo, put \(names.count == 1 ? "it" : "them") back from the Trash.")
+            ? .done(title: "Deleted \(SkillRemoval.title(deleted))",
+                    message: "Moved to the Trash. To undo, put \(deleted.count == 1 ? "it" : "them") back from the Trash.")
             : .failed(message: "Couldn't delete \(failures.count == 1 ? "1 copy" : "\(failures.count) copies") (\(Set(failures).sorted().joined(separator: ", "))). "
                 + (removed > 0 ? "Other copies were moved to the Trash." : "Nothing was deleted."))
     }
@@ -150,16 +153,17 @@ struct SkillRemovalView: View {
             case .confirm(let names, let copies, let missing):
                 Text("Delete \(SkillRemoval.title(names)) from this Mac?").font(.headline)
                 Text("Every copy moves to the Trash.").font(.callout).foregroundStyle(.secondary)
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 8) {
-                        ForEach(SkillRemoval.grouped(names: names, copies: copies), id: \.name) { skill in
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text(skill.name).font(.callout.weight(.semibold)).lineLimit(1).truncationMode(.middle)
-                                Text(SkillRemoval.agents(skill.copies)).font(.caption).foregroundStyle(.secondary)
-                            }.help(skill.copies.map(\.installCmd).joined(separator: "\n"))
-                        }
-                    }.frame(maxWidth: .infinity, alignment: .leading)
-                }.frame(maxHeight: 160)
+                let skills = SkillRemoval.grouped(names: names, copies: copies)
+                let list = VStack(alignment: .leading, spacing: 8) {
+                    ForEach(skills, id: \.name) { skill in
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(skill.name).font(.callout.weight(.semibold)).lineLimit(1).truncationMode(.middle)
+                            Text(SkillRemoval.agents(skill.copies)).font(.caption).foregroundStyle(.secondary)
+                        }.help(skill.copies.map(\.installCmd).joined(separator: "\n"))
+                    }
+                }.frame(maxWidth: .infinity, alignment: .leading)
+                // Short lists sit in the panel; long ones scroll so the buttons stay in view.
+                if skills.count > 5 { ScrollView { list }.frame(height: 200) } else { list }
                 if !missing.isEmpty {
                     Text("Not on this Mac: \(missing.joined(separator: ", "))").font(.caption).foregroundStyle(.secondary)
                         .lineLimit(3)
