@@ -113,6 +113,9 @@ export type CloudSaveSettings = { enabled: boolean; excludedSkillKeys: string[] 
 
 export type CloudSavedVersion = {
   id: string;
+  /** With the commit, lets the owner's Mac download and check this version to restore it. */
+  sourceId: string;
+  commitSha: string;
   treeSha: string;
   skillMdSha: string;
   fileCount: number;
@@ -173,6 +176,8 @@ async function usedBytes(db: Database, userId: string): Promise<number> {
 // Times are ISO 8601 in UTC with milliseconds, which every browser and the Mac parse.
 const versionColumns = `
   release.id,
+  release.source_id AS "sourceId",
+  release.commit_sha AS "commitSha",
   release.tree_sha AS "treeSha",
   release.skill_md_sha AS "skillMdSha",
   cloud.file_count AS "fileCount",
