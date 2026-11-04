@@ -48,7 +48,7 @@ test("manual exchange stores only the device hash and rejects replay", async () 
       [exchanged.deviceId]
     );
 
-    assert.equal(exchanged.accountLabel, "Manual Mac");
+    assert.equal(exchanged.accountLabel, `${userId}@example.com`);
     assert.equal(stored.rows[0].token_hash, hashToken(exchanged.credential));
     assert.notEqual(stored.rows[0].token_hash, exchanged.credential);
     assert.deepEqual(stored.rows[0].granted_scopes, [...BASE_DEVICE_SCOPES]);

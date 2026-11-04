@@ -92,6 +92,7 @@ import {
   matchesSearch,
   skillDisplays,
   onAMac,
+  macsReport,
   setSkillDisplays,
   setAccessSummary,
   starCount,
@@ -507,7 +508,8 @@ export function UnifiedApp({
   );
   // Sets still match skills no Mac reports any more; the lists and counts show only skills on a Mac.
   const everMine = signedIn ? models.mine : [];
-  const mine = everMine.filter(onAMac);
+  const perMac = useMemo(() => macsReport(data.skills), [data.skills]);
+  const mine = everMine.filter((skill) => onAMac(skill, perMac));
   const setRows = management?.detail.set ? setSkillDisplays(management.detail.set, everMine, catalog.skills) : [];
   const library = signedIn
     ? models.library

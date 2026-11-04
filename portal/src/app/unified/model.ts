@@ -294,9 +294,18 @@ function catalogOwner(id: string | null | undefined) {
   return /^[a-zA-Z0-9][a-zA-Z0-9-]{0,99}$/.test(owner) && id!.includes("/") ? owner : "";
 }
 
-/** Some Mac still reports this skill; a skill every Mac stopped reporting only lives on in Sets. */
-export function onAMac(skill: SkillDisplay) {
-  return !!skill.installed?.sourceSkills.some((copy) => copy.isCurrent !== false);
+/**
+ * Some Mac still reports this skill; a skill every Mac stopped reporting only lives on in Sets.
+ * Once a Mac reports per device, copies from the older account-wide sync (no device) are history too.
+ */
+export function onAMac(skill: SkillDisplay, macsReport = false) {
+  return !!skill.installed?.sourceSkills.some((copy) =>
+    copy.isCurrent !== false && (!macsReport || copy.deviceId != null));
+}
+
+/** Whether any Mac reports its skills per device. */
+export function macsReport(skills: PortalData["skills"]) {
+  return skills.some((skill) => skill.deviceId != null && skill.isCurrent !== false);
 }
 
 export function skillDisplays(data: PortalData, catalog: CatalogDisplay) {

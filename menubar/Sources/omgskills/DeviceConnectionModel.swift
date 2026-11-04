@@ -32,12 +32,27 @@ final class DeviceConnectionModel {
         case uncertain(String)
     }
 
+    /// Copies with the same name and SKILL.md are one skill, as on the web; a copy without a SKILL.md hash stands alone.
+    nonisolated static func uniqueSkillCount(_ installations: [Skill]) -> Int {
+        var seen = Set<String>(), alone = 0
+        for skill in installations {
+            let name = skill.name.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ")
+            guard let sha = skill.skillMdSha?.trimmingCharacters(in: .whitespaces).lowercased(), !name.isEmpty,
+                  sha.range(of: "^([a-f0-9]{40}|[a-f0-9]{64})$", options: .regularExpression) != nil
+            else { alone += 1; continue }
+            seen.insert(name + "\n" + sha)
+        }
+        return seen.count + alone
+    }
+
     typealias InventoryScanner = @Sendable () async throws -> InstalledSkillsScanner.ScanResult
 
     private(set) var state: State = .disconnected
     private(set) var disconnectWarning: String?
     private(set) var continuityWarning: String?
     private(set) var reportStatus: ReportStatus = .idle
+    /// Skills on this Mac counted the way the web lists them: one per skill, not per agent it's in.
+    private(set) var skillCount: Int?
     private(set) var lastReportOutcome: InventoryReportOutcome?
     private(set) var lastInventoryCheckedAt: Date?
     @ObservationIgnored var onInventoryConnectionReady: (@MainActor () -> Void)?
@@ -684,6 +699,7 @@ final class DeviceConnectionModel {
                         guard isCurrent(attemptID), connectedCredential == record else { return }
                         try checked.validate(check, deviceID: record.connection.deviceID)
                         lastInventoryCheckedAt = checked.checkedDate
+                        skillCount = Self.uniqueSkillCount(scan.installations)
                         reportStatus = .reported(baseline.result, scanIssueCount: 0)
                         lastReportOutcome = .checked
                         lastReportAttemptID = attemptID
@@ -707,6 +723,7 @@ final class DeviceConnectionModel {
                         throw DeviceSyncAPIError.invalidResponse
                     }
                 }
+                skillCount = Self.uniqueSkillCount(scan.installations)
                 reportStatus = .reported(result, scanIssueCount: scan.issues.count)
                 lastReportOutcome = .reported(partial: !scan.issues.isEmpty || result.complete == false)
                 lastReportAttemptID = attemptID

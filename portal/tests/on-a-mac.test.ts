@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { onAMac, type SkillDisplay } from "../src/app/unified/model";
+import { macsReport, onAMac, type SkillDisplay } from "../src/app/unified/model";
 
-const copy = (isCurrent?: boolean) => ({ id: "x", name: "bflow", description: null, githubUrl: null,
+const copy = (isCurrent?: boolean, deviceId: string | null = null) => ({ id: "x", deviceId, name: "bflow", description: null, githubUrl: null,
   isLocalOnly: true, source: "Claude", lastSeenAt: "2026-07-16T00:00:00Z", isCurrent });
 const display = (...copies: ReturnType<typeof copy>[]) => ({ key: "synced:x", name: "bflow", description: "",
   author: "", githubUrl: null, tags: [],
@@ -14,4 +14,14 @@ test("a skill every Mac stopped reporting is left out of the lists; one copy on 
   // Older inventories don't say; those stay listed.
   assert.equal(onAMac(display(copy(undefined))), true);
   assert.equal(onAMac({ ...display(copy(true)), installed: undefined }), false);
+});
+
+test("once a Mac reports per device, copies from the older account-wide sync stop counting", () => {
+  const legacy = copy(true), mac = copy(true, "mac-a");
+  assert.equal(macsReport([legacy]), false);
+  assert.equal(macsReport([legacy, mac]), true);
+  assert.equal(macsReport([legacy, copy(false, "mac-a")]), false);
+  assert.equal(onAMac(display(legacy), false), true);
+  assert.equal(onAMac(display(legacy), true), false);
+  assert.equal(onAMac(display(legacy, mac), true), true);
 });

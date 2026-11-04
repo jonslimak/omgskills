@@ -13,7 +13,7 @@ struct ConnectedInventoryView: View {
             switch model.state {
             case .connected:
                 if let count = Self.reportedCount(model.reportStatus) {
-                    Text("\(count) Skills").font(.body)
+                    Text("\(model.skillCount ?? count) Skills").font(.body)
                 }
                 if let attention = Self.reportAttention(model.reportStatus) {
                     Text(attention).font(.callout).textSelection(.enabled)
