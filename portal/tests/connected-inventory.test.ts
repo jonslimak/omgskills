@@ -179,7 +179,8 @@ test("real unified list groups identical skills but retains each Mac, agent and 
       signedIn: true, readOnlyAccount: true, state: "ready", navigate: noOp, onSession: noOp, onFavorite: noOp,
       onCreateSet: noOp, onMembership: noOp, onVisibility: noOp, retry: noOp }));
     assert.equal([...html.matchAll(/aria-label="Open Same skill"/g)].length, 1);
-    assert.match(html, /aria-label="Installed in 2 agents"/);
+    // Agent logos are in the skill panel, not the list.
+    assert.doesNotMatch(html, /ua-agent-tile|ua-agent-count/);
     // Each Mac's report stays out of the row; the skill panel shows it behind "Show history".
     for (const text of ["Work Mac / codex", "Home Mac / codex", "Unknown Mac / codex", "Last known (revoked)", "Last reported"]) assert.ok(!html.includes(text), text);
     assert.doesNotMatch(html, /Currently live|Currently installed/);

@@ -76,7 +76,8 @@ export function makeFixtures(scenario: Scenario = "populated"): PortalData {
         githubUrl: repo ? `https://github.com/${repo}` : null,
         isLocalOnly: !repo,
         source,
-        lastSeenAt: "2026-09-24T10:00:00Z",
+        // Recent, so the sample counts as on a Mac now (older legacy copies stop showing after 30 days).
+        lastSeenAt: new Date(Date.now() - 864e5).toISOString(),
       })),
   );
   const item = (index: number): SetItem => ({

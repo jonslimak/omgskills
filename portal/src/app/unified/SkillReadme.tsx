@@ -109,6 +109,7 @@ export function SavedSkillReadme({ skill, load }: { skill: SkillDisplay; load: S
         <p className="ua-muted" role="status">Skill instructions unavailable.</p>
         <button className="ua-icon" type="button" title="Retry" aria-label="Retry loading skill instructions" onClick={() => setRevision(value => value + 1)}><RefreshCw /></button>
       </div> : !current.doc ? <p className="ua-muted">Turn on cloud save to read this skill's instructions here.</p>
+      : !current.doc.markdown.trim() ? <p className="ua-muted">No instructions beyond the name and description.</p>
       : <div>
         <ReadmeRenderBoundary key={`${id}:${revision}`}>
           <Suspense fallback={<p className="ua-muted" role="status">Loading...</p>}>

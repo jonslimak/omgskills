@@ -75,7 +75,8 @@ struct CatalogInstallView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .center, spacing: 8) {
                 if let connection, case .connected(let info) = connection.state {
-                    Text(info.accountLabel).font(.headline).textSelection(.enabled)
+                    Text(info.accountLabel).font(.headline).lineLimit(1).minimumScaleFactor(0.75)
+                        .truncationMode(.middle).textSelection(.enabled).help(info.accountLabel)
                 }
                 Spacer()
                 if let showAppMenu {

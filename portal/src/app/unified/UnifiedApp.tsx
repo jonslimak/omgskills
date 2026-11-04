@@ -373,40 +373,21 @@ function Empty({
     </div>
   );
 }
-function AgentTiles({
-  skill,
-  sources,
-  onlyInstalled = false,
-}: {
-  skill: SkillDisplay;
-  sources: string[];
-  onlyInstalled?: boolean;
-}) {
-  if (!skill.installed?.sources.length) return null;
-  const installedSources = displaySourceNames(skill.installed.sources);
-  const visibleSources = onlyInstalled ? sources.filter(source => installedSources.includes(source)) : sources;
+/** The agents a skill is in, with their logos, for the skill panel. */
+function AgentList({ sources }: { sources: string[] }) {
   return (
-    <div
-      className="ua-agent-tiles"
-      aria-label={installedSources.join(", ")}
-    >
-      {visibleSources.map((source) => (
-        <span
-          className="ua-agent-tile"
-          data-present={installedSources.includes(source)}
-          key={source}
-          title={installedSources.includes(source) ? source : undefined}
-        >
-          {installedSources.includes(source) ? (
-            agentKind(source) !== "other" ? (
-              <span className="ua-agent-logo" data-agent={agentKind(source)} aria-hidden="true" />
-            ) : (
-              source.slice(0, 1)
-            )
-          ) : null}
+    <strong className="ua-agent-list">
+      {displaySourceNames(sources).map((source) => (
+        <span key={source} className="ua-agent-name">
+          {agentKind(source) !== "other" && (
+            <span className="ua-agent-tile" data-present="true" aria-hidden="true">
+              <span className="ua-agent-logo" data-agent={agentKind(source)} />
+            </span>
+          )}
+          {source}
         </span>
       ))}
-    </div>
+    </strong>
   );
 }
 const categoryIcons: Record<string, LucideIcon> = {
@@ -821,7 +802,6 @@ export function UnifiedApp({
 
   function renderRow(skill: SkillDisplay, rank?: number, compact = false) {
     const canSelect = editing && !!skill.installed;
-    const installedSources = displaySourceNames(skill.installed?.sources ?? []);
     const liveCopies = !discovery ? liveCopiesOf(skill) : undefined;
     const versionCount = liveCopies ? skillVersions(liveCopies).length : 0;
     const fromSets = !discovery && skill.installed ? installedSetNames(skill.installed) : [];
@@ -896,14 +876,6 @@ export function UnifiedApp({
             </span>}
           </span>
         </button>
-        {!compact && !discovery && !nav.query && (
-          <AgentTiles skill={skill} sources={sources} onlyInstalled={nav.view === "favorites"} />
-        )}
-        {!!installedSources.length && <span className="ua-agent-count"
-          aria-label={`${skill.installed?.inventoryVersion === 3 ? "Observed" : "Installed"} in ${installedSources.length} ${installedSources.length === 1 ? "agent" : "agents"}`}
-          title={installedSources.join(", ")}>
-          {installedSources.length}
-        </span>}
         {!canSelect &&
           (discovery || nav.query || compact ? (
             <>
@@ -2010,7 +1982,7 @@ export function UnifiedApp({
                     <h3>On this account</h3>
                     <div>
                       <span>Observed on</span>
-                      <strong>{displaySourceNames(detail.installed.sources).join(", ")}</strong>
+                      <AgentList sources={detail.installed.sources} />
                     </div>
                     {detailVersions.length > 1 && <div className="ua-detail-versions">
                       <span>{detailVersions.length} versions</span>

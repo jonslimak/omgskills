@@ -22,6 +22,7 @@ import { CloudStoreError, type CloudObjectStore } from "./cloud-store.js";
 import { requirePrivateReleaseAccess } from "./private-release-access.js";
 import { addGroupItemWithClient, updateCloudGroupItemWithClient, type GroupItemPublication } from "./group-items.js";
 import { gitObjectSha, validateSkillPackage, type SkillManifestEntry } from "./skill-package.js";
+import { skillMdBody } from "./skill-readme.js";
 
 const connectionString = process.env.AUTH_TEST_DATABASE_URL;
 if (!connectionString) {
@@ -1451,7 +1452,7 @@ test("the web reads a saved skill's current SKILL.md, only for its owner", async
     assert.equal(response.headers.get("cache-control"), "no-store");
     const body = await response.json();
     assert.equal(body.key, "notes");
-    assert.equal(body.markdown, v2[0].text);
+    assert.equal(body.markdown, skillMdBody(v2[0].text), "Frontmatter already shows as name and description");
     assert.equal(body.truncated, false);
 
     assert.equal((await read("missing")).status, 404);

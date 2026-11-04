@@ -23,6 +23,11 @@ const folderReadmeNames = ["README.md", "readme.md"];
 const idPattern = /^[a-z0-9][a-z0-9-]{0,99}\/[a-z0-9_.-]+(?::[^\x00-\x1f\x7f]{1,800})?$/i;
 const frontmatter = /^\uFEFF?---\r?\n[\s\S]*?\r?\n---[ \t]*(?:\r?\n|$)/;
 
+/** A SKILL.md without its frontmatter: the name and description already show above it. */
+export function skillMdBody(markdown: string) {
+  return markdown.replace(frontmatter, "").replace(/^(?:[ \t]*\r?\n)+/, "");
+}
+
 /** A catalog SKILL.md path, as safe relative segments; anything else falls back to the repo README. */
 function skillFileSegments(value: unknown): string[] | null {
   if (typeof value !== "string" || value.length > 800 || /[\\\x00-\x1f\x7f]/.test(value)) return null;
@@ -130,7 +135,7 @@ export function createSkillReadmeHandler(options: Options = {}) {
   }
 
   function readme(repository: string, kind: ReadmeKind, file: { markdown: string; sourceUrl: string }): SkillReadme | null {
-    const markdown = kind === "skill" ? file.markdown.replace(frontmatter, "").replace(/^(?:[ \t]*\r?\n)+/, "") : file.markdown;
+    const markdown = kind === "skill" ? skillMdBody(file.markdown) : file.markdown;
     if (!markdown.trim()) return null;
     return { repository, kind, sourceUrl: file.sourceUrl, truncated: markdown.length > characterLimit,
       markdown: markdown.slice(0, characterLimit).replace(/[\uD800-\uDBFF]$/, "") };

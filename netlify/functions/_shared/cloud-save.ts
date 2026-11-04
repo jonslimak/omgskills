@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { type Pool, type PoolClient, type QueryResult, type QueryResultRow } from "pg";
 import { appendSkillRelease } from "./group-storage.js";
 import { cloudBlobKey, type CloudObjectStore } from "./cloud-store.js";
+import { skillMdBody } from "./skill-readme.js";
 import { drainCloudPurge, queuedFileCount, releaseStorageKeys, reserveStorageKeys } from "./cloud-storage-purge.js";
 import { combineLabels, pathLabels, scanFileContents, type SecretFinding, type SkillLabel } from "./skill-scan.js";
 import {
@@ -1063,7 +1064,7 @@ export async function readCloudSkillMd(
   );
   const row = file.rows[0];
   if (!row) throw new CloudSaveError("not_found", "Saved skill not found");
-  const text = new TextDecoder().decode(await store.get(row.storageKey ?? cloudBlobKey(input.userId, row.blobSha)));
+  const text = skillMdBody(new TextDecoder().decode(await store.get(row.storageKey ?? cloudBlobKey(input.userId, row.blobSha))));
   return {
     key: skillKey,
     markdown: text.slice(0, SKILL_MD_CHARACTER_LIMIT).replace(/[\uD800-\uDBFF]$/, ""),
