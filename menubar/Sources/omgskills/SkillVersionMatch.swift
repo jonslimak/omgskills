@@ -54,8 +54,13 @@ enum SkillVersionMatch {
         let isLink = (try? destination.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) == true
         let staged = destination.deletingLastPathComponent()
             .appendingPathComponent(".omgskills-match-\(UUID().uuidString)", isDirectory: true)
-        if isLink { try fileManager.createSymbolicLink(at: staged, withDestinationURL: source) }
-        else { try fileManager.copyItem(at: source, to: staged) }
+        do {
+            if isLink { try fileManager.createSymbolicLink(at: staged, withDestinationURL: source) }
+            else { try fileManager.copyItem(at: source, to: staged) }
+        } catch {
+            try? fileManager.removeItem(at: staged)
+            throw error
+        }
         do { try trash(target) } catch {
             try? fileManager.removeItem(at: staged)
             throw error
@@ -99,10 +104,12 @@ final class SkillVersionMatchController {
     }
 
     var isActive: Bool { state != .idle }
+    var isWorking: Bool { if case .working = state { true } else { false } }
 
     /// Returns true for any match link, so it never reaches the installer. A newer link replaces an open question.
     func receive(_ url: URL) -> Bool {
         guard url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "match" else { return false }
+        guard !isWorking else { return true }
         guard let name = SkillVersionMatch.name(from: url) else {
             state = .failed(message: "This link is invalid.")
             return true
@@ -150,7 +157,11 @@ final class SkillVersionMatchController {
         }
     }
 
-    func close() { state = .idle; selected = nil }
+    func close() {
+        guard !isWorking else { return }
+        state = .idle
+        selected = nil
+    }
 }
 
 #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE

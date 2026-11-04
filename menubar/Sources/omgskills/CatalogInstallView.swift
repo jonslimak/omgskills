@@ -389,6 +389,8 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     func receive(_ url: URL) {
         if connectedRuntime != nil && url.absoluteString == "omgskills://connect" { showStatus(); return }
         if connectedRuntime?.receivePairingCallback(url) == true { showStatus(); return }
+        // While version match is replacing files, no other link (install, Set, delete) may touch skill folders.
+        if versionMatch?.isWorking == true { showStatus(); return }
         if GroupInstallDeepLink.route(from: url) != nil {
             if model.appReplacementBlocksRequest {
                 model.receive(url)

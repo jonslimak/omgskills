@@ -104,6 +104,18 @@ struct SkillVersionMatchTests {
         #expect(try String(contentsOf: old.appendingPathComponent("SKILL.md"), encoding: .utf8) == "old", "What it linked to is untouched")
     }
 
+    @Test func aFailedCopyLeavesNothingStaged() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let target = root.appendingPathComponent("codex/humanizer")
+        try FileManager.default.createDirectory(at: target, withIntermediateDirectories: true)
+        #expect(throws: (any Error).self) {
+            try SkillVersionMatch.replace(copy("humanizer", "Codex", sha: "old", path: target.path),
+                with: root.appendingPathComponent("missing")) { _ in Issue.record("must not trash") }
+        }
+        #expect(try FileManager.default.contentsOfDirectory(atPath: target.deletingLastPathComponent().path) == ["humanizer"])
+    }
+
     @Test func aFailedMoveAfterTrashSaysWhereTheOldCopyIs() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
