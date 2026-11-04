@@ -127,6 +127,17 @@ struct CloudSaveFolderTests {
         #expect(throws: CloudSaveFolder.ReadError.privateLink("keys-skill")) {
             try CloudSaveFolder.read(directory: skills.appendingPathComponent("keys-skill"), links: policy)
         }
+        // A parent directory can be a link even when the skill folder itself is not.
+        let privateChild = try makeSkill(sshFolder, "nested")
+        try link("private-parent", in: skills, to: sshFolder)
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("nested")) {
+            try CloudSaveFolder.read(directory: skills.appendingPathComponent("private-parent/nested"), links: policy)
+        }
+        #expect(FileManager.default.fileExists(atPath: privateChild.appendingPathComponent("SKILL.md").path))
+        let projectParent = home.appendingPathComponent("Projects/app-skill")
+        try link("project-parent", in: skills, to: projectParent)
+        let viaParent = try CloudSaveFolder.read(directory: skills.appendingPathComponent("project-parent/skill"), links: policy)
+        #expect(viaParent.entries.map(\.path) == ["SKILL.md", "docs/a.md"])
 
         let outside = try makeSkill(skills, "outside")
         try link("hosts", in: outside, to: URL(fileURLWithPath: "/etc/hosts"))

@@ -43,6 +43,20 @@ struct CloudSaveFolder: Equatable, Sendable {
 
         enum Target: Equatable { case library, own, privateFile }
 
+        func reachesThroughLink(_ url: URL) -> Bool {
+            let homePath = home.standardizedFileURL.path
+            let path = url.standardizedFileURL.path
+            guard path.hasPrefix(homePath + "/") else {
+                return (try? url.resourceValues(forKeys: [.isSymbolicLinkKey]))?.isSymbolicLink == true
+            }
+            var current = home.standardizedFileURL
+            for component in path.dropFirst(homePath.count + 1).split(separator: "/") {
+                current.appendPathComponent(String(component))
+                if (try? current.resourceValues(forKeys: [.isSymbolicLinkKey]))?.isSymbolicLink == true { return true }
+            }
+            return false
+        }
+
         func classify(_ target: URL) -> Target {
             let path = target.resolvingSymlinksInPath().standardizedFileURL.path
             let library = libraryRoot.resolvingSymlinksInPath().standardizedFileURL.path
@@ -82,7 +96,7 @@ struct CloudSaveFolder: Equatable, Sendable {
         guard fileManager.fileExists(atPath: root.path, isDirectory: &isDirectory), isDirectory.boolValue else {
             throw ReadError.unreadable
         }
-        let rootIsLink = (try? directory.resourceValues(forKeys: [.isSymbolicLinkKey]))?.isSymbolicLink == true
+        let rootIsLink = links?.reachesThroughLink(directory) ?? false
         if let links {
             switch links.classify(root) {
             case .library: throw ReadError.libraryInstall
