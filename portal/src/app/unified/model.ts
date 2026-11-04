@@ -294,6 +294,11 @@ function catalogOwner(id: string | null | undefined) {
   return /^[a-zA-Z0-9][a-zA-Z0-9-]{0,99}$/.test(owner) && id!.includes("/") ? owner : "";
 }
 
+/** Some Mac still reports this skill; a skill every Mac stopped reporting only lives on in Sets. */
+export function onAMac(skill: SkillDisplay) {
+  return !!skill.installed?.sourceSkills.some((copy) => copy.isCurrent !== false);
+}
+
 export function skillDisplays(data: PortalData, catalog: CatalogDisplay) {
   const grouped = groupSyncedSkills(data.skills, { groupInstallations: true });
   const byId = new Map(catalog.skills.map((skill) => [skill.id, skill]));
