@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { liveMine, liveSkill, onAMac, type SkillDisplay } from "../src/app/unified/model";
+import { liveMine, liveSkill, onAMac, setSkillDisplays, type SkillDisplay } from "../src/app/unified/model";
 
 const now = Date.parse("2026-11-04T12:00:00Z");
 const recent = "2026-11-01T00:00:00Z", old = "2026-09-28T00:00:00Z";
@@ -40,4 +40,19 @@ test("a skill with live and old copies shows and acts on only the live ones", ()
   assert.equal(liveSkill(display(copy(false, "mac")), now).installed, undefined);
   const allLive = display(copy(true, "mac"));
   assert.equal(liveSkill(allLive, now), allLive);
+});
+
+test("a Set row uses a live copy when the copy it was saved with is gone", () => {
+  const stale = { ...copy(false, "mac-old", recent, "old", "Codex"), inventoryVersion: 3 as const };
+  const live = { ...copy(true, "mac-a", recent, "live", "Claude"), inventoryVersion: 3 as const };
+  const set = { items: [{ id: "item", kind: "synced", syncedSkillId: "old", name: "bflow", description: "", githubUrl: null }] } as never;
+  const [row] = setSkillDisplays(set, [display(stale, live)], [], now);
+  assert.equal(row.installed?.id, "live");
+  assert.deepEqual(row.installed?.sourceSkills.map((c) => c.id), ["live"]);
+  // The item's own copy wins while a Mac still has it.
+  const [own] = setSkillDisplays(set, [display({ ...stale, isCurrent: true }, live)], [], now);
+  assert.equal(own.installed?.id, "old");
+  // With no Mac having the skill, the row keeps the copy it was saved with.
+  const [history] = setSkillDisplays(set, [display(stale)], [], now);
+  assert.equal(history.installed?.id, "old");
 });

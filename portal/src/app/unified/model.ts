@@ -373,7 +373,7 @@ export function matchesSearch(skill: SkillDisplay, query: string) {
 }
 
 // Set contents come from the detail response, not the account's installed list.
-export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[], catalog: CatalogSummary[] = []): SkillDisplay[] {
+export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[], catalog: CatalogSummary[] = [], now = Date.now()): SkillDisplay[] {
   const byId = new Map(catalog.map(skill => [skill.id, skill]));
   return set.items.map(item => {
     const installed = item.syncedSkillId
@@ -389,10 +389,20 @@ export function setSkillDisplays(set: PortalSet, mine: SkillDisplay[], catalog: 
       githubUrl: publicSkill?.githubUrl || item.githubUrl || installed?.githubUrl || null,
       author: publicSkill?.author || installed?.author || "", tags: publicSkill?.tags || [],
       avatar: publicSkill?.avatar || installed?.avatar, stars: publicSkill?.stars, installCommand: publicSkill?.installCommand,
-      installed: installation && (installation.inventoryVersion === 2 || installation.inventoryVersion === 3 || installation.deviceId != null)
-        ? groupSyncedSkills([installation])[0] : installed?.installed };
+      installed: setItemInstallation(installation, installed, now) };
   });
 }
+/**
+ * What a Set row shows and acts on: the item's own copy while a Mac still has it, otherwise a live
+ * copy of the same skill, and only when no Mac has the skill the copy the item was saved with.
+ */
+function setItemInstallation(installation: SyncedSkill | undefined, skill: SkillDisplay | undefined, now: number) {
+  const exact = installation && (installation.inventoryVersion === 2 || installation.inventoryVersion === 3 || installation.deviceId != null)
+    ? groupSyncedSkills([installation])[0] : undefined;
+  if (exact && isLive(installation!, now)) return exact;
+  return (skill ? liveSkill(skill, now).installed : undefined) ?? exact ?? skill?.installed;
+}
+
 /** How a skill shared from its owner's cloud save reads in a Set. */
 export function cloudSharedLabel(skill: SkillDisplay, role: PortalSet["role"] | undefined) {
   if (role === "owner") return skill.setItemUpdateAvailable ? "Shared from your cloud save · newer version saved" : "Shared from your cloud save";

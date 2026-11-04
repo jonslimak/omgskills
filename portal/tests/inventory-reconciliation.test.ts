@@ -191,7 +191,9 @@ test("v3 retains missing rows, physical IDs, unknown Macs, timestamps and Set me
   assert.match(inventorySummary(groups.find(skill => skill.id === "legacy")!)!.location, /Unknown Mac/);
   const item = { id: "retained-item", kind: "synced" as const, syncedSkillId: "missing-id", name: "Saved snapshot", description: "Preserved note", githubUrl: null };
   const saved = setSkillDisplays({ ...data.sets[0], items: [item] }, skillDisplays(data, catalog).mine)[0];
-  assert.equal(saved.installed?.isCurrent, false);
+  // The saved copy is gone but another Mac still has the skill, so the row shows and acts on that copy.
+  assert.equal(saved.installed?.id, "other-mac");
+  assert.equal(saved.installed?.isCurrent, true);
   assert.equal(saved.setItemId, item.id);
   assert.equal(saved.name, "Saved snapshot");
 });
@@ -322,8 +324,8 @@ test("rendered My skills and Set rows retain missing history separately from lat
     assert.equal(grouped.length, 1);
     assert.equal(isMember(data.sets[0], grouped[0].installed!), true);
     const saved = setSkillDisplays(data.sets[0], grouped)[0];
-    assert.deepEqual(saved.installed?.allSkillIds, ["missing-id"]);
-    assert.equal(saved.installed?.sourceSkills[0], data.skills[0]);
+    assert.deepEqual(saved.installed?.allSkillIds, ["missing-id", "claude-copy", "other-mac"]);
+    assert.deepEqual(saved.installed?.sourceSkills, [data.skills[1]]);
     assert.match(render({ ...setNav, source: "codex" }, management), /aria-label="Open Saved snapshot"/);
     assert.deepEqual(data.skills.map(inventorySummary), histories);
     assert.deepEqual(data, beforeGrouping);
