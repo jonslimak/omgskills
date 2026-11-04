@@ -93,6 +93,7 @@ import {
   matchesSearch,
   skillDisplays,
   liveSkill,
+  maxRemoveFromMac,
   removeFromMacLink,
   liveMine,
   setSkillDisplays,
@@ -942,7 +943,7 @@ export function UnifiedApp({
                 Copy source link
               </MenuItem>
               {(!readOnlyAccount || management) && liveCopies && <MenuItem icon={Trash2} danger
-                onSelect={() => window.location.assign(removeFromMacLink(liveCopies.name))}>
+                onSelect={() => window.location.assign(removeFromMacLink([liveCopies.name]))}>
                 Delete from my Mac…
               </MenuItem>}
             </Menu>
@@ -1762,6 +1763,16 @@ export function UnifiedApp({
                         <ListPlus />
                         Add to set
                       </button>
+                      {(!readOnlyAccount || management) && (() => {
+                        const names = visible.filter(skill => picked.includes(skill.key))
+                          .flatMap(skill => liveCopiesOf(skill)?.name ?? []);
+                        const tooMany = names.length > maxRemoveFromMac;
+                        return <button type="button" className="ua-pill ua-pill-danger" disabled={!names.length || tooMany}
+                          title={tooMany ? `Select up to ${maxRemoveFromMac} skills` : undefined}
+                          onClick={() => window.location.assign(removeFromMacLink(names))}>
+                          <Trash2 />Delete from my Mac
+                        </button>;
+                      })()}
                     </div>
                   )}
                   {visible.length ||
