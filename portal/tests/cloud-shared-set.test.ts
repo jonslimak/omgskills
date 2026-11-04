@@ -63,4 +63,8 @@ test("people a Set is shared with can read a private item's instructions from it
   await loadSharedSkillMd(async <T>(path: string) => { paths.push(path); return { markdown: "# x", truncated: false } as T; },
     releaseId, new AbortController().signal);
   assert.deepEqual(paths, [`/api/portal/private-releases/${releaseId}/skill-md`]);
+  // Access taken away: the next open asks the server again and shows nothing it no longer allows.
+  await assert.rejects(loadSharedSkillMd(async <T>(path: string) => { paths.push(path); throw new Error("404") as T; },
+    releaseId, new AbortController().signal));
+  assert.equal(paths.length, 2, "Never answered from an earlier read");
 });

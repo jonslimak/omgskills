@@ -59,15 +59,10 @@ export type SharedSkillMd = { markdown: string; truncated: boolean };
 export type SharedSkillMdLoader = (releaseId: string, signal: AbortSignal) => Promise<SharedSkillMd>;
 
 /** A private Set item's instructions, for people the Set is shared with (checked like the Mac download). */
-export async function loadSharedSkillMd(api: PortalApi, releaseId: string, signal: AbortSignal): Promise<SharedSkillMd> {
-  // A version never changes, so each is read once per page.
-  const cached = sharedSkillMdCache.get(releaseId);
-  if (cached) return cached;
-  const doc = await api<SharedSkillMd>(`/api/portal/private-releases/${encodeURIComponent(releaseId)}/skill-md`, { signal, cache: "no-store" });
-  sharedSkillMdCache.set(releaseId, doc);
-  return doc;
+/** Not cached: every open asks the server again, so taking away access (or marking a version secret) applies at once. */
+export function loadSharedSkillMd(api: PortalApi, releaseId: string, signal: AbortSignal): Promise<SharedSkillMd> {
+  return api<SharedSkillMd>(`/api/portal/private-releases/${encodeURIComponent(releaseId)}/skill-md`, { signal, cache: "no-store" });
 }
-const sharedSkillMdCache = new Map<string, SharedSkillMd>();
 
 /** The first of these skill keys with a saved copy, or null when none is saved. */
 export async function loadSavedSkillMd(api: PortalApi, keys: string[], signal: AbortSignal): Promise<SavedSkillMd | null> {
