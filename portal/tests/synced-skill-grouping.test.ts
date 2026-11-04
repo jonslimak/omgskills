@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { groupSyncedSkills, installedSetNames, type SyncedSkill } from "../src/synced-skill-grouping.js";
+import { groupSyncedSkills, hasCatalogId, installedSetNames, type SyncedSkill } from "../src/synced-skill-grouping.js";
 
 test("Set origins include every grouped installation, without inventing membership", () => {
   const base: SyncedSkill = { id: "first", name: "review", description: "Review", githubUrl: null,
@@ -148,7 +148,7 @@ test("display-only grouping combines exact catalog matches and preserves every i
   assert.deepEqual(skills, before);
   assert.equal(groupSyncedSkills(skills).length, 3, "Mutation callers still see separate records");
   assert.equal(groupSyncedSkills([...skills, { ...base, id: "different", catalogSkillId: "other/repo:review" }],
-    { groupInstallations: true }).length, 2);
+    { groupInstallations: true }).length, 1, "One skill per name, even across catalog IDs, as the Mac counts it");
 });
 
 test("display groups are one skill per name, whatever the content or agent", () => {
@@ -235,14 +235,17 @@ test("display representatives prefer confirmed current copies over missing or le
   assert.equal(missing.isCurrent, false, "A missing-only group must not be reported as current");
 });
 
-test("a shared fingerprint cannot bridge conflicting catalog identities", () => {
-  const base: SyncedSkill = { inventoryVersion: 3, id: "unresolved", name: "Review", description: "Review",
+test("same-named copies with different catalog IDs are one skill, found by either ID", () => {
+  const base: SyncedSkill = { inventoryVersion: 3, deviceId: "mac-a", id: "unresolved", name: "Review", description: "Review",
     skillMdSha: "a".repeat(64), catalogSkillId: null, githubUrl: null, isLocalOnly: true,
-    source: "codex", lastSeenAt: "2026-10-30T12:00:00Z" };
+    source: "codex", lastSeenAt: "2026-10-30T12:00:00Z", isCurrent: true };
   const rows = [base, { ...base, id: "a", catalogSkillId: "a/repo:review" },
-    { ...base, id: "b", catalogSkillId: "b/repo:review" }];
+    { ...base, id: "b", source: "claude", skillMdSha: "b".repeat(64), catalogSkillId: "b/repo:review" }];
   for (const input of [rows, [...rows].reverse()]) {
-    assert.equal(groupSyncedSkills(input, { groupInstallations: true }).length, 3);
+    const groups = groupSyncedSkills(input, { groupInstallations: true });
+    assert.equal(groups.length, 1);
+    assert.ok(hasCatalogId(groups[0], "a/repo:review") && hasCatalogId(groups[0], "b/repo:review"));
+    assert.equal(groups[0].skillMdSha, "a".repeat(64), "Actions use the version most agents have");
   }
 });
 

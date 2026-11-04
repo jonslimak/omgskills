@@ -324,7 +324,7 @@ test("rendered My skills and Set rows retain missing history separately from lat
     assert.equal(grouped.length, 1);
     assert.equal(isMember(data.sets[0], grouped[0].installed!), true);
     const saved = setSkillDisplays(data.sets[0], grouped)[0];
-    assert.deepEqual(saved.installed?.allSkillIds, ["missing-id", "claude-copy", "other-mac"]);
+    assert.deepEqual(new Set(saved.installed?.allSkillIds), new Set(["missing-id", "claude-copy", "other-mac"]));
     assert.deepEqual(saved.installed?.sourceSkills, [data.skills[1]]);
     assert.match(render({ ...setNav, source: "codex" }, management), /aria-label="Open Saved snapshot"/);
     assert.deepEqual(data.skills.map(inventorySummary), histories);

@@ -34,6 +34,11 @@ export type GroupedSyncedSkill = SyncedSkill & {
   sources: string[];
 };
 
+/** A skill groups copies by name, so its copies may carry more than one catalog ID. */
+export function hasCatalogId(skill: GroupedSyncedSkill, catalogId: string) {
+  return skill.catalogSkillId === catalogId || skill.sourceSkills.some(copy => copy.catalogSkillId?.trim() === catalogId);
+}
+
 export function installedSetNames(skill: GroupedSyncedSkill): string[] {
   return [...new Set(skill.sourceSkills.flatMap(source => {
     const name = source.installedFromSet?.trim();
@@ -139,7 +144,12 @@ function chooseDisplayInstallation(skills: SyncedSkill[]) {
   if (!candidates.length) candidates = skills;
   const deviceCopies = candidates.filter(skill => skill.deviceId != null);
   const versionedCopies = candidates.filter(skill => skill.inventoryVersion === 2 || skill.inventoryVersion === 3);
-  return chooseRepresentativeSkill(deviceCopies.length ? deviceCopies : versionedCopies.length ? versionedCopies : candidates);
+  candidates = deviceCopies.length ? deviceCopies : versionedCopies.length ? versionedCopies : candidates;
+  // Copies can be different versions; act on the version most agents have.
+  const counts = new Map<string, number>();
+  for (const skill of candidates) counts.set(skill.skillMdSha ?? "", (counts.get(skill.skillMdSha ?? "") ?? 0) + 1);
+  const top = Math.max(...counts.values());
+  return chooseRepresentativeSkill(candidates.filter(skill => counts.get(skill.skillMdSha ?? "") === top));
 }
 
 export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = false } = {}): GroupedSyncedSkill[] {
@@ -150,13 +160,12 @@ export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = 
 
   for (const skill of skills) {
     if (groupInstallations) {
-      const catalogId = skill.catalogSkillId?.trim();
-      const identity = catalogId || nameIdentity(skill);
+      // The same rule as the Mac's count: by name, whatever the catalog ID, agent or version.
+      const identity = nameIdentity(skill) ?? skill.catalogSkillId?.trim();
       if (identity) {
-        const groups = catalogId ? catalogGroups : displayGroups;
-        const group = groups.get(identity) ?? [];
+        const group = displayGroups.get(identity) ?? [];
         group.push(skill);
-        groups.set(identity, group);
+        displayGroups.set(identity, group);
         continue;
       }
     }
@@ -172,27 +181,6 @@ export function groupSyncedSkills(skills: SyncedSkill[], { groupInstallations = 
       catalogGroups.set(catalogSkillId, group);
     } else {
       unresolvedSkills.push(skill);
-    }
-  }
-
-  if (groupInstallations) {
-    const catalogIdsByName = new Map<string, Set<string>>();
-    for (const [catalogId, group] of catalogGroups) {
-      for (const skill of group) {
-        const key = nameIdentity(skill);
-        if (!key) continue;
-        const matches = catalogIdsByName.get(key) ?? new Set<string>();
-        matches.add(catalogId);
-        catalogIdsByName.set(key, matches);
-      }
-    }
-    // A same-named copy may join one known identity, but must never bridge conflicting catalog IDs.
-    for (const [key, group] of displayGroups) {
-      const matches = catalogIdsByName.get(key);
-      if (matches?.size !== 1) continue;
-      const [catalogId] = matches;
-      catalogGroups.get(catalogId)!.push(...group);
-      displayGroups.delete(key);
     }
   }
 
