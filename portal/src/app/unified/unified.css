@@ -846,6 +846,7 @@
 }
 .ua-row-name {
   display: block;
+  min-width: 0;
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
