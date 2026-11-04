@@ -133,7 +133,8 @@ export async function portalPrivateReleases(
   }
 
   try {
-    if (route.action === "package") {
+    if (route.action !== "register") {
+      // Shared content, on the web or a Mac, stops with the same switch.
       (dependencies?.requireMacFeature ?? requireSkillGroupsFeature)();
     }
     const resolved = dependencies ?? defaultDependencies();
@@ -215,8 +216,7 @@ export default async (req: Request, context: Context) => portalPrivateReleases(r
 export const config: Config = {
   path: [
     "/api/portal/private-sources/:sourceId/releases",
-    "/api/portal/private-releases/:releaseId/package",
-    "/api/portal/private-releases/:releaseId/skill-md"
+    "/api/portal/private-releases/:releaseId/package"
   ],
   rateLimit: {
     action: "rate_limit",

@@ -19,6 +19,8 @@ export type PortalGroupItemRow = {
   releaseId?: string | null;
   /** The owner's newest saved version, for owners only. */
   savedReleaseId?: string | null;
+  /** The Set's owner owns the item's source (false in a duplicated Set). */
+  sharedByOwner?: boolean | null;
 };
 
 export function portalGroupItem(row: PortalGroupItemRow, role: GroupAccessRole) {
@@ -40,7 +42,7 @@ export function portalGroupItem(row: PortalGroupItemRow, role: GroupAccessRole) 
     ...(row.sourceKind === "cloud" && role !== "public" ? { cloudShared: true } : {}),
     // Invitees and the owner can read a private item's instructions on the web (same check as the download).
     ...(role !== "public" && (row.sourceKind === "cloud" || row.sourceKind === "private_github") && row.releaseId
-      && !row.metadataOnlyReason ? { sharedReleaseId: row.releaseId } : {}),
+      && !row.metadataOnlyReason && row.sharedByOwner === true ? { sharedReleaseId: row.releaseId } : {}),
     ...(role === "owner" && row.sourceKind === "cloud" && row.savedReleaseId && row.savedReleaseId !== row.releaseId
       ? { updateAvailable: true } : {}),
   };

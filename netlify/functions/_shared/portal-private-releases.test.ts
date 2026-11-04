@@ -381,7 +381,6 @@ test("an invitee reads a shared skill's instructions on the web, without frontma
   const actors: unknown[] = [];
   let audited = false, deviceAuth = 0;
   const response = await portalPrivateReleases(new Request(skillMdUrl), context, dependencies({
-    requireMacFeature() { throw new Error("Reading instructions is a web feature"); },
     async requirePortalUser() { return { ...actor, id: "recipient-id", email: "recipient@example.com" }; },
     async requireDeviceActor() { deviceAuth += 1; return deviceActor; },
     async authorize(receivedActor) { actors.push(receivedActor); return invitedWebGrant; },
@@ -417,5 +416,13 @@ test("instructions for people not invited look the same as a release that doesn'
   assert.equal(audited, false);
   const post = await portalPrivateReleases(new Request(skillMdUrl, { method: "POST" }), context, dependencies());
   assert.equal(post.status, 405);
-  assert.ok([config.path].flat().includes("/api/portal/private-releases/:releaseId/skill-md"));
+  const { config: skillMdConfig } = await import("../portal-shared-skill-md.mjs");
+  assert.equal(skillMdConfig.path, "/api/portal/private-releases/:releaseId/skill-md");
+  assert.ok(!([config.path].flat() as string[]).includes(skillMdConfig.path as string), "Its own function and rate limit");
+  let gated = false;
+  const off = await portalPrivateReleases(new Request(skillMdUrl), context, dependencies({
+    requireMacFeature() { gated = true; throw new Response("Not found", { status: 404 }); }
+  }));
+  assert.equal(gated, true);
+  assert.equal(off.status, 404, "The sharing switch stops web reads too");
 });
