@@ -37,7 +37,7 @@ final class DeviceConnectionModel {
         var seen = Set<String>(), alone = 0
         for skill in installations {
             let name = skill.name.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ")
-            guard let sha = skill.skillMdSha?.trimmingCharacters(in: .whitespaces).lowercased(), !name.isEmpty,
+            guard let sha = skill.skillMdSha?.lowercased(), !name.isEmpty,
                   sha.range(of: "^([a-f0-9]{40}|[a-f0-9]{64})$", options: .regularExpression) != nil
             else { alone += 1; continue }
             seen.insert(name + "\n" + sha)
