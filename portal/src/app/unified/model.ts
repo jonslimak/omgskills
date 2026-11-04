@@ -295,36 +295,44 @@ function catalogOwner(id: string | null | undefined) {
   return /^[a-zA-Z0-9][a-zA-Z0-9-]{0,99}$/.test(owner) && id!.includes("/") ? owner : "";
 }
 
-/**
- * Some Mac still reports this skill; a skill every Mac stopped reporting only lives on in Sets.
- * Once a Mac reports per device, copies from the older account-wide sync (no device) are history too.
- */
-export function onAMac(skill: SkillDisplay, macsReport = false) {
-  return !!skill.installed?.sourceSkills.some((copy) => isLive(copy, macsReport));
+/** Copies from the older account-wide sync (no device) that no Mac has refreshed for this long are history. */
+const LEGACY_COPY_STALE_MS = 30 * 24 * 60 * 60 * 1000;
+
+function isLive(copy: SyncedSkill, now: number) {
+  if (copy.isCurrent === false) return false;
+  if (copy.deviceId != null) return true;
+  const seen = Date.parse(copy.lastSeenAt);
+  return !Number.isFinite(seen) || now - seen < LEGACY_COPY_STALE_MS;
 }
 
-function isLive(copy: SyncedSkill, macsReport: boolean) {
-  return copy.isCurrent !== false && (!macsReport || copy.deviceId != null);
+/** Some Mac still has this skill; a skill no Mac has any more only lives on in Sets. */
+export function onAMac(skill: SkillDisplay, now = Date.now()) {
+  return !!skill.installed?.sourceSkills.some((copy) => isLive(copy, now));
 }
 
 /**
  * The skill as Macs have it now: agents, actions and details use only live copies.
- * Set membership still matches every copy it ever had.
+ * Set membership still matches every copy it ever had (allSkillIds).
  */
-export function liveSkill(skill: SkillDisplay, macsReport = false): SkillDisplay {
+export function liveSkill(skill: SkillDisplay, now = Date.now()): SkillDisplay {
   const installed = skill.installed;
   if (!installed) return skill;
-  const live = installed.sourceSkills.filter((copy) => isLive(copy, macsReport));
+  const live = installed.sourceSkills.filter((copy) => isLive(copy, now));
   if (!live.length) return { ...skill, installed: undefined };
   if (live.length === installed.sourceSkills.length) return skill;
-  const [current] = groupSyncedSkills(live, { groupInstallations: true });
-  return { ...skill, installed: { ...current, sourceSkills: live,
-    sources: displaySourceNames(live.map((copy) => copy.source)), allSkillIds: installed.allSkillIds } };
+  // Actions use a live copy; the skill's catalog identity and text stay those of the whole group.
+  const action = live.find((copy) => copy.id === installed.id)
+    ?? live.find((copy) => copy.deviceId != null) ?? live[0];
+  return { ...skill, installed: { ...action,
+    catalogSkillId: installed.catalogSkillId, identityStatus: installed.identityStatus,
+    isLocalOnly: installed.isLocalOnly, description: installed.description, githubUrl: installed.githubUrl,
+    allSkillIds: installed.allSkillIds, sourceSkills: live,
+    sources: displaySourceNames(live.map((copy) => copy.source)) } };
 }
 
-/** Whether any Mac reports its skills per device. */
-export function macsReport(skills: PortalData["skills"]) {
-  return skills.some((skill) => skill.deviceId != null && skill.isCurrent !== false);
+/** My skills as Macs have them now. */
+export function liveMine(mine: SkillDisplay[], now = Date.now()) {
+  return mine.map((skill) => liveSkill(skill, now)).filter((skill) => skill.installed);
 }
 
 export function skillDisplays(data: PortalData, catalog: CatalogDisplay) {

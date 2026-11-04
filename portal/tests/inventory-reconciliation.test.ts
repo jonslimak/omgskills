@@ -23,8 +23,9 @@ const configuration = { enabled: "1", development: true, integration: "1", ready
 const environment = { VITE_NEWMAC_CONNECTED_INVENTORY_TEST: "1", VITE_NEWMAC_INVENTORY_RECONCILIATION_TEST: "1",
   VITE_PORTAL_INTEGRATION: "1", PORTAL_TEST_ENVIRONMENT_VERIFIED: "1", PORTAL_TEST_API_ORIGIN: "http://127.0.0.1:8888",
   VITE_CLERK_PUBLISHABLE_KEY: "pk_test_fixture", VITE_SKILLGROUPS_WEB_ENABLED: "1", VITE_NEWMAC_CATALOG_INSTALL_TEST: "1" };
-const observed = "2026-10-16T12:00:00Z";
-const reported = "2026-10-16T15:00:00Z";
+// Recent, so the old account-wide fixture copy still counts as live (older than 30 days is history).
+const observed = new Date(Date.now() - 2 * 86_400_000).toISOString();
+const reported = new Date(Date.parse(observed) + 3 * 3_600_000).toISOString();
 const identity = { name: "Test account", email: "test@example.test" };
 const catalog = { skills: [], collections: [], creators: [], categories: [], trendingIds: [] };
 const v3Path = "/api/portal/synced-skills?version=3";
