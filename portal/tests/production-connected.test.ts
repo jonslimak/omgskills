@@ -112,12 +112,12 @@ test("production install handoff preserves both agents and cannot offer the test
 
 test("production setup references only the exact separately published Mac release", () => {
   assert.equal(productionDistribution.url,
-    "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.31/OMGSkills-Connected-0.0.31-31-arm64.zip");
+    "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.32/OMGSkills-Connected-0.0.32-32-arm64.zip");
   assert.equal(productionDistribution.checksumURL, productionDistribution.url + ".sha256");
-  assert.equal(productionDistribution.filename, "OMGSkills-Connected-0.0.31-31-arm64.zip");
-  assert.equal(productionDistribution.version, "0.0.31");
-  assert.equal(productionDistribution.build, "30");
-  assert.equal(productionDistribution.sha256, "b70e9fd503e84e9d3188a2067fd996a28394755be448497de9cdd57280b17fb7");
+  assert.equal(productionDistribution.filename, "OMGSkills-Connected-0.0.32-32-arm64.zip");
+  assert.equal(productionDistribution.version, "0.0.32");
+  assert.equal(productionDistribution.build, "32");
+  assert.equal(productionDistribution.sha256, "aef5c044f593c1baf9f7b906b75418440b5e331d0f68d9112f1ec3a5c6fa9738");
   assert.equal(productionFeatures.connectedInventoryReadEnabled, true);
   assert.equal(productionFeatures.connectedInventorySyncEnabled, true);
 });
