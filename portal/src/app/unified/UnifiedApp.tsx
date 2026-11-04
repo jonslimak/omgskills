@@ -528,7 +528,10 @@ export function UnifiedApp({
   if (selected) closingDetail.current = { skill: selected, pending: detailPending };
   const detail = selected ?? closingDetail.current?.skill;
   const selectedInstallations = detail?.installed?.sourceSkills ?? [];
-  const detailLive = detail?.installed ? liveSkill(detail).installed : undefined;
+  // A Set or Favorites row holds the saved copy; versions come from all of that skill's copies Macs have now.
+  const liveCopiesOf = (skill: SkillDisplay) => skill.installed && (mine.find(mineSkill =>
+    mineSkill.installed?.allSkillIds.includes(skill.installed!.id))?.installed ?? liveSkill(skill).installed);
+  const detailLive = detail ? liveCopiesOf(detail) : undefined;
   const detailVersions = detailLive ? skillVersions(detailLive) : [];
   const panelPending = selected ? detailPending : !!closingDetail.current?.pending;
   // List rows already carry the name and avatar; only the direct-link placeholder (no author) waits.
@@ -819,7 +822,7 @@ export function UnifiedApp({
   function renderRow(skill: SkillDisplay, rank?: number, compact = false) {
     const canSelect = editing && !!skill.installed;
     const installedSources = displaySourceNames(skill.installed?.sources ?? []);
-    const liveCopies = !discovery && skill.installed ? liveSkill(skill).installed : undefined;
+    const liveCopies = !discovery ? liveCopiesOf(skill) : undefined;
     const versionCount = liveCopies ? skillVersions(liveCopies).length : 0;
     const fromSets = !discovery && skill.installed ? installedSetNames(skill.installed) : [];
     return (
