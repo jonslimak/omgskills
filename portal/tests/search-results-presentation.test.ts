@@ -11,7 +11,7 @@ test("public search hides personal labels and the sign-in prompt when there are 
   assert.ok(search.includes('matchingMine.length > 0 && <h2 className="ua-search-library-label">Library</h2>'));
   assert.equal(search.includes('In my skills'), false);
   assert.equal(search.includes('Sign in to see your skills.'), false);
-  assert.ok(source.includes('const mine = signedIn ? models.mine : [];'));
+  assert.ok(source.includes('const everMine = signedIn ? models.mine : [];'));
 });
 
 test("personal results use a native disclosure that starts collapsed for each search scope", () => {

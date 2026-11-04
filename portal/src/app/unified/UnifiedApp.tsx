@@ -91,6 +91,7 @@ import {
   isFavorite,
   matchesSearch,
   skillDisplays,
+  onAMac,
   setSkillDisplays,
   setAccessSummary,
   starCount,
@@ -504,15 +505,17 @@ export function UnifiedApp({
     () => displaySourceNames(data.skills.map((s) => s.source)),
     [data.skills],
   );
-  const mine = signedIn ? models.mine : [];
-  const setRows = management?.detail.set ? setSkillDisplays(management.detail.set, mine, catalog.skills) : [];
+  // Sets still match skills no Mac reports any more; the lists and counts show only skills on a Mac.
+  const everMine = signedIn ? models.mine : [];
+  const mine = everMine.filter(onAMac);
+  const setRows = management?.detail.set ? setSkillDisplays(management.detail.set, everMine, catalog.skills) : [];
   const library = signedIn
     ? models.library
     : models.library.map((skill) => ({ ...skill, installed: undefined }));
   const pendingSelection: SkillDisplay | undefined = publicStatus && nav.selected.startsWith("catalog:")
     ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
-  const selected = [...mine, ...library, ...setRows].find((s) => s.key === nav.selected
+  const selected = [...everMine, ...library, ...setRows].find((s) => s.key === nav.selected
     || (nav.selected.startsWith("synced:") && s.key.startsWith("synced:")
       && s.installed?.allSkillIds.includes(nav.selected.slice(7)))) || pendingSelection;
   const detailOpen = useRef(false);
@@ -1102,7 +1105,7 @@ export function UnifiedApp({
   let visible = nav.view === "favorites" ? favorites : mine;
   if (nav.view === "set")
     visible = activeSet
-      ? mine.filter((skill) => isMember(activeSet, skill.installed!))
+      ? everMine.filter((skill) => isMember(activeSet, skill.installed!))
       : [];
   if (setPage) visible = setRows;
   if (nav.view === "top") visible = top;
@@ -1778,7 +1781,7 @@ export function UnifiedApp({
                     activeSet.items
                       .filter(
                         (item) =>
-                          !mine.some((skill) =>
+                          !everMine.some((skill) =>
                             skill.installed?.allSkillIds.includes(
                               item.syncedSkillId || "",
                             ),
