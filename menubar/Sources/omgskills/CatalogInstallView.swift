@@ -403,8 +403,8 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     func receive(_ url: URL) {
         if connectedRuntime != nil && url.absoluteString == "omgskills://connect" { showStatus(); return }
         if connectedRuntime?.receivePairingCallback(url) == true { showStatus(); return }
-        // While version match is replacing files, no other link (install, Set, delete) may touch skill folders.
-        if versionMatch?.isWorking == true { showStatus(); return }
+        // While a restore or version match is replacing files, no other link (install, Set, delete) may touch skill folders.
+        if versionMatch?.isWorking == true || restore?.isWorking == true { showStatus(); return }
         if GroupInstallDeepLink.route(from: url) != nil {
             if model.appReplacementBlocksRequest {
                 model.receive(url)
@@ -416,12 +416,6 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
             return
         }
         // Delete links never reach the installer; without a connected account they are dropped.
-        // While a restore or version match is replacing files, other skill links wait for it to finish.
-        if url.scheme?.lowercased() == "omgskills", ["remove", "match", "restore"].contains(url.host?.lowercased() ?? ""),
-           restore?.isWorking == true || versionMatch?.isWorking == true {
-            showStatus()
-            return
-        }
         if url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "remove" {
             if !model.appReplacementBlocksRequest, removal?.receive(url) == true { versionMatch?.close(); restore?.close(); showStatus() }
             return

@@ -76,6 +76,9 @@ struct SkillRestoreTests {
         _ = restore.receive(URL(string: "omgskills://restore?name=notes&key=notes&version=33333333-3333-4333-8333-333333333333")!)
         for _ in 0..<50 { await Task.yield() }
         #expect(restore.state == .failed(message: "That saved version wasn't found. Nothing was changed."))
+        _ = restore.receive(URL(string: "omgskills://restore?name=notes&key=notes&version=\(versionID)")!)
+        for _ in 0..<50 { await Task.yield() }
+        #expect(restore.state == .alreadyRestored(name: "notes"))
         // Another skill's saved files can never land on this one.
         _ = restore.receive(URL(string: "omgskills://restore?name=notes&key=other&version=\(versionID)")!)
         for _ in 0..<50 { await Task.yield() }

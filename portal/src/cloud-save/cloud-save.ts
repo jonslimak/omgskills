@@ -69,17 +69,19 @@ export type SavedVersionsLoader = (keys: string[], signal: AbortSignal) => Promi
 
 /** A saved skill's versions, newest first, for the first of these keys that is saved; null when none is. */
 export async function loadSavedVersions(api: PortalApi, keys: string[], signal: AbortSignal): Promise<SavedVersions | null> {
+  // A skill's copies may be saved under several folder names; show the one with the most history.
+  let best: SavedVersions | null = null;
   for (const key of keys) {
     try {
       const { versions } = await api<{ versions: { id: string; savedAt: string }[] }>(
         `${base}/skills/${encodeURIComponent(key)}/versions`, { signal, cache: "no-store" });
-      return { key, versions: versions.map(({ id, savedAt }) => ({ id, savedAt })) };
+      if (!best || versions.length > best.versions.length) best = { key, versions: versions.map(({ id, savedAt }) => ({ id, savedAt })) };
     } catch (error) {
       if (error instanceof PortalApiError && (error.status === 404 || error.status === 503)) continue;
       throw error;
     }
   }
-  return null;
+  return best;
 }
 
 /** Opens the Mac app, which asks first and then puts this saved version in place of the skill's copies. */

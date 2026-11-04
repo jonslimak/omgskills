@@ -88,6 +88,7 @@ final class SkillRestoreController {
         case checking(name: String)
         case confirm(request: SkillRestore.Request, version: CloudSavedVersion, copies: [Skill])
         case working(name: String)
+        case alreadyRestored(name: String)
         case done(name: String, message: String)
         case failed(message: String)
     }
@@ -146,6 +147,10 @@ final class SkillRestoreController {
             guard let version = try await versions(request.key, credential).first(where: { $0.id == request.versionID }) else {
                 return finish(id, .failed(message: "That saved version wasn't found. Nothing was changed."))
             }
+            // Every copy already has that SKILL.md: nothing to put back.
+            if copies.allSatisfy({ $0.skillMdSha?.lowercased() == version.skillMdSha.lowercased() }) {
+                return finish(id, .alreadyRestored(name: request.name))
+            }
             finish(id, .confirm(request: request, version: version, copies: copies))
         } catch {
             finish(id, .failed(message: "Couldn't reach your saved versions. Check your connection and try again."))
@@ -163,6 +168,9 @@ final class SkillRestoreController {
         state = .working(name: request.name)
         let shown = Set(asked.map(SkillRemoval.location))
         let copies = SkillRestore.copies(for: request, in: installations()).filter { shown.contains(SkillRemoval.location($0)) }
+        guard !copies.isEmpty else {
+            return finish(id, .failed(message: "\(request.name) is no longer on this Mac. Nothing was changed."))
+        }
         let package: SkillPackage
         do { package = try await download(version.sourceId, version.release, credential) }
         catch GroupSkillPackageLoaderError.contentReadRequired {
@@ -224,6 +232,9 @@ struct SkillRestoreView: View {
                 }
             case .working(let name):
                 ProgressView("Restoring \(name)…").controlSize(.small)
+            case .alreadyRestored(let name):
+                Text("\(name) already has that version").font(.headline)
+                Button("Done") { controller.close() }.keyboardShortcut(.defaultAction)
             case .done(let name, let message):
                 Text("Restored \(name)").font(.headline)
                 Text(message).font(.callout).foregroundStyle(.secondary)
