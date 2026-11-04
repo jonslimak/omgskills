@@ -1,39 +1,58 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { liveSkill, macsReport, onAMac, type SkillDisplay } from "../src/app/unified/model";
+import { liveMine, liveSkill, onAMac, setSkillDisplays, type SkillDisplay } from "../src/app/unified/model";
 
-const copy = (isCurrent?: boolean, deviceId: string | null = null) => ({ id: "x", deviceId, name: "bflow", description: null, githubUrl: null,
-  isLocalOnly: true, source: "Claude", lastSeenAt: "2026-07-16T00:00:00Z", isCurrent });
+const now = Date.parse("2026-11-04T12:00:00Z");
+const recent = "2026-11-01T00:00:00Z", old = "2026-09-28T00:00:00Z";
+const copy = (isCurrent: boolean | undefined, deviceId: string | null = null, lastSeenAt = recent, id = "x", source = "Claude") =>
+  ({ id, deviceId, name: "bflow", description: null, githubUrl: null, isLocalOnly: true, source, lastSeenAt, isCurrent });
 const display = (...copies: ReturnType<typeof copy>[]) => ({ key: "synced:x", name: "bflow", description: "",
   author: "", githubUrl: null, tags: [],
-  installed: { ...copies[0], allSkillIds: ["x"], sourceSkills: copies, sources: ["Claude"] } }) as SkillDisplay;
+  installed: { ...copies[0], allSkillIds: copies.map((c) => c.id), sourceSkills: copies,
+    sources: [...new Set(copies.map((c) => c.source))] } }) as SkillDisplay;
 
-test("a skill every Mac stopped reporting is left out of the lists; one copy on a Mac keeps it", () => {
-  assert.equal(onAMac(display(copy(false), copy(false))), false);
-  assert.equal(onAMac(display(copy(false), copy(true))), true);
-  // Older inventories don't say; those stay listed.
-  assert.equal(onAMac(display(copy(undefined))), true);
-  assert.equal(onAMac({ ...display(copy(true)), installed: undefined }), false);
+test("a skill no Mac has any more is left out; one live copy keeps it", () => {
+  assert.equal(onAMac(display(copy(false, "mac"), copy(false)), now), false);
+  assert.equal(onAMac(display(copy(false, "mac"), copy(true, "mac")), now), true);
+  assert.equal(onAMac({ ...display(copy(true, "mac")), installed: undefined }, now), false);
 });
 
-test("once a Mac reports per device, copies from the older account-wide sync stop counting", () => {
-  const legacy = copy(true), mac = copy(true, "mac-a");
-  assert.equal(macsReport([legacy]), false);
-  assert.equal(macsReport([legacy, mac]), true);
-  assert.equal(macsReport([legacy, copy(false, "mac-a")]), false);
-  assert.equal(onAMac(display(legacy), false), true);
-  assert.equal(onAMac(display(legacy), true), false);
-  assert.equal(onAMac(display(legacy, mac), true), true);
+test("old account-wide copies count only while a Mac still refreshes them", () => {
+  // A Mac still on the old sync keeps its skills listed.
+  assert.equal(onAMac(display(copy(true, null, recent)), now), true);
+  // Copies no Mac refreshed for over 30 days are history, even when still marked current.
+  assert.equal(onAMac(display(copy(true, null, old)), now), false);
+  assert.deepEqual(liveMine([display(copy(true, null, old)), display(copy(true, "mac"))], now).length, 1);
 });
 
 test("a skill with live and old copies shows and acts on only the live ones", () => {
-  const old = { ...copy(true), id: "old", source: "Codex" }, live = { ...copy(true, "mac-a"), id: "live", source: "Claude" };
-  const skill = { ...display(old, live), installed: { ...display(old, live).installed!, id: "old", allSkillIds: ["old", "live"], sources: ["Claude", "Codex"] } };
-  const shown = liveSkill(skill, true);
+  const stale = copy(true, null, old, "old", "Codex"), live = copy(true, "mac-a", recent, "live", "Claude");
+  const skill = display(stale, live);
+  skill.installed = { ...skill.installed!, catalogSkillId: "owner/repo:bflow", githubUrl: "https://github.com/owner/repo" };
+  const shown = liveSkill(skill, now);
   assert.equal(shown.installed?.id, "live");
   assert.deepEqual(shown.installed?.sources, ["Claude"]);
   assert.deepEqual(shown.installed?.sourceSkills.map((c) => c.id), ["live"]);
+  // Set membership still matches the old copy; the catalog identity stays the group's.
   assert.deepEqual(shown.installed?.allSkillIds, ["old", "live"]);
-  assert.equal(liveSkill(display({ ...copy(false), id: "gone" }), true).installed, undefined);
-  assert.equal(liveSkill(skill, false), skill);
+  assert.equal(shown.installed?.catalogSkillId, "owner/repo:bflow");
+  assert.equal(shown.installed?.githubUrl, "https://github.com/owner/repo");
+  assert.equal(liveSkill(display(copy(false, "mac")), now).installed, undefined);
+  const allLive = display(copy(true, "mac"));
+  assert.equal(liveSkill(allLive, now), allLive);
+});
+
+test("a Set row uses a live copy when the copy it was saved with is gone", () => {
+  const stale = { ...copy(false, "mac-old", recent, "old", "Codex"), inventoryVersion: 3 as const };
+  const live = { ...copy(true, "mac-a", recent, "live", "Claude"), inventoryVersion: 3 as const };
+  const set = { items: [{ id: "item", kind: "synced", syncedSkillId: "old", name: "bflow", description: "", githubUrl: null }] } as never;
+  const [row] = setSkillDisplays(set, [display(stale, live)], [], now);
+  assert.equal(row.installed?.id, "live");
+  assert.deepEqual(row.installed?.sourceSkills.map((c) => c.id), ["live"]);
+  // The item's own copy wins while a Mac still has it.
+  const [own] = setSkillDisplays(set, [display({ ...stale, isCurrent: true }, live)], [], now);
+  assert.equal(own.installed?.id, "old");
+  // With no Mac having the skill, the row keeps the copy it was saved with.
+  const [history] = setSkillDisplays(set, [display(stale)], [], now);
+  assert.equal(history.installed?.id, "old");
 });

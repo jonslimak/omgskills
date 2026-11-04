@@ -23,8 +23,9 @@ const configuration = { enabled: "1", development: true, integration: "1", ready
 const environment = { VITE_NEWMAC_CONNECTED_INVENTORY_TEST: "1", VITE_NEWMAC_INVENTORY_RECONCILIATION_TEST: "1",
   VITE_PORTAL_INTEGRATION: "1", PORTAL_TEST_ENVIRONMENT_VERIFIED: "1", PORTAL_TEST_API_ORIGIN: "http://127.0.0.1:8888",
   VITE_CLERK_PUBLISHABLE_KEY: "pk_test_fixture", VITE_SKILLGROUPS_WEB_ENABLED: "1", VITE_NEWMAC_CATALOG_INSTALL_TEST: "1" };
-const observed = "2026-10-16T12:00:00Z";
-const reported = "2026-10-16T15:00:00Z";
+// Recent, so the old account-wide fixture copy still counts as live (older than 30 days is history).
+const observed = new Date(Date.now() - 2 * 86_400_000).toISOString();
+const reported = new Date(Date.parse(observed) + 3 * 3_600_000).toISOString();
 const identity = { name: "Test account", email: "test@example.test" };
 const catalog = { skills: [], collections: [], creators: [], categories: [], trendingIds: [] };
 const v3Path = "/api/portal/synced-skills?version=3";
@@ -190,7 +191,9 @@ test("v3 retains missing rows, physical IDs, unknown Macs, timestamps and Set me
   assert.match(inventorySummary(groups.find(skill => skill.id === "legacy")!)!.location, /Unknown Mac/);
   const item = { id: "retained-item", kind: "synced" as const, syncedSkillId: "missing-id", name: "Saved snapshot", description: "Preserved note", githubUrl: null };
   const saved = setSkillDisplays({ ...data.sets[0], items: [item] }, skillDisplays(data, catalog).mine)[0];
-  assert.equal(saved.installed?.isCurrent, false);
+  // The saved copy is gone but another Mac still has the skill, so the row shows and acts on that copy.
+  assert.equal(saved.installed?.id, "other-mac");
+  assert.equal(saved.installed?.isCurrent, true);
   assert.equal(saved.setItemId, item.id);
   assert.equal(saved.name, "Saved snapshot");
 });
@@ -321,8 +324,8 @@ test("rendered My skills and Set rows retain missing history separately from lat
     assert.equal(grouped.length, 1);
     assert.equal(isMember(data.sets[0], grouped[0].installed!), true);
     const saved = setSkillDisplays(data.sets[0], grouped)[0];
-    assert.deepEqual(saved.installed?.allSkillIds, ["missing-id"]);
-    assert.equal(saved.installed?.sourceSkills[0], data.skills[0]);
+    assert.deepEqual(saved.installed?.allSkillIds, ["missing-id", "claude-copy", "other-mac"]);
+    assert.deepEqual(saved.installed?.sourceSkills, [data.skills[1]]);
     assert.match(render({ ...setNav, source: "codex" }, management), /aria-label="Open Saved snapshot"/);
     assert.deepEqual(data.skills.map(inventorySummary), histories);
     assert.deepEqual(data, beforeGrouping);

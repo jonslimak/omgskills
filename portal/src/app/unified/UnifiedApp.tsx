@@ -92,7 +92,7 @@ import {
   matchesSearch,
   skillDisplays,
   liveSkill,
-  macsReport,
+  liveMine,
   setSkillDisplays,
   setAccessSummary,
   starCount,
@@ -502,21 +502,17 @@ export function UnifiedApp({
   const main = useRef<HTMLElement>(null);
   const detailTrigger = useRef<HTMLElement | null>(null);
   const models = useMemo(() => skillDisplays(data, catalog), [data, catalog]);
-  const perMac = useMemo(() => macsReport(data.skills), [data.skills]);
   // Sets still match skills no Mac reports any more; the lists, agents and counts show only what Macs have now.
   const everMine = signedIn ? models.mine : [];
-  const mine = useMemo(
-    () => (signedIn ? models.mine : []).map((skill) => liveSkill(skill, perMac)).filter((skill) => skill.installed),
-    [signedIn, models, perMac],
-  );
+  const mine = useMemo(() => (signedIn ? liveMine(models.mine) : []), [signedIn, models]);
   const sources = useMemo(
     () => displaySourceNames(mine.flatMap((s) => s.installed?.sourceSkills.map((copy) => copy.source) ?? [])),
     [mine],
   );
   const setRows = management?.detail.set ? setSkillDisplays(management.detail.set, everMine, catalog.skills) : [];
   // A Discover skill counts as yours only while a Mac has it, so Favorites and Sets get a live copy.
-  const library = models.library.map((skill) =>
-    signedIn ? liveSkill(skill, perMac) : { ...skill, installed: undefined });
+  const library = useMemo(() => models.library.map((skill) =>
+    signedIn ? liveSkill(skill) : { ...skill, installed: undefined }), [signedIn, models]);
   const pendingSelection: SkillDisplay | undefined = publicStatus && nav.selected.startsWith("catalog:")
     ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
@@ -1111,6 +1107,7 @@ export function UnifiedApp({
   if (nav.view === "set")
     visible = activeSet
       ? everMine.filter((skill) => isMember(activeSet, skill.installed!))
+          .map((skill) => { const live = liveSkill(skill); return live.installed ? live : skill; })
       : [];
   if (setPage) visible = setRows;
   if (nav.view === "top") visible = top;
