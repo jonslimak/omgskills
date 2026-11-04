@@ -272,6 +272,13 @@ struct GroupManifestRelease: Decodable, Equatable, Sendable {
         case skillMdSha
     }
 
+    init(id: String, commitSha: String, treeSha: String, skillMdSha: String) {
+        self.id = id
+        self.commitSha = commitSha
+        self.treeSha = treeSha
+        self.skillMdSha = skillMdSha
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try requireNormalizedText(container.decode(String.self, forKey: .id), field: "release.id")

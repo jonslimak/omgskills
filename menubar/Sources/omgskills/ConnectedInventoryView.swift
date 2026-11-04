@@ -60,10 +60,14 @@ struct ConnectedInventoryView: View {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 4) {
-                Toggle("Save skills to the cloud", isOn: Binding(
-                    get: { controller.summary.map { $0.status != .off } ?? false },
-                    set: { controller.setEnabled($0) }))
-                .toggleStyle(.switch).controlSize(.small)
+                HStack(spacing: 8) {
+                    Text("Save to cloud").lineLimit(1)
+                    Spacer(minLength: 0)
+                    Toggle("Save to cloud", isOn: Binding(
+                        get: { controller.summary.map { $0.status != .off } ?? false },
+                        set: { controller.setEnabled($0) }))
+                    .toggleStyle(.switch).controlSize(.small).labelsHidden()
+                }
                 if let summary = controller.summary, summary.status != .off {
                     HStack(spacing: 6) {
                         if controller.isRunning { ProgressView().controlSize(.mini) }

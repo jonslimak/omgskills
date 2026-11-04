@@ -48,10 +48,10 @@ enum SkillVersionMatch {
     /// Replaces `target` with `source`: prepare beside it first, then trash the old one, then move the new one in.
     /// A linked copy stays a link (now to `source`), so whatever kept it linked keeps working; a folder gets a copy.
     /// If anything fails the old copy stays, or is in the Trash and the error says so; nothing half-written is left.
-    nonisolated static func replace(_ target: Skill, with source: URL, fileManager: FileManager = .default,
-                                    trash: (Skill) throws -> Void) throws {
+    nonisolated static func replace(_ target: Skill, with source: URL, alwaysCopy: Bool = false,
+                                    fileManager: FileManager = .default, trash: (Skill) throws -> Void) throws {
         let destination = URL(fileURLWithPath: target.installCmd)
-        let isLink = (try? destination.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) == true
+        let isLink = !alwaysCopy && (try? destination.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) == true
         let staged = destination.deletingLastPathComponent()
             .appendingPathComponent(".omgskills-match-\(UUID().uuidString)", isDirectory: true)
         if isLink { try fileManager.createSymbolicLink(at: staged, withDestinationURL: source) }

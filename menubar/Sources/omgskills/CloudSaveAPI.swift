@@ -106,6 +106,19 @@ extension CloudSaveServing {
     }
 }
 
+struct CloudSavedVersion: Decodable, Equatable, Sendable {
+    let id: String
+    let sourceId: String
+    let commitSha: String
+    let treeSha: String
+    let skillMdSha: String
+    let savedAt: String
+
+    var release: GroupManifestRelease {
+        GroupManifestRelease(id: id, commitSha: commitSha, treeSha: treeSha, skillMdSha: skillMdSha)
+    }
+}
+
 struct CloudSaveAPI: CloudSaveServing {
     /// Raw bytes per batch: base64 adds a third, and the server takes at most 4 MB of files per request.
     static let batchBytes = 3 * 1024 * 1024
@@ -189,6 +202,14 @@ struct CloudSaveAPI: CloudSaveServing {
         } catch let missing as MissingFiles {
             return .missingFiles(missing.hashes)
         }
+    }
+
+    /// A saved skill's versions, newest first, with what this Mac needs to download and check one.
+    func versions(key: String, credential: StoredDeviceCredential) async throws -> [CloudSavedVersion] {
+        let data = try await send("GET", path: ["skills", key, "versions"], credential: credential)
+        struct Body: Decodable { let versions: [CloudSavedVersion] }
+        do { return try JSONDecoder().decode(Body.self, from: data).versions }
+        catch { throw CloudSaveAPIError.invalidResponse }
     }
 
     func markDeletedLocally(key: String, deleted: Bool, credential: StoredDeviceCredential) async throws {

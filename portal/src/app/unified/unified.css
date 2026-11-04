@@ -2012,6 +2012,7 @@
   align-self: flex-start;
 }
 .ua-detail-account h3,
+.ua-saved-versions h3,
 .ua-more h3 {
   font-family: var(--ua-sans);
   font-size: 11px;
@@ -2023,6 +2024,23 @@
   display: flex;
   justify-content: space-between;
   gap: 15px;
+  color: var(--ua-muted);
+}
+.ua-saved-versions ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.ua-saved-versions li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ua-body);
+  font-size: 13px;
+}
+.ua-saved-versions small {
   color: var(--ua-muted);
 }
 .ua-detail-match {

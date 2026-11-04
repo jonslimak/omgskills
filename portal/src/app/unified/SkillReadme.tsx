@@ -2,7 +2,7 @@ import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode 
 import { ArrowUpRight, RefreshCw } from "lucide-react";
 import type { SkillDisplay } from "./model";
 import { PublicReadmeClient, publicReadmeId, readmeBrowseUrl, readmeTitle, type SkillDocuments } from "./public-readme";
-import { cloudSkillKey, type SavedSkillMd, type SavedSkillMdLoader, type SharedSkillMd, type SharedSkillMdLoader } from "../../cloud-save/cloud-save";
+import { cloudSkillKey, restoreVersionLink, type SavedSkillMd, type SavedSkillMdLoader, type SavedVersions, type SavedVersionsLoader, type SharedSkillMd, type SharedSkillMdLoader } from "../../cloud-save/cloud-save";
 
 const MarkdownBody = lazy(() => import("./ReadmeMarkdown"));
 const publicClient = new PublicReadmeClient();
@@ -158,5 +158,42 @@ export function SharedSkillReadme({ releaseId, load }: { releaseId: string; load
         </ReadmeRenderBoundary>
         <p className="ua-muted">{current.doc.truncated ? "Preview shortened. " : ""}The version this Set installs.</p>
       </div>}
+  </section>;
+}
+
+type VersionsState = { id: string; status: "loading" | "ready" | "error"; saved: SavedVersions | null };
+
+/** A local skill's saved versions, newest first; an older one can be put back on the Mac that has the skill. */
+export function SavedVersionsList({ skill, liveName, load }: { skill: SkillDisplay; liveName?: string; load: SavedVersionsLoader }) {
+  const keys = publicReadmeId(skill) ? [] : savedSkillKeys(skill);
+  const id = keys.join("\n");
+  const loader = useRef(load);
+  loader.current = load;
+  const [state, setState] = useState<VersionsState>({ id: "", status: "loading", saved: null });
+  useEffect(() => {
+    if (!id) return;
+    const controller = new AbortController();
+    setState({ id, status: "loading", saved: null });
+    void loader.current(id.split("\n"), controller.signal).then(saved => {
+      if (!controller.signal.aborted) setState({ id, status: "ready", saved });
+    }).catch(() => {
+      if (!controller.signal.aborted) setState({ id, status: "error", saved: null });
+    });
+    return () => controller.abort();
+  }, [id]);
+  const current = state.id === id ? state : null;
+  if (!id || !current || current.status !== "ready" || !current.saved || current.saved.versions.length < 2) return null;
+  const { key, versions } = current.saved;
+  return <section className="ua-saved-versions" aria-label="Saved versions">
+    <h3>Saved versions</h3>
+    <ul>
+      {versions.map((version, index) => <li key={version.id}>
+        <span>{new Date(version.savedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>
+        {index === 0 ? <small>Current</small> : liveName
+          ? <button type="button" className="ua-link" onClick={() => window.location.assign(restoreVersionLink(liveName, key, version.id))}>
+              Restore
+            </button> : null}
+      </li>)}
+    </ul>
   </section>;
 }
