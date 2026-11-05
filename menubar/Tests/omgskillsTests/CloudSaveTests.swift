@@ -87,20 +87,23 @@ struct CloudSaveFolderTests {
             try CloudSaveFolder.read(directory: skills.appendingPathComponent("gstack-ship"), links: policy)
         }
 
-        // Your own skill kept elsewhere in your home folder is saved as if the files were here.
+        // Your own skill kept elsewhere in your home folder, linked as a whole, is saved as if the files were here.
         let project = try makeSkill(home.appendingPathComponent("Projects/notes"), "skill",
                                     files: ["docs/guide.md": "guide", "run.sh": "echo hi\n"], executable: ["run.sh"])
-        let mine = skills.appendingPathComponent("mine", isDirectory: true)
-        try fm.createDirectory(at: mine, withIntermediateDirectories: true)
-        try link("SKILL.md", in: mine, to: project.appendingPathComponent("SKILL.md"))
-        try link("docs", in: mine, to: project.appendingPathComponent("docs"))
-        try link("run.sh", in: mine, to: project.appendingPathComponent("run.sh"))
+        try link("mine", in: skills, to: project)
+        let mine = skills.appendingPathComponent("mine")
         let followed = try CloudSaveFolder.read(directory: mine, links: policy)
         #expect(followed.entries.map(\.path) == ["SKILL.md", "docs/guide.md", "run.sh"])
         #expect(followed.entries.map(\.mode) == ["100644", "100644", "100755"])
         #expect(followed.treeSha == (try CloudSaveFolder.read(directory: project)).treeSha)
         // Without a policy, links still stop a folder being saved.
-        #expect(throws: CloudSaveFolder.ReadError.containsLink("SKILL.md")) { try CloudSaveFolder.read(directory: mine) }
+        // Links inside a skill may not leave it, except to another installed skill: a skill copied from someone
+        // else could otherwise reach your files. Per-file links out to a project aren't followed.
+        let perFile = skills.appendingPathComponent("per-file", isDirectory: true)
+        try fm.createDirectory(at: perFile, withIntermediateDirectories: true)
+        try link("SKILL.md", in: perFile, to: project.appendingPathComponent("SKILL.md"))
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("SKILL.md")) { try CloudSaveFolder.read(directory: perFile, links: policy) }
+        #expect(throws: CloudSaveFolder.ReadError.containsLink("SKILL.md")) { try CloudSaveFolder.read(directory: perFile) }
 
         // Keys, settings and other apps' data are never followed.
         // Agents keep sign-in and settings files beside their skills folder; those are private too.
@@ -120,12 +123,53 @@ struct CloudSaveFolderTests {
         let usesShared = try makeSkill(skills, "uses-shared")
         try link("ref.md", in: usesShared, to: codexSkill.appendingPathComponent("ref.md"))
         #expect(try CloudSaveFolder.read(directory: usesShared, links: policy).entries.map(\.path) == ["SKILL.md", "ref.md"])
+        // A skill copied from someone else may carry links out to your files; only other skills are followed.
+        for (name, target) in [("docs-file", "Documents/taxes.pdf"), ("downloads", "Downloads/report.csv"),
+                               ("project-config", "Projects/app/config/credentials.json")] {
+            let file = home.appendingPathComponent(target)
+            try fm.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try Data("private".utf8).write(to: file)
+            let skill = try makeSkill(skills, "cloned-\(name)")
+            try link(name, in: skill, to: file)
+            #expect(throws: CloudSaveFolder.ReadError.privateLink(name)) { try CloudSaveFolder.read(directory: skill, links: policy) }
+        }
+        let desktop = home.appendingPathComponent("Desktop", isDirectory: true)
+        try fm.createDirectory(at: desktop, withIntermediateDirectories: true)
+        try Data("x".utf8).write(to: desktop.appendingPathComponent("notes.txt"))
+        let clonedFolder = try makeSkill(skills, "cloned-folder")
+        try link("ref", in: clonedFolder, to: desktop)
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("ref")) { try CloudSaveFolder.read(directory: clonedFolder, links: policy) }
+        // A skill folder that is itself a link to a folder without a SKILL.md isn't read either.
+        try link("whole-desktop", in: skills, to: desktop)
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("whole-desktop")) {
+            try CloudSaveFolder.read(directory: skills.appendingPathComponent("whole-desktop"), links: policy)
+        }
+        // Not even to a project that has a SKILL.md of its own.
+        let myapp = try makeSkill(home.appendingPathComponent("Projects"), "myapp", files: ["config/credentials.json": "{}"])
+        try fm.createDirectory(at: myapp.appendingPathComponent(".git"), withIntermediateDirectories: true)
+        let cloned = try makeSkill(skills, "cloned-repo")
+        try fm.createDirectory(at: cloned.appendingPathComponent(".git"), withIntermediateDirectories: true)
+        try link("ref", in: cloned, to: myapp)
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("ref")) { try CloudSaveFolder.read(directory: cloned, links: policy) }
+        // A folder shared by several skills in one repository is outside each skill, so isn't followed.
+        let multi = home.appendingPathComponent("Projects/multi", isDirectory: true)
+        try fm.createDirectory(at: multi.appendingPathComponent(".git"), withIntermediateDirectories: true)
+        let shared = multi.appendingPathComponent("scripts", isDirectory: true)
+        try fm.createDirectory(at: shared, withIntermediateDirectories: true)
+        try Data("echo\n".utf8).write(to: shared.appendingPathComponent("run.sh"))
+        let foo = try makeSkill(multi.appendingPathComponent("skills"), "foo")
+        try fm.createSymbolicLink(atPath: foo.appendingPathComponent("scripts").path, withDestinationPath: "../../scripts")
+        try link("foo", in: skills, to: foo)
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("scripts")) {
+            try CloudSaveFolder.read(directory: skills.appendingPathComponent("foo"), links: policy)
+        }
+        // Links within the skill's own folder are fine.
+        let inner = try makeSkill(skills, "inner", files: ["docs/a.md": "a"])
+        try link("alias.md", in: inner, to: inner.appendingPathComponent("docs/a.md"))
+        #expect(try CloudSaveFolder.read(directory: inner, links: policy).entries.map(\.path) == ["SKILL.md", "alias.md", "docs/a.md"])
         // Hidden files in a linked folder, such as a project's .env, are never read.
         let app = try makeSkill(home.appendingPathComponent("Projects/app-skill"), "skill",
                                 files: [".env": "TOKEN=secret", ".config/keys.json": "{}", "docs/.env": "x", "docs/a.md": "a"])
-        let viaFolder = try makeSkill(skills, "via-folder")
-        try link("docs", in: viaFolder, to: app.appendingPathComponent("docs"))
-        #expect(try CloudSaveFolder.read(directory: viaFolder, links: policy).entries.map(\.path) == ["SKILL.md", "docs/a.md"])
         try link("app-skill", in: skills, to: app)
         let viaRoot = try CloudSaveFolder.read(directory: skills.appendingPathComponent("app-skill"), links: policy)
         #expect(viaRoot.entries.map(\.path) == ["SKILL.md", "docs/a.md"])
