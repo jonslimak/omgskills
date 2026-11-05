@@ -2065,19 +2065,10 @@ export function UnifiedApp({
                     </button>
                   )}
                 </div>
-                <SkillReadme skill={detail} />
-                {detail.setItemReleaseId && sharedSkillMd
-                  ? <SharedSkillReadme releaseId={detail.setItemReleaseId} load={sharedSkillMd} />
-                  : savedSkillMd && <SavedSkillReadme skill={detail} load={savedSkillMd} />}
-                {cloud && !detail.setItemReleaseId && detail.installed && <CloudStatusSection key={detail.key} row={cloudRow(detail)}
-                  confirm={!readOnlyAccount || management ? cloud.confirm : undefined} />}
-                {!detail.setItemReleaseId && savedVersions && <SavedVersionsList skill={detail}
-                  liveName={!readOnlyAccount || management ? detailLive?.name : undefined} load={savedVersions} />}
                 {detail.installed && (
                   <section className="ua-detail-account">
-                    <h3>On this account</h3>
                     <div>
-                      <span>Observed on</span>
+                      <span>Installed on</span>
                       <AgentList sources={detail.installed.sources} />
                     </div>
                     {detailVersions.length > 1 && <div className="ua-detail-versions">
@@ -2107,6 +2098,14 @@ export function UnifiedApp({
                     </div>}
                   </section>
                 )}
+                <SkillReadme skill={detail} />
+                {detail.setItemReleaseId && sharedSkillMd
+                  ? <SharedSkillReadme releaseId={detail.setItemReleaseId} load={sharedSkillMd} />
+                  : savedSkillMd && <SavedSkillReadme skill={detail} load={savedSkillMd} />}
+                {cloud && !detail.setItemReleaseId && detail.installed && <CloudStatusSection key={detail.key} row={cloudRow(detail)}
+                  confirm={!readOnlyAccount || management ? cloud.confirm : undefined} />}
+                {!detail.setItemReleaseId && savedVersions && <SavedVersionsList skill={detail}
+                  liveName={!readOnlyAccount || management ? detailLive?.name : undefined} load={savedVersions} />}
                 {detail.publicUrl && (
                   <a className="ua-link" href={detail.publicUrl} target="_blank" rel="noreferrer">
                     View public skill page <ArrowUpRight />
