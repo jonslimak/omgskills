@@ -1159,8 +1159,10 @@ export function UnifiedApp({
   const origin = !isDiscovery(nav.view) && !setPage && nav.show ? skillsByOrigin(visible) : null;
   if (origin && nav.show !== "origin") visible = nav.show === "personal" ? origin.personal : origin.public;
   // My own lists are in name order, so a letter index can jump through them.
-  const railList = !discovery && !setPage && ["all", "favorites", "set"].includes(nav.view) && listState === "ready";
-  if (railList) visible = [...visible].sort(byName);
+  const nameOrdered = !discovery && !setPage && ["all", "favorites", "set"].includes(nav.view) && listState === "ready";
+  if (nameOrdered) visible = [...visible].sort(byName);
+  // The letter index needs one A–Z list on screen: not search results, and not the two By origin groups.
+  const railList = nameOrdered && !nav.query.trim() && nav.show !== "origin";
   const attentionView = nav.view === "all" && nav.id === "attention";
   const titles: Record<View, string> = {
     all: attentionView ? "needs attention" : "my skills",
@@ -1226,7 +1228,12 @@ export function UnifiedApp({
         <select
           aria-label="Show skills"
           value={nav.show ?? "all"}
-          onChange={(event) => navigate({ ...nav, show: event.target.value === "all" ? undefined : event.target.value as SkillShow })}
+          onChange={(event) => {
+            // A different set of rows: drop selections made in the old one and start at the top.
+            setPicked([]);
+            main.current?.scrollTo({ top: 0 });
+            navigate({ ...nav, show: event.target.value === "all" ? undefined : event.target.value as SkillShow });
+          }}
         >
           <option value="all">All</option>
           <option value="personal">Personal</option>
