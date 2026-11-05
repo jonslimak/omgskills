@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { removeFromMacLink } from "../src/app/unified/model";
+import { matchVersionsLink, removeFromMacLink } from "../src/app/unified/model";
 
 test("Delete from my Mac opens the app with only the skill's name", () => {
   assert.equal(removeFromMacLink(["humanizer"]), "omgskills://remove?name=humanizer");
@@ -20,4 +20,12 @@ test("Edit can delete the selected skills a Mac has now, in one link", () => {
   assert.match(source, /\.flatMap\(skill => liveCopiesOf\(skill\)\?\.name \?\? \[\]\)/);
   assert.match(source, /disabled=\{!names\.length \|\| tooMany\}/);
   assert.match(source, /onClick=\{\(\) => window\.location\.assign\(removeFromMacLink\(names\)\)\}/);
+});
+
+test("Make versions match opens the app for a skill whose agents have different versions", () => {
+  assert.equal(matchVersionsLink(" humanizer "), "omgskills://match?name=humanizer");
+  assert.equal(matchVersionsLink("a&b"), "omgskills://match?name=a%26b");
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(source, /liveCopies && versionCount > 1 && <MenuItem icon=\{RefreshCw\}/);
+  assert.match(source, /detailVersions\.length > 1 && detailLive && \(!readOnlyAccount \|\| management\) && <button/);
 });

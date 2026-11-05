@@ -2025,6 +2025,9 @@
   gap: 15px;
   color: var(--ua-muted);
 }
+.ua-detail-match {
+  align-self: flex-start;
+}
 .ua-detail-versions {
   display: flex;
   justify-content: space-between;
