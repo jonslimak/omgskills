@@ -553,6 +553,18 @@ export function UnifiedApp({
     mineSkill.installed?.allSkillIds.includes(skill.installed!.id))?.installed ?? liveSkill(skill).installed);
   const detailLive = detail ? liveCopiesOf(detail) : undefined;
   const detailVersions = detailLive ? skillVersions(detailLive) : [];
+  // Installed means a Mac has it now; the install card can still add it for the agent that doesn't.
+  const installedAgents = [...new Set((detailLive?.sources ?? []).map(agentKind))].sort().join(",");
+  const installedHere = !!detailLive;
+  const missingAgent = installedHere && !(installedAgents.includes("claude") && installedAgents.includes("codex"));
+  // An install that finishes changes where the skill is; close the card and drop its intent.
+  const installDone = useRef(installedAgents);
+  useEffect(() => {
+    if (installDone.current === installedAgents) return;
+    installDone.current = installedAgents;
+    if (installOpen) onInstallCancel?.();
+    setInstallOpen(false);
+  }, [installedAgents, installOpen, onInstallCancel]);
   const panelPending = selected ? detailPending : !!closingDetail.current?.pending;
   // List rows already carry the name and avatar; only the direct-link placeholder (no author) waits.
   const detailHeadingKnown = !!detail && !(panelPending && !detail.author);
@@ -888,7 +900,6 @@ export function UnifiedApp({
               {!compact && !creatorHeader && (discovery || nav.query) && skill.author && (
                 <span className="ua-row-author">@{skill.author}</span>
               )}
-              {skill.installed?.isLocalOnly && <Lock aria-label="Local skill" />}
               {!discovery && <CloudAttention status={cloudRow(skill)?.status} />}
               {versionCount > 1 && <span className="ua-row-versions" title="Your agents have different versions of this skill">
                 {versionCount} versions
@@ -1956,7 +1967,16 @@ export function UnifiedApp({
                 </div>
                 {!panelPending && <>
                 <div className="ua-detail-actions">
-                  {onMac && signedIn && publicInstallAction && detail.catalogId && !detail.installed?.isLocalOnly && (
+                  {/* Already on a Mac: say so instead of offering to install it again. */}
+                  {onMac && signedIn && publicInstallAction && detail.catalogId && installedHere && (
+                    <span className="ua-pill"><Check aria-hidden="true" />Installed</span>
+                  )}
+                  {onMac && signedIn && publicInstallAction && detail.catalogId && installedHere && missingAgent && !installOpen && (
+                    <button type="button" className="ua-pill ua-detail-copy" aria-expanded={false} onClick={() => setInstallOpen(true)}>
+                      Add to another agent
+                    </button>
+                  )}
+                  {onMac && signedIn && publicInstallAction && detail.catalogId && (!installedHere || (missingAgent && installOpen)) && (
                     installOpen ? (
                       <button
                         type="button"
@@ -1983,9 +2003,9 @@ export function UnifiedApp({
                     </button>
                   ) : !(onMac && signedIn && publicInstallAction && detail.catalogId) && (
                     <span className="ua-pill">
-                      {detail.installed?.isLocalOnly && <Lock />}
+                      {detail.installed?.isLocalOnly && <User aria-hidden="true" />}
                       {detail.setItemCloudShared ? cloudSharedLabel(detail, activeSet?.role)
-                        : detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Local skill" : "Source unavailable"}
+                        : detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Personal skill" : "Source unavailable"}
                     </span>
                   )}
                   <span className="ua-detail-icons">
@@ -2062,19 +2082,10 @@ export function UnifiedApp({
                     </button>
                   )}
                 </div>
-                <SkillReadme skill={detail} />
-                {detail.setItemReleaseId && sharedSkillMd
-                  ? <SharedSkillReadme releaseId={detail.setItemReleaseId} load={sharedSkillMd} />
-                  : savedSkillMd && <SavedSkillReadme skill={detail} load={savedSkillMd} />}
-                {cloud && !detail.setItemReleaseId && detail.installed && <CloudStatusSection key={detail.key} row={cloudRow(detail)}
-                  confirm={!readOnlyAccount || management ? cloud.confirm : undefined} />}
-                {!detail.setItemReleaseId && savedVersions && <SavedVersionsList skill={detail}
-                  liveName={!readOnlyAccount || management ? detailLive?.name : undefined} load={savedVersions} />}
                 {detail.installed && (
                   <section className="ua-detail-account">
-                    <h3>On this account</h3>
                     <div>
-                      <span>Observed on</span>
+                      <span>Installed on</span>
                       <AgentList sources={detail.installed.sources} />
                     </div>
                     {detailVersions.length > 1 && <div className="ua-detail-versions">
@@ -2104,6 +2115,14 @@ export function UnifiedApp({
                     </div>}
                   </section>
                 )}
+                <SkillReadme skill={detail} />
+                {detail.setItemReleaseId && sharedSkillMd
+                  ? <SharedSkillReadme releaseId={detail.setItemReleaseId} load={sharedSkillMd} />
+                  : savedSkillMd && <SavedSkillReadme skill={detail} load={savedSkillMd} />}
+                {cloud && !detail.setItemReleaseId && detail.installed && <CloudStatusSection key={detail.key} row={cloudRow(detail)}
+                  confirm={!readOnlyAccount || management ? cloud.confirm : undefined} />}
+                {!detail.setItemReleaseId && savedVersions && <SavedVersionsList skill={detail}
+                  liveName={!readOnlyAccount || management ? detailLive?.name : undefined} load={savedVersions} />}
                 {detail.publicUrl && (
                   <a className="ua-link" href={detail.publicUrl} target="_blank" rel="noreferrer">
                     View public skill page <ArrowUpRight />
