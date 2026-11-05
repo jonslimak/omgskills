@@ -315,10 +315,9 @@ test("rendered My skills and Set rows retain missing history separately from lat
     const histories = data.skills.map(inventorySummary);
     const filtered = render({ ...initialNavigation, source: "codex" });
     assert.equal([...filtered.matchAll(/aria-label="Open Removal fixture"/g)].length, 1);
-    assert.equal([...filtered.matchAll(/<option[^>]*>Codex<\/option>/g)].length, 1);
-    // The Claude copy is no longer on any Mac, so it is not offered as an agent.
-    assert.equal([...filtered.matchAll(/<option[^>]*>Claude<\/option>/g)].length, 0);
-    assert.doesNotMatch(filtered, /<option[^>]*>(?:codex|Claude Code)<\/option>/);
+    // The Show menu replaced the agent menu; an old ?source= link still filters.
+    assert.match(filtered, /aria-label="Show skills"/);
+    assert.doesNotMatch(filtered, /Filter by agent/);
     const grouped = skillDisplays(data, catalog).mine;
     assert.equal(grouped.length, 1);
     assert.equal(isMember(data.sets[0], grouped[0].installed!), true);

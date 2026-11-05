@@ -69,7 +69,7 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
   const { state } = view;
   const rows = cloudSkillRows(state, skills);
   const reviews = rows.filter(row => row.status === "review" || row.status === "confirmed");
-  const choosable = rows.filter(row => row.status !== "library" || state.settings.excludedSkillKeys.includes(row.key));
+  const choosable = rows.filter(row => (row.status !== "library" && row.status !== "set") || state.settings.excludedSkillKeys.includes(row.key));
   const savedCount = rows.filter(row => row.status === "saved" || row.status === "deleted").length;
 
   return <section className="rd-private-source rd-private-source-live cloud-save" aria-label="Cloud save">

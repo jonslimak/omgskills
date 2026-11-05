@@ -1,4 +1,4 @@
-import { useEffect, useState, type ComponentProps } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
 import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
 import { RefreshCw } from "lucide-react";
 import { UnifiedApp } from "../../app/unified/UnifiedApp";
@@ -15,7 +15,8 @@ import { useManagement } from "./useManagement";
 import { DevicesPanel } from "../DevicesPanel";
 import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
 import { CloudSavePanel } from "../../cloud-save/CloudSavePanel";
-import { loadSavedSkillMd, loadSavedVersions, loadSharedSkillMd } from "../../cloud-save/cloud-save";
+import { confirmCloudReview, loadCloudSave, loadSavedSkillMd, loadSavedVersions, loadSharedSkillMd, type CloudSaveState } from "../../cloud-save/cloud-save";
+import type { CloudInfo } from "../../app/unified/CloudStatus";
 import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation, staticPageAddress, unknownAppAddress } from "./entry-navigation";
 import { renderPublicFirst } from "./public-first";
@@ -49,6 +50,26 @@ export type UnifiedSessionComposition = {
   publicInstallAction: ComponentProps<typeof UnifiedApp>["publicInstallAction"];
   clearInstallIntent: (next: Navigation) => void;
 };
+
+/** The account's cloud save state for the skill list; reloaded with the account and after a confirm. */
+function useCloudStatus(api: PortalApi, enabled: boolean, revision: unknown): CloudInfo | undefined {
+  const apiRef = useRef(api);
+  apiRef.current = api;
+  const [state, setState] = useState<CloudSaveState | null>(null);
+  const [reload, setReload] = useState(0);
+  useEffect(() => {
+    if (!enabled) { setState(null); return; }
+    const controller = new AbortController();
+    void loadCloudSave(apiRef.current, controller.signal)
+      .then(view => { if (!controller.signal.aborted) setState(view.status === "ready" ? view.state : null); })
+      .catch(() => { /* The list shows no cloud status; the Cloud save page reports the error. */ });
+    return () => controller.abort();
+  }, [enabled, revision, reload]);
+  return useMemo(() => state ? {
+    state,
+    confirm: async (key: string) => { await confirmCloudReview(apiRef.current, key); setReload(value => value + 1); },
+  } : undefined, [state]);
+}
 
 function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, productionInstall, composition, cleanPaths , takeover }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; productionInstall: boolean; composition?: UnifiedSessionComposition; cleanPaths: boolean ; takeover: boolean }) {
   const normalApi = usePortalApi();
@@ -146,6 +167,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const [syncMetadata] = useState(() => cleanPaths ? createPageMetadata(document, takeover) : null);
   const title = pageTitle(nav, catalog);
   useEffect(() => { syncMetadata?.(location.pathname + location.search, title); }, [syncMetadata, current, title]);
+  const cloud = useCloudStatus(api, available && !!snapshot.data && !snapshot.accessDenied && !composition?.readOnly && !local, snapshot.revision);
   const management = useManagement({ data, mine: liveMine(skillDisplays(data, publicData.catalog).mine),
     busy: snapshot.setSaving || snapshot.profileSaving, blocked: !!composition?.readOnly || !available || !snapshot.data || !!snapshot.error || snapshot.accessDenied,
     scope: `${nav.view}:${nav.id}:${nav.query}`, saveSet: account.saveSet, saveMembership: account.saveMembership,
@@ -181,6 +203,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
       ? (keys, signal) => loadSavedSkillMd(api, keys, signal) : undefined}
     savedVersions={available && !snapshot.accessDenied && !composition?.readOnly && !local
       ? (keys, signal) => loadSavedVersions(api, keys, signal) : undefined}
+    cloud={cloud}
     sharedSkillMd={available && !snapshot.accessDenied && !local
       ? (releaseId, signal) => loadSharedSkillMd(api, releaseId, signal) : undefined}
     accountPages={available && !snapshot.accessDenied ? (view, theme) => view === "profile" && !composition?.readOnly ? <ProfilePanel profile={data.profile} theme={theme}

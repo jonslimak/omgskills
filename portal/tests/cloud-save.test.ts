@@ -139,3 +139,58 @@ test("a skill's cloud keys are its folders on every Mac, once each", () => {
   } as never);
   assert.deepEqual(keys, ["notes", "other"]);
 });
+
+test("my skills marks only skills cloud save can't keep, and picks the copy that needs attention", async () => {
+  const { needsAttention, skillCloudRow } = await import("../src/cloud-save/cloud-save");
+  assert.deepEqual(["saved", "deleted", "confirmed", "library", "excluded", "waiting", "off"].filter(status => needsAttention(status as never)), []);
+  assert.deepEqual(["review", "links", "too_large", "unreadable", "failed"].every(status => needsAttention(status as never)), true);
+  const row = (key: string, status: string) => ({ key, name: key, status, versionCount: 0, setCount: 0, savedAt: null, labels: [], findings: [] }) as never;
+  const rows = new Map([["a", row("a", "saved")], ["b", row("b", "links")], ["c", row("c", "library")]]);
+  assert.equal(skillCloudRow(rows, ["a", "b"])?.key, "b", "A copy that can't be saved wins over a saved one");
+  assert.equal(skillCloudRow(rows, ["c", "a"])?.key, "a");
+  assert.equal(skillCloudRow(rows, ["missing"]), null);
+});
+
+test("Show splits my skills into personal (own) and public (library), each by name, and survives the address", async () => {
+  const { skillsByOrigin, parseNavigation, navigationSearch, initialNavigation } = await import("../src/app/unified/model");
+  const skill = (name: string, catalogId?: string) => ({ key: name, name, catalogId }) as never;
+  const split = skillsByOrigin([skill("zeta", "a/b:zeta"), skill("beta"), skill("Alpha"), skill("delta", "a/b:delta")]);
+  assert.deepEqual(split.personal.map((s: { name: string }) => s.name), ["Alpha", "beta"]);
+  assert.deepEqual(split.public.map((s: { name: string }) => s.name), ["delta", "zeta"]);
+  assert.equal(parseNavigation(navigationSearch({ ...initialNavigation, show: "origin" })).show, "origin");
+  assert.equal(parseNavigation("?view=all&show=bogus").show, undefined);
+  assert.equal(parseNavigation("?view=discover&show=public").show, undefined, "Only my own lists");
+});
+
+test("the letter index files names by first letter and lands on the next letter that has skills", async () => {
+  const { railLetter, railTarget } = await import("../src/app/unified/AlphaRail");
+  assert.deepEqual(["api", "Élan", "  zod", "3d", "_x"].map(railLetter), ["A", "E", "Z", "#", "#"]);
+  assert.equal(railTarget(["#", "A", "D", "S"], "B"), "D");
+  assert.equal(railTarget(["#", "A", "D", "S"], "S"), "S");
+  assert.equal(railTarget(["#", "A", "D", "S"], "Z"), "S", "Past the last letter stays at the end");
+  assert.equal(railTarget([], "A"), null);
+});
+
+test("a private skill installed from a Set says it came from the Set, not the library", async () => {
+  const rows = cloudSkillRows(state({ skills: [], needsReview: [], skipped: { team: "library" } }), [
+    installed("team", { installedFromSet: "Team" }),
+    installed("pdf", { catalogSkillId: "anthropics/skills:pdf", installedFromSet: "Team", isLocalOnly: false }),
+  ]);
+  assert.deepEqual(rows.map(row => [row.key, row.status]).sort(), [["pdf", "library"], ["team", "set"]]);
+  const { statusText, needsAttention } = await import("../src/cloud-save/cloud-save");
+  assert.equal(statusText.set, "Saved · from a Set");
+  assert.equal(needsAttention("set"), false);
+});
+
+test("Needs attention survives account navigation; other ids on My skills don't", async () => {
+  const { accountNavigation } = await import("../src/integration/unified/policy");
+  const { initialNavigation } = await import("../src/app/unified/model");
+  assert.equal(accountNavigation({ ...initialNavigation, id: "attention", show: "public" }, true).id, "attention");
+  assert.equal(accountNavigation({ ...initialNavigation, id: "other" }, true).id, "");
+  assert.equal(accountNavigation({ ...initialNavigation, view: "favorites", id: "attention" }, true).id, "");
+});
+
+test("the letter rail uses the letters the list has, in rail order", async () => {
+  const { railLettersOf } = await import("../src/app/unified/AlphaRail");
+  assert.deepEqual(railLettersOf([{ name: "zod" }, { name: "3d" }, { name: "api" }, { name: "Alpha" }]), ["#", "A", "Z"]);
+});

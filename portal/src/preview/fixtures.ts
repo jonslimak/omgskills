@@ -7,6 +7,7 @@ export type Scenario =
   | "loading"
   | "error"
   | "long-content"
+  | "many-skills"
   | "connected-source";
 const entries = [
   [
@@ -199,6 +200,16 @@ export function makeFixtures(scenario: Scenario = "populated"): PortalData {
     data.skills = [];
     data.sets = [];
     data.devices = [];
+  }
+  if (scenario === "many-skills") {
+    // Enough own skills to need the letter index.
+    const words = ["api-review", "billing-docs", "changelog", "data-cleanup", "email-drafts", "figma-handoff", "git-hygiene",
+      "hiring-notes", "invoice-check", "jira-triage", "kanban-sync", "legal-review", "meeting-notes", "onboarding",
+      "pricing-page", "qa-checklist", "release-notes", "sql-helper", "test-writer", "ux-copy", "vendor-review", "weekly-report",
+      "yaml-lint", "zod-schemas", "3d-renders", "élan-voice"];
+    const template = data.skills[data.skills.length - 1];
+    data.skills.push(...words.map((name, index) => ({ ...template, id: `many-${index}`, name, installationFolder: name,
+      description: `Sample skill ${name}.`, catalogSkillId: null, githubUrl: null, skillMdSha: index.toString(16).padStart(64, "0") })));
   }
   if (scenario === "long-content") {
     data.skills[0].name =
