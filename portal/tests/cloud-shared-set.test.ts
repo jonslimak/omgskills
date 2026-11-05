@@ -68,3 +68,20 @@ test("people a Set is shared with can read a private item's instructions from it
     releaseId, new AbortController().signal));
   assert.equal(paths.length, 2, "Never answered from an earlier read");
 });
+
+test("a saved skill's versions list newest first, and Restore opens the Mac app with that version", async () => {
+  const { loadSavedVersions, restoreVersionLink } = await import("../src/cloud-save/cloud-save");
+  const { PortalApiError } = await import("../src/api-error");
+  const paths: string[] = [];
+  const saved = await loadSavedVersions(async <T>(path: string) => {
+    paths.push(path);
+    if (path.includes("/notes-copy/")) throw new PortalApiError("Not found", 404);
+    if (path.includes("/notes-short/")) return { versions: [{ id: "only", savedAt: "2026-11-04T10:00:00Z" }] } as T;
+    return { versions: [{ id: "r2", savedAt: "2026-11-04T10:00:00Z", treeSha: "t" }, { id: "r1", savedAt: "2026-11-01T10:00:00Z" }] } as T;
+  }, ["notes-copy", "notes-short", "notes"], new AbortController().signal);
+  assert.deepEqual(paths, ["/api/portal/cloud-save/skills/notes-copy/versions", "/api/portal/cloud-save/skills/notes-short/versions",
+    "/api/portal/cloud-save/skills/notes/versions"], "Shows the folder with the most history");
+  assert.deepEqual(saved, { key: "notes", versions: [{ id: "r2", savedAt: "2026-11-04T10:00:00Z" }, { id: "r1", savedAt: "2026-11-01T10:00:00Z" }] });
+  assert.equal(restoreVersionLink(" my notes ", "my notes", "22222222-2222-4222-8222-222222222222"),
+    "omgskills://restore?name=my%20notes&key=my%20notes&version=22222222-2222-4222-8222-222222222222");
+});

@@ -64,6 +64,31 @@ export function loadSharedSkillMd(api: PortalApi, releaseId: string, signal: Abo
   return api<SharedSkillMd>(`/api/portal/private-releases/${encodeURIComponent(releaseId)}/skill-md`, { signal, cache: "no-store" });
 }
 
+export type SavedVersions = { key: string; versions: { id: string; savedAt: string }[] };
+export type SavedVersionsLoader = (keys: string[], signal: AbortSignal) => Promise<SavedVersions | null>;
+
+/** A saved skill's versions, newest first, for the first of these keys that is saved; null when none is. */
+export async function loadSavedVersions(api: PortalApi, keys: string[], signal: AbortSignal): Promise<SavedVersions | null> {
+  // A skill's copies may be saved under several folder names; show the one with the most history.
+  let best: SavedVersions | null = null;
+  for (const key of keys) {
+    try {
+      const { versions } = await api<{ versions: { id: string; savedAt: string }[] }>(
+        `${base}/skills/${encodeURIComponent(key)}/versions`, { signal, cache: "no-store" });
+      if (!best || versions.length > best.versions.length) best = { key, versions: versions.map(({ id, savedAt }) => ({ id, savedAt })) };
+    } catch (error) {
+      if (error instanceof PortalApiError && (error.status === 404 || error.status === 503)) continue;
+      throw error;
+    }
+  }
+  return best;
+}
+
+/** Opens the Mac app, which asks first and then puts this saved version in place of the skill's copies. */
+export function restoreVersionLink(name: string, key: string, versionId: string) {
+  return `omgskills://restore?name=${encodeURIComponent(name.trim())}&key=${encodeURIComponent(key)}&version=${encodeURIComponent(versionId)}`;
+}
+
 /** The first of these skill keys with a saved copy, or null when none is saved. */
 export async function loadSavedSkillMd(api: PortalApi, keys: string[], signal: AbortSignal): Promise<SavedSkillMd | null> {
   for (const key of keys) {

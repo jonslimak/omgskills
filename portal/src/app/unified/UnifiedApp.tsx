@@ -125,8 +125,8 @@ import { isMacDevice } from "./install-command";
 import { SiteFooter } from "./SiteFooter";
 import { saveTheme, storedTheme, type Theme } from "./theme-preference";
 import { trackEvent } from "./analytics";
-import { SavedSkillReadme, SharedSkillReadme, SkillReadme } from "./SkillReadme";
-import type { SavedSkillMdLoader, SharedSkillMdLoader } from "../../cloud-save/cloud-save";
+import { SavedSkillReadme, SavedVersionsList, SharedSkillReadme, SkillReadme } from "./SkillReadme";
+import type { SavedSkillMdLoader, SavedVersionsLoader, SharedSkillMdLoader } from "../../cloud-save/cloud-save";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
@@ -159,6 +159,8 @@ type Props = {
   savedSkillMd?: SavedSkillMdLoader;
   /** Reads a private Set item's instructions for people the Set is shared with. */
   sharedSkillMd?: SharedSkillMdLoader;
+  /** Lists a local skill's saved versions, so an older one can be restored on a Mac. */
+  savedVersions?: SavedVersionsLoader;
   publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
   /** Clears a saved install request when the user cancels from the Install button. */
   onInstallCancel?: () => void;
@@ -447,6 +449,7 @@ export function UnifiedApp({
   accountPages,
   savedSkillMd,
   sharedSkillMd,
+  savedVersions,
   publicInstallAction,
   onInstallCancel,
   supportedAccountViews,
@@ -2008,6 +2011,8 @@ export function UnifiedApp({
                 {detail.setItemReleaseId && sharedSkillMd
                   ? <SharedSkillReadme releaseId={detail.setItemReleaseId} load={sharedSkillMd} />
                   : savedSkillMd && <SavedSkillReadme skill={detail} load={savedSkillMd} />}
+                {!detail.setItemReleaseId && savedVersions && <SavedVersionsList skill={detail}
+                  liveName={!readOnlyAccount || management ? detailLive?.name : undefined} load={savedVersions} />}
                 {detail.installed && (
                   <section className="ua-detail-account">
                     <h3>On this account</h3>
