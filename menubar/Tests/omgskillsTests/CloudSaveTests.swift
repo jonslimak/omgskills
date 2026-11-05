@@ -103,7 +103,11 @@ struct CloudSaveFolderTests {
         #expect(throws: CloudSaveFolder.ReadError.containsLink("SKILL.md")) { try CloudSaveFolder.read(directory: mine) }
 
         // Keys, settings and other apps' data are never followed.
-        for (name, target) in [("keys", ".ssh/id_ed25519"), ("env", "Projects/app/.env"), ("prefs", "Library/Preferences/x.plist")] {
+        // Agents keep sign-in and settings files beside their skills folder; those are private too.
+        for (name, target) in [("keys", ".ssh/id_ed25519"), ("env", "Projects/app/.env"), ("prefs", "Library/Preferences/x.plist"),
+                               ("codex-auth", ".codex/auth.json"), ("claude-settings", ".claude/settings.json"),
+                               ("claude-history", ".claude/projects/p/chat.jsonl"), ("cursor-mcp", ".cursor/mcp.json"),
+                               ("agents-config", ".agents/config.toml")] {
             let file = home.appendingPathComponent(target)
             try fm.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
             try Data("secret".utf8).write(to: file)
@@ -111,6 +115,11 @@ struct CloudSaveFolderTests {
             try link(name, in: skill, to: file)
             #expect(throws: CloudSaveFolder.ReadError.privateLink(name)) { try CloudSaveFolder.read(directory: skill, links: policy) }
         }
+        // Another skill's files in an agent's skills folder are still followed.
+        let codexSkill = try makeSkill(home.appendingPathComponent(".codex/skills/shared"), "skill", files: ["ref.md": "r"])
+        let usesShared = try makeSkill(skills, "uses-shared")
+        try link("ref.md", in: usesShared, to: codexSkill.appendingPathComponent("ref.md"))
+        #expect(try CloudSaveFolder.read(directory: usesShared, links: policy).entries.map(\.path) == ["SKILL.md", "ref.md"])
         // Hidden files in a linked folder, such as a project's .env, are never read.
         let app = try makeSkill(home.appendingPathComponent("Projects/app-skill"), "skill",
                                 files: [".env": "TOKEN=secret", ".config/keys.json": "{}", "docs/.env": "x", "docs/a.md": "a"])
