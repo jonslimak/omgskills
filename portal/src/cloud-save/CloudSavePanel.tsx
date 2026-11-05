@@ -69,7 +69,6 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
   const { state } = view;
   const rows = cloudSkillRows(state, skills);
   const reviews = rows.filter(row => row.status === "review" || row.status === "confirmed");
-  const choosable = rows.filter(row => (row.status !== "library" && row.status !== "set") || state.settings.excludedSkillKeys.includes(row.key));
 
   return <section className="rd-private-source rd-private-source-live cloud-save" aria-label="Cloud save">
     <div className="rd-section-heading"><h2>Cloud save</h2>
@@ -78,8 +77,8 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
     <div className="cloud-save-switch">
       <div className="rd-grow">
         <strong>Save my skills to the cloud</strong>
-        <p className="rd-muted">omgskills keeps a private, versioned copy of every skill you wrote or changed, so you
-          can get it back or use it on another Mac. Only you can see it. Skills from the library or a Set are kept as that version until you change them.</p>
+        <p className="rd-muted">omgskills keeps a private, versioned copy of every skill you have, so you
+          can get it back or use it on another Mac. Only you can see it. Skills from the library and Sets are saved too.</p>
       </div>
       <Toggle label="Save my skills to the cloud" checked={state.settings.enabled} disabled={saving}
         onChange={enabled => void change(() => saveCloudSettings(callbacks.current.api, { enabled }), "Cloud save could not be changed.")} />
@@ -117,7 +116,7 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
         <h3>Choose skills</h3>
         <p className="rd-muted">Every skill is saved unless you untick it. New skills are saved automatically.</p>
         <div className="cloud-save-choices">
-          {choosable.map(row => <label key={row.key}>
+          {rows.map(row => <label key={row.key}>
             <input type="checkbox" aria-label={`Save ${row.name}`} checked={!excluded.has(row.key)} disabled={saving} onChange={event => {
               const next = new Set(excluded);
               if (event.target.checked) next.delete(row.key); else next.add(row.key);

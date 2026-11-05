@@ -10,7 +10,7 @@ export function CloudStatusBadge({ row }: { row: CloudSkillRow | null }) {
   if (!row) return null;
   const attention = needsAttention(row.status);
   const Icon = row.status === "review" ? TriangleAlert : attention ? CloudOff : Cloud;
-  const saved = row.status === "saved" || row.status === "deleted";
+  const saved = ["saved", "deleted", "library", "set"].includes(row.status);
   const history = [
     saved && row.versionCount > 0 ? `${row.versionCount} ${row.versionCount === 1 ? "version" : "versions"}` : "",
     saved && row.savedAt ? `last saved ${new Date(row.savedAt).toLocaleDateString()}` : "",

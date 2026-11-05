@@ -171,7 +171,7 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
     const review = reviews.get(key);
     const found: CloudSkillRow["status"] = excluded.has(key) ? "excluded"
       : review ? (review.confirmed ? "confirmed" : "review")
-      : copy ? (copy.deletedLocallyAt ? "deleted" : "saved")
+      : copy ? (copy.deletedLocallyAt ? "deleted" : fromLibrary.has(key) ? "library" : "saved")
       : !state.settings.enabled ? (fromLibrary.has(key) ? "library" : "off")
       : state.skipped[key] ?? (fromLibrary.has(key) ? "library" : "waiting");
     // A private skill installed from a Set isn't in the library; say where it came from.
@@ -263,8 +263,8 @@ export const statusHelp: Partial<Record<CloudSkillRow["status"], string>> = {
   too_large: "It's over the size limit (12 MB, 4 MB per file).",
   unreadable: "Your Mac couldn't read its folder.",
   failed: "The last save failed. Your Mac tries again on its next sync.",
-  library: "Unchanged from the library, so the library keeps it for you. If you change it, your version is saved too.",
-  set: "Unchanged from the Set you installed it from, so the Set keeps it for you. If you change it, your version is saved too.",
+  library: "The version you installed from the library is saved. If you change it, your version is saved too.",
+  set: "The version you installed from a Set is saved. If you change it, your version is saved too.",
   excluded: "You left it out of cloud save.",
   waiting: "Your Mac saves it on its next sync.",
   off: "Cloud save is off.",

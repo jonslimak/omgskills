@@ -2,8 +2,6 @@ import Foundation
 
 /// Why a skill wasn't saved, as the web shows it.
 enum CloudSaveSkipReason: String, Equatable, Sendable {
-    /// An unchanged library or Set install, which can be fetched again.
-    case library
     case links
     case tooLarge = "too_large"
     case unreadable
@@ -27,9 +25,6 @@ struct CloudSaveSummary: Equatable, Sendable {
     var savedCount = 0
     /// New versions saved in this pass.
     var uploadedCount = 0
-    /// Library and Set installs left unchanged, which are not uploaded.
-    var library: Set<String> = []
-    var libraryCount: Int { library.count }
     /// Skills whose copy here is older than the one already in the cloud, so it isn't saved over it.
     var olderHereCount = 0
     var needsReview: [String] = []
@@ -48,7 +43,7 @@ struct CloudSaveSummary: Equatable, Sendable {
     var localTrees: [String: String] = [:]
 }
 
-/// Saves this Mac's own and edited skills to the cloud. One pass compares every
+/// Saves every skill on this Mac to the cloud, library and Set installs included. One pass compares every
 /// skill folder with its cloud copy and uploads what changed; it is safe to repeat.
 struct CloudSaveSync: Sendable {
     typealias Pace = @Sendable () async throws -> Void
@@ -145,8 +140,7 @@ struct CloudSaveSync: Sendable {
         summary.notOnThisMacCount = inCloud.subtracting(here).count
         summary.leftOutCount = here.intersection(excluded).count
         // Only a finished pass knows every reason; the web keeps the last full report until then.
-        let report = summary.skipped.merging(summary.library.map { ($0, .library) }, uniquingKeysWith: { reason, _ in reason })
-            .filter { !excluded.contains($0.key) }
+        let report = summary.skipped.filter { !excluded.contains($0.key) }
         try? await pace()
         try? await api.reportSkipped(report, credential: credential)
         if !summary.needsReview.isEmpty || !summary.skipped.isEmpty { summary.status = .incomplete }
@@ -205,25 +199,18 @@ struct CloudSaveSync: Sendable {
             let key = CloudSaveFolder.key(forFolderName: directory.lastPathComponent)
             let folder: CloudSaveFolder
             do { folder = try CloudSaveFolder.read(directory: directory, links: links) }
-            catch CloudSaveFolder.ReadError.libraryInstall { summary.library.insert(key); continue }
             catch CloudSaveFolder.ReadError.containsLink { summary.skipped[key] = .links; continue }
             catch CloudSaveFolder.ReadError.privateLink { summary.skipped[key] = .links; continue }
             catch CloudSaveFolder.ReadError.invalid(let code) where [.fileTooLarge, .packageTooLarge, .tooManyFiles].contains(code) {
                 summary.skipped[key] = .tooLarge; continue
             }
             catch { summary.skipped[key] = .unreadable; continue }
-            if Self.isUnchangedInstall(folder) {
-                summary.library.insert(key)
-                continue
-            }
             // Any file counts as an edit, not just SKILL.md.
             if let existing = chosen[key], existing.modifiedAt >= folder.modifiedAt { continue }
             chosen[key] = folder
             summary.skipped[key] = nil
-            summary.library.remove(key)
         }
-        // An edited copy on another agent is saved, even when this one is unchanged or can't be read.
-        summary.library.subtract(chosen.keys)
+        // A copy on another agent that reads fine is saved, even when this one can't be read.
         summary.skipped = summary.skipped.filter { chosen[$0.key] == nil }
         return chosen.values.sorted { $0.key < $1.key }
     }
@@ -244,16 +231,6 @@ struct CloudSaveSync: Sendable {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return formatter.date(from: value) ?? ISO8601DateFormatter().date(from: value)
-    }
-
-    /// A skill installed by omgskills from the library or a Set, with its files unchanged.
-    static func isUnchangedInstall(_ folder: CloudSaveFolder) -> Bool {
-        let directory = folder.directory
-        guard let provenance = SkillInstallProvenanceStore.read(targetRoot: directory.deletingLastPathComponent(),
-                                                                 targetName: directory.lastPathComponent) else { return false }
-        if let treeSha = provenance.treeSha { return treeSha.lowercased() == folder.treeSha }
-        // Older installs recorded only SKILL.md.
-        return folder.entries.count == 1 && provenance.skillMdSha?.lowercased() == folder.coordinates.skillMdSha
     }
 
     private static func stopStatus(_ error: CloudSaveAPIError) -> CloudSaveSummary.Status? {

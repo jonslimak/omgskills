@@ -208,3 +208,10 @@ test("one summary line: every skill counts, then only what needs a look", async 
     currentVersion: { id: "r", savedAt: "2026-11-01T00:00:00Z", fileCount: 1, totalBytes: 1 } }], needsReview: [], skipped: {} }), [installed("here")]);
   assert.deepEqual(rows.map(r => [r.key, r.onMac]).sort(), [["gone", false], ["here", true]]);
 });
+
+test("a library install saved to the cloud keeps its library label and its versions", () => {
+  const rows = cloudSkillRows(state({ needsReview: [], skipped: {}, skills: [{ key: "pdf", versionCount: 2, deletedLocallyAt: null, setCount: 0,
+    currentVersion: { id: "r2", savedAt: "2026-11-05T00:00:00Z", fileCount: 3, totalBytes: 10 } }] }),
+    [installed("pdf", { catalogSkillId: "anthropics/skills:pdf", isLocalOnly: false })]);
+  assert.deepEqual([rows[0].status, rows[0].versionCount], ["library", 2]);
+});

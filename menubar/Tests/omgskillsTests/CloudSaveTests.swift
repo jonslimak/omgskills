@@ -64,7 +64,7 @@ struct CloudSaveFolderTests {
         #expect(throws: CloudSaveFolder.ReadError.invalid(.missingSkillMd)) { try CloudSaveFolder.read(directory: empty) }
     }
 
-    @Test func followsLinksToYourOwnFilesButNotToTheLibraryOrPrivatePlaces() throws {
+    @Test func followsLinksToYourOwnFilesAndTheOldLibraryButNotPrivatePlaces() throws {
         let home = try temporaryRoot()
         let fm = FileManager.default
         let library = home.appendingPathComponent("Library/Application Support/omgskills/repos", isDirectory: true)
@@ -75,17 +75,16 @@ struct CloudSaveFolderTests {
             try fm.createSymbolicLink(at: folder.appendingPathComponent(name), withDestinationURL: target)
         }
 
-        // An older omgskills install: the files live in its library folder.
+        // An older omgskills install: the files live in its library folder, and are saved as if they were here.
         let repo = try makeSkill(library.appendingPathComponent("garrytan--gstack"), "ship", files: ["sections/a.md": "a"])
         let ship = skills.appendingPathComponent("ship", isDirectory: true)
         try fm.createDirectory(at: ship, withIntermediateDirectories: true)
         try link("SKILL.md", in: ship, to: repo.appendingPathComponent("SKILL.md"))
         try link("sections", in: ship, to: repo.appendingPathComponent("sections"))
-        #expect(throws: CloudSaveFolder.ReadError.libraryInstall) { try CloudSaveFolder.read(directory: ship, links: policy) }
+        let repoTree = try CloudSaveFolder.read(directory: repo).treeSha
+        #expect(try CloudSaveFolder.read(directory: ship, links: policy).treeSha == repoTree)
         try link("gstack-ship", in: skills, to: repo)
-        #expect(throws: CloudSaveFolder.ReadError.libraryInstall) {
-            try CloudSaveFolder.read(directory: skills.appendingPathComponent("gstack-ship"), links: policy)
-        }
+        #expect(try CloudSaveFolder.read(directory: skills.appendingPathComponent("gstack-ship"), links: policy).treeSha == repoTree)
 
         // Your own skill kept elsewhere in your home folder, linked as a whole, is saved as if the files were here.
         let project = try makeSkill(home.appendingPathComponent("Projects/notes"), "skill",
@@ -329,7 +328,7 @@ struct CloudSaveSyncTests {
         #expect(CloudSaveController.statusText(clean) == "24 skills · 3 need attention on the web · 3 not on this Mac")
     }
 
-    @Test func excludedSkillsAndUnchangedLibraryInstallsAreNotUploaded() async throws {
+    @Test func libraryInstallsAreSavedAndExcludedSkillsAreNot() async throws {
         let root = try temporaryRoot()
         let mine = try makeSkill(root, "private-notes")
         let library = try makeSkill(root, "pdf")
@@ -342,21 +341,20 @@ struct CloudSaveSyncTests {
         let api = FakeCloudSave(excluded: ["private-notes"])
         let summary = try await sync(api).run(installations: [installation(mine), installation(library)],
             localFolderKeys: [], deviceID: "device-1", credential: credential())
-        #expect(summary.libraryCount == 1)
-        #expect(summary.uploadedCount == 0)
-        #expect(await api.calls == ["state"])
-        // The web hears why; a left-out skill already shows as left out.
-        #expect(await api.reported == [["pdf": .library]])
+        // The exact version installed from the library is saved; the left-out skill isn't.
+        #expect(summary.uploadedCount == 1 && summary.savedCount == 1)
+        let calls = await api.calls
+        #expect(calls.contains("version:pdf") && !calls.contains("version:private-notes"))
+        #expect(await api.reported == [[:]])
 
-        // Editing the library skill makes it the user's own copy.
+        // Editing it saves the user's version too.
         try Data("---\nname: pdf\ndescription: mine\n---\n".utf8).write(to: library.appendingPathComponent("SKILL.md"))
         let edited = try await sync(api).run(installations: [installation(library)], localFolderKeys: [],
             deviceID: "device-1", credential: credential())
         #expect(edited.uploadedCount == 1)
-        #expect(await api.reported.last == [:])
     }
 
-    @Test func skillsLinkedIntoTheOldLibraryFolderCountAsLibraryInstalls() async throws {
+    @Test func skillsLinkedIntoTheOldLibraryFolderAreSaved() async throws {
         let home = try temporaryRoot()
         let library = home.appendingPathComponent("Library/Application Support/omgskills/repos", isDirectory: true)
         let repo = try makeSkill(library.appendingPathComponent("garrytan--gstack"), "ship")
@@ -370,9 +368,8 @@ struct CloudSaveSyncTests {
         sync.links = CloudSaveFolder.LinkPolicy(home: home, libraryRoot: library)
         let summary = try await sync.run(installations: [installation(ship)], localFolderKeys: [], deviceID: "device-1",
                                          credential: credential())
-        #expect(summary.library == ["ship"])
-        #expect(summary.skipped.isEmpty)
-        #expect(await api.reported == [["ship": .library]])
+        #expect(summary.uploadedCount == 1 && summary.skipped.isEmpty)
+        #expect(await api.reported == [[:]])
     }
 
     @Test func tellsTheWebWhySkillsWereNotSavedOnlyAfterAFinishedPass() async throws {
