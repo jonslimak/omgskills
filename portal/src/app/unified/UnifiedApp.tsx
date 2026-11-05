@@ -1955,7 +1955,11 @@ export function UnifiedApp({
                 </div>
                 {!panelPending && <>
                 <div className="ua-detail-actions">
-                  {onMac && signedIn && publicInstallAction && detail.catalogId && !detail.installed?.isLocalOnly && (
+                  {/* Already on a Mac: say so instead of offering to install it again. */}
+                  {onMac && signedIn && publicInstallAction && detail.catalogId && detail.installed && (
+                    <span className="ua-pill"><Check aria-hidden="true" />Installed</span>
+                  )}
+                  {onMac && signedIn && publicInstallAction && detail.catalogId && !detail.installed && (
                     installOpen ? (
                       <button
                         type="button"
