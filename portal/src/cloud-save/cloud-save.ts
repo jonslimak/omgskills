@@ -131,6 +131,10 @@ export type CloudSkillRow = {
   savedAt: string | null;
   labels: CloudLabel[];
   findings: { path: string; findings: CloudFinding[] }[];
+  /** Installed on one of your Macs now, as opposed to kept only in the cloud. */
+  onMac: boolean;
+  /** Installed from the library or a Set rather than written by you. */
+  origin: "library" | "set" | null;
 };
 
 /**
@@ -169,9 +173,11 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
     const review = reviews.get(key);
     const found: CloudSkillRow["status"] = excluded.has(key) ? "excluded"
       : review ? (review.confirmed ? "confirmed" : "review")
-      : copy ? (copy.deletedLocallyAt ? "deleted" : "saved")
-      : !state.settings.enabled ? (fromLibrary.has(key) ? "library" : "off")
-      : state.skipped[key] ?? (fromLibrary.has(key) ? "library" : "waiting");
+      : copy ? (copy.deletedLocallyAt ? "deleted" : fromLibrary.has(key) ? "library" : "saved")
+      : !state.settings.enabled ? "off"
+      // Only a saved copy is "from the library"; an older Mac reports unchanged installs as not uploaded.
+      : state.skipped[key] === "library" ? "waiting"
+      : state.skipped[key] ?? "waiting";
     // A private skill installed from a Set isn't in the library; say where it came from.
     const status = found === "library" && fromLibrary.has(key) && !fromCatalog.has(key) ? "set" : found;
     return {
@@ -183,6 +189,8 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
       savedAt: copy?.currentVersion.savedAt ?? null,
       labels: copy?.currentVersion.labels ?? [],
       findings: review?.files ?? [],
+      onMac: names.has(key),
+      origin: fromCatalog.has(key) ? "library" : fromLibrary.has(key) ? "set" : null,
     };
   }).sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.name.localeCompare(b.name));
 }
@@ -216,6 +224,25 @@ export const labelText: Record<CloudLabel, string> = {
   scripts: "Contains scripts",
 };
 
+/**
+ * One line for every screen: all your skills (on your Macs or kept in the cloud), then only what
+ * needs a look. The cloud keeps a record of every skill, so a skill whose files need attention still counts.
+ */
+export function cloudSummaryText(rows: CloudSkillRow[]) {
+  const count = (test: (row: CloudSkillRow) => boolean) => rows.filter(test).length;
+  const attention = count(row => needsAttention(row.status));
+  const pending = count(row => row.status === "waiting" || row.status === "confirmed");
+  const leftOut = count(row => row.status === "excluded");
+  const notOnMac = count(row => !row.onMac);
+  const parts = [`${rows.length} ${rows.length === 1 ? "skill" : "skills"}`];
+  if (!attention && !pending && !leftOut) parts.push("all saved");
+  if (attention) parts.push(`${attention} need${attention === 1 ? "s" : ""} attention`);
+  if (pending) parts.push(`${pending} not saved yet`);
+  if (leftOut) parts.push(`${leftOut} left out`);
+  if (notOnMac) parts.push(`${notOnMac} not on your Macs`);
+  return parts.join(" · ");
+}
+
 /** Skills cloud save can't keep a copy of until something is done about them. */
 export function needsAttention(status: CloudSkillRow["status"]) {
   return status === "review" || status === "failed" || status === "links" || status === "too_large" || status === "unreadable";
@@ -241,8 +268,8 @@ export const statusHelp: Partial<Record<CloudSkillRow["status"], string>> = {
   too_large: "It's over the size limit (12 MB, 4 MB per file).",
   unreadable: "Your Mac couldn't read its folder.",
   failed: "The last save failed. Your Mac tries again on its next sync.",
-  library: "Unchanged from the library, so the library keeps it for you. If you change it, your version is saved too.",
-  set: "Unchanged from the Set you installed it from, so the Set keeps it for you. If you change it, your version is saved too.",
+  library: "The version you installed from the library is saved. If you change it, your version is saved too.",
+  set: "The version you installed from a Set is saved. If you change it, your version is saved too.",
   excluded: "You left it out of cloud save.",
   waiting: "Your Mac saves it on its next sync.",
   off: "Cloud save is off.",

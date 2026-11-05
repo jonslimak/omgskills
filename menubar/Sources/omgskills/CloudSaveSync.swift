@@ -2,8 +2,6 @@ import Foundation
 
 /// Why a skill wasn't saved, as the web shows it.
 enum CloudSaveSkipReason: String, Equatable, Sendable {
-    /// An unchanged library or Set install, which can be fetched again.
-    case library
     case links
     case tooLarge = "too_large"
     case unreadable
@@ -27,19 +25,28 @@ struct CloudSaveSummary: Equatable, Sendable {
     var savedCount = 0
     /// New versions saved in this pass.
     var uploadedCount = 0
-    /// Library and Set installs left unchanged, which are not uploaded.
-    var library: Set<String> = []
-    var libraryCount: Int { library.count }
     /// Skills whose copy here is older than the one already in the cloud, so it isn't saved over it.
     var olderHereCount = 0
     var needsReview: [String] = []
     /// Skills that can't be saved, by key, with the reason.
     var skipped: [String: CloudSaveSkipReason] = [:]
+    /// Every skill: on this Mac or kept in the cloud. The cloud keeps a record of each one,
+    /// so a skill whose files need attention still counts.
+    var skillCount = 0
+    /// Skills kept in the cloud that aren't on this Mac (deleted here, or from another Mac).
+    var notOnThisMacCount = 0
+    /// Skills on this Mac you chose to leave out of cloud save.
+    var leftOutCount = 0
+    /// Unchanged library and Set installs not uploaded yet: a pass saves only a few, so the first
+    /// sync after installing many doesn't flood the server. The rest follow on later passes.
+    var notSavedYetCount = 0
+    /// Skills whose files keep them from being saved until something is done, shown on the web.
+    var attentionCount: Int { needsReview.count + skipped.count }
     /// The tree of every skill folder read in this pass, to tell next time whether it changed here.
     var localTrees: [String: String] = [:]
 }
 
-/// Saves this Mac's own and edited skills to the cloud. One pass compares every
+/// Saves every skill on this Mac to the cloud, library and Set installs included. One pass compares every
 /// skill folder with its cloud copy and uploads what changed; it is safe to repeat.
 struct CloudSaveSync: Sendable {
     typealias Pace = @Sendable () async throws -> Void
@@ -71,7 +78,12 @@ struct CloudSaveSync: Sendable {
         // so it still counts as changed here next time.
         summary.localTrees = lastTrees.filter { key, _ in folders.contains { $0.key == key } }
 
-        for folder in folders where !excluded.contains(folder.key) {
+        // Your own and edited skills go first, so unchanged installs never crowd them out of storage.
+        let unchanged = Set(folders.filter(Self.isUnchangedInstall).map(\.key))
+        let ordered = folders.filter { !unchanged.contains($0.key) } + folders.filter { unchanged.contains($0.key) }
+        var installUploads = 0
+
+        for folder in ordered where !excluded.contains(folder.key) {
             try Task.checkCancellation()
             if let current = saved[folder.key], current.currentVersion.treeSha == folder.treeSha {
                 summary.savedCount += 1
@@ -89,10 +101,14 @@ struct CloudSaveSync: Sendable {
             }
             // A stale copy on this Mac must not replace a newer save from another Mac.
             if let current = saved[folder.key], !Self.isNewerHere(folder, than: current, lastTree: lastTrees[folder.key],
-                                                                   deviceID: deviceID) {
+                                                                   deviceID: deviceID, unchangedInstall: unchanged.contains(folder.key)) {
                 summary.olderHereCount += 1
                 summary.localTrees[folder.key] = folder.treeSha
                 continue
+            }
+            if unchanged.contains(folder.key) {
+                guard installUploads < Self.installUploadsPerPass else { summary.notSavedYetCount += 1; continue }
+                installUploads += 1
             }
             do {
                 if try await save(folder, credential: credential) { summary.uploadedCount += 1 }
@@ -127,9 +143,16 @@ struct CloudSaveSync: Sendable {
                 try? await api.withdrawReview(key: review.key, credential: credential)
             }
         }
+        let here = Set(installations.map { CloudSaveFolder.key(forFolderName: URL(fileURLWithPath: $0.installCmd).lastPathComponent) })
+        // A review this Mac just withdrew (its skill is gone from here) no longer counts.
+        let withdrawn = Set(state.needsReview.filter { $0.deviceId == deviceID && localFolderKeys?.contains($0.key) == false }.map(\.key))
+        let inCloud = Set(state.skills.map(\.key)).union(state.needsReview.map(\.key).filter { !withdrawn.contains($0) })
+        summary.skipped = summary.skipped.filter { !excluded.contains($0.key) }
+        summary.skillCount = here.union(inCloud).count
+        summary.notOnThisMacCount = inCloud.subtracting(here).count
+        summary.leftOutCount = here.intersection(excluded).count
         // Only a finished pass knows every reason; the web keeps the last full report until then.
-        let report = summary.skipped.merging(summary.library.map { ($0, .library) }, uniquingKeysWith: { reason, _ in reason })
-            .filter { !excluded.contains($0.key) }
+        let report = summary.skipped.filter { !excluded.contains($0.key) }
         try? await pace()
         try? await api.reportSkipped(report, credential: credential)
         if !summary.needsReview.isEmpty || !summary.skipped.isEmpty { summary.status = .incomplete }
@@ -188,25 +211,19 @@ struct CloudSaveSync: Sendable {
             let key = CloudSaveFolder.key(forFolderName: directory.lastPathComponent)
             let folder: CloudSaveFolder
             do { folder = try CloudSaveFolder.read(directory: directory, links: links) }
-            catch CloudSaveFolder.ReadError.libraryInstall { summary.library.insert(key); continue }
             catch CloudSaveFolder.ReadError.containsLink { summary.skipped[key] = .links; continue }
             catch CloudSaveFolder.ReadError.privateLink { summary.skipped[key] = .links; continue }
             catch CloudSaveFolder.ReadError.invalid(let code) where [.fileTooLarge, .packageTooLarge, .tooManyFiles].contains(code) {
                 summary.skipped[key] = .tooLarge; continue
             }
             catch { summary.skipped[key] = .unreadable; continue }
-            if Self.isUnchangedInstall(folder) {
-                summary.library.insert(key)
-                continue
-            }
             // Any file counts as an edit, not just SKILL.md.
             if let existing = chosen[key], existing.modifiedAt >= folder.modifiedAt { continue }
             chosen[key] = folder
             summary.skipped[key] = nil
-            summary.library.remove(key)
         }
-        // An edited copy on another agent is saved, even when this one is unchanged.
-        summary.library.subtract(chosen.keys)
+        // A copy on another agent that reads fine is saved, even when this one can't be read.
+        summary.skipped = summary.skipped.filter { chosen[$0.key] == nil }
         return chosen.values.sorted { $0.key < $1.key }
     }
 
@@ -214,19 +231,18 @@ struct CloudSaveSync: Sendable {
     /// This Mac's own save is always replaced. Another Mac's is replaced only by an edit made here:
     /// the copy changed since the last pass, or, for a skill not seen here before, a file was
     /// modified after that save.
+    /// An unchanged library or Set install never replaces another Mac's save: that one may hold your edits.
     static func isNewerHere(_ folder: CloudSaveFolder, than current: CloudSaveState.SavedSkill, lastTree: String?,
-                            deviceID: String) -> Bool {
+                            deviceID: String, unchangedInstall: Bool = false) -> Bool {
         if current.currentVersion.deviceId == deviceID { return true }
+        if unchangedInstall { return false }
         if let lastTree { return lastTree != folder.treeSha }
         guard let savedAt = date(current.currentVersion.savedAt) else { return true }
         return folder.modifiedAt > savedAt
     }
 
-    static func date(_ value: String) -> Date? {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter.date(from: value) ?? ISO8601DateFormatter().date(from: value)
-    }
+    /// How many unchanged installs one pass uploads.
+    static let installUploadsPerPass = 20
 
     /// A skill installed by omgskills from the library or a Set, with its files unchanged.
     static func isUnchangedInstall(_ folder: CloudSaveFolder) -> Bool {
@@ -236,6 +252,12 @@ struct CloudSaveSync: Sendable {
         if let treeSha = provenance.treeSha { return treeSha.lowercased() == folder.treeSha }
         // Older installs recorded only SKILL.md.
         return folder.entries.count == 1 && provenance.skillMdSha?.lowercased() == folder.coordinates.skillMdSha
+    }
+
+    static func date(_ value: String) -> Date? {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter.date(from: value) ?? ISO8601DateFormatter().date(from: value)
     }
 
     private static func stopStatus(_ error: CloudSaveAPIError) -> CloudSaveSummary.Status? {

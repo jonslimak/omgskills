@@ -44,7 +44,7 @@ test("every skill gets one row with an honest status, reviews first", () => {
     installed("old", { isCurrent: false }),
   ]);
   assert.deepEqual(rows.map(row => [row.key, row.status]), [
-    ["deploy", "review"], ["notes", "saved"], ["gone", "deleted"], ["new-one", "waiting"], ["pdf", "library"], ["private", "excluded"],
+    ["deploy", "review"], ["notes", "saved"], ["gone", "deleted"], ["new-one", "waiting"], ["pdf", "waiting"], ["private", "excluded"],
   ]);
   assert.deepEqual(rows.find(row => row.key === "notes")?.labels, ["scripts"]);
   assert.equal(rows[0].findings[0].findings[0].line, 1);
@@ -66,7 +66,7 @@ test("a Mac's reason for not saving a skill wins over guessing", () => {
   ]);
   assert.deepEqual(rows.map(row => [row.key, row.status]), [
     ["notes", "saved"], ["pdf", "failed"], ["ship", "links"], ["huge", "too_large"], ["odd", "unreadable"],
-    ["fresh", "waiting"], ["spec", "library"],
+    ["fresh", "waiting"], ["spec", "waiting"],
   ]);
   // With cloud save off, nothing is being saved, so old reasons don't show.
   const off = cloudSkillRows(state({ settings: { enabled: false, excludedSkillKeys: [] }, skipped: { ship: "links" } }),
@@ -172,7 +172,9 @@ test("the letter index files names by first letter and lands on the next letter 
 });
 
 test("a private skill installed from a Set says it came from the Set, not the library", async () => {
-  const rows = cloudSkillRows(state({ skills: [], needsReview: [], skipped: { team: "library" } }), [
+  const copy = (key: string) => ({ key, versionCount: 1, deletedLocallyAt: null, setCount: 0,
+    currentVersion: { id: `r-${key}`, savedAt: "2026-11-05T00:00:00Z", fileCount: 1, totalBytes: 1 } });
+  const rows = cloudSkillRows(state({ skills: [copy("team"), copy("pdf")], needsReview: [], skipped: {} }), [
     installed("team", { installedFromSet: "Team" }),
     installed("pdf", { catalogSkillId: "anthropics/skills:pdf", installedFromSet: "Team", isLocalOnly: false }),
   ]);
@@ -180,6 +182,10 @@ test("a private skill installed from a Set says it came from the Set, not the li
   const { statusText, needsAttention } = await import("../src/cloud-save/cloud-save");
   assert.equal(statusText.set, "Saved · from a Set");
   assert.equal(needsAttention("set"), false);
+  // Not uploaded yet (or an older Mac skipped it): honest about it, never "Saved".
+  const unsaved = cloudSkillRows(state({ skills: [], needsReview: [], skipped: { pdf: "library" } }),
+    [installed("pdf", { catalogSkillId: "anthropics/skills:pdf", isLocalOnly: false })]);
+  assert.deepEqual([unsaved[0].status, unsaved[0].origin], ["waiting", "library"]);
 });
 
 test("Needs attention survives account navigation; other ids on My skills don't", async () => {
@@ -193,4 +199,25 @@ test("Needs attention survives account navigation; other ids on My skills don't"
 test("the letter rail uses the letters the list has, in rail order", async () => {
   const { railLettersOf } = await import("../src/app/unified/AlphaRail");
   assert.deepEqual(railLettersOf([{ name: "zod" }, { name: "3d" }, { name: "api" }, { name: "Alpha" }]), ["#", "A", "Z"]);
+});
+
+test("one summary line: every skill counts, then only what needs a look", async () => {
+  const { cloudSummaryText } = await import("../src/cloud-save/cloud-save");
+  const row = (status: string, onMac = true) => ({ key: status, name: status, status, versionCount: 0, setCount: 0, savedAt: null,
+    labels: [], findings: [], onMac }) as never;
+  assert.equal(cloudSummaryText([row("saved"), row("library"), row("set"), row("deleted", false)]), "4 skills · all saved · 1 not on your Macs");
+  assert.equal(cloudSummaryText([row("saved"), row("review"), row("links")]), "3 skills · 2 need attention");
+  assert.equal(cloudSummaryText([row("saved"), row("too_large"), row("waiting"), row("excluded")]),
+    "4 skills · 1 needs attention · 1 not saved yet · 1 left out");
+  assert.equal(cloudSummaryText([row("saved")]), "1 skill · all saved");
+  const rows = cloudSkillRows(state({ skills: [{ key: "gone", versionCount: 1, deletedLocallyAt: "2026-11-01T00:00:00Z", setCount: 0,
+    currentVersion: { id: "r", savedAt: "2026-11-01T00:00:00Z", fileCount: 1, totalBytes: 1 } }], needsReview: [], skipped: {} }), [installed("here")]);
+  assert.deepEqual(rows.map(r => [r.key, r.onMac]).sort(), [["gone", false], ["here", true]]);
+});
+
+test("a library install saved to the cloud keeps its library label and its versions", () => {
+  const rows = cloudSkillRows(state({ needsReview: [], skipped: {}, skills: [{ key: "pdf", versionCount: 2, deletedLocallyAt: null, setCount: 0,
+    currentVersion: { id: "r2", savedAt: "2026-11-05T00:00:00Z", fileCount: 3, totalBytes: 10 } }] }),
+    [installed("pdf", { catalogSkillId: "anthropics/skills:pdf", isLocalOnly: false })]);
+  assert.deepEqual([rows[0].status, rows[0].versionCount], ["library", 2]);
 });

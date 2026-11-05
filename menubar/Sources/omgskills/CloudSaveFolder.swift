@@ -25,8 +25,6 @@ struct CloudSaveFolder: Equatable, Sendable {
     enum ReadError: Error, Equatable, Sendable {
         case unreadable
         case containsLink(String)
-        /// The folder links into the library copies older omgskills versions kept; it can be installed again.
-        case libraryInstall
         /// A link points somewhere cloud save never reads, such as keys, settings or other apps' data.
         case privateLink(String)
         case invalid(SkillPackageValidationFailureCode)
@@ -60,7 +58,11 @@ struct CloudSaveFolder: Equatable, Sendable {
         func classify(_ target: URL) -> Target {
             let path = target.resolvingSymlinksInPath().standardizedFileURL.path
             let library = libraryRoot.resolvingSymlinksInPath().standardizedFileURL.path
-            if path == library || path.hasPrefix(library + "/") { return .library }
+            if path == library || path.hasPrefix(library + "/") {
+                // Library copies are public, but a repo's hidden files (.git holds its settings) are never read.
+                let inside = path.dropFirst(library.count).split(separator: "/")
+                return inside.contains { $0.hasPrefix(".") } ? .privateFile : .library
+            }
             let homePath = home.resolvingSymlinksInPath().standardizedFileURL.path
             guard path.hasPrefix(homePath + "/") else { return .privateFile }
             let parts = path.dropFirst(homePath.count + 1).split(separator: "/").map(String.init)
@@ -127,7 +129,8 @@ struct CloudSaveFolder: Equatable, Sendable {
         let rootIsLink = links?.reachesThroughLink(directory) ?? false
         if let links {
             switch links.classify(root) {
-            case .library: throw ReadError.libraryInstall
+            // Older omgskills versions kept library copies there and linked skills to them; they're saved like any skill.
+            case .library: break
             case .privateFile where rootIsLink: throw ReadError.privateLink(directory.lastPathComponent)
             // A skill folder linked to somewhere that isn't a skill, such as the Desktop.
             case .own where rootIsLink && !links.insideSkill(root.standardizedFileURL.path):
@@ -137,7 +140,6 @@ struct CloudSaveFolder: Equatable, Sendable {
         }
         var reader = Reader(links: links, root: root, fileManager: fileManager, visited: [root.standardizedFileURL.path])
         try reader.collect(root, prefix: "", throughLink: links != nil && rootIsLink)
-        if reader.linksIntoLibrary { throw ReadError.libraryInstall }
         let entries = reader.entries, modifiedAt = reader.modifiedAt
         do {
             let coordinates = try SkillPackageValidator.unpinnedCoordinates(for: entries, limits: limits)
@@ -157,7 +159,6 @@ struct CloudSaveFolder: Equatable, Sendable {
         var visited: Set<String>
         var entries: [SkillPackageEntry] = []
         var modifiedAt = Date.distantPast
-        var linksIntoLibrary = false
 
         /// `throughLink`: this folder was reached by following a link, so it may be a project folder
         /// holding hidden files such as .env; those are never read.
@@ -174,7 +175,7 @@ struct CloudSaveFolder: Equatable, Sendable {
                     guard let links else { throw ReadError.containsLink(path) }
                     let target = url.resolvingSymlinksInPath()
                     switch links.classify(target) {
-                    case .library: linksIntoLibrary = true; continue
+                    case .library: break
                     case .privateFile: throw ReadError.privateLink(path)
                     case .own: guard links.follows(target, root: root) else { throw ReadError.privateLink(path) }
                     }

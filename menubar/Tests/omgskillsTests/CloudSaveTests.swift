@@ -64,7 +64,7 @@ struct CloudSaveFolderTests {
         #expect(throws: CloudSaveFolder.ReadError.invalid(.missingSkillMd)) { try CloudSaveFolder.read(directory: empty) }
     }
 
-    @Test func followsLinksToYourOwnFilesButNotToTheLibraryOrPrivatePlaces() throws {
+    @Test func followsLinksToYourOwnFilesAndTheOldLibraryButNotPrivatePlaces() throws {
         let home = try temporaryRoot()
         let fm = FileManager.default
         let library = home.appendingPathComponent("Library/Application Support/omgskills/repos", isDirectory: true)
@@ -75,17 +75,16 @@ struct CloudSaveFolderTests {
             try fm.createSymbolicLink(at: folder.appendingPathComponent(name), withDestinationURL: target)
         }
 
-        // An older omgskills install: the files live in its library folder.
+        // An older omgskills install: the files live in its library folder, and are saved as if they were here.
         let repo = try makeSkill(library.appendingPathComponent("garrytan--gstack"), "ship", files: ["sections/a.md": "a"])
         let ship = skills.appendingPathComponent("ship", isDirectory: true)
         try fm.createDirectory(at: ship, withIntermediateDirectories: true)
         try link("SKILL.md", in: ship, to: repo.appendingPathComponent("SKILL.md"))
         try link("sections", in: ship, to: repo.appendingPathComponent("sections"))
-        #expect(throws: CloudSaveFolder.ReadError.libraryInstall) { try CloudSaveFolder.read(directory: ship, links: policy) }
+        let repoTree = try CloudSaveFolder.read(directory: repo).treeSha
+        #expect(try CloudSaveFolder.read(directory: ship, links: policy).treeSha == repoTree)
         try link("gstack-ship", in: skills, to: repo)
-        #expect(throws: CloudSaveFolder.ReadError.libraryInstall) {
-            try CloudSaveFolder.read(directory: skills.appendingPathComponent("gstack-ship"), links: policy)
-        }
+        #expect(try CloudSaveFolder.read(directory: skills.appendingPathComponent("gstack-ship"), links: policy).treeSha == repoTree)
 
         // Your own skill kept elsewhere in your home folder, linked as a whole, is saved as if the files were here.
         let project = try makeSkill(home.appendingPathComponent("Projects/notes"), "skill",
@@ -304,7 +303,32 @@ struct CloudSaveSyncTests {
         #expect(await synced.calls == ["state"])
     }
 
-    @Test func excludedSkillsAndUnchangedLibraryInstallsAreNotUploaded() async throws {
+    @Test func summaryLineCountsEverySkillThenWhatNeedsALook() async throws {
+        let root = try temporaryRoot()
+        let notes = try makeSkill(root, "notes")
+        let left = try makeSkill(root, "left")
+        let folder = try CloudSaveFolder.read(directory: notes)
+        let version = { (id: String, tree: String) in
+            CloudSaveState.Version(id: id, treeSha: tree, deviceId: "device-1", savedAt: "2026-01-01T00:00:00.000Z", labels: []) }
+        let api = FakeCloudSave(excluded: ["left"], skills: [
+            .init(key: "notes", currentVersion: version("r1", folder.treeSha), deletedLocallyAt: nil),
+            .init(key: "gone", currentVersion: version("r2", "x"), deletedLocallyAt: "2026-01-02T00:00:00.000Z"),
+        ])
+        let summary = try await sync(api).run(installations: [installation(notes), installation(left)], localFolderKeys: ["notes", "left"],
+            deviceID: "device-1", credential: credential())
+        #expect(summary.skillCount == 3 && summary.notOnThisMacCount == 1 && summary.leftOutCount == 1)
+        #expect(CloudSaveController.statusText(summary) == "3 skills · 1 left out · 1 not on this Mac")
+
+        var clean = CloudSaveSummary(status: .upToDate)
+        clean.skillCount = 24
+        #expect(CloudSaveController.statusText(clean) == "24 skills · all saved")
+        clean.needsReview = ["a"]
+        clean.skipped = ["b": .links, "c": .tooLarge]
+        clean.notOnThisMacCount = 3
+        #expect(CloudSaveController.statusText(clean) == "24 skills · 3 need attention on the web · 3 not on this Mac")
+    }
+
+    @Test func libraryInstallsAreSavedAndExcludedSkillsAreNot() async throws {
         let root = try temporaryRoot()
         let mine = try makeSkill(root, "private-notes")
         let library = try makeSkill(root, "pdf")
@@ -317,21 +341,73 @@ struct CloudSaveSyncTests {
         let api = FakeCloudSave(excluded: ["private-notes"])
         let summary = try await sync(api).run(installations: [installation(mine), installation(library)],
             localFolderKeys: [], deviceID: "device-1", credential: credential())
-        #expect(summary.libraryCount == 1)
-        #expect(summary.uploadedCount == 0)
-        #expect(await api.calls == ["state"])
-        // The web hears why; a left-out skill already shows as left out.
-        #expect(await api.reported == [["pdf": .library]])
+        // The exact version installed from the library is saved; the left-out skill isn't.
+        #expect(summary.uploadedCount == 1 && summary.savedCount == 1)
+        let calls = await api.calls
+        #expect(calls.contains("version:pdf") && !calls.contains("version:private-notes"))
+        #expect(await api.reported == [[:]])
 
-        // Editing the library skill makes it the user's own copy.
+        // Editing it saves the user's version too.
         try Data("---\nname: pdf\ndescription: mine\n---\n".utf8).write(to: library.appendingPathComponent("SKILL.md"))
         let edited = try await sync(api).run(installations: [installation(library)], localFolderKeys: [],
             deviceID: "device-1", credential: credential())
         #expect(edited.uploadedCount == 1)
-        #expect(await api.reported.last == [:])
     }
 
-    @Test func skillsLinkedIntoTheOldLibraryFolderCountAsLibraryInstalls() async throws {
+    private func markInstalled(_ folder: URL) throws {
+        let tree = try CloudSaveFolder.read(directory: folder).treeSha
+        let metadata = SkillInstallProvenanceStore.metadataURL(targetRoot: folder.deletingLastPathComponent(), targetName: folder.lastPathComponent)
+        try FileManager.default.createDirectory(at: metadata.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data(#"{"installedAt":"2026-11-01T00:00:00Z","treeSha":"\#(tree)","catalogSkillId":"o/r:\#(folder.lastPathComponent)"}"#.utf8)
+            .write(to: metadata)
+    }
+
+    @Test func unchangedInstallsGoLastAFewPerPassAndNeverReplaceAnotherMacsSave() async throws {
+        let root = try temporaryRoot()
+        let own = try makeSkill(root, "zz-own")
+        var installs: [URL] = []
+        for index in 0..<(CloudSaveSync.installUploadsPerPass + 2) {
+            let folder = try makeSkill(root, String(format: "a-lib-%02d", index))
+            try markInstalled(folder)
+            installs.append(folder)
+        }
+        let api = FakeCloudSave()
+        let summary = try await sync(api).run(installations: ([own] + installs).map { installation($0) }, localFolderKeys: [],
+            deviceID: "device-1", credential: credential())
+        let saves = await api.calls.filter { $0.hasPrefix("version:") }
+        #expect(saves.first == "version:zz-own", "Your own skill is saved before any install")
+        #expect(summary.notSavedYetCount == 2)
+        #expect(CloudSaveController.statusText(summary).contains("2 not saved yet"))
+
+        // Another Mac saved an edit; this Mac's unchanged install of the same skill must not replace it.
+        let pdf = try makeSkill(root, "pdf")
+        try markInstalled(pdf)
+        let edited = FakeCloudSave(skills: [.init(key: "pdf", currentVersion: .init(id: "r1", treeSha: "edited", deviceId: "device-2",
+            savedAt: "2000-01-01T00:00:00.000Z", labels: []), deletedLocallyAt: nil)])
+        let second = try await sync(edited).run(installations: [installation(pdf)], localFolderKeys: ["pdf"],
+            deviceID: "device-1", credential: credential())
+        #expect(second.olderHereCount == 1 && second.uploadedCount == 0)
+    }
+
+    @Test func aLinkIntoTheLibraryNeverReadsARepoHiddenFiles() throws {
+        let home = try temporaryRoot()
+        let fm = FileManager.default
+        let library = home.appendingPathComponent("Library/Application Support/omgskills/repos", isDirectory: true)
+        let repo = try makeSkill(library.appendingPathComponent("o--r"), "ship")
+        let git = library.appendingPathComponent("o--r/.git", isDirectory: true)
+        try fm.createDirectory(at: git, withIntermediateDirectories: true)
+        try Data("[remote]".utf8).write(to: git.appendingPathComponent("config"))
+        try fm.createSymbolicLink(at: repo.appendingPathComponent("cfg"), withDestinationURL: git.appendingPathComponent("config"))
+        let skills = home.appendingPathComponent(".claude/skills", isDirectory: true)
+        try fm.createDirectory(at: skills, withIntermediateDirectories: true)
+        try fm.createSymbolicLink(at: skills.appendingPathComponent("ship"), withDestinationURL: repo)
+        let policy = CloudSaveFolder.LinkPolicy(home: home, libraryRoot: library)
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("cfg")) {
+            try CloudSaveFolder.read(directory: skills.appendingPathComponent("ship"), links: policy)
+        }
+    }
+
+    @Test func skillsLinkedIntoTheOldLibraryFolderAreSaved() async throws {
         let home = try temporaryRoot()
         let library = home.appendingPathComponent("Library/Application Support/omgskills/repos", isDirectory: true)
         let repo = try makeSkill(library.appendingPathComponent("garrytan--gstack"), "ship")
@@ -345,9 +421,8 @@ struct CloudSaveSyncTests {
         sync.links = CloudSaveFolder.LinkPolicy(home: home, libraryRoot: library)
         let summary = try await sync.run(installations: [installation(ship)], localFolderKeys: [], deviceID: "device-1",
                                          credential: credential())
-        #expect(summary.library == ["ship"])
-        #expect(summary.skipped.isEmpty)
-        #expect(await api.reported == [["ship": .library]])
+        #expect(summary.uploadedCount == 1 && summary.skipped.isEmpty)
+        #expect(await api.reported == [[:]])
     }
 
     @Test func tellsTheWebWhySkillsWereNotSavedOnlyAfterAFinishedPass() async throws {

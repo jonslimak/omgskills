@@ -143,7 +143,7 @@ final class CloudSaveController {
         }
     }
 
-    static func statusText(_ summary: CloudSaveSummary) -> String {
+    nonisolated static func statusText(_ summary: CloudSaveSummary) -> String {
         switch summary.status {
         case .off: return "Cloud save is off."
         case .permissionRequired: return "Reconnect this Mac to allow cloud save."
@@ -151,10 +151,14 @@ final class CloudSaveController {
         case .storageFull: return "Cloud storage is full."
         case .unavailable: return "Cloud save is unavailable right now. It will try again."
         case .upToDate, .incomplete:
-            var parts = ["\(summary.savedCount) \(summary.savedCount == 1 ? "skill" : "skills") saved"]
-            if !summary.needsReview.isEmpty { parts.append("\(summary.needsReview.count) need review on the web") }
-            if !summary.skipped.isEmpty { parts.append("\(summary.skipped.count) can't be saved") }
-            if summary.olderHereCount > 0 { parts.append("\(summary.olderHereCount) newer in the cloud") }
+            // The same line the web shows: every skill, then only what needs a look.
+            let attention = summary.attentionCount
+            var parts = ["\(summary.skillCount) \(summary.skillCount == 1 ? "skill" : "skills")"]
+            if attention == 0 && summary.leftOutCount == 0 && summary.notSavedYetCount == 0 { parts.append("all saved") }
+            if attention > 0 { parts.append("\(attention) need\(attention == 1 ? "s" : "") attention on the web") }
+            if summary.notSavedYetCount > 0 { parts.append("\(summary.notSavedYetCount) not saved yet") }
+            if summary.leftOutCount > 0 { parts.append("\(summary.leftOutCount) left out") }
+            if summary.notOnThisMacCount > 0 { parts.append("\(summary.notOnThisMacCount) not on this Mac") }
             return parts.joined(separator: " · ")
         }
     }

@@ -163,9 +163,10 @@ export function SharedSkillReadme({ releaseId, load }: { releaseId: string; load
 
 type VersionsState = { id: string; status: "loading" | "ready" | "error"; saved: SavedVersions | null };
 
-/** A local skill's saved versions, newest first; an older one can be put back on the Mac that has the skill. */
+/** An installed skill's saved versions, newest first; an older one can be put back on the Mac that has the skill.
+ * Library installs are saved too, so they have versions like any skill. */
 export function SavedVersionsList({ skill, liveName, load }: { skill: SkillDisplay; liveName?: string; load: SavedVersionsLoader }) {
-  const keys = publicReadmeId(skill) ? [] : savedSkillKeys(skill);
+  const keys = savedSkillKeys(skill);
   const id = keys.join("\n");
   const loader = useRef(load);
   loader.current = load;

@@ -5,7 +5,7 @@ import type { PortalApi } from "../portal-api";
 import type { SyncedSkill } from "../synced-skill-grouping";
 import { Action, EmptyState, IconAction, Toggle } from "../app/ui";
 import {
-  cloudSkillRows, confirmCloudReview, deleteCloudSaved, formatBytes, setsNote, isDeletingAllCloudSkills, isDeletingCloudSkill, labelText, loadCloudSave, saveCloudSettings, statusText,
+  cloudSkillRows, cloudSummaryText, confirmCloudReview, deleteCloudSaved, formatBytes, setsNote, isDeletingAllCloudSkills, isDeletingCloudSkill, labelText, loadCloudSave, saveCloudSettings, statusText,
   type CloudDeleteSelection, type CloudSaveView,
 } from "./cloud-save";
 
@@ -69,8 +69,6 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
   const { state } = view;
   const rows = cloudSkillRows(state, skills);
   const reviews = rows.filter(row => row.status === "review" || row.status === "confirmed");
-  const choosable = rows.filter(row => (row.status !== "library" && row.status !== "set") || state.settings.excludedSkillKeys.includes(row.key));
-  const savedCount = rows.filter(row => row.status === "saved" || row.status === "deleted").length;
 
   return <section className="rd-private-source rd-private-source-live cloud-save" aria-label="Cloud save">
     <div className="rd-section-heading"><h2>Cloud save</h2>
@@ -79,8 +77,8 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
     <div className="cloud-save-switch">
       <div className="rd-grow">
         <strong>Save my skills to the cloud</strong>
-        <p className="rd-muted">omgskills keeps a private, versioned copy of every skill you wrote or changed, so you
-          can get it back or use it on another Mac. Only you can see it. Unchanged skills from the library aren't uploaded.</p>
+        <p className="rd-muted">omgskills keeps a private, versioned copy of every skill you have, so you
+          can get it back or use it on another Mac. Only you can see it. Skills from the library and Sets are saved too.</p>
       </div>
       <Toggle label="Save my skills to the cloud" checked={state.settings.enabled} disabled={saving}
         onChange={enabled => void change(() => saveCloudSettings(callbacks.current.api, { enabled }), "Cloud save could not be changed.")} />
@@ -88,7 +86,7 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
     {error && <p role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}
     {state.settings.enabled && <p className="rd-muted" role="status">
-      {savedCount} {savedCount === 1 ? "skill" : "skills"} saved · {formatBytes(state.usage.bytes)} of {formatBytes(state.usage.limitBytes)} used.
+      {cloudSummaryText(rows)} · {formatBytes(state.usage.bytes)} of {formatBytes(state.usage.limitBytes)} used.
       Your Mac saves changes in the background; if it asks, reconnect it to allow saving.
     </p>}
 
@@ -118,7 +116,7 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
         <h3>Choose skills</h3>
         <p className="rd-muted">Every skill is saved unless you untick it. New skills are saved automatically.</p>
         <div className="cloud-save-choices">
-          {choosable.map(row => <label key={row.key}>
+          {rows.map(row => <label key={row.key}>
             <input type="checkbox" aria-label={`Save ${row.name}`} checked={!excluded.has(row.key)} disabled={saving} onChange={event => {
               const next = new Set(excluded);
               if (event.target.checked) next.delete(row.key); else next.add(row.key);

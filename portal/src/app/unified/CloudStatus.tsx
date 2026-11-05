@@ -10,13 +10,13 @@ export function CloudStatusBadge({ row }: { row: CloudSkillRow | null }) {
   if (!row) return null;
   const attention = needsAttention(row.status);
   const Icon = row.status === "review" ? TriangleAlert : attention ? CloudOff : Cloud;
-  const saved = row.status === "saved" || row.status === "deleted";
+  const saved = ["saved", "deleted", "library", "set"].includes(row.status);
   const history = [
     saved && row.versionCount > 0 ? `${row.versionCount} ${row.versionCount === 1 ? "version" : "versions"}` : "",
     saved && row.savedAt ? `last saved ${new Date(row.savedAt).toLocaleDateString()}` : "",
   ].filter(Boolean).join(", ");
   const detail = attention ? undefined : [history && `${history[0].toUpperCase()}${history.slice(1)}.`, statusHelp[row.status]].filter(Boolean).join(" ");
-  return <span className="ua-cloud-badge" data-attention={attention || undefined} title={detail || undefined}
+  return <span className="ua-cloud-badge" data-status={row.status} data-attention={attention || undefined} title={detail || undefined}
     aria-label={`Cloud save: ${statusText[row.status]}${detail ? `. ${detail}` : ""}`}>
     <Icon aria-hidden="true" /><span aria-hidden="true">{statusText[row.status]}</span>
   </span>;
@@ -30,7 +30,9 @@ export function CloudStatusSection({ row, confirm }: { row: CloudSkillRow | null
   const attention = needsAttention(row.status);
   if (!attention && !row.labels.length) return null;
   return <section className="ua-cloud-status" aria-label="Cloud save" data-status={row.status}>
-    {attention && statusHelp[row.status] && <p className="ua-muted">{statusHelp[row.status]}</p>}
+    {attention && statusHelp[row.status] && <p className="ua-muted">{row.status === "review" && row.origin
+      ? `A file in this skill from ${row.origin === "library" ? "the library" : "a Set"} looks like it contains a key or password, so it wasn't saved. If it's only an example, confirm it's safe.`
+      : statusHelp[row.status]}</p>}
     {row.findings.map(file => <p className="ua-muted ua-cloud-finding" key={file.path}>
       {file.path}: {file.findings.map(finding => `${finding.kind} on line ${finding.line}`).join(", ")}
     </p>)}
