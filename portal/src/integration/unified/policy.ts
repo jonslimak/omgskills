@@ -11,7 +11,8 @@ export function accountNavigation(nav: Navigation, signedIn: boolean): Navigatio
   if (!["all", "favorites", "sets", "set", "agents", "profile", "devices", "github", "cloud", "mcp"].includes(nav.view)) return { ...initialNavigation };
   if (nav.view === "set" && !/^[a-zA-Z0-9_-]+$/.test(nav.id)) return { ...initialNavigation, view: "sets" };
   const list = ["all", "favorites", "set"].includes(nav.view);
-  return { ...nav, id: nav.view === "set" ? nav.id : "",
+  // "attention" is the only list filter My skills keeps in the address.
+  return { ...nav, id: nav.view === "set" || (nav.view === "all" && nav.id === "attention") ? nav.id : "",
     selected: list && (nav.selected.startsWith("synced:") || (nav.view !== "all" && nav.selected.startsWith("set-item:"))) ? nav.selected : "" };
 }
 

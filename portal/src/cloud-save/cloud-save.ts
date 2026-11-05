@@ -124,7 +124,7 @@ export function isDeletingAllCloudSkills(selection: CloudDeleteSelection): boole
 export type CloudSkillRow = {
   key: string;
   name: string;
-  status: "saved" | "deleted" | "review" | "confirmed" | "excluded" | "library" | "waiting" | "off"
+  status: "saved" | "deleted" | "review" | "confirmed" | "excluded" | "library" | "set" | "waiting" | "off"
     | "links" | "too_large" | "unreadable" | "failed";
   versionCount: number;
   setCount: number;
@@ -141,12 +141,14 @@ export type CloudSkillRow = {
 export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]): CloudSkillRow[] {
   const names = new Map<string, string>();
   const fromLibrary = new Set<string>();
+  const fromCatalog = new Set<string>();
   for (const skill of installed) {
     if (skill.isCurrent === false) continue;
     const key = cloudSkillKey(skill.installationFolder || skill.name);
     if (!key) continue;
     if (!names.has(key)) names.set(key, skill.name);
     if (skill.catalogSkillId || skill.installedFromSet) fromLibrary.add(key);
+    if (skill.catalogSkillId) fromCatalog.add(key);
   }
   const saved = new Map(state.skills.map(skill => [skill.key, skill]));
   const reviews = new Map(state.needsReview.map(review => [review.key, review]));
@@ -165,11 +167,13 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
   return keys.map((key): CloudSkillRow => {
     const copy = saved.get(key);
     const review = reviews.get(key);
-    const status: CloudSkillRow["status"] = excluded.has(key) ? "excluded"
+    const found: CloudSkillRow["status"] = excluded.has(key) ? "excluded"
       : review ? (review.confirmed ? "confirmed" : "review")
       : copy ? (copy.deletedLocallyAt ? "deleted" : "saved")
       : !state.settings.enabled ? (fromLibrary.has(key) ? "library" : "off")
       : state.skipped[key] ?? (fromLibrary.has(key) ? "library" : "waiting");
+    // A private skill installed from a Set isn't in the library; say where it came from.
+    const status = found === "library" && fromLibrary.has(key) && !fromCatalog.has(key) ? "set" : found;
     return {
       key,
       name: label(key),
@@ -185,7 +189,7 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
 
 const statusOrder: Record<CloudSkillRow["status"], number> = {
   review: 0, confirmed: 1, saved: 2, deleted: 3, failed: 4, links: 5, too_large: 6, unreadable: 7, waiting: 8, off: 9,
-  library: 10, excluded: 11,
+  library: 10, set: 10, excluded: 11,
 };
 
 export const statusText: Record<CloudSkillRow["status"], string> = {
@@ -194,7 +198,8 @@ export const statusText: Record<CloudSkillRow["status"], string> = {
   review: "Needs review",
   confirmed: "Saving on next sync",
   excluded: "Left out",
-  library: "From the library, not uploaded",
+  library: "Saved · from the library",
+  set: "Saved · from a Set",
   waiting: "Not saved yet",
   off: "Not saved",
   links: "Not saved: links to files outside the skill",
@@ -209,6 +214,38 @@ export const labelText: Record<CloudLabel, string> = {
   hidden_instructions: "Contains hidden instructions",
   invisible_characters: "Contains invisible characters",
   scripts: "Contains scripts",
+};
+
+/** Skills cloud save can't keep a copy of until something is done about them. */
+export function needsAttention(status: CloudSkillRow["status"]) {
+  return status === "review" || status === "failed" || status === "links" || status === "too_large" || status === "unreadable";
+}
+
+/** One status for a skill whose copies sit in several folders: the one that needs attention first. */
+export function skillCloudRow(rows: Map<string, CloudSkillRow>, keys: string[]): CloudSkillRow | null {
+  let best: CloudSkillRow | null = null;
+  for (const key of keys) {
+    const row = rows.get(key);
+    if (!row) continue;
+    const rank = (item: CloudSkillRow) => (needsAttention(item.status) ? 0 : 100) + statusOrder[item.status];
+    if (!best || rank(row) < rank(best)) best = row;
+  }
+  return best;
+}
+
+/** What to do about a skill that isn't saved, for its detail panel. */
+export const statusHelp: Partial<Record<CloudSkillRow["status"], string>> = {
+  review: "A file looks like it contains a key or password, so it wasn't saved. Remove the key on your Mac and it saves by itself, or confirm it's safe.",
+  confirmed: "You confirmed it's safe. Your Mac saves it on its next sync.",
+  links: "It links to files outside its folder, which are never saved. Copy those files into the skill and it saves by itself.",
+  too_large: "It's over the size limit (12 MB, 4 MB per file).",
+  unreadable: "Your Mac couldn't read its folder.",
+  failed: "The last save failed. Your Mac tries again on its next sync.",
+  library: "Unchanged from the library, so the library keeps it for you. If you change it, your version is saved too.",
+  set: "Unchanged from the Set you installed it from, so the Set keeps it for you. If you change it, your version is saved too.",
+  excluded: "You left it out of cloud save.",
+  waiting: "Your Mac saves it on its next sync.",
+  off: "Cloud save is off.",
 };
 
 /** What deleting also does to Sets, for the confirmation; empty when no Set shares it. */

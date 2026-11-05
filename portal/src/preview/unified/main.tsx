@@ -22,6 +22,7 @@ import { previewInstallClient } from "../../app/unified/public-install";
 import { f2Cases, f2CaseNavigation, f2NavigationSearch, readF2CaseKey } from "./f2-install";
 import { createPreviewCatalogStore, createPreviewInstallStore, PublicInstallSetup } from "./PublicInstallSetup";
 import { CatalogInstallSetup } from "../../app/unified/CatalogInstallSetup";
+import { previewCloudState } from "./cloud-fixture";
 
 const installClient = import.meta.env.DEV ? previewInstallClient(import.meta.env.DEV,
   import.meta.env.VITE_NEWMAC_F1, import.meta.env.VITE_NEWMAC_SETUP_TEST, location.hostname) : null;
@@ -47,6 +48,7 @@ function Preview() {
   const [f2CaseKey, setF2CaseKey] = useState(() => readF2CaseKey(location.search));
   const [nav, setNav] = useState(readNavigation);
   const [revision, setRevision] = useState(0);
+  const [cloudState, setCloudState] = useState(() => previewCloudState(makeFixtures().skills));
   const [signedOutNav, setSignedOutNav] = useState<Navigation | null>(null);
   const [liveCatalog, setLiveCatalog] = useState(true);
   const publicData = usePublicCatalog(publicClient, nav, liveCatalog);
@@ -146,6 +148,8 @@ function Preview() {
           store={catalogStore} returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} />}
       onInstallCancel={() => catalogStore.clear()}
       onSession={session}
+      cloud={{ state: cloudState, confirm: async key => setCloudState(state => ({ ...state,
+        needsReview: state.needsReview.map(review => review.key === key ? { ...review, confirmed: true } : review) })) }}
       state={
         scenario === "loading" || scenario === "error" ? scenario : "ready"
       }
@@ -249,6 +253,7 @@ function Preview() {
                 <option value="loading">Loading</option>
                 <option value="error">Error</option>
                 <option value="long-content">Long content</option>
+                <option value="many-skills">Many skills</option>
                 <option value="connected-source">GitHub source</option>
               </select>
             </label>

@@ -62,6 +62,8 @@ import {
   SearchX,
   Server,
   Cloud,
+  CloudOff,
+  TriangleAlert,
   Shapes,
   Share,
   ShieldCheck,
@@ -105,6 +107,9 @@ import {
   discoverCollectionPage,
   inventorySummary,
   cloudSharedLabel,
+  skillsByOrigin,
+  byName,
+  type SkillShow,
   type CatalogDisplay,
   type Navigation,
   type SkillDisplay,
@@ -125,8 +130,11 @@ import { isMacDevice } from "./install-command";
 import { SiteFooter } from "./SiteFooter";
 import { saveTheme, storedTheme, type Theme } from "./theme-preference";
 import { trackEvent } from "./analytics";
-import { SavedSkillReadme, SavedVersionsList, SharedSkillReadme, SkillReadme } from "./SkillReadme";
+import { SavedSkillReadme, SavedVersionsList, SharedSkillReadme, SkillReadme, savedSkillKeys } from "./SkillReadme";
 import type { SavedSkillMdLoader, SavedVersionsLoader, SharedSkillMdLoader } from "../../cloud-save/cloud-save";
+import { AlphaRail, railLetter, railLettersOf as railLetters } from "./AlphaRail";
+import { CloudStatusBadge, CloudStatusSection, type CloudInfo } from "./CloudStatus";
+import { cloudSkillRows, needsAttention, skillCloudRow, statusText } from "../../cloud-save/cloud-save";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
@@ -161,6 +169,8 @@ type Props = {
   sharedSkillMd?: SharedSkillMdLoader;
   /** Lists a local skill's saved versions, so an older one can be restored on a Mac. */
   savedVersions?: SavedVersionsLoader;
+  /** Each skill's cloud save status, shown in the list and the detail panel. */
+  cloud?: CloudInfo;
   publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
   /** Clears a saved install request when the user cancels from the Install button. */
   onInstallCancel?: () => void;
@@ -168,6 +178,13 @@ type Props = {
   initialNotice?: string;
   supportedAccountViews?: readonly View[];
 };
+
+/** A small mark beside a skill's name, only when cloud save can't keep a copy of it. */
+function CloudAttention({ status }: { status?: Parameters<typeof needsAttention>[0] }) {
+  if (!status || !needsAttention(status)) return null;
+  const Icon = status === "review" ? TriangleAlert : CloudOff;
+  return <span className="ua-row-cloud" data-status={status} title={statusText[status]} aria-label={statusText[status]} role="img"><Icon aria-hidden="true" /></span>;
+}
 
 // Semi-bolds the "Use when ..." lead-in so the reader sees when to use the skill first.
 function DescriptionParagraph({ text }: { text: string }) {
@@ -450,6 +467,7 @@ export function UnifiedApp({
   savedSkillMd,
   sharedSkillMd,
   savedVersions,
+  cloud,
   publicInstallAction,
   onInstallCancel,
   supportedAccountViews,
@@ -499,6 +517,14 @@ export function UnifiedApp({
   // Sets still match skills no Mac reports any more; the lists, agents and counts show only what Macs have now.
   const everMine = signedIn ? models.mine : [];
   const mine = useMemo(() => (signedIn ? liveMine(models.mine) : []), [signedIn, models]);
+  const cloudRows = useMemo(() => new Map(cloud && signedIn
+    ? cloudSkillRows(cloud.state, data.skills).map(row => [row.key, row]) : []), [cloud, signedIn, data.skills]);
+  const cloudRow = (skill: SkillDisplay) => cloudRows.size && skill.installed ? skillCloudRow(cloudRows, savedSkillKeys(skill)) : null;
+  const attentionLabel = (skill: SkillDisplay) => {
+    const status = !discovery ? cloudRow(skill)?.status : undefined;
+    return status && needsAttention(status) ? `, ${statusText[status]}` : "";
+  };
+  const attention = mine.filter(skill => { const row = cloudRow(skill); return !!row && needsAttention(row.status); });
   const sources = useMemo(
     () => displaySourceNames(mine.flatMap((s) => s.installed?.sourceSkills.map((copy) => copy.source) ?? [])),
     [mine],
@@ -721,7 +747,7 @@ export function UnifiedApp({
     if (!supportsView(view)) return null;
     const active = !nav.query && (view === "creators"
       ? (nav.view === "creators" && nav.id === id) || (nav.view === "creator" && isCompany(nav.id, creator?.isCompany) === (id === "companies"))
-      : nav.view === view && (!id || nav.id === id));
+      : nav.view === view && (view === "all" ? nav.id === id : !id || nav.id === id));
     return (
       <button
         type="button"
@@ -823,6 +849,7 @@ export function UnifiedApp({
         key={skill.key}
         className={`ua-row ${compact ? "ua-row-compact" : ""}`}
         data-selected={selected?.key === skill.key}
+        data-letter={!discovery && !compact ? railLetter(skill.name) : undefined}
       >
         {canSelect && (
           <input
@@ -851,7 +878,7 @@ export function UnifiedApp({
                 )
               : event.detail < 2 ? open(skill) : undefined
           }
-          aria-label={`Open ${skill.name}${versionCount > 1 ? `, ${versionCount} versions` : ""}`}
+          aria-label={`Open ${skill.name}${versionCount > 1 ? `, ${versionCount} versions` : ""}${attentionLabel(skill)}`}
           aria-expanded={selected?.key === skill.key}
         >
           <Avatar src={skill.avatar} name={skill.author || skill.name} />
@@ -862,6 +889,7 @@ export function UnifiedApp({
                 <span className="ua-row-author">@{skill.author}</span>
               )}
               {skill.installed?.isLocalOnly && <Lock aria-label="Local skill" />}
+              {!discovery && <CloudAttention status={cloudRow(skill)?.status} />}
               {versionCount > 1 && <span className="ua-row-versions" title="Your agents have different versions of this skill">
                 {versionCount} versions
               </span>}
@@ -1106,7 +1134,7 @@ export function UnifiedApp({
   const top = catalog.trendingIds.flatMap(
     (id) => library.find((s) => s.catalogId === id) || [],
   );
-  let visible = nav.view === "favorites" ? favorites : mine;
+  let visible = nav.view === "favorites" ? favorites : nav.view === "all" && nav.id === "attention" ? attention : mine;
   if (nav.view === "set")
     visible = activeSet
       ? everMine.filter((skill) => isMember(activeSet, skill.installed!))
@@ -1128,8 +1156,16 @@ export function UnifiedApp({
     visible = visible.filter((skill) =>
       skill.installed && displaySourceNames(skill.installed.sources).includes(displaySourceName(nav.source)),
     );
+  const origin = !isDiscovery(nav.view) && !setPage && nav.show ? skillsByOrigin(visible) : null;
+  if (origin && nav.show !== "origin") visible = nav.show === "personal" ? origin.personal : origin.public;
+  // My own lists are in name order, so a letter index can jump through them.
+  const nameOrdered = !discovery && !setPage && ["all", "favorites", "set"].includes(nav.view) && listState === "ready";
+  if (nameOrdered) visible = [...visible].sort(byName);
+  // The letter index needs one A–Z list on screen: not search results, and not the two By origin groups.
+  const railList = nameOrdered && !nav.query.trim() && nav.show !== "origin";
+  const attentionView = nav.view === "all" && nav.id === "attention";
   const titles: Record<View, string> = {
-    all: "my skills",
+    all: attentionView ? "needs attention" : "my skills",
     favorites: "favorites",
     sets: "sets",
     discover: "Discover",
@@ -1154,6 +1190,8 @@ export function UnifiedApp({
     : titles[nav.view];
   const meta = nav.query
     ? `Results for "${nav.query}"`
+    : attentionView
+      ? "Cloud save can't keep a copy of these yet. Open one to see why and what to do."
     : nav.view === "all"
       ? `${mine.length} skills across ${sources.length} sources`
       : nav.view === "discover"
@@ -1183,17 +1221,26 @@ export function UnifiedApp({
       >
         {editing ? "Done" : "Edit"}
       </button>}
-      <label className="ua-filter">
-        <span className="ua-filter-label">Agent</span>
+      {nav.source !== "all" && <button type="button" className="ua-pill" aria-label={`Stop showing only ${displaySourceName(nav.source)} skills`}
+        onClick={() => navigate({ ...nav, source: "all" })}>{displaySourceName(nav.source)} <X aria-hidden="true" /></button>}
+      {!setPage && <label className="ua-filter">
+        <span className="ua-filter-label">Show</span>
         <select
-          aria-label="Filter by agent"
-          value={nav.source === "all" ? "all" : displaySourceName(nav.source)}
-          onChange={(event) => navigate({ ...nav, source: event.target.value })}
+          aria-label="Show skills"
+          value={nav.show ?? "all"}
+          onChange={(event) => {
+            // A different set of rows: drop selections made in the old one and start at the top.
+            setPicked([]);
+            main.current?.scrollTo({ top: 0 });
+            navigate({ ...nav, show: event.target.value === "all" ? undefined : event.target.value as SkillShow });
+          }}
         >
           <option value="all">All</option>
-          {sources.map((source) => <option key={source}>{source}</option>)}
+          <option value="personal">Personal</option>
+          <option value="public">Public</option>
+          <option value="origin">By origin</option>
         </select>
-      </label>
+      </label>}
     </div>
     ) : null;
 
@@ -1268,6 +1315,7 @@ export function UnifiedApp({
             ) : (
               <>
                 {navItem("all", "All skills", User, mine.length)}
+                {attention.length > 0 && navItem("all", "Needs attention", TriangleAlert, attention.length, "attention")}
                 {(!readOnlyAccount || management) && <>{navItem("favorites", "Favorites", Heart, management ? data.sets.find(set => set.isFavorites)?.itemCount ?? 0 : favorites.length)}
                 {management && navItem("sets", "All sets", Shapes, sets.length)}
                 <div className="ua-nav-group">
@@ -1382,6 +1430,7 @@ export function UnifiedApp({
             )}
           </header>
           <main className="ua-main" data-view={nav.view} ref={main} id="unified-main" tabIndex={-1}>
+            {railList && <AlphaRail scroller={main} letters={railLetters(visible)} count={visible.length} />}
             <div className="ua-content">
               {!collectionHeader && !creatorHeader && ((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
                 (!signedIn && (nav.view !== "discover" || !!nav.query))) && (
@@ -1790,7 +1839,12 @@ export function UnifiedApp({
                   {visible.length ||
                   nav.view !== "set" ||
                   !activeSet?.items.length
-                    ? rows(visible, nav.view === "top")
+                    ? origin && nav.show === "origin" && visible.length
+                      ? <>
+                          {origin.personal.length > 0 && <section className="ua-origin-group"><SectionHeading title="Personal" />{rows(origin.personal)}</section>}
+                          {origin.public.length > 0 && <section className="ua-origin-group"><SectionHeading title="Public" />{rows(origin.public)}</section>}
+                        </>
+                      : rows(visible, nav.view === "top")
                     : null}
                   {!management && nav.view === "set" &&
                     activeSet &&
@@ -1964,6 +2018,7 @@ export function UnifiedApp({
                     </IconButton>
                   )}
                   </span>
+                  {cloud && !detail.setItemReleaseId && detail.installed && <CloudStatusBadge row={cloudRow(detail)} />}
                   {!signedIn && (
                     <button type="button" className="ua-pill ua-primary ua-detail-signin" onClick={signIn} data-humblytics="App Sign In">
                       Sign in to manage skills
@@ -2011,6 +2066,8 @@ export function UnifiedApp({
                 {detail.setItemReleaseId && sharedSkillMd
                   ? <SharedSkillReadme releaseId={detail.setItemReleaseId} load={sharedSkillMd} />
                   : savedSkillMd && <SavedSkillReadme skill={detail} load={savedSkillMd} />}
+                {cloud && !detail.setItemReleaseId && detail.installed && <CloudStatusSection key={detail.key} row={cloudRow(detail)}
+                  confirm={!readOnlyAccount || management ? cloud.confirm : undefined} />}
                 {!detail.setItemReleaseId && savedVersions && <SavedVersionsList skill={detail}
                   liveName={!readOnlyAccount || management ? detailLive?.name : undefined} load={savedVersions} />}
                 {detail.installed && (

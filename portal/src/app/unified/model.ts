@@ -151,7 +151,19 @@ export type Navigation = {
   query: string;
   selected: string;
   source: string;
+  /** Which of my skills to show: own ones, library ones, or both split by origin. */
+  show?: SkillShow;
 };
+export type SkillShow = "personal" | "public" | "origin";
+const skillShows: SkillShow[] = ["personal", "public", "origin"];
+export const byName = (a: SkillDisplay, b: SkillDisplay) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+/** Personal skills are your own; public ones were installed from the library. Each part sorted by name. */
+export function skillsByOrigin(skills: SkillDisplay[]) {
+  return {
+    personal: skills.filter(skill => !skill.catalogId).sort(byName),
+    public: skills.filter(skill => !!skill.catalogId).sort(byName),
+  };
+}
 export const initialNavigation: Navigation = {
   view: "all",
   id: "",
@@ -177,6 +189,8 @@ export function parseNavigation(search: string): Navigation {
     selected: params.get("skill") || "",
     source: params.get("source") || "all",
   };
+  const show = params.get("show") as SkillShow;
+  if (skillShows.includes(show) && !isDiscovery(nav.view)) nav.show = show;
   if (nav.view === "category") {
     const term = discoveryCategories.some(group => group.items.includes(nav.id)) ? nav.id : "";
     nav.view = "discover";
@@ -199,6 +213,7 @@ export function navigationSearch(nav: Navigation) {
   if (nav.query) params.set("q", nav.query);
   if (nav.selected) params.set("skill", nav.selected);
   if (nav.source !== "all") params.set("source", nav.source);
+  if (nav.show) params.set("show", nav.show);
   const sort = addressSort(nav);
   if (sort) params.set("sort", sort);
   return params.size ? `?${params}` : "";

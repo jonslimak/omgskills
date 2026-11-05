@@ -609,6 +609,9 @@
   margin-bottom: 16px;
   gap: 12px;
 }
+.ua-origin-group > .ua-section-heading {
+  margin-bottom: 4px;
+}
 .ua-section-heading h2 {
   font-family: var(--ua-display);
   font-size: 18px;
@@ -2043,6 +2046,56 @@
 .ua-saved-versions small {
   color: var(--ua-muted);
 }
+.ua-row-cloud {
+  display: inline-flex;
+  align-self: center;
+  flex-shrink: 0;
+  color: var(--ua-danger);
+}
+.ua-row-cloud svg {
+  width: 13px;
+  height: 13px;
+}
+.ua-cloud-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 4px;
+  color: var(--ua-muted);
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: default;
+}
+.ua-cloud-badge svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+.ua-cloud-badge[data-attention] svg {
+  color: var(--ua-danger);
+}
+.ua-cloud-status > p.ua-muted {
+  font-size: 13px;
+}
+.ua-cloud-finding {
+  overflow-wrap: anywhere;
+}
+.ua-cloud-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ua-cloud-labels span {
+  border: 1px solid var(--ua-line, rgba(127, 127, 127, 0.3));
+  border-radius: 999px;
+  padding: 2px 8px;
+  color: var(--ua-muted);
+  font-size: 11px;
+}
+.ua-cloud-status > .ua-pill {
+  align-self: flex-start;
+}
 .ua-detail-match {
   align-self: flex-start;
 }
@@ -2752,4 +2805,63 @@
 .ua-detail-copy-hint {
   margin: -8px 0 0;
   font-size: 12px;
+}
+
+/* Letter index for long lists of my skills. */
+.ua-az-anchor {
+  position: sticky;
+  top: 0;
+  height: 0;
+  z-index: 3;
+}
+.ua-az {
+  position: absolute;
+  right: 2px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 22px;
+  padding: 4px 0;
+  border-radius: 11px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ua-az[data-active="true"] {
+  background: var(--ua-chip);
+}
+.ua-az button {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 600 10px/1 var(--ua-sans);
+  color: var(--ua-faint);
+  cursor: pointer;
+}
+.ua-az button[data-empty="true"] {
+  opacity: 0.35;
+}
+.ua-az-bubble {
+  position: absolute;
+  right: 44px;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--ua-ink);
+  color: var(--ua-bg);
+  font: 700 26px/1 var(--ua-display);
+  pointer-events: none;
+}
+main:has(> .ua-az-anchor) .ua-row {
+  scroll-margin-top: 8px;
+}
+main:has(> .ua-az-anchor) .ua-content {
+  padding-right: 40px;
 }
