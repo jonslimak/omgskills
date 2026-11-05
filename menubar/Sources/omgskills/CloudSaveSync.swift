@@ -137,7 +137,9 @@ struct CloudSaveSync: Sendable {
             }
         }
         let here = Set(installations.map { CloudSaveFolder.key(forFolderName: URL(fileURLWithPath: $0.installCmd).lastPathComponent) })
-        let inCloud = Set(state.skills.map(\.key)).union(state.needsReview.map(\.key))
+        // A review this Mac just withdrew (its skill is gone from here) no longer counts.
+        let withdrawn = Set(state.needsReview.filter { $0.deviceId == deviceID && localFolderKeys?.contains($0.key) == false }.map(\.key))
+        let inCloud = Set(state.skills.map(\.key)).union(state.needsReview.map(\.key).filter { !withdrawn.contains($0) })
         summary.skipped = summary.skipped.filter { !excluded.contains($0.key) }
         summary.skillCount = here.union(inCloud).count
         summary.notOnThisMacCount = inCloud.subtracting(here).count
@@ -220,8 +222,9 @@ struct CloudSaveSync: Sendable {
             summary.skipped[key] = nil
             summary.library.remove(key)
         }
-        // An edited copy on another agent is saved, even when this one is unchanged.
+        // An edited copy on another agent is saved, even when this one is unchanged or can't be read.
         summary.library.subtract(chosen.keys)
+        summary.skipped = summary.skipped.filter { chosen[$0.key] == nil }
         return chosen.values.sorted { $0.key < $1.key }
     }
 

@@ -155,7 +155,7 @@ final class CloudSaveController {
             let attention = summary.attentionCount
             var parts = ["\(summary.skillCount) \(summary.skillCount == 1 ? "skill" : "skills")"]
             if attention == 0 && summary.leftOutCount == 0 { parts.append("all saved") }
-            if attention > 0 { parts.append("\(attention) need\(attention == 1 ? "s" : "") attention") }
+            if attention > 0 { parts.append("\(attention) need\(attention == 1 ? "s" : "") attention on the web") }
             if summary.leftOutCount > 0 { parts.append("\(summary.leftOutCount) left out") }
             if summary.notOnThisMacCount > 0 { parts.append("\(summary.notOnThisMacCount) not on this Mac") }
             return parts.joined(separator: " · ")

@@ -232,7 +232,7 @@ export function cloudSummaryText(rows: CloudSkillRow[]) {
   const parts = [`${rows.length} ${rows.length === 1 ? "skill" : "skills"}`];
   if (!attention && !pending && !leftOut) parts.push("all saved");
   if (attention) parts.push(`${attention} need${attention === 1 ? "s" : ""} attention`);
-  if (pending) parts.push(`${pending} saving on next sync`);
+  if (pending) parts.push(`${pending} not saved yet`);
   if (leftOut) parts.push(`${leftOut} left out`);
   if (notOnMac) parts.push(`${notOnMac} not on your Macs`);
   return parts.join(" · ");

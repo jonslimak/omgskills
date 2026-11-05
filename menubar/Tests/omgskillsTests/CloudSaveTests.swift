@@ -326,7 +326,7 @@ struct CloudSaveSyncTests {
         clean.needsReview = ["a"]
         clean.skipped = ["b": .links, "c": .tooLarge]
         clean.notOnThisMacCount = 3
-        #expect(CloudSaveController.statusText(clean) == "24 skills · 3 need attention · 3 not on this Mac")
+        #expect(CloudSaveController.statusText(clean) == "24 skills · 3 need attention on the web · 3 not on this Mac")
     }
 
     @Test func excludedSkillsAndUnchangedLibraryInstallsAreNotUploaded() async throws {

@@ -202,7 +202,7 @@ test("one summary line: every skill counts, then only what needs a look", async 
   assert.equal(cloudSummaryText([row("saved"), row("library"), row("set"), row("deleted", false)]), "4 skills · all saved · 1 not on your Macs");
   assert.equal(cloudSummaryText([row("saved"), row("review"), row("links")]), "3 skills · 2 need attention");
   assert.equal(cloudSummaryText([row("saved"), row("too_large"), row("waiting"), row("excluded")]),
-    "4 skills · 1 needs attention · 1 saving on next sync · 1 left out");
+    "4 skills · 1 needs attention · 1 not saved yet · 1 left out");
   assert.equal(cloudSummaryText([row("saved")]), "1 skill · all saved");
   const rows = cloudSkillRows(state({ skills: [{ key: "gone", versionCount: 1, deletedLocallyAt: "2026-11-01T00:00:00Z", setCount: 0,
     currentVersion: { id: "r", savedAt: "2026-11-01T00:00:00Z", fileCount: 1, totalBytes: 1 } }], needsReview: [], skipped: {} }), [installed("here")]);
