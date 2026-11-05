@@ -30,7 +30,9 @@ export function CloudStatusSection({ row, confirm }: { row: CloudSkillRow | null
   const attention = needsAttention(row.status);
   if (!attention && !row.labels.length) return null;
   return <section className="ua-cloud-status" aria-label="Cloud save" data-status={row.status}>
-    {attention && statusHelp[row.status] && <p className="ua-muted">{statusHelp[row.status]}</p>}
+    {attention && statusHelp[row.status] && <p className="ua-muted">{row.status === "review" && row.origin
+      ? `A file in this skill from ${row.origin === "library" ? "the library" : "a Set"} looks like it contains a key or password, so it wasn't saved. If it's only an example, confirm it's safe.`
+      : statusHelp[row.status]}</p>}
     {row.findings.map(file => <p className="ua-muted ua-cloud-finding" key={file.path}>
       {file.path}: {file.findings.map(finding => `${finding.kind} on line ${finding.line}`).join(", ")}
     </p>)}

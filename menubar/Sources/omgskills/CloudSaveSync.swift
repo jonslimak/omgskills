@@ -37,6 +37,9 @@ struct CloudSaveSummary: Equatable, Sendable {
     var notOnThisMacCount = 0
     /// Skills on this Mac you chose to leave out of cloud save.
     var leftOutCount = 0
+    /// Unchanged library and Set installs not uploaded yet: a pass saves only a few, so the first
+    /// sync after installing many doesn't flood the server. The rest follow on later passes.
+    var notSavedYetCount = 0
     /// Skills whose files keep them from being saved until something is done, shown on the web.
     var attentionCount: Int { needsReview.count + skipped.count }
     /// The tree of every skill folder read in this pass, to tell next time whether it changed here.
@@ -75,7 +78,12 @@ struct CloudSaveSync: Sendable {
         // so it still counts as changed here next time.
         summary.localTrees = lastTrees.filter { key, _ in folders.contains { $0.key == key } }
 
-        for folder in folders where !excluded.contains(folder.key) {
+        // Your own and edited skills go first, so unchanged installs never crowd them out of storage.
+        let unchanged = Set(folders.filter(Self.isUnchangedInstall).map(\.key))
+        let ordered = folders.filter { !unchanged.contains($0.key) } + folders.filter { unchanged.contains($0.key) }
+        var installUploads = 0
+
+        for folder in ordered where !excluded.contains(folder.key) {
             try Task.checkCancellation()
             if let current = saved[folder.key], current.currentVersion.treeSha == folder.treeSha {
                 summary.savedCount += 1
@@ -93,10 +101,14 @@ struct CloudSaveSync: Sendable {
             }
             // A stale copy on this Mac must not replace a newer save from another Mac.
             if let current = saved[folder.key], !Self.isNewerHere(folder, than: current, lastTree: lastTrees[folder.key],
-                                                                   deviceID: deviceID) {
+                                                                   deviceID: deviceID, unchangedInstall: unchanged.contains(folder.key)) {
                 summary.olderHereCount += 1
                 summary.localTrees[folder.key] = folder.treeSha
                 continue
+            }
+            if unchanged.contains(folder.key) {
+                guard installUploads < Self.installUploadsPerPass else { summary.notSavedYetCount += 1; continue }
+                installUploads += 1
             }
             do {
                 if try await save(folder, credential: credential) { summary.uploadedCount += 1 }
@@ -219,12 +231,27 @@ struct CloudSaveSync: Sendable {
     /// This Mac's own save is always replaced. Another Mac's is replaced only by an edit made here:
     /// the copy changed since the last pass, or, for a skill not seen here before, a file was
     /// modified after that save.
+    /// An unchanged library or Set install never replaces another Mac's save: that one may hold your edits.
     static func isNewerHere(_ folder: CloudSaveFolder, than current: CloudSaveState.SavedSkill, lastTree: String?,
-                            deviceID: String) -> Bool {
+                            deviceID: String, unchangedInstall: Bool = false) -> Bool {
         if current.currentVersion.deviceId == deviceID { return true }
+        if unchangedInstall { return false }
         if let lastTree { return lastTree != folder.treeSha }
         guard let savedAt = date(current.currentVersion.savedAt) else { return true }
         return folder.modifiedAt > savedAt
+    }
+
+    /// How many unchanged installs one pass uploads.
+    static let installUploadsPerPass = 20
+
+    /// A skill installed by omgskills from the library or a Set, with its files unchanged.
+    static func isUnchangedInstall(_ folder: CloudSaveFolder) -> Bool {
+        let directory = folder.directory
+        guard let provenance = SkillInstallProvenanceStore.read(targetRoot: directory.deletingLastPathComponent(),
+                                                                 targetName: directory.lastPathComponent) else { return false }
+        if let treeSha = provenance.treeSha { return treeSha.lowercased() == folder.treeSha }
+        // Older installs recorded only SKILL.md.
+        return folder.entries.count == 1 && provenance.skillMdSha?.lowercased() == folder.coordinates.skillMdSha
     }
 
     static func date(_ value: String) -> Date? {

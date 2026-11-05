@@ -133,6 +133,8 @@ export type CloudSkillRow = {
   findings: { path: string; findings: CloudFinding[] }[];
   /** Installed on one of your Macs now, as opposed to kept only in the cloud. */
   onMac: boolean;
+  /** Installed from the library or a Set rather than written by you. */
+  origin: "library" | "set" | null;
 };
 
 /**
@@ -172,8 +174,10 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
     const found: CloudSkillRow["status"] = excluded.has(key) ? "excluded"
       : review ? (review.confirmed ? "confirmed" : "review")
       : copy ? (copy.deletedLocallyAt ? "deleted" : fromLibrary.has(key) ? "library" : "saved")
-      : !state.settings.enabled ? (fromLibrary.has(key) ? "library" : "off")
-      : state.skipped[key] ?? (fromLibrary.has(key) ? "library" : "waiting");
+      : !state.settings.enabled ? "off"
+      // Only a saved copy is "from the library"; an older Mac reports unchanged installs as not uploaded.
+      : state.skipped[key] === "library" ? "waiting"
+      : state.skipped[key] ?? "waiting";
     // A private skill installed from a Set isn't in the library; say where it came from.
     const status = found === "library" && fromLibrary.has(key) && !fromCatalog.has(key) ? "set" : found;
     return {
@@ -186,6 +190,7 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
       labels: copy?.currentVersion.labels ?? [],
       findings: review?.files ?? [],
       onMac: names.has(key),
+      origin: fromCatalog.has(key) ? "library" : fromLibrary.has(key) ? "set" : null,
     };
   }).sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.name.localeCompare(b.name));
 }

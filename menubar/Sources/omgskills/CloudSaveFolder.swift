@@ -58,7 +58,11 @@ struct CloudSaveFolder: Equatable, Sendable {
         func classify(_ target: URL) -> Target {
             let path = target.resolvingSymlinksInPath().standardizedFileURL.path
             let library = libraryRoot.resolvingSymlinksInPath().standardizedFileURL.path
-            if path == library || path.hasPrefix(library + "/") { return .library }
+            if path == library || path.hasPrefix(library + "/") {
+                // Library copies are public, but a repo's hidden files (.git holds its settings) are never read.
+                let inside = path.dropFirst(library.count).split(separator: "/")
+                return inside.contains { $0.hasPrefix(".") } ? .privateFile : .library
+            }
             let homePath = home.resolvingSymlinksInPath().standardizedFileURL.path
             guard path.hasPrefix(homePath + "/") else { return .privateFile }
             let parts = path.dropFirst(homePath.count + 1).split(separator: "/").map(String.init)
