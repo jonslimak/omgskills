@@ -16,7 +16,7 @@ struct ProductionConnectedConfigurationTests {
         }
         #expect(configuration.profile == .production)
         #expect(info["CFBundleShortVersionString"] as? String == "0.0.34")
-        #expect(info["CFBundleVersion"] as? String == "33")
+        #expect(info["CFBundleVersion"] as? String == "34")
         #expect(info["OMGSkillsSkillGroupsAuthEnabled"] as? Bool == true)
         let connected = try #require(configuration.connected)
         #expect(connected.connectURL.absoluteString == "https://omgskills.com/app/connect?inventory=3")
