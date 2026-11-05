@@ -16,7 +16,7 @@ export function CloudStatusBadge({ row }: { row: CloudSkillRow | null }) {
     saved && row.savedAt ? `last saved ${new Date(row.savedAt).toLocaleDateString()}` : "",
   ].filter(Boolean).join(", ");
   const detail = attention ? undefined : [history && `${history[0].toUpperCase()}${history.slice(1)}.`, statusHelp[row.status]].filter(Boolean).join(" ");
-  return <span className="ua-cloud-badge" data-attention={attention || undefined} title={detail || undefined}
+  return <span className="ua-cloud-badge" data-status={row.status} data-attention={attention || undefined} title={detail || undefined}
     aria-label={`Cloud save: ${statusText[row.status]}${detail ? `. ${detail}` : ""}`}>
     <Icon aria-hidden="true" /><span aria-hidden="true">{statusText[row.status]}</span>
   </span>;

@@ -35,6 +35,15 @@ struct CloudSaveSummary: Equatable, Sendable {
     var needsReview: [String] = []
     /// Skills that can't be saved, by key, with the reason.
     var skipped: [String: CloudSaveSkipReason] = [:]
+    /// Every skill: on this Mac or kept in the cloud. The cloud keeps a record of each one,
+    /// so a skill whose files need attention still counts.
+    var skillCount = 0
+    /// Skills kept in the cloud that aren't on this Mac (deleted here, or from another Mac).
+    var notOnThisMacCount = 0
+    /// Skills on this Mac you chose to leave out of cloud save.
+    var leftOutCount = 0
+    /// Skills whose files keep them from being saved until something is done, shown on the web.
+    var attentionCount: Int { needsReview.count + skipped.count }
     /// The tree of every skill folder read in this pass, to tell next time whether it changed here.
     var localTrees: [String: String] = [:]
 }
@@ -127,6 +136,12 @@ struct CloudSaveSync: Sendable {
                 try? await api.withdrawReview(key: review.key, credential: credential)
             }
         }
+        let here = Set(installations.map { CloudSaveFolder.key(forFolderName: URL(fileURLWithPath: $0.installCmd).lastPathComponent) })
+        let inCloud = Set(state.skills.map(\.key)).union(state.needsReview.map(\.key))
+        summary.skipped = summary.skipped.filter { !excluded.contains($0.key) }
+        summary.skillCount = here.union(inCloud).count
+        summary.notOnThisMacCount = inCloud.subtracting(here).count
+        summary.leftOutCount = here.intersection(excluded).count
         // Only a finished pass knows every reason; the web keeps the last full report until then.
         let report = summary.skipped.merging(summary.library.map { ($0, .library) }, uniquingKeysWith: { reason, _ in reason })
             .filter { !excluded.contains($0.key) }

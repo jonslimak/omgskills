@@ -131,6 +131,8 @@ export type CloudSkillRow = {
   savedAt: string | null;
   labels: CloudLabel[];
   findings: { path: string; findings: CloudFinding[] }[];
+  /** Installed on one of your Macs now, as opposed to kept only in the cloud. */
+  onMac: boolean;
 };
 
 /**
@@ -183,6 +185,7 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
       savedAt: copy?.currentVersion.savedAt ?? null,
       labels: copy?.currentVersion.labels ?? [],
       findings: review?.files ?? [],
+      onMac: names.has(key),
     };
   }).sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.name.localeCompare(b.name));
 }
@@ -215,6 +218,25 @@ export const labelText: Record<CloudLabel, string> = {
   invisible_characters: "Contains invisible characters",
   scripts: "Contains scripts",
 };
+
+/**
+ * One line for every screen: all your skills (on your Macs or kept in the cloud), then only what
+ * needs a look. The cloud keeps a record of every skill, so a skill whose files need attention still counts.
+ */
+export function cloudSummaryText(rows: CloudSkillRow[]) {
+  const count = (test: (row: CloudSkillRow) => boolean) => rows.filter(test).length;
+  const attention = count(row => needsAttention(row.status));
+  const pending = count(row => row.status === "waiting" || row.status === "confirmed");
+  const leftOut = count(row => row.status === "excluded");
+  const notOnMac = count(row => !row.onMac);
+  const parts = [`${rows.length} ${rows.length === 1 ? "skill" : "skills"}`];
+  if (!attention && !pending && !leftOut) parts.push("all saved");
+  if (attention) parts.push(`${attention} need${attention === 1 ? "s" : ""} attention`);
+  if (pending) parts.push(`${pending} saving on next sync`);
+  if (leftOut) parts.push(`${leftOut} left out`);
+  if (notOnMac) parts.push(`${notOnMac} not on your Macs`);
+  return parts.join(" · ");
+}
 
 /** Skills cloud save can't keep a copy of until something is done about them. */
 export function needsAttention(status: CloudSkillRow["status"]) {

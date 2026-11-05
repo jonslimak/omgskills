@@ -18,6 +18,7 @@
   --ua-faint: #94949b;
   --ua-side: #f5f5f7;
   --ua-chip: #f2f2f7;
+  --ua-saved: #2e9d58;
   --ua-selection: #e8e8ed;
   --ua-line: #e5e5ea;
   --ua-blue: #0071e3;
@@ -44,6 +45,7 @@
   --ua-faint: #85858f;
   --ua-side: #19191c;
   --ua-chip: #242428;
+  --ua-saved: #4cc27a;
   --ua-selection: #303035;
   --ua-line: #333338;
   --rd-row-divider: var(--ua-line);
@@ -2071,6 +2073,9 @@
   width: 15px;
   height: 15px;
   flex-shrink: 0;
+}
+.ua-cloud-badge:is([data-status="saved"], [data-status="deleted"], [data-status="library"], [data-status="set"]) svg {
+  color: var(--ua-saved);
 }
 .ua-cloud-badge[data-attention] svg {
   color: var(--ua-danger);

@@ -194,3 +194,17 @@ test("the letter rail uses the letters the list has, in rail order", async () =>
   const { railLettersOf } = await import("../src/app/unified/AlphaRail");
   assert.deepEqual(railLettersOf([{ name: "zod" }, { name: "3d" }, { name: "api" }, { name: "Alpha" }]), ["#", "A", "Z"]);
 });
+
+test("one summary line: every skill counts, then only what needs a look", async () => {
+  const { cloudSummaryText } = await import("../src/cloud-save/cloud-save");
+  const row = (status: string, onMac = true) => ({ key: status, name: status, status, versionCount: 0, setCount: 0, savedAt: null,
+    labels: [], findings: [], onMac }) as never;
+  assert.equal(cloudSummaryText([row("saved"), row("library"), row("set"), row("deleted", false)]), "4 skills · all saved · 1 not on your Macs");
+  assert.equal(cloudSummaryText([row("saved"), row("review"), row("links")]), "3 skills · 2 need attention");
+  assert.equal(cloudSummaryText([row("saved"), row("too_large"), row("waiting"), row("excluded")]),
+    "4 skills · 1 needs attention · 1 saving on next sync · 1 left out");
+  assert.equal(cloudSummaryText([row("saved")]), "1 skill · all saved");
+  const rows = cloudSkillRows(state({ skills: [{ key: "gone", versionCount: 1, deletedLocallyAt: "2026-11-01T00:00:00Z", setCount: 0,
+    currentVersion: { id: "r", savedAt: "2026-11-01T00:00:00Z", fileCount: 1, totalBytes: 1 } }], needsReview: [], skipped: {} }), [installed("here")]);
+  assert.deepEqual(rows.map(r => [r.key, r.onMac]).sort(), [["gone", false], ["here", true]]);
+});

@@ -304,6 +304,31 @@ struct CloudSaveSyncTests {
         #expect(await synced.calls == ["state"])
     }
 
+    @Test func summaryLineCountsEverySkillThenWhatNeedsALook() async throws {
+        let root = try temporaryRoot()
+        let notes = try makeSkill(root, "notes")
+        let left = try makeSkill(root, "left")
+        let folder = try CloudSaveFolder.read(directory: notes)
+        let version = { (id: String, tree: String) in
+            CloudSaveState.Version(id: id, treeSha: tree, deviceId: "device-1", savedAt: "2026-01-01T00:00:00.000Z", labels: []) }
+        let api = FakeCloudSave(excluded: ["left"], skills: [
+            .init(key: "notes", currentVersion: version("r1", folder.treeSha), deletedLocallyAt: nil),
+            .init(key: "gone", currentVersion: version("r2", "x"), deletedLocallyAt: "2026-01-02T00:00:00.000Z"),
+        ])
+        let summary = try await sync(api).run(installations: [installation(notes), installation(left)], localFolderKeys: ["notes", "left"],
+            deviceID: "device-1", credential: credential())
+        #expect(summary.skillCount == 3 && summary.notOnThisMacCount == 1 && summary.leftOutCount == 1)
+        #expect(CloudSaveController.statusText(summary) == "3 skills · 1 left out · 1 not on this Mac")
+
+        var clean = CloudSaveSummary(status: .upToDate)
+        clean.skillCount = 24
+        #expect(CloudSaveController.statusText(clean) == "24 skills · all saved")
+        clean.needsReview = ["a"]
+        clean.skipped = ["b": .links, "c": .tooLarge]
+        clean.notOnThisMacCount = 3
+        #expect(CloudSaveController.statusText(clean) == "24 skills · 3 need attention · 3 not on this Mac")
+    }
+
     @Test func excludedSkillsAndUnchangedLibraryInstallsAreNotUploaded() async throws {
         let root = try temporaryRoot()
         let mine = try makeSkill(root, "private-notes")
