@@ -1,6 +1,6 @@
 import { useEffect, useId, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Download, RefreshCw, X } from "lucide-react";
-import type { SkillDisplay } from "./model";
+import { agentKind, type SkillDisplay } from "./model";
 import { catalogInstallAction, catalogInstallClients, type CatalogInstallAgent } from "./public-install";
 import { CatalogInstallIntentStore, CatalogInstallSetupSession } from "./catalog-install-intent";
 import { refreshInstallSkill } from "./PublicInstallSetup";
@@ -13,7 +13,10 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
   distribution?: CandidateDistribution;
 }) {
   const saved = store.read().intent;
-  const [agent, setAgent] = useState<CatalogInstallAgent>(() => saved && saved.catalogId === skill.catalogId ? saved.agent : "claude");
+  // Start on the agent that doesn't have the skill yet.
+  const [agent, setAgent] = useState<CatalogInstallAgent>(() => saved && saved.catalogId === skill.catalogId ? saved.agent
+    : skill.installed?.sources.some(source => agentKind(source) === "claude")
+      && !skill.installed.sources.some(source => agentKind(source) === "codex") ? "codex" : "claude");
   const selectId = useId();
   const picker = <>
     <label className="ua-sr" htmlFor={selectId}>Agent</label>

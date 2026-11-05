@@ -553,6 +553,18 @@ export function UnifiedApp({
     mineSkill.installed?.allSkillIds.includes(skill.installed!.id))?.installed ?? liveSkill(skill).installed);
   const detailLive = detail ? liveCopiesOf(detail) : undefined;
   const detailVersions = detailLive ? skillVersions(detailLive) : [];
+  // Installed means a Mac has it now; the install card can still add it for the agent that doesn't.
+  const installedAgents = [...new Set((detailLive?.sources ?? []).map(agentKind))].sort().join(",");
+  const installedHere = !!detailLive;
+  const missingAgent = installedHere && !(installedAgents.includes("claude") && installedAgents.includes("codex"));
+  // An install that finishes changes where the skill is; close the card and drop its intent.
+  const installDone = useRef(installedAgents);
+  useEffect(() => {
+    if (installDone.current === installedAgents) return;
+    installDone.current = installedAgents;
+    if (installOpen) onInstallCancel?.();
+    setInstallOpen(false);
+  }, [installedAgents, installOpen, onInstallCancel]);
   const panelPending = selected ? detailPending : !!closingDetail.current?.pending;
   // List rows already carry the name and avatar; only the direct-link placeholder (no author) waits.
   const detailHeadingKnown = !!detail && !(panelPending && !detail.author);
@@ -1956,10 +1968,15 @@ export function UnifiedApp({
                 {!panelPending && <>
                 <div className="ua-detail-actions">
                   {/* Already on a Mac: say so instead of offering to install it again. */}
-                  {onMac && signedIn && publicInstallAction && detail.catalogId && detail.installed && (
+                  {onMac && signedIn && publicInstallAction && detail.catalogId && installedHere && (
                     <span className="ua-pill"><Check aria-hidden="true" />Installed</span>
                   )}
-                  {onMac && signedIn && publicInstallAction && detail.catalogId && !detail.installed && (
+                  {onMac && signedIn && publicInstallAction && detail.catalogId && installedHere && missingAgent && !installOpen && (
+                    <button type="button" className="ua-pill ua-detail-copy" aria-expanded={false} onClick={() => setInstallOpen(true)}>
+                      Add to another agent
+                    </button>
+                  )}
+                  {onMac && signedIn && publicInstallAction && detail.catalogId && (!installedHere || (missingAgent && installOpen)) && (
                     installOpen ? (
                       <button
                         type="button"
