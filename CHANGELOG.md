@@ -4,6 +4,13 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.35] - 2026-11-05
+
+### App
+- Cloud save now saves library and Set installs too.
+- Show one cloud save summary line: "N skills · all saved" when complete.
+- Save your own skills first.
+
 ## [0.0.20] - 2026-09-29
 
 ### App
