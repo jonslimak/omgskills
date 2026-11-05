@@ -888,7 +888,6 @@ export function UnifiedApp({
               {!compact && !creatorHeader && (discovery || nav.query) && skill.author && (
                 <span className="ua-row-author">@{skill.author}</span>
               )}
-              {skill.installed?.isLocalOnly && <Lock aria-label="Local skill" />}
               {!discovery && <CloudAttention status={cloudRow(skill)?.status} />}
               {versionCount > 1 && <span className="ua-row-versions" title="Your agents have different versions of this skill">
                 {versionCount} versions
@@ -1983,9 +1982,9 @@ export function UnifiedApp({
                     </button>
                   ) : !(onMac && signedIn && publicInstallAction && detail.catalogId) && (
                     <span className="ua-pill">
-                      {detail.installed?.isLocalOnly && <Lock />}
+                      {detail.installed?.isLocalOnly && <User aria-hidden="true" />}
                       {detail.setItemCloudShared ? cloudSharedLabel(detail, activeSet?.role)
-                        : detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Local skill" : "Source unavailable"}
+                        : detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Personal skill" : "Source unavailable"}
                     </span>
                   )}
                   <span className="ua-detail-icons">
