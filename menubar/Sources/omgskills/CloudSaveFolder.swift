@@ -66,7 +66,8 @@ struct CloudSaveFolder: Equatable, Sendable {
             let parts = path.dropFirst(homePath.count + 1).split(separator: "/").map(String.init)
             guard let first = parts.first, first != "Library" else { return .privateFile }
             for (index, part) in parts.enumerated() where part.hasPrefix(".") {
-                if index == 0 && Self.agentFolders.contains(part) { continue }
+                // Agent folders also hold sign-in and settings files (~/.codex/auth.json); only their skills folder is read.
+                if index == 0 && Self.agentFolders.contains(part) && parts.count > 2 && parts[1] == "skills" { continue }
                 return .privateFile
             }
             return .own
