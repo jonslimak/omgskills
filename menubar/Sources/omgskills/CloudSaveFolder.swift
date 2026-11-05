@@ -72,6 +72,33 @@ struct CloudSaveFolder: Equatable, Sendable {
             }
             return .own
         }
+
+        /// A skill copied from someone else can carry links (git keeps them), so a link inside a skill is
+        /// followed only within the skill's own folder or to another installed skill. Anything else, such as
+        /// Documents, Desktop, Downloads or a project folder, means the skill isn't saved.
+        func follows(_ target: URL, root: URL) -> Bool {
+            let path = target.resolvingSymlinksInPath().standardizedFileURL.path
+            let rootPath = root.resolvingSymlinksInPath().standardizedFileURL.path
+            if path.hasPrefix(rootPath + "/") { return true }
+            let parts = relativeParts(path)
+            return parts.count > 2 && Self.agentFolders.contains(parts[0]) && parts[1] == "skills"
+        }
+
+        /// Whether the path is a skill folder or inside one, below the home folder itself.
+        func insideSkill(_ path: String) -> Bool {
+            var folder = home.resolvingSymlinksInPath().standardizedFileURL.path
+            for part in relativeParts(path) {
+                folder += "/" + part
+                if FileManager.default.fileExists(atPath: folder + "/SKILL.md") { return true }
+            }
+            return false
+        }
+
+        private func relativeParts(_ path: String) -> [String] {
+            let homePath = home.resolvingSymlinksInPath().standardizedFileURL.path
+            guard path.hasPrefix(homePath + "/") else { return [] }
+            return path.dropFirst(homePath.count + 1).split(separator: "/").map(String.init)
+        }
     }
 
     /// A skill's identity across agents and Macs, matching the server: the folder name, NFC and lower case.
@@ -102,10 +129,13 @@ struct CloudSaveFolder: Equatable, Sendable {
             switch links.classify(root) {
             case .library: throw ReadError.libraryInstall
             case .privateFile where rootIsLink: throw ReadError.privateLink(directory.lastPathComponent)
+            // A skill folder linked to somewhere that isn't a skill, such as the Desktop.
+            case .own where rootIsLink && !links.insideSkill(root.standardizedFileURL.path):
+                throw ReadError.privateLink(directory.lastPathComponent)
             default: break
             }
         }
-        var reader = Reader(links: links, fileManager: fileManager, visited: [root.standardizedFileURL.path])
+        var reader = Reader(links: links, root: root, fileManager: fileManager, visited: [root.standardizedFileURL.path])
         try reader.collect(root, prefix: "", throughLink: links != nil && rootIsLink)
         if reader.linksIntoLibrary { throw ReadError.libraryInstall }
         let entries = reader.entries, modifiedAt = reader.modifiedAt
@@ -120,6 +150,8 @@ struct CloudSaveFolder: Equatable, Sendable {
 
     private struct Reader {
         let links: LinkPolicy?
+        /// The skill's own folder; its links may not leave it except to another installed skill.
+        let root: URL
         let fileManager: FileManager
         /// Folders already read, so a link back up the tree can't loop.
         var visited: Set<String>
@@ -144,7 +176,7 @@ struct CloudSaveFolder: Equatable, Sendable {
                     switch links.classify(target) {
                     case .library: linksIntoLibrary = true; continue
                     case .privateFile: throw ReadError.privateLink(path)
-                    case .own: break
+                    case .own: guard links.follows(target, root: root) else { throw ReadError.privateLink(path) }
                     }
                     // Read what the link points to as if it were here.
                     url = target
