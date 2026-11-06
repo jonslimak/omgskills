@@ -218,7 +218,7 @@ test("inventory accepts optional/null Set origins and rejects malformed values",
   }
 });
 
-test("connected sessions stay memory-only, refresh v2 after Set saves and preserve stale rows", async () => {
+test("connected sessions stay memory-only, reread only Sets after Set saves and preserve stale rows", async () => {
   const paths: string[] = [];
   let fail = false;
   const transport: PortalApi = async <T>(path: string, init?: RequestInit) => {
@@ -233,7 +233,8 @@ test("connected sessions stay memory-only, refresh v2 after Set saves and preser
   await session.refresh();
   assert.equal(session.getSnapshot().data?.skills.length, 4);
   await session.saveSet({ kind: "update", id: "existing-set", changes: { name: "Renamed", description: "", visibility: "private" } });
-  assert.equal(paths.filter(path => path === "/api/portal/synced-skills?version=2").length, 2);
+  // A Set save reads only the Sets again; the inventory is not reread, and never through the old endpoint.
+  assert.equal(paths.filter(path => path === "/api/portal/synced-skills?version=2").length, 1);
   assert.ok(!paths.includes("/api/portal/synced-skills"));
   fail = true;
   await session.refresh();

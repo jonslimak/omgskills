@@ -83,6 +83,31 @@ export function setSummary(
   };
 }
 
+/** Your Sets only: what a Set or Favorites change can alter. Skills, devices and profile stay as they are. */
+export async function loadAccountSets(api: PortalApi, identity: AccountIdentity, includeFavoriteItems = false) {
+  const [owned, shared] = await Promise.all([listOwnedGroups(api), listSharedGroups(api)]);
+  if (!Array.isArray(owned) || !Array.isArray(shared)) throw new Error("The portal returned an invalid account response.");
+  return accountSets(api, identity, owned, shared, includeFavoriteItems);
+}
+
+async function accountSets(api: PortalApi, identity: AccountIdentity, owned: SkillGroup[], shared: SkillGroup[], includeFavoriteItems: boolean) {
+  const sets = [
+    ...owned.map((group) => setSummary(group, true, identity.name)),
+    ...shared.map((group) => setSummary(group, false, identity.name)),
+  ];
+  // Only the unified shell needs catalog membership; leave legacy reads unchanged.
+  const favorites = sets.find(set => set.role === "owner" && set.isFavorites);
+  if (includeFavoriteItems && favorites) {
+    const detail = await loadSetData(api, favorites.id);
+    if (detail.role !== "owner" || !detail.isFavorites) throw new Error("Favorites changed. Refresh your account.");
+    favorites.items = detail.items;
+    favorites.itemCount = detail.items.length;
+    favorites.membershipSkillIds = detail.items.some(item => item.kind === "synced" && !item.syncedSkillId)
+      ? undefined : detail.items.flatMap(item => item.syncedSkillId ? [item.syncedSkillId] : []);
+  }
+  return sets;
+}
+
 export async function loadAccountData(
   api: PortalApi,
   identity: AccountIdentity,
@@ -107,20 +132,7 @@ export async function loadAccountData(
     throw new Error("The portal returned an invalid account response.");
   }
   const inventory = connectedInventory ? parseConnectedInventory(synced, inventoryReconciliation ? 3 : 2) : null;
-  const sets = [
-    ...owned.map((group) => setSummary(group, true, identity.name)),
-    ...shared.map((group) => setSummary(group, false, identity.name)),
-  ];
-  // Only the unified shell needs catalog membership; leave legacy reads unchanged.
-  const favorites = sets.find(set => set.role === "owner" && set.isFavorites);
-  if (includeFavoriteItems && favorites) {
-    const detail = await loadSetData(api, favorites.id);
-    if (detail.role !== "owner" || !detail.isFavorites) throw new Error("Favorites changed. Refresh your account.");
-    favorites.items = detail.items;
-    favorites.itemCount = detail.items.length;
-    favorites.membershipSkillIds = detail.items.some(item => item.kind === "synced" && !item.syncedSkillId)
-      ? undefined : detail.items.flatMap(item => item.syncedSkillId ? [item.syncedSkillId] : []);
-  }
+  const sets = await accountSets(api, identity, owned, shared, includeFavoriteItems);
   return {
     ...(inventory ? { inventoryVersion: inventoryReconciliation ? 3 as const : 2 as const } : {}),
     skills: inventory?.skills ?? synced.skills,

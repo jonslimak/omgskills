@@ -349,7 +349,7 @@ test("rendered My skills and Set rows retain missing history separately from lat
   }
 });
 
-test("explicit Set saves refresh with v3 while keeping retained physical membership unchanged", async () => {
+test("explicit Set saves reread only Sets while keeping retained physical membership unchanged", async () => {
   const writes: unknown[] = [], reads: string[] = [];
   const transport: PortalApi = async <T>(path: string, init?: RequestInit) => {
     if (init?.method === "PATCH") {
@@ -365,7 +365,7 @@ test("explicit Set saves refresh with v3 while keeping retained physical members
     await session.refresh();
     const before = session.getSnapshot().data!;
     await session.saveSet({ kind: "update", id: "saved-set", changes: { name: "Renamed Set", description: "", visibility: "private" } });
-    assert.equal(reads.filter(path => path === v3Path).length, 2);
+    assert.equal(reads.filter(path => path === v3Path).length, 1, "a Set save rereads only the Sets");
     assert.deepEqual(session.getSnapshot().data!.skills, before.skills);
     assert.deepEqual(session.getSnapshot().data!.sets[0].membershipSkillIds, ["missing-id"]);
     assert.deepEqual(writes, [{ path: "/api/portal/groups/saved-set", body: { name: "Renamed Set", description: "", visibility: "private" } }]);
