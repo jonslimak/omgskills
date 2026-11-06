@@ -71,11 +71,12 @@ test("the server builds the same My skills list and count as the web", () => {
   const server = buildMySkills({ inventory, cloud: cloud as unknown as ServerCloudState, additions, catalog: library, now });
   assert.equal(server.count, web.all.length);
   assert.equal(server.notInstalledCount, web.notInstalledAll.length);
-  const shape = (name: string, installed: boolean, catalogId: string | null | undefined, status: string | null) =>
-    `${name}|${installed}|${catalogId ?? ""}|${status ?? ""}`;
+  type Row = { name: string; description: string; author: string; catalogId?: string | null };
+  const shape = (skill: Row, installed: boolean, status: string | null) =>
+    `${skill.name}|${skill.description}|${skill.author}|${installed}|${skill.catalogId ?? ""}|${status ?? ""}`;
   assert.deepEqual(
-    server.skills.map(skill => shape(skill.name, skill.installed, skill.catalogId, skill.status)).sort(),
-    web.all.map(skill => shape(skill.name, !!skill.installed, skill.catalogId, web.status(skill))).sort());
+    server.skills.map(skill => shape(skill, skill.installed, skill.status)).sort(),
+    web.all.map(skill => shape(skill, !!skill.installed, web.status(skill))).sort());
   assert.equal(new Set(server.skills.map(skill => skill.id)).size, server.skills.length, "IDs are unique");
 });
 
@@ -109,4 +110,31 @@ test("cloud save down still lists everything a Mac reported, and says it's parti
   assert.ok(result.skills.some(skill => skill.name === "notes" && skill.installed));
   assert.equal(result.skills.find(skill => skill.name === "notes")!.available, false, "Without cloud save nothing is known to be saved");
   assert.equal(result.skills.find(skill => skill.name === "xlsx")!.source, "public");
+});
+
+test("one locked folder locks the skill, and a left-out folder's copy is never read", () => {
+  const twin = [copy("a", "Twin", { installationFolder: "twin-a" }), copy("b", "Twin", { installationFolder: "twin-b", source: "codex" })];
+  const state = (skills: unknown[], excluded: string[] = []) => ({ ...cloud, skills, needsReview: [], skipped: {},
+    settings: { enabled: true, excludedSkillKeys: excluded } }) as unknown as ServerCloudState;
+  const secret = buildMySkills({ inventory: twin, additions: [], now,
+    cloud: state([saved("twin-a", { deletedLocallyAt: recent, labels: ["confirmed_secret"] }), saved("twin-b")]) }).skills[0];
+  assert.deepEqual([secret.available, secret.source], [false, null]);
+  const leftOut = buildMySkills({ inventory: twin, additions: [], now, cloud: state([saved("twin-a")], ["twin-a"]) }).skills[0];
+  assert.notEqual(leftOut.savedKey, "twin-a");
+  assert.equal(leftOut.available, false);
+});
+
+test("IDs stay put as copies come and go, and shared library IDs are told apart by name", () => {
+  const both = [copy("a", "Notes", { installationFolder: "notes-b" }), copy("b", "Notes", { installationFolder: "notes-a", source: "codex" })];
+  const first = buildMySkills({ inventory: both, cloud: null, additions: [], now }).skills[0].id;
+  const later = buildMySkills({ inventory: [both[0], { ...both[1], isCurrent: false }], cloud: null, additions: [], now }).skills[0].id;
+  assert.equal(first, "key:notes-a");
+  assert.equal(later, first);
+  const lib = { catalogSkillId: "o/r:pdf", identityStatus: "resolved" as const, isLocalOnly: false };
+  const ids = buildMySkills({ inventory: [copy("x", "pdf", lib), copy("y", "PDF tools", lib)], cloud: null, additions: [], now })
+    .skills.map(skill => skill.id).sort();
+  assert.deepEqual(ids, ["lib:o/r:pdf#pdf", "lib:o/r:pdf#pdf tools"]);
+  const dated = buildMySkills({ inventory: [copy("d", "old", { deviceId: null, lastSeenAt: new Date(stale) as never })], cloud: null,
+    additions: [], now });
+  assert.equal(dated.count, 0, "A database Date is read like a string");
 });

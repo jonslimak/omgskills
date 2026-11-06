@@ -65,7 +65,9 @@ export function cloudSkillKey(name: string) {
 function isLive(copy: SyncedSkill, now: number) {
   if (copy.isCurrent === false) return false;
   if (copy.deviceId != null) return true;
-  const seen = Date.parse(copy.lastSeenAt);
+  // The database gives a Date; JSON gives a string.
+  const value: unknown = copy.lastSeenAt;
+  const seen = value instanceof Date ? value.getTime() : Date.parse(String(value));
   return !Number.isFinite(seen) || now - seen < LEGACY_COPY_STALE_MS;
 }
 
@@ -157,10 +159,14 @@ const reasons: Partial<Record<LibraryCloudStatus, string>> = {
  * Your saved copy comes first; a library skill without one reads its public version. A personal skill with no
  * saved copy is only on your Mac.
  */
-function access(row: CloudRow | null, catalogId: string | null, saved: boolean):
+const isLocked = (row: CloudRow) => attention.has(row.status) || row.status === "confirmed" || row.confirmedSecret;
+
+function access(row: CloudRow | null, catalogId: string | null, saved: boolean, locked: CloudRow | null = null):
   Pick<LibrarySkill, "available" | "source" | "reason"> {
-  if (row && (attention.has(row.status) || row.status === "confirmed" || row.confirmedSecret)) {
-    return { available: false, source: null, reason: reasons[row.confirmedSecret ? "confirmed" : row.status] ?? "It needs a look on the web." };
+  // Any copy that is locked locks the skill, even when another folder's copy looks fine.
+  const lock = locked ?? (row && isLocked(row) ? row : null);
+  if (lock) {
+    return { available: false, source: null, reason: reasons[lock.confirmedSecret ? "confirmed" : lock.status] ?? "It needs a look on the web." };
   }
   if (saved && row?.status !== "excluded") return { available: true, source: "saved", reason: null };
   if (catalogId) return { available: true, source: "public", reason: null };
@@ -186,10 +192,14 @@ export function buildMySkills(input: MySkillsInputs): MySkillsLibrary {
     const catalogId = skill.catalogSkillId || null;
     const keys = keysOf(live);
     const row = pickRow(rows, keys);
-    const savedKey = keys.find(key => rows.get(key)?.savedAt) ?? null;
+    const locked = keys.map(key => rows.get(key)).find((item): item is CloudRow => !!item && isLocked(item)) ?? null;
+    // The saved copy read is the shown folder's when it has one; never a left-out folder's.
+    const readable = (key: string) => !!rows.get(key)?.savedAt && rows.get(key)?.status !== "excluded";
+    const savedKey = (row && readable(row.key) ? row.key : keys.find(readable)) ?? null;
     const details = catalogId ? catalog.get(catalogId) : undefined;
     return {
-      id: catalogId ? `lib:${catalogId}` : `key:${keys[0]}`,
+      // Every folder the skill was ever in, sorted, so a copy going stale doesn't move the ID.
+      id: catalogId ? `lib:${catalogId}` : `key:${keysOf(skill.sourceSkills).sort()[0]}`,
       name: skill.name,
       description: skill.description || "",
       author: details?.author || catalogOwner(catalogId),
@@ -199,7 +209,7 @@ export function buildMySkills(input: MySkillsInputs): MySkillsLibrary {
       installed: true,
       savedKey,
       status: row?.status ?? null,
-      ...access(row, catalogId, !!savedKey),
+      ...access(row, catalogId, !!savedKey, locked),
     };
   });
 
@@ -252,12 +262,11 @@ export function buildMySkills(input: MySkillsInputs): MySkillsLibrary {
   const notInstalledAll = [...notInstalled,
     ...added.filter(skill => !notInstalled.some(other => other.catalogId === skill.catalogId))];
   const skills = [...installedSkills, ...notInstalledAll];
-  // Two skills can share a library ID (different names, same catalog skill); each keeps an ID of its own.
-  const ids = new Set<string>();
-  for (const skill of skills) {
-    if (ids.has(skill.id)) skill.id = `${skill.id}#${skill.savedKey ?? cloudSkillKey(skill.name)}`;
-    ids.add(skill.id);
-  }
+  // Two skills can share a library ID (different names, same catalog skill); then each is told apart by name,
+  // whatever order they came in.
+  const counts = new Map<string, number>();
+  for (const skill of skills) counts.set(skill.id, (counts.get(skill.id) ?? 0) + 1);
+  for (const skill of skills) if ((counts.get(skill.id) ?? 0) > 1) skill.id = `${skill.id}#${cloudSkillKey(skill.name)}`;
   return { skills, count: skills.length, notInstalledCount: notInstalledAll.length };
 }
 
