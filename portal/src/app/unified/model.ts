@@ -48,6 +48,8 @@ export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
   setItemUpdateAvailable?: boolean;
   /** A private Set item's version, whose instructions people with access can read. */
   setItemReleaseId?: string;
+  /** In My skills but on none of your Macs: its saved copy's key. */
+  cloudKey?: string;
 };
 
 export function inventorySummary(skill: SyncedSkill) {
@@ -154,10 +156,27 @@ export type Navigation = {
   /** Which of my skills to show: own ones, library ones, or both split by origin. */
   show?: SkillShow;
 };
-export type SkillShow = "personal" | "public" | "origin";
-const skillShows: SkillShow[] = ["personal", "public", "origin"];
+export type SkillShow = "installed" | "not-installed" | "personal" | "public" | "origin";
+const skillShows: SkillShow[] = ["installed", "not-installed", "personal", "public", "origin"];
 export const byName = (a: SkillDisplay, b: SkillDisplay) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
 /** Personal skills are your own; public ones were installed from the library. Each part sorted by name. */
+/**
+ * Skills in My skills that no Mac has now: saved copies whose folder is on none of your Macs.
+ * Names and descriptions come from the last copy a Mac reported, when there was one.
+ */
+export function notInstalledSkills(rows: { key: string; name: string; onMac: boolean }[], everMine: SkillDisplay[],
+  keysOf: (skill: SkillDisplay) => string[]): SkillDisplay[] {
+  return rows.filter(row => !row.onMac).map(row => {
+    const last = everMine.find(skill => keysOf(skill).includes(row.key));
+    return { ...(last ?? { name: row.name, description: "", author: "", githubUrl: null, tags: [] }),
+      key: `cloud:${row.key}`, installed: undefined, cloudKey: row.key };
+  });
+}
+/** The installed or not-installed part of My skills, for the Show menu. */
+export function byInstalled(skills: SkillDisplay[], show: SkillShow | undefined) {
+  return show === "installed" ? skills.filter(skill => !skill.cloudKey)
+    : show === "not-installed" ? skills.filter(skill => !!skill.cloudKey) : skills;
+}
 export function skillsByOrigin(skills: SkillDisplay[]) {
   return {
     personal: skills.filter(skill => !skill.catalogId).sort(byName),

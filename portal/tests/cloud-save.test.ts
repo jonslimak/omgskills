@@ -221,3 +221,18 @@ test("a library install saved to the cloud keeps its library label and its versi
     [installed("pdf", { catalogSkillId: "anthropics/skills:pdf", isLocalOnly: false })]);
   assert.deepEqual([rows[0].status, rows[0].versionCount], ["library", 2]);
 });
+
+test("My skills also lists skills on none of your Macs, as not installed", async () => {
+  const { notInstalledSkills, byInstalled } = await import("../src/app/unified/model");
+  const rows = [{ key: "here", name: "Here", onMac: true }, { key: "gone", name: "gone", onMac: false }, { key: "elsewhere", name: "elsewhere", onMac: false }];
+  const stale = { key: "synced:old", name: "Gone Skill", description: "Last known", author: "", githubUrl: null, tags: [], catalogId: "owner/gone" };
+  const keysOf = (skill: { key: string }) => skill.key === "synced:old" ? ["gone"] : [];
+  const rest = notInstalledSkills(rows, [stale], keysOf);
+  assert.deepEqual(rest.map(skill => [skill.key, skill.name, skill.cloudKey, skill.installed]),
+    [["cloud:gone", "Gone Skill", "gone", undefined], ["cloud:elsewhere", "elsewhere", "elsewhere", undefined]]);
+  assert.equal(rest[0].catalogId, "owner/gone", "a library skill stays public in By origin");
+  const mine = [{ key: "synced:here", name: "Here", description: "", author: "", githubUrl: null, tags: [] }, ...rest];
+  assert.deepEqual(byInstalled(mine, "installed").map(skill => skill.key), ["synced:here"]);
+  assert.deepEqual(byInstalled(mine, "not-installed").map(skill => skill.key), ["cloud:gone", "cloud:elsewhere"]);
+  assert.equal(byInstalled(mine, undefined).length, 3);
+});
