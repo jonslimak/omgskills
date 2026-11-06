@@ -87,5 +87,5 @@ export default async (req: Request): Promise<Response> => {
 export const config: Config = {
   path: ["/api/library/mcp", "/.well-known/oauth-protected-resource", "/.well-known/oauth-protected-resource/api/library/mcp",
     "/.well-known/oauth-authorization-server"],
-  rateLimit: { windowLimit: 300, windowSize: 60, aggregateBy: ["ip", "domain"] },
+  rateLimit: { windowLimit: 120, windowSize: 60, aggregateBy: ["ip", "domain"] },
 };

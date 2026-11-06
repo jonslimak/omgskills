@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { handleLibraryMcp, issuerFromPublishableKey, type LibraryMcpDependencies, type VerifiedToken } from "./library-mcp.js";
+import { clearVerifyCache, handleLibraryMcp, issuerFromPublishableKey, type LibraryMcpDependencies, type VerifiedToken } from "./library-mcp.js";
 import { buildMySkills } from "./my-skills-library.js";
 import type { SavedFile } from "./library-read.js";
 
@@ -33,6 +33,7 @@ const files: SavedFile[] = [
 ];
 
 function deps(token: Partial<VerifiedToken> | null = {}, overrides: Partial<LibraryMcpDependencies> = {}) {
+  clearVerifyCache();
   const calls: string[] = [];
   const value: LibraryMcpDependencies = {
     verifyToken: async () => token === null ? null
@@ -92,6 +93,11 @@ test("no token, or one that is revoked, expired or for another address, asks to 
     assert.match(response.headers.get("www-authenticate")!, /error="invalid_token"/);
     assert.deepEqual(calls, [], "Nothing is read");
   }
+  let checks = 0;
+  const counted = deps(null, { verifyToken: async () => { checks++; return null; } }).value;
+  await handleLibraryMcp(rpc("tools/list", {}, "Bearer made-up"), counted);
+  await handleLibraryMcp(rpc("tools/list", {}, "Bearer made-up"), counted);
+  assert.equal(checks, 1, "A repeated made-up token asks Clerk once");
   const stranger = await handleLibraryMcp(rpc("tools/list", {}), deps({ subject: "clerk-nobody" }).value);
   assert.equal(stranger.status, 403);
 });
@@ -106,6 +112,7 @@ test("each account reads only its own library", async () => {
   const a = deps();
   const listed = JSON.parse((await call(a.value, "search_my_skills", {})).text);
   assert.deepEqual(listed.skills.map((skill: { name: string }) => skill.name), ["locked", "notes", "pdf"]);
+  assert.equal(listed.skills[0].description, "", "A locked skill's description stays hidden");
   assert.deepEqual(a.calls, ["load:user-a"]);
   const b = deps({ subject: "clerk-b" });
   const other = JSON.parse((await call(b.value, "search_my_skills", { query: "notes" })).text);

@@ -1,5 +1,6 @@
 // My skills for the user's own agents: an MCP server at /api/library/mcp, read only, signed in with Clerk OAuth.
 // Every call checks the token (not revoked, not expired, issued for this address) and reads only that user's library.
+import { createHash } from "node:crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
@@ -73,6 +74,24 @@ export function issuerFromPublishableKey(key: string | undefined | null): string
 
 let authServerCache: { issuer: string; expires: number; body: unknown } | null = null;
 
+// Clerk's answers are kept briefly (by token hash), so repeated or made-up tokens don't each cost a Clerk call.
+// Short enough that a disconnect still takes effect within a minute.
+const VERIFY_CACHE_MS = 30_000;
+const verifyCache = new Map<string, { expires: number; value: VerifiedToken | null }>();
+
+async function cachedVerify(token: string, verify: (token: string) => Promise<VerifiedToken | null>) {
+  const key = createHash("sha256").update(token).digest("hex");
+  const hit = verifyCache.get(key);
+  if (hit && hit.expires > Date.now()) return hit.value;
+  const value = await verify(token);
+  if (verifyCache.size >= 1000) verifyCache.delete(verifyCache.keys().next().value!);
+  verifyCache.set(key, { expires: Date.now() + VERIFY_CACHE_MS, value });
+  return value;
+}
+
+/** For tests: forget cached sign-in checks. */
+export function clearVerifyCache() { verifyCache.clear(); }
+
 export async function handleLibraryMcp(req: Request, deps: LibraryMcpDependencies): Promise<Response> {
   const path = new URL(req.url).pathname.replace(/\/$/, "");
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
@@ -95,7 +114,8 @@ export async function handleLibraryMcp(req: Request, deps: LibraryMcpDependencie
     if (!issuer) return json({ error: "Sign-in isn't configured" }, 503);
     if (authServerCache?.issuer === issuer && authServerCache.expires > Date.now()) return json(authServerCache.body);
     try {
-      const response = await (deps.fetchMetadata ?? fetch)(`${issuer}/.well-known/oauth-authorization-server`);
+      const response = await (deps.fetchMetadata ?? ((url: string) => fetch(url, { signal: AbortSignal.timeout(5_000) })))(
+        `${issuer}/.well-known/oauth-authorization-server`);
       if (!response.ok) throw new Error(`Clerk metadata ${response.status}`);
       const body = await response.json();
       authServerCache = { issuer, expires: Date.now() + 10 * 60_000, body };
@@ -111,7 +131,7 @@ export async function handleLibraryMcp(req: Request, deps: LibraryMcpDependencie
   const token = /^Bearer\s+(\S+)$/i.exec(header)?.[1];
   if (!token) return unauthorized(req);
   let verified: VerifiedToken | null;
-  try { verified = await deps.verifyToken(token); }
+  try { verified = await cachedVerify(token, deps.verifyToken); }
   catch { return json({ error: "Sign-in check unavailable; try again" }, 503); }
   // Only a live token issued for this exact address; one for another app or server is refused.
   if (!verified || verified.revoked || verified.expired || !verified.aud.includes(resourceUrl(req))) {
@@ -154,7 +174,9 @@ function text(value: unknown, isError = false) {
 
 function row(skill: LibrarySkill) {
   return {
-    id: skill.id, name: skill.name, description: skill.description.slice(0, 300), author: skill.author || undefined,
+    // A locked skill's text stays hidden, its description included.
+    id: skill.id, name: skill.name, description: skill.available ? skill.description.slice(0, 300) : "",
+    author: skill.author || undefined,
     origin: skill.origin, installed: skill.installed, available: skill.available,
     source: skill.source ?? undefined, reason: skill.reason ?? undefined,
   };
