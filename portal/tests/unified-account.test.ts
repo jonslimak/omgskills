@@ -203,3 +203,10 @@ test("set header never shows inactive saved emails or owner-only access records 
   assert.deepEqual(setAccessSummary({ ...set, visibility: "public" }), { people: ["Owner"], label: "Public access" });
   assert.deepEqual(setAccessSummary({ ...set, visibility: "restricted", role: "invited" }), { people: ["Owner"], label: "Invite only" });
 });
+
+test("an added My skills row opens its library detail so Install works", () => {
+  const added = { key: "added:a/r:pdf", catalogId: "a/r:pdf", added: true, name: "PDF", author: "a", description: "", tags: [], githubUrl: null };
+  assert.deepEqual(openSkillNavigation(initialNavigation, added), { ...initialNavigation, view: "discover", selected: "catalog:a/r:pdf" });
+  const discover = { ...initialNavigation, view: "discover" as const, query: "pdf" };
+  assert.deepEqual(openSkillNavigation(discover, added), { ...discover, selected: "catalog:a/r:pdf" });
+});

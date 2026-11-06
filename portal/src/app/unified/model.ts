@@ -215,6 +215,8 @@ export const initialNavigation: Navigation = {
   source: "all",
 };
 export function openSkillNavigation(nav: Navigation, skill: SkillDisplay): Navigation {
+  // An added library skill opens as that library skill, where Install and its details live.
+  if (skill.added && skill.catalogId) skill = { ...skill, key: `catalog:${skill.catalogId}` };
   if (!isDiscovery(nav.view) && skill.key.startsWith("catalog:")) {
     if (skill.installed) return { ...nav, selected: `synced:${skill.installed.id}` };
     // Public detail requests must not inherit a private set, search, or source.
