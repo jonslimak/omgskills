@@ -50,6 +50,8 @@ export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
   setItemReleaseId?: string;
   /** In My skills but on none of your Macs: its saved copy's key. */
   cloudKey?: string;
+  /** A library skill added to My skills and not installed. */
+  added?: boolean;
 };
 
 export function inventorySummary(skill: SyncedSkill) {
@@ -172,10 +174,29 @@ export function notInstalledSkills(rows: { key: string; name: string; onMac: boo
       key: `cloud:${row.key}`, installed: undefined, cloudKey: row.key };
   });
 }
+/**
+ * Library skills added to My skills that no Mac has: once installed, the installed skill stands for them.
+ * One the loaded library doesn't include yet shows by its ID until it does.
+ */
+export function addedSkills(additions: { catalogId: string; name?: string; description?: string; author?: string; githubUrl?: string | null }[],
+  library: SkillDisplay[], mine: SkillDisplay[]): SkillDisplay[] {
+  const seen = new Set<string>();
+  return additions.filter(({ catalogId: id }) => !seen.has(id) && seen.add(id) && !mine.some(skill => skill.catalogId === id
+    || (skill.installed && hasCatalogId(skill.installed, id)))).map(addition => {
+    const id = addition.catalogId;
+    const known = library.find(skill => skill.catalogId === id);
+    const owner = id.split("/")[0] ?? "";
+    return { ...(known ?? { name: addition.name || id.split(":").at(-1) || id, description: addition.description ?? "",
+      author: addition.author || owner, githubUrl: addition.githubUrl ?? null, tags: [],
+      avatar: owner ? `https://github.com/${encodeURIComponent(owner)}.png?size=80` : undefined }),
+      key: `added:${id}`, catalogId: id, installed: undefined, added: true };
+  });
+}
+const notInstalled = (skill: SkillDisplay) => !!skill.cloudKey || !!skill.added;
 /** The installed or not-installed part of My skills, for the Show menu. */
 export function byInstalled(skills: SkillDisplay[], show: SkillShow | undefined) {
-  return show === "installed" ? skills.filter(skill => !skill.cloudKey)
-    : show === "not-installed" ? skills.filter(skill => !!skill.cloudKey) : skills;
+  return show === "installed" ? skills.filter(skill => !notInstalled(skill))
+    : show === "not-installed" ? skills.filter(notInstalled) : skills;
 }
 export function skillsByOrigin(skills: SkillDisplay[]) {
   return {

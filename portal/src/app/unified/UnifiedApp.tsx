@@ -109,6 +109,7 @@ import {
   cloudSharedLabel,
   skillsByOrigin,
   notInstalledSkills,
+  addedSkills,
   byInstalled,
   byName,
   type SkillShow,
@@ -136,6 +137,7 @@ import { SavedSkillReadme, SavedVersionsList, SharedSkillReadme, SkillReadme, sa
 import type { SavedSkillMdLoader, SavedVersionsLoader, SharedSkillMdLoader } from "../../cloud-save/cloud-save";
 import { AlphaRail, railLetter, railLettersOf as railLetters } from "./AlphaRail";
 import { CloudStatusBadge, CloudStatusSection, type CloudInfo } from "./CloudStatus";
+import type { MySkillAdditions } from "../my-skills-additions";
 import { cloudSkillRows, needsAttention, skillCloudRow, statusText } from "../../cloud-save/cloud-save";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
@@ -173,6 +175,8 @@ type Props = {
   savedVersions?: SavedVersionsLoader;
   /** Each skill's cloud save status, shown in the list and the detail panel. */
   cloud?: CloudInfo;
+  /** Library skills added to My skills; absent where the account can't keep them. */
+  additions?: MySkillAdditions;
   publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
   /** Clears a saved install request when the user cancels from the Install button. */
   onInstallCancel?: () => void;
@@ -470,6 +474,7 @@ export function UnifiedApp({
   sharedSkillMd,
   savedVersions,
   cloud,
+  additions,
   publicInstallAction,
   onInstallCancel,
   supportedAccountViews,
@@ -524,7 +529,16 @@ export function UnifiedApp({
   const cloudRow = (skill: SkillDisplay) => cloudRows.size && (skill.installed || skill.cloudKey) ? skillCloudRow(cloudRows, savedSkillKeys(skill)) : null;
   // My skills is every skill you have: the ones on your Macs, then the ones kept only in your account.
   const notInstalled = useMemo(() => notInstalledSkills([...cloudRows.values()], everMine, savedSkillKeys), [cloudRows, everMine]);
-  const allMine = useMemo(() => [...mine, ...notInstalled], [mine, notInstalled]);
+  const added = useMemo(() => additions ? addedSkills(additions.skills, models.library, mine) : [], [additions, models, mine]);
+  const notInstalledAll = useMemo(() => [...notInstalled, ...added.filter(skill =>
+    !notInstalled.some(other => other.catalogId === skill.catalogId))], [notInstalled, added]);
+  const allMine = useMemo(() => [...mine, ...notInstalledAll], [mine, notInstalledAll]);
+  const inMySkills = (catalogId: string | undefined) => !!catalogId && !!additions?.skills.some(skill => skill.catalogId === catalogId);
+  const changeMySkills = (catalogId: string, add: boolean) => {
+    void additions?.[add ? "add" : "remove"](catalogId).then(
+      () => setNotice(add ? "Added to My skills" : "Removed from My skills"),
+      () => setNotice("Couldn't update My skills. Try again."));
+  };
   const attentionLabel = (skill: SkillDisplay) => {
     const status = !discovery ? cloudRow(skill)?.status : undefined;
     return status && needsAttention(status) ? `, ${statusText[status]}` : "";
@@ -541,7 +555,7 @@ export function UnifiedApp({
   const pendingSelection: SkillDisplay | undefined = publicStatus && nav.selected.startsWith("catalog:")
     ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
-  const selected = [...mine, ...notInstalled, ...library, ...setRows, ...everMine].find((s) => s.key === nav.selected
+  const selected = [...mine, ...notInstalledAll, ...library, ...setRows, ...everMine].find((s) => s.key === nav.selected
     || (nav.selected.startsWith("synced:") && s.key.startsWith("synced:")
       && s.installed?.allSkillIds.includes(nav.selected.slice(7)))) || pendingSelection;
   const detailOpen = useRef(false);
@@ -906,7 +920,7 @@ export function UnifiedApp({
                 <span className="ua-row-author">@{skill.author}</span>
               )}
               {!discovery && <CloudAttention status={cloudRow(skill)?.status} />}
-              {skill.cloudKey && <span className="ua-row-versions" title="In My skills, not on any of your Macs">Not installed</span>}
+              {(skill.cloudKey || skill.added) && <span className="ua-row-versions" title="In My skills, not on any of your Macs">Not installed</span>}
               {versionCount > 1 && <span className="ua-row-versions" title="Your agents have different versions of this skill">
                 {versionCount} versions
               </span>}
@@ -987,6 +1001,9 @@ export function UnifiedApp({
                 <MenuItem icon={ArrowUp} disabled={!canManage || activeSet.items[0]?.id === skill.setItemId} onSelect={() => management.reorder(activeSet, skill.setItemId!, -1)}>Move up</MenuItem>
                 <MenuItem icon={ArrowDown} disabled={!canManage || activeSet.items.at(-1)?.id === skill.setItemId} onSelect={() => management.reorder(activeSet, skill.setItemId!, 1)}>Move down</MenuItem>
               </>}
+              {skill.added && additions && <MenuItem icon={X} onSelect={() => changeMySkills(skill.catalogId!, false)}>
+                Remove from My skills
+              </MenuItem>}
               <MenuItem
                 icon={Copy}
                 onSelect={() => void copySource(skill)}
@@ -1211,7 +1228,7 @@ export function UnifiedApp({
     : attentionView
       ? "Cloud save can't keep a copy of these yet. Open one to see why and what to do."
     : nav.view === "all"
-      ? notInstalled.length ? `${allMine.length} skills · ${notInstalled.length} not installed` : `${mine.length} skills across ${sources.length} sources`
+      ? notInstalledAll.length ? `${allMine.length} skills · ${notInstalledAll.length} not installed` : `${mine.length} skills across ${sources.length} sources`
       : nav.view === "discover"
         ? "Find your next useful skill."
         : nav.view === "favorites"
@@ -2006,6 +2023,18 @@ export function UnifiedApp({
                       </button>
                     )
                   )}
+                  {/* A library skill can join My skills without installing it. */}
+                  {signedIn && additions && detail.catalogId && !installedHere && (inMySkills(detail.catalogId) ? (
+                    <button type="button" className="ua-pill ua-detail-copy" aria-pressed title="Remove from My skills"
+                      onClick={() => changeMySkills(detail.catalogId!, false)}>
+                      <Check aria-hidden="true" />In My skills
+                    </button>
+                  ) : (
+                    <button type="button" className="ua-pill ua-detail-copy" aria-pressed={false}
+                      onClick={() => changeMySkills(detail.catalogId!, true)}>
+                      Add to My skills <Plus aria-hidden="true" />
+                    </button>
+                  ))}
                   {detail.installCommand ? (
                     <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
                       Copy <Copy />
@@ -2014,7 +2043,7 @@ export function UnifiedApp({
                     <span className="ua-pill">
                       {detail.installed?.isLocalOnly && <User aria-hidden="true" />}
                       {detail.setItemCloudShared ? cloudSharedLabel(detail, activeSet?.role)
-                        : detail.cloudKey ? "Not installed" : detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Personal skill" : "Source unavailable"}
+                        : detail.cloudKey || detail.added ? "Not installed" : detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Personal skill" : "Source unavailable"}
                     </span>
                   )}
                   <span className="ua-detail-icons">

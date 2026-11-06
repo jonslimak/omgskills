@@ -236,3 +236,27 @@ test("My skills also lists skills on none of your Macs, as not installed", async
   assert.deepEqual(byInstalled(mine, "not-installed").map(skill => skill.key), ["cloud:gone", "cloud:elsewhere"]);
   assert.equal(byInstalled(mine, undefined).length, 3);
 });
+
+test("library skills added to My skills show as not installed until a Mac has them", async () => {
+  const { addedSkills, byInstalled } = await import("../src/app/unified/model");
+  const library = [{ key: "catalog:a/r:known", catalogId: "a/r:known", name: "Known", description: "From the library", author: "a", githubUrl: null, tags: [] }];
+  const installedCopy = { catalogSkillId: "a/r:installed", sourceSkills: [] } as never;
+  const mine = [{ key: "synced:1", name: "Installed", description: "", author: "", githubUrl: null, tags: [], installed: installedCopy }];
+  const rows = addedSkills([{ catalogId: "a/r:known" }, { catalogId: "o/repo:gone", name: "Gone", description: "Kept by the server" },
+    { catalogId: "a/r:installed" }, { catalogId: "a/r:known" }], library, mine);
+  assert.deepEqual(rows.map(row => [row.key, row.name, row.description, row.added]), [
+    ["added:a/r:known", "Known", "From the library", true],
+    ["added:o/repo:gone", "Gone", "Kept by the server", true],
+  ], "installed and repeated skills drop out; the library's details win");
+  assert.equal(rows[1].author, "o");
+  assert.deepEqual(byInstalled([...mine, ...rows], "not-installed").map(row => row.key), ["added:a/r:known", "added:o/repo:gone"]);
+});
+
+test("the My skills list reads what the server sends and treats a missing endpoint as unavailable", async () => {
+  const { loadMySkillAdditions } = await import("../src/app/my-skills-additions");
+  const { PortalApiError } = await import("../src/api-error");
+  const api = (async () => ({ skills: [{ catalogSkillId: "a/r:s", name: "S", description: null, author: 3 }, { catalogSkillId: "" }, null] })) as never;
+  assert.deepEqual(await loadMySkillAdditions(api), [{ catalogId: "a/r:s", name: "S", description: undefined, author: undefined, githubUrl: null }]);
+  assert.equal(await loadMySkillAdditions((async () => { throw new PortalApiError("Not found", 404); }) as never), null);
+  await assert.rejects(loadMySkillAdditions((async () => ({})) as never));
+});
