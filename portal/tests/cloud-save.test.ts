@@ -252,4 +252,8 @@ test("a Not installed skill can be opened from My skills", async () => {
   const { initialNavigation } = await import("../src/app/unified/model");
   assert.equal(accountNavigation({ ...initialNavigation, view: "all", selected: "cloud:gone" }, true).selected, "cloud:gone");
   assert.equal(accountNavigation({ ...initialNavigation, view: "favorites", selected: "cloud:gone" }, true).selected, "");
+  // A search lists your skills on every page, so its Not installed results open there too.
+  assert.equal(accountNavigation({ ...initialNavigation, view: "favorites", query: "gone", selected: "cloud:gone" }, true).selected, "cloud:gone");
+  assert.equal(accountNavigation({ ...initialNavigation, view: "discover", query: "gone", selected: "cloud:gone" }, true).selected, "cloud:gone");
+  assert.equal(accountNavigation({ ...initialNavigation, view: "discover", selected: "cloud:gone" }, true).selected, "");
 });
