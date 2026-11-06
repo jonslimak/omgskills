@@ -221,3 +221,39 @@ test("a library install saved to the cloud keeps its library label and its versi
     [installed("pdf", { catalogSkillId: "anthropics/skills:pdf", isLocalOnly: false })]);
   assert.deepEqual([rows[0].status, rows[0].versionCount], ["library", 2]);
 });
+
+test("My skills also lists saved skills that no listed skill holds, as not installed", async () => {
+  const { notInstalledSkills, byInstalled } = await import("../src/app/unified/model");
+  const saved = "2026-11-01T00:00:00Z";
+  const rows = [{ key: "here", name: "Here", savedAt: saved }, { key: "gone", name: "gone", savedAt: saved },
+    { key: "elsewhere", name: "elsewhere", savedAt: saved }, { key: "review-only", name: "review-only", savedAt: null },
+    { key: "foo-old", name: "Foo (folder foo-old)", savedAt: saved }];
+  const base = { description: "", author: "", githubUrl: null, tags: [] };
+  const here = { ...base, key: "synced:here", name: "Here" };
+  const foo = { ...base, key: "synced:foo", name: "Foo", description: "Live foo" };
+  const stale = { ...base, key: "synced:old", name: "Gone Skill", description: "Last known", catalogId: "owner/gone" };
+  const keysOf = (skill: { key: string }) => ({ "synced:here": ["here"], "synced:old": ["gone"], "synced:foo": ["foo", "foo-old"] } as Record<string, string[]>)[skill.key] ?? [];
+  const mine = [here, foo].map(skill => ({ ...skill, installed: {} as never }));
+  const rest = notInstalledSkills(rows, [{ ...here, installed: {} as never }], [here, foo, stale], keysOf);
+  assert.deepEqual(rest.map(skill => [skill.key, skill.name, skill.description]),
+    [["cloud:gone", "Gone Skill", "Last known"], ["cloud:elsewhere", "elsewhere", ""], ["cloud:foo-old", "Foo", "Live foo"]],
+    "a review alone isn't kept");
+  // Once Foo is installed again, its old folder's copy isn't listed twice.
+  assert.equal(notInstalledSkills(rows, mine, [here, foo, stale], keysOf).some(skill => skill.key === "cloud:foo-old"), false);
+  assert.equal(rest[0].catalogId, "owner/gone", "a library skill stays public in By origin");
+  const all = [{ ...here, installed: {} as never }, ...rest];
+  assert.deepEqual(byInstalled(all, "installed").map(skill => skill.key), ["synced:here"]);
+  assert.deepEqual(byInstalled(all, "not-installed").length, 3);
+  assert.equal(byInstalled(all, undefined).length, 4);
+});
+
+test("a Not installed skill can be opened from My skills", async () => {
+  const { accountNavigation } = await import("../src/integration/unified/policy");
+  const { initialNavigation } = await import("../src/app/unified/model");
+  assert.equal(accountNavigation({ ...initialNavigation, view: "all", selected: "cloud:gone" }, true).selected, "cloud:gone");
+  assert.equal(accountNavigation({ ...initialNavigation, view: "favorites", selected: "cloud:gone" }, true).selected, "");
+  // A search lists your skills on every page, so its Not installed results open there too.
+  assert.equal(accountNavigation({ ...initialNavigation, view: "favorites", query: "gone", selected: "cloud:gone" }, true).selected, "cloud:gone");
+  assert.equal(accountNavigation({ ...initialNavigation, view: "discover", query: "gone", selected: "cloud:gone" }, true).selected, "cloud:gone");
+  assert.equal(accountNavigation({ ...initialNavigation, view: "discover", selected: "cloud:gone" }, true).selected, "");
+});

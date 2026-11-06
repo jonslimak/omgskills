@@ -13,9 +13,12 @@ export function previewCloudState(skills: SyncedSkill[]): CloudSaveState {
   return {
     settings: { enabled: true, excludedSkillKeys: [] },
     usage: { bytes: 6_800_000, limitBytes: 1024 ** 3 },
-    skills: saved.map((key, index) => ({ key, versionCount: 1 + (index % 3), deletedLocallyAt: null,
+    skills: saved.map((key, index): CloudSaveState["skills"][number] => ({ key, versionCount: 1 + (index % 3), deletedLocallyAt: null,
       currentVersion: { id: `v-${key}`, savedAt: "2026-11-03T10:00:00Z", fileCount: 3, totalBytes: 12_000,
-        labels: index % 4 === 0 ? ["scripts" as const] : [] } })),
+        labels: index % 4 === 0 ? ["scripts" as const] : [] } })).concat(
+      // Two kept only in the account: deleted from this Mac, or saved from another one.
+      ["meeting-notes", "old-deploy-checklist"].map(key => ({ key, versionCount: 2, deletedLocallyAt: "2026-11-01T10:00:00Z",
+        currentVersion: { id: `v-${key}`, savedAt: "2026-10-30T10:00:00Z", fileCount: 2, totalBytes: 8_000, labels: [] } }))),
     needsReview: review ? [{ key: review, confirmed: false, updatedAt: "2026-11-05T10:00:00Z",
       files: [{ path: "rules/1-safety.md", findings: [{ rule: "password", kind: "Password", line: 580 }] }] }] : [],
     skipped,

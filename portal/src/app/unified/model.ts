@@ -48,6 +48,8 @@ export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
   setItemUpdateAvailable?: boolean;
   /** A private Set item's version, whose instructions people with access can read. */
   setItemReleaseId?: string;
+  /** In My skills but on none of your Macs: its saved copy's key. */
+  cloudKey?: string;
 };
 
 export function inventorySummary(skill: SyncedSkill) {
@@ -154,10 +156,30 @@ export type Navigation = {
   /** Which of my skills to show: own ones, library ones, or both split by origin. */
   show?: SkillShow;
 };
-export type SkillShow = "personal" | "public" | "origin";
-const skillShows: SkillShow[] = ["personal", "public", "origin"];
+export type SkillShow = "installed" | "not-installed" | "personal" | "public" | "origin";
+const skillShows: SkillShow[] = ["installed", "not-installed", "personal", "public", "origin"];
 export const byName = (a: SkillDisplay, b: SkillDisplay) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
 /** Personal skills are your own; public ones were installed from the library. Each part sorted by name. */
+/**
+ * Skills in My skills that no Mac has now: saved copies whose folder belongs to no skill in the list.
+ * Only a saved copy counts; a review alone saved nothing. Details come from the last copy a Mac
+ * reported, unless that skill is still installed elsewhere (then the row's own label tells them apart).
+ */
+export function notInstalledSkills(rows: { key: string; name: string; savedAt: string | null }[], mine: SkillDisplay[],
+  everMine: SkillDisplay[], keysOf: (skill: SkillDisplay) => string[]): SkillDisplay[] {
+  const listed = new Set(mine.flatMap(keysOf));
+  return rows.filter(row => row.savedAt && !listed.has(row.key)).map(row => {
+    const last = everMine.find(skill => keysOf(skill).includes(row.key));
+    const stillInstalled = last && mine.some(skill => skill.key === last.key);
+    return { ...(last && !stillInstalled ? last : { name: row.name, description: "", author: "", githubUrl: null, tags: [] }),
+      key: `cloud:${row.key}`, installed: undefined, cloudKey: row.key };
+  });
+}
+/** The installed or not-installed part of My skills, for the Show menu. */
+export function byInstalled(skills: SkillDisplay[], show: SkillShow | undefined) {
+  return show === "installed" ? skills.filter(skill => !skill.cloudKey)
+    : show === "not-installed" ? skills.filter(skill => !!skill.cloudKey) : skills;
+}
 export function skillsByOrigin(skills: SkillDisplay[]) {
   return {
     personal: skills.filter(skill => !skill.catalogId).sort(byName),
@@ -190,7 +212,8 @@ export function parseNavigation(search: string): Navigation {
     source: params.get("source") || "all",
   };
   const show = params.get("show") as SkillShow;
-  if (skillShows.includes(show) && !isDiscovery(nav.view)) nav.show = show;
+  if (skillShows.includes(show) && !isDiscovery(nav.view)
+    && (nav.view === "all" || (show !== "installed" && show !== "not-installed"))) nav.show = show;
   if (nav.view === "category") {
     const term = discoveryCategories.some(group => group.items.includes(nav.id)) ? nav.id : "";
     nav.view = "discover";

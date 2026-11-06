@@ -73,6 +73,7 @@ export function SkillReadme({ skill, client = publicClient }: { skill: SkillDisp
 
 /** Folder keys of a skill on the user's Macs, which is how cloud save names it. */
 export function savedSkillKeys(skill: SkillDisplay): string[] {
+  if (skill.cloudKey) return [skill.cloudKey];
   const sources = skill.installed?.sourceSkills ?? [];
   return [...new Set(sources.map(source => cloudSkillKey(source.installationFolder || source.name)))];
 }
