@@ -43,7 +43,7 @@ export function CloudStatusSection({ row, confirm }: { row: CloudSkillRow | null
       setBusy(true);
       setError("");
       void confirm(row.key).catch(() => setError("It couldn't be confirmed. Try again.")).finally(() => setBusy(false));
-    }}>{busy ? "Confirming..." : "It's safe, save it"}</button>}
+    }}>{busy ? "Confirming..." : "It's safe, sync it"}</button>}
     {error && <p role="alert">{error}</p>}
   </section>;
 }
