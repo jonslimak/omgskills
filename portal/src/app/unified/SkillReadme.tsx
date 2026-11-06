@@ -109,7 +109,7 @@ export function SavedSkillReadme({ skill, load }: { skill: SkillDisplay; load: S
       : current.status === "error" ? <div className="ua-readme-error">
         <p className="ua-muted" role="status">Skill instructions unavailable.</p>
         <button className="ua-icon" type="button" title="Retry" aria-label="Retry loading skill instructions" onClick={() => setRevision(value => value + 1)}><RefreshCw /></button>
-      </div> : !current.doc ? <p className="ua-muted">Turn on cloud save to read this skill's instructions here.</p>
+      </div> : !current.doc ? <p className="ua-muted">Turn on sync to read this skill's instructions here.</p>
       : !current.doc.markdown.trim() ? <p className="ua-muted">No instructions beyond the name and description.</p>
       : <div>
         <ReadmeRenderBoundary key={`${id}:${revision}`}>
@@ -118,7 +118,7 @@ export function SavedSkillReadme({ skill, load }: { skill: SkillDisplay; load: S
             <MarkdownBody markdown={current.doc.markdown} sourceUrl="about:blank" />
           </Suspense>
         </ReadmeRenderBoundary>
-        <p className="ua-muted">{current.doc.truncated ? "Preview shortened. " : ""}From your cloud save, saved {new Date(current.doc.savedAt).toLocaleDateString()}.</p>
+        <p className="ua-muted">{current.doc.truncated ? "Preview shortened. " : ""}Synced {new Date(current.doc.savedAt).toLocaleDateString()}.</p>
       </div>}
   </section>;
 }

@@ -471,7 +471,7 @@ function setItemInstallation(installation: SyncedSkill | undefined, skill: Skill
 
 /** How a skill shared from its owner's cloud save reads in a Set. */
 export function cloudSharedLabel(skill: SkillDisplay, role: PortalSet["role"] | undefined) {
-  if (role === "owner") return skill.setItemUpdateAvailable ? "Shared from your cloud save · newer version saved" : "Shared from your cloud save";
+  if (role === "owner") return skill.setItemUpdateAvailable ? "Shared from My skills · newer version synced" : "Shared from My skills";
   return "Private skill · installs with the Set";
 }
 

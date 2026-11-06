@@ -19,7 +19,7 @@ export function CloudStatusBadge({ row: shown, notInstalled = false }: { row: Cl
   ].filter(Boolean).join(", ");
   const detail = attention ? undefined : [history && `${history[0].toUpperCase()}${history.slice(1)}.`, statusHelp[row.status]].filter(Boolean).join(" ");
   return <span className="ua-cloud-badge" data-status={row.status} data-attention={attention || undefined} title={detail || undefined}
-    aria-label={`Cloud save: ${statusText[row.status]}${detail ? `. ${detail}` : ""}`}>
+    aria-label={`Sync: ${statusText[row.status]}${detail ? `. ${detail}` : ""}`}>
     <Icon aria-hidden="true" /><span aria-hidden="true">{statusText[row.status]}</span>
   </span>;
 }
@@ -31,7 +31,7 @@ export function CloudStatusSection({ row, confirm }: { row: CloudSkillRow | null
   if (!row) return null;
   const attention = needsAttention(row.status);
   if (!attention && !row.labels.length) return null;
-  return <section className="ua-cloud-status" aria-label="Cloud save" data-status={row.status}>
+  return <section className="ua-cloud-status" aria-label="Sync" data-status={row.status}>
     {attention && statusHelp[row.status] && <p className="ua-muted">{row.status === "review" && row.origin
       ? `A file in this skill from ${row.origin === "library" ? "the library" : "a Set"} looks like it contains a key or password, so it wasn't saved. If it's only an example, confirm it's safe.`
       : statusHelp[row.status]}</p>}
