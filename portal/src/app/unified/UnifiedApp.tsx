@@ -2104,6 +2104,11 @@ export function UnifiedApp({
                     {publicStatus?.detail === "error" ? <>
                       <p role="status">{publicStatus.detailError}</p>
                       {!publicStatus.detailMissing && <button className="ua-pill" type="button" onClick={publicStatus.retryDetail}>Try again</button>}
+                      {/* A skill that left the library can still leave My skills. */}
+                      {publicStatus.detailMissing && signedIn && additions && inMySkills(detail?.catalogId) && (
+                        <button className="ua-pill" type="button" disabled={additions.pending.includes(detail!.catalogId!)}
+                          onClick={() => changeMySkills(detail!.catalogId!, false)}>Remove from My skills</button>
+                      )}
                     </> : <div className="ua-detail-skeleton" role="status" aria-label="Loading skill">
                       <span /><span /><span /><span />
                     </div>}
