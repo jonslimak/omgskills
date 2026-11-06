@@ -178,6 +178,8 @@ type Props = {
   cloud?: CloudInfo;
   /** Library skills added to My skills; absent where the account can't keep them. */
   additions?: MySkillAdditions;
+  /** My skills is still waiting on its cloud and added skills, so its count would jump. */
+  mySkillsLoading?: boolean;
   publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
   /** Clears a saved install request when the user cancels from the Install button. */
   onInstallCancel?: () => void;
@@ -476,6 +478,7 @@ export function UnifiedApp({
   savedVersions,
   cloud,
   additions,
+  mySkillsLoading = false,
   publicInstallAction,
   onInstallCancel,
   supportedAccountViews,
@@ -631,7 +634,9 @@ export function UnifiedApp({
   const metadataOnly = !nav.query.trim() && ["creators", "collections"].includes(nav.view);
   const publicListState = metadataOnly ? publicStatus?.metadata ?? publicStatus?.list : publicStatus?.list;
   const publicListError = metadataOnly ? publicStatus?.metadataError : publicStatus?.error;
-  const listState = dataPage || developersPage || progressiveDiscover ? "ready" : publicList ? publicListState : setPage && state === "ready" ? management.detail.state : state;
+  const listState = dataPage || developersPage || progressiveDiscover ? "ready" : publicList ? publicListState : setPage && state === "ready" ? management.detail.state
+    : nav.view === "all" && state === "ready" && mySkillsLoading ? "loading" : state;
+  const myCountReady = state === "ready" && !mySkillsLoading;
   const canManage = !!management && !management.blocked && !management.busy;
   const editableSet = activeSet?.role === "owner" && !activeSet.hidden && !activeSet.isFavorites;
   const scopeKey = `${nav.view}:${nav.id}:${nav.query}:${nav.source}:${signedIn}`;
@@ -1230,6 +1235,8 @@ export function UnifiedApp({
     ? `Results for "${nav.query}"`
     : attentionView
       ? "Cloud save can't keep a copy of these yet. Open one to see why and what to do."
+    : nav.view === "all" && listState === "loading"
+      ? "Loading skills\u2026"
     : nav.view === "all"
       ? notInstalledAll.length ? `${allMine.length} skills · ${notInstalledAll.length} not installed` : `${mine.length} skills across ${sources.length} sources`
       : nav.view === "discover"
@@ -1354,7 +1361,7 @@ export function UnifiedApp({
               </>
             ) : (
               <>
-                {navItem("all", "All skills", User, allMine.length)}
+                {navItem("all", "All skills", User, myCountReady ? allMine.length : undefined)}
                 {attention.length > 0 && navItem("all", "Needs attention", TriangleAlert, attention.length, "attention")}
                 {(!readOnlyAccount || management) && <>{navItem("favorites", "Favorites", Heart, management ? data.sets.find(set => set.isFavorites)?.itemCount ?? 0 : favorites.length)}
                 {management && navItem("sets", "All sets", Shapes, sets.length)}

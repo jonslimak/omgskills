@@ -1,6 +1,6 @@
 import { getPgPool } from "./db.js";
 import { errorResponse, jsonResponse, optionsResponse, withTimeout } from "./http.js";
-import { type CatalogSkill, loadPublishedSkills } from "./published-catalog.js";
+import { loadPublishedSkills } from "./published-catalog.js";
 import { requirePortalUser } from "./user.js";
 import { requireJsonObject, requireString } from "./validation.js";
 
@@ -16,7 +16,6 @@ const defaultDependencies = {
   // A cold instance downloads and parses the whole catalog, so adding waits as long as other catalog adds do.
   loadPublishedSkills: () => withTimeout(loadPublishedSkills(), 25_000),
   // The list only borrows names from the catalog; the web fills them in from the library when it can't wait.
-  loadPublishedSkillsForList: () => withTimeout(loadPublishedSkills(), 2_000),
 };
 export type MySkillsDependencies = typeof defaultDependencies;
 
@@ -25,47 +24,18 @@ function catalogSkillIdFromQuery(req: Request): string {
   return requireString(new URL(req.url).searchParams.get("catalogSkillId"), "catalogSkillId", MAX_ID_LENGTH);
 }
 
-type PublishedSkill = CatalogSkill & { author_handle?: unknown };
-
-function text(value: unknown): string | null {
-  return typeof value === "string" && value.trim() ? value : null;
-}
-
-/** Display fields from the published catalog; all null when the skill is gone or the catalog is down. */
-function displayFields(catalogSkillId: string, skill: PublishedSkill | undefined) {
-  if (!skill) return { name: null, description: null, author: null, githubUrl: null };
-  const owner = catalogSkillId.split("/")[0];
-  return {
-    name: text(skill.name),
-    description: text(skill.description),
-    author: text(skill.author_handle) ?? text(owner),
-    githubUrl: text(skill.github_url) ?? text(skill.githubUrl),
-  };
-}
-
-async function listMySkills(pool: QueryPool, userId: string, loadSkills: () => Promise<CatalogSkill[]>) {
-  const [result, catalog] = await Promise.all([
-    pool.query<{ catalogSkillId: string; addedAt: Date | string }>(
-      `
-        SELECT catalog_skill_id AS "catalogSkillId", added_at AS "addedAt"
-        FROM my_skill_additions
-        WHERE user_id = $1
-        ORDER BY added_at DESC, catalog_skill_id
-      `,
-      [userId],
-    ),
-    loadSkills().catch(() => [] as CatalogSkill[]),
-  ]);
-  const wanted = new Set(result.rows.map((row) => row.catalogSkillId));
-  const byId = new Map<string, PublishedSkill>();
-  for (const skill of catalog) {
-    if (skill.id && wanted.has(skill.id)) byId.set(skill.id, skill);
-  }
-  return result.rows.map((row) => ({
-    catalogSkillId: row.catalogSkillId,
-    addedAt: new Date(row.addedAt).toISOString(),
-    ...displayFields(row.catalogSkillId, byId.get(row.catalogSkillId)),
-  }));
+// The list is a quick database read: the web already has the library and fills in names and details from it.
+async function listMySkills(pool: QueryPool, userId: string) {
+  const result = await pool.query<{ catalogSkillId: string; addedAt: Date | string }>(
+    `
+      SELECT catalog_skill_id AS "catalogSkillId", added_at AS "addedAt"
+      FROM my_skill_additions
+      WHERE user_id = $1
+      ORDER BY added_at DESC, catalog_skill_id
+    `,
+    [userId],
+  );
+  return result.rows.map((row) => ({ catalogSkillId: row.catalogSkillId, addedAt: new Date(row.addedAt).toISOString() }));
 }
 
 async function addMySkill(pool: QueryPool, userId: string, catalogSkillId: string): Promise<boolean> {
@@ -115,7 +85,7 @@ export async function handleMySkills(
     const user = await deps.requirePortalUser(req);
 
     if (req.method === "GET") {
-      return jsonResponse(req, { skills: await listMySkills(deps.getPgPool(), user.id, deps.loadPublishedSkillsForList) });
+      return jsonResponse(req, { skills: await listMySkills(deps.getPgPool(), user.id) });
     }
 
     if (req.method === "POST") {
