@@ -206,7 +206,8 @@ export function createLibraryServer(userId: string, deps: LibraryMcpDependencies
     const library = await deps.loadMySkills(userId);
     const q = query?.trim().toLowerCase() ?? "";
     const matches = library.skills
-      .filter(skill => !q || `${skill.name} ${skill.description} ${skill.author}`.toLowerCase().includes(q))
+      // A locked skill is found by name and author only; its hidden description can't be probed.
+      .filter(skill => !q || `${skill.name} ${skill.available ? skill.description : ""} ${skill.author}`.toLowerCase().includes(q))
       .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
     const start = Math.max(0, Number.parseInt(cursor ?? "0", 10) || 0);
     const page = matches.slice(start, start + PAGE_SIZE);

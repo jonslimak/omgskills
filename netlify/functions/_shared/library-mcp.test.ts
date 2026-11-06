@@ -113,6 +113,8 @@ test("each account reads only its own library", async () => {
   const listed = JSON.parse((await call(a.value, "search_my_skills", {})).text);
   assert.deepEqual(listed.skills.map((skill: { name: string }) => skill.name), ["locked", "notes", "pdf"]);
   assert.equal(listed.skills[0].description, "", "A locked skill's description stays hidden");
+  const probe = JSON.parse((await call(a.value, "search_my_skills", { query: "locked help" })).text);
+  assert.equal(probe.total, 0, "Searching can't match a locked skill's hidden description");
   assert.deepEqual(a.calls, ["load:user-a"]);
   const b = deps({ subject: "clerk-b" });
   const other = JSON.parse((await call(b.value, "search_my_skills", { query: "notes" })).text);

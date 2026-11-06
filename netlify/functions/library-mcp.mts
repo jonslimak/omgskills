@@ -10,6 +10,7 @@ import { createCloudObjectStore } from "./_shared/cloud-store.js";
 import { createCompactMcpLibraryLoader } from "./_shared/compact-mcp-library.js";
 import { getPgPool } from "./_shared/db.js";
 import { getEnv } from "./_shared/env.js";
+import { withTimeout } from "./_shared/http.js";
 import { handleLibraryMcp, issuerFromPublishableKey, type LibraryMcpDependencies, type VerifiedToken } from "./_shared/library-mcp.js";
 import { listSavedFiles, readSavedFile } from "./_shared/library-read.js";
 import { loadProductionMcpLibrary } from "./_shared/mcp-library.js";
@@ -22,10 +23,6 @@ const catalog = validateProductionFeatures(featureConfig).catalogSearchEnabled
 async function publicSkill(id: string): Promise<SkillResult | undefined> {
   const { library } = await catalog.get();
   return (await library.getSkill(id)) ?? undefined;
-}
-
-function withTimeout<T>(work: Promise<T>, ms: number) {
-  return Promise.race([work, new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))]);
 }
 
 /** Asks Clerk about an OAuth access token; its answer includes the audience, which the SDK in use drops. */
