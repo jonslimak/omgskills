@@ -594,6 +594,23 @@ export const cloudSkipReports = pgTable(
   ]
 );
 
+/** Public catalog skills a person added to My skills without installing them (private, not Favorites). */
+export const mySkillAdditions = pgTable(
+  "my_skill_additions",
+  {
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    catalogSkillId: text("catalog_skill_id").notNull(),
+    addedAt: timestamp("added_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.catalogSkillId] }),
+    check(
+      "my_skill_additions_catalog_skill_id_check",
+      sql`char_length(${table.catalogSkillId}) BETWEEN 1 AND 500`
+    )
+  ]
+);
+
 /** No longer used: replaced by cloud_storage_purge_queue, and dropped in a later release. */
 export const cloudPurgeQueue = pgTable(
   "cloud_purge_queue",

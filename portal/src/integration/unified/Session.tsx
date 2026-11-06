@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
 import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
 import { RefreshCw } from "lucide-react";
 import { UnifiedApp } from "../../app/unified/UnifiedApp";
@@ -17,6 +17,7 @@ import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
 import { CloudSavePanel } from "../../cloud-save/CloudSavePanel";
 import { confirmCloudReview, loadCloudSave, loadSavedSkillMd, loadSavedVersions, loadSharedSkillMd, type CloudSaveState } from "../../cloud-save/cloud-save";
 import type { CloudInfo } from "../../app/unified/CloudStatus";
+import { addMySkill, loadMySkillAdditions, removeMySkill, type MySkillAddition, type MySkillAdditions } from "../../app/my-skills-additions";
 import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation, staticPageAddress, unknownAppAddress } from "./entry-navigation";
 import { renderPublicFirst } from "./public-first";
@@ -69,6 +70,45 @@ function useCloudStatus(api: PortalApi, enabled: boolean, revision: unknown): Cl
     state,
     confirm: async (key: string) => { await confirmCloudReview(apiRef.current, key); setReload(value => value + 1); },
   } : undefined, [state]);
+}
+
+/** Library skills added to My skills; each change shows at once and goes back if the save fails. */
+function useMySkillAdditions(api: PortalApi, enabled: boolean): MySkillAdditions | undefined {
+  const apiRef = useRef(api);
+  apiRef.current = api;
+  const [skills, setSkills] = useState<MySkillAddition[] | null>(null);
+  const current = useRef(skills);
+  current.current = skills;
+  // One save per skill at a time, so a quick undo can't reach the server before the add it undoes.
+  const [pending, setPending] = useState<string[]>([]);
+  const inFlight = useRef(new Set<string>());
+  useEffect(() => {
+    if (!enabled) { setSkills(null); return; }
+    const controller = new AbortController();
+    void loadMySkillAdditions(apiRef.current, controller.signal)
+      .then(value => { if (!controller.signal.aborted) setSkills(value); })
+      .catch(() => { if (!controller.signal.aborted) setSkills(null); });
+    return () => controller.abort();
+  }, [enabled]);
+  const change = useCallback(async (catalogId: string, add: boolean) => {
+    if (inFlight.current.has(catalogId)) return;
+    inFlight.current.add(catalogId);
+    setPending([...inFlight.current]);
+    const previous = current.current?.find(skill => skill.catalogId === catalogId);
+    setSkills(old => old && (add ? [previous ?? { catalogId }, ...old.filter(skill => skill.catalogId !== catalogId)]
+      : old.filter(skill => skill.catalogId !== catalogId)));
+    try { await (add ? addMySkill : removeMySkill)(apiRef.current, catalogId); }
+    catch (failure) {
+      // Put back only this skill, keeping any other change made meanwhile.
+      setSkills(old => old && (add ? old.filter(skill => skill.catalogId !== catalogId)
+        : previous ? [previous, ...old.filter(skill => skill.catalogId !== catalogId)] : old));
+      throw failure;
+    } finally {
+      inFlight.current.delete(catalogId);
+      setPending([...inFlight.current]);
+    }
+  }, []);
+  return useMemo(() => skills ? { skills, pending, add: (id: string) => change(id, true), remove: (id: string) => change(id, false) } : undefined, [skills, pending, change]);
 }
 
 function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, productionInstall, composition, cleanPaths , takeover }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; productionInstall: boolean; composition?: UnifiedSessionComposition; cleanPaths: boolean ; takeover: boolean }) {
@@ -168,6 +208,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const title = pageTitle(nav, catalog);
   useEffect(() => { syncMetadata?.(location.pathname + location.search, title); }, [syncMetadata, current, title]);
   const cloud = useCloudStatus(api, available && !!snapshot.data && !snapshot.accessDenied && !composition?.readOnly && !local, snapshot.revision);
+  const mySkills = useMySkillAdditions(api, available && !!snapshot.data && !snapshot.accessDenied && !composition?.readOnly && !local);
   const management = useManagement({ data, mine: liveMine(skillDisplays(data, publicData.catalog).mine),
     busy: snapshot.setSaving || snapshot.profileSaving, blocked: !!composition?.readOnly || !available || !snapshot.data || !!snapshot.error || snapshot.accessDenied,
     scope: `${nav.view}:${nav.id}:${nav.query}`, saveSet: account.saveSet, saveMembership: account.saveMembership,
@@ -204,6 +245,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     savedVersions={available && !snapshot.accessDenied && !composition?.readOnly && !local
       ? (keys, signal) => loadSavedVersions(api, keys, signal) : undefined}
     cloud={cloud}
+    additions={mySkills}
     sharedSkillMd={available && !snapshot.accessDenied && !local
       ? (releaseId, signal) => loadSharedSkillMd(api, releaseId, signal) : undefined}
     accountPages={available && !snapshot.accessDenied ? (view, theme) => view === "profile" && !composition?.readOnly ? <ProfilePanel profile={data.profile} theme={theme}

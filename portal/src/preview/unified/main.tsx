@@ -23,6 +23,7 @@ import { f2Cases, f2CaseNavigation, f2NavigationSearch, readF2CaseKey } from "./
 import { createPreviewCatalogStore, createPreviewInstallStore, PublicInstallSetup } from "./PublicInstallSetup";
 import { CatalogInstallSetup } from "../../app/unified/CatalogInstallSetup";
 import { previewCloudState } from "./cloud-fixture";
+import type { MySkillAddition } from "../../app/my-skills-additions";
 
 const installClient = import.meta.env.DEV ? previewInstallClient(import.meta.env.DEV,
   import.meta.env.VITE_NEWMAC_F1, import.meta.env.VITE_NEWMAC_SETUP_TEST, location.hostname) : null;
@@ -49,6 +50,12 @@ function Preview() {
   const [nav, setNav] = useState(readNavigation);
   const [revision, setRevision] = useState(0);
   const [cloudState, setCloudState] = useState(() => previewCloudState(makeFixtures().skills));
+  // One library skill added to My skills without installing it.
+  const [added, setAdded] = useState<MySkillAddition[]>([{ catalogId: "anthropics/skills:pdf", name: "pdf", author: "anthropics",
+    description: "Read, fill and create PDF files.", githubUrl: null }]);
+  const additions = { skills: added, pending: [] as string[],
+    add: async (id: string) => setAdded(old => [{ catalogId: id }, ...old.filter(other => other.catalogId !== id)]),
+    remove: async (id: string) => setAdded(old => old.filter(other => other.catalogId !== id)) };
   const [signedOutNav, setSignedOutNav] = useState<Navigation | null>(null);
   const [liveCatalog, setLiveCatalog] = useState(true);
   const publicData = usePublicCatalog(publicClient, nav, liveCatalog);
@@ -148,6 +155,7 @@ function Preview() {
           store={catalogStore} returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} />}
       onInstallCancel={() => catalogStore.clear()}
       onSession={session}
+      additions={signedIn ? additions : undefined}
       cloud={{ state: cloudState, confirm: async key => setCloudState(state => ({ ...state,
         needsReview: state.needsReview.map(review => review.key === key ? { ...review, confirmed: true } : review) })) }}
       state={
