@@ -134,6 +134,13 @@ test("IDs stay put as copies come and go, and shared library IDs are told apart 
   const ids = buildMySkills({ inventory: [copy("x", "pdf", lib), copy("y", "PDF tools", lib)], cloud: null, additions: [], now })
     .skills.map(skill => skill.id).sort();
   assert.deepEqual(ids, ["lib:o/r:pdf#pdf", "lib:o/r:pdf#pdf tools"]);
+  // One library skill no Mac has now, saved in two folders: two rows, two IDs.
+  const gone = [copy("p", "pdf", { ...lib, installationFolder: "pdf-a", isCurrent: false }),
+    copy("q", "pdf", { ...lib, installationFolder: "pdf-b", isCurrent: false, source: "codex" })];
+  const twoSaved = { settings: { enabled: true, excludedSkillKeys: [] }, usage: { bytes: 0, limitBytes: 1 },
+    skills: [saved("pdf-a"), saved("pdf-b")], needsReview: [], skipped: {} } as unknown as ServerCloudState;
+  const savedIds = buildMySkills({ inventory: gone, cloud: twoSaved, additions: [], now }).skills.map(skill => skill.id).sort();
+  assert.deepEqual(savedIds, ["lib:o/r:pdf#pdf-a", "lib:o/r:pdf#pdf-b"]);
   const dated = buildMySkills({ inventory: [copy("d", "old", { deviceId: null, lastSeenAt: new Date(stale) as never })], cloud: null,
     additions: [], now });
   assert.equal(dated.count, 0, "A database Date is read like a string");

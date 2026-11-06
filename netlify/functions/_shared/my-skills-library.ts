@@ -262,11 +262,13 @@ export function buildMySkills(input: MySkillsInputs): MySkillsLibrary {
   const notInstalledAll = [...notInstalled,
     ...added.filter(skill => !notInstalled.some(other => other.catalogId === skill.catalogId))];
   const skills = [...installedSkills, ...notInstalledAll];
-  // Two skills can share a library ID (different names, same catalog skill); then each is told apart by name,
-  // whatever order they came in.
+  // Two skills can share a library ID (different names, or saved in two folders); then each is told apart by its
+  // saved folder, else its name, whatever order they came in.
   const counts = new Map<string, number>();
   for (const skill of skills) counts.set(skill.id, (counts.get(skill.id) ?? 0) + 1);
-  for (const skill of skills) if ((counts.get(skill.id) ?? 0) > 1) skill.id = `${skill.id}#${cloudSkillKey(skill.name)}`;
+  for (const skill of skills) {
+    if ((counts.get(skill.id) ?? 0) > 1) skill.id = `${skill.id}#${skill.savedKey ?? cloudSkillKey(skill.name)}`;
+  }
   return { skills, count: skills.length, notInstalledCount: notInstalledAll.length };
 }
 
