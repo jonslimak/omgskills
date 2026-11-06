@@ -110,7 +110,7 @@ final class CloudSaveController {
             } catch CloudSaveAPIError.reconnectRequired {
                 summary = CloudSaveSummary(status: .reconnectRequired)
             } catch {
-                message = "Cloud save could not be changed. Try again."
+                message = "Sync could not be changed. Try again."
             }
         }
     }
@@ -139,26 +139,25 @@ final class CloudSaveController {
             message = nil
         } catch is CancellationError {
         } catch {
-            message = "Cloud save could not finish. It will try again."
+            message = "Sync could not finish. It will try again."
         }
     }
 
+    /// The line under the My skills count: what this Mac has, then only what needs a look.
     nonisolated static func statusText(_ summary: CloudSaveSummary) -> String {
         switch summary.status {
-        case .off: return "Cloud save is off."
-        case .permissionRequired: return "Reconnect this Mac to allow cloud save."
-        case .reconnectRequired: return "Reconnect this Mac to keep saving skills."
-        case .storageFull: return "Cloud storage is full."
-        case .unavailable: return "Cloud save is unavailable right now. It will try again."
+        case .off: return "Not synced"
+        case .permissionRequired: return "Reconnect this Mac to allow sync."
+        case .reconnectRequired: return "Reconnect this Mac to keep syncing."
+        case .storageFull: return "Sync storage is full."
+        case .unavailable: return "Sync is unavailable right now. It will try again."
         case .upToDate, .incomplete:
-            // The same line the web shows: every skill, then only what needs a look.
             let attention = summary.attentionCount
-            var parts = ["\(summary.skillCount) \(summary.skillCount == 1 ? "skill" : "skills")"]
-            if attention == 0 && summary.leftOutCount == 0 && summary.notSavedYetCount == 0 { parts.append("all saved") }
-            if attention > 0 { parts.append("\(attention) need\(attention == 1 ? "s" : "") attention on the web") }
-            if summary.notSavedYetCount > 0 { parts.append("\(summary.notSavedYetCount) not saved yet") }
+            var parts = ["\(summary.hereCount) on this Mac"]
+            if attention == 0 && summary.leftOutCount == 0 && summary.notSavedYetCount == 0 { parts.append("all synced") }
+            if attention > 0 { parts.append("\(attention) can't sync") }
+            if summary.notSavedYetCount > 0 { parts.append("\(summary.notSavedYetCount) not synced yet") }
             if summary.leftOutCount > 0 { parts.append("\(summary.leftOutCount) left out") }
-            if summary.notOnThisMacCount > 0 { parts.append("\(summary.notOnThisMacCount) not on this Mac") }
             return parts.joined(separator: " · ")
         }
     }

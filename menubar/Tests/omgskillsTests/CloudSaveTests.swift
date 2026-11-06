@@ -223,6 +223,10 @@ private actor FakeCloudSave: CloudSaveServing {
     var saved: [String: String] = [:]
     var deleted: [String: Bool] = [:]
     var calls: [String] = []
+    var additions: [String] = []
+
+    func add(_ ids: [String]) { additions = ids }
+    func mySkillAdditions(credential: StoredDeviceCredential) async throws -> [String] { additions }
 
     init(enabled: Bool = true, excluded: [String] = [], skills: [CloudSaveState.SavedSkill] = []) {
         state = CloudSaveState(settings: .init(enabled: enabled, excludedSkillKeys: excluded),
@@ -317,15 +321,38 @@ struct CloudSaveSyncTests {
         let summary = try await sync(api).run(installations: [installation(notes), installation(left)], localFolderKeys: ["notes", "left"],
             deviceID: "device-1", credential: credential())
         #expect(summary.skillCount == 3 && summary.notOnThisMacCount == 1 && summary.leftOutCount == 1)
-        #expect(CloudSaveController.statusText(summary) == "3 skills · 1 left out · 1 not on this Mac")
+        #expect(summary.hereCount == 2 && summary.mySkillsCount == 3)
+        #expect(CloudSaveController.statusText(summary) == "2 on this Mac · 1 left out")
 
         var clean = CloudSaveSummary(status: .upToDate)
-        clean.skillCount = 24
-        #expect(CloudSaveController.statusText(clean) == "24 skills · all saved")
+        clean.hereCount = 21
+        #expect(CloudSaveController.statusText(clean) == "21 on this Mac · all synced")
         clean.needsReview = ["a"]
         clean.skipped = ["b": .links, "c": .tooLarge]
-        clean.notOnThisMacCount = 3
-        #expect(CloudSaveController.statusText(clean) == "24 skills · 3 need attention on the web · 3 not on this Mac")
+        #expect(CloudSaveController.statusText(clean) == "21 on this Mac · 3 can't sync")
+        #expect(CloudSaveController.statusText(CloudSaveSummary(status: .off)) == "Not synced")
+    }
+
+    @Test func mySkillsCountAddsLibrarySkillsNothingElseStandsFor() async throws {
+        let root = try temporaryRoot()
+        let notes = try makeSkill(root, "notes")
+        let pdf = try makeSkill(root, "pdf")
+        try markInstalled(pdf)
+        let api = FakeCloudSave(skills: [.init(key: "docx", currentVersion: .init(id: "r1", treeSha: "x", deviceId: "device-2",
+            savedAt: "2026-01-01T00:00:00.000Z", labels: []), deletedLocallyAt: nil)])
+        // pdf is installed here (by catalog ID); docx is saved from another Mac; only xlsx and a duplicate are new.
+        await api.add(["o/r:pdf", "anthropics/skills:docx", "anthropics/skills:xlsx", "anthropics/skills:xlsx"])
+        var pdfInstall = installation(pdf)
+        pdfInstall = Skill(id: pdfInstall.id, name: "pdf", description: "", githubUrl: "", installCmd: pdf.path, authorHandle: "",
+            tags: [], readmeSnippet: nil, stars: 0, lastUpdated: pdfInstall.lastUpdated, firstSeen: "", skillMdSha: nil,
+            installs: nil, trendingRank: nil, trendingSource: nil, origin: "Claude", isSymlink: false, isLocalOnly: false,
+            catalogSkillId: "o/r:pdf")
+        let summary = try await sync(api).run(installations: [installation(notes), pdfInstall], localFolderKeys: ["notes", "pdf"],
+            deviceID: "device-1", credential: credential())
+        #expect(summary.hereCount == 2 && summary.skillCount == 3 && summary.addedCount == 1 && summary.mySkillsCount == 4)
+        #expect(ConnectedInventoryView.headerText(here: 2, summary: summary) == "4 skills")
+        #expect(ConnectedInventoryView.lineText(here: 2, summary: CloudSaveSummary(status: .off)) == "2 on this Mac · Not synced")
+        #expect(ConnectedInventoryView.headerText(here: 2, summary: CloudSaveSummary(status: .off)) == "2 skills")
     }
 
     @Test func libraryInstallsAreSavedAndExcludedSkillsAreNot() async throws {
@@ -377,7 +404,7 @@ struct CloudSaveSyncTests {
         let saves = await api.calls.filter { $0.hasPrefix("version:") }
         #expect(saves.first == "version:zz-own", "Your own skill is saved before any install")
         #expect(summary.notSavedYetCount == 2)
-        #expect(CloudSaveController.statusText(summary).contains("2 not saved yet"))
+        #expect(CloudSaveController.statusText(summary).contains("2 not synced yet"))
 
         // Another Mac saved an edit; this Mac's unchanged install of the same skill must not replace it.
         let pdf = try makeSkill(root, "pdf")
@@ -508,9 +535,9 @@ struct CloudSaveSyncTests {
         _ = try await CloudSaveSync(api: api, pace: { await paces.tick() }).run(installations: [installation(skill)],
             localFolderKeys: ["notes"], deviceID: "device-1", credential: credential())
         // Without batch upload: the first version request, one per batch attempt, one per file, the final save,
-        // and the report of skills not saved.
+        // the added library skills, and the report of skills not saved.
         #expect(await api.calls.filter { $0.hasPrefix("upload:") }.count == 3)
-        #expect(await paces.count == 1 + 1 + 3 + 1 + 1)
+        #expect(await paces.count == 1 + 1 + 3 + 1 + 1 + 1)
     }
 
     @Test func stopsWhenTheServerIsUnavailable() async throws {

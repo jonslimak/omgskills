@@ -126,6 +126,61 @@ struct SkillRemovalTests {
         removal.confirm()
         #expect(trashed.sorted() == ["a/Claude", "a/Codex", "b/Codex"])
         #expect(reported == 1, "One rescan for the whole batch")
-        #expect(removal.state == .done(title: "Deleted 2 skills", message: "Moved to the Trash. To undo, put them back from the Trash."))
+        #expect(removal.state == .done(title: "Removed 2 skills", message: "Moved to the Trash. To undo, put them back from the Trash."))
+    }
+
+    @Test func deleteEverywhereAsksTwiceTrashesThenForgetsTheSkill() async {
+        var trashed: [String] = [], forgotten: [[String]] = [], reported = 0
+        let library = Skill(id: "l", name: "pdf", description: "", githubUrl: "", installCmd: "/Users/me/.codex/skills/PDF",
+            authorHandle: "", tags: [], readmeSnippet: nil, stars: 0, lastUpdated: "", firstSeen: "", skillMdSha: nil,
+            installs: nil, trendingRank: nil, trendingSource: nil, origin: "Codex", isSymlink: false, isLocalOnly: false,
+            catalogSkillId: "anthropics/skills:pdf")
+        let removal = SkillRemovalController(installations: { [self] in [copy("pdf", "Claude"), library] },
+            trash: { trashed.append($0.origin!); return .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
+        removal.onRemoved = { reported += 1 }
+        #expect(!removal.canDeleteEverywhere)
+        removal.forget = { keys, ids in forgotten.append(keys + ids) }
+        removal.setCount = { _ in 2 }
+        _ = removal.receive(URL(string: "omgskills://remove?name=pdf")!)
+        removal.chooseEverywhere()
+        guard case .confirmEverywhere(let names, _, _) = removal.state else { Issue.record("expected second question"); return }
+        #expect(names == ["pdf"] && trashed.isEmpty && forgotten.isEmpty, "Nothing happens before the second yes")
+        await Task.yield()
+        await removal.confirmEverywhere()
+        #expect(trashed.sorted() == ["Claude", "Codex"])
+        #expect(forgotten == [["pdf", "anthropics/skills:pdf"]])
+        #expect(reported == 1)
+        #expect(removal.state == .done(title: "Deleted pdf",
+            message: "Removed from My skills and moved to the Trash. Copies on other Macs stay there."))
+        #expect(SkillRemoval.everywhereWarning(count: 1, sets: 2).hasSuffix("It's also taken out of 2 Sets; people keep what they installed."))
+        #expect(!SkillRemoval.everywhereWarning(count: 1, sets: 0).contains("Set"))
+    }
+
+    @Test func deleteEverywhereKeepsMySkillsWhenACopyStaysOrTheAccountFails() async {
+        struct Blocked: Error {}
+        var forgot = 0
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let stuck = root.appendingPathComponent("pdf")
+        try? FileManager.default.createDirectory(at: stuck, withIntermediateDirectories: true)
+        let stuckCopy = Skill(id: "s", name: "pdf", description: "", githubUrl: "", installCmd: stuck.path, authorHandle: "",
+            tags: [], readmeSnippet: nil, stars: 0, lastUpdated: "", firstSeen: "", skillMdSha: nil, installs: nil,
+            trendingRank: nil, trendingSource: nil, origin: "Codex", isSymlink: false, isLocalOnly: true)
+        let removal = SkillRemovalController(installations: { [self] in [copy("pdf", "Claude"), stuckCopy] },
+            trash: { if $0.origin == "Codex" { throw Blocked() }; return .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
+        removal.forget = { _, _ in forgot += 1 }
+        _ = removal.receive(URL(string: "omgskills://remove?name=pdf")!)
+        removal.chooseEverywhere()
+        await removal.confirmEverywhere()
+        #expect(forgot == 0, "A copy still here keeps it in My skills")
+        #expect(removal.state == .failed(message: "Couldn't delete 1 copy (Codex). Other copies were moved to the Trash. My skills still has it."))
+
+        let failing = SkillRemovalController(installations: { [self] in [copy("pdf", "Claude")] },
+            trash: { _ in .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
+        failing.forget = { _, _ in throw Blocked() }
+        _ = failing.receive(URL(string: "omgskills://remove?name=pdf")!)
+        failing.chooseEverywhere()
+        await failing.confirmEverywhere()
+        #expect(failing.state == .failed(message: "Moved to the Trash, but couldn't remove pdf from My skills. Delete it on the web."))
     }
 }

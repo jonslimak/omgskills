@@ -63,6 +63,17 @@ enum SkillRemoval {
         names.count == 1 ? names[0] : "\(names.count) skills"
     }
 
+    /// What Delete everywhere does, said before it happens.
+    static func everywhereWarning(count: Int, sets: Int?) -> String {
+        let them = count == 1 ? "it" : "them"
+        var text = "Removes \(them) from My skills and your account, and moves the copies here to the Trash. "
+            + "Copies on other Macs stay there but stop syncing."
+        if let sets, sets > 0 {
+            text += " \(count == 1 ? "It's" : "They're") also taken out of \(sets == 1 ? "1 Set" : "\(sets) Sets"); people keep what they installed."
+        }
+        return text
+    }
+
     /// Agent names for the copies, e.g. "Agents, Claude, Codex".
     static func agents(_ copies: [Skill]) -> String {
         Set(copies.map { $0.origin ?? "Agent" }).sorted().joined(separator: ", ")
@@ -76,6 +87,9 @@ final class SkillRemovalController {
         case idle
         /// `names` are the skills this Mac has; `missing` were asked for but are not here.
         case confirm(names: [String], copies: [Skill], missing: [String])
+        /// Delete everywhere, asked a second time; `sets` is how many Sets share them, once known.
+        case confirmEverywhere(names: [String], copies: [Skill], sets: Int?)
+        case working(title: String)
         case notFound(names: [String])
         case done(title: String, message: String)
         case failed(message: String)
@@ -83,9 +97,15 @@ final class SkillRemovalController {
 
     private(set) var state: State = .idle
     var onRemoved: () -> Void = {}
+    /// Removes the skills from My skills and the account (saved keys, then added library skills).
+    /// Without it, this Mac can only remove its own copies.
+    var forget: ((_ keys: [String], _ catalogIDs: [String]) async throws -> Void)?
+    /// How many Sets share any of these saved skills, or nil when unknown.
+    var setCount: ((_ keys: [String]) async -> Int?)?
 
     @ObservationIgnored private let installations: () -> [Skill]
     @ObservationIgnored private let trash: (Skill) throws -> InstalledSkillUninstaller.Result
+    @ObservationIgnored private var attempt = UUID()
 
     init(installations: @escaping () -> [Skill],
          trash: @escaping (Skill) throws -> InstalledSkillUninstaller.Result) {
@@ -94,11 +114,15 @@ final class SkillRemovalController {
     }
 
     var isActive: Bool { state != .idle }
+    var canDeleteEverywhere: Bool { forget != nil }
+    var isWorking: Bool { if case .working = state { true } else { false } }
 
     /// Returns true for any removal link, so it never reaches the installer.
     /// A newer link replaces any question still open, so the panel always asks about the skill last clicked.
     func receive(_ url: URL) -> Bool {
         guard url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "remove" else { return false }
+        guard !isWorking else { return true }
+        attempt = UUID()
         guard let names = SkillRemoval.names(from: url) else {
             state = .failed(message: "This delete link is invalid.")
             return true
@@ -111,32 +135,105 @@ final class SkillRemovalController {
         return true
     }
 
+    /// Remove from this Mac: every copy here goes to the Trash; My skills keeps it.
     func confirm() {
         guard case .confirm(let names, let asked, _) = state else { return }
-        // Only copies that are still there and were shown; anything new since the question is left alone.
+        guard let outcome = trashShown(names: names, asked: asked) else { return }
+        state = outcome.failures.isEmpty
+            ? .done(title: "Removed \(SkillRemoval.title(outcome.removed))",
+                    message: "Moved to the Trash. To undo, put \(outcome.removed.count == 1 ? "it" : "them") back from the Trash.")
+            : Self.partialFailure(outcome)
+    }
+
+    /// Asks again before deleting everywhere, with how many Sets would lose the skills.
+    func chooseEverywhere() {
+        guard forget != nil, case .confirm(let names, let copies, _) = state else { return }
+        let id = UUID()
+        attempt = id
+        state = .confirmEverywhere(names: names, copies: copies, sets: nil)
+        guard let setCount else { return }
+        let keys = Self.keys(copies)
+        Task {
+            let sets = await setCount(keys)
+            guard attempt == id, case .confirmEverywhere(let names, let copies, nil) = state else { return }
+            state = .confirmEverywhere(names: names, copies: copies, sets: sets)
+        }
+    }
+
+    /// Delete everywhere: the copies here go to the Trash, then My skills and the account forget them.
+    /// Other Macs keep their copies, but they no longer sync.
+    func confirmEverywhere() async {
+        guard let forget, case .confirmEverywhere(let names, let asked, _) = state else { return }
+        let id = UUID()
+        attempt = id
+        guard let outcome = trashShown(names: names, asked: asked, reportRemoved: false) else { return }
+        // A copy still here would be left out of sync, not deleted; the account keeps everything until all are gone.
+        guard outcome.failures.isEmpty else {
+            if !outcome.removed.isEmpty { onRemoved() }
+            state = Self.partialFailure(outcome, kept: true)
+            return
+        }
+        state = .working(title: "Deleting \(SkillRemoval.title(outcome.removed))…")
+        let gone = outcome.copies.filter { outcome.removed.map(SkillRemoval.normalizedName).contains(SkillRemoval.normalizedName($0.name)) }
+        var forgotten = true
+        do { try await forget(Self.keys(gone), Array(Set(gone.compactMap(\.catalogSkillId))).sorted()) }
+        catch { forgotten = false }
+        // The next sync runs after the account forgot them, so it doesn't save them back.
+        onRemoved()
+        guard attempt == id else { return }
+        if !forgotten {
+            state = .failed(message: "Moved to the Trash, but couldn't remove \(SkillRemoval.title(outcome.removed)) from My skills. "
+                + "Delete it on the web.")
+        } else {
+            state = .done(title: "Deleted \(SkillRemoval.title(outcome.removed))",
+                          message: "Removed from My skills and moved to the Trash. Copies on other Macs stay there.")
+        }
+    }
+
+    func close() {
+        guard !isWorking else { return }
+        attempt = UUID()
+        state = .idle
+    }
+
+    private struct Outcome {
+        let copies: [Skill]
+        let removed: [String]
+        let failures: [String]
+    }
+
+    /// Trashes the copies that are still there and were shown; anything new since the question is left alone.
+    /// Returns nil when none are left.
+    private func trashShown(names: [String], asked: [Skill], reportRemoved: Bool = true) -> Outcome? {
         let shown = Set(asked.map(SkillRemoval.location))
         let copies = SkillRemoval.copies(named: names, in: installations()).filter { shown.contains(SkillRemoval.location($0)) }
-        guard !copies.isEmpty else { state = .notFound(names: names); return }
-        var removed = 0, failures: [String] = [], removedNames = Set<String>()
+        guard !copies.isEmpty else { state = .notFound(names: names); return nil }
+        var failures: [String] = [], removedNames = Set<String>()
         for copy in copies {
-            do { _ = try trash(copy); removed += 1; removedNames.insert(SkillRemoval.normalizedName(copy.name)) }
+            do { _ = try trash(copy); removedNames.insert(SkillRemoval.normalizedName(copy.name)) }
             catch {
                 // Already gone (e.g. trashed through a linked folder) is what was asked for.
                 if (try? FileManager.default.attributesOfItem(atPath: copy.installCmd)) == nil {
-                    removed += 1; removedNames.insert(SkillRemoval.normalizedName(copy.name))
+                    removedNames.insert(SkillRemoval.normalizedName(copy.name))
                 } else { failures.append(copy.origin ?? "Agent") }
             }
         }
-        let deleted = names.filter { removedNames.contains(SkillRemoval.normalizedName($0)) }
-        if removed > 0 { onRemoved() }
-        state = failures.isEmpty
-            ? .done(title: "Deleted \(SkillRemoval.title(deleted))",
-                    message: "Moved to the Trash. To undo, put \(deleted.count == 1 ? "it" : "them") back from the Trash.")
-            : .failed(message: "Couldn't delete \(failures.count == 1 ? "1 copy" : "\(failures.count) copies") (\(Set(failures).sorted().joined(separator: ", "))). "
-                + (removed > 0 ? "Other copies were moved to the Trash." : "Nothing was deleted."))
+        let removed = names.filter { removedNames.contains(SkillRemoval.normalizedName($0)) }
+        if reportRemoved && !removedNames.isEmpty { onRemoved() }
+        return Outcome(copies: copies, removed: removed, failures: failures)
     }
 
-    func close() { state = .idle }
+    private static func partialFailure(_ outcome: Outcome, kept: Bool = false) -> State {
+        let count = outcome.failures.count
+        return .failed(message: "Couldn't delete \(count == 1 ? "1 copy" : "\(count) copies") (\(Set(outcome.failures).sorted().joined(separator: ", "))). "
+            + (outcome.removed.isEmpty ? "Nothing was deleted." : "Other copies were moved to the Trash.")
+            + (kept ? " My skills still has it." : ""))
+    }
+
+    /// The account's keys for these copies: their folder names.
+    static func keys(_ copies: [Skill]) -> [String] {
+        Array(Set(copies.map { CloudSaveFolder.key(forFolderName: URL(fileURLWithPath: $0.installCmd).lastPathComponent) })).sorted()
+    }
 }
 
 #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
@@ -151,8 +248,9 @@ struct SkillRemovalView: View {
             case .idle:
                 EmptyView()
             case .confirm(let names, let copies, let missing):
-                Text("Delete \(SkillRemoval.title(names)) from this Mac?").font(.headline)
-                Text("Every copy moves to the Trash.").font(.callout).foregroundStyle(.secondary)
+                Text("Remove \(SkillRemoval.title(names)) from this Mac?").font(.headline)
+                Text(controller.canDeleteEverywhere ? "Every copy here moves to the Trash. My skills keeps \(names.count == 1 ? "it" : "them")."
+                     : "Every copy moves to the Trash.").font(.callout).foregroundStyle(.secondary)
                 let skills = SkillRemoval.grouped(names: names, copies: copies)
                 let list = VStack(alignment: .leading, spacing: 8) {
                     ForEach(skills, id: \.name) { skill in
@@ -170,11 +268,29 @@ struct SkillRemovalView: View {
                 }
                 VStack(spacing: 6) {
                     Button(role: .destructive) { controller.confirm() } label: {
-                        Text("Move to Trash").frame(maxWidth: .infinity)
+                        Text("Remove from this Mac").frame(maxWidth: .infinity)
+                    }
+                    if controller.canDeleteEverywhere {
+                        Button(role: .destructive) { controller.chooseEverywhere() } label: {
+                            Text("Delete everywhere…").frame(maxWidth: .infinity)
+                        }
                     }
                     Button { controller.close() } label: { Text("Cancel").frame(maxWidth: .infinity) }
                         .keyboardShortcut(.cancelAction)
                 }
+            case .confirmEverywhere(let names, _, let sets):
+                Text("Delete \(SkillRemoval.title(names)) everywhere?").font(.headline)
+                Text(SkillRemoval.everywhereWarning(count: names.count, sets: sets))
+                    .font(.callout).foregroundStyle(.secondary)
+                VStack(spacing: 6) {
+                    Button(role: .destructive) { Task { await controller.confirmEverywhere() } } label: {
+                        Text("Delete everywhere").frame(maxWidth: .infinity)
+                    }
+                    Button { controller.close() } label: { Text("Cancel").frame(maxWidth: .infinity) }
+                        .keyboardShortcut(.cancelAction)
+                }
+            case .working(let title):
+                ProgressView(title).controlSize(.small)
             case .notFound(let names):
                 Text(names.count == 1 ? "\(names[0]) isn't on this Mac." : "None of these \(names.count) skills are on this Mac.")
                     .font(.headline)
