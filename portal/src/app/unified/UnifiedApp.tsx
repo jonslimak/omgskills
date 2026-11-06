@@ -854,7 +854,7 @@ export function UnifiedApp({
         GitHub sources
       </MenuItem>}
       {supportsView("cloud") && accountPages && <MenuItem icon={Cloud} onSelect={() => goFromAccount("cloud")}>
-        Cloud save
+        Sync
       </MenuItem>}
       {supportsView("mcp") && <MenuItem icon={Server} onSelect={() => goFromAccount("mcp")}>
         MCP server
@@ -1208,7 +1208,7 @@ export function UnifiedApp({
   const railList = nameOrdered && !nav.query.trim() && nav.show !== "origin";
   const attentionView = nav.view === "all" && nav.id === "attention";
   const titles: Record<View, string> = {
-    all: attentionView ? "needs attention" : "my skills",
+    all: attentionView ? "can't sync" : "my skills",
     favorites: "favorites",
     sets: "sets",
     discover: "Discover",
@@ -1225,7 +1225,7 @@ export function UnifiedApp({
     devices: "devices",
     profile: "profile",
     github: "GitHub sources",
-    cloud: "Cloud save",
+    cloud: "Sync",
     mcp: "MCP server",
   };
   const title = nav.query
@@ -1234,7 +1234,7 @@ export function UnifiedApp({
   const meta = nav.query
     ? `Results for "${nav.query}"`
     : attentionView
-      ? "Cloud save can't keep a copy of these yet. Open one to see why and what to do."
+      ? "These can't sync yet. Open one to see why and what to do."
     : nav.view === "all" && listState === "loading"
       ? "Loading skills\u2026"
     : nav.view === "all"
@@ -1362,7 +1362,7 @@ export function UnifiedApp({
             ) : (
               <>
                 {navItem("all", "All skills", User, myCountReady ? allMine.length : undefined)}
-                {attention.length > 0 && navItem("all", "Needs attention", TriangleAlert, attention.length, "attention")}
+                {attention.length > 0 && navItem("all", "Can't sync", TriangleAlert, attention.length, "attention")}
                 {(!readOnlyAccount || management) && <>{navItem("favorites", "Favorites", Heart, management ? data.sets.find(set => set.isFavorites)?.itemCount ?? 0 : favorites.length)}
                 {management && navItem("sets", "All sets", Shapes, sets.length)}
                 <div className="ua-nav-group">
@@ -1802,7 +1802,7 @@ export function UnifiedApp({
                     </>
                   )}
                   {nav.view === "cloud" && (
-                    <Empty title="Cloud save">Sign in to save your skills to the cloud.</Empty>
+                    <Empty title="Sync">Sign in to sync your skills.</Empty>
                   )}
                   {nav.view === "github" && (
                     <Empty

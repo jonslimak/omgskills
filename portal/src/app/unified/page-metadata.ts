@@ -4,7 +4,7 @@ import type { CatalogDisplay, Navigation } from "./model";
 const viewTitles: Partial<Record<Navigation["view"], string>> = {
   all: "My skills", favorites: "Favorites", sets: "Sets", discover: "Discover", data: "Data", developers: "Developers & Agents",
   top: "Trending skills", collections: "Collections", agents: "Agents", devices: "Devices",
-  profile: "Profile", github: "GitHub sources", cloud: "Cloud save", mcp: "MCP server",
+  profile: "Profile", github: "GitHub sources", cloud: "Sync", mcp: "MCP server",
 };
 
 export function pageTitle(nav: Navigation, catalog: Pick<CatalogDisplay, "skills" | "creators" | "collections">) {

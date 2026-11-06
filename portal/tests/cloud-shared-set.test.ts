@@ -23,8 +23,8 @@ test("a skill shared from cloud save is marked in the Set; only the owner hears 
   const [shared] = setSkillDisplays(owner, []);
   assert.equal(shared.setItemCloudShared, true);
   assert.equal(shared.setItemUpdateAvailable, true);
-  assert.equal(cloudSharedLabel(shared, "owner"), "Shared from your cloud save · newer version saved");
-  assert.equal(cloudSharedLabel({ ...shared, setItemUpdateAvailable: undefined }, "owner"), "Shared from your cloud save");
+  assert.equal(cloudSharedLabel(shared, "owner"), "Shared from My skills · newer version synced");
+  assert.equal(cloudSharedLabel({ ...shared, setItemUpdateAvailable: undefined }, "owner"), "Shared from My skills");
   assert.equal(cloudSharedLabel(setSkillDisplays(member, [])[0], "invited"), "Private skill · installs with the Set");
 });
 

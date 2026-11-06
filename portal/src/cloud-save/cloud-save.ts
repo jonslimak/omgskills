@@ -201,19 +201,19 @@ const statusOrder: Record<CloudSkillRow["status"], number> = {
 };
 
 export const statusText: Record<CloudSkillRow["status"], string> = {
-  saved: "Saved",
-  deleted: "Saved · deleted on Mac",
-  review: "Needs review",
-  confirmed: "Saving on next sync",
+  saved: "Synced",
+  deleted: "Synced · deleted on a Mac",
+  review: "Can't sync: needs review",
+  confirmed: "Syncs next time",
   excluded: "Left out",
-  library: "Saved · from the library",
-  set: "Saved · from a Set",
-  waiting: "Not saved yet",
-  off: "Not saved",
-  links: "Not saved: links to files outside the skill",
-  too_large: "Not saved: too large",
-  unreadable: "Not saved: couldn't be read",
-  failed: "Not saved yet: the last try failed, trying again",
+  library: "Synced · from the library",
+  set: "Synced · from a Set",
+  waiting: "Not synced yet",
+  off: "Not synced",
+  links: "Can't sync: links to files outside the skill",
+  too_large: "Can't sync: too large",
+  unreadable: "Can't sync: couldn't be read",
+  failed: "Not synced yet: the last try failed, trying again",
 };
 
 export const labelText: Record<CloudLabel, string> = {
@@ -235,9 +235,9 @@ export function cloudSummaryText(rows: CloudSkillRow[]) {
   const leftOut = count(row => row.status === "excluded");
   const notOnMac = count(row => !row.onMac);
   const parts = [`${rows.length} ${rows.length === 1 ? "skill" : "skills"}`];
-  if (!attention && !pending && !leftOut) parts.push("all saved");
-  if (attention) parts.push(`${attention} need${attention === 1 ? "s" : ""} attention`);
-  if (pending) parts.push(`${pending} not saved yet`);
+  if (!attention && !pending && !leftOut) parts.push("all synced");
+  if (attention) parts.push(`${attention} can't sync`);
+  if (pending) parts.push(`${pending} not synced yet`);
   if (leftOut) parts.push(`${leftOut} left out`);
   if (notOnMac) parts.push(`${notOnMac} not on your Macs`);
   return parts.join(" · ");
@@ -262,17 +262,17 @@ export function skillCloudRow(rows: Map<string, CloudSkillRow>, keys: string[]):
 
 /** What to do about a skill that isn't saved, for its detail panel. */
 export const statusHelp: Partial<Record<CloudSkillRow["status"], string>> = {
-  review: "A file looks like it contains a key or password, so it wasn't saved. Remove the key on your Mac and it saves by itself, or confirm it's safe.",
-  confirmed: "You confirmed it's safe. Your Mac saves it on its next sync.",
-  links: "It links to files outside its folder, which are never saved. Copy those files into the skill and it saves by itself.",
+  review: "A file looks like it contains a key or password, so it wasn't synced. Remove the key on your Mac and it syncs by itself, or confirm it's safe.",
+  confirmed: "You confirmed it's safe. Your Mac syncs it next time.",
+  links: "It links to files outside its folder, which never sync. Copy those files into the skill and it syncs by itself.",
   too_large: "It's over the size limit (12 MB, 4 MB per file).",
   unreadable: "Your Mac couldn't read its folder.",
-  failed: "The last save failed. Your Mac tries again on its next sync.",
-  library: "The version you installed from the library is saved. If you change it, your version is saved too.",
-  set: "The version you installed from a Set is saved. If you change it, your version is saved too.",
-  excluded: "You left it out of cloud save.",
-  waiting: "Your Mac saves it on its next sync.",
-  off: "Cloud save is off.",
+  failed: "The last sync failed. Your Mac tries again next time.",
+  library: "The version you installed from the library is synced. If you change it, your version is synced too.",
+  set: "The version you installed from a Set is synced. If you change it, your version is synced too.",
+  excluded: "You left it out of sync.",
+  waiting: "Your Mac syncs it next time.",
+  off: "Sync is off.",
 };
 
 /** What deleting also does to Sets, for the confirmation; empty when no Set shares it. */
