@@ -13,7 +13,10 @@ struct ConnectedInventoryView: View {
             switch model.state {
             case .connected:
                 if let count = Self.reportedCount(model.reportStatus) {
-                    Text("\(model.skillCount ?? count) Skills").font(.body)
+                    let here = model.skillCount ?? count
+                    let cloud = runtime?.cloudSave.flatMap { $0.isAvailable ? $0.shownSummary : nil }
+                    Text(Self.headerText(here: here, summary: cloud)).font(.body)
+                    Text(Self.lineText(here: here, summary: cloud)).font(.caption).foregroundStyle(.secondary)
                 }
                 if let attention = Self.reportAttention(model.reportStatus) {
                     Text(attention).font(.callout).textSelection(.enabled)
@@ -24,7 +27,9 @@ struct ConnectedInventoryView: View {
                 }
                 if let warning = runtime?.watchWarning { Text(warning).font(.caption).foregroundStyle(.secondary) }
                 if let cloudSave = runtime?.cloudSave, cloudSave.isAvailable {
-                    CloudSaveSection(controller: cloudSave, reconnect: { runtime?.connect(deviceName: deviceName) })
+                    // While the header is hidden (reporting, or a failed report), the section says how sync is doing.
+                    CloudSaveSection(controller: cloudSave, showsStatus: Self.reportedCount(model.reportStatus) == nil,
+                                     reconnect: { runtime?.connect(deviceName: deviceName) })
                 }
                 HStack(spacing: 8) { inventoryActions }.buttonStyle(.bordered)
             case .authorizing, .exchanging, .storingCredential, .syncing:
@@ -56,26 +61,30 @@ struct ConnectedInventoryView: View {
 
     private struct CloudSaveSection: View {
         let controller: CloudSaveController
+        let showsStatus: Bool
         let reconnect: () -> Void
 
         var body: some View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
-                    Text("Save to cloud").lineLimit(1)
+                    Text("Sync My skills").lineLimit(1)
+                    if controller.isRunning { ProgressView().controlSize(.mini) }
                     Spacer(minLength: 0)
-                    Toggle("Save to cloud", isOn: Binding(
-                        get: { controller.summary.map { $0.status != .off } ?? false },
+                    Toggle("Sync My skills", isOn: Binding(
+                        get: { controller.isEnabled },
                         set: { controller.setEnabled($0) }))
                     .toggleStyle(.switch).controlSize(.small).labelsHidden()
                 }
-                if let summary = controller.summary, summary.status != .off {
-                    HStack(spacing: 6) {
-                        if controller.isRunning { ProgressView().controlSize(.mini) }
-                        Text(CloudSaveController.statusText(summary)).font(.caption).foregroundStyle(.secondary)
-                    }
-                    if summary.status == .permissionRequired || summary.status == .reconnectRequired {
-                        Button("Reconnect", action: reconnect).controlSize(.small)
-                    }
+                if !controller.isEnabled {
+                    Text("Off: My skills lists names only, and files stay on this Mac.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                if showsStatus, let summary = controller.shownSummary, summary.status != .off {
+                    Text(CloudSaveController.statusText(summary)).font(.caption).foregroundStyle(.secondary)
+                }
+                if let summary = controller.summary,
+                   summary.status == .permissionRequired || summary.status == .reconnectRequired {
+                    Button("Reconnect", action: reconnect).controlSize(.small)
                 }
                 if let message = controller.message { Text(message).font(.caption).foregroundStyle(.secondary) }
             }.padding(.top, 8)
@@ -90,6 +99,22 @@ struct ConnectedInventoryView: View {
         Button {
             if let runtime { runtime.disconnect() } else { model.disconnect() }
         } label: { Text("Disconnect").frame(maxWidth: .infinity) }
+    }
+
+    /// The My skills count: everything in the account once sync has reported, else what this Mac has.
+    nonisolated static func headerText(here: Int, summary: CloudSaveSummary?) -> String {
+        let total = summary.flatMap { [.upToDate, .incomplete].contains($0.status) ? $0.mySkillsCount : nil } ?? here
+        return "\(total) \(total == 1 ? "skill" : "skills")"
+    }
+
+    /// "75 on this Mac · 5 can't sync · 2 left out", or why sync isn't reporting.
+    nonisolated static func lineText(here: Int, summary: CloudSaveSummary?) -> String {
+        guard let summary else { return "\(here) on this Mac" }
+        switch summary.status {
+        case .upToDate, .incomplete: return CloudSaveController.statusText(summary)
+        case .off: return "\(here) on this Mac · Not synced"
+        default: return "\(here) on this Mac · " + CloudSaveController.statusText(summary)
+        }
     }
 
     static func reportedCount(_ status: DeviceConnectionModel.ReportStatus) -> Int? {

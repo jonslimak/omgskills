@@ -26,6 +26,8 @@ struct CloudSaveState: Decodable, Equatable, Sendable {
         let key: String
         let currentVersion: Version
         let deletedLocallyAt: String?
+        /// Sets this saved skill is shared in.
+        var setCount: Int? = nil
     }
     struct Review: Decodable, Equatable, Sendable {
         struct File: Decodable, Equatable, Sendable {
@@ -93,6 +95,8 @@ protocol CloudSaveServing: Sendable {
     func withdrawReview(key: String, credential: StoredDeviceCredential) async throws
     /// Tells the web why each skill wasn't saved, replacing this Mac's last report.
     func reportSkipped(_ skipped: [String: CloudSaveSkipReason], credential: StoredDeviceCredential) async throws
+    /// Library skills added to My skills (by catalog ID), installed anywhere or not.
+    func mySkillAdditions(credential: StoredDeviceCredential) async throws -> [String]
 }
 
 /// The server has no batch upload; files go one at a time.
@@ -100,6 +104,8 @@ struct CloudSaveBatchUnsupported: Error {}
 
 extension CloudSaveServing {
     func reportSkipped(_ skipped: [String: CloudSaveSkipReason], credential: StoredDeviceCredential) async throws {}
+
+    func mySkillAdditions(credential: StoredDeviceCredential) async throws -> [String] { [] }
 
     func uploadFiles(_ entries: [SkillPackageEntry], credential: StoredDeviceCredential) async throws -> [CloudSaveFinding] {
         throw CloudSaveBatchUnsupported()
@@ -227,6 +233,26 @@ struct CloudSaveAPI: CloudSaveServing {
         _ = try await send("PUT", path: ["skipped"], json: ["skipped": skipped.mapValues(\.rawValue)], credential: credential)
     }
 
+    /// Delete everywhere: the saved copy and every version go, and the skill is left out of sync from then on.
+    func deleteSkill(key: String, credential: StoredDeviceCredential) async throws {
+        try requireUploadScope(credential)
+        _ = try await send("DELETE", path: ["skills", key], credential: credential)
+    }
+
+    func mySkillAdditions(credential: StoredDeviceCredential) async throws -> [String] {
+        let data = try await send("GET", path: [], base: "my-skills", credential: credential)
+        struct Body: Decodable { struct Row: Decodable { let catalogSkillId: String }; let skills: [Row] }
+        do { return try JSONDecoder().decode(Body.self, from: data).skills.map(\.catalogSkillId) }
+        catch { throw CloudSaveAPIError.invalidResponse }
+    }
+
+    /// Takes a library skill out of My skills.
+    func removeMySkill(catalogID: String, credential: StoredDeviceCredential) async throws {
+        try requireUploadScope(credential)
+        _ = try await send("DELETE", path: [], query: [URLQueryItem(name: "catalogSkillId", value: catalogID)],
+                           base: "my-skills", credential: credential)
+    }
+
     private struct SavedBody: Decodable { let created: Bool }
     private struct BatchResult: Decodable { let findings: [CloudSaveFinding]? }
     private struct BatchBody: Decodable { let files: [BatchResult] }
@@ -243,10 +269,15 @@ struct CloudSaveAPI: CloudSaveServing {
         guard credential.connection.grantedScopes.contains(.contentWrite) else { throw CloudSaveAPIError.permissionRequired }
     }
 
-    private func send(_ method: String, path: [String], json: [String: Any]? = nil, body: Data? = nil,
+    private func send(_ method: String, path: [String], query: [URLQueryItem] = [], base: String = "cloud-save",
+                      json: [String: Any]? = nil, body: Data? = nil,
                       headers: [String: String] = [:], credential: StoredDeviceCredential) async throws -> Data {
-        var url = origin.appendingPathComponent("api").appendingPathComponent("portal").appendingPathComponent("cloud-save")
+        var url = origin.appendingPathComponent("api").appendingPathComponent("portal").appendingPathComponent(base)
         for component in path { url.appendPathComponent(component) }
+        if !query.isEmpty, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            components.queryItems = query
+            if let withQuery = components.url { url = withQuery }
+        }
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.timeoutInterval = 60

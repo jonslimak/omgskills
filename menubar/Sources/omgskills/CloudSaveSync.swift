@@ -35,6 +35,12 @@ struct CloudSaveSummary: Equatable, Sendable {
     var skillCount = 0
     /// Skills kept in the cloud that aren't on this Mac (deleted here, or from another Mac).
     var notOnThisMacCount = 0
+    /// Skills on this Mac, one per folder name.
+    var hereCount = 0
+    /// Library skills added to My skills that are neither on this Mac nor saved in the account.
+    var addedCount = 0
+    /// Everything in My skills: what this Mac has, what the account keeps, and added library skills.
+    var mySkillsCount: Int { skillCount + addedCount }
     /// Skills on this Mac you chose to leave out of cloud save.
     var leftOutCount = 0
     /// Unchanged library and Set installs not uploaded yet: a pass saves only a few, so the first
@@ -149,7 +155,12 @@ struct CloudSaveSync: Sendable {
         let inCloud = Set(state.skills.map(\.key)).union(state.needsReview.map(\.key).filter { !withdrawn.contains($0) })
         summary.skipped = summary.skipped.filter { !excluded.contains($0.key) }
         summary.skillCount = here.union(inCloud).count
+        summary.hereCount = here.count
         summary.notOnThisMacCount = inCloud.subtracting(here).count
+        try? await pace()
+        if let additions = try? await api.mySkillAdditions(credential: credential) {
+            summary.addedCount = Self.addedNotListed(additions, installations: installations, keys: here.union(inCloud))
+        }
         summary.leftOutCount = here.intersection(excluded).count
         // Only a finished pass knows every reason; the web keeps the last full report until then.
         let report = summary.skipped.filter { !excluded.contains($0.key) }
@@ -239,6 +250,17 @@ struct CloudSaveSync: Sendable {
         if let lastTree { return lastTree != folder.treeSha }
         guard let savedAt = date(current.currentVersion.savedAt) else { return true }
         return folder.modifiedAt > savedAt
+    }
+
+    /// Added library skills that nothing else in My skills stands for: not installed here (by catalog ID), and
+    /// no skill here or in the account under the folder name a library install would use.
+    /// Unlike the web, skills only on another Mac and not synced aren't known here, so this count can be lower.
+    static func addedNotListed(_ catalogIDs: [String], installations: [Skill], keys: Set<String>) -> Int {
+        let installed = Set(installations.compactMap(\.catalogSkillId))
+        return Set(catalogIDs).filter { id in
+            let name = id.split(separator: ":").last.map(String.init) ?? id
+            return !installed.contains(id) && !keys.contains(CloudSaveFolder.key(forFolderName: name))
+        }.count
     }
 
     /// How many unchanged installs one pass uploads.

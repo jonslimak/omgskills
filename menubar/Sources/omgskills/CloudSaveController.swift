@@ -11,6 +11,18 @@ final class CloudSaveController {
     private(set) var isAvailable = false
     private(set) var isRunning = false
     private(set) var message: String?
+    /// The switch position just chosen, until the server has answered and a pass has run.
+    private(set) var pendingEnabled: Bool?
+    /// The setting as the server last confirmed it: by a change, or by a pass that read it.
+    private(set) var confirmedEnabled: Bool?
+    /// Whether the switch reads on: the choice in progress, else the confirmed setting, else the last pass.
+    var isEnabled: Bool { pendingEnabled ?? confirmedEnabled ?? summary.map { $0.status != .off } ?? false }
+    /// The last pass, only when it agrees with the switch: nothing while turning on, "off" while turning off.
+    var shownSummary: CloudSaveSummary? {
+        guard let summary else { return nil }
+        if !isEnabled { return CloudSaveSummary(status: .off) }
+        return summary.status == .off ? nil : summary
+    }
 
     typealias Scan = @Sendable () async throws -> InstalledSkillsScanner.ScanResult
     /// Every folder name in the skills folders, or nil when one of them couldn't be read.
@@ -25,6 +37,7 @@ final class CloudSaveController {
     @ObservationIgnored private var task: Task<Void, Never>?
     @ObservationIgnored private var taskID: UUID?
     @ObservationIgnored private var rerun = false
+    @ObservationIgnored private var change = UUID()
 
     init(api: any CloudSaveServing, credential: @escaping @MainActor () -> StoredDeviceCredential?, scan: @escaping Scan,
          folderKeys: @escaping FolderKeys, treeRecord: URL? = CloudSaveController.defaultTreeRecord,
@@ -99,10 +112,16 @@ final class CloudSaveController {
         message = nil
         // Turning it off stops a pass in progress; the server refuses anything after the change.
         if !enabled { cancel() }
+        let id = UUID()
+        change = id
+        pendingEnabled = enabled
         return Task { @MainActor [weak self] in
             guard let self else { return }
+            // Only the latest choice settles the switch.
+            defer { if change == id { pendingEnabled = nil } }
             do {
                 try await api.setEnabled(enabled, credential: record)
+                if change == id { confirmedEnabled = enabled }
                 if enabled { await requestRun()?.value }
                 else { summary = CloudSaveSummary(status: .off) }
             } catch CloudSaveAPIError.permissionRequired {
@@ -110,7 +129,7 @@ final class CloudSaveController {
             } catch CloudSaveAPIError.reconnectRequired {
                 summary = CloudSaveSummary(status: .reconnectRequired)
             } catch {
-                message = "Cloud save could not be changed. Try again."
+                message = "Sync could not be changed. Try again."
             }
         }
     }
@@ -136,29 +155,29 @@ final class CloudSaveController {
             if [.upToDate, .incomplete].contains(next.status) { remember(next.localTrees, for: deviceID) }
             if next.status != .unavailable { isAvailable = true }
             summary = next
+            if [.off, .upToDate, .incomplete].contains(next.status) { confirmedEnabled = next.status != .off }
             message = nil
         } catch is CancellationError {
         } catch {
-            message = "Cloud save could not finish. It will try again."
+            message = "Sync could not finish. It will try again."
         }
     }
 
+    /// The line under the My skills count: what this Mac has, then only what needs a look.
     nonisolated static func statusText(_ summary: CloudSaveSummary) -> String {
         switch summary.status {
-        case .off: return "Cloud save is off."
-        case .permissionRequired: return "Reconnect this Mac to allow cloud save."
-        case .reconnectRequired: return "Reconnect this Mac to keep saving skills."
-        case .storageFull: return "Cloud storage is full."
-        case .unavailable: return "Cloud save is unavailable right now. It will try again."
+        case .off: return "Not synced"
+        case .permissionRequired: return "Reconnect this Mac to allow sync."
+        case .reconnectRequired: return "Reconnect this Mac to keep syncing."
+        case .storageFull: return "Sync storage is full."
+        case .unavailable: return "Sync is unavailable right now. It will try again."
         case .upToDate, .incomplete:
-            // The same line the web shows: every skill, then only what needs a look.
             let attention = summary.attentionCount
-            var parts = ["\(summary.skillCount) \(summary.skillCount == 1 ? "skill" : "skills")"]
-            if attention == 0 && summary.leftOutCount == 0 && summary.notSavedYetCount == 0 { parts.append("all saved") }
-            if attention > 0 { parts.append("\(attention) need\(attention == 1 ? "s" : "") attention on the web") }
-            if summary.notSavedYetCount > 0 { parts.append("\(summary.notSavedYetCount) not saved yet") }
+            var parts = ["\(summary.hereCount) on this Mac"]
+            if attention == 0 && summary.leftOutCount == 0 && summary.notSavedYetCount == 0 { parts.append("all synced") }
+            if attention > 0 { parts.append("\(attention) can't sync") }
+            if summary.notSavedYetCount > 0 { parts.append("\(summary.notSavedYetCount) not synced yet") }
             if summary.leftOutCount > 0 { parts.append("\(summary.leftOutCount) left out") }
-            if summary.notOnThisMacCount > 0 { parts.append("\(summary.notOnThisMacCount) not on this Mac") }
             return parts.joined(separator: " · ")
         }
     }
