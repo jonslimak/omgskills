@@ -1,7 +1,7 @@
 import { isDeviceCredential } from "./crypto.js";
 import { getPgPool } from "./db.js";
 import { DeviceAuthError, requireDeviceActor, type DeviceScope } from "./device-auth.js";
-import { errorResponse, jsonResponse, optionsResponse, withTimeout } from "./http.js";
+import { errorResponse, jsonResponse, optionsResponse, secretJsonResponse, withTimeout } from "./http.js";
 import { loadPublishedSkills } from "./published-catalog.js";
 import { requirePortalUser } from "./user.js";
 import { requireJsonObject, requireString } from "./validation.js";
@@ -96,7 +96,7 @@ export async function handleMySkills(
       : await deps.requirePortalUser(req);
 
     if (req.method === "GET") {
-      return jsonResponse(req, { skills: await listMySkills(deps.getPgPool(), user.id) });
+      return secretJsonResponse(req, { skills: await listMySkills(deps.getPgPool(), user.id) });
     }
 
     if (req.method === "POST") {

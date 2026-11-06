@@ -183,6 +183,7 @@ test("a paired Mac reads and removes with its credential, but can't add", async 
   const device = { authorization: `Bearer device_${"a".repeat(43)}` };
   const list = await handleMySkills(new Request(base, { headers: device }), h.deps);
   assert.equal(list.status, 200);
+  assert.equal(list.headers.get("cache-control"), "no-store");
   assert.deepEqual(await list.json(), { skills: [{ catalogSkillId: catalogId, addedAt: "2026-11-06T00:00:00.000Z" }] });
   const removed = await handleMySkills(new Request(`${base}?catalogSkillId=${encodeURIComponent(catalogId)}`,
     { method: "DELETE", headers: device }), h.deps);
