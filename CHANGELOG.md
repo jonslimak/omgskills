@@ -4,6 +4,12 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.36] - 2026-11-06
+
+### App
+- Show the My skills count and sync status on Mac.
+- Install synced skills and distinguish local removal from deletion everywhere.
+
 ## [0.0.35] - 2026-11-05
 
 ### App
