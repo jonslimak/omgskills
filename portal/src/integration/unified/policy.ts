@@ -13,7 +13,8 @@ export function accountNavigation(nav: Navigation, signedIn: boolean): Navigatio
   const list = ["all", "favorites", "set"].includes(nav.view);
   // "attention" is the only list filter My skills keeps in the address.
   return { ...nav, id: nav.view === "set" || (nav.view === "all" && nav.id === "attention") ? nav.id : "",
-    selected: list && (nav.selected.startsWith("synced:") || (nav.view !== "all" && nav.selected.startsWith("set-item:"))) ? nav.selected : "" };
+    selected: list && (nav.selected.startsWith("synced:") || (nav.view === "all" && nav.selected.startsWith("cloud:"))
+      || (nav.view !== "all" && nav.selected.startsWith("set-item:"))) ? nav.selected : "" };
 }
 
 // Private names/search terms must never be sent to the public search service.

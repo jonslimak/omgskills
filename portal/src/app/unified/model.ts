@@ -161,14 +161,17 @@ const skillShows: SkillShow[] = ["installed", "not-installed", "personal", "publ
 export const byName = (a: SkillDisplay, b: SkillDisplay) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
 /** Personal skills are your own; public ones were installed from the library. Each part sorted by name. */
 /**
- * Skills in My skills that no Mac has now: saved copies whose folder is on none of your Macs.
- * Names and descriptions come from the last copy a Mac reported, when there was one.
+ * Skills in My skills that no Mac has now: saved copies whose folder belongs to no skill in the list.
+ * Only a saved copy counts; a review alone saved nothing. Details come from the last copy a Mac
+ * reported, unless that skill is still installed elsewhere (then the row's own label tells them apart).
  */
-export function notInstalledSkills(rows: { key: string; name: string; onMac: boolean }[], everMine: SkillDisplay[],
-  keysOf: (skill: SkillDisplay) => string[]): SkillDisplay[] {
-  return rows.filter(row => !row.onMac).map(row => {
+export function notInstalledSkills(rows: { key: string; name: string; savedAt: string | null }[], mine: SkillDisplay[],
+  everMine: SkillDisplay[], keysOf: (skill: SkillDisplay) => string[]): SkillDisplay[] {
+  const listed = new Set(mine.flatMap(keysOf));
+  return rows.filter(row => row.savedAt && !listed.has(row.key)).map(row => {
     const last = everMine.find(skill => keysOf(skill).includes(row.key));
-    return { ...(last ?? { name: row.name, description: "", author: "", githubUrl: null, tags: [] }),
+    const stillInstalled = last && mine.some(skill => skill.key === last.key);
+    return { ...(last && !stillInstalled ? last : { name: row.name, description: "", author: "", githubUrl: null, tags: [] }),
       key: `cloud:${row.key}`, installed: undefined, cloudKey: row.key };
   });
 }
@@ -209,7 +212,8 @@ export function parseNavigation(search: string): Navigation {
     source: params.get("source") || "all",
   };
   const show = params.get("show") as SkillShow;
-  if (skillShows.includes(show) && !isDiscovery(nav.view)) nav.show = show;
+  if (skillShows.includes(show) && !isDiscovery(nav.view)
+    && (nav.view === "all" || (show !== "installed" && show !== "not-installed"))) nav.show = show;
   if (nav.view === "category") {
     const term = discoveryCategories.some(group => group.items.includes(nav.id)) ? nav.id : "";
     nav.view = "discover";

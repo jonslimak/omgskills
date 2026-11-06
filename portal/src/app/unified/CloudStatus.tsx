@@ -6,8 +6,10 @@ import { needsAttention, statusHelp, statusText, labelText, type CloudSaveState,
 export type CloudInfo = { state: CloudSaveState; confirm: (key: string) => Promise<void> };
 
 /** A skill's cloud save status as one short label beside its actions; the detail shows on hover. */
-export function CloudStatusBadge({ row }: { row: CloudSkillRow | null }) {
-  if (!row) return null;
+export function CloudStatusBadge({ row: shown, notInstalled = false }: { row: CloudSkillRow | null; notInstalled?: boolean }) {
+  if (!shown) return null;
+  // A skill already marked Not installed just reads Saved.
+  const row = notInstalled && shown.status === "deleted" ? { ...shown, status: "saved" as const } : shown;
   const attention = needsAttention(row.status);
   const Icon = row.status === "review" ? TriangleAlert : attention ? CloudOff : Cloud;
   const saved = ["saved", "deleted", "library", "set"].includes(row.status);
