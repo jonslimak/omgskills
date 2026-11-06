@@ -328,3 +328,67 @@ test("confirmed creation survives failed refresh without replaying the write", a
   await assert.rejects(f.session.saveMembership({ kind: "create-selected", name: "Test", skills: [pair] }), /Refresh your account/);
   assert.equal(writes, 1); f.session.dispose();
 });
+
+test("a heart tap shows in Favorites before the server answers, and only for an existing Favorites", async () => {
+  const { withFavoriteChange } = await import("../src/integration/membership-data");
+  const { isFavorite } = await import("../src/app/unified/model");
+  const favorites = { ...setSummary({ id: "fav", name: "Favorites", slug: "favorites", isFavorites: true, itemCount: 0, syncedSkillIds: [] } as never, true, "Owner"), isFavorites: true };
+  const data = { skills: physical, sets: [favorites], devices: [], profile: { handle: "", name: "", email: "", published: false }, privateSourceConnected: null } as never as Parameters<typeof withFavoriteChange>[0];
+  const installed = { key: "pair", name: "Pair", installed: pair } as never;
+  const library = { key: "lib", name: "Lib", catalogId: "owner/lib" } as never;
+
+  const added = withFavoriteChange(data, { kind: "favorites", skills: [pair], add: true });
+  assert.equal(isFavorite(added, installed), true);
+  assert.equal(added.sets[0].itemCount, 1);
+  const catalog = withFavoriteChange(data, { kind: "catalog", catalogId: "owner/lib", favorite: true });
+  assert.equal(isFavorite(catalog, library), true);
+
+  // Removing by any copy's ID, or by catalog ID, clears the heart.
+  assert.equal(isFavorite(withFavoriteChange(added, { kind: "remove-favorite", skillId: "claude" }), installed), false);
+  assert.equal(isFavorite(withFavoriteChange(catalog, { kind: "remove-favorite", catalogId: "owner/lib" }), library), false);
+  assert.equal(withFavoriteChange(added, { kind: "remove-favorite", skillId: "claude" }).sets[0].itemCount, 0);
+
+  // Other commands, a repeat, and a first favorite (which creates the set) change nothing yet.
+  assert.equal(withFavoriteChange(added, { kind: "favorites", skills: [pair], add: true }), added);
+  assert.equal(withFavoriteChange(data, { kind: "reorder", id: "fav", itemIds: [] }), data);
+  const none = { ...data, sets: [] };
+  assert.equal(withFavoriteChange(none, { kind: "favorites", skills: [pair], add: true }), none);
+});
+
+test("a favorite shows at once, rereads only Sets, and goes back (rereading skills) when the save fails", async () => {
+  const { isFavorite } = await import("../src/app/unified/model");
+  for (const outcome of ["saved", "failed"] as const) {
+    const f = fixture([]);
+    const reads: string[] = [];
+    let release!: () => void;
+    const gate = new Promise<void>(resolve => { release = resolve; });
+    const api: PortalApi = async <T>(path: string, init?: RequestInit) => {
+      if (!init?.method || init.method === "GET") reads.push(path);
+      if (path.endsWith("/synced-skills")) return { skills: physical } as T;
+      if (path.endsWith("/profile")) return { profile: { handle: null, profilePublished: false, publicUrl: null } } as T;
+      if (path.endsWith("/shared")) return { groups: [] } as T;
+      if (path.endsWith("/groups")) return { groups: [{ id: "set", name: "Favorites", slug: "favorites", isFavorites: true,
+        syncedSkillIds: f.items().map(item => item.syncedSkillId), itemCount: f.items().length }] } as T;
+      if (init?.method === "POST") {
+        await gate;
+        if (outcome === "failed") throw new PortalApiError("Nope", 422);
+      }
+      const value = await f.api<any>(path, init);
+      return (value.group ? { ...value, group: { ...value.group, isFavorites: true } } : value) as T;
+    };
+    const session = createAccountSession({ api, identity: { name: "Test", email: "test@example.test" },
+      cacheKey: `instant-${outcome}`, changed: () => {}, includeFavoriteItems: true });
+    try {
+      await session.refresh();
+      const display = { key: "pair", name: "Pair", installed: pair } as never;
+      reads.length = 0;
+      const saving = session.saveMembership({ kind: "favorites", skills: [pair], add: true });
+      assert.equal(isFavorite(session.getSnapshot().data!, display), true, "the heart fills before the server answers");
+      release();
+      await saving.catch(() => {});
+      assert.equal(isFavorite(session.getSnapshot().data!, display), outcome === "saved");
+      // A save reads only Sets again; a failure reads skills too, so a retry uses current copies.
+      assert.equal(reads.some(path => path.endsWith("/synced-skills")), outcome === "failed");
+    } finally { session.dispose(); }
+  }
+});

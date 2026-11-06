@@ -1,8 +1,8 @@
 import type { PortalApi } from "../portal-api";
 import { PortalApiError, isAccessError } from "../api-error";
 import { addSyncedSkillToGroup, createCatalogFavoritesGroup, createFavoritesGroup, createGroup, listOwnedGroups, removeGroupItem, reorderGroupItems, updateGroupItem } from "../groups/api";
-import { hasCatalogId, type GroupedSyncedSkill } from "../synced-skill-grouping";
-import { isMember, type MembershipResult, type PortalSet } from "../app/model";
+import { groupSyncedSkills, hasCatalogId, type GroupedSyncedSkill } from "../synced-skill-grouping";
+import { isMember, type MembershipResult, type PortalData, type PortalSet } from "../app/model";
 import { loadSetData } from "./data";
 
 export const emptyMembershipResult = (): MembershipResult => ({ completedIds: [], failed: [], added: 0, removed: 0, unchanged: 0, uncertain: false });
@@ -212,4 +212,43 @@ export async function removeFavoriteMembership(api: PortalApi, sets: PortalSet[]
     (skill && item.kind === "synced" && item.syncedSkillId && skill.allSkillIds.includes(item.syncedSkillId)));
   for (const item of matches) await removeMembershipItem(api, id, item.id, signal);
   return { ...result, removed: matches.length ? 1 : 0, unchanged: matches.length ? 0 : 1 };
+}
+
+/**
+ * Favorites as they will be once a heart tap saves, shown before the server answers.
+ * The reload after the save replaces it; a first favorite, which creates the set, waits for that reload.
+ */
+export function withFavoriteChange(data: PortalData, command: MembershipCommand): PortalData {
+  const favorites = data.sets.find(set => set.role === "owner" && set.isFavorites);
+  if (!favorites || favorites.hidden) return data;
+  let next: PortalSet;
+  if (command.kind === "favorites" && command.add) {
+    const skills = command.skills.filter(skill => !isMember(favorites, skill));
+    if (!skills.length) return data;
+    next = { ...favorites, itemCount: (favorites.itemCount ?? favorites.items.length) + skills.length,
+      membershipSkillIds: favorites.membershipSkillIds && [...favorites.membershipSkillIds, ...skills.map(skill => skill.id)],
+      items: [...favorites.items, ...skills.map(skill => ({ id: `pending:${skill.id}`, syncedSkillId: skill.id, name: skill.name,
+        description: skill.description ?? "", githubUrl: skill.githubUrl, kind: "synced" as const }))] };
+  } else if (command.kind === "catalog" && command.favorite) {
+    if (favorites.items.some(item => item.catalogSkillId === command.catalogId)) return data;
+    next = { ...favorites, itemCount: (favorites.itemCount ?? favorites.items.length) + 1,
+      items: [...favorites.items, { id: `pending:${command.catalogId}`, syncedSkillId: null, catalogSkillId: command.catalogId,
+        name: "", description: "", githubUrl: null, kind: "catalog" }] };
+  } else if (command.kind === "remove-favorite" || (command.kind === "favorites" && !command.add)) {
+    // Mirror what the save removes: Favorites by skill or catalog ID, or a plain Set change by the chosen copies only.
+    const groups = groupSyncedSkills(data.skills, { groupInstallations: true });
+    const skills = command.kind === "favorites" ? command.skills
+      : command.skillId ? groups.filter(group => group.allSkillIds.includes(command.skillId!)) : [];
+    const catalogId = command.kind === "remove-favorite" ? command.catalogId : undefined;
+    const ids = new Set(skills.flatMap(skill => skill.allSkillIds));
+    const matches = (item: PortalSet["items"][number]) => (item.syncedSkillId !== null && ids.has(item.syncedSkillId))
+      || (command.kind === "remove-favorite" && !!item.catalogSkillId
+        && (item.catalogSkillId === catalogId || skills.some(skill => hasCatalogId(skill, item.catalogSkillId!))));
+    const items = favorites.items.filter(item => !matches(item));
+    const membershipSkillIds = favorites.membershipSkillIds?.filter(id => !ids.has(id));
+    const removed = Math.max(favorites.items.length - items.length, (favorites.membershipSkillIds?.length ?? 0) - (membershipSkillIds?.length ?? 0));
+    if (!removed) return data;
+    next = { ...favorites, items, membershipSkillIds, itemCount: Math.max(0, (favorites.itemCount ?? favorites.items.length) - removed) };
+  } else return data;
+  return { ...data, sets: data.sets.map(set => set === favorites ? next : set) };
 }

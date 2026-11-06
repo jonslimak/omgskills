@@ -1,12 +1,12 @@
 import type { PortalApi } from "../portal-api";
 import type { PortalData } from "../app/model";
 import { isAccessError, PortalApiError } from "../api-error";
-import { loadAccountData, readOnlyApi, saveProfileData, type AccountIdentity } from "./data";
+import { loadAccountData, loadAccountSets, readOnlyApi, saveProfileData, type AccountIdentity } from "./data";
 import { saveSetData, type SetCommand } from "./set-data";
 import { changeMembership, changeFavorites, createSelectedSet, removeMembershipItem, reorderMembership, updateMembershipItem, emptyMembershipResult, type MembershipCommand } from "./membership-data";
 import { groupSyncedSkills, type GroupedSyncedSkill, type SyncedSkill } from "../synced-skill-grouping";
 import type { MembershipResult } from "../app/model";
-import { addCatalogMembership, removeFavoriteMembership } from "./membership-data";
+import { addCatalogMembership, removeFavoriteMembership, withFavoriteChange } from "./membership-data";
 
 function membershipRows(skills: SyncedSkill[], selected?: GroupedSyncedSkill[]) {
   const displayGroups = groupSyncedSkills(skills, { groupInstallations: true });
@@ -189,7 +189,8 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
       persist(confirmed);
       emit({ data: confirmed });
       try {
-        const data = await loadAccountData(readOnlyApi(api, controller.signal, connectedInventory, inventoryReconciliation), identity, includeFavoriteItems, connectedInventory, inventoryReconciliation);
+        // A Set change leaves skills, devices and profile alone, so only the Sets are read again.
+        const data = { ...confirmed, sets: await loadAccountSets(readOnlyApi(api, controller.signal, connectedInventory, inventoryReconciliation), identity, includeFavoriteItems) };
         checkActive();
         persist(data);
         emit({ data, error: "", setSaving: false, revision: snapshot.revision + 1 });
@@ -217,7 +218,8 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
     const signal = controller.signal;
     const scoped: PortalApi = (path, init) => api(path, { ...init, signal, redirect: "error", cache: "no-store" });
     const checkActive = () => { if (!active || version !== generation) throw new DOMException("Account changed", "AbortError"); };
-    emit({ refreshing: false, setSaving: true });
+    // The heart shows the change at once; the reload below confirms it, or puts it back.
+    emit({ refreshing: false, setSaving: true, data: withFavoriteChange(current, command) });
     const promise = (async () => {
       let result = emptyMembershipResult();
       let failure: unknown;
@@ -256,7 +258,14 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
       // Reconcile even a partial batch; never replay writes to recover a failed read.
       let data = current;
       let refreshError = "";
-      try { data = await loadAccountData(readOnlyApi(scoped, undefined, connectedInventory, inventoryReconciliation), identity, includeFavoriteItems, connectedInventory, inventoryReconciliation); checkActive(); persist(data); }
+      try {
+        // Membership changes only Sets, so only the Sets are read again. A failure may mean the
+        // skills changed since they loaded (a Mac synced), so it reads everything for the retry.
+        const read = readOnlyApi(scoped, undefined, connectedInventory, inventoryReconciliation);
+        data = failure || result.failed.length ? await loadAccountData(read, identity, includeFavoriteItems, connectedInventory, inventoryReconciliation)
+          : { ...current, sets: await loadAccountSets(read, identity, includeFavoriteItems) };
+        checkActive(); persist(data);
+      }
       catch (error) {
         checkActive();
         if (isAccessError(error)) {
@@ -264,6 +273,8 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
           emit({ data: null, accessDenied: true, setSaving: false, error: "Changes may have saved, but account access is unavailable. Sign in again." });
           throw new Error("Account access is unavailable. Sign in again.");
         }
+        // A confirmed save keeps showing, even when the read after it fails.
+        if (!failure && !result.uncertain && !result.failed.length) data = withFavoriteChange(current, command);
         refreshError = "Could not refresh after the operation. Refresh to confirm the latest membership.";
       }
       emit({ data, setSaving: false, revision: snapshot.revision + 1,
