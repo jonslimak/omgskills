@@ -154,6 +154,20 @@ struct SkillRemovalTests {
             message: "Removed from My skills and moved to the Trash. Copies on other Macs stay there."))
         #expect(SkillRemoval.everywhereWarning(count: 1, sets: 2).hasSuffix("It's also taken out of 2 Sets; people keep what they installed."))
         #expect(!SkillRemoval.everywhereWarning(count: 1, sets: 0).contains("Set"))
+        #expect(SkillRemoval.everywhereWarning(count: 2, sets: 3).hasSuffix("taken out of the Sets they're in; people keep what they installed."))
+
+        var allowed = false
+        let offline = SkillRemovalController(installations: { [self] in [copy("pdf", "Claude")] },
+            trash: { _ in Issue.record("must not trash"); return .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
+        offline.forget = { _, _ in Issue.record("must not forget") }
+        offline.mayForget = { allowed }
+        #expect(!offline.canDeleteEverywhere, "No permission, no Delete everywhere")
+        allowed = true
+        _ = offline.receive(URL(string: "omgskills://remove?name=pdf")!)
+        offline.chooseEverywhere()
+        allowed = false
+        await offline.confirmEverywhere()
+        #expect(offline.state == .failed(message: "Reconnect this Mac to your account to delete everywhere. Nothing was deleted."))
     }
 
     @Test func deleteEverywhereKeepsMySkillsWhenACopyStaysOrTheAccountFails() async {

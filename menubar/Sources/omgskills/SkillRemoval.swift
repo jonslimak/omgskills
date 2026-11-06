@@ -69,7 +69,10 @@ enum SkillRemoval {
         var text = "Removes \(them) from My skills and your account, and moves the copies here to the Trash. "
             + "Copies on other Macs stay there but stop syncing."
         if let sets, sets > 0 {
-            text += " \(count == 1 ? "It's" : "They're") also taken out of \(sets == 1 ? "1 Set" : "\(sets) Sets"); people keep what they installed."
+            // Counts add up per skill, so for several skills one Set may be counted twice; don't give a number.
+            text += count == 1
+                ? " It's also taken out of \(sets == 1 ? "1 Set" : "\(sets) Sets"); people keep what they installed."
+                : " They're also taken out of the Sets they're in; people keep what they installed."
         }
         return text
     }
@@ -102,6 +105,8 @@ final class SkillRemovalController {
     var forget: ((_ keys: [String], _ catalogIDs: [String]) async throws -> Void)?
     /// How many Sets share any of these saved skills, or nil when unknown.
     var setCount: ((_ keys: [String]) async -> Int?)?
+    /// Whether this Mac may delete from the account now (connected, with permission to change content).
+    var mayForget: () -> Bool = { true }
 
     @ObservationIgnored private let installations: () -> [Skill]
     @ObservationIgnored private let trash: (Skill) throws -> InstalledSkillUninstaller.Result
@@ -114,7 +119,7 @@ final class SkillRemovalController {
     }
 
     var isActive: Bool { state != .idle }
-    var canDeleteEverywhere: Bool { forget != nil }
+    var canDeleteEverywhere: Bool { forget != nil && mayForget() }
     var isWorking: Bool { if case .working = state { true } else { false } }
 
     /// Returns true for any removal link, so it never reaches the installer.
@@ -147,7 +152,7 @@ final class SkillRemovalController {
 
     /// Asks again before deleting everywhere, with how many Sets would lose the skills.
     func chooseEverywhere() {
-        guard forget != nil, case .confirm(let names, let copies, _) = state else { return }
+        guard canDeleteEverywhere, case .confirm(let names, let copies, _) = state else { return }
         let id = UUID()
         attempt = id
         state = .confirmEverywhere(names: names, copies: copies, sets: nil)
@@ -164,6 +169,11 @@ final class SkillRemovalController {
     /// Other Macs keep their copies, but they no longer sync.
     func confirmEverywhere() async {
         guard let forget, case .confirmEverywhere(let names, let asked, _) = state else { return }
+        // Nothing goes to the Trash unless the account can forget it too.
+        guard mayForget() else {
+            state = .failed(message: "Reconnect this Mac to your account to delete everywhere. Nothing was deleted.")
+            return
+        }
         let id = UUID()
         attempt = id
         guard let outcome = trashShown(names: names, asked: asked, reportRemoved: false) else { return }
@@ -249,7 +259,7 @@ struct SkillRemovalView: View {
                 EmptyView()
             case .confirm(let names, let copies, let missing):
                 Text("Remove \(SkillRemoval.title(names)) from this Mac?").font(.headline)
-                Text(controller.canDeleteEverywhere ? "Every copy here moves to the Trash. My skills keeps \(names.count == 1 ? "it" : "them")."
+                Text(controller.canDeleteEverywhere ? "Every copy here moves to the Trash. If synced, My skills keeps \(names.count == 1 ? "it" : "them")."
                      : "Every copy moves to the Trash.").font(.callout).foregroundStyle(.secondary)
                 let skills = SkillRemoval.grouped(names: names, copies: copies)
                 let list = VStack(alignment: .leading, spacing: 8) {

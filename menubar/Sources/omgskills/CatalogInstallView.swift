@@ -320,6 +320,9 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
                     for key in keys { try await account.deleteSkill(key: key, credential: credential) }
                     for id in catalogIDs { try await account.removeMySkill(catalogID: id, credential: credential) }
                 }
+                removal.mayForget = { [weak runtime] in
+                    runtime?.connection.currentCredential?.connection.grantedScopes.contains(.contentWrite) == true
+                }
                 removal.setCount = { [weak runtime] keys in
                     guard let credential = await runtime?.connection.currentCredential,
                           let state = try? await account.state(credential: credential) else { return nil }

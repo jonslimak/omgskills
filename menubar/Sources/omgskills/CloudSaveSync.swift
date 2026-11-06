@@ -254,6 +254,7 @@ struct CloudSaveSync: Sendable {
 
     /// Added library skills that nothing else in My skills stands for: not installed here (by catalog ID), and
     /// no skill here or in the account under the folder name a library install would use.
+    /// Unlike the web, skills only on another Mac and not synced aren't known here, so this count can be lower.
     static func addedNotListed(_ catalogIDs: [String], installations: [Skill], keys: Set<String>) -> Int {
         let installed = Set(installations.compactMap(\.catalogSkillId))
         return Set(catalogIDs).filter { id in
