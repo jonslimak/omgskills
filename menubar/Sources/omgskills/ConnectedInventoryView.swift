@@ -14,7 +14,7 @@ struct ConnectedInventoryView: View {
             case .connected:
                 if let count = Self.reportedCount(model.reportStatus) {
                     let here = model.skillCount ?? count
-                    let cloud = runtime?.cloudSave.flatMap { $0.isAvailable ? $0.summary : nil }
+                    let cloud = runtime?.cloudSave.flatMap { $0.isAvailable ? $0.shownSummary : nil }
                     Text(Self.headerText(here: here, summary: cloud)).font(.body)
                     Text(Self.lineText(here: here, summary: cloud)).font(.caption).foregroundStyle(.secondary)
                 }
@@ -79,7 +79,7 @@ struct ConnectedInventoryView: View {
                     Text("Off: My skills lists names only, and files stay on this Mac.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
-                if showsStatus, controller.isEnabled, let summary = controller.summary, summary.status != .off {
+                if showsStatus, let summary = controller.shownSummary, summary.status != .off {
                     Text(CloudSaveController.statusText(summary)).font(.caption).foregroundStyle(.secondary)
                 }
                 if let summary = controller.summary,

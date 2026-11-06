@@ -13,8 +13,16 @@ final class CloudSaveController {
     private(set) var message: String?
     /// The switch position just chosen, until the server has answered and a pass has run.
     private(set) var pendingEnabled: Bool?
-    /// Whether the switch reads on: the choice in progress, else the last pass.
-    var isEnabled: Bool { pendingEnabled ?? summary.map { $0.status != .off } ?? false }
+    /// The setting as the server last confirmed it: by a change, or by a pass that read it.
+    private(set) var confirmedEnabled: Bool?
+    /// Whether the switch reads on: the choice in progress, else the confirmed setting, else the last pass.
+    var isEnabled: Bool { pendingEnabled ?? confirmedEnabled ?? summary.map { $0.status != .off } ?? false }
+    /// The last pass, only when it agrees with the switch: nothing while turning on, "off" while turning off.
+    var shownSummary: CloudSaveSummary? {
+        guard let summary else { return nil }
+        if !isEnabled { return CloudSaveSummary(status: .off) }
+        return summary.status == .off ? nil : summary
+    }
 
     typealias Scan = @Sendable () async throws -> InstalledSkillsScanner.ScanResult
     /// Every folder name in the skills folders, or nil when one of them couldn't be read.
@@ -113,6 +121,7 @@ final class CloudSaveController {
             defer { if change == id { pendingEnabled = nil } }
             do {
                 try await api.setEnabled(enabled, credential: record)
+                if change == id { confirmedEnabled = enabled }
                 if enabled { await requestRun()?.value }
                 else { summary = CloudSaveSummary(status: .off) }
             } catch CloudSaveAPIError.permissionRequired {
@@ -146,6 +155,7 @@ final class CloudSaveController {
             if [.upToDate, .incomplete].contains(next.status) { remember(next.localTrees, for: deviceID) }
             if next.status != .unavailable { isAvailable = true }
             summary = next
+            if [.off, .upToDate, .incomplete].contains(next.status) { confirmedEnabled = next.status != .off }
             message = nil
         } catch is CancellationError {
         } catch {

@@ -240,7 +240,11 @@ private actor FakeCloudSave: CloudSaveServing {
     }
 
     func state(credential: StoredDeviceCredential) async throws -> CloudSaveState { calls.append("state"); return state }
-    func setEnabled(_ enabled: Bool, credential: StoredDeviceCredential) async throws { calls.append("enabled:\(enabled)") }
+    func setEnabled(_ enabled: Bool, credential: StoredDeviceCredential) async throws {
+        calls.append("enabled:\(enabled)")
+        state = CloudSaveState(settings: .init(enabled: enabled, excludedSkillKeys: state.settings.excludedSkillKeys),
+                               usage: state.usage, skills: state.skills, needsReview: state.needsReview)
+    }
     func uploadFile(_ entry: SkillPackageEntry, confirmSecrets: Bool, credential: StoredDeviceCredential) async throws {
         calls.append("upload:\(entry.path)")
         if let findings = held[entry.blobSha], !confirmSecrets { throw CloudSaveAPIError.needsReview(findings) }
@@ -824,7 +828,26 @@ struct CloudSaveControllerTests {
         #expect(controller.summary?.status == .off && !controller.isEnabled)
         let change = controller.setEnabled(true)
         #expect(controller.isEnabled, "On right away, before the server answers")
+        #expect(controller.shownSummary == nil, "No stale \"Not synced\" while turning on")
         await change?.value
-        #expect(controller.pendingEnabled == nil)
+        #expect(controller.pendingEnabled == nil && controller.isEnabled)
+    }
+
+    @Test func aFailedPassAfterTurningOnKeepsTheSwitchOn() async throws {
+        struct Flaky: CloudSaveServing {
+            func state(credential: StoredDeviceCredential) async throws -> CloudSaveState { throw CloudSaveAPIError.unavailable }
+            func setEnabled(_ enabled: Bool, credential: StoredDeviceCredential) async throws {}
+            func uploadFile(_ entry: SkillPackageEntry, confirmSecrets: Bool, credential: StoredDeviceCredential) async throws {}
+            func saveVersion(_ folder: CloudSaveFolder, credential: StoredDeviceCredential) async throws -> CloudSaveVersionResult { .saved(created: false) }
+            func markDeletedLocally(key: String, deleted: Bool, credential: StoredDeviceCredential) async throws {}
+            func withdrawReview(key: String, credential: StoredDeviceCredential) async throws {}
+        }
+        let controller = CloudSaveController(api: Flaky(), credential: { credential() },
+            scan: { InstalledSkillsScanner.ScanResult(skills: [], installations: [], summary: InstalledSkillSummary()) },
+            folderKeys: { [] }, treeRecord: nil, pace: {})
+        await controller.setEnabled(true)?.value
+        #expect(controller.isEnabled, "The account is on even though the pass couldn't reach the server")
+        await controller.setEnabled(false)?.value
+        #expect(!controller.isEnabled && controller.shownSummary?.status == .off)
     }
 }
