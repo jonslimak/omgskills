@@ -27,7 +27,9 @@ struct ConnectedInventoryView: View {
                 }
                 if let warning = runtime?.watchWarning { Text(warning).font(.caption).foregroundStyle(.secondary) }
                 if let cloudSave = runtime?.cloudSave, cloudSave.isAvailable {
-                    CloudSaveSection(controller: cloudSave, reconnect: { runtime?.connect(deviceName: deviceName) })
+                    // While the header is hidden (reporting, or a failed report), the section says how sync is doing.
+                    CloudSaveSection(controller: cloudSave, showsStatus: Self.reportedCount(model.reportStatus) == nil,
+                                     reconnect: { runtime?.connect(deviceName: deviceName) })
                 }
                 HStack(spacing: 8) { inventoryActions }.buttonStyle(.bordered)
             case .authorizing, .exchanging, .storingCredential, .syncing:
@@ -59,6 +61,7 @@ struct ConnectedInventoryView: View {
 
     private struct CloudSaveSection: View {
         let controller: CloudSaveController
+        let showsStatus: Bool
         let reconnect: () -> Void
 
         var body: some View {
@@ -68,13 +71,16 @@ struct ConnectedInventoryView: View {
                     if controller.isRunning { ProgressView().controlSize(.mini) }
                     Spacer(minLength: 0)
                     Toggle("Sync My skills", isOn: Binding(
-                        get: { controller.summary.map { $0.status != .off } ?? false },
+                        get: { controller.isEnabled },
                         set: { controller.setEnabled($0) }))
                     .toggleStyle(.switch).controlSize(.small).labelsHidden()
                 }
-                if controller.summary?.status == .off {
+                if !controller.isEnabled {
                     Text("Off: My skills lists names only, and files stay on this Mac.")
                         .font(.caption).foregroundStyle(.secondary)
+                }
+                if showsStatus, controller.isEnabled, let summary = controller.summary, summary.status != .off {
+                    Text(CloudSaveController.statusText(summary)).font(.caption).foregroundStyle(.secondary)
                 }
                 if let summary = controller.summary,
                    summary.status == .permissionRequired || summary.status == .reconnectRequired {

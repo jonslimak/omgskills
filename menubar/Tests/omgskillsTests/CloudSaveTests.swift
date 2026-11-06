@@ -812,3 +812,19 @@ struct CloudSaveAPITests {
         await #expect(throws: CloudSaveAPIError.unavailable) { try await api.state(credential: credential()) }
     }
 }
+
+@MainActor
+struct CloudSaveControllerTests {
+    @Test func theSwitchShowsTheNewChoiceUntilThePassFinishes() async throws {
+        let api = FakeCloudSave(enabled: false)
+        let controller = CloudSaveController(api: api, credential: { credential() },
+            scan: { InstalledSkillsScanner.ScanResult(skills: [], installations: [], summary: InstalledSkillSummary()) },
+            folderKeys: { [] }, treeRecord: nil, pace: {})
+        await controller.requestRun()?.value
+        #expect(controller.summary?.status == .off && !controller.isEnabled)
+        let change = controller.setEnabled(true)
+        #expect(controller.isEnabled, "On right away, before the server answers")
+        await change?.value
+        #expect(controller.pendingEnabled == nil)
+    }
+}

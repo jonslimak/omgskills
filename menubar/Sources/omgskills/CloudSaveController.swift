@@ -11,6 +11,10 @@ final class CloudSaveController {
     private(set) var isAvailable = false
     private(set) var isRunning = false
     private(set) var message: String?
+    /// The switch position just chosen, until the server has answered and a pass has run.
+    private(set) var pendingEnabled: Bool?
+    /// Whether the switch reads on: the choice in progress, else the last pass.
+    var isEnabled: Bool { pendingEnabled ?? summary.map { $0.status != .off } ?? false }
 
     typealias Scan = @Sendable () async throws -> InstalledSkillsScanner.ScanResult
     /// Every folder name in the skills folders, or nil when one of them couldn't be read.
@@ -25,6 +29,7 @@ final class CloudSaveController {
     @ObservationIgnored private var task: Task<Void, Never>?
     @ObservationIgnored private var taskID: UUID?
     @ObservationIgnored private var rerun = false
+    @ObservationIgnored private var change = UUID()
 
     init(api: any CloudSaveServing, credential: @escaping @MainActor () -> StoredDeviceCredential?, scan: @escaping Scan,
          folderKeys: @escaping FolderKeys, treeRecord: URL? = CloudSaveController.defaultTreeRecord,
@@ -99,8 +104,13 @@ final class CloudSaveController {
         message = nil
         // Turning it off stops a pass in progress; the server refuses anything after the change.
         if !enabled { cancel() }
+        let id = UUID()
+        change = id
+        pendingEnabled = enabled
         return Task { @MainActor [weak self] in
             guard let self else { return }
+            // Only the latest choice settles the switch.
+            defer { if change == id { pendingEnabled = nil } }
             do {
                 try await api.setEnabled(enabled, credential: record)
                 if enabled { await requestRun()?.value }
