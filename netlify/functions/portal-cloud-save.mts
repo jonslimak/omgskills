@@ -160,7 +160,8 @@ export async function portalCloudSave(
         return secretJsonResponse(req, await readCloudSave(dependencies.pool(), userId));
       }
       case "skill": {
-        const { userId } = await dependencies.requireUser(req);
+        // Delete everywhere: the web, or a Mac that may write content.
+        const { userId } = await actor(req, dependencies, "content:write");
         return secretJsonResponse(req, await deleteCloudSkills(dependencies.pool(), dependencies.store(),
           { userId, skillKey: route.skillKey }));
       }

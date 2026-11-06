@@ -175,3 +175,21 @@ test("OPTIONS answers the CORS preflight", async () => {
   const response = await handleMySkills(new Request(base, { method: "OPTIONS" }), harness().deps);
   assert.ok(response.status < 300);
 });
+
+test("a paired Mac reads and removes with its credential, but can't add", async () => {
+  const scopes: string[] = [];
+  const h = harness({ denied: true, rows: [{ catalogSkillId: catalogId, addedAt: new Date("2026-11-06T00:00:00Z") }] });
+  h.deps.requireDevice = async (_req, scope) => { scopes.push(scope); return { id: user.id }; };
+  const device = { authorization: `Bearer device_${"a".repeat(43)}` };
+  const list = await handleMySkills(new Request(base, { headers: device }), h.deps);
+  assert.equal(list.status, 200);
+  assert.equal(list.headers.get("cache-control"), "no-store");
+  assert.deepEqual(await list.json(), { skills: [{ catalogSkillId: catalogId, addedAt: "2026-11-06T00:00:00.000Z" }] });
+  const removed = await handleMySkills(new Request(`${base}?catalogSkillId=${encodeURIComponent(catalogId)}`,
+    { method: "DELETE", headers: device }), h.deps);
+  assert.deepEqual(await removed.json(), { removed: true });
+  const add = await handleMySkills(new Request(base, { method: "POST", headers: { ...device, "content-type": "application/json" },
+    body: JSON.stringify({ catalogSkillId: catalogId }) }), h.deps);
+  assert.equal(add.status, 401);
+  assert.deepEqual(scopes, ["sync:write", "content:write"]);
+});

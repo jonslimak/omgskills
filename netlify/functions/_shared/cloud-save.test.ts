@@ -163,15 +163,15 @@ test("storage listing parses pages and rejects malformed responses", async () =>
   await assert.rejects(store.listCloudObjects(null, 20), /continuation token/);
 });
 
-test("deleting is a web action: a Mac's credential can't delete saved skills", async () => {
+test("deleting everything is a web action; a Mac may delete one skill everywhere", async () => {
   const seen: string[] = [];
   const deps = dependencies({
     requireUser: async () => { seen.push("user"); throw new Response("Unauthorized", { status: 401 }); },
-    requireDevice: async () => { seen.push("device"); return { userId: "u", deviceId: "d" }; }
+    requireDevice: async (_req: Request, scope: string) => { seen.push(`device:${scope}`); throw new Response("Forbidden", { status: 403 }); }
   });
   const device = { authorization: `Bearer device_${"a".repeat(43)}` };
   assert.equal((await call("DELETE", "", deps, device)).status, 401);
-  assert.equal((await call("DELETE", "/skills/notes", deps, device)).status, 401);
-  assert.deepEqual(seen, ["user", "user"]);
+  assert.equal((await call("DELETE", "/skills/notes", deps, device)).status, 403);
+  assert.deepEqual(seen, ["user", "device:content:write"]);
   assert.equal((await call("POST", "/skills/notes")).status, 405);
 });

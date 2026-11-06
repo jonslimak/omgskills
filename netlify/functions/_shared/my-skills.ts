@@ -1,5 +1,7 @@
+import { isDeviceCredential } from "./crypto.js";
 import { getPgPool } from "./db.js";
-import { errorResponse, jsonResponse, optionsResponse, withTimeout } from "./http.js";
+import { DeviceAuthError, requireDeviceActor, type DeviceScope } from "./device-auth.js";
+import { errorResponse, jsonResponse, optionsResponse, secretJsonResponse, withTimeout } from "./http.js";
 import { loadPublishedSkills } from "./published-catalog.js";
 import { requirePortalUser } from "./user.js";
 import { requireJsonObject, requireString } from "./validation.js";
@@ -13,9 +15,10 @@ type QueryPool = Pick<ReturnType<typeof getPgPool>, "query">;
 const defaultDependencies = {
   getPgPool: (): QueryPool => getPgPool(),
   requirePortalUser: (req: Request) => requirePortalUser(req),
+  // A paired Mac reads My skills (to count and install it) and removes from it (Delete everywhere).
+  requireDevice: async (req: Request, scope: DeviceScope) => ({ id: (await requireDeviceActor(getPgPool(), req, scope)).userId }),
   // A cold instance downloads and parses the whole catalog, so adding waits as long as other catalog adds do.
   loadPublishedSkills: () => withTimeout(loadPublishedSkills(), 25_000),
-  // The list only borrows names from the catalog; the web fills them in from the library when it can't wait.
 };
 export type MySkillsDependencies = typeof defaultDependencies;
 
@@ -71,6 +74,11 @@ async function removeMySkill(pool: QueryPool, userId: string, catalogSkillId: st
   return result.rows.length > 0;
 }
 
+function presentsDeviceCredential(req: Request): boolean {
+  const token = req.headers.get("authorization")?.match(/^Bearer ([^\s]+)$/i)?.[1];
+  return Boolean(token && isDeviceCredential(token));
+}
+
 export async function handleMySkills(
   req: Request,
   overrides: Partial<MySkillsDependencies> = {},
@@ -82,10 +90,13 @@ export async function handleMySkills(
       return errorResponse(req, 405, "Method not allowed");
     }
 
-    const user = await deps.requirePortalUser(req);
+    // Adding is a web choice; a Mac can read and remove.
+    const user = req.method !== "POST" && presentsDeviceCredential(req)
+      ? await deps.requireDevice(req, req.method === "GET" ? "sync:write" : "content:write")
+      : await deps.requirePortalUser(req);
 
     if (req.method === "GET") {
-      return jsonResponse(req, { skills: await listMySkills(deps.getPgPool(), user.id) });
+      return secretJsonResponse(req, { skills: await listMySkills(deps.getPgPool(), user.id) });
     }
 
     if (req.method === "POST") {
@@ -110,6 +121,7 @@ export async function handleMySkills(
     if (error instanceof Response) {
       return errorResponse(req, error.status, await error.text());
     }
+    if (error instanceof DeviceAuthError) return errorResponse(req, error.status, error.message);
     return errorResponse(req, 500, "Failed to update My skills");
   }
 }
