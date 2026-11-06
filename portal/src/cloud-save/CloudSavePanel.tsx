@@ -91,9 +91,9 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
     </p>}
 
     {reviews.length > 0 && <div className="cloud-save-reviews">
-      <h3>Needs review</h3>
-      <p className="rd-muted">These files look like they contain a key or password, so they weren't saved. Remove the
-        key on your Mac and the skill saves by itself, or confirm it's safe to save as it is.</p>
+      <h3>Can't sync: needs review</h3>
+      <p className="rd-muted">These files look like they contain a key or password, so they weren't synced. Remove the
+        key on your Mac and the skill syncs by itself, or confirm it's safe to sync as it is.</p>
       {reviews.map(row => <div className="rd-source-release" key={row.key}>
         <div className="rd-grow"><strong>{row.name}</strong>
           {row.findings.map(file => <p className="rd-muted" key={file.path}>
@@ -101,9 +101,9 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
           </p>)}
         </div>
         {row.status === "confirmed"
-          ? <span className="rd-muted">Saving on your Mac's next sync</span>
+          ? <span className="rd-muted">Syncs next time</span>
           : <Action disabled={saving} onClick={() => void change(() => confirmCloudReview(callbacks.current.api, row.key),
-              "The skill could not be confirmed.")}>It's safe, save it</Action>}
+              "The skill could not be confirmed.")}>It's safe, sync it</Action>}
       </div>)}
     </div>}
 
@@ -114,10 +114,10 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
           "Your choices could not be saved.").then(done => { if (done) setChoosing(false); });
       }}>
         <h3>Choose skills</h3>
-        <p className="rd-muted">Every skill is saved unless you untick it. New skills are saved automatically.</p>
+        <p className="rd-muted">Every skill syncs unless you untick it. New skills sync automatically.</p>
         <div className="cloud-save-choices">
           {rows.map(row => <label key={row.key}>
-            <input type="checkbox" aria-label={`Save ${row.name}`} checked={!excluded.has(row.key)} disabled={saving} onChange={event => {
+            <input type="checkbox" aria-label={`Sync ${row.name}`} checked={!excluded.has(row.key)} disabled={saving} onChange={event => {
               const next = new Set(excluded);
               if (event.target.checked) next.delete(row.key); else next.add(row.key);
               setExcluded(next);
@@ -143,13 +143,13 @@ export function CloudSavePanel({ api, skills, denied }: { api: PortalApi; skills
         <div className="rd-grow"><strong>{row.name}</strong>
           <p className="rd-muted">{statusText[row.status]}
             {row.versionCount > 0 && ` · ${row.versionCount} ${row.versionCount === 1 ? "version" : "versions"}`}
-            {row.savedAt && ` · last saved ${new Date(row.savedAt).toLocaleDateString()}`}</p>
+            {row.savedAt && ` · last synced ${new Date(row.savedAt).toLocaleDateString()}`}</p>
           {row.labels.length > 0 && <p className="cloud-save-labels">{row.labels.map(label =>
             <span key={label}>{labelText[label]}</span>)}</p>}
         </div>
         {row.versionCount > 0 && (isDeletingCloudSkill(deleting, row.key)
           ? <div className="cloud-save-confirm">
-            <span>Delete all {row.versionCount} {row.versionCount === 1 ? "version" : "versions"} and stop saving it?{setsNote(row.setCount)}</span>
+            <span>Delete all {row.versionCount} {row.versionCount === 1 ? "version" : "versions"} and stop syncing it?{setsNote(row.setCount)}</span>
             <Action disabled={saving} onClick={() => void change(() => deleteCloudSaved(callbacks.current.api, row.key),
               "The skill could not be deleted.").then(done => { setDeleting(null); if (done) setNotice(`${row.name}'s synced copy was deleted. It stays on your Mac.`); })}>Delete</Action>
             <Action variant="outline" disabled={saving} onClick={() => setDeleting(null)}>Cancel</Action>

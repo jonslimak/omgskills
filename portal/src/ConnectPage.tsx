@@ -21,7 +21,7 @@ export function ConsentContent({ request, policy, snapshot, approve, cancel }: {
       <div className="connect-permission">
         <strong>Access</strong><span>Report installed-skill metadata</span>
         {request && policy.scopes(request).includes("content:read") && <span>Read private skills shared with you</span>}
-        {request && policy.scopes(request).includes("content:write") && <span>Save your skills to the cloud</span>}
+        {request && policy.scopes(request).includes("content:write") && <span>Sync My skills (on by default)</span>}
       </div>
       {snapshot.status && <p role={snapshot.phase === "invalid" || snapshot.phase === "error" ? "alert" : "status"}
         className={snapshot.phase === "invalid" ? "connect-error" : "status"}>{snapshot.status}</p>}

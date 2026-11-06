@@ -1208,7 +1208,7 @@ export function UnifiedApp({
   const railList = nameOrdered && !nav.query.trim() && nav.show !== "origin";
   const attentionView = nav.view === "all" && nav.id === "attention";
   const titles: Record<View, string> = {
-    all: attentionView ? "needs attention" : "my skills",
+    all: attentionView ? "can't sync" : "my skills",
     favorites: "favorites",
     sets: "sets",
     discover: "Discover",

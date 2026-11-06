@@ -202,7 +202,7 @@ const statusOrder: Record<CloudSkillRow["status"], number> = {
 
 export const statusText: Record<CloudSkillRow["status"], string> = {
   saved: "Synced",
-  deleted: "Synced · not on a Mac",
+  deleted: "Synced · deleted on a Mac",
   review: "Can't sync: needs review",
   confirmed: "Syncs next time",
   excluded: "Left out",

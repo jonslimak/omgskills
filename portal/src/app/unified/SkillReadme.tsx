@@ -186,8 +186,8 @@ export function SavedVersionsList({ skill, liveName, load }: { skill: SkillDispl
   const current = state.id === id ? state : null;
   if (!id || !current || current.status !== "ready" || !current.saved || current.saved.versions.length < 2) return null;
   const { key, versions } = current.saved;
-  return <section className="ua-saved-versions" aria-label="Saved versions">
-    <h3>Saved versions</h3>
+  return <section className="ua-saved-versions" aria-label="Synced versions">
+    <h3>Synced versions</h3>
     <ul>
       {versions.map((version, index) => <li key={version.id}>
         <span>{new Date(version.savedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>
