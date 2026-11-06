@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PortalSet, LoadState } from "../model";
 import type { CatalogSummary } from "./model";
 import type { PublicCatalogClient } from "./public-catalog";
@@ -28,17 +28,22 @@ export function useSetCatalog(client: PublicCatalogClient, set: PortalSet | null
   return { ...current, retry: () => setAttempt(value => value + 1) };
 }
 
-/** Library details for skills added to My skills, so their rows show names without the server waiting on the catalog. */
+/**
+ * Library details for skills added to My skills, so their rows show names without the server waiting on the catalog.
+ * Details already loaded stay while a new add or remove fetches only the skills not loaded yet.
+ */
 export function useAddedCatalog(client: PublicCatalogClient, ids: string[]) {
-  const key = JSON.stringify(ids);
-  const [result, setResult] = useState<{ key: string; skills: CatalogSummary[] }>({ key: "[]", skills: [] });
+  const [loaded, setLoaded] = useState<Map<string, CatalogSummary>>(() => new Map());
+  const missing = JSON.stringify(ids.filter(id => !loaded.has(id)));
   useEffect(() => {
-    if (key === "[]") return;
+    if (missing === "[]") return;
     const controller = new AbortController();
     // Rows still show by ID if the library can't be reached.
-    void loadSetCatalog(client, JSON.parse(key), controller.signal)
-      .then(({ skills }) => { if (!controller.signal.aborted) setResult({ key, skills }); }, () => {});
+    void loadSetCatalog(client, JSON.parse(missing), controller.signal).then(({ skills }) => {
+      if (controller.signal.aborted) return;
+      setLoaded(old => { const next = new Map(old); for (const skill of skills) next.set(skill.id, skill); return next; });
+    }, () => {});
     return () => controller.abort();
-  }, [client, key]);
-  return result.key === key ? result.skills : [];
+  }, [client, missing]);
+  return useMemo(() => ids.flatMap(id => loaded.get(id) ?? []), [ids, loaded]);
 }

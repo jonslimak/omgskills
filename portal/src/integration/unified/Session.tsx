@@ -214,7 +214,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const { info: cloud, loaded: cloudLoaded } = useCloudStatus(api, extras, Math.max(1, snapshot.revision));
   const { additions: mySkills, loaded: mySkillsLoaded } = useMySkillAdditions(api, extras);
   const addedCatalog = useAddedCatalog(publicClient, useMemo(() => mySkills?.skills.map(skill => skill.catalogId) ?? [], [mySkills?.skills]));
-  // My skills waits for all three (or 4 seconds), so its count shows once and is right.
+  // My skills waits for the account, cloud save and its added skills (or 4 seconds), so its count shows once and is right.
   const [extrasWaited, setExtrasWaited] = useState(false);
   useEffect(() => {
     if (!extras) { setExtrasWaited(false); return; }
@@ -222,7 +222,10 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     return () => clearTimeout(timer);
   }, [extras]);
   const myListLoading = extras && !extrasWaited && !(cloudLoaded && mySkillsLoaded);
-  const catalog = { ...publicData.catalog, skills: [...publicData.catalog.skills, ...setCatalog.skills, ...addedCatalog] };
+  // One entry per library skill: Set and added details only fill in what the loaded page lacks.
+  const catalogIds = new Set(publicData.catalog.skills.map(skill => skill.id));
+  const catalog = { ...publicData.catalog, skills: [...publicData.catalog.skills, ...[...setCatalog.skills, ...addedCatalog]
+    .filter(skill => !catalogIds.has(skill.id) && catalogIds.add(skill.id))] };
   // Keep the tab title (and, on a taken-over page, its search tags) in step with the view.
   const [syncMetadata] = useState(() => cleanPaths ? createPageMetadata(document, takeover) : null);
   const title = pageTitle(nav, catalog);
