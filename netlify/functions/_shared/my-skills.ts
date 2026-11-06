@@ -13,22 +13,16 @@ type QueryPool = Pick<ReturnType<typeof getPgPool>, "query">;
 const defaultDependencies = {
   getPgPool: (): QueryPool => getPgPool(),
   requirePortalUser: (req: Request) => requirePortalUser(req),
-  loadPublishedSkills: () => withTimeout(loadPublishedSkills(), 5_000),
+  // A cold instance downloads and parses the whole catalog, so adding waits as long as other catalog adds do.
+  loadPublishedSkills: () => withTimeout(loadPublishedSkills(), 25_000),
+  // The list only borrows names from the catalog; the web fills them in from the library when it can't wait.
+  loadPublishedSkillsForList: () => withTimeout(loadPublishedSkills(), 2_000),
 };
 export type MySkillsDependencies = typeof defaultDependencies;
 
-/** The catalog id after /api/portal/my-skills/, decoded; undefined for the collection path. */
-function catalogSkillIdFromPath(req: Request): string | undefined {
-  const parts = new URL(req.url).pathname.split("/").filter(Boolean);
-  const raw = parts.slice(3).join("/");
-  if (!raw) return undefined;
-  let decoded: string;
-  try {
-    decoded = decodeURIComponent(raw);
-  } catch {
-    throw new Response("catalogSkillId is not valid", { status: 400 });
-  }
-  return requireString(decoded, "catalogSkillId", MAX_ID_LENGTH);
+/** The catalog id a DELETE names in ?catalogSkillId= (catalog IDs contain a slash, so not in the path). */
+function catalogSkillIdFromQuery(req: Request): string {
+  return requireString(new URL(req.url).searchParams.get("catalogSkillId"), "catalogSkillId", MAX_ID_LENGTH);
 }
 
 type PublishedSkill = CatalogSkill & { author_handle?: unknown };
@@ -114,16 +108,14 @@ export async function handleMySkills(
   if (req.method === "OPTIONS") return optionsResponse(req);
   const deps = { ...defaultDependencies, ...overrides };
   try {
-    const pathId = catalogSkillIdFromPath(req);
-    const allowed = pathId === undefined ? ["GET", "POST"] : ["DELETE"];
-    if (!allowed.includes(req.method)) {
+    if (!["GET", "POST", "DELETE"].includes(req.method)) {
       return errorResponse(req, 405, "Method not allowed");
     }
 
     const user = await deps.requirePortalUser(req);
 
     if (req.method === "GET") {
-      return jsonResponse(req, { skills: await listMySkills(deps.getPgPool(), user.id, deps.loadPublishedSkills) });
+      return jsonResponse(req, { skills: await listMySkills(deps.getPgPool(), user.id, deps.loadPublishedSkillsForList) });
     }
 
     if (req.method === "POST") {
@@ -142,7 +134,7 @@ export async function handleMySkills(
       return jsonResponse(req, { catalogSkillId, added });
     }
 
-    const removed = await removeMySkill(deps.getPgPool(), user.id, pathId!);
+    const removed = await removeMySkill(deps.getPgPool(), user.id, catalogSkillIdFromQuery(req));
     return jsonResponse(req, { removed });
   } catch (error) {
     if (error instanceof Response) {

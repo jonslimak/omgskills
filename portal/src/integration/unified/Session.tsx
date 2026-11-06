@@ -79,6 +79,9 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean): MySkillAdditions
   const [skills, setSkills] = useState<MySkillAddition[] | null>(null);
   const current = useRef(skills);
   current.current = skills;
+  // One save per skill at a time, so a quick undo can't reach the server before the add it undoes.
+  const [pending, setPending] = useState<string[]>([]);
+  const inFlight = useRef(new Set<string>());
   useEffect(() => {
     if (!enabled) { setSkills(null); return; }
     const controller = new AbortController();
@@ -88,6 +91,9 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean): MySkillAdditions
     return () => controller.abort();
   }, [enabled]);
   const change = useCallback(async (catalogId: string, add: boolean) => {
+    if (inFlight.current.has(catalogId)) return;
+    inFlight.current.add(catalogId);
+    setPending([...inFlight.current]);
     const previous = current.current?.find(skill => skill.catalogId === catalogId);
     setSkills(old => old && (add ? [previous ?? { catalogId }, ...old.filter(skill => skill.catalogId !== catalogId)]
       : old.filter(skill => skill.catalogId !== catalogId)));
@@ -97,9 +103,12 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean): MySkillAdditions
       setSkills(old => old && (add ? old.filter(skill => skill.catalogId !== catalogId)
         : previous ? [previous, ...old.filter(skill => skill.catalogId !== catalogId)] : old));
       throw failure;
+    } finally {
+      inFlight.current.delete(catalogId);
+      setPending([...inFlight.current]);
     }
   }, []);
-  return useMemo(() => skills ? { skills, add: (id: string) => change(id, true), remove: (id: string) => change(id, false) } : undefined, [skills, change]);
+  return useMemo(() => skills ? { skills, pending, add: (id: string) => change(id, true), remove: (id: string) => change(id, false) } : undefined, [skills, pending, change]);
 }
 
 function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, productionInstall, composition, cleanPaths , takeover }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; productionInstall: boolean; composition?: UnifiedSessionComposition; cleanPaths: boolean ; takeover: boolean }) {

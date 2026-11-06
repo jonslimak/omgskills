@@ -277,3 +277,10 @@ test("the My skills list reads what the server sends and treats a missing endpoi
   assert.equal(await loadMySkillAdditions((async () => { throw new PortalApiError("Not found", 404); }) as never), null);
   await assert.rejects(loadMySkillAdditions((async () => ({})) as never));
 });
+
+test("removing from My skills names the skill in the query, since catalog IDs contain a slash", async () => {
+  const { removeMySkill } = await import("../src/app/my-skills-additions");
+  const calls: [string, RequestInit | undefined][] = [];
+  await removeMySkill((async (path: string, init?: RequestInit) => { calls.push([path, init]); return {}; }) as never, "owner/repo:skill");
+  assert.deepEqual(calls, [["/api/portal/my-skills?catalogSkillId=owner%2Frepo%3Askill", { method: "DELETE" }]]);
+});

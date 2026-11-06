@@ -5,5 +5,6 @@ import { handleMySkills } from "./_shared/my-skills.js";
 export default async (req: Request, _context: Context) => handleMySkills(req);
 
 export const config: Config = {
-  path: ["/api/portal/my-skills", "/api/portal/my-skills/:catalogSkillId"]
+  // DELETE names the skill in ?catalogSkillId=, since catalog IDs contain a slash.
+  path: "/api/portal/my-skills"
 };

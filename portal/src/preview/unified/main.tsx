@@ -53,7 +53,7 @@ function Preview() {
   // One library skill added to My skills without installing it.
   const [added, setAdded] = useState<MySkillAddition[]>([{ catalogId: "anthropics/skills:pdf", name: "pdf", author: "anthropics",
     description: "Read, fill and create PDF files.", githubUrl: null }]);
-  const additions = { skills: added,
+  const additions = { skills: added, pending: [] as string[],
     add: async (id: string) => setAdded(old => [{ catalogId: id }, ...old.filter(other => other.catalogId !== id)]),
     remove: async (id: string) => setAdded(old => old.filter(other => other.catalogId !== id)) };
   const [signedOutNav, setSignedOutNav] = useState<Navigation | null>(null);

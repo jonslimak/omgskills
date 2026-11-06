@@ -8,6 +8,8 @@ export type MySkillAddition = { catalogId: string; name?: string; description?: 
 export type MySkillAdditions = {
   /** Newest first. */
   skills: MySkillAddition[];
+  /** Skills with a save on its way; another tap waits for it. */
+  pending: string[];
   add: (catalogId: string) => Promise<void>;
   remove: (catalogId: string) => Promise<void>;
 };
@@ -36,5 +38,5 @@ export async function addMySkill(api: PortalApi, catalogId: string) {
 }
 
 export async function removeMySkill(api: PortalApi, catalogId: string) {
-  await api(`${base}/${encodeURIComponent(catalogId)}`, { method: "DELETE" });
+  await api(`${base}?catalogSkillId=${encodeURIComponent(catalogId)}`, { method: "DELETE" });
 }

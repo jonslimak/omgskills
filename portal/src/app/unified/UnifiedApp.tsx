@@ -138,6 +138,7 @@ import type { SavedSkillMdLoader, SavedVersionsLoader, SharedSkillMdLoader } fro
 import { AlphaRail, railLetter, railLettersOf as railLetters } from "./AlphaRail";
 import { CloudStatusBadge, CloudStatusSection, type CloudInfo } from "./CloudStatus";
 import type { MySkillAdditions } from "../my-skills-additions";
+import { PortalApiError } from "../../api-error";
 import { cloudSkillRows, needsAttention, skillCloudRow, statusText } from "../../cloud-save/cloud-save";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
@@ -535,9 +536,10 @@ export function UnifiedApp({
   const allMine = useMemo(() => [...mine, ...notInstalledAll], [mine, notInstalledAll]);
   const inMySkills = (catalogId: string | undefined) => !!catalogId && !!additions?.skills.some(skill => skill.catalogId === catalogId);
   const changeMySkills = (catalogId: string, add: boolean) => {
-    void additions?.[add ? "add" : "remove"](catalogId).then(
+    if (!additions || additions.pending.includes(catalogId)) return;
+    void additions[add ? "add" : "remove"](catalogId).then(
       () => setNotice(add ? "Added to My skills" : "Removed from My skills"),
-      () => setNotice("Couldn't update My skills. Try again."));
+      error => setNotice(error instanceof PortalApiError && [404, 409].includes(error.status) ? error.message : "Couldn't update My skills. Try again."));
   };
   const attentionLabel = (skill: SkillDisplay) => {
     const status = !discovery ? cloudRow(skill)?.status : undefined;
@@ -2025,13 +2027,14 @@ export function UnifiedApp({
                     )
                   )}
                   {/* A library skill can join My skills without installing it. */}
-                  {signedIn && additions && detail.catalogId && !installedHere && (inMySkills(detail.catalogId) ? (
-                    <button type="button" className="ua-pill ua-detail-copy" aria-pressed title="Remove from My skills"
+                  {signedIn && additions && detail.catalogId && !installedHere && !detail.cloudKey && (inMySkills(detail.catalogId) ? (
+                    <button type="button" className="ua-pill ua-detail-copy" aria-label="In My skills. Remove from My skills"
+                      title="Remove from My skills" disabled={additions.pending.includes(detail.catalogId)}
                       onClick={() => changeMySkills(detail.catalogId!, false)}>
                       <Check aria-hidden="true" />In My skills
                     </button>
                   ) : (
-                    <button type="button" className="ua-pill ua-detail-copy" aria-pressed={false}
+                    <button type="button" className="ua-pill ua-detail-copy" disabled={additions.pending.includes(detail.catalogId)}
                       onClick={() => changeMySkills(detail.catalogId!, true)}>
                       Add to My skills <Plus aria-hidden="true" />
                     </button>

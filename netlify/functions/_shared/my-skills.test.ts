@@ -43,7 +43,11 @@ function harness(options: { denied?: boolean; catalogDown?: boolean; rows?: Row[
       if (options.denied) throw new Response("Unauthorized", { status: 401 });
       return user;
     },
-    loadPublishedSkills: async () => {
+    loadPublishedSkills: loader,
+    loadPublishedSkillsForList: loader,
+  };
+  return { deps, rows, queries, catalogLoads: () => catalogLoads };
+  async function loader() {
       catalogLoads++;
       if (options.catalogDown) throw new Error("Published catalog unavailable");
       return [
@@ -52,15 +56,13 @@ function harness(options: { denied?: boolean; catalogDown?: boolean; rows?: Row[
         { id: "new/repo:b", name: "B", description: "Does b", author_handle: "newauthor", github_url: "https://github.com/new/repo" },
         { id: "old/repo:a", name: "A", githubUrl: "https://github.com/old/repo" },
       ];
-    },
-  };
-  return { deps, rows, queries, catalogLoads: () => catalogLoads };
+  }
 }
 
 const post = (body: unknown) => new Request(base, {
   method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
 });
-const del = (id: string) => new Request(`${base}/${encodeURIComponent(id)}`, { method: "DELETE" });
+const del = (id: string) => new Request(`${base}?catalogSkillId=${encodeURIComponent(id)}`, { method: "DELETE" });
 
 const listRows = () => [
   { catalogSkillId: "old/repo:a", addedAt: new Date("2026-11-01T00:00:00Z") },
@@ -132,7 +134,7 @@ test("POST returns 409 when My skills is full, but repeats stay idempotent", asy
   assert.deepEqual(await repeat.json(), { catalogSkillId: catalogId, added: false });
 });
 
-test("DELETE removes by URL-encoded id and is idempotent", async () => {
+test("DELETE removes by the id in the query and is idempotent", async () => {
   const h = harness({ rows: [{ catalogSkillId: catalogId, addedAt: new Date() }] });
   const first = await handleMySkills(del(catalogId), h.deps);
   assert.equal(first.status, 200);
@@ -161,8 +163,9 @@ test("bad ids and bodies are rejected with 400", async () => {
     post({ catalogSkillId: 42 }),
     post({ catalogSkillId: "x".repeat(501) }),
     new Request(base, { method: "POST", body: "not json" }),
-    new Request(`${base}/%E0%A4%A`, { method: "DELETE" }),
-    new Request(`${base}/${"x".repeat(501)}`, { method: "DELETE" }),
+    new Request(base, { method: "DELETE" }),
+    new Request(`${base}?catalogSkillId=%20`, { method: "DELETE" }),
+    new Request(`${base}?catalogSkillId=${"x".repeat(501)}`, { method: "DELETE" }),
   ];
   for (const req of bad) {
     const response = await handleMySkills(req, h.deps);
@@ -174,10 +177,8 @@ test("bad ids and bodies are rejected with 400", async () => {
 test("wrong methods return 405", async () => {
   const h = harness();
   for (const req of [
-    new Request(base, { method: "DELETE" }),
     new Request(base, { method: "PUT" }),
-    new Request(`${base}/${encodeURIComponent(catalogId)}`),
-    new Request(`${base}/${encodeURIComponent(catalogId)}`, { method: "POST" }),
+    new Request(base, { method: "PATCH" }),
   ]) {
     const response = await handleMySkills(req, h.deps);
     assert.equal(response.status, 405, `${req.method} ${req.url}`);
