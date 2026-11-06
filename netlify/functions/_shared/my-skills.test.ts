@@ -44,7 +44,6 @@ function harness(options: { denied?: boolean; catalogDown?: boolean; rows?: Row[
       return user;
     },
     loadPublishedSkills: loader,
-    loadPublishedSkillsForList: loader,
   };
   return { deps, rows, queries, catalogLoads: () => catalogLoads };
   async function loader() {
@@ -69,31 +68,17 @@ const listRows = () => [
   { catalogSkillId: "gone/repo:c", addedAt: new Date("2026-11-03T00:00:00Z") },
   { catalogSkillId: "new/repo:b", addedAt: new Date("2026-11-05T00:00:00Z") },
 ];
-const nulls = { name: null, description: null, author: null, githubUrl: null };
 
-test("GET lists My skills newest first with catalog display fields", async () => {
-  const h = harness({ rows: listRows() });
-  const response = await handleMySkills(new Request(base), h.deps);
-  assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { skills: [
-    { catalogSkillId: "new/repo:b", addedAt: "2026-11-05T00:00:00.000Z",
-      name: "B", description: "Does b", author: "newauthor", githubUrl: "https://github.com/new/repo" },
-    { catalogSkillId: "gone/repo:c", addedAt: "2026-11-03T00:00:00.000Z", ...nulls },
-    { catalogSkillId: "old/repo:a", addedAt: "2026-11-01T00:00:00.000Z",
-      name: "A", description: null, author: "old", githubUrl: "https://github.com/old/repo" },
-  ] });
-});
-
-test("GET still lists rows with null display fields when the catalog is unavailable", async () => {
+test("GET lists My skills newest first without waiting for the catalog", async () => {
   const h = harness({ rows: listRows(), catalogDown: true });
   const response = await handleMySkills(new Request(base), h.deps);
   assert.equal(response.status, 200);
-  const body = await response.json() as { skills: unknown[] };
-  assert.deepEqual(body.skills, [
-    { catalogSkillId: "new/repo:b", addedAt: "2026-11-05T00:00:00.000Z", ...nulls },
-    { catalogSkillId: "gone/repo:c", addedAt: "2026-11-03T00:00:00.000Z", ...nulls },
-    { catalogSkillId: "old/repo:a", addedAt: "2026-11-01T00:00:00.000Z", ...nulls },
-  ]);
+  assert.deepEqual(await response.json(), { skills: [
+    { catalogSkillId: "new/repo:b", addedAt: "2026-11-05T00:00:00.000Z" },
+    { catalogSkillId: "gone/repo:c", addedAt: "2026-11-03T00:00:00.000Z" },
+    { catalogSkillId: "old/repo:a", addedAt: "2026-11-01T00:00:00.000Z" },
+  ] });
+  assert.equal(h.catalogLoads(), 0);
 });
 
 test("POST adds a catalog skill, and a repeat add is a no-op", async () => {

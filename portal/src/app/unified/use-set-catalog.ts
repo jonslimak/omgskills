@@ -27,3 +27,18 @@ export function useSetCatalog(client: PublicCatalogClient, set: PortalSet | null
     : result.key === key ? result : { skills: [], state: "loading" as const, note: "" };
   return { ...current, retry: () => setAttempt(value => value + 1) };
 }
+
+/** Library details for skills added to My skills, so their rows show names without the server waiting on the catalog. */
+export function useAddedCatalog(client: PublicCatalogClient, ids: string[]) {
+  const key = JSON.stringify(ids);
+  const [result, setResult] = useState<{ key: string; skills: CatalogSummary[] }>({ key: "[]", skills: [] });
+  useEffect(() => {
+    if (key === "[]") return;
+    const controller = new AbortController();
+    // Rows still show by ID if the library can't be reached.
+    void loadSetCatalog(client, JSON.parse(key), controller.signal)
+      .then(({ skills }) => { if (!controller.signal.aborted) setResult({ key, skills }); }, () => {});
+    return () => controller.abort();
+  }, [client, key]);
+  return result.key === key ? result.skills : [];
+}
