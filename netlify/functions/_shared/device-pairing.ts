@@ -190,6 +190,12 @@ export async function exchangePairingCode(pool: Pool, options: ExchangeOptions) 
       await client.query("UPDATE device_tokens SET reconnect_key_hash = $2 WHERE id = $1",
         [device.rows[0].id, reconnectHash]);
     }
+    if (grantedScopes.includes("content:write")) {
+      // Sync My skills is on by default for a Mac that connects with sync, unless the account already chose.
+      await client.query(
+        "INSERT INTO cloud_save_settings (user_id, enabled) VALUES ($1, true) ON CONFLICT (user_id) DO NOTHING",
+        [pairing.user_id]);
+    }
     await client.query("UPDATE sync_tokens SET used_at = $2 WHERE id = $1", [pairing.id, now]);
     await client.query("COMMIT");
 
