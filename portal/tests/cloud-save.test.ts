@@ -222,19 +222,36 @@ test("a library install saved to the cloud keeps its library label and its versi
   assert.deepEqual([rows[0].status, rows[0].versionCount], ["library", 2]);
 });
 
-test("My skills also lists skills on none of your Macs, as not installed", async () => {
+test("My skills also lists saved skills that no listed skill holds, as not installed", async () => {
   const { notInstalledSkills, byInstalled } = await import("../src/app/unified/model");
-  const rows = [{ key: "here", name: "Here", onMac: true }, { key: "gone", name: "gone", onMac: false }, { key: "elsewhere", name: "elsewhere", onMac: false }];
-  const stale = { key: "synced:old", name: "Gone Skill", description: "Last known", author: "", githubUrl: null, tags: [], catalogId: "owner/gone" };
-  const keysOf = (skill: { key: string }) => skill.key === "synced:old" ? ["gone"] : [];
-  const rest = notInstalledSkills(rows, [stale], keysOf);
-  assert.deepEqual(rest.map(skill => [skill.key, skill.name, skill.cloudKey, skill.installed]),
-    [["cloud:gone", "Gone Skill", "gone", undefined], ["cloud:elsewhere", "elsewhere", "elsewhere", undefined]]);
+  const saved = "2026-11-01T00:00:00Z";
+  const rows = [{ key: "here", name: "Here", savedAt: saved }, { key: "gone", name: "gone", savedAt: saved },
+    { key: "elsewhere", name: "elsewhere", savedAt: saved }, { key: "review-only", name: "review-only", savedAt: null },
+    { key: "foo-old", name: "Foo (folder foo-old)", savedAt: saved }];
+  const base = { description: "", author: "", githubUrl: null, tags: [] };
+  const here = { ...base, key: "synced:here", name: "Here" };
+  const foo = { ...base, key: "synced:foo", name: "Foo", description: "Live foo" };
+  const stale = { ...base, key: "synced:old", name: "Gone Skill", description: "Last known", catalogId: "owner/gone" };
+  const keysOf = (skill: { key: string }) => ({ "synced:here": ["here"], "synced:old": ["gone"], "synced:foo": ["foo", "foo-old"] } as Record<string, string[]>)[skill.key] ?? [];
+  const mine = [here, foo].map(skill => ({ ...skill, installed: {} as never }));
+  const rest = notInstalledSkills(rows, [{ ...here, installed: {} as never }], [here, foo, stale], keysOf);
+  assert.deepEqual(rest.map(skill => [skill.key, skill.name, skill.description]),
+    [["cloud:gone", "Gone Skill", "Last known"], ["cloud:elsewhere", "elsewhere", ""], ["cloud:foo-old", "Foo", "Live foo"]],
+    "a review alone isn't kept");
+  // Once Foo is installed again, its old folder's copy isn't listed twice.
+  assert.equal(notInstalledSkills(rows, mine, [here, foo, stale], keysOf).some(skill => skill.key === "cloud:foo-old"), false);
   assert.equal(rest[0].catalogId, "owner/gone", "a library skill stays public in By origin");
-  const mine = [{ key: "synced:here", name: "Here", description: "", author: "", githubUrl: null, tags: [] }, ...rest];
-  assert.deepEqual(byInstalled(mine, "installed").map(skill => skill.key), ["synced:here"]);
-  assert.deepEqual(byInstalled(mine, "not-installed").map(skill => skill.key), ["cloud:gone", "cloud:elsewhere"]);
-  assert.equal(byInstalled(mine, undefined).length, 3);
+  const all = [{ ...here, installed: {} as never }, ...rest];
+  assert.deepEqual(byInstalled(all, "installed").map(skill => skill.key), ["synced:here"]);
+  assert.deepEqual(byInstalled(all, "not-installed").length, 3);
+  assert.equal(byInstalled(all, undefined).length, 4);
+});
+
+test("a Not installed skill can be opened from My skills", async () => {
+  const { accountNavigation } = await import("../src/integration/unified/policy");
+  const { initialNavigation } = await import("../src/app/unified/model");
+  assert.equal(accountNavigation({ ...initialNavigation, view: "all", selected: "cloud:gone" }, true).selected, "cloud:gone");
+  assert.equal(accountNavigation({ ...initialNavigation, view: "favorites", selected: "cloud:gone" }, true).selected, "");
 });
 
 test("library skills added to My skills show as not installed until a Mac has them", async () => {

@@ -528,7 +528,7 @@ export function UnifiedApp({
     ? cloudSkillRows(cloud.state, data.skills).map(row => [row.key, row]) : []), [cloud, signedIn, data.skills]);
   const cloudRow = (skill: SkillDisplay) => cloudRows.size && (skill.installed || skill.cloudKey) ? skillCloudRow(cloudRows, savedSkillKeys(skill)) : null;
   // My skills is every skill you have: the ones on your Macs, then the ones kept only in your account.
-  const notInstalled = useMemo(() => notInstalledSkills([...cloudRows.values()], everMine, savedSkillKeys), [cloudRows, everMine]);
+  const notInstalled = useMemo(() => notInstalledSkills([...cloudRows.values()], mine, everMine, savedSkillKeys), [cloudRows, mine, everMine]);
   const added = useMemo(() => additions ? addedSkills(additions.skills, models.library, mine) : [], [additions, models, mine]);
   const notInstalledAll = useMemo(() => [...notInstalled, ...added.filter(skill =>
     !notInstalled.some(other => other.catalogId === skill.catalogId))], [notInstalled, added]);
@@ -543,7 +543,8 @@ export function UnifiedApp({
     const status = !discovery ? cloudRow(skill)?.status : undefined;
     return status && needsAttention(status) ? `, ${statusText[status]}` : "";
   };
-  const attention = allMine.filter(skill => { const row = cloudRow(skill); return !!row && needsAttention(row.status); });
+  // Only an installed skill can be fixed on a Mac.
+  const attention = mine.filter(skill => { const row = cloudRow(skill); return !!row && needsAttention(row.status); });
   const sources = useMemo(
     () => displaySourceNames(mine.flatMap((s) => s.installed?.sourceSkills.map((copy) => copy.source) ?? [])),
     [mine],
@@ -616,7 +617,7 @@ export function UnifiedApp({
     signedIn && (!readOnlyAccount || !!management) &&
     ["all", "favorites", "set"].includes(nav.view) &&
     (!activeSet || (activeSet.role === "owner" && !activeSet.hidden));
-  const matchingMine = mine.filter((skill) => matchesSearch(skill, nav.query) && (nav.source === "all" || skill.installed?.sources.includes(displaySourceName(nav.source))));
+  const matchingMine = allMine.filter((skill) => matchesSearch(skill, nav.query) && (nav.source === "all" || skill.installed?.sources.includes(displaySourceName(nav.source))));
   const remoteRows = catalog.resultIds?.flatMap((id) => library.find((skill) => skill.catalogId === id) || []) || [];
   const matchingLibrary = publicStatus ? remoteRows : library.filter((skill) => matchesSearch(skill, nav.query));
   const privateSearch = readOnlyAccount && !discovery;
@@ -1271,8 +1272,8 @@ export function UnifiedApp({
           }}
         >
           <option value="all">All</option>
-          {nav.view === "all" && <option value="installed">Installed</option>}
-          {nav.view === "all" && <option value="not-installed">Not installed</option>}
+          {nav.view === "all" && nav.id !== "attention" && <option value="installed">Installed</option>}
+          {nav.view === "all" && nav.id !== "attention" && <option value="not-installed">Not installed</option>}
           <option value="personal">Personal</option>
           <option value="public">Public</option>
           <option value="origin">By origin</option>
@@ -2076,7 +2077,7 @@ export function UnifiedApp({
                     </IconButton>
                   )}
                   </span>
-                  {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && <CloudStatusBadge row={cloudRow(detail)} />}
+                  {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && <CloudStatusBadge row={cloudRow(detail)} notInstalled={!!detail.cloudKey} />}
                   {!signedIn && (
                     <button type="button" className="ua-pill ua-primary ua-detail-signin" onClick={signIn} data-humblytics="App Sign In">
                       Sign in to manage skills
@@ -2157,7 +2158,7 @@ export function UnifiedApp({
                 {detail.setItemReleaseId && sharedSkillMd
                   ? <SharedSkillReadme releaseId={detail.setItemReleaseId} load={sharedSkillMd} />
                   : savedSkillMd && <SavedSkillReadme skill={detail} load={savedSkillMd} />}
-                {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && <CloudStatusSection key={detail.key} row={cloudRow(detail)}
+                {cloud && !detail.setItemReleaseId && detail.installed && <CloudStatusSection key={detail.key} row={cloudRow(detail)}
                   confirm={!readOnlyAccount || management ? cloud.confirm : undefined} />}
                 {!detail.setItemReleaseId && savedVersions && <SavedVersionsList skill={detail}
                   liveName={!readOnlyAccount || management ? detailLive?.name : undefined} load={savedVersions} />}
