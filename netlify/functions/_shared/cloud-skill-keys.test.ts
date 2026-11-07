@@ -60,3 +60,10 @@ test("derived keys stay within the key length limit", () => {
 test("long keys keep whole characters, counted as the server counts them", () => {
   assert.equal(candidateKey("é".repeat(191) + "😀😀", "codex", 1), `${"é".repeat(191)}😀@codex`);
 });
+
+test("a saved skill keeps a key whose folder part was cut to fit", () => {
+  const folder = "a".repeat(200);
+  const saved = candidateKey(folder, "codex", 1);
+  const spec = copy("codex", "other", folder);
+  assert.equal(cloudSkillKeys([spec], [{ key: folder, name: folder }, { key: saved, name: "other" }]).get(spec), saved);
+});

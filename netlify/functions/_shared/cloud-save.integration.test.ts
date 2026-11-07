@@ -536,6 +536,11 @@ test("skills saved before names were kept take the name their Mac reports, and M
     const added = await updateCloudSaveSettings(pool, userId, parseCloudSaveSettingsUpdate({ addExcludedSkillKeys: ["notes@codex", "a"] }));
     assert.deepEqual(added.excludedSkillKeys, ["a", "notes@codex"]);
     assert.equal(added.enabled, true);
+
+    // An account with no settings yet gets them, saving off.
+    const fresh = await createUser(pool);
+    const first = await updateCloudSaveSettings(pool, fresh.userId, parseCloudSaveSettingsUpdate({ addExcludedSkillKeys: ["notes@codex"] }));
+    assert.deepEqual([first.enabled, first.excludedSkillKeys], [false, ["notes@codex"]]);
   });
 });
 

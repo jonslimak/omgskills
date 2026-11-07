@@ -28,8 +28,12 @@ export function candidateKey(folder: string, agent: string, index: number) {
   return `${base}${suffix}`;
 }
 
+/** Whether a key is one of this folder's candidates, including ones whose folder part was cut to fit. */
 function belongsToFolder(key: string, folder: string) {
-  return key === folder || key.startsWith(`${folder}@`);
+  if (key === folder || key.startsWith(`${folder}@`)) return true;
+  const at = key.lastIndexOf("@");
+  const suffix = at < 0 ? null : /^(.+?)(?:-([0-9]+))?$/.exec(key.slice(at + 1));
+  return !!suffix && candidateKey(folder, suffix[1], suffix[2] ? Number(suffix[2]) : 1) === key;
 }
 
 /**

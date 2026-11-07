@@ -408,12 +408,15 @@ export async function updateCloudSaveSettings(
   update: CloudSaveSettingsUpdate
 ): Promise<CloudSaveSettings> {
   if (update.addExcludedSkillKeys) {
-    const added = await db.query<CloudSaveSettings>(
+    // Creates the settings row when there is none yet (saving stays off unless this request turns it on below).
+    const added = update.addExcludedSkillKeys.length > MAX_EXCLUDED_SKILLS ? { rows: [] } : await db.query<CloudSaveSettings>(
       `
-        UPDATE cloud_save_settings SET
-          excluded_skill_keys = ARRAY(SELECT DISTINCT key FROM unnest(excluded_skill_keys || $2::text[]) AS key ORDER BY key),
+        INSERT INTO cloud_save_settings AS settings (user_id, enabled, excluded_skill_keys)
+        VALUES ($1, false, $2::text[])
+        ON CONFLICT (user_id) DO UPDATE SET
+          excluded_skill_keys = ARRAY(SELECT DISTINCT key FROM unnest(settings.excluded_skill_keys || $2::text[]) AS key ORDER BY key),
           updated_at = now()
-        WHERE user_id = $1 AND cardinality(excluded_skill_keys || $2::text[]) <= ${MAX_EXCLUDED_SKILLS}
+        WHERE cardinality(settings.excluded_skill_keys || $2::text[]) <= ${MAX_EXCLUDED_SKILLS}
         RETURNING enabled, excluded_skill_keys AS "excludedSkillKeys"
       `,
       [userId, update.addExcludedSkillKeys]
