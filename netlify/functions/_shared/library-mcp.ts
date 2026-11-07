@@ -76,7 +76,8 @@ function json(body: unknown, status = 200, headers: Record<string, string> = {})
 }
 
 function unauthorized(req: Request, error?: "invalid_token") {
-  const challenge = `Bearer resource_metadata="${metadataUrl(req)}"${error ? `, error="${error}"` : ""}`;
+  // The scope hint tells clients what to ask for at sign-in (matches scopes_supported below).
+  const challenge = `Bearer resource_metadata="${metadataUrl(req)}", scope="profile email"${error ? `, error="${error}"` : ""}`;
   return json({ error: error ?? "unauthorized", error_description: "Sign in to omgskills to read My skills." }, 401,
     { "WWW-Authenticate": challenge });
 }

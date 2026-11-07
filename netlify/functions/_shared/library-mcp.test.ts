@@ -178,6 +178,7 @@ test("the short address /my/mcp works with its own tokens, and the first address
   assert.equal(bare.resource, resource, "The bare address still describes the first address");
   const challenge = (await handleLibraryMcp(at(mine, ""), deps().value)).headers.get("www-authenticate")!;
   assert.match(challenge, /resource_metadata="https:\/\/omgskills\.test\/\.well-known\/oauth-protected-resource\/my\/mcp"/);
+  assert.match(challenge, /scope="profile email"/);
   assert.equal((await handleLibraryMcp(at(mine), deps({ aud: [mine] }).value)).status, 200);
   assert.equal((await handleLibraryMcp(at(resource), deps({ aud: [resource] }).value)).status, 200);
   assert.equal((await handleLibraryMcp(at(mine), deps({ aud: [resource] }).value)).status, 401, "Each address takes only its own tokens");
