@@ -103,8 +103,8 @@ export function McpPanel({ api, denied }: { api: PortalApi; denied: () => void }
           ? <Action variant="outline" disabled={busy !== null} onClick={() => void change(agent, false)}>Allow again</Action>
           : <Action variant="outline" disabled={busy !== null} onClick={() => void change(agent, true)}>Disconnect</Action>}
       </div>)}
-      {agents && agents.some(agent => !agent.blocked) && <p className="rd-muted">Disconnecting cuts the agent off right
-        away. To use it again, choose Allow again, then reconnect it in the agent.</p>}
+      {agents && agents.length > 0 && <p className="rd-muted">Disconnecting cuts the agent off right away. To use it
+        again, choose Allow again.</p>}
     </div>
 
     <div className="mcp-panel-server">

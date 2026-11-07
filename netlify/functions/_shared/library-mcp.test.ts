@@ -104,6 +104,8 @@ test("no token, or one that is revoked, expired or for another address, asks to 
   assert.equal(refused.status, 403, "A disconnected agent is refused even with a valid token");
   assert.match((await refused.json()).error_description, /Allow again/);
   assert.deepEqual(blocked.calls, [], "Nothing is read for a disconnected agent");
+  const down = deps({}, { touchAgent: async () => { throw new Error("db down"); } });
+  assert.equal((await handleLibraryMcp(rpc("tools/list", {}), down.value)).status, 503, "A database problem fails closed, retryable");
   const stranger = await handleLibraryMcp(rpc("tools/list", {}), deps({ subject: "clerk-nobody" }).value);
   assert.equal(stranger.status, 403);
 });

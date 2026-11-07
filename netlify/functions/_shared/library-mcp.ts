@@ -139,13 +139,20 @@ export async function handleLibraryMcp(req: Request, deps: LibraryMcpDependencie
   if (!verified || verified.revoked || verified.expired || !verified.aud.includes(resourceUrl(req))) {
     return unauthorized(req, "invalid_token");
   }
-  const userId = await deps.userIdFor(verified.subject);
+  let userId: string | null;
+  let blocked = false;
+  try {
+    userId = await deps.userIdFor(verified.subject);
+    // A disconnected agent stays out, even with a fresh sign-in, until the person allows it again.
+    if (userId) blocked = (await deps.touchAgent(userId, verified.clientId || "unknown")).blocked;
+  } catch {
+    return json({ error: "My skills is unavailable right now; try again" }, 503);
+  }
   if (!userId) {
     return json({ error: "no_account", error_description: "Sign in once at omgskills.com to set up My skills." }, 403);
   }
 
-  // A disconnected agent stays out, even with a fresh sign-in, until the person allows it again.
-  if ((await deps.touchAgent(userId, verified.clientId || "unknown")).blocked) {
+  if (blocked) {
     return json({ error: "disconnected", error_description:
       "You disconnected this agent from My skills. To use it again, choose Allow again at omgskills.com (account menu, MCP)." }, 403);
   }
