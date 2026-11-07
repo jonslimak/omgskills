@@ -1,4 +1,4 @@
-import type { Config } from "@netlify/functions";
+import type { Config, Context } from "@netlify/functions";
 import featureConfig from "../../config/production-features.json" with { type: "json" };
 import { validateProductionFeatures } from "../../config/production-features.mjs";
 import { readSkillContent } from "../../mcp/src/content.js";
@@ -129,11 +129,15 @@ const dependencies: LibraryMcpDependencies = {
     ?? issuerFromPublishableKey(getEnv("CLERK_PUBLISHABLE_KEY") ?? getEnv("VITE_CLERK_PUBLISHABLE_KEY")),
 };
 
-export default async (req: Request): Promise<Response> => {
+export default async (req: Request, context?: Pick<Context, "waitUntil">): Promise<Response> => {
   // Off until sign-in is set up for this site.
   if (getEnv("LIBRARY_MCP_ENABLED") !== "1") return new Response("Not found", { status: 404 });
-  // Start loading the catalog now (it takes seconds on a cold start) while the sign-in is checked.
-  if (req.method === "POST") void catalog.get().catch(() => undefined);
+  // Start loading the catalog now (it takes seconds on a cold start) while the sign-in is checked. It keeps
+  // loading after a reply that couldn't wait for it (a frozen function never finishes), so the next call has it.
+  if (req.method === "POST") {
+    const load = catalog.get().then(() => undefined, () => undefined);
+    context?.waitUntil?.(load);
+  }
   return handleLibraryMcp(req, dependencies);
 };
 
