@@ -35,19 +35,21 @@ enum SavedSkillInstall {
 
     /// Copies already on this Mac under that key, in any agent folder.
     static func copies(for request: Request, in installations: [Skill]) -> [Skill] {
-        installations.filter {
-            CloudSaveFolder.key(forFolderName: URL(fileURLWithPath: $0.installCmd).lastPathComponent) == request.key
-        }
+        let keys = CloudSaveKeys.current(for: installations)
+        return installations.filter { keys[$0.installCmd] == request.key }
     }
 
     /// Writes the package next to the destination, then moves it into place, so an agent never sees half a skill.
-    /// Refuses when anything already has that name.
+    /// The folder is named like the skill's folder elsewhere: a key such as "notes@codex" (another skill holds
+    /// "notes") installs as "notes" when that name is free here, else as the key. Refuses when both are taken.
     nonisolated static func install(_ package: SkillPackage, key: String, into root: URL,
                                     fileManager: FileManager = .default) throws -> URL {
-        let destination = root.appendingPathComponent(key, isDirectory: true)
-        guard (try? fileManager.attributesOfItem(atPath: destination.path)) == nil else {
+        let free = { (name: String) in (try? fileManager.attributesOfItem(atPath: root.appendingPathComponent(name).path)) == nil }
+        let base = key.replacingOccurrences(of: "@(claude|codex|agents)(-[0-9]+)?$", with: "", options: .regularExpression)
+        guard let name = [base, key].first(where: { !$0.isEmpty && free($0) }) else {
             throw CocoaError(.fileWriteFileExists)
         }
+        let destination = root.appendingPathComponent(name, isDirectory: true)
         try fileManager.createDirectory(at: root, withIntermediateDirectories: true)
         let staging = root.appendingPathComponent(".omgskills-install-\(UUID().uuidString)", isDirectory: true)
         defer { try? fileManager.removeItem(at: staging) }

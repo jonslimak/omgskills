@@ -157,7 +157,7 @@ final class SkillRemovalController {
         attempt = id
         state = .confirmEverywhere(names: names, copies: copies, sets: nil)
         guard let setCount else { return }
-        let keys = Self.keys(copies)
+        let keys = Self.keys(copies, among: installations())
         Task {
             let sets = await setCount(keys)
             guard attempt == id, case .confirmEverywhere(let names, let copies, nil) = state else { return }
@@ -176,6 +176,8 @@ final class SkillRemovalController {
         }
         let id = UUID()
         attempt = id
+        // Keys come from everything installed before anything moves to the Trash.
+        let installed = installations()
         guard let outcome = trashShown(names: names, asked: asked, reportRemoved: false) else { return }
         // A copy still here would be left out of sync, not deleted; the account keeps everything until all are gone.
         guard outcome.failures.isEmpty else {
@@ -186,7 +188,7 @@ final class SkillRemovalController {
         state = .working(title: "Deleting \(SkillRemoval.title(outcome.removed))…")
         let gone = outcome.copies.filter { outcome.removed.map(SkillRemoval.normalizedName).contains(SkillRemoval.normalizedName($0.name)) }
         var forgotten = true
-        do { try await forget(Self.keys(gone), Array(Set(gone.compactMap(\.catalogSkillId))).sorted()) }
+        do { try await forget(Self.keys(gone, among: installed), Array(Set(gone.compactMap(\.catalogSkillId))).sorted()) }
         catch { forgotten = false }
         // The next sync runs after the account forgot them, so it doesn't save them back.
         onRemoved()
@@ -240,9 +242,10 @@ final class SkillRemovalController {
             + (kept ? " My skills still has it." : ""))
     }
 
-    /// The account's keys for these copies: their folder names.
-    static func keys(_ copies: [Skill]) -> [String] {
-        Array(Set(copies.map { CloudSaveFolder.key(forFolderName: URL(fileURLWithPath: $0.installCmd).lastPathComponent) })).sorted()
+    /// The account's keys for these copies: their folder names, unless another skill shares the folder name.
+    static func keys(_ copies: [Skill], among installations: [Skill]) -> [String] {
+        let keys = CloudSaveKeys.current(for: installations + copies)
+        return Array(Set(copies.compactMap { keys[$0.installCmd] })).sorted()
     }
 }
 

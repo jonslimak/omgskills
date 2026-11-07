@@ -30,10 +30,11 @@ private func makeSkill(_ root: URL, _ name: String, skillMd: String = "---\nname
     return directory
 }
 
-private func installation(_ directory: URL, modified: String = "2026-11-01T00:00:00Z") -> Skill {
-    Skill(id: "installed:\(directory.path)", name: directory.lastPathComponent, description: "", githubUrl: "",
+private func installation(_ directory: URL, modified: String = "2026-11-01T00:00:00Z", name: String? = nil,
+                          origin: String = "Claude") -> Skill {
+    Skill(id: "installed:\(directory.path)", name: name ?? directory.lastPathComponent, description: "", githubUrl: "",
           installCmd: directory.path, authorHandle: "", tags: [], readmeSnippet: nil, stars: 0, lastUpdated: modified,
-          firstSeen: "", skillMdSha: nil, installs: nil, trendingRank: nil, trendingSource: nil, origin: "Claude",
+          firstSeen: "", skillMdSha: nil, installs: nil, trendingRank: nil, trendingSource: nil, origin: origin,
           isSymlink: false, isLocalOnly: true)
 }
 
@@ -221,11 +222,18 @@ private actor FakeCloudSave: CloudSaveServing {
     var stored: Set<String> = []
     var held: [String: [CloudSaveFinding]] = [:]
     var saved: [String: String] = [:]
+    /// The SKILL.md name sent with each save, by key.
+    var names: [String: String] = [:]
+    /// Keys another Mac's different skill holds.
+    var takenKeys: Set<String> = []
     var deleted: [String: Bool] = [:]
     var calls: [String] = []
     var additions: [String] = []
 
     func add(_ ids: [String]) { additions = ids }
+    func take(_ key: String) { takenKeys.insert(key) }
+    var leftOut: [String]?
+    func setExcluded(_ keys: [String], credential: StoredDeviceCredential) async throws { leftOut = keys }
     func mySkillAdditions(credential: StoredDeviceCredential) async throws -> [String] { additions }
 
     init(enabled: Bool = true, excluded: [String] = [], skills: [CloudSaveState.SavedSkill] = []) {
@@ -252,6 +260,8 @@ private actor FakeCloudSave: CloudSaveServing {
     }
     func saveVersion(_ folder: CloudSaveFolder, credential: StoredDeviceCredential) async throws -> CloudSaveVersionResult {
         calls.append("version:\(folder.key)")
+        if takenKeys.contains(folder.key) { throw CloudSaveAPIError.nameTaken }
+        names[folder.key] = folder.name
         let missing = Array(Set(folder.entries.map(\.blobSha)).subtracting(stored)).sorted()
         if !missing.isEmpty { return .missingFiles(missing) }
         let created = saved[folder.key] != folder.treeSha
@@ -528,6 +538,119 @@ struct CloudSaveSyncTests {
             installation(newer, modified: "2026-11-01T00:00:00Z")], localFolderKeys: [], deviceID: "device-1", credential: credential())
         let newest = try CloudSaveFolder.read(directory: newer).treeSha
         #expect(await api.saved == ["notes": newest])
+    }
+
+    @Test func differentSkillsInSameNameFoldersAreSavedApart() async throws {
+        let claude = try temporaryRoot(), codex = try temporaryRoot()
+        let library = try makeSkill(claude, "last30days", skillMd: "---\nname: last30days\ndescription: research\n---\n",
+                                    files: ["scripts/run.py": "print(1)"])
+        let spec = try makeSkill(codex, "last30days", skillMd: "---\nname: last30days-v3-spec\ndescription: spec\n---\n")
+        // The cloud copy under the folder name is the Codex spec, saved by this Mac before the fix.
+        let specTree = try CloudSaveFolder.read(directory: spec).treeSha
+        let api = FakeCloudSave(skills: [.init(key: "last30days", currentVersion: .init(id: "r1", treeSha: specTree,
+            deviceId: "device-1", savedAt: "2026-11-03T00:00:00.000Z", labels: nil), deletedLocallyAt: nil)])
+        let installs = [installation(library, name: "last30days"),
+                        installation(spec, name: "last30days-v3-spec", origin: "Codex")]
+        let summary = try await sync(api).run(installations: installs, localFolderKeys: ["last30days"], deviceID: "device-1",
+                                              credential: credential())
+        #expect(await api.saved == ["last30days": try CloudSaveFolder.read(directory: library).treeSha,
+                                    "last30days@codex": specTree])
+        #expect(await api.names == ["last30days": "last30days", "last30days@codex": "last30days-v3-spec"])
+        #expect(summary.hereCount == 2)
+        #expect(summary.skillCount == 2)
+        #expect(await api.deleted.isEmpty, "The spec's own key is on this Mac, so it isn't marked deleted")
+        #expect(summary.keys == [library.path: "last30days", spec.path: "last30days@codex"])
+    }
+
+    @Test func aSkillKeepsItsKeyWhenTheOtherSameNameSkillIsDeleted() async throws {
+        let claude = try temporaryRoot(), codex = try temporaryRoot()
+        let spec = try makeSkill(codex, "last30days", skillMd: "---\nname: last30days-v3-spec\ndescription: spec\n---\n")
+        let specTree = try CloudSaveFolder.read(directory: spec).treeSha
+        let version = { (tree: String) in CloudSaveState.Version(id: "r", treeSha: tree, deviceId: "device-1",
+                                                                 savedAt: "2026-11-03T00:00:00.000Z", labels: nil) }
+        let api = FakeCloudSave(skills: [
+            .init(key: "last30days", name: "last30days", currentVersion: version("a"), deletedLocallyAt: nil),
+            .init(key: "last30days@codex", name: "last30days-v3-spec", currentVersion: version(specTree), deletedLocallyAt: nil),
+        ])
+        // The library copy in Claude was deleted; only the spec is left, in a folder named like the library's key.
+        _ = claude
+        let summary = try await sync(api).run(installations: [installation(spec, name: "last30days-v3-spec", origin: "Codex")],
+            localFolderKeys: ["last30days"], lastKeys: [spec.path: "last30days@codex"], deviceID: "device-1",
+            credential: credential())
+        #expect(await api.saved.isEmpty, "Nothing is saved over the library skill")
+        #expect(await api.deleted == ["last30days": true], "The library skill is kept, marked deleted on this Mac")
+        #expect(summary.keys == [spec.path: "last30days@codex"])
+    }
+
+    @Test func aSkillLeftOutUnderItsFolderNameStaysLeftOutUnderItsOwnKey() async throws {
+        let claude = try temporaryRoot(), codex = try temporaryRoot()
+        let library = try makeSkill(claude, "last30days", skillMd: "---\nname: last30days\ndescription: research\n---\n")
+        let spec = try makeSkill(codex, "last30days", skillMd: "---\nname: last30days-v3-spec\ndescription: spec\n---\n")
+        let api = FakeCloudSave(excluded: ["last30days"])
+        let summary = try await sync(api).run(installations: [installation(library, name: "last30days"),
+            installation(spec, name: "last30days-v3-spec", origin: "Codex")], localFolderKeys: ["last30days"],
+            deviceID: "device-1", credential: credential())
+        #expect(await api.leftOut == ["last30days@codex"])
+        #expect(await api.saved.isEmpty)
+        #expect(summary.leftOutCount == 2)
+    }
+
+    @Test func aDifferentSkillSavedFromAnotherMacMovesToItsOwnKey() async throws {
+        let codex = try temporaryRoot()
+        let spec = try makeSkill(codex, "last30days", skillMd: "---\nname: last30days-v3-spec\ndescription: spec\n---\n")
+        let api = FakeCloudSave()
+        await api.take("last30days")
+        let first = try await sync(api).run(installations: [installation(spec, name: "last30days-v3-spec", origin: "Codex")],
+            localFolderKeys: ["last30days"], deviceID: "device-1", credential: credential())
+        #expect(first.skipped.isEmpty, "Nothing is reported under the other skill's key")
+        #expect(first.keys.isEmpty, "The refused key isn't remembered")
+    }
+
+    @Test func cloudKeysMatchTheServerRule() {
+        let root = URL(fileURLWithPath: "/tmp/agents")
+        func copy(_ agent: String, _ folder: String, _ name: String) -> Skill {
+            installation(root.appendingPathComponent(agent).appendingPathComponent(folder), name: name, origin: agent)
+        }
+        let library = copy("Claude", "last30days", "last30days"), spec = copy("Codex", "last30days", "last30days-v3-spec")
+        var keys = CloudSaveKeys.keys(for: [spec, library])
+        #expect(keys[library.installCmd] == "last30days")
+        #expect(keys[spec.installCmd] == "last30days@codex")
+
+        let a = copy("Claude", "pdf", "PDF"), b = copy("Codex", "pdf", "pdf"), c = copy("Agents", "PDF", "PDF")
+        keys = CloudSaveKeys.keys(for: [a, b, c])
+        #expect([a, b, c].map { keys[$0.installCmd] } == ["pdf", "pdf", "pdf"], "Same name, any case, is one skill")
+
+        let x = copy("Codex", "notes", "Writer"), y = copy("Agents", "notes", "Editor"), z = copy("Claude", "notes", "Editor")
+        keys = CloudSaveKeys.keys(for: [x, y, z])
+        #expect([y, z, x].map { keys[$0.installCmd] } == ["notes", "notes", "notes@codex"],
+                "No copy named like the folder: the first agent's keeps it")
+
+        // Long keys keep whole characters, counted as the server counts them (UTF-16).
+        let long = String(repeating: "é", count: 191) + "😀😀"
+        #expect(CloudSaveKeys.candidate(folder: long, agent: "codex", index: 1) == String(repeating: "é", count: 191) + "😀@codex")
+
+        // Saved skills are found by name, on any Mac and in any agent.
+        let records = [CloudSaveKeys.Record(key: "last30days", name: "last30days", deviceID: "mac-a"),
+                       CloudSaveKeys.Record(key: "last30days@codex", name: "last30days-v3-spec", deviceID: "mac-a")]
+        let elsewhere = copy("Agents", "last30days", "Last30days-v3-spec")
+        #expect(CloudSaveKeys.keys(for: [elsewhere], records: records, deviceID: "mac-b")[elsewhere.installCmd] == "last30days@codex")
+        // A Mac with only a new, different skill never takes a key another skill holds.
+        let other = copy("Codex", "last30days", "something-else")
+        #expect(CloudSaveKeys.keys(for: [other], records: records, deviceID: "mac-b")[other.installCmd] == "last30days@codex-2")
+
+        // A remembered key stays put when another skill with that folder name shows up.
+        let remembered = [spec.installCmd: "last30days"]
+        keys = CloudSaveKeys.keys(for: [spec, library], records: [.init(key: "last30days", name: nil)], remembered: remembered)
+        #expect(keys[spec.installCmd] == "last30days")
+        #expect(keys[library.installCmd] == "last30days@claude")
+
+        // An edited SKILL.md name keeps the key only on the Mac that saved it last.
+        let renamed = copy("Claude", "last30days", "renamed")
+        let held = [renamed.installCmd: "last30days"]
+        #expect(CloudSaveKeys.keys(for: [renamed], records: records, remembered: held, deviceID: "mac-a")[renamed.installCmd]
+                == "last30days")
+        #expect(CloudSaveKeys.keys(for: [renamed], records: records, remembered: held, deviceID: "mac-b")[renamed.installCmd]
+                == "last30days@claude")
     }
 
     @Test func filesSentOneAtATimeArePacedLikeEveryOtherRequest() async throws {

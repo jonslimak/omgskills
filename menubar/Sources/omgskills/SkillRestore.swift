@@ -33,12 +33,11 @@ enum SkillRestore {
         return Request(name: name, key: key, versionID: version)
     }
 
-    /// The copies a restore link may replace: same skill name and saved under the link's key (its folder name),
+    /// The copies a restore link may replace: same skill name and saved under the link's key,
     /// so one skill's saved files can never land on another skill.
     static func copies(for request: Request, in installations: [Skill]) -> [Skill] {
-        SkillRemoval.copies(named: [request.name], in: installations).filter {
-            CloudSaveFolder.key(forFolderName: URL(fileURLWithPath: $0.installCmd).lastPathComponent) == request.key
-        }
+        let keys = CloudSaveKeys.current(for: installations)
+        return SkillRemoval.copies(named: [request.name], in: installations).filter { keys[$0.installCmd] == request.key }
     }
 
     /// Writes a downloaded version to a new folder (already checked by the download).

@@ -24,6 +24,8 @@ struct CloudSaveState: Decodable, Equatable, Sendable {
     }
     struct SavedSkill: Decodable, Equatable, Sendable {
         let key: String
+        /// Its SKILL.md name as cloud save compares it; nil when saved before names were kept.
+        var name: String? = nil
         let currentVersion: Version
         let deletedLocallyAt: String?
         /// Sets this saved skill is shared in.
@@ -71,6 +73,8 @@ enum CloudSaveAPIError: Error, Equatable, Sendable {
     case unavailable
     case disabled
     case excluded
+    /// A different skill is saved under this key.
+    case nameTaken
     case needsReview([CloudSaveFinding])
     case tooLarge
     case storageFull
@@ -87,6 +91,8 @@ enum CloudSaveVersionResult: Equatable, Sendable {
 protocol CloudSaveServing: Sendable {
     func state(credential: StoredDeviceCredential) async throws -> CloudSaveState
     func setEnabled(_ enabled: Bool, credential: StoredDeviceCredential) async throws
+    /// Leaves more skills out of cloud save, keeping the rest of the list.
+    func setExcluded(_ keys: [String], credential: StoredDeviceCredential) async throws
     func uploadFile(_ entry: SkillPackageEntry, confirmSecrets: Bool, credential: StoredDeviceCredential) async throws
     /// Uploads several files, returning what was found in any that were held back for review.
     func uploadFiles(_ entries: [SkillPackageEntry], credential: StoredDeviceCredential) async throws -> [CloudSaveFinding]
@@ -103,6 +109,8 @@ protocol CloudSaveServing: Sendable {
 struct CloudSaveBatchUnsupported: Error {}
 
 extension CloudSaveServing {
+    func setExcluded(_ keys: [String], credential: StoredDeviceCredential) async throws {}
+
     func reportSkipped(_ skipped: [String: CloudSaveSkipReason], credential: StoredDeviceCredential) async throws {}
 
     func mySkillAdditions(credential: StoredDeviceCredential) async throws -> [String] { [] }
@@ -148,6 +156,11 @@ struct CloudSaveAPI: CloudSaveServing {
     func setEnabled(_ enabled: Bool, credential: StoredDeviceCredential) async throws {
         try requireUploadScope(credential)
         _ = try await send("PUT", path: ["settings"], json: ["enabled": enabled], credential: credential)
+    }
+
+    func setExcluded(_ keys: [String], credential: StoredDeviceCredential) async throws {
+        try requireUploadScope(credential)
+        _ = try await send("PUT", path: ["settings"], json: ["addExcludedSkillKeys": keys], credential: credential)
     }
 
     func uploadFile(_ entry: SkillPackageEntry, confirmSecrets: Bool, credential: StoredDeviceCredential) async throws {
@@ -202,7 +215,8 @@ struct CloudSaveAPI: CloudSaveServing {
         }
         do {
             let data = try await send("POST", path: ["skills", folder.key, "versions"],
-                json: ["files": files, "treeSha": folder.treeSha], credential: credential)
+                json: ["files": files, "treeSha": folder.treeSha].merging(folder.name.map { ["skillName": $0] } ?? [:]) { a, _ in a },
+                credential: credential)
             let created = (try? JSONDecoder().decode(SavedBody.self, from: data))?.created ?? false
             return .saved(created: created)
         } catch let missing as MissingFiles {
@@ -308,6 +322,7 @@ struct CloudSaveAPI: CloudSaveServing {
         case (401, _): throw CloudSaveAPIError.reconnectRequired
         case (403, "disabled"): throw CloudSaveAPIError.disabled
         case (403, "excluded"): throw CloudSaveAPIError.excluded
+        case (409, "name_taken"): throw CloudSaveAPIError.nameTaken
         case (422, "needs_review"): throw CloudSaveAPIError.needsReview(error?.findings ?? [])
         case (413, "quota_exceeded"): throw CloudSaveAPIError.storageFull
         case (413, _): throw CloudSaveAPIError.tooLarge

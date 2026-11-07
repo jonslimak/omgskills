@@ -148,11 +148,16 @@ final class CloudSaveController {
         do {
             let result = try await scan()
             let deviceID = record.connection.deviceID
+            let keyRecord = treeRecord?.deletingLastPathComponent().appendingPathComponent("cloud-save-keys.json")
             let next = try await sync.run(installations: result.installations, localFolderKeys: folderKeys(),
-                lastTrees: lastTrees(for: deviceID), deviceID: deviceID, credential: record)
+                lastTrees: lastTrees(for: deviceID), lastKeys: CloudSaveKeys.remembered(at: keyRecord).keys,
+                deviceID: deviceID, credential: record)
             guard !Task.isCancelled else { return }
             // Only a pass that reached every skill can say what this Mac's copies look like now.
-            if [.upToDate, .incomplete].contains(next.status) { remember(next.localTrees, for: deviceID) }
+            if [.upToDate, .incomplete].contains(next.status) {
+                remember(next.localTrees, for: deviceID)
+                CloudSaveKeys.remember(.init(keys: next.keys, records: next.records), at: keyRecord)
+            }
             if next.status != .unavailable { isAvailable = true }
             summary = next
             if [.off, .upToDate, .incomplete].contains(next.status) { confirmedEnabled = next.status != .off }
