@@ -42,3 +42,24 @@ test("inventory reads skip the catalog when nothing is hinted, and survive it be
   };
   assert.equal(skills[0].catalogSkillId, null);
 });
+
+test("inventory reads give each copy its cloud save key, apart when same-name folders hold different skills", async () => {
+  const library = row({ id: "library", source: "claude", stableKey: "location:v1:claude:last30days", name: "last30days",
+    catalogSkillIdHint: null });
+  const spec = row({ id: "spec", stableKey: "location:v1:codex:last30days", name: "last30days-v3-spec", catalogSkillIdHint: null });
+  const { skills } = await readSyncInventory(pool([library, spec]), "user", 2, new Date(), async () => catalog) as {
+    skills: Array<{ id: string; cloudKey: string }>
+  };
+  assert.deepEqual(skills.map(({ id, cloudKey }) => [id, cloudKey]), [["library", "last30days"], ["spec", "last30days@codex"]]);
+});
+
+test("inventory reads keep a saved skill on its own key after the other same-name skill is gone", async () => {
+  const spec = row({ id: "spec", stableKey: "location:v1:codex:last30days", name: "last30days-v3-spec", catalogSkillIdHint: null });
+  const records = [{ key: "last30days", name: "last30days" }, { key: "last30days@codex", name: "last30days-v3-spec" }];
+  const withRecords = { query: async (sql: string) =>
+    ({ rows: sql.includes("FROM synced_skills") ? [spec] : sql.includes("FROM cloud_saved_skills") ? records : [] }) } as unknown as Pool;
+  const { skills } = await readSyncInventory(withRecords, "user", 2, new Date(), async () => catalog) as {
+    skills: Array<{ cloudKey: string }>
+  };
+  assert.equal(skills[0].cloudKey, "last30days@codex");
+});

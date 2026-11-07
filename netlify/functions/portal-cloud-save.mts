@@ -220,7 +220,8 @@ export async function portalCloudSave(
           deviceId: device.deviceId,
           skillKey: route.skillKey,
           files: parseCloudManifest(body),
-          expectedTreeSha: body.treeSha
+          expectedTreeSha: body.treeSha,
+          skillName: body.skillName
         });
         if (result.status === "missing_files") return secretJsonResponse(req, result, { status: 409 });
         return secretJsonResponse(req, result, { status: result.created ? 201 : 200 });

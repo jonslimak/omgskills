@@ -1,5 +1,7 @@
 import type { Pool } from "pg";
 import { listUserDevices } from "./device-auth.js";
+import { cloudSkillKeys } from "./cloud-skill-keys.js";
+import { readCloudRecordNames } from "./cloud-save.js";
 import { verifiedCatalogHint } from "./github-skill-resolution.js";
 import { withTimeout } from "./http.js";
 import { loadCatalogHintIdentity, type PublishedCatalogIdentity } from "./published-catalog.js";
@@ -52,6 +54,9 @@ export async function readSyncInventory(
     // Historical uploads accepted arbitrary URLs. Do not repeat credentials.
     githubUrl: safeRepositoryUrl(row.githubUrl)
   }));
+  // The cloud save record each copy uses; same-name folders holding different skills are saved apart.
+  const records = await readCloudRecordNames(pool, userId);
+  for (const [skill, cloudKey] of cloudSkillKeys(skills, records)) Object.assign(skill, { cloudKey });
   // Presence reports store the Mac's catalog hint unverified; link the rows it proves.
   const hinted = skills.filter((skill) => !skill.catalogSkillId && skill.catalogSkillIdHint && skill.skillMdSha);
   if (hinted.length) {

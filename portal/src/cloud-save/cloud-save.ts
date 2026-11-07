@@ -111,6 +111,11 @@ export function cloudSkillKey(name: string) {
   return name.normalize("NFC").toLowerCase();
 }
 
+/** The cloud save key one installed copy uses: the server's, else its folder name. */
+export function installationCloudKey(skill: { cloudKey?: string | null; installationFolder?: string | null; name: string }) {
+  return skill.cloudKey || cloudSkillKey(skill.installationFolder || skill.name);
+}
+
 export type CloudDeleteSelection = { kind: "skill"; key: string } | { kind: "all" } | null;
 
 export function isDeletingCloudSkill(selection: CloudDeleteSelection, key: string): boolean {
@@ -148,7 +153,7 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
   const fromCatalog = new Set<string>();
   for (const skill of installed) {
     if (skill.isCurrent === false) continue;
-    const key = cloudSkillKey(skill.installationFolder || skill.name);
+    const key = installationCloudKey(skill);
     if (!key) continue;
     if (!names.has(key)) names.set(key, skill.name);
     if (skill.catalogSkillId || skill.installedFromSet) fromLibrary.add(key);

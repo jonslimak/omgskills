@@ -62,6 +62,11 @@ export function cloudSkillKey(name: string) {
   return name.normalize("NFC").toLowerCase();
 }
 
+/** The cloud save key one installed copy uses: the inventory's, else its folder name. */
+function copyKey(copy: SyncedSkill) {
+  return copy.cloudKey || cloudSkillKey(copy.installationFolder || copy.name);
+}
+
 function isLive(copy: SyncedSkill, now: number) {
   if (copy.isCurrent === false) return false;
   if (copy.deviceId != null) return true;
@@ -77,7 +82,7 @@ function catalogOwner(id: string | null | undefined) {
 }
 
 function keysOf(copies: SyncedSkill[]) {
-  return [...new Set(copies.map(copy => cloudSkillKey(copy.installationFolder || copy.name)))];
+  return [...new Set(copies.map(copyKey))];
 }
 
 type CloudRow = { key: string; name: string; status: LibraryCloudStatus; savedAt: string | null; confirmedSecret: boolean;
@@ -97,7 +102,7 @@ function cloudRows(state: CloudSaveState, installed: SyncedSkill[]): Map<string,
   const fromCatalog = new Set<string>();
   for (const skill of installed) {
     if (skill.isCurrent === false) continue;
-    const key = cloudSkillKey(skill.installationFolder || skill.name);
+    const key = copyKey(skill);
     if (!key) continue;
     if (!names.has(key)) names.set(key, skill.name);
     if (skill.catalogSkillId || skill.installedFromSet) fromLibrary.add(key);

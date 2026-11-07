@@ -3,6 +3,8 @@ import { type Pool, type PoolClient, type QueryResult, type QueryResultRow } fro
 import { appendSkillRelease } from "./group-storage.js";
 import { cloudBlobKey, type CloudObjectStore } from "./cloud-store.js";
 import { skillMdBody } from "./skill-readme.js";
+import { cloudNameKey, type CloudRecordName } from "./cloud-skill-keys.js";
+import { installationFolderFromKey } from "./sync-skill.js";
 import { drainCloudPurge, queuedFileCount, releaseStorageKeys, reserveStorageKeys } from "./cloud-storage-purge.js";
 import { combineLabels, pathLabels, scanFileContents, type SecretFinding, type SkillLabel } from "./skill-scan.js";
 import {
@@ -44,6 +46,7 @@ export type CloudSaveErrorCode =
   | "file_too_large"
   | "quota_exceeded"
   | "needs_review"
+  | "name_taken"
   | "not_found";
 
 export type HeldFile = { path: string; blobSha: string; findings: SecretFinding[] };
@@ -71,6 +74,7 @@ const statusByCode: Record<CloudSaveErrorCode, number> = {
   file_too_large: 413,
   quota_exceeded: 413,
   needs_review: 422,
+  name_taken: 409,
   not_found: 404
 };
 
@@ -102,6 +106,13 @@ export function normalizeSkillKey(value: unknown): string {
   return key;
 }
 
+/** A SKILL.md name as cloud save compares it (see cloudNameKey), or null when none was sent. */
+function normalizeSkillName(value: unknown): string | null {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== "string" || value.length > 500) throw new CloudSaveError("invalid_request", "Invalid skill name");
+  return value.normalize("NFC").toLowerCase() || null;
+}
+
 function requireBlobSha(value: unknown): string {
   if (typeof value !== "string" || !/^[0-9a-f]{40}$/i.test(value)) {
     throw new CloudSaveError("invalid_request", "Invalid file hash");
@@ -127,6 +138,8 @@ export type CloudSavedVersion = {
 
 export type CloudSavedSkill = {
   key: string;
+  /** The skill's SKILL.md name as cloud save compares it; null when saved before names were kept. */
+  name: string | null;
   currentVersion: CloudSavedVersion;
   versionCount: number;
   deletedLocallyAt: string | null;
@@ -259,14 +272,76 @@ export async function reportCloudSkips(
   );
 }
 
+/**
+ * Names for skills saved before names were kept: the SKILL.md name the Mac that saved one reports for a
+ * skill in that folder, when it reports exactly one. Keys of those skills are their folder names.
+ */
+async function reportedNames(db: Database, userId: string, wanted: { key: string; deviceId: string | null }[]) {
+  const names = new Map<string, string>();
+  const devices = [...new Set(wanted.map((item) => item.deviceId).filter((id): id is string => !!id))];
+  if (!devices.length) return names;
+  const rows = await db.query<{ deviceId: string; name: string; source: string; stableKey: string }>(
+    `SELECT device_id AS "deviceId", name, source, stable_key AS "stableKey" FROM synced_skills
+     WHERE user_id = $1 AND is_current = true AND device_id = ANY($2::uuid[])`,
+    [userId, devices]
+  );
+  const byFolder = new Map<string, Set<string>>();
+  for (const row of rows.rows) {
+    const folder = installationFolderFromKey(row.stableKey, row.source);
+    if (!folder) continue;
+    const id = `${row.deviceId}\u0000${cloudNameKey(folder)}`;
+    byFolder.set(id, (byFolder.get(id) ?? new Set()).add(cloudNameKey(row.name)));
+  }
+  for (const { key, deviceId } of wanted) {
+    const found = deviceId ? byFolder.get(`${deviceId}\u0000${key}`) : undefined;
+    // Two skills in same-name folders there: the one named like its folder holds the folder key (cloud-skill-keys.ts).
+    if (found?.size === 1) names.set(key, [...found][0]);
+    else if (found?.has(key)) names.set(key, key);
+  }
+  return names;
+}
+
+/** The names of a person's saved skills, for `cloudSkillKeys`. */
+export async function readCloudRecordNames(db: Database, userId: string): Promise<CloudRecordName[]> {
+  const result = await db.query<{ key: string; name: string | null; deviceId: string | null }>(
+    `SELECT saved.skill_key AS key, saved.skill_name AS name, cloud.device_id AS "deviceId"
+     FROM cloud_saved_skills saved JOIN cloud_releases cloud ON cloud.release_id = saved.current_release_id
+     WHERE saved.user_id = $1`, [userId]);
+  const reported = await reportedNames(db, userId, result.rows.filter((row) => !row.name));
+  return result.rows.map((row) => ({ key: row.key, name: row.name ?? reported.get(row.key) ?? null }));
+}
+
+/**
+ * Two different skills can share a folder name; one never saves over the other. A save under a key whose
+ * skill has another SKILL.md name is refused, and the Mac saves under another key. The Mac that saved it
+ * last may rename it (an edited SKILL.md name). Names come from the Mac, or, for Macs and skills from before
+ * names were kept, from what the saving Mac reports. Returns the names to keep.
+ */
+async function checkSkillName(db: Database, input: { userId: string; deviceId: string | null; skillKey: string;
+  skillName: string | null }, existing: { name: string | null; deviceId: string | null } | undefined) {
+  const wanted = [];
+  if (!input.skillName) wanted.push({ key: input.skillKey, deviceId: input.deviceId });
+  const reportedHere = wanted.length ? await reportedNames(db, input.userId, wanted) : new Map<string, string>();
+  const incoming = input.skillName ?? reportedHere.get(input.skillKey) ?? null;
+  let saved = existing?.name ?? null;
+  if (existing && !saved) {
+    saved = (await reportedNames(db, input.userId, [{ key: input.skillKey, deviceId: existing.deviceId }])).get(input.skillKey) ?? null;
+  }
+  if (saved && incoming && saved !== incoming && existing?.deviceId !== input.deviceId) {
+    throw new CloudSaveError("name_taken", "Another skill with this folder name is saved under this key");
+  }
+  return incoming ?? saved;
+}
+
 export async function readCloudSave(db: Database, userId: string): Promise<CloudSaveState> {
   const [settings, bytes, skills, needsReview, skipped] = await Promise.all([
     readCloudSaveSettings(db, userId),
     usedBytes(db, userId),
-    db.query<CloudSavedVersion & { key: string; versionCount: number; deletedLocallyAt: string | null; setCount: number }>(
+    db.query<CloudSavedVersion & { key: string; name: string | null; versionCount: number; deletedLocallyAt: string | null; setCount: number }>(
       `
         SELECT
           saved.skill_key AS key,
+          saved.skill_name AS name,
           to_char(saved.deleted_locally_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "deletedLocallyAt",
           (SELECT count(*)::int FROM skill_releases WHERE source_id = saved.source_id) AS "versionCount",
           (SELECT count(DISTINCT item.group_id)::int FROM skill_group_items item WHERE item.source_id = saved.source_id) AS "setCount",
@@ -282,13 +357,16 @@ export async function readCloudSave(db: Database, userId: string): Promise<Cloud
     readReviews(db, userId),
     readSkips(db, userId)
   ]);
+  const reported = await reportedNames(db, userId, skills.rows.filter((row) => !row.name)
+    .map((row) => ({ key: row.key, deviceId: row.deviceId })));
   return {
     settings,
     needsReview,
     skipped,
     usage: { bytes, limitBytes: CLOUD_SAVE_LIMITS.maximumUserBytes },
-    skills: skills.rows.map(({ key, versionCount, deletedLocallyAt, setCount, ...version }) => ({
+    skills: skills.rows.map(({ key, name, versionCount, deletedLocallyAt, setCount, ...version }) => ({
       key,
+      name: name ?? reported.get(key) ?? null,
       versionCount,
       deletedLocallyAt,
       setCount,
@@ -297,8 +375,11 @@ export async function readCloudSave(db: Database, userId: string): Promise<Cloud
   };
 }
 
-export function parseCloudSaveSettingsUpdate(body: Record<string, unknown>): Partial<CloudSaveSettings> {
-  const update: Partial<CloudSaveSettings> = {};
+/** A settings change. `addExcludedSkillKeys` leaves more skills out without replacing the list, for the Mac. */
+export type CloudSaveSettingsUpdate = Partial<CloudSaveSettings> & { addExcludedSkillKeys?: string[] };
+
+export function parseCloudSaveSettingsUpdate(body: Record<string, unknown>): CloudSaveSettingsUpdate {
+  const update: CloudSaveSettingsUpdate = {};
   if (Object.hasOwn(body, "enabled")) {
     if (typeof body.enabled !== "boolean") throw new CloudSaveError("invalid_request", "enabled must be true or false");
     update.enabled = body.enabled;
@@ -309,7 +390,13 @@ export function parseCloudSaveSettingsUpdate(body: Record<string, unknown>): Par
     }
     update.excludedSkillKeys = [...new Set(body.excludedSkillKeys.map(normalizeSkillKey))].sort();
   }
-  if (update.enabled === undefined && update.excludedSkillKeys === undefined) {
+  if (Object.hasOwn(body, "addExcludedSkillKeys")) {
+    if (!Array.isArray(body.addExcludedSkillKeys) || body.addExcludedSkillKeys.length > MAX_EXCLUDED_SKILLS) {
+      throw new CloudSaveError("invalid_request", "addExcludedSkillKeys must be a list of skill keys");
+    }
+    update.addExcludedSkillKeys = [...new Set(body.addExcludedSkillKeys.map(normalizeSkillKey))].sort();
+  }
+  if (update.enabled === undefined && update.excludedSkillKeys === undefined && update.addExcludedSkillKeys === undefined) {
     throw new CloudSaveError("invalid_request", "Nothing to update");
   }
   return update;
@@ -318,8 +405,22 @@ export function parseCloudSaveSettingsUpdate(body: Record<string, unknown>): Par
 export async function updateCloudSaveSettings(
   db: Database,
   userId: string,
-  update: Partial<CloudSaveSettings>
+  update: CloudSaveSettingsUpdate
 ): Promise<CloudSaveSettings> {
+  if (update.addExcludedSkillKeys) {
+    const added = await db.query<CloudSaveSettings>(
+      `
+        UPDATE cloud_save_settings SET
+          excluded_skill_keys = ARRAY(SELECT DISTINCT key FROM unnest(excluded_skill_keys || $2::text[]) AS key ORDER BY key),
+          updated_at = now()
+        WHERE user_id = $1 AND cardinality(excluded_skill_keys || $2::text[]) <= ${MAX_EXCLUDED_SKILLS}
+        RETURNING enabled, excluded_skill_keys AS "excludedSkillKeys"
+      `,
+      [userId, update.addExcludedSkillKeys]
+    );
+    if (!added.rows[0]) throw new CloudSaveError("invalid_request", "Too many skills are left out");
+    if (update.enabled === undefined && update.excludedSkillKeys === undefined) return added.rows[0];
+  }
   const result = await db.query<CloudSaveSettings>(
     `
       INSERT INTO cloud_save_settings (user_id, enabled, excluded_skill_keys)
@@ -614,9 +715,12 @@ export async function saveCloudVersion(
     skillKey: unknown;
     files: SkillManifestEntry[];
     expectedTreeSha?: unknown;
+    /** The skill's SKILL.md name. Macs before names were kept leave it out. */
+    skillName?: unknown;
   }
 ): Promise<SaveCloudVersionResult> {
   const skillKey = normalizeSkillKey(input.skillKey);
+  const skillName = normalizeSkillName(input.skillName);
   await requireSavingEnabled(pool, input.userId, skillKey);
   let manifest;
   try {
@@ -630,6 +734,13 @@ export async function saveCloudVersion(
   if (input.expectedTreeSha !== undefined && requireBlobSha(input.expectedTreeSha) !== manifest.treeSha) {
     throw new CloudSaveError("invalid_package", "The skill's tree hash does not match its files");
   }
+
+  // Checked before anything is held for review under this key; again under the lock below.
+  const before = await pool.query<{ name: string | null; deviceId: string | null }>(
+    `SELECT saved.skill_name AS name, cloud.device_id AS "deviceId"
+     FROM cloud_saved_skills saved JOIN cloud_releases cloud ON cloud.release_id = saved.current_release_id
+     WHERE saved.user_id = $1 AND saved.skill_key = $2`, [input.userId, skillKey]);
+  await checkSkillName(pool, { ...input, skillKey, skillName }, before.rows[0]);
 
   const hashes = [...new Set(input.files.map((file) => file.blobSha))];
   const stored = await pool.query<{ blob_sha: string; byte_size: number; labels: string[] }>(
@@ -689,16 +800,23 @@ export async function saveCloudVersion(
       return { status: "missing_files", missing: hashes.filter((hash) => !present.has(hash)) };
     }
     const sourceId = await lockCloudSource(client, input.userId, skillKey);
-    const current = await client.query<{ releaseId: string; treeSha: string }>(
+    const current = await client.query<{ releaseId: string; treeSha: string; name: string | null; deviceId: string | null }>(
       `
-        SELECT release.id AS "releaseId", release.tree_sha AS "treeSha"
+        SELECT release.id AS "releaseId", release.tree_sha AS "treeSha", saved.skill_name AS name,
+          cloud.device_id AS "deviceId"
         FROM cloud_saved_skills saved
         JOIN skill_releases release ON release.id = saved.current_release_id
+        JOIN cloud_releases cloud ON cloud.release_id = release.id
         WHERE saved.source_id = $1
       `,
       [sourceId]
     );
-    if (current.rows[0]?.treeSha === manifest.treeSha) {
+    const existing = current.rows[0];
+    const keptName = await checkSkillName(client, { ...input, skillKey, skillName }, existing);
+    if (existing && keptName && existing.name !== keptName) {
+      await client.query("UPDATE cloud_saved_skills SET skill_name = $2 WHERE source_id = $1", [sourceId, keptName]);
+    }
+    if (existing?.treeSha === manifest.treeSha) {
       // Only this Mac's own waiting copy is settled by matching the current version.
       await client.query(
         "DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2 AND device_id IS NOT DISTINCT FROM $3",
@@ -740,14 +858,15 @@ export async function saveCloudVersion(
     );
     await client.query(
       `
-        INSERT INTO cloud_saved_skills (source_id, user_id, skill_key, current_release_id)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO cloud_saved_skills (source_id, user_id, skill_key, current_release_id, skill_name)
+        VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT (source_id) DO UPDATE SET
           current_release_id = EXCLUDED.current_release_id,
+          skill_name = COALESCE(EXCLUDED.skill_name, cloud_saved_skills.skill_name),
           deleted_locally_at = NULL,
           updated_at = now()
       `,
-      [sourceId, input.userId, skillKey, releaseId]
+      [sourceId, input.userId, skillKey, releaseId, keptName]
     );
     await client.query("DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2", [input.userId, skillKey]);
     await client.query("COMMIT");
