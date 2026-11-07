@@ -619,11 +619,13 @@ export const libraryAgentConnections = pgTable(
     clientId: text("client_id").notNull(),
     firstUsedAt: timestamp("first_used_at", { withTimezone: true }).notNull().defaultNow(),
     lastUsedAt: timestamp("last_used_at", { withTimezone: true }).notNull().defaultNow(),
-    blockedAt: timestamp("blocked_at", { withTimezone: true })
+    blockedAt: timestamp("blocked_at", { withTimezone: true }),
+    clientName: text("client_name")
   },
   (table) => [
     primaryKey({ columns: [table.userId, table.clientId] }),
-    check("library_agent_connections_client_id_check", sql`char_length(${table.clientId}) BETWEEN 1 AND 500`)
+    check("library_agent_connections_client_id_check", sql`char_length(${table.clientId}) BETWEEN 1 AND 500`),
+    check("library_agent_connections_client_name_check", sql`${table.clientName} IS NULL OR char_length(${table.clientName}) <= 200`)
   ]
 );
 
