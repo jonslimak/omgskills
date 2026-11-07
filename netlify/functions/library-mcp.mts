@@ -107,14 +107,18 @@ const dependencies: LibraryMcpDependencies = {
     readCloud: (id) => readCloudSave(getPgPool(), id),
     readAdditions: async (id) => (await getPgPool().query<{ id: string }>(
       "SELECT catalog_skill_id AS id FROM my_skill_additions WHERE user_id = $1 ORDER BY added_at DESC", [id])).rows.map(row => row.id),
+    // The catalog's summary rows hold every listed field, so no detail files are fetched for the list.
     catalogDetails: (ids) => withTimeout((async () => {
+      const { library } = await catalog.get();
+      // OmgskillsLibrary (legacy loader) is in memory already; the search catalog has a summary reader.
+      const summary = "summaryReader" in library && typeof library.summaryReader === "function" ? library.summaryReader() : library;
       const details = new Map<string, CatalogDetails>();
-      for (const id of ids) {
-        const skill = await publicSkill(id);
+      await Promise.all(ids.map(async id => {
+        const skill = await summary.getSkill(id);
         if (skill) details.set(id, { name: skill.name, description: skill.description, author: skill.author_handle, githubUrl: skill.github_url });
-      }
+      }));
       return details;
-    })(), 4_000),
+    })(), 5_000), // Short enough to stay inside the function limit after sign-in and inventory reads.
   }),
   savedFiles: (userId, key) => listSavedFiles(getPgPool(), userId, key),
   readSaved: (userId, file) => readSavedFile(createCloudObjectStore(), userId, file),
@@ -128,11 +132,14 @@ const dependencies: LibraryMcpDependencies = {
 export default async (req: Request): Promise<Response> => {
   // Off until sign-in is set up for this site.
   if (getEnv("LIBRARY_MCP_ENABLED") !== "1") return new Response("Not found", { status: 404 });
+  // Start loading the catalog now (it takes seconds on a cold start) while the sign-in is checked.
+  if (req.method === "POST") void catalog.get().catch(() => undefined);
   return handleLibraryMcp(req, dependencies);
 };
 
 export const config: Config = {
-  path: ["/api/library/mcp", "/.well-known/oauth-protected-resource", "/.well-known/oauth-protected-resource/api/library/mcp",
+  path: ["/my/mcp", "/api/library/mcp", "/.well-known/oauth-protected-resource",
+    "/.well-known/oauth-protected-resource/my/mcp", "/.well-known/oauth-protected-resource/api/library/mcp",
     "/.well-known/oauth-authorization-server"],
   rateLimit: { windowLimit: 120, windowSize: 60, aggregateBy: ["ip", "domain"] },
 };
