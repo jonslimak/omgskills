@@ -2,7 +2,7 @@ import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode 
 import { ArrowUpRight, RefreshCw } from "lucide-react";
 import type { SkillDisplay } from "./model";
 import { PublicReadmeClient, publicReadmeId, readmeBrowseUrl, readmeTitle, type SkillDocuments } from "./public-readme";
-import { cloudSkillKey, restoreVersionLink, type SavedSkillMd, type SavedSkillMdLoader, type SavedVersions, type SavedVersionsLoader, type SharedSkillMd, type SharedSkillMdLoader } from "../../cloud-save/cloud-save";
+import { installationCloudKey, restoreVersionLink, type SavedSkillMd, type SavedSkillMdLoader, type SavedVersions, type SavedVersionsLoader, type SharedSkillMd, type SharedSkillMdLoader } from "../../cloud-save/cloud-save";
 
 const MarkdownBody = lazy(() => import("./ReadmeMarkdown"));
 const publicClient = new PublicReadmeClient();
@@ -75,7 +75,7 @@ export function SkillReadme({ skill, client = publicClient }: { skill: SkillDisp
 export function savedSkillKeys(skill: SkillDisplay): string[] {
   if (skill.cloudKey) return [skill.cloudKey];
   const sources = skill.installed?.sourceSkills ?? [];
-  return [...new Set(sources.map(source => cloudSkillKey(source.installationFolder || source.name)))];
+  return [...new Set(sources.map(installationCloudKey))];
 }
 
 type SavedState = { id: string; status: "loading" | "ready" | "error"; doc: SavedSkillMd | null };

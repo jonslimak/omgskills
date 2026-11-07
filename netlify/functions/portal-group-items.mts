@@ -15,7 +15,8 @@ import {
   reorderGroupItemsWithClient,
   updateCloudGroupItemWithClient
 } from "./_shared/group-items.js";
-import { normalizeSkillKey } from "./_shared/cloud-save.js";
+import { normalizeSkillKey, readCloudRecordNames } from "./_shared/cloud-save.js";
+import { cloudSkillKeys } from "./_shared/cloud-skill-keys.js";
 import { installationFolderFromKey } from "./_shared/sync-skill.js";
 import { errorResponse, jsonResponse, optionsResponse, secretJsonResponse, withTimeout } from "./_shared/http.js";
 import { portalGroupItem, type PortalGroupItemRow } from "./_shared/portal-group-item.js";
@@ -49,10 +50,26 @@ type SyncedSkill = {
   source: string;
 };
 
-/** Cloud save names a skill by its folder on the Mac. */
-function cloudKeyOf(skill: SyncedSkill): string | null {
+/**
+ * The cloud save key of one synced skill: its folder name, unless another skill in a same-name folder
+ * holds that key (see cloud-skill-keys.ts). Its Mac's other current copies and the saved skills decide.
+ */
+async function cloudKeyOf(client: QueryClient, userId: string, skill: SyncedSkill): Promise<string | null> {
+  const rows = await client.query<{ id: string; name: string; source: string; stableKey: string; deviceId: string | null;
+    isCurrent: boolean }>(
+    `SELECT id, name, source, stable_key AS "stableKey", device_id AS "deviceId", is_current AS "isCurrent"
+     FROM synced_skills
+     WHERE user_id = $1 AND is_current = true
+       AND device_id IS NOT DISTINCT FROM (SELECT device_id FROM synced_skills WHERE id = $2 AND user_id = $1)
+     ORDER BY lower(name), source, id`,
+    [userId, skill.id]
+  );
+  const copies = rows.rows.map(row => ({ ...row, installationFolder: installationFolderFromKey(row.stableKey, row.source) }));
+  const own = copies.find(copy => copy.id === skill.id);
+  if (!own) return null;
+  const key = cloudSkillKeys(copies, await readCloudRecordNames(client, userId)).get(own);
   try {
-    return normalizeSkillKey(installationFolderFromKey(skill.stableKey, skill.source) ?? skill.name);
+    return key ? normalizeSkillKey(key) : null;
   } catch {
     return null;
   }
@@ -234,7 +251,7 @@ export default async (req: Request, _context: Context) => {
       const note = optionalString(body?.note, 1000);
       const prepared = await prepareSyncedGroupPublication(available);
       // A skill only on the owner's Macs is shared from its cloud save copy, when there is one.
-      const cloudKey = prepared.kind === "metadata_only" ? cloudKeyOf(available) : null;
+      const cloudKey = prepared.kind === "metadata_only" ? await cloudKeyOf(getPgPool(), user.id, available) : null;
       const publication: GroupItemPublication = prepared.kind === "metadata_only" && cloudKey
         ? { kind: "cloud", ownerUserId: user.id, skillKey: cloudKey, fallback: prepared.reason }
         : prepared;

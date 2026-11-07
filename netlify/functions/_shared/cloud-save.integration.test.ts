@@ -469,6 +469,81 @@ test("a file with a key is held back until the user confirms, and the skill wait
   });
 });
 
+test("a different skill never saves over a saved skill of another name from another Mac", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    const other = (await pool.query<{ id: string }>(
+      `INSERT INTO device_tokens (user_id, token_hash, device_name, expires_at, granted_scopes)
+       VALUES ($1, 'hash-other', 'Mac 2', now() + interval '1 day', ARRAY['sync:write', 'self:revoke', 'content:write']) RETURNING id`,
+      [userId]
+    )).rows[0].id;
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, [...v1, ...v2]);
+    // Saved before names were kept: the first named save claims it.
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    assert.equal((await readCloudSave(pool, userId)).skills[0].name, null);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1), skillName: "Notes" });
+    assert.equal((await readCloudSave(pool, userId)).skills[0].name, "notes");
+
+    // Another Mac's different skill in a same-name folder is refused; the same skill is saved.
+    await rejects(saveCloudVersion(pool, { userId, deviceId: other, skillKey: "notes", files: manifest(v2), skillName: "notes-spec" }),
+      "name_taken");
+    const same = await saveCloudVersion(pool, { userId, deviceId: other, skillKey: "notes", files: manifest(v2), skillName: "NOTES" });
+    assert.equal(same.status === "saved" && same.created, true);
+    // A Mac that sends no name (before this change) saves as before and keeps the name.
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    assert.equal((await readCloudSave(pool, userId)).skills[0].name, "notes");
+    // The Mac that saved it last may rename it.
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v2), skillName: "Renamed" });
+    assert.equal((await readCloudSave(pool, userId)).skills[0].name, "renamed");
+    await rejects(saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v2), skillName: 7 }), "invalid_request");
+  });
+});
+
+test("skills saved before names were kept take the name their Mac reports, and Macs sending no name are checked too", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    const other = (await pool.query<{ id: string }>(
+      `INSERT INTO device_tokens (user_id, token_hash, device_name, expires_at, granted_scopes)
+       VALUES ($1, 'hash-other', 'Mac 2', now() + interval '1 day', ARRAY['sync:write', 'self:revoke', 'content:write']) RETURNING id`,
+      [userId]
+    )).rows[0].id;
+    const report = async (device: string, name: string, source = "codex") => {
+      const run = randomUUID();
+      await pool.query("INSERT INTO sync_runs(id,user_id,device_id,status,completed_at) VALUES($1,$2,$3,'completed',now())", [run, userId, device]);
+      await pool.query(`INSERT INTO synced_skills(user_id,sync_run_id,device_id,stable_key,name,source,identity_status,is_local_only)
+        VALUES($1,$2,$3,$5,$4,$6,'localOnly',true)`, [userId, run, device, name, `location:v1:${source}:notes`, source]);
+    };
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, [...v1, ...v2]);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    await report(deviceId, "Notes");
+    await report(other, "notes-spec");
+    assert.equal((await readCloudSave(pool, userId)).skills[0].name, "notes", "From what its Mac reports");
+    await rejects(saveCloudVersion(pool, { userId, deviceId: other, skillKey: "notes", files: manifest(v2), skillName: "notes-spec" }),
+      "name_taken");
+    await rejects(saveCloudVersion(pool, { userId, deviceId: other, skillKey: "notes", files: manifest(v2) }), "name_taken");
+
+    // A Mac reporting two skills in same-name folders: the one named like the folder holds the key.
+    await report(deviceId, "notes-v3-spec", "claude");
+    assert.equal((await readCloudSave(pool, userId)).skills[0].name, "notes");
+
+    // The Mac adds to the left-out list without replacing it.
+    await updateCloudSaveSettings(pool, userId, { excludedSkillKeys: ["a"] });
+    const { parseCloudSaveSettingsUpdate } = await import("./cloud-save.js");
+    const added = await updateCloudSaveSettings(pool, userId, parseCloudSaveSettingsUpdate({ addExcludedSkillKeys: ["notes@codex", "a"] }));
+    assert.deepEqual(added.excludedSkillKeys, ["a", "notes@codex"]);
+    assert.equal(added.enabled, true);
+
+    // An account with no settings yet gets them, saving off.
+    const fresh = await createUser(pool);
+    const first = await updateCloudSaveSettings(pool, fresh.userId, parseCloudSaveSettingsUpdate({ addExcludedSkillKeys: ["notes@codex"] }));
+    assert.deepEqual([first.enabled, first.excludedSkillKeys], [false, ["notes@codex"]]);
+  });
+});
+
 test("a review belongs to its Mac's copy, and deleting the skill there clears it", async () => {
   await withMigratedSchema(async (pool) => {
     const store = new MemoryStore();

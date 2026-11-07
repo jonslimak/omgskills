@@ -1,11 +1,11 @@
 import type { CloudSaveState } from "../../cloud-save/cloud-save";
-import { cloudSkillKey } from "../../cloud-save/cloud-save";
+import { installationCloudKey } from "../../cloud-save/cloud-save";
 import type { SyncedSkill } from "../../synced-skill-grouping";
 
 /** Sample cloud save state for the preview: one skill to review, three that can't be saved, the rest saved. */
 export function previewCloudState(skills: SyncedSkill[]): CloudSaveState {
   const own = [...new Set(skills.filter(skill => skill.isCurrent !== false && !skill.catalogSkillId && !skill.installedFromSet)
-    .map(skill => cloudSkillKey(skill.installationFolder || skill.name)))];
+    .map(installationCloudKey))];
   const [review, ...rest] = own;
   const reasons = ["links", "links", "too_large"] as const;
   const skipped = Object.fromEntries(rest.slice(0, reasons.length).map((key, index) => [key, reasons[index]]));

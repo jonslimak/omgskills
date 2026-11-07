@@ -13,6 +13,8 @@ export type SyncedSkill = {
   deviceStatus?: "active" | "revoked" | "expired" | "inactive" | null;
   lastReportedAt?: string | null;
   installationFolder?: string | null;
+  /** The cloud save key this copy uses, from the server; older responses leave it out. */
+  cloudKey?: string | null;
   gitRelativePath?: string | null;
   catalogSkillIdHint?: string | null;
   installedFromSet?: string | null;
