@@ -8,6 +8,8 @@ struct CloudSaveFolder: Equatable, Sendable {
     let coordinates: SkillPackageCoordinates
     /// When any file in the folder last changed.
     let modifiedAt: Date
+    /// The skill's SKILL.md name, sent with each save so a different skill never saves over it.
+    var name: String? = nil
 
     var treeSha: String { coordinates.treeSha }
 
@@ -120,7 +122,9 @@ struct CloudSaveFolder: Equatable, Sendable {
         return result
     }
 
-    static func read(directory: URL, links: LinkPolicy? = nil, fileManager: FileManager = .default) throws -> CloudSaveFolder {
+    /// `key`: the skill's cloud key when it isn't just the folder name (see CloudSaveKeys).
+    static func read(directory: URL, key: String? = nil, links: LinkPolicy? = nil,
+                     fileManager: FileManager = .default) throws -> CloudSaveFolder {
         let root = directory.resolvingSymlinksInPath()
         var isDirectory: ObjCBool = false
         guard fileManager.fileExists(atPath: root.path, isDirectory: &isDirectory), isDirectory.boolValue else {
@@ -143,7 +147,7 @@ struct CloudSaveFolder: Equatable, Sendable {
         let entries = reader.entries, modifiedAt = reader.modifiedAt
         do {
             let coordinates = try SkillPackageValidator.unpinnedCoordinates(for: entries, limits: limits)
-            return CloudSaveFolder(key: key(forFolderName: directory.lastPathComponent), directory: directory,
+            return CloudSaveFolder(key: key ?? Self.key(forFolderName: directory.lastPathComponent), directory: directory,
                 entries: entries, coordinates: coordinates, modifiedAt: modifiedAt)
         } catch let error as SkillPackageValidationError {
             throw ReadError.invalid(error.code)

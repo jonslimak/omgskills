@@ -105,6 +105,8 @@ final class SkillRemovalController {
     var forget: ((_ keys: [String], _ catalogIDs: [String]) async throws -> Void)?
     /// How many Sets share any of these saved skills, or nil when unknown.
     var setCount: ((_ keys: [String]) async -> Int?)?
+    /// The account's saved skills, read now, so keys are right even before this Mac's first cloud save pass.
+    var savedRecords: (() async -> [CloudSaveKeys.Record]?)?
     /// Whether this Mac may delete from the account now (connected, with permission to change content).
     var mayForget: () -> Bool = { true }
 
@@ -157,8 +159,9 @@ final class SkillRemovalController {
         attempt = id
         state = .confirmEverywhere(names: names, copies: copies, sets: nil)
         guard let setCount else { return }
-        let keys = Self.keys(copies)
+        let installed = installations()
         Task {
+            let keys = Self.keys(copies, among: installed, records: await savedRecords?())
             let sets = await setCount(keys)
             guard attempt == id, case .confirmEverywhere(let names, let copies, nil) = state else { return }
             state = .confirmEverywhere(names: names, copies: copies, sets: sets)
@@ -176,6 +179,10 @@ final class SkillRemovalController {
         }
         let id = UUID()
         attempt = id
+        // Keys come from everything installed before anything moves to the Trash.
+        let installed = installations()
+        let records = await savedRecords?()
+        guard attempt == id else { return }
         guard let outcome = trashShown(names: names, asked: asked, reportRemoved: false) else { return }
         // A copy still here would be left out of sync, not deleted; the account keeps everything until all are gone.
         guard outcome.failures.isEmpty else {
@@ -186,7 +193,7 @@ final class SkillRemovalController {
         state = .working(title: "Deleting \(SkillRemoval.title(outcome.removed))…")
         let gone = outcome.copies.filter { outcome.removed.map(SkillRemoval.normalizedName).contains(SkillRemoval.normalizedName($0.name)) }
         var forgotten = true
-        do { try await forget(Self.keys(gone), Array(Set(gone.compactMap(\.catalogSkillId))).sorted()) }
+        do { try await forget(Self.keys(gone, among: installed, records: records), Array(Set(gone.compactMap(\.catalogSkillId))).sorted()) }
         catch { forgotten = false }
         // The next sync runs after the account forgot them, so it doesn't save them back.
         onRemoved()
@@ -240,9 +247,10 @@ final class SkillRemovalController {
             + (kept ? " My skills still has it." : ""))
     }
 
-    /// The account's keys for these copies: their folder names.
-    static func keys(_ copies: [Skill]) -> [String] {
-        Array(Set(copies.map { CloudSaveFolder.key(forFolderName: URL(fileURLWithPath: $0.installCmd).lastPathComponent) })).sorted()
+    /// The account's keys for these copies: their folder names, unless another skill shares the folder name.
+    static func keys(_ copies: [Skill], among installations: [Skill], records: [CloudSaveKeys.Record]? = nil) -> [String] {
+        let keys = CloudSaveKeys.current(for: installations + copies, records: records)
+        return Array(Set(copies.compactMap { keys[$0.installCmd] })).sorted()
     }
 }
 

@@ -81,5 +81,9 @@ struct SavedSkillInstallTests {
         defer { try? FileManager.default.removeItem(at: root) }
         try FileManager.default.createDirectory(at: root.appendingPathComponent("notes"), withIntermediateDirectories: true)
         #expect(throws: (any Error).self) { try SavedSkillInstall.install(package, key: "notes", into: root) }
+        // A skill saved under its own key goes in its usual folder name when that is free, else under the key.
+        #expect(try SavedSkillInstall.install(package, key: "notes@codex", into: root).lastPathComponent == "notes@codex")
+        let empty = root.appendingPathComponent("other")
+        #expect(try SavedSkillInstall.install(package, key: "notes@codex", into: empty).lastPathComponent == "notes")
     }
 }

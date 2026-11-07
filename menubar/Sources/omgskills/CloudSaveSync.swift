@@ -50,6 +50,10 @@ struct CloudSaveSummary: Equatable, Sendable {
     var attentionCount: Int { needsReview.count + skipped.count }
     /// The tree of every skill folder read in this pass, to tell next time whether it changed here.
     var localTrees: [String: String] = [:]
+    /// The cloud key of every skill here, by `installCmd`, to keep each skill on its key next time.
+    var keys: [String: String] = [:]
+    /// The account's saved skills, for finding keys between passes.
+    var records: [CloudSaveKeys.Record] = []
 }
 
 /// Saves every skill on this Mac to the cloud, library and Set installs included. One pass compares every
@@ -66,7 +70,9 @@ struct CloudSaveSync: Sendable {
     /// `localFolderKeys` lists every skill folder name on this Mac, valid or not, or nil when a
     /// skills folder couldn't be read; deletions are only marked when it is known.
     /// `lastTrees` is what each skill looked like on this Mac at the end of the previous pass.
-    func run(installations: [Skill], localFolderKeys: Set<String>?, lastTrees: [String: String] = [:], deviceID: String,
+    /// `lastKeys` is each skill's cloud key from the previous pass, by `installCmd`.
+    func run(installations: [Skill], localFolderKeys: Set<String>?, lastTrees: [String: String] = [:],
+             lastKeys: [String: String] = [:], deviceID: String,
              credential: StoredDeviceCredential) async throws -> CloudSaveSummary {
         let state: CloudSaveState
         do { state = try await api.state(credential: credential) }
@@ -77,9 +83,37 @@ struct CloudSaveSync: Sendable {
         }
 
         var summary = CloudSaveSummary(status: .upToDate)
-        let excluded = Set(state.settings.excludedSkillKeys)
+        var excluded = Set(state.settings.excludedSkillKeys)
         let saved = Dictionary(state.skills.map { ($0.key, $0) }, uniquingKeysWith: { first, _ in first })
-        let folders = candidates(installations, summary: &summary)
+        let records = CloudSaveKeys.records(from: state)
+        let keys = CloudSaveKeys.keys(for: installations, records: records, remembered: lastKeys, deviceID: deviceID)
+        summary.keys = keys
+        summary.records = records
+        // A skill left out under its folder name stays left out when it moves to its own key (a different
+        // skill with the same folder name took the folder key).
+        let remembered = Set(lastKeys.values), recorded = Set(state.skills.map(\.key))
+        let split = Set(installations.compactMap { skill -> String? in
+            guard let key = keys[skill.installCmd] else { return nil }
+            let folder = CloudSaveKeys.folderKey(of: skill)
+            return key != folder && excluded.contains(folder) && !excluded.contains(key)
+                && !recorded.contains(key) && !remembered.contains(key) ? key : nil
+        })
+        if !split.isEmpty {
+            do {
+                try await pace()
+                try await api.setExcluded(split.sorted(), credential: credential)
+            } catch let error as CloudSaveAPIError {
+                if let stop = Self.stopStatus(error) { summary.status = stop; return summary }
+                // Not saved this pass, and not remembered, so the next pass tries again.
+                summary.keys = summary.keys.filter { !split.contains($0.value) }
+            }
+            excluded.formUnion(split)
+        }
+        let folders = candidates(installations, keys: keys, summary: &summary)
+        // What is here: every skill by its key, and folders that aren't readable skills by their name. A folder
+        // name alone doesn't keep another skill's key here (the skill once saved under it may be gone).
+        let skillFolders = Set(installations.map(CloudSaveKeys.folderKey(of:)))
+        let localFolderKeys = localFolderKeys.map { $0.subtracting(skillFolders).union(keys.values) }
         // A copy that isn't settled (not saved, waiting for review) keeps its earlier record,
         // so it still counts as changed here next time.
         summary.localTrees = lastTrees.filter { key, _ in folders.contains { $0.key == key } }
@@ -126,6 +160,9 @@ struct CloudSaveSync: Sendable {
                 case .needsReview: summary.needsReview.append(folder.key)
                 case .tooLarge: summary.skipped[folder.key] = .tooLarge
                 case .excluded: break
+                case .nameTaken:
+                    // Another Mac just saved a different skill under this key; the next pass picks another.
+                    summary.keys = summary.keys.filter { $0.value != folder.key }
                 default: summary.skipped[folder.key] = .failed
                 }
             }
@@ -149,7 +186,7 @@ struct CloudSaveSync: Sendable {
                 try? await api.withdrawReview(key: review.key, credential: credential)
             }
         }
-        let here = Set(installations.map { CloudSaveFolder.key(forFolderName: URL(fileURLWithPath: $0.installCmd).lastPathComponent) })
+        let here = Set(keys.values)
         // A review this Mac just withdrew (its skill is gone from here) no longer counts.
         let withdrawn = Set(state.needsReview.filter { $0.deviceId == deviceID && localFolderKeys?.contains($0.key) == false }.map(\.key))
         let inCloud = Set(state.skills.map(\.key)).union(state.needsReview.map(\.key).filter { !withdrawn.contains($0) })
@@ -214,14 +251,16 @@ struct CloudSaveSync: Sendable {
     }
 
     /// Reads each skill folder once per key. The same skill on two agents is one cloud skill;
-    /// when the copies differ, the most recently edited one is saved.
-    private func candidates(_ installations: [Skill], summary: inout CloudSaveSummary) -> [CloudSaveFolder] {
+    /// when the copies differ, the most recently edited one is saved. Different skills in same-name
+    /// folders have different keys, so each is saved.
+    private func candidates(_ installations: [Skill], keys: [String: String],
+                            summary: inout CloudSaveSummary) -> [CloudSaveFolder] {
         var chosen: [String: CloudSaveFolder] = [:]
         for skill in installations {
             let directory = URL(fileURLWithPath: skill.installCmd, isDirectory: true)
-            let key = CloudSaveFolder.key(forFolderName: directory.lastPathComponent)
-            let folder: CloudSaveFolder
-            do { folder = try CloudSaveFolder.read(directory: directory, links: links) }
+            let key = keys[skill.installCmd] ?? CloudSaveFolder.key(forFolderName: directory.lastPathComponent)
+            var folder: CloudSaveFolder
+            do { folder = try CloudSaveFolder.read(directory: directory, key: key, links: links) }
             catch CloudSaveFolder.ReadError.containsLink { summary.skipped[key] = .links; continue }
             catch CloudSaveFolder.ReadError.privateLink { summary.skipped[key] = .links; continue }
             catch CloudSaveFolder.ReadError.invalid(let code) where [.fileTooLarge, .packageTooLarge, .tooManyFiles].contains(code) {
@@ -230,6 +269,7 @@ struct CloudSaveSync: Sendable {
             catch { summary.skipped[key] = .unreadable; continue }
             // Any file counts as an edit, not just SKILL.md.
             if let existing = chosen[key], existing.modifiedAt >= folder.modifiedAt { continue }
+            folder.name = skill.name
             chosen[key] = folder
             summary.skipped[key] = nil
         }
@@ -290,7 +330,7 @@ struct CloudSaveSync: Sendable {
         case .storageFull: .storageFull
         case .unavailable, .rateLimited: .unavailable
         // One skill's problem never stops the others.
-        case .excluded, .needsReview, .tooLarge, .rejected, .invalidResponse: nil
+        case .excluded, .nameTaken, .needsReview, .tooLarge, .rejected, .invalidResponse: nil
         }
     }
 
