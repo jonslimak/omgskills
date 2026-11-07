@@ -5,7 +5,7 @@ import type { PortalApi } from "../../portal-api";
 import { Action, IconAction } from "../ui";
 
 export const PUBLIC_MCP_URL = "https://omgskills.com/mcp";
-export const MY_SKILLS_MCP_URL = "https://omgskills.com/api/library/mcp";
+export const MY_SKILLS_MCP_URL = "https://omgskills.com/my/mcp";
 
 export type LibraryAgent = { clientId: string; name: string; firstUsedAt: string; lastUsedAt: string; blocked: boolean };
 

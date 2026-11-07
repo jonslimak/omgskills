@@ -162,3 +162,26 @@ test("only POST reaches the tools, and other paths are not found", async () => {
   assert.equal((await handleLibraryMcp(new Request(`${origin}/api/library/other`), deps().value)).status, 404);
   assert.equal((await handleLibraryMcp(new Request(resource, { method: "OPTIONS" }), deps().value)).status, 204);
 });
+
+test("the short address /my/mcp works with its own tokens, and the first address keeps working", async () => {
+  const mine = `${origin}/my/mcp`;
+  const at = (url: string, auth = "Bearer token") => new Request(url, {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json, text/event-stream", ...(auth ? { authorization: auth } : {}) },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }),
+  });
+  const meta = await (await handleLibraryMcp(new Request(`${origin}/.well-known/oauth-protected-resource/my/mcp`), deps().value)).json();
+  assert.equal(meta.resource, mine);
+  const old = await (await handleLibraryMcp(new Request(`${origin}/.well-known/oauth-protected-resource/api/library/mcp`), deps().value)).json();
+  assert.equal(old.resource, resource);
+  const bare = await (await handleLibraryMcp(new Request(`${origin}/.well-known/oauth-protected-resource`), deps().value)).json();
+  assert.equal(bare.resource, resource, "The bare address still describes the first address");
+  const challenge = (await handleLibraryMcp(at(mine, ""), deps().value)).headers.get("www-authenticate")!;
+  assert.match(challenge, /resource_metadata="https:\/\/omgskills\.test\/\.well-known\/oauth-protected-resource\/my\/mcp"/);
+  assert.match(challenge, /scope="profile email"/);
+  assert.equal((await handleLibraryMcp(at(mine), deps({ aud: [mine] }).value)).status, 200);
+  assert.equal((await handleLibraryMcp(at(resource), deps({ aud: [resource] }).value)).status, 200);
+  assert.equal((await handleLibraryMcp(at(mine), deps({ aud: [resource] }).value)).status, 401, "Each address takes only its own tokens");
+  assert.equal((await handleLibraryMcp(at(resource), deps({ aud: [mine] }).value)).status, 401);
+  assert.equal((await handleLibraryMcp(new Request(`${origin}/.well-known/oauth-protected-resource/other`), deps().value)).status, 404);
+});
