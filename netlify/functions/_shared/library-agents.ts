@@ -75,7 +75,7 @@ export async function touchAgent(db: Database, userId: string, clientId: string,
   );
   // Until the client_name column exists (a deploy before its migration), work as before without names.
   const result = await upsert("blocked_at IS NOT NULL AS blocked, client_name IS NULL AS unnamed").catch(error => {
-    if ((error as { code?: string })?.code === "42703") return upsert("blocked_at IS NOT NULL AS blocked");
+    if (isMissingColumn(error)) return upsert("blocked_at IS NOT NULL AS blocked");
     throw error;
   });
   const row = result.rows[0];
@@ -90,19 +90,26 @@ export async function touchAgent(db: Database, userId: string, clientId: string,
   return { blocked: row?.blocked === true };
 }
 
+const isMissingColumn = (error: unknown) => (error as { code?: string } | null)?.code === "42703";
+
 export type LibraryAgent = { clientId: string; name: string; firstUsedAt: string; lastUsedAt: string; blocked: boolean };
 
 export async function listAgents(db: Database, userId: string): Promise<LibraryAgent[]> {
-  const result = await db.query<{ clientId: string; clientName: string | null; firstUsedAt: Date | string;
+  const select = (name: string) => db.query<{ clientId: string; clientName: string | null; firstUsedAt: Date | string;
     lastUsedAt: Date | string; blocked: boolean }>(
     `
-      SELECT client_id AS "clientId", client_name AS "clientName", first_used_at AS "firstUsedAt",
+      SELECT client_id AS "clientId", ${name} AS "clientName", first_used_at AS "firstUsedAt",
         last_used_at AS "lastUsedAt", blocked_at IS NOT NULL AS blocked
       FROM library_agent_connections WHERE user_id = $1
       ORDER BY last_used_at DESC, client_id
     `,
     [userId],
   );
+  // Until the client_name column exists (a deploy before its migration), list agents without names.
+  const result = await select("client_name").catch(error => {
+    if (isMissingColumn(error)) return select("NULL::text");
+    throw error;
+  });
   return result.rows.map(row => ({ clientId: row.clientId, name: row.clientName || agentName(row.clientId),
     firstUsedAt: new Date(row.firstUsedAt).toISOString(), lastUsedAt: new Date(row.lastUsedAt).toISOString(), blocked: row.blocked }));
 }

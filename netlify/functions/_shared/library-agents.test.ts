@@ -122,6 +122,15 @@ test("before the name column exists, agents still work", async () => {
   } } as never;
   assert.deepEqual(await touchAgent(db, "user-a", "dcr_x", async () => "never"), { blocked: true });
   assert.equal(calls.length, 2, "No name lookup or update without the column");
+  const listed = await handleLibraryAgents(new Request(base), {
+    getPgPool: () => ({ query: async (sql: string) => {
+      if (sql.includes("client_name")) throw Object.assign(new Error("column does not exist"), { code: "42703" });
+      return { rows: [{ clientId: "https://grok.com/client.json", clientName: null, firstUsedAt: new Date(), lastUsedAt: new Date(), blocked: false }] };
+    } }) as never,
+    requirePortalUser: async () => ({ id: "user-a", clerkUserId: "c", email: "a@example.test", displayName: "a" }) as never,
+  });
+  assert.equal(listed.status, 200, "The list still loads");
+  assert.equal((await listed.json()).agents[0].name, "Grok");
   const broken = { query: async () => { throw new Error("db down"); } } as never;
   await assert.rejects(touchAgent(broken, "user-a", "dcr_x"), /db down/);
 });
