@@ -1190,6 +1190,28 @@ button.rd-skill-title:hover {
     transition: none;
   }
 }
+.mcp-panel-server,
+.mcp-panel-agents {
+  display: grid;
+  gap: 8px;
+}
+.mcp-panel-server h3,
+.mcp-panel-agents h3 {
+  font-size: 13px;
+  font-weight: 600;
+}
+.mcp-panel-server code {
+  justify-self: start;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.mcp-panel-server .ua-link {
+  justify-self: start;
+}
+.mcp-panel-agents [data-blocked] strong {
+  color: var(--muted-foreground);
+}
 .cloud-save-switch {
   display: flex;
   align-items: flex-start;
