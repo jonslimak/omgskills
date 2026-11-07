@@ -135,7 +135,10 @@ export default async (req: Request, context?: Pick<Context, "waitUntil">): Promi
   // Start loading the catalog now (it takes seconds on a cold start) while the sign-in is checked. It keeps
   // loading after a reply that couldn't wait for it (a frozen function never finishes), so the next call has it.
   if (req.method === "POST") {
-    const load = catalog.get().then(() => undefined, () => undefined);
+    const startedAt = Date.now(), cold = !catalog.status().hasSnapshot;
+    const load = catalog.get().then(
+      () => { if (cold) console.info(`My skills MCP catalog load: ${Date.now() - startedAt}ms`); },
+      error => { console.error("My skills MCP catalog load failed:", error); });
     context?.waitUntil?.(load);
   }
   return handleLibraryMcp(req, dependencies);
