@@ -628,6 +628,10 @@ struct CloudSaveSyncTests {
         // Long keys keep whole characters, counted as the server counts them (UTF-16).
         let long = String(repeating: "é", count: 191) + "😀😀"
         #expect(CloudSaveKeys.candidate(folder: long, agent: "codex", index: 1) == String(repeating: "é", count: 191) + "😀@codex")
+        // A saved key whose folder part was cut to fit still belongs to its skill.
+        let cut = CloudSaveKeys.candidate(folder: long, agent: "codex", index: 2)
+        let longSpec = copy("Codex", long, "other")
+        #expect(CloudSaveKeys.keys(for: [longSpec], records: [.init(key: long, name: long), .init(key: cut, name: "other")])[longSpec.installCmd] == cut)
 
         // Saved skills are found by name, on any Mac and in any agent.
         let records = [CloudSaveKeys.Record(key: "last30days", name: "last30days", deviceID: "mac-a"),

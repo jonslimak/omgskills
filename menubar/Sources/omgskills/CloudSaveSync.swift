@@ -85,7 +85,7 @@ struct CloudSaveSync: Sendable {
         var summary = CloudSaveSummary(status: .upToDate)
         var excluded = Set(state.settings.excludedSkillKeys)
         let saved = Dictionary(state.skills.map { ($0.key, $0) }, uniquingKeysWith: { first, _ in first })
-        let records = state.skills.map { CloudSaveKeys.Record(key: $0.key, name: $0.name, deviceID: $0.currentVersion.deviceId) }
+        let records = CloudSaveKeys.records(from: state)
         let keys = CloudSaveKeys.keys(for: installations, records: records, remembered: lastKeys, deviceID: deviceID)
         summary.keys = keys
         summary.records = records

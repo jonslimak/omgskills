@@ -38,8 +38,19 @@ enum CloudSaveKeys {
         return name.isEmpty ? folderKey(of: skill) : name
     }
 
+    /// Whether a key is one of this folder's candidates, including ones whose folder part was cut to fit.
     private static func belongs(_ key: String, to folder: String) -> Bool {
-        key == folder || key.hasPrefix(folder + "@")
+        if key == folder || key.hasPrefix(folder + "@") { return true }
+        guard let at = key.lastIndex(of: "@") else { return false }
+        var agent = String(key[key.index(after: at)...]), index = 1
+        if let dash = agent.lastIndex(of: "-"), dash != agent.startIndex {
+            let digits = agent[agent.index(after: dash)...]
+            if !digits.isEmpty, digits.allSatisfy({ ("0"..."9").contains($0) }), let number = Int(digits) {
+                index = number
+                agent = String(agent[..<dash])
+            }
+        }
+        return candidate(folder: folder, agent: agent, index: index) == key
     }
 
     /// Keyed by `installCmd`. A skill's key is its folder name, unless that key holds a different skill. Then:
@@ -149,9 +160,14 @@ enum CloudSaveKeys {
     }
 
     /// Keys for skills here outside a cloud save pass (restore, install, delete): the remembered ones, else the
-    /// rule with the saved skills the last pass saw.
-    static func current(for installations: [Skill], at url: URL? = defaultRecord) -> [String: String] {
+    /// rule with the account's saved skills (`records` when just read, else the ones the last pass saw).
+    static func current(for installations: [Skill], records: [Record]? = nil, at url: URL? = defaultRecord) -> [String: String] {
         let memory = remembered(at: url)
-        return keys(for: installations, records: memory.records, remembered: memory.keys)
+        return keys(for: installations, records: records ?? memory.records, remembered: memory.keys)
+    }
+
+    /// The account's saved skills as the key rule reads them.
+    static func records(from state: CloudSaveState) -> [Record] {
+        state.skills.map { Record(key: $0.key, name: $0.name, deviceID: $0.currentVersion.deviceId) }
     }
 }

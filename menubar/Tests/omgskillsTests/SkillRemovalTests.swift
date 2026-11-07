@@ -32,6 +32,17 @@ struct SkillRemovalTests {
         #expect(SkillRemoval.agents(found) == "Agents, Claude, Codex")
     }
 
+    @Test func deleteEverywhereUsesTheAccountsSavedSkills() {
+        // Before this Mac's first cloud save pass: a spec in a "last30days" folder is saved as "last30days@codex".
+        var spec = copy("last30days", "Codex")
+        spec = Skill(id: spec.id, name: "last30days-v3-spec", description: "", githubUrl: "", installCmd: spec.installCmd,
+            authorHandle: "", tags: [], readmeSnippet: nil, stars: 0, lastUpdated: "", firstSeen: "", skillMdSha: nil,
+            installs: nil, trendingRank: nil, trendingSource: nil, origin: "Codex", isSymlink: false, isLocalOnly: true)
+        let records = [CloudSaveKeys.Record(key: "last30days", name: "last30days"),
+                       CloudSaveKeys.Record(key: "last30days@codex", name: "last30days-v3-spec")]
+        #expect(SkillRemovalController.keys([spec], among: [spec], records: records) == ["last30days@codex"])
+    }
+
     @Test func asksFirstThenTrashesEveryCopy() {
         var trashed: [String] = [], reported = 0
         let removal = SkillRemovalController(
