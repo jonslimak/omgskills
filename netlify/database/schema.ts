@@ -611,6 +611,22 @@ export const mySkillAdditions = pgTable(
   ]
 );
 
+/** Agents a person connected to My skills (library MCP); blocked_at set means disconnected. */
+export const libraryAgentConnections = pgTable(
+  "library_agent_connections",
+  {
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    clientId: text("client_id").notNull(),
+    firstUsedAt: timestamp("first_used_at", { withTimezone: true }).notNull().defaultNow(),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }).notNull().defaultNow(),
+    blockedAt: timestamp("blocked_at", { withTimezone: true })
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.clientId] }),
+    check("library_agent_connections_client_id_check", sql`char_length(${table.clientId}) BETWEEN 1 AND 500`)
+  ]
+);
+
 /** No longer used: replaced by cloud_storage_purge_queue, and dropped in a later release. */
 export const cloudPurgeQueue = pgTable(
   "cloud_purge_queue",

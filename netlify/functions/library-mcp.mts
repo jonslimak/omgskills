@@ -13,6 +13,7 @@ import { getEnv } from "./_shared/env.js";
 import { withTimeout } from "./_shared/http.js";
 import { handleLibraryMcp, issuerFromPublishableKey, type LibraryMcpDependencies, type VerifiedToken } from "./_shared/library-mcp.js";
 import { listSavedFiles, readSavedFile } from "./_shared/library-read.js";
+import { touchAgent } from "./_shared/library-agents.js";
 import { loadProductionMcpLibrary } from "./_shared/mcp-library.js";
 import { loadMySkills, type CatalogDetails } from "./_shared/my-skills-library.js";
 import { readSyncInventory } from "./_shared/sync-inventory-read.js";
@@ -40,10 +41,11 @@ async function verifyToken(token: string): Promise<VerifiedToken | null> {
     return null;
   }
   if (!response.ok) throw new Error(`Clerk verify ${response.status}`);
-  const body = await response.json() as { subject?: unknown; aud?: unknown; revoked?: unknown; expired?: unknown };
+  const body = await response.json() as { subject?: unknown; aud?: unknown; revoked?: unknown; expired?: unknown; client_id?: unknown };
   if (typeof body.subject !== "string") return null;
   const aud = typeof body.aud === "string" ? [body.aud] : Array.isArray(body.aud) ? body.aud.filter((a): a is string => typeof a === "string") : [];
-  return { subject: body.subject, aud, revoked: body.revoked === true, expired: body.expired === true };
+  return { subject: body.subject, aud, revoked: body.revoked === true, expired: body.expired === true,
+    clientId: typeof body.client_id === "string" ? body.client_id : undefined };
 }
 
 const dependencies: LibraryMcpDependencies = {
@@ -52,6 +54,7 @@ const dependencies: LibraryMcpDependencies = {
     const result = await getPgPool().query<{ id: string }>("SELECT id FROM users WHERE clerk_user_id = $1", [clerkUserId]);
     return result.rows[0]?.id ?? null;
   },
+  touchAgent: (userId, clientId) => touchAgent(getPgPool(), userId, clientId),
   loadMySkills: (userId) => loadMySkills(userId, {
     readInventory: async (id) => (await readSyncInventory(getPgPool(), id, 3)).skills as unknown as SyncedSkill[],
     readCloud: (id) => readCloudSave(getPgPool(), id),

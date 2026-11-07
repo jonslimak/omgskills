@@ -38,6 +38,7 @@ function deps(token: Partial<VerifiedToken> | null = {}, overrides: Partial<Libr
   const value: LibraryMcpDependencies = {
     verifyToken: async () => token === null ? null
       : { subject: "clerk-a", aud: [resource], revoked: false, expired: false, ...token },
+    touchAgent: async (_userId, clientId) => ({ blocked: clientId === "https://blocked.example/client.json" }),
     userIdFor: async (clerk) => clerk === "clerk-a" ? "user-a" : clerk === "clerk-b" ? "user-b" : null,
     loadMySkills: async (userId) => { calls.push(`load:${userId}`); return { ...library(userId), partial: [] }; },
     savedFiles: async (userId, key) => { calls.push(`files:${userId}:${key}`); return { files, savedAt: "2026-11-05" }; },
@@ -98,6 +99,13 @@ test("no token, or one that is revoked, expired or for another address, asks to 
   await handleLibraryMcp(rpc("tools/list", {}, "Bearer made-up"), counted);
   await handleLibraryMcp(rpc("tools/list", {}, "Bearer made-up"), counted);
   assert.equal(checks, 1, "A repeated made-up token asks Clerk once");
+  const blocked = deps({ clientId: "https://blocked.example/client.json" });
+  const refused = await handleLibraryMcp(rpc("tools/list", {}), blocked.value);
+  assert.equal(refused.status, 403, "A disconnected agent is refused even with a valid token");
+  assert.match((await refused.json()).error_description, /Allow again/);
+  assert.deepEqual(blocked.calls, [], "Nothing is read for a disconnected agent");
+  const down = deps({}, { touchAgent: async () => { throw new Error("db down"); } });
+  assert.equal((await handleLibraryMcp(rpc("tools/list", {}), down.value)).status, 503, "A database problem fails closed, retryable");
   const stranger = await handleLibraryMcp(rpc("tools/list", {}), deps({ subject: "clerk-nobody" }).value);
   assert.equal(stranger.status, 403);
 });
