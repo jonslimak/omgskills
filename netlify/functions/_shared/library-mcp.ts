@@ -1,4 +1,5 @@
-// My skills for the user's own agents: an MCP server at /api/library/mcp, read only, signed in with Clerk OAuth.
+// My skills for the user's own agents: an MCP server at /my/mcp (and the older /api/library/mcp), read only,
+// signed in with Clerk OAuth.
 // Every call checks the token (not revoked, not expired, issued for this address) and reads only that user's library.
 import { createHash } from "node:crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -10,8 +11,21 @@ import type { Inspection } from "../../../mcp/src/file-inspection.js";
 import type { LibrarySkill, MySkillsLibrary } from "./my-skills-library.js";
 import type { FileRead, SavedFile } from "./library-read.js";
 
-export const LIBRARY_MCP_PATH = "/api/library/mcp";
-export const PROTECTED_RESOURCE_PATH = `/.well-known/oauth-protected-resource${LIBRARY_MCP_PATH}`;
+export const LIBRARY_MCP_PATH = "/my/mcp";
+/** The first address, kept so agents connected to it keep working. */
+export const LEGACY_LIBRARY_MCP_PATH = "/api/library/mcp";
+const MCP_PATHS = [LIBRARY_MCP_PATH, LEGACY_LIBRARY_MCP_PATH];
+const METADATA_PREFIX = "/.well-known/oauth-protected-resource";
+export const PROTECTED_RESOURCE_PATH = `${METADATA_PREFIX}${LIBRARY_MCP_PATH}`;
+
+/** Which MCP address a request is for: its own path, or for metadata the address after the prefix. */
+function mcpPathOf(path: string): string | null {
+  if (MCP_PATHS.includes(path)) return path;
+  // The bare metadata address predates /my/mcp, so it keeps describing the older address.
+  if (path === METADATA_PREFIX) return LEGACY_LIBRARY_MCP_PATH;
+  const rest = path.startsWith(`${METADATA_PREFIX}/`) ? path.slice(METADATA_PREFIX.length) : null;
+  return rest && MCP_PATHS.includes(rest) ? rest : null;
+}
 const MAX_REQUEST_BYTES = 64 * 1024;
 const PAGE_SIZE = 50;
 const SKILL_MD_CHARS = 100_000;
@@ -37,12 +51,15 @@ export type LibraryMcpDependencies = {
   fetchMetadata?: (url: string) => Promise<Response>;
 };
 
+/** This MCP address as tokens name it (their audience); each address has its own. */
 export function resourceUrl(req: Request) {
-  return new URL(LIBRARY_MCP_PATH, new URL(req.url).origin).toString();
+  const url = new URL(req.url);
+  return new URL(mcpPathOf(url.pathname.replace(/\/$/, "")) ?? LIBRARY_MCP_PATH, url.origin).toString();
 }
 
 function metadataUrl(req: Request) {
-  return new URL(PROTECTED_RESOURCE_PATH, new URL(req.url).origin).toString();
+  const url = new URL(req.url);
+  return new URL(`${METADATA_PREFIX}${mcpPathOf(url.pathname.replace(/\/$/, "")) ?? LIBRARY_MCP_PATH}`, url.origin).toString();
 }
 
 const cors = {
@@ -98,7 +115,7 @@ export async function handleLibraryMcp(req: Request, deps: LibraryMcpDependencie
   const path = new URL(req.url).pathname.replace(/\/$/, "");
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
 
-  if (path === PROTECTED_RESOURCE_PATH || path === "/.well-known/oauth-protected-resource") {
+  if (path === METADATA_PREFIX || (path.startsWith(`${METADATA_PREFIX}/`) && mcpPathOf(path))) {
     const issuer = deps.issuer();
     if (!issuer) return json({ error: "Sign-in isn't configured" }, 503);
     return json({
@@ -127,7 +144,7 @@ export async function handleLibraryMcp(req: Request, deps: LibraryMcpDependencie
     }
   }
 
-  if (path !== LIBRARY_MCP_PATH) return json({ error: "Not found" }, 404);
+  if (!MCP_PATHS.includes(path)) return json({ error: "Not found" }, 404);
 
   const header = req.headers.get("authorization") ?? "";
   const token = /^Bearer\s+(\S+)$/i.exec(header)?.[1];
