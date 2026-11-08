@@ -167,13 +167,13 @@ export const byName = (a: SkillDisplay, b: SkillDisplay) => a.name.localeCompare
  * Only a saved copy counts; a review alone saved nothing. Details come from the last copy a Mac
  * reported, unless that skill is still installed elsewhere (then the row's own label tells them apart).
  */
-export function notInstalledSkills(rows: { key: string; name: string; savedAt: string | null }[], mine: SkillDisplay[],
+export function notInstalledSkills(rows: { key: string; name: string; description?: string; savedAt: string | null }[], mine: SkillDisplay[],
   everMine: SkillDisplay[], keysOf: (skill: SkillDisplay) => string[]): SkillDisplay[] {
   const listed = new Set(mine.flatMap(keysOf));
   return rows.filter(row => row.savedAt && !listed.has(row.key)).map(row => {
     const last = everMine.find(skill => keysOf(skill).includes(row.key));
     const stillInstalled = last && mine.some(skill => skill.key === last.key);
-    return { ...(last && !stillInstalled ? last : { name: row.name, description: "", author: "", githubUrl: null, tags: [] }),
+    return { ...(last && !stillInstalled ? last : { name: row.name, description: row.description ?? "", author: "", githubUrl: null, tags: [] }),
       key: `cloud:${row.key}`, installed: undefined, cloudKey: row.key };
   });
 }

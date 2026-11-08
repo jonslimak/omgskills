@@ -1590,7 +1590,7 @@ test("deleting a skill while its Set is being edited waits its turn instead of d
 test("a skill added from GitHub saves like a Mac's, with no device, and a Mac can download it", async () => {
   await withMigratedSchema(async (pool) => {
     const store = new MemoryStore();
-    const { userId } = await createUser(pool);
+    const { userId, deviceId } = await createUser(pool);
     const file = (path: string, text: string, mode = "100644") => {
       const data = Buffer.from(text);
       return { path, mode, blobSha: gitObjectSha("blob", data), data: new Uint8Array(data) };
@@ -1607,7 +1607,7 @@ test("a skill added from GitHub saves like a Mac's, with no device, and a Mac ca
     await updateCloudSaveSettings(pool, userId, { enabled: true });
     assert.deepEqual(await saveGithubSkill(pool, store, userId, skill("PDF", "skills/pdf")), { key: "pdf", name: "PDF" });
     const saved = (await readCloudSave(pool, userId)).skills;
-    assert.deepEqual(saved.map((item) => [item.key, item.name, item.currentVersion.deviceId]), [["pdf", "pdf", null]]);
+    assert.deepEqual(saved.map((item) => [item.key, item.name, item.description, item.currentVersion.deviceId]), [["pdf", "pdf", "d", null]]);
     const loaded = await loadCloudVersionPackage(pool, store, { userId, releaseId: saved[0].currentVersion.id });
     assert.deepEqual(loaded.package.entries.map((entry) => [entry.path, entry.mode]).sort(), [["SKILL.md", "100644"], ["run.sh", "100755"]]);
 
@@ -1617,6 +1617,10 @@ test("a skill added from GitHub saves like a Mac's, with no device, and a Mac ca
     // A save from no device never replaces a saved skill, even with a stale list of keys (two adds at once).
     await rejects(saveCloudVersion(pool, { userId, deviceId: null, skillKey: "pdf", files: manifest(v1), skillName: "notes" }), "name_taken");
     assert.equal((await readCloudSave(pool, userId)).skills.find((item) => item.key === "pdf")?.name, "pdf");
+    // A Mac's new version may have a new SKILL.md, so the description kept from GitHub goes with it.
+    await uploadAll(pool, store, userId, v1);
+    assert.equal((await saveCloudVersion(pool, { userId, deviceId, skillKey: "pdf", files: manifest(v1), skillName: "PDF" })).status, "saved");
+    assert.equal((await readCloudSave(pool, userId)).skills.find((item) => item.key === "pdf")?.description, null);
 
     // The same skill added twice at once (two tabs, a double click) is saved once.
     const both = await Promise.allSettled([saveGithubSkill(pool, store, userId, skill("twin", "a/twin")),

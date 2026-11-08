@@ -10,6 +10,8 @@ export type CloudSaveState = {
   usage: { bytes: number; limitBytes: number };
   skills: {
     key: string;
+    /** The SKILL.md description, kept only for skills added from GitHub; older servers leave it out. */
+    description?: string | null;
     versionCount: number;
     deletedLocallyAt: string | null;
     /** Sets that share this skill; older servers leave it out. */
@@ -129,6 +131,8 @@ export function isDeletingAllCloudSkills(selection: CloudDeleteSelection): boole
 export type CloudSkillRow = {
   key: string;
   name: string;
+  /** The saved description, for a skill added from GitHub; empty otherwise (the Mac's report gives it). */
+  description: string;
   status: "saved" | "deleted" | "review" | "confirmed" | "excluded" | "library" | "set" | "waiting" | "off"
     | "links" | "too_large" | "unreadable" | "failed";
   versionCount: number;
@@ -188,6 +192,7 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
     return {
       key,
       name: label(key),
+      description: copy?.description ?? "",
       status,
       versionCount: copy?.versionCount ?? 0,
       setCount: copy?.setCount ?? 0,

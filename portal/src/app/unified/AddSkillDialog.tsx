@@ -28,7 +28,21 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
   const [link, setLink] = useState(initialLink);
   const [found, setFound] = useState<Found | null>(null);
   const request = useRef<AbortController | null>(null);
+  const input = useRef<HTMLInputElement>(null);
+  const loading = found?.state === "loading";
+  // Once skills are found for this link, adding is the only next step; Find comes back when the link changes,
+  // and stays after a failed read so it can be tried again.
+  const shown = found?.state === "ready" && found.link.trim() === link.trim()
+    && (found.github ? found.github.state !== "error" : found.skills.length > 0);
+  // The Find button is gone while a link is read; if it had focus, focus returns to the link field after.
+  const refocus = useRef(false);
+  useEffect(() => {
+    if (loading || !refocus.current) return;
+    refocus.current = false;
+    if (!(document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLButtonElement)) input.current?.focus();
+  }, [loading]);
   const find = (value: string) => {
+    refocus.current = document.activeElement instanceof HTMLButtonElement && document.activeElement.type === "submit";
     request.current?.abort();
     if (!value.trim()) { setFound(null); return; }
     const controller = new AbortController();
@@ -74,16 +88,19 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
       .finally(() => { adding.current = false; });
   };
   return <div className="ua-add-skill">
-    <form onSubmit={event => { event.preventDefault(); find(link); }}>
+    {/* Enter submits a form with no button too, so a read in progress is never restarted from here. */}
+    <form onSubmit={event => { event.preventDefault(); if (!loading) find(link); }}>
       <label>
         GitHub link
-        <input autoFocus type="text" inputMode="url" autoComplete="off" spellCheck={false} value={link} maxLength={500} required
+        <input ref={input} autoFocus type="text" inputMode="url" autoComplete="off" spellCheck={false} value={link} maxLength={500} required
           placeholder="https://github.com/owner/repo" onChange={event => setLink(event.target.value)} />
       </label>
       <p className="ua-muted">A repo, a folder or a SKILL.md.</p>
-      <button type="submit" className="ua-pill ua-primary" disabled={!link.trim() || found?.state === "loading"}>
-        {found?.state === "loading" ? "Finding…" : "Find skills"}
-      </button>
+      {/* While a link is read the button gives way to a spinner. The status stays mounted so its text is announced. */}
+      <div className="ua-add-skill-loading" role="status" hidden={!loading}>
+        {loading && <><span className="ua-loader" aria-hidden="true" />Inspecting &amp; verifying skill…</>}
+      </div>
+      {!loading && !shown && <button type="submit" className="ua-pill ua-primary" disabled={!link.trim()}>Find skills</button>}
     </form>
     {/* Results belong to the link they were found for; editing the link hides them until Find runs again. */}
     {found && found.state !== "loading" && found.link.trim() === link.trim() && <div role="status" aria-live="polite">
@@ -124,11 +141,15 @@ function GithubSkill({ result, onAdd }: { result: GithubResult; onAdd: (preview:
     Open it there to install it on a Mac.</p>;
   const { preview } = result;
   const where = `github.com/${preview.repo}${preview.folder ? `/${preview.folder}` : ""}`;
+  const owner = preview.repo.split("/")[0] ?? "";
   return <div className="ua-github-skill">
-    <span className="ua-add-skill-text">
-      <strong>{preview.name}</strong>
-      {preview.description && <small>{preview.description}</small>}
-    </span>
+    <div className="ua-github-skill-head">
+      <Avatar src={owner ? `https://github.com/${encodeURIComponent(owner)}.png?size=80` : undefined} name={owner || preview.name} />
+      <span className="ua-add-skill-text">
+        <strong>{preview.name}</strong>
+        {preview.description && <small>{preview.description}</small>}
+      </span>
+    </div>
     <p className="ua-muted">Not in the library. From {where} · {preview.fileCount} file{preview.fileCount === 1 ? "" : "s"},{" "}
       {formatBytes(preview.totalBytes)}. Added as it is now; it won't update by itself.</p>
     {preview.labels.length > 0 && <ul className="ua-github-skill-labels" aria-label="Check before adding">
