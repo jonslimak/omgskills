@@ -30,6 +30,10 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
   const request = useRef<AbortController | null>(null);
   const input = useRef<HTMLInputElement>(null);
   const loading = found?.state === "loading";
+  // Once skills are found for this link, adding is the only next step; Find comes back when the link changes,
+  // and stays after a failed read so it can be tried again.
+  const shown = found?.state === "ready" && found.link.trim() === link.trim()
+    && (found.github ? found.github.state !== "error" : found.skills.length > 0);
   // The Find button is gone while a link is read; if it had focus, focus returns to the link field after.
   const refocus = useRef(false);
   useEffect(() => {
@@ -96,7 +100,7 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
       <div className="ua-add-skill-loading" role="status" hidden={!loading}>
         {loading && <><span className="ua-loader" aria-hidden="true" />Inspecting &amp; verifying skill…</>}
       </div>
-      {!loading && <button type="submit" className="ua-pill ua-primary" disabled={!link.trim()}>Find skills</button>}
+      {!loading && !shown && <button type="submit" className="ua-pill ua-primary" disabled={!link.trim()}>Find skills</button>}
     </form>
     {/* Results belong to the link they were found for; editing the link hides them until Find runs again. */}
     {found && found.state !== "loading" && found.link.trim() === link.trim() && <div role="status" aria-live="polite">
