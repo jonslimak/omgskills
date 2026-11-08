@@ -10,8 +10,9 @@ const ROOT = "a".repeat(40);
 type RepoFile = { text: string; mode?: string; type?: string };
 
 /** A pretend public repo on GitHub: refs, one recursive tree, and raw files. */
-function github(files: Record<string, RepoFile>, options: { refs?: string[]; private?: boolean; limited?: boolean; secondary?: boolean; tamper?: string; truncated?: boolean } = {}) {
+function github(files: Record<string, RepoFile>, options: { refs?: string[]; private?: boolean; limited?: boolean; secondary?: boolean; tamper?: string; truncated?: boolean; flaky?: string } = {}) {
   const calls: string[] = [];
+  const dropped = new Set<string>();
   const blob = (file: RepoFile) => gitObjectSha("blob", Buffer.from(file.text));
   const fetcher = (async (input: string | URL) => {
     const url = String(input);
@@ -24,6 +25,8 @@ function github(files: Record<string, RepoFile>, options: { refs?: string[]; pri
       const path = raw[2].split("/").map(decodeURIComponent).join("/");
       const file = files[path];
       if (!file) return new Response("", { status: 404 });
+      // A flaky file fails its first request, the way the raw CDN now and then does.
+      if (path === options.flaky && !dropped.has(path)) { dropped.add(path); throw new TypeError("fetch failed"); }
       return new Response(path === options.tamper ? `${file.text}!` : file.text);
     }
     const path = url.replace("https://api.github.com", "");
@@ -123,13 +126,32 @@ test("the saved key is the folder name, then folder@agents", () => {
 test("SKILL.md is read the way the Mac reads it, or refused with the reason", () => {
   assert.deepEqual(skillMdHeader("---\nname:  My   Skill \ndescription: 'It''s  good' # note\n---\n"), { name: "My Skill", description: "It's good" });
   assert.deepEqual(skillMdHeader('---\nname: "pdf"\ndescription: Read # and write\n---'), { name: "pdf", description: "Read" });
+  // Multi-line descriptions, as many real skills write them.
+  assert.deepEqual(skillMdHeader("---\nname: x\ndescription: >-\n  Turn an idea\n  into a plan.\n---"), { name: "x", description: "Turn an idea into a plan." });
+  assert.deepEqual(skillMdHeader("---\nname: x\ndescription: |\n  Line one\n  line two\n---"), { name: "x", description: "Line one line two" });
+  assert.deepEqual(skillMdHeader("---\nname: x\ndescription: Starts here\n  and carries on\nlicense: MIT\n---"), { name: "x", description: "Starts here and carries on" });
+  assert.deepEqual(skillMdHeader('---\nname: x\ndescription: "a \\" b"\n---'), { name: "x", description: 'a " b' });
+  // Quoted 0o17 is text; U+FEFF inside a name is kept, as the Mac keeps it.
+  assert.deepEqual(skillMdHeader('---\nname: "0o17"\ndescription: y\n---'), { name: "0o17", description: "y" });
+  assert.deepEqual(skillMdHeader("---\nname: a\uFEFFb\ndescription: y\n---"), { name: "a\uFEFFb", description: "y" });
+  // Text to Yams though YAML 1.1 would type them.
+  for (const plain of ["y", "N", "-.5", "0:30", "2024-1-1"]) {
+    assert.deepEqual(skillMdHeader(`---\nname: x\ndescription: ${plain}\n---`), { name: "x", description: plain }, plain);
+  }
   for (const [text, why] of [
     ["\uFEFF---\nname: x\ndescription: y\n---", /doesn't start with a --- header/],
+    ["---\nname: x\ndescription: y", /isn't closed/],
     ["---\nname: x\n---", /has no description/],
     ["---\nname: 123\ndescription: y\n---", /name isn't text/],
-    ["---\nname: >-\n  x\ndescription: y\n---", /name runs over several lines|form/],
-    ["---\nname: x\ndescription: \"a \\\" b\"\n---", /form it doesn't take/],
-    ["---\nname: x\nname: y\ndescription: y\n---", /two name lines/],
+    ["---\nname: yes\ndescription: y\n---", /name isn't text/],
+    ["---\nname: x\ndescription: [a, b]\n---", /description isn't text/],
+    ["---\nname: x\ndescription: For example: this\n---", /isn't valid YAML at line 3 \(text with ": " in it needs quotes\)/],
+    ["---\nname: x\nname: y\ndescription: y\n---", /same field twice/],
+    ["---\n- a\n---", /no name or description/],
+    ["---\nname: x\ndescription: a\u2028b\n---", /hidden control character/],
+    ["---\nname: x\ndescription: a\u0007b\n---", /hidden control character/],
+    ["---\n<<: {name: a}\n<<: {description: b}\n---", /same field twice/],
+    ["---\nname: 0o17\ndescription: y\n---", /name isn't text/],
   ] as const) {
     assert.throws(() => skillMdHeader(text), (error) => error instanceof GithubImportError && why.test(error.message), text);
   }
@@ -147,4 +169,46 @@ test("a pinned read checks the repo is still public", async () => {
   const repo = github({ "pdf/SKILL.md": { text: skillMd("pdf") } }, { private: true });
   await fails(readGithubSkill(parseGithubImportLink("https://github.com/o/r/tree/main/pdf")!,
     { fetcher: repo.fetcher, token: "", pinned: { commitSha: COMMIT, folder: "pdf" } }), "not_found");
+});
+
+test("a repo or folder whose only skill is in a folder below reads that skill", async () => {
+  const repo = github({
+    "README.md": { text: "# repo\n" },
+    "skills/prompt/SKILL.md": { text: skillMd("prompt") },
+    "skills/prompt/references/guide.md": { text: "guide\n" },
+    "docs/notes.md": { text: "notes\n" },
+  });
+  for (const url of ["https://github.com/o/r", "https://github.com/o/r/tree/main/skills"]) {
+    const skill = await read(url, repo);
+    assert.equal(skill.folder, "skills/prompt", url);
+    assert.equal(skill.name, "prompt");
+    // Only the skill's own files, relative to its folder.
+    assert.deepEqual(skill.files.map(file => file.path).sort(), ["SKILL.md", "references/guide.md"], url);
+  }
+  // The add re-reads exactly the folder the preview showed.
+  const pinned = await readGithubSkill(parseGithubImportLink("https://github.com/o/r")!,
+    { fetcher: repo.fetcher, token: "", pinned: { commitSha: COMMIT, folder: "skills/prompt" } });
+  assert.equal(pinned.folder, "skills/prompt");
+  // A deeper single skill is found too.
+  const deep = await read("https://github.com/o/r", github({ "a/b/c/SKILL.md": { text: skillMd("c") } }));
+  assert.equal(deep.folder, "a/b/c");
+});
+
+test("a SKILL.md at the top wins over skills inside it; two below still asks for one", async () => {
+  const top = await read("https://github.com/o/r", github({
+    "SKILL.md": { text: skillMd("top") }, "examples/demo/SKILL.md": { text: skillMd("demo") } }));
+  assert.equal(top.name, "top");
+  assert.equal(top.folder, "");
+  assert.equal(top.files.length, 2);
+  await fails(read("https://github.com/o/r/tree/main/skills", github({
+    "skills/a/SKILL.md": { text: skillMd("a") }, "skills/b/SKILL.md": { text: skillMd("b") } })), "several_skills", /folder has 2 skills/);
+  await fails(read("https://github.com/o/r/tree/main/skills", github({ "skills/README.md": { text: "x" }, "SKILL.md": { text: skillMd("x") } })),
+    "no_skill", /No SKILL.md in this folder/);
+});
+
+test("a dropped file request is tried once more; a stale copy too", async () => {
+  const skill = await read("https://github.com/o/r", github({ "SKILL.md": { text: skillMd("x") }, "a.md": { text: "a" } }, { flaky: "a.md" }));
+  assert.equal(skill.files.length, 2);
+  // A file that never matches its hash is still refused.
+  await fails(read("https://github.com/o/r", github({ "SKILL.md": { text: skillMd("x") } }, { tamper: "SKILL.md" })), "unavailable");
 });

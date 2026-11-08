@@ -1,6 +1,7 @@
 // "Add skill" for a skill that isn't in the library: read one skill folder from a public GitHub repo,
 // pinned to a commit, and check it the way cloud save checks a Mac's upload. Every refusal says why,
 // in words the person can act on.
+import { isScalar, parseDocument, YAMLError, type Document } from "yaml";
 import { CLOUD_SAVE_LIMITS } from "./cloud-save.js";
 import { gitObjectSha, SkillPackageValidationError, validateSkillManifest, type SkillManifestEntry } from "./skill-package.js";
 import { combineLabels, pathLabels, scanFileContents, type SkillLabel } from "./skill-scan.js";
@@ -158,10 +159,19 @@ async function folderEntries(repoPath: string, rootTree: string, folder: string,
 const tooLarge = () => new GithubImportError("too_large",
   `This skill is too big to add (up to ${CLOUD_SAVE_LIMITS.maximumFileCount} files and ${CLOUD_SAVE_LIMITS.maximumTotalBytes / 1024 / 1024} MB).`, 413);
 
+/** Yams's default resolver rules for null, bool, int, float and timestamp (Resolver.swift); a plain value matching one isn't text on the Mac. */
+const YAMS_TYPED = [
+  /^(?:~|null|Null|NULL|)$/,
+  /^(?:yes|Yes|YES|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF)$/,
+  /^(?:[-+]?0b[0-1_]+|[-+]?0o?[0-7_]+|[-+]?(?:0|[1-9][0-9_]*)|[-+]?0x[0-9a-fA-F_]+|[-+]?[1-9][0-9_]*(?::[0-5]?[0-9])+)$/,
+  /^(?:[-+]?(?:[0-9][0-9_]*)(?:\.[0-9_]*)?(?:[eE][-+]?[0-9]+)?|\.[0-9_]+(?:[eE][-+][0-9]+)?|[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*|[-+]?\.(?:inf|Inf|INF)|\.(?:nan|NaN|NAN))$/,
+  /^(?:[0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}(?:[Tt]|[ \t]+)[0-9]{1,2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]*)?(?:[ \t]*(?:Z|[-+][0-9]{1,2}(?::[0-9]{2})?))?)$/,
+];
+
 /**
- * The SKILL.md name and description, read the way the Mac reads them (a YAML header that starts the file;
- * both text; runs of spaces squeezed), so a skill added here is the same skill on the Mac. Only plain,
- * one-line values are taken; any other form is refused with the reason rather than guessed at.
+ * The SKILL.md name and description, read the way the Mac reads them: a header that starts the file, closed
+ * by the first "\n---", parsed as YAML 1.1 (as Yams does); both must be text; runs of whitespace are squeezed.
+ * So a skill added here is the same skill on the Mac, and anything the Mac would skip is refused with the reason.
  */
 export function skillMdHeader(markdown: string): { name: string; description: string } {
   const unreadable = (why: string) => new GithubImportError("no_name", `Its SKILL.md ${why}, so omgskills can't read it.`);
@@ -169,25 +179,46 @@ export function skillMdHeader(markdown: string): { name: string; description: st
   const after = markdown.slice(3);
   const end = after.indexOf("\n---");
   if (end < 0) throw unreadable("header isn't closed with ---");
-  const lines = after.slice(0, end).split(/\r?\n/);
-  const field = (key: string) => {
-    const found = lines.flatMap((line, index) => line.startsWith(`${key}:`) ? [index] : []);
-    if (!found.length) throw unreadable(`has no ${key}`);
-    if (found.length > 1) throw unreadable(`has two ${key} lines`);
-    if (/^[ \t]+\S/.test(lines[found[0] + 1] ?? "")) throw unreadable(`${key} runs over several lines`);
-    let value = lines[found[0]].slice(key.length + 1).trim();
-    const double = value.match(/^"([^"\\]*)"(?:[ \t]+#.*)?$/);
-    const single = value.match(/^'((?:[^']|'')*)'(?:[ \t]+#.*)?$/);
-    if (double) value = double[1];
-    else if (single) value = single[1].replace(/''/g, "'");
-    else {
-      value = value.replace(/[ \t]+#.*$/, "");
-      if (!value || /^[|>\[{&*!%@`"'#]/.test(value) || /: |:$/.test(value)) throw unreadable(`${key} is in a form it doesn't take`);
-      if (/^(~|null|true|false|yes|no|on|off|[-+]?(\d[\d_]*(\.\d*)?|\.\d+)([eE][-+]?\d+)?|0x[0-9a-f]+|0o[0-7]+|[-+]?\.(inf|nan))$/i.test(value)) {
-        throw unreadable(`${key} isn't text`);
-      }
+  const block = after.slice(0, end);
+  // The Mac's YAML reader (libyaml) refuses control characters and treats U+0085, U+2028 and U+2029 as line
+  // breaks; the yaml package takes them. Both are refused here, as is a broken surrogate.
+  if (/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\u2028\u2029\uFFFE\uFFFF]/.test(block) || /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/.test(block)) {
+    throw unreadable("header has a hidden control character in it");
+  }
+  // Yams refuses two merge keys (<<) in one map; the yaml package merges both.
+  if ((block.match(/^<<[ \t]*:/gm) ?? []).length > 1) throw unreadable("has the same field twice");
+  let document: Document.Parsed;
+  try {
+    document = parseDocument(block, { version: "1.1", logLevel: "error" });
+    if (document.errors.length) throw document.errors[0];
+  } catch (error) {
+    const line = error instanceof YAMLError ? error.linePos?.[0]?.line : undefined;
+    const text = line ? block.split(/\r?\n/)[line - 1] ?? "" : "";
+    const colon = /^\s*[\w-]+:\s*[^"'\s|>].*:\s/.test(text) ? " (text with \": \" in it needs quotes)" : "";
+    if (error instanceof YAMLError && error.code === "DUPLICATE_KEY") throw unreadable(`has the same field twice${line ? ` (line ${line})` : ""}`);
+    // The block starts on the opening --- line, so its line numbers are the file's.
+    throw unreadable(`header isn't valid YAML${line ? ` at line ${line}` : ""}${colon}`);
+  }
+  let header: unknown;
+  try {
+    header = document.toJS({ maxAliasCount: 20 });
+  } catch {
+    throw unreadable("header isn't valid YAML");
+  }
+  if (!header || typeof header !== "object" || Array.isArray(header)) throw unreadable("header has no name or description");
+  const field = (key: "name" | "description") => {
+    // A plain (unquoted, untagged) value is typed by Yams's own rules, which differ from YAML 1.1's in places
+    // (y/n are text to Yams, 0o17 a number): the text is taken as written unless Yams would make it a non-text value.
+    const node = document.get(key, true);
+    let value = (header as Record<string, unknown>)[key];
+    if (isScalar(node) && node.type === "PLAIN" && !node.tag && typeof node.source === "string") {
+      if (YAMS_TYPED.some(pattern => pattern.test(node.source as string))) throw unreadable(`${key} isn't text`);
+      value = node.source;
     }
-    const text = value.replace(/\s+/g, " ").trim();
+    if (value === undefined || value === null) throw unreadable(`has no ${key}`);
+    if (typeof value !== "string") throw unreadable(`${key} isn't text`);
+    // The Mac squeezes runs of ICU whitespace ([\t\n\f\r\p{Z}]); JavaScript's \s also takes U+FEFF, which it keeps.
+    const text = value.replace(/[\t\n\f\r\p{Z}]+/gu, " ").replace(/^[\t\n\v\f\r\x85\p{Z}]+|[\t\n\v\f\r\x85\p{Z}]+$/gu, "");
     if (!text) throw unreadable(`has an empty ${key}`);
     return text;
   };
@@ -233,14 +264,16 @@ export async function readGithubSkill(
   } else {
     target = await resolveLink(link, options);
   }
-  const entries = await folderEntries(target.repoPath, target.rootTree, target.folder, options);
-  const blobs = entries.filter(entry => entry.type !== "tree");
+  let blobs = (await folderEntries(target.repoPath, target.rootTree, target.folder, options)).filter(entry => entry.type !== "tree");
   if (!blobs.some(entry => entry.path === "SKILL.md")) {
-    const nested = blobs.filter(entry => /(^|\/)SKILL\.md$/.test(entry.path ?? "")).length;
-    if (nested > 1) throw new GithubImportError("several_skills",
-      `This ${target.folder ? "folder" : "repo"} has ${nested} skills. Paste the link to one skill's folder.`);
-    if (nested === 1) throw new GithubImportError("several_skills", "The skill is in a folder below this one. Paste the link to that folder.");
-    throw new GithubImportError("no_skill", `No SKILL.md in this ${target.folder ? "folder" : "repo"}, so it isn't a skill.`);
+    const nested = blobs.flatMap(entry => entry.path?.endsWith("/SKILL.md") ? [entry.path.slice(0, -"/SKILL.md".length)] : []);
+    if (nested.length > 1) throw new GithubImportError("several_skills",
+      `This ${target.folder ? "folder" : "repo"} has ${nested.length} skills. Paste the link to one skill's folder.`);
+    if (!nested.length) throw new GithubImportError("no_skill", `No SKILL.md in this ${target.folder ? "folder" : "repo"}, so it isn't a skill.`);
+    // The only skill here is in a folder below: that is the skill the link means.
+    const prefix = `${nested[0]}/`;
+    blobs = blobs.filter(entry => entry.path!.startsWith(prefix)).map(entry => ({ ...entry, path: entry.path!.slice(prefix.length) }));
+    target = { ...target, folder: target.folder ? `${target.folder}/${nested[0]}` : nested[0] };
   }
   if (blobs.length > CLOUD_SAVE_LIMITS.maximumFileCount) throw tooLarge();
   let declared = 0;
@@ -264,22 +297,26 @@ export async function readGithubSkill(
   const [owner, repo] = target.repoPath.split("/").slice(2).map(decodeURIComponent);
   const files = await mapConcurrent(blobs, 12, async (entry): Promise<GithubSkillFile> => {
     const path = target.folder ? `${target.folder}/${entry.path}` : entry.path!;
-    // raw.githubusercontent.com has no API quota; the hash check below proves the file is the one in the tree.
-    let response: Response;
-    let data: Uint8Array;
-    try {
-      response = await (options.fetcher ?? fetch)(
-        `https://raw.githubusercontent.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${target.commitSha}/${encodePath(path)}`,
-        { signal: timeLeft(options, 10_000) });
-      const limited = await rateLimit(response, options);
-      if (limited) throw limited;
-      if (!response.ok) throw unavailable();
-      data = new Uint8Array(await response.arrayBuffer());
-    } catch (error) {
-      if (error instanceof GithubImportError && error.code !== "unavailable") throw error;
-      throw fetchFailed(options);
+    // raw.githubusercontent.com has no API quota; the hash check proves the file is the one in the tree.
+    // Its CDN now and then drops a request or serves a stale copy, so each file gets one retry.
+    const url = `https://raw.githubusercontent.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${target.commitSha}/${encodePath(path)}`;
+    let data: Uint8Array | null = null;
+    for (let attempt = 0; attempt < 2 && !data; attempt += 1) {
+      try {
+        const response = await (options.fetcher ?? fetch)(url, { signal: timeLeft(options, 10_000) });
+        const limited = await rateLimit(response, options);
+        if (limited) throw limited;
+        if (response.ok) {
+          const body = new Uint8Array(await response.arrayBuffer());
+          if (gitObjectSha("blob", body) === entry.sha!.toLowerCase()) data = body;
+        } else if (response.status < 500) throw unavailable();
+      } catch (error) {
+        // A refusal (limit, missing file) stands; a dropped request is retried while there is time.
+        if (error instanceof GithubImportError) throw error.code === "unavailable" ? fetchFailed(options) : error;
+        if (fetchFailed(options).code === "too_slow") throw tooSlow();
+      }
     }
-    if (gitObjectSha("blob", data) !== entry.sha!.toLowerCase()) throw unavailable();
+    if (!data) throw fetchFailed(options);
     return { path: entry.path!, mode: entry.mode!, blobSha: entry.sha!.toLowerCase(), data };
   });
   const manifest = manifestOf(files);
