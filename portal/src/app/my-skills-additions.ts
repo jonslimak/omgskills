@@ -10,9 +10,15 @@ export type MySkillAdditions = {
   skills: MySkillAddition[];
   /** Skills with a save on its way; another tap waits for it. */
   pending: string[];
-  add: (catalogId: string) => Promise<void>;
+  /** Details shown until the loaded library has the skill. */
+  add: (catalogId: string, details?: Omit<MySkillAddition, "catalogId">) => Promise<void>;
   remove: (catalogId: string) => Promise<void>;
+  /** The library skills a pasted GitHub link points at ("Add skill"). */
+  findByGithubLink?: (link: string, signal?: AbortSignal) => Promise<GithubLinkSkills>;
 };
+
+/** The library skills at a GitHub link; more when the link holds more than were listed. */
+export type GithubLinkSkills = { skills: MySkillAddition[]; more: boolean };
 
 const base = "/api/portal/my-skills";
 
@@ -39,4 +45,26 @@ export async function addMySkill(api: PortalApi, catalogId: string) {
 
 export async function removeMySkill(api: PortalApi, catalogId: string) {
   await api(`${base}?catalogSkillId=${encodeURIComponent(catalogId)}`, { method: "DELETE" });
+}
+
+/** Throws PortalApiError 400 with a message to show when it isn't a GitHub link we can read. */
+export async function findSkillsAtGithubLink(api: PortalApi, link: string, signal?: AbortSignal): Promise<GithubLinkSkills> {
+  const value = await api<{ skills?: Record<string, unknown>[]; more?: boolean; warning?: string }>(
+    `/api/portal/catalog-search?github=${encodeURIComponent(link.trim())}`, { signal, cache: "no-store" });
+  if (!Array.isArray(value?.skills) || value.warning) throw new Error("The library couldn't be checked. Try again.");
+  return {
+    skills: value.skills.flatMap(skill => typeof skill?.id === "string" && skill.id ? [{
+      catalogId: skill.id, name: text(skill.name, 200), description: text(skill.description, 2000),
+      author: skill.id.split("/")[0], githubUrl: text(skill.githubUrl, 500) ?? null,
+    }] : []),
+    more: value.more === true,
+  };
+}
+
+/**
+ * Whether text reads as a GitHub link "Add skill" can read (pasted in search, it offers Add skill):
+ * a repo, a /tree/ folder or a /blob/…/SKILL.md, as the server takes them.
+ */
+export function looksLikeGithubLink(text: string) {
+  return /^\s*(https?:\/\/)?(www\.)?github\.com\/[\w.-]+\/[\w.-]+(\/?|\/tree\/[^\s?#]+|\/blob\/[^\s?#]+\/skill\.md)([?#]\S*)?\s*$/i.test(text);
 }

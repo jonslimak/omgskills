@@ -1,5 +1,6 @@
 import type { Config, Context } from "@netlify/functions";
 import { errorResponse, jsonResponse, optionsResponse } from "./_shared/http.js";
+import { catalogSkillsForGithubLink, parseGithubLink } from "./_shared/github-link-catalog.js";
 import { loadPublishedSkills } from "./_shared/published-catalog.js";
 import { requirePortalUser } from "./_shared/user.js";
 
@@ -13,6 +14,13 @@ export default async (req: Request, _context: Context) => {
 
   try {
     await requirePortalUser(req);
+    // "Add skill": the catalog skills a pasted GitHub link points at.
+    const github = new URL(req.url).searchParams.get("github");
+    if (github !== null) {
+      const link = github.length <= 500 ? parseGithubLink(github) : null;
+      if (!link) return errorResponse(req, 400, "Paste a link to a GitHub repo, folder or SKILL.md.");
+      return jsonResponse(req, catalogSkillsForGithubLink(link, await loadPublishedSkills()));
+    }
     const query = new URL(req.url).searchParams.get("q")?.trim().toLowerCase() ?? "";
     if (query.length < 2) {
       return jsonResponse(req, { skills: [] });

@@ -18,7 +18,7 @@ import { McpPanel } from "../../app/unified/McpPanel";
 import { CloudSavePanel } from "../../cloud-save/CloudSavePanel";
 import { confirmCloudReview, loadCloudSave, loadSavedSkillMd, loadSavedVersions, loadSharedSkillMd, type CloudSaveState } from "../../cloud-save/cloud-save";
 import type { CloudInfo } from "../../app/unified/CloudStatus";
-import { addMySkill, loadMySkillAdditions, removeMySkill, type MySkillAddition, type MySkillAdditions } from "../../app/my-skills-additions";
+import { addMySkill, findSkillsAtGithubLink, loadMySkillAdditions, removeMySkill, type MySkillAddition, type MySkillAdditions } from "../../app/my-skills-additions";
 import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation, staticPageAddress, unknownAppAddress } from "./entry-navigation";
 import { renderPublicFirst } from "./public-first";
@@ -97,12 +97,12 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean): { additions: MyS
       .finally(() => { if (!controller.signal.aborted) setLoaded(true); });
     return () => controller.abort();
   }, [enabled]);
-  const change = useCallback(async (catalogId: string, add: boolean) => {
+  const change = useCallback(async (catalogId: string, add: boolean, details?: Omit<MySkillAddition, "catalogId">) => {
     if (inFlight.current.has(catalogId)) return;
     inFlight.current.add(catalogId);
     setPending([...inFlight.current]);
     const previous = current.current?.find(skill => skill.catalogId === catalogId);
-    setSkills(old => old && (add ? [previous ?? { catalogId }, ...old.filter(skill => skill.catalogId !== catalogId)]
+    setSkills(old => old && (add ? [previous ?? { ...details, catalogId }, ...old.filter(skill => skill.catalogId !== catalogId)]
       : old.filter(skill => skill.catalogId !== catalogId)));
     try { await (add ? addMySkill : removeMySkill)(apiRef.current, catalogId); }
     catch (failure) {
@@ -115,7 +115,9 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean): { additions: MyS
       setPending([...inFlight.current]);
     }
   }, []);
-  const additions = useMemo(() => skills ? { skills, pending, add: (id: string) => change(id, true), remove: (id: string) => change(id, false) } : undefined, [skills, pending, change]);
+  const additions = useMemo(() => skills ? { skills, pending,
+    add: (id: string, details?: Omit<MySkillAddition, "catalogId">) => change(id, true, details), remove: (id: string) => change(id, false),
+    findByGithubLink: (link: string, signal?: AbortSignal) => findSkillsAtGithubLink(apiRef.current, link, signal) } : undefined, [skills, pending, change]);
   return { additions, loaded };
 }
 
