@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { matchVersionsLink, removeFromMacLink } from "../src/app/unified/model";
+import { installSavedLink, matchVersionsLink, removeFromMacLink } from "../src/app/unified/model";
 
 test("Delete from my Mac opens the app with only the skill's name", () => {
   assert.equal(removeFromMacLink(["humanizer"]), "omgskills://remove?name=humanizer");
@@ -28,4 +28,11 @@ test("Make versions match opens the app for a skill whose agents have different 
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /liveCopies && versionCount > 1 && <MenuItem icon=\{RefreshCw\}/);
   assert.match(source, /detailVersions\.length > 1 && detailLive && \(!readOnlyAccount \|\| management\) && <button/);
+});
+
+test("Install opens the app for a synced personal skill no Mac has, with its name and saved key", () => {
+  assert.equal(installSavedLink(" my notes ", "notes@codex"), "omgskills://install-saved?name=my%20notes&key=notes%40codex");
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(source, /const savedInstall = !!\(onMac && signedIn && \(!readOnlyAccount \|\| management\) && detail\?\.cloudKey && !detail\.catalogId\);/);
+  assert.match(source, /onClick=\{\(\) => window\.location\.assign\(installSavedLink\(detail\.name, detail\.cloudKey!\)\)\}/);
 });

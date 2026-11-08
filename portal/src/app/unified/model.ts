@@ -519,6 +519,11 @@ export function removeFromMacLink(names: string[]) {
   return `omgskills://remove?${unique.map(name => `name=${encodeURIComponent(name)}`).join("&")}`;
 }
 
+/** Opens the Mac app, which asks which agent gets this synced skill and installs its newest saved version. */
+export function installSavedLink(name: string, key: string) {
+  return `omgskills://install-saved?name=${encodeURIComponent(name.trim())}&key=${encodeURIComponent(key)}`;
+}
+
 /** Opens the Mac app, which shows this skill's versions (newest picked) and makes every copy match the chosen one. */
 export function matchVersionsLink(name: string) {
   return `omgskills://match?name=${encodeURIComponent(name.trim())}`;
