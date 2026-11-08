@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { findSkillsAtGithubLink, looksLikeGithubLink } from "../src/app/my-skills-additions";
+import { addGithubSkill, findSkillsAtGithubLink, looksLikeGithubLink, previewGithubSkill } from "../src/app/my-skills-additions";
 import type { PortalApi } from "../src/portal-api";
 
 test("search offers Add skill only for GitHub links", () => {
@@ -38,4 +38,26 @@ test("Add skill is on your own My skills only, beside Edit", () => {
   const dialog = readFileSync(new URL("../src/app/unified/AddSkillDialog.tsx", import.meta.url), "utf8");
   assert.match(dialog, /<input autoFocus type="text"/, "a link without https:// can be submitted");
   assert.match(dialog, /found\.link\.trim\(\) === link\.trim\(\)/, "results hide once the link is edited");
+});
+
+test("a GitHub skill outside the library is previewed, then that exact version is added", async () => {
+  const asked: [string, RequestInit | undefined][] = [];
+  const api = (async (path: string, init?: RequestInit) => {
+    asked.push([path, init]);
+    return init?.method === "POST" ? { skill: { key: "notes", name: "Notes" } }
+      : { repo: "o/r", commitSha: "c".repeat(40), folder: "notes", name: "Notes", description: null, skillMd: "", skillMdTruncated: false,
+        labels: [], fileCount: 1, totalBytes: 10, files: [{ path: "SKILL.md", bytes: 10 }], blocker: null };
+  }) as PortalApi;
+  const preview = await previewGithubSkill(api, " github.com/o/r/tree/main/notes ");
+  assert.equal(asked[0][0], "/api/portal/github-skill?link=github.com%2Fo%2Fr%2Ftree%2Fmain%2Fnotes");
+  assert.equal(preview.link, "github.com/o/r/tree/main/notes");
+  assert.deepEqual(await addGithubSkill(api, preview), { key: "notes", name: "Notes" });
+  assert.deepEqual(JSON.parse(String(asked[1][1]?.body)), { link: "github.com/o/r/tree/main/notes", commitSha: "c".repeat(40), folder: "notes" });
+});
+
+test("Add skill shows why a GitHub skill can't be added", () => {
+  const dialog = readFileSync(new URL("../src/app/unified/AddSkillDialog.tsx", import.meta.url), "utf8");
+  assert.match(dialog, /<strong>Can't add this skill\.<\/strong> \{result\.message\}/);
+  assert.match(dialog, /<strong>Can't add this skill\.<\/strong> \{preview\.blocker\}/);
+  assert.match(dialog, /<strong>Not added\.<\/strong> \{result\.error\}/);
 });

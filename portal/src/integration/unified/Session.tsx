@@ -18,7 +18,8 @@ import { McpPanel } from "../../app/unified/McpPanel";
 import { CloudSavePanel } from "../../cloud-save/CloudSavePanel";
 import { confirmCloudReview, loadCloudSave, loadSavedSkillMd, loadSavedVersions, loadSharedSkillMd, type CloudSaveState } from "../../cloud-save/cloud-save";
 import type { CloudInfo } from "../../app/unified/CloudStatus";
-import { addMySkill, findSkillsAtGithubLink, loadMySkillAdditions, removeMySkill, type MySkillAddition, type MySkillAdditions } from "../../app/my-skills-additions";
+import { addGithubSkill, addMySkill, findSkillsAtGithubLink, loadMySkillAdditions, previewGithubSkill, removeMySkill, type GithubSkillPreview,
+  type MySkillAddition, type MySkillAdditions } from "../../app/my-skills-additions";
 import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation, staticPageAddress, unknownAppAddress } from "./entry-navigation";
 import { renderPublicFirst } from "./public-first";
@@ -54,7 +55,7 @@ export type UnifiedSessionComposition = {
 };
 
 /** The account's cloud save state for the skill list; reloaded with the account and after a confirm. */
-function useCloudStatus(api: PortalApi, enabled: boolean, revision: unknown): { info: CloudInfo | undefined; loaded: boolean } {
+function useCloudStatus(api: PortalApi, enabled: boolean, revision: unknown): { info: CloudInfo | undefined; loaded: boolean; reload: () => void } {
   const apiRef = useRef(api);
   apiRef.current = api;
   const [state, setState] = useState<CloudSaveState | null>(null);
@@ -74,11 +75,12 @@ function useCloudStatus(api: PortalApi, enabled: boolean, revision: unknown): { 
     state,
     confirm: async (key: string) => { await confirmCloudReview(apiRef.current, key); setReload(value => value + 1); },
   } : undefined, [state]);
-  return { info, loaded };
+  const reloadCloud = useCallback(() => setReload(value => value + 1), []);
+  return { info, loaded, reload: reloadCloud };
 }
 
 /** Library skills added to My skills; each change shows at once and goes back if the save fails. */
-function useMySkillAdditions(api: PortalApi, enabled: boolean): { additions: MySkillAdditions | undefined; loaded: boolean } {
+function useMySkillAdditions(api: PortalApi, enabled: boolean, cloudChanged: () => void): { additions: MySkillAdditions | undefined; loaded: boolean } {
   const apiRef = useRef(api);
   apiRef.current = api;
   const [skills, setSkills] = useState<MySkillAddition[] | null>(null);
@@ -117,7 +119,11 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean): { additions: MyS
   }, []);
   const additions = useMemo(() => skills ? { skills, pending,
     add: (id: string, details?: Omit<MySkillAddition, "catalogId">) => change(id, true, details), remove: (id: string) => change(id, false),
-    findByGithubLink: (link: string, signal?: AbortSignal) => findSkillsAtGithubLink(apiRef.current, link, signal) } : undefined, [skills, pending, change]);
+    findByGithubLink: (link: string, signal?: AbortSignal) => findSkillsAtGithubLink(apiRef.current, link, signal),
+    previewGithubSkill: (link: string, signal?: AbortSignal) => previewGithubSkill(apiRef.current, link, signal),
+    // A GitHub skill is saved like a synced one, so the synced list reloads to show it.
+    addGithubSkill: async (preview: GithubSkillPreview) => { const saved = await addGithubSkill(apiRef.current, preview); cloudChanged(); return saved; },
+  } : undefined, [skills, pending, change, cloudChanged]);
   return { additions, loaded };
 }
 
@@ -214,8 +220,8 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const setCatalog = useSetCatalog(publicClient, detail.set);
   // Both start with the account load instead of after it. The account's first load is revision 1: no second fetch.
   const extras = available && !snapshot.accessDenied && !composition?.readOnly && !local;
-  const { info: cloud, loaded: cloudLoaded } = useCloudStatus(api, extras, Math.max(1, snapshot.revision));
-  const { additions: mySkills, loaded: mySkillsLoaded } = useMySkillAdditions(api, extras);
+  const { info: cloud, loaded: cloudLoaded, reload: reloadCloud } = useCloudStatus(api, extras, Math.max(1, snapshot.revision));
+  const { additions: mySkills, loaded: mySkillsLoaded } = useMySkillAdditions(api, extras, reloadCloud);
   const addedCatalog = useAddedCatalog(publicClient, useMemo(() => mySkills?.skills.map(skill => skill.catalogId) ?? [], [mySkills?.skills]));
   // My skills waits for the account, cloud save and its added skills (or 4 seconds), so its count shows once and is right.
   const [extrasWaited, setExtrasWaited] = useState(false);

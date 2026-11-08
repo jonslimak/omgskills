@@ -23,6 +23,8 @@ import { requirePrivateReleaseAccess } from "./private-release-access.js";
 import { addGroupItemWithClient, updateCloudGroupItemWithClient, type GroupItemPublication } from "./group-items.js";
 import { gitObjectSha, validateSkillPackage, type SkillManifestEntry } from "./skill-package.js";
 import { skillMdBody } from "./skill-readme.js";
+import { GithubImportError, type GithubSkill } from "./github-skill-import.js";
+import { saveGithubSkill } from "./github-skill-save.js";
 
 const connectionString = process.env.AUTH_TEST_DATABASE_URL;
 if (!connectionString) {
@@ -1582,5 +1584,46 @@ test("deleting a skill while its Set is being edited waits its turn instead of d
     }
     const item = (await pool.query<{ reason: string }>("SELECT metadata_only_reason AS reason FROM skill_group_items WHERE group_id = $1", [group])).rows[0];
     assert.equal(item.reason, "cloud_deleted");
+  });
+});
+
+test("a skill added from GitHub saves like a Mac's, with no device, and a Mac can download it", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId } = await createUser(pool);
+    const file = (path: string, text: string, mode = "100644") => {
+      const data = Buffer.from(text);
+      return { path, mode, blobSha: gitObjectSha("blob", data), data: new Uint8Array(data) };
+    };
+    const skill = (name: string, folder: string): GithubSkill => {
+      const files = [file("SKILL.md", `---\nname: ${name}\ndescription: d\n---\n`), file("run.sh", "echo hi\n", "100755")];
+      return { repo: "o/r", commitSha: "c".repeat(40), folder, name, description: "d", skillMd: "", labels: ["scripts"], files,
+        totalBytes: files.reduce((sum, item) => sum + item.data.byteLength, 0) };
+    };
+    const refused = (promise: Promise<unknown>, code: string) =>
+      assert.rejects(promise, (error) => error instanceof GithubImportError && error.code === code);
+
+    await refused(saveGithubSkill(pool, store, userId, skill("PDF", "skills/pdf")), "sync_off");
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    assert.deepEqual(await saveGithubSkill(pool, store, userId, skill("PDF", "skills/pdf")), { key: "pdf", name: "PDF" });
+    const saved = (await readCloudSave(pool, userId)).skills;
+    assert.deepEqual(saved.map((item) => [item.key, item.name, item.currentVersion.deviceId]), [["pdf", "pdf", null]]);
+    const loaded = await loadCloudVersionPackage(pool, store, { userId, releaseId: saved[0].currentVersion.id });
+    assert.deepEqual(loaded.package.entries.map((entry) => [entry.path, entry.mode]).sort(), [["SKILL.md", "100644"], ["run.sh", "100755"]]);
+
+    // The same skill again is refused; another skill in a same-name folder gets its own key.
+    await refused(saveGithubSkill(pool, store, userId, skill("pdf", "x/pdf")), "already_added");
+    assert.equal((await saveGithubSkill(pool, store, userId, skill("pdf-tools", "other/pdf"))).key, "pdf@agents");
+    // A save from no device never replaces a saved skill, even with a stale list of keys (two adds at once).
+    await rejects(saveCloudVersion(pool, { userId, deviceId: null, skillKey: "pdf", files: manifest(v1), skillName: "notes" }), "name_taken");
+    assert.equal((await readCloudSave(pool, userId)).skills.find((item) => item.key === "pdf")?.name, "pdf");
+
+    // The same skill added twice at once (two tabs, a double click) is saved once.
+    const both = await Promise.allSettled([saveGithubSkill(pool, store, userId, skill("twin", "a/twin")),
+      saveGithubSkill(pool, store, userId, skill("twin", "a/twin"))]);
+    assert.equal(both.filter((result) => result.status === "fulfilled").length, 1);
+    assert.ok(both.some((result) => result.status === "rejected" && result.reason instanceof GithubImportError
+      && result.reason.code === "already_added"));
+    assert.equal((await readCloudSave(pool, userId)).skills.filter((item) => item.name === "twin").length, 1);
   });
 });
