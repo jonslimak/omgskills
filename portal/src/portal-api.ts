@@ -12,7 +12,8 @@ export function usePortalApi(): PortalApi {
     const response = await fetch(path, {
       ...init,
       headers: {
-        "Content-Type": "application/json",
+        // A form (an uploaded folder) sets its own type, with the boundary between its parts.
+        ...(init.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...init.headers,
       },

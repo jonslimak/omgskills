@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { Check, Plus } from "lucide-react";
 import { PortalApiError } from "../../api-error";
 import { formatBytes, labelText, type CloudLabel } from "../../cloud-save/cloud-save";
-import type { GithubLinkSkills, GithubSkillPreview, MySkillAdditions } from "../my-skills-additions";
+import { pickedFolder, uploadProblem, type GithubLinkSkills, type GithubSkillPreview, type MySkillAdditions, type PickedFolder } from "../my-skills-additions";
 import { Avatar } from "./Avatar";
 
 /** A skill that isn't in the library: read from GitHub, or why it can't be added. */
 type GithubResult = { state: "preview"; preview: GithubSkillPreview; adding?: boolean; error?: string } | { state: "error"; message: string }
   | { state: "added"; name: string };
+/** A skill uploaded from this computer: being read, then shown like a GitHub skill. */
+type Upload = { folder: PickedFolder; result: { state: "loading" } | GithubResult };
 type Found = { link: string } & ({ state: "loading" } | { state: "error"; message: string }
   | ({ state: "ready"; github?: GithubResult } & GithubLinkSkills));
 
@@ -16,7 +18,8 @@ const reason = (error: unknown, fallback: string) =>
   error instanceof PortalApiError && !error.message.startsWith("Request failed") ? error.message : fallback;
 
 /**
- * "Add skill": paste a GitHub link (repo, folder or SKILL.md) and add the skills it points at to My skills.
+ * "Add skill": paste a GitHub link (repo, folder or SKILL.md) and add the skills it points at to My skills,
+ * or upload a skill's folder from this computer (checked and shown the same way as one from GitHub).
  * Library skills are added as library skills. Any other GitHub skill is shown first (files, warnings, SKILL.md),
  * then saved as it is now, like a skill synced from a Mac; when it can't be, the reason is shown.
  */
@@ -41,7 +44,46 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
     refocus.current = false;
     if (!(document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLButtonElement)) input.current?.focus();
   }, [loading]);
+  const [upload, setUpload] = useState<Upload | null>(null);
+  // Its own one-at-a-time lock: an upload still saving never blocks adding a GitHub skill.
+  const addingUpload = useRef(false);
+  const uploadRequest = useRef<AbortController | null>(null);
+  const folderInput = useRef<HTMLInputElement>(null);
+  const filesInput = useRef<HTMLInputElement>(null);
+  const uploadLoading = upload?.result.state === "loading";
+  const choose = (list: FileList | null) => {
+    if (!list?.length || !additions.previewUpload) return;
+    const folder = pickedFolder(list);
+    // One source at a time: a link being read stops, and its results go.
+    request.current?.abort();
+    setFound(null);
+    uploadRequest.current?.abort();
+    const problem = uploadProblem(folder);
+    if (problem) { setUpload({ folder, result: { state: "error", message: problem } }); return; }
+    const controller = new AbortController();
+    uploadRequest.current = controller;
+    setUpload({ folder, result: { state: "loading" } });
+    additions.previewUpload(folder, controller.signal).then(
+      preview => { if (!controller.signal.aborted) setUpload({ folder, result: { state: "preview", preview } }); },
+      error => { if (!controller.signal.aborted) setUpload({ folder, result: { state: "error",
+        message: reason(error, "The folder couldn't be checked. Try again.") } }); });
+  };
+  const addUploaded = (preview: GithubSkillPreview) => {
+    if (!additions.addUpload || !upload || addingUpload.current) return;
+    addingUpload.current = true;
+    const { folder } = upload;
+    const set = (result: GithubResult) => setUpload(old => old?.folder === folder ? { folder, result } : old);
+    set({ state: "preview", preview, adding: true });
+    additions.addUpload(folder).then(saved => {
+      set({ state: "added", name: saved.name });
+      notify(`Added ${saved.name} to My skills`);
+    }, error => set({ state: "preview", preview, error: reason(error, "The skill couldn't be added. Try again.") }))
+      .finally(() => { addingUpload.current = false; });
+  };
+  useEffect(() => () => uploadRequest.current?.abort(), []);
   const find = (value: string) => {
+    uploadRequest.current?.abort();
+    setUpload(null);
     refocus.current = document.activeElement instanceof HTMLButtonElement && document.activeElement.type === "submit";
     request.current?.abort();
     if (!value.trim()) { setFound(null); return; }
@@ -131,17 +173,39 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
         </ul>}
       {found.state === "ready" && found.more && <p className="ua-muted">Showing the first {found.skills.length}. Paste a folder link to see the rest.</p>}
     </div>}
+    {additions.previewUpload && <div className="ua-add-skill-upload">
+      <p className="ua-muted">Or upload a skill from this computer.</p>
+      {/* A folder picker where the browser has one; files one by one everywhere (phones can't pick folders). */}
+      <input ref={folderInput} type="file" hidden multiple {...{ webkitdirectory: "" }}
+        onChange={event => { choose(event.target.files); event.target.value = ""; }} />
+      <input ref={filesInput} type="file" hidden multiple
+        onChange={event => { choose(event.target.files); event.target.value = ""; }} />
+      {uploadLoading
+        ? <div className="ua-add-skill-loading" role="status"><span className="ua-loader" aria-hidden="true" />Inspecting &amp; verifying skill…</div>
+        // Always there, so a wrong folder (or one changed since it was picked) can be picked again.
+        : <div className="ua-add-skill-upload-buttons">
+          <button type="button" className="ua-pill" onClick={() => folderInput.current?.click()}>{upload ? "Choose another folder" : "Choose a folder"}</button>
+          <button type="button" className="ua-pill" onClick={() => filesInput.current?.click()}>{upload ? "Choose other files" : "Choose files"}</button>
+        </div>}
+      {upload && upload.result.state !== "loading" && <div role="status" aria-live="polite">
+        <GithubSkill result={upload.result} onAdd={addUploaded} uploaded={upload.folder.name || "your files"} />
+      </div>}
+    </div>}
   </div>;
 }
 
 /** A GitHub skill that isn't in the library, shown before it is added (its files come from someone else). */
-function GithubSkill({ result, onAdd }: { result: GithubResult; onAdd: (preview: GithubSkillPreview) => void }) {
+function GithubSkill({ result, onAdd, uploaded }: {
+  result: GithubResult; onAdd: (preview: GithubSkillPreview) => void;
+  /** For a skill uploaded from this computer: the folder it came from. */
+  uploaded?: string;
+}) {
   if (result.state === "error") return <p className="ua-add-skill-note"><strong>Can't add this skill.</strong> {result.message}</p>;
   if (result.state === "added") return <p className="ua-add-skill-note"><Check aria-hidden="true" /> Added {result.name} to My skills.
     Open it there to install it on a Mac.</p>;
   const { preview } = result;
-  const where = `github.com/${preview.repo}${preview.folder ? `/${preview.folder}` : ""}`;
-  const owner = preview.repo.split("/")[0] ?? "";
+  const where = uploaded !== undefined ? `this computer (${uploaded})` : `github.com/${preview.repo}${preview.folder ? `/${preview.folder}` : ""}`;
+  const owner = uploaded !== undefined ? "" : preview.repo.split("/")[0] ?? "";
   return <div className="ua-github-skill">
     <div className="ua-github-skill-head">
       <Avatar src={owner ? `https://github.com/${encodeURIComponent(owner)}.png?size=80` : undefined} name={owner || preview.name} />
@@ -150,7 +214,7 @@ function GithubSkill({ result, onAdd }: { result: GithubResult; onAdd: (preview:
         {preview.description && <small>{preview.description}</small>}
       </span>
     </div>
-    <p className="ua-muted">Not in the library. From {where} · {preview.fileCount} file{preview.fileCount === 1 ? "" : "s"},{" "}
+    <p className="ua-muted">{uploaded === undefined && "Not in the library. "}From {where} · {preview.fileCount} file{preview.fileCount === 1 ? "" : "s"},{" "}
       {formatBytes(preview.totalBytes)}. Added as it is now; it won't update by itself.</p>
     {preview.labels.length > 0 && <ul className="ua-github-skill-labels" aria-label="Check before adding">
       {preview.labels.map(label => <li key={label}>{labelText[label as CloudLabel] ?? label}</li>)}

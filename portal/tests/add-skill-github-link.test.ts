@@ -36,7 +36,7 @@ test("Add skill is on your own My skills only, beside Edit", () => {
   assert.match(source, /\{findByGithubLink && nav\.view === "all" && !nav\.id && !editing && <button/);
   assert.match(source, /\{githubLinkSearch \? \(/);
   const dialog = readFileSync(new URL("../src/app/unified/AddSkillDialog.tsx", import.meta.url), "utf8");
-  assert.match(dialog, /<input autoFocus type="text"/, "a link without https:// can be submitted");
+  assert.match(dialog, /<input ref=\{input\} autoFocus type="text"/, "a link without https:// can be submitted");
   assert.match(dialog, /found\.link\.trim\(\) === link\.trim\(\)/, "results hide once the link is edited");
 });
 
@@ -60,4 +60,30 @@ test("Add skill shows why a GitHub skill can't be added", () => {
   assert.match(dialog, /<strong>Can't add this skill\.<\/strong> \{result\.message\}/);
   assert.match(dialog, /<strong>Can't add this skill\.<\/strong> \{preview\.blocker\}/);
   assert.match(dialog, /<strong>Not added\.<\/strong> \{result\.error\}/);
+});
+
+test("a picked folder loses its own name and the files the Mac skips; it is checked before sending", async () => {
+  const { pickedFolder, uploadProblem, previewUpload, MAX_UPLOAD_BYTES } = await import("../src/app/my-skills-additions");
+  const file = (path: string, size = 3) => Object.assign(new File(["x".repeat(size)], path.split("/").at(-1)!), { webkitRelativePath: path });
+  const folder = pickedFolder([file("notes/SKILL.md"), file("notes/refs/a.md"), file("notes/.DS_Store"), file("notes/.git/config")]);
+  assert.equal(folder.name, "notes");
+  assert.deepEqual(folder.files.map(item => item.path), ["SKILL.md", "refs/a.md"]);
+  const loose = pickedFolder([new File(["x"], "SKILL.md"), new File(["y"], "run.sh")]);
+  assert.equal(loose.name, "");
+  assert.deepEqual(loose.files.map(item => item.path), ["SKILL.md", "run.sh"]);
+  assert.equal(uploadProblem(folder), null);
+  assert.match(uploadProblem(pickedFolder([])) ?? "", /empty/);
+  assert.match(uploadProblem(pickedFolder([file("big/SKILL.md", MAX_UPLOAD_BYTES + 1)])) ?? "", /too big/);
+  let sent: RequestInit | undefined;
+  const api = (async (path: string, init?: RequestInit) => {
+    assert.equal(path, "/api/portal/upload-skill");
+    sent = init;
+    return { name: "notes", files: [], commitSha: "", repo: "", folder: "notes" };
+  }) as PortalApi;
+  await previewUpload(api, folder);
+  const form = sent?.body as FormData;
+  assert.equal(form.get("folder"), "notes");
+  assert.deepEqual(JSON.parse(String(form.get("paths"))), ["SKILL.md", "refs/a.md"]);
+  assert.equal(form.getAll("file").length, 2);
+  assert.equal(form.get("add"), null);
 });

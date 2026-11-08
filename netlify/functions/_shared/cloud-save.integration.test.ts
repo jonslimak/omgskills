@@ -25,6 +25,7 @@ import { gitObjectSha, validateSkillPackage, type SkillManifestEntry } from "./s
 import { skillMdBody } from "./skill-readme.js";
 import { GithubImportError, type GithubSkill } from "./github-skill-import.js";
 import { saveGithubSkill } from "./github-skill-save.js";
+import { readUploadedSkill } from "./skill-upload.js";
 
 const connectionString = process.env.AUTH_TEST_DATABASE_URL;
 if (!connectionString) {
@@ -1629,5 +1630,17 @@ test("a skill added from GitHub saves like a Mac's, with no device, and a Mac ca
     assert.ok(both.some((result) => result.status === "rejected" && result.reason instanceof GithubImportError
       && result.reason.code === "already_added"));
     assert.equal((await readCloudSave(pool, userId)).skills.filter((item) => item.name === "twin").length, 1);
+
+    // A folder uploaded from the web saves the same way, keyed by its folder name.
+    const form = new FormData();
+    form.append("folder", "my-uploads");
+    form.append("paths", JSON.stringify(["skills/upload-notes/SKILL.md", "skills/upload-notes/run.sh"]));
+    form.append("file", new Blob(["---\nname: Upload Notes\ndescription: From the web.\n---\n"]), "SKILL.md");
+    form.append("file", new Blob(["#!/bin/sh\necho hi\n"]), "run.sh");
+    assert.deepEqual(await saveGithubSkill(pool, store, userId, await readUploadedSkill(form)), { key: "upload-notes", name: "Upload Notes" });
+    const uploaded = (await readCloudSave(pool, userId)).skills.find((item) => item.key === "upload-notes");
+    assert.equal(uploaded?.description, "From the web.");
+    const files = await loadCloudVersionPackage(pool, store, { userId, releaseId: uploaded!.currentVersion.id });
+    assert.deepEqual(files.package.entries.map((entry) => [entry.path, entry.mode]).sort(), [["SKILL.md", "100644"], ["run.sh", "100755"]]);
   });
 });

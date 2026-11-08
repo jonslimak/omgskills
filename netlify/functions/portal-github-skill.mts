@@ -1,12 +1,11 @@
 import type { Config, Context } from "@netlify/functions";
 import type { Pool } from "pg";
-import { isCloudSaveAvailable, readCloudRecordNames, readCloudSaveSettings } from "./_shared/cloud-save.js";
-import { cloudNameKey } from "./_shared/cloud-skill-keys.js";
+import { isCloudSaveAvailable } from "./_shared/cloud-save.js";
 import { createCloudObjectStore, type CloudObjectStore } from "./_shared/cloud-store.js";
 import { getPgPool } from "./_shared/db.js";
 import { getEnv } from "./_shared/env.js";
-import { GithubImportError, parseGithubImportLink, readGithubSkill, type GithubImportOptions, type GithubSkill } from "./_shared/github-skill-import.js";
-import { saveGithubSkill } from "./_shared/github-skill-save.js";
+import { GithubImportError, parseGithubImportLink, readGithubSkill, type GithubImportOptions } from "./_shared/github-skill-import.js";
+import { saveGithubSkill, skillPreview } from "./_shared/github-skill-save.js";
 import { optionsResponse, secretJsonResponse } from "./_shared/http.js";
 import { requirePortalUser } from "./_shared/user.js";
 import { requireJsonObject } from "./_shared/validation.js";
@@ -31,20 +30,6 @@ const defaults: PortalGithubSkillDependencies = {
   github: {},
 };
 
-const MAX_SKILL_MD_CHARS = 20_000;
-const MAX_LISTED_FILES = 100;
-const SYNC_OFF = "Sync is off. Turn on Sync My skills (menu → Sync) to add skills from GitHub.";
-
-function preview(skill: GithubSkill, blocker: string | null) {
-  return {
-    repo: skill.repo, commitSha: skill.commitSha, folder: skill.folder, name: skill.name, description: skill.description,
-    skillMd: skill.skillMd.slice(0, MAX_SKILL_MD_CHARS), skillMdTruncated: skill.skillMd.length > MAX_SKILL_MD_CHARS,
-    labels: skill.labels, fileCount: skill.files.length, totalBytes: skill.totalBytes,
-    files: skill.files.slice(0, MAX_LISTED_FILES).map(file => ({ path: file.path, bytes: file.data.byteLength })),
-    blocker,
-  };
-}
-
 function link(value: unknown) {
   const parsed = typeof value === "string" ? parseGithubImportLink(value) : null;
   if (!parsed) throw new GithubImportError("invalid_link", "Paste a link to a GitHub repo, folder or SKILL.md.", 400);
@@ -63,11 +48,7 @@ export async function portalGithubSkill(req: Request, dependencies: PortalGithub
     if (req.method === "GET") {
       // Netlify stops a function after about 10 seconds; GitHub gets 8 of them, so a slow read still gets its reason.
       const skill = await readGithubSkill(link(new URL(req.url).searchParams.get("link")), { deadline: Date.now() + 8_000, ...dependencies.github });
-      const [settings, records] = await Promise.all([readCloudSaveSettings(pool, userId), readCloudRecordNames(pool, userId)]);
-      const blocker = !settings.enabled ? SYNC_OFF
-        : records.some(record => record.name === cloudNameKey(skill.name)) ? `You already have a skill named "${skill.name}" in My skills.`
-        : null;
-      return secretJsonResponse(req, preview(skill, blocker));
+      return secretJsonResponse(req, await skillPreview(pool, userId, skill));
     }
     const body = await requireJsonObject(req);
     const raw = body.folder;
