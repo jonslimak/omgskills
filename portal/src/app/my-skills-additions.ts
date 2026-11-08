@@ -104,8 +104,8 @@ export async function addGithubSkill(api: PortalApi, preview: GithubSkillPreview
 /** A folder (or files) picked on this computer, with each file's path inside it. */
 export type PickedFolder = { name: string; files: { path: string; file: File }[] };
 
-/** Matches the server: Netlify takes up to 6 MB, with room left for the form. */
-export const MAX_UPLOAD_BYTES = 4.5 * 1024 * 1024;
+/** Matches the server: Netlify takes up to 6 MB once base64-encoded, with room left for the form. */
+export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 const MAX_UPLOAD_FILES = 512;
 /** What the Mac and the server leave out of a skill. */
 const IGNORED = new Set([".DS_Store", ".git"]);

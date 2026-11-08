@@ -45,6 +45,8 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
     if (!(document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLButtonElement)) input.current?.focus();
   }, [loading]);
   const [upload, setUpload] = useState<Upload | null>(null);
+  // Its own one-at-a-time lock: an upload still saving never blocks adding a GitHub skill.
+  const addingUpload = useRef(false);
   const uploadRequest = useRef<AbortController | null>(null);
   const folderInput = useRef<HTMLInputElement>(null);
   const filesInput = useRef<HTMLInputElement>(null);
@@ -67,8 +69,8 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
         message: reason(error, "The folder couldn't be checked. Try again.") } }); });
   };
   const addUploaded = (preview: GithubSkillPreview) => {
-    if (!additions.addUpload || !upload || adding.current) return;
-    adding.current = true;
+    if (!additions.addUpload || !upload || addingUpload.current) return;
+    addingUpload.current = true;
     const { folder } = upload;
     const set = (result: GithubResult) => setUpload(old => old?.folder === folder ? { folder, result } : old);
     set({ state: "preview", preview, adding: true });
@@ -76,7 +78,7 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
       set({ state: "added", name: saved.name });
       notify(`Added ${saved.name} to My skills`);
     }, error => set({ state: "preview", preview, error: reason(error, "The skill couldn't be added. Try again.") }))
-      .finally(() => { adding.current = false; });
+      .finally(() => { addingUpload.current = false; });
   };
   useEffect(() => () => uploadRequest.current?.abort(), []);
   const find = (value: string) => {
@@ -180,9 +182,10 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
         onChange={event => { choose(event.target.files); event.target.value = ""; }} />
       {uploadLoading
         ? <div className="ua-add-skill-loading" role="status"><span className="ua-loader" aria-hidden="true" />Inspecting &amp; verifying skill…</div>
-        : upload?.result.state !== "preview" && upload?.result.state !== "added" && <div className="ua-add-skill-upload-buttons">
-          <button type="button" className="ua-pill" onClick={() => folderInput.current?.click()}>Choose a folder</button>
-          <button type="button" className="ua-pill" onClick={() => filesInput.current?.click()}>Choose files</button>
+        // Always there, so a wrong folder (or one changed since it was picked) can be picked again.
+        : <div className="ua-add-skill-upload-buttons">
+          <button type="button" className="ua-pill" onClick={() => folderInput.current?.click()}>{upload ? "Choose another folder" : "Choose a folder"}</button>
+          <button type="button" className="ua-pill" onClick={() => filesInput.current?.click()}>{upload ? "Choose other files" : "Choose files"}</button>
         </div>}
       {upload && upload.result.state !== "loading" && <div role="status" aria-live="polite">
         <GithubSkill result={upload.result} onAdd={addUploaded} uploaded={upload.folder.name || "your files"} />

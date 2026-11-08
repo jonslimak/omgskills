@@ -4,8 +4,13 @@ import { CLOUD_SAVE_LIMITS } from "./cloud-save.js";
 import { checkSkillFiles, GithubImportError, skillFolderIn, tooLarge, type GithubSkill, type GithubSkillFile } from "./github-skill-import.js";
 import { gitObjectSha } from "./skill-package.js";
 
-/** Netlify refuses request bodies over 6 MB; this leaves room for the form's own bytes. */
-export const MAX_UPLOAD_BYTES = 4.5 * 1024 * 1024;
+/**
+ * Netlify refuses request bodies over 6 MB, counted after it base64-encodes a binary body (a third bigger):
+ * 4 MB of files plus the form's own bytes stays under that.
+ */
+export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+/** Room for the form's boundaries and the paths list on top of the files. */
+export const MAX_UPLOAD_BODY_BYTES = MAX_UPLOAD_BYTES + 256 * 1024;
 
 /** What the Mac leaves out of a synced skill (CloudSaveFolder.swift), left out here too. */
 const IGNORED = new Set([".DS_Store", ".git"]);

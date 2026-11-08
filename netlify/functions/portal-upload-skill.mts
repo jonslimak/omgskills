@@ -7,7 +7,7 @@ import { getEnv } from "./_shared/env.js";
 import { GithubImportError } from "./_shared/github-skill-import.js";
 import { saveGithubSkill, skillPreview } from "./_shared/github-skill-save.js";
 import { optionsResponse, secretJsonResponse } from "./_shared/http.js";
-import { MAX_UPLOAD_BYTES, readUploadedSkill, uploadTooLarge } from "./_shared/skill-upload.js";
+import { MAX_UPLOAD_BODY_BYTES, readUploadedSkill, uploadTooLarge } from "./_shared/skill-upload.js";
 import { requirePortalUser } from "./_shared/user.js";
 
 // "Add skill" from a folder on the person's computer.
@@ -28,16 +28,14 @@ const defaults: PortalUploadSkillDependencies = {
   async requireUserId(req) { return (await requirePortalUser(req)).id; },
 };
 
-/** Room for the form's boundaries and the paths list on top of the files. */
-const MAX_BODY_BYTES = MAX_UPLOAD_BYTES + 256 * 1024;
-
 export async function portalUploadSkill(req: Request, dependencies: PortalUploadSkillDependencies = defaults): Promise<Response> {
   if (req.method === "OPTIONS") return optionsResponse(req);
   if (req.method !== "POST") return secretJsonResponse(req, { error: "Method not allowed" }, { status: 405 });
   try {
     const userId = await dependencies.requireUserId(req);
     if (!dependencies.available()) throw new GithubImportError("unavailable", "Adding skills isn't available yet.", 503);
-    if (Number(req.headers.get("content-length") ?? 0) > MAX_BODY_BYTES) throw uploadTooLarge();
+    // A body known to be too big is refused unread; one of unknown size is still held to Netlify's own 6 MB limit.
+    if (Number(req.headers.get("content-length") ?? 0) > MAX_UPLOAD_BODY_BYTES) throw uploadTooLarge();
     if (!(req.headers.get("content-type") ?? "").startsWith("multipart/form-data")) {
       throw new GithubImportError("invalid_link", "The folder couldn't be read. Choose it again.", 400);
     }

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { GithubImportError } from "./github-skill-import.js";
 import { portalUploadSkill } from "../portal-upload-skill.mjs";
-import { MAX_UPLOAD_BYTES, readUploadedSkill } from "./skill-upload.js";
+import { MAX_UPLOAD_BODY_BYTES, readUploadedSkill } from "./skill-upload.js";
 
 const skillMd = (name: string) => `---\nname: ${name}\ndescription: Helps with ${name}.\n---\n# ${name}\n`;
 
@@ -54,7 +54,7 @@ test("what can't be added says why", async () => {
   broken.append("paths", JSON.stringify(["SKILL.md", "extra"]));
   broken.append("file", new Blob([skillMd("x")]), "SKILL.md");
   await refused(readUploadedSkill(broken), "invalid_link");
-  assert.ok(MAX_UPLOAD_BYTES < 6 * 1024 * 1024, "fits under Netlify's 6 MB body limit");
+  assert.ok(MAX_UPLOAD_BODY_BYTES * 4 / 3 < 6 * 1024 * 1024, "fits under Netlify's 6 MB limit once base64-encoded");
 });
 
 test("the endpoint previews, and refuses a body over the limit before reading it", async () => {
@@ -63,8 +63,10 @@ test("the endpoint previews, and refuses a body over the limit before reading it
     pool: () => ({ query: async (sql: string) => sql.includes("cloud_save_settings")
       ? { rows: [{ enabled: true, excludedSkillKeys: [] }] } : { rows: [] } }) as never,
   };
-  const ok = await portalUploadSkill(new Request("https://omgskills.com/api/portal/upload-skill",
-    { method: "POST", body: form("notes", { "SKILL.md": skillMd("notes") }) }), dependencies);
+  const sent = new Request("https://omgskills.com/api/portal/upload-skill", { method: "POST", body: form("notes", { "SKILL.md": skillMd("notes") }) });
+  const bytes = await sent.arrayBuffer();
+  const ok = await portalUploadSkill(new Request(sent.url, { method: "POST", body: bytes,
+    headers: { "content-type": sent.headers.get("content-type")!, "content-length": String(bytes.byteLength) } }), dependencies);
   const body = await ok.json();
   assert.equal(ok.status, 200, JSON.stringify(body));
   assert.equal(body.name, "notes");
