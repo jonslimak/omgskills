@@ -138,7 +138,8 @@ import { SavedSkillReadme, SavedVersionsList, SharedSkillReadme, SkillReadme, sa
 import type { SavedSkillMdLoader, SavedVersionsLoader, SharedSkillMdLoader } from "../../cloud-save/cloud-save";
 import { AlphaRail, railLetter, railLettersOf as railLetters } from "./AlphaRail";
 import { CloudStatusBadge, CloudStatusSection, type CloudInfo } from "./CloudStatus";
-import type { MySkillAdditions } from "../my-skills-additions";
+import { looksLikeGithubLink, type MySkillAdditions } from "../my-skills-additions";
+import { AddSkillForm } from "./AddSkillDialog";
 import { PortalApiError } from "../../api-error";
 import { cloudSkillRows, needsAttention, skillCloudRow, statusText } from "../../cloud-save/cloud-save";
 
@@ -500,8 +501,10 @@ export function UnifiedApp({
   const [editing, setEditing] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
   const [dialog, setDialog] = useState<
-    "new-set" | "membership" | "signin" | null
+    "new-set" | "membership" | "signin" | "add-skill" | null
   >(null);
+  // "Add skill" starts with the GitHub link pasted in search, if any.
+  const [addSkillLink, setAddSkillLink] = useState("");
   const [actionSkills, setActionSkills] = useState<SkillDisplay[]>([]);
   const [setName, setSetName] = useState("");
   const [notice, setNotice] = useState(initialNotice);
@@ -621,6 +624,10 @@ export function UnifiedApp({
   const sets = signedIn
     ? data.sets.filter((set) => (!set.hidden || (showHidden && nav.view === "sets")) && !set.isFavorites)
     : [];
+  // "Add skill" (GitHub link) is for your own My skills.
+  const findByGithubLink = signedIn && !readOnlyAccount && !management ? additions?.findByGithubLink : undefined;
+  const githubLinkSearch = !!findByGithubLink && looksLikeGithubLink(nav.query);
+  const openAddSkill = (link = "") => { setAddSkillLink(link); setDialog("add-skill"); };
   const editableView =
     signedIn && (!readOnlyAccount || !!management) &&
     ["all", "favorites", "set"].includes(nav.view) &&
@@ -1269,6 +1276,8 @@ export function UnifiedApp({
       >
         {editing ? "Done" : "Edit"}
       </button>}
+      {findByGithubLink && nav.view === "all" && !nav.id && !editing && <button type="button" className="ua-pill ua-add-skill-button"
+        aria-label="Add skill" onClick={() => openAddSkill()}><Plus aria-hidden="true" /><span className="ua-add-skill-label">Add skill</span></button>}
       {nav.source !== "all" && <button type="button" className="ua-pill" aria-label={`Stop showing only ${displaySourceName(nav.source)} skills`}
         onClick={() => navigate({ ...nav, source: "all" })}>{displaySourceName(nav.source)} <X aria-hidden="true" /></button>}
       {!setPage && <label className="ua-filter">
@@ -1623,7 +1632,11 @@ export function UnifiedApp({
                 <span className="ua-muted">Could not refresh. Showing saved results.</span>
                 <button type="button" className="ua-pill" onClick={publicStatus.retry}>Retry</button>
               </div>}
-              {listState === "loading" ? (
+              {githubLinkSearch ? (
+                // A pasted GitHub link finds skills by where they live, not by words.
+                <button type="button" className="ua-pill ua-primary ua-add-skill-offer"
+                  onClick={() => openAddSkill(nav.query.trim())}><Plus aria-hidden="true" />Add skills from this GitHub link</button>
+              ) : listState === "loading" ? (
                 <div
                   className="ua-skeletons"
                   role="status"
@@ -2320,6 +2333,11 @@ export function UnifiedApp({
           >
             Done
           </button>
+        </Modal>
+      )}
+      {findByGithubLink && additions && dialog === "add-skill" && (
+        <Modal title="Add skill" theme={theme} close={() => setDialog(null)}>
+          <AddSkillForm additions={{ ...additions, findByGithubLink }} initialLink={addSkillLink} notify={setNotice} />
         </Modal>
       )}
       {!onSignIn && dialog === "signin" && (

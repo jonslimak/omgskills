@@ -54,8 +54,15 @@ function Preview() {
   const [added, setAdded] = useState<MySkillAddition[]>([{ catalogId: "anthropics/skills:pdf", name: "pdf", author: "anthropics",
     description: "Read, fill and create PDF files.", githubUrl: null }]);
   const additions = { skills: added, pending: [] as string[],
-    add: async (id: string) => setAdded(old => [{ catalogId: id }, ...old.filter(other => other.catalogId !== id)]),
-    remove: async (id: string) => setAdded(old => old.filter(other => other.catalogId !== id)) };
+    add: async (id: string, details?: Omit<MySkillAddition, "catalogId">) =>
+      setAdded(old => [{ ...details, catalogId: id }, ...old.filter(other => other.catalogId !== id)]),
+    remove: async (id: string) => setAdded(old => old.filter(other => other.catalogId !== id)),
+    // Sample "Add skill" lookup: the anthropics/skills repo has three skills; anything else has none.
+    findByGithubLink: async (link: string) => /github\.com\/anthropics\/skills/i.test(link) ? { more: false,
+      skills: ["docx", "pdf", "xlsx"].filter(name => !/\/tree\/|\/blob\//.test(link) || link.toLowerCase().includes(`/${name}`))
+        .map(name => ({ catalogId: `anthropics/skills:${name}`, name, author: "anthropics",
+          description: `Work with ${name.toUpperCase()} files.`, githubUrl: "https://github.com/anthropics/skills" })) }
+      : { skills: [], more: false } };
   const [signedOutNav, setSignedOutNav] = useState<Navigation | null>(null);
   const [liveCatalog, setLiveCatalog] = useState(true);
   const publicData = usePublicCatalog(publicClient, nav, liveCatalog);
