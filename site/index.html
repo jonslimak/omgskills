@@ -3,6 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    // Signed in (Clerk's __client_uat is above 0): go straight to My skills. A link from another page of the
+    // site still shows this one, so Home keeps working for people who are signed in.
+    (function () {
+      try {
+        var signedIn = /(?:^|;\s*)__client_uat(?:_[^=;]*)?=[1-9][0-9]*(?:;|$)/.test(document.cookie);
+        var fromSite = document.referrer && new URL(document.referrer).origin === location.origin;
+        if (signedIn && !fromSite) location.replace("/app/?view=all");
+      } catch (error) {}
+    })();
+  </script>
   <title>omgskills - share agent skills with your team (Claude Code &amp; Codex)</title>
   <meta name="description" content="Put your team's agent skills in one place. Share a set once, and everyone's Claude Code and Codex stay in sync. Free, with an open library of agent skills.">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
