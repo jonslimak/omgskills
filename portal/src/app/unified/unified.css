@@ -2918,3 +2918,8 @@ main:has(> .ua-az-anchor) .ua-content {
   /* The Show filter drops its "Show" label on phones; the select says what it filters. */
   .ua-heading-actions .ua-filter-label { display: none; }
 }
+
+/* iPhone zooms the page into any field under 16px when it takes focus; dialogs' fields stay at 16px on touch screens. */
+@media (pointer: coarse) {
+  .ua-modal input, .ua-modal textarea, .ua-modal select { font-size: 16px; }
+}
