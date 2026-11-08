@@ -1,4 +1,5 @@
 import { StrictMode, useEffect, useState } from "react";
+import { PortalApiError } from "../../api-error";
 import { createRoot, type Root } from "react-dom/client";
 import { RotateCcw } from "lucide-react";
 import { UnifiedApp } from "../../app/unified/UnifiedApp";
@@ -62,7 +63,18 @@ function Preview() {
       skills: ["docx", "pdf", "xlsx"].filter(name => !/\/tree\/|\/blob\//.test(link) || link.toLowerCase().includes(`/${name}`))
         .map(name => ({ catalogId: `anthropics/skills:${name}`, name, author: "anthropics",
           description: `Work with ${name.toUpperCase()} files.`, githubUrl: "https://github.com/anthropics/skills" })) }
-      : { skills: [], more: false } };
+      : { skills: [], more: false },
+    // Sample GitHub skills outside the library: "secret" can't be read, "taken" is already added, the rest preview.
+    previewGithubSkill: async (link: string) => {
+      if (/secret/i.test(link)) throw new PortalApiError("\"config.env\" line 3 looks like a password or key (AWS secret key), so the skill wasn't added.", 422);
+      const name = link.replace(/\/+$/, "").split("/").at(-1) || "skill";
+      return { link, repo: "someone/skills", commitSha: "c".repeat(40), folder: `skills/${name}`, name,
+        description: `Helps with ${name}.`, skillMd: `---\nname: ${name}\ndescription: Helps with ${name}.\n---\n# ${name}\n\nSteps…\n`,
+        skillMdTruncated: false, labels: ["scripts"], fileCount: 2, totalBytes: 2048,
+        files: [{ path: "SKILL.md", bytes: 1024 }, { path: "scripts/run.sh", bytes: 1024 }],
+        blocker: /taken/i.test(link) ? `You already have a skill named "${name}" in My skills.` : null };
+    },
+    addGithubSkill: async (preview: { name: string }) => ({ key: preview.name.toLowerCase(), name: preview.name }) };
   const [signedOutNav, setSignedOutNav] = useState<Navigation | null>(null);
   const [liveCatalog, setLiveCatalog] = useState(true);
   const publicData = usePublicCatalog(publicClient, nav, liveCatalog);

@@ -15,6 +15,17 @@ export type MySkillAdditions = {
   remove: (catalogId: string) => Promise<void>;
   /** The library skills a pasted GitHub link points at ("Add skill"). */
   findByGithubLink?: (link: string, signal?: AbortSignal) => Promise<GithubLinkSkills>;
+  /** A GitHub skill that isn't in the library: what would be added, or why it can't be. */
+  previewGithubSkill?: (link: string, signal?: AbortSignal) => Promise<GithubSkillPreview>;
+  /** Saves that previewed version to My skills, as if a Mac had synced it. */
+  addGithubSkill?: (preview: GithubSkillPreview) => Promise<{ key: string; name: string }>;
+};
+
+/** A skill read from GitHub, pinned to a commit. `blocker` says why it can't be added (sync off, already added). */
+export type GithubSkillPreview = {
+  link: string; repo: string; commitSha: string; folder: string; name: string; description: string | null;
+  skillMd: string; skillMdTruncated: boolean; labels: string[]; fileCount: number; totalBytes: number;
+  files: { path: string; bytes: number }[]; blocker: string | null;
 };
 
 /** The library skills at a GitHub link; more when the link holds more than were listed. */
@@ -67,4 +78,21 @@ export async function findSkillsAtGithubLink(api: PortalApi, link: string, signa
  */
 export function looksLikeGithubLink(text: string) {
   return /^\s*(https?:\/\/)?(www\.)?github\.com\/[\w.-]+\/[\w.-]+(\/?|\/tree\/[^\s?#]+|\/blob\/[^\s?#]+\/skill\.md)([?#]\S*)?\s*$/i.test(text);
+}
+
+/** Throws PortalApiError with the reason to show when the skill can't be read or added. */
+export async function previewGithubSkill(api: PortalApi, link: string, signal?: AbortSignal): Promise<GithubSkillPreview> {
+  const value = await api<Omit<GithubSkillPreview, "link">>(`/api/portal/github-skill?link=${encodeURIComponent(link.trim())}`,
+    { signal, cache: "no-store" });
+  if (typeof value?.name !== "string" || typeof value.commitSha !== "string" || !Array.isArray(value.files)) {
+    throw new Error("GitHub couldn't be checked. Try again.");
+  }
+  return { ...value, link: link.trim() };
+}
+
+export async function addGithubSkill(api: PortalApi, preview: GithubSkillPreview): Promise<{ key: string; name: string }> {
+  const value = await api<{ skill?: { key?: string; name?: string } }>("/api/portal/github-skill", { method: "POST",
+    body: JSON.stringify({ link: preview.link, commitSha: preview.commitSha, folder: preview.folder }) });
+  if (typeof value?.skill?.key !== "string") throw new Error("The skill couldn't be added. Try again.");
+  return { key: value.skill.key, name: value.skill.name ?? preview.name };
 }

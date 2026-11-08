@@ -2882,6 +2882,17 @@ main:has(> .ua-az-anchor) .ua-content {
 .ua-add-skill-text strong { overflow-wrap: anywhere; }
 .ua-add-skill-text small { color: var(--ua-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .ua-add-skill-offer { align-self: flex-start; margin-bottom: 12px; }
+/* A GitHub skill that isn't in the library, shown before it is added. */
+.ua-github-skill { display: flex; flex-direction: column; gap: 10px; }
+.ua-github-skill > p { margin: 0; overflow-wrap: anywhere; }
+.ua-github-skill > .ua-pill { align-self: flex-start; width: auto; padding-inline: 14px; }
+.ua-github-skill-labels { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.ua-github-skill-labels li { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--ua-line); color: var(--ua-muted); }
+.ua-github-skill details summary { cursor: pointer; }
+.ua-github-skill pre { margin: 8px 0 0; max-height: 240px; overflow: auto; padding: 10px; border: 1px solid var(--ua-line); border-radius: 8px;
+  font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ua-github-skill-files { list-style: none; padding: 0; margin: 8px 0 0; max-height: 200px; overflow: auto; font-size: 13px; }
+.ua-github-skill-files li { overflow-wrap: anywhere; }
 .ua-heading-actions > .ua-pill.ua-add-skill-button { width: auto; padding-inline: 10px; gap: 4px; white-space: nowrap; flex-shrink: 0; }
 .ua-add-skill-button svg { width: 14px; height: 14px; }
 @media (max-width: 759px) {
