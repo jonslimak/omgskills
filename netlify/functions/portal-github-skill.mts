@@ -61,7 +61,8 @@ export async function portalGithubSkill(req: Request, dependencies: PortalGithub
     }
     const pool = dependencies.pool();
     if (req.method === "GET") {
-      const skill = await readGithubSkill(link(new URL(req.url).searchParams.get("link")), dependencies.github);
+      // Netlify stops a function after about 10 seconds; GitHub gets 8 of them, so a slow read still gets its reason.
+      const skill = await readGithubSkill(link(new URL(req.url).searchParams.get("link")), { deadline: Date.now() + 8_000, ...dependencies.github });
       const [settings, records] = await Promise.all([readCloudSaveSettings(pool, userId), readCloudRecordNames(pool, userId)]);
       const blocker = !settings.enabled ? SYNC_OFF
         : records.some(record => record.name === cloudNameKey(skill.name)) ? `You already have a skill named "${skill.name}" in My skills.`
@@ -75,7 +76,8 @@ export async function portalGithubSkill(req: Request, dependencies: PortalGithub
     if (folder === null || typeof body.commitSha !== "string") {
       throw new GithubImportError("invalid_link", "Find the skill again, then add it.", 400);
     }
-    const skill = await readGithubSkill(link(body.link), { ...dependencies.github, pinned: { commitSha: body.commitSha, folder } });
+    // Saving needs time after the read, so the read gets less here.
+    const skill = await readGithubSkill(link(body.link), { deadline: Date.now() + 6_000, ...dependencies.github, pinned: { commitSha: body.commitSha, folder } });
     return secretJsonResponse(req, { skill: await saveGithubSkill(pool, dependencies.store(), userId, skill) });
   } catch (error) {
     if (error instanceof GithubImportError) {

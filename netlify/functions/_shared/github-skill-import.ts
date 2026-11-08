@@ -7,7 +7,7 @@ import { combineLabels, pathLabels, scanFileContents, type SkillLabel } from "./
 
 export type GithubImportErrorCode =
   | "invalid_link" | "not_found" | "branch_not_found" | "folder_not_found" | "no_skill" | "several_skills"
-  | "no_name" | "unsupported_file" | "too_large" | "secret" | "rate_limited" | "unavailable" | "sync_off" | "already_added";
+  | "no_name" | "unsupported_file" | "too_large" | "secret" | "rate_limited" | "unavailable" | "sync_off" | "already_added" | "too_slow";
 
 export class GithubImportError extends Error {
   constructor(readonly code: GithubImportErrorCode, message: string, readonly status = 422) {
@@ -45,12 +45,40 @@ export function parseGithubImportLink(raw: string): GithubImportLink | null {
   return { owner, repo, kind, rest: kind === "blob" ? rest.slice(0, -1) : rest };
 }
 
-export type GithubImportOptions = { fetcher?: typeof fetch; token?: string; now?: () => number };
+/** deadline: when the whole read must be done (ms since 1970), so the function answers before Netlify cuts it off. */
+export type GithubImportOptions = { fetcher?: typeof fetch; token?: string; now?: () => number; deadline?: number };
 
 type TreeEntry = { path?: string; mode?: string; type?: string; sha?: string; size?: number };
 
 const API = "https://api.github.com";
 const SHA = /^[0-9a-f]{40}$/;
+
+/** The time one request may take from now: the step's own limit, cut short by the whole read's deadline. */
+function timeLeft(options: GithubImportOptions, ms: number) {
+  const left = options.deadline === undefined ? ms : Math.min(ms, options.deadline - (options.now ?? Date.now)());
+  if (left <= 0) throw tooSlow();
+  return AbortSignal.timeout(left);
+}
+
+/** A failed fetch: past the deadline it is too slow, otherwise GitHub is unreachable. */
+function fetchFailed(options: GithubImportOptions) {
+  return options.deadline !== undefined && (options.now ?? Date.now)() >= options.deadline ? tooSlow() : unavailable();
+}
+
+/** GitHub's limits: the hourly quota (403 with remaining 0), secondary limits (403 with retry-after or saying so), and 429. */
+async function rateLimit(response: Response, options: GithubImportOptions): Promise<GithubImportError | null> {
+  if (response.status !== 403 && response.status !== 429) return null;
+  const limited = response.status === 429 || response.headers.get("x-ratelimit-remaining") === "0"
+    || response.headers.has("retry-after") || /rate limit/i.test(await response.clone().text().catch(() => ""));
+  if (!limited) return null;
+  const now = (options.now ?? Date.now)();
+  const retry = Number(response.headers.get("retry-after"));
+  const reset = Number(response.headers.get("x-ratelimit-reset"));
+  const wait = Number.isFinite(retry) && retry > 0 ? retry * 1000 : Number.isFinite(reset) && reset > 0 ? reset * 1000 - now : NaN;
+  const minutes = Number.isFinite(wait) ? Math.max(1, Math.ceil(wait / 60_000)) : null;
+  return new GithubImportError("rate_limited", `GitHub is limiting requests right now. Try again${
+    minutes ? ` in ${minutes} minute${minutes === 1 ? "" : "s"}` : " soon"}.`, 503);
+}
 
 async function api<T>(path: string, options: GithubImportOptions, missing: () => GithubImportError): Promise<T> {
   const headers: Record<string, string> = {
@@ -60,28 +88,25 @@ async function api<T>(path: string, options: GithubImportOptions, missing: () =>
   if (token) headers.authorization = `Bearer ${token}`;
   let response: Response;
   try {
-    response = await (options.fetcher ?? fetch)(`${API}${path}`, { headers, signal: AbortSignal.timeout(8_000) });
-  } catch {
-    throw unavailable();
+    response = await (options.fetcher ?? fetch)(`${API}${path}`, { headers, signal: timeLeft(options, 8_000) });
+  } catch (error) {
+    if (error instanceof GithubImportError) throw error;
+    throw fetchFailed(options);
   }
-  if (response.status === 404 || response.status === 422) throw missing();
-  if (response.status === 429 || (response.status === 403 && response.headers.get("x-ratelimit-remaining") === "0")) {
-    const reset = Number(response.headers.get("x-ratelimit-reset"));
-    const minutes = Number.isFinite(reset) && reset > 0
-      ? Math.max(1, Math.ceil((reset * 1000 - (options.now ?? Date.now)()) / 60_000)) : null;
-    throw new GithubImportError("rate_limited", `GitHub is limiting requests right now. Try again${
-      minutes ? ` in ${minutes} minute${minutes === 1 ? "" : "s"}` : " soon"}.`, 503);
-  }
-  if (response.status === 403 || response.status === 451) throw missing();
+  const limited = await rateLimit(response, options);
+  if (limited) throw limited;
+  if (response.status === 404 || response.status === 422 || response.status === 403 || response.status === 451) throw missing();
   if (!response.ok) throw unavailable();
   try {
     return await response.json() as T;
   } catch {
-    throw unavailable();
+    throw fetchFailed(options);
   }
 }
 
 const unavailable = () => new GithubImportError("unavailable", "GitHub couldn't be reached. Try again.", 503);
+const tooSlow = () => new GithubImportError("too_slow",
+  "GitHub took too long to send this skill. Try again; a skill with fewer or smaller files reads faster.", 504);
 const encodePath = (value: string) => value.split("/").map(encodeURIComponent).join("/");
 
 /** The commit and root tree the link points at, and the folder inside it. A ref may hold slashes, so each split is tried. */
@@ -124,6 +149,7 @@ async function folderEntries(repoPath: string, rootTree: string, folder: string,
     if (!child?.sha || !SHA.test(child.sha)) throw folderMissing();
     tree = child.sha;
   }
+  if (!folder) throw new GithubImportError("several_skills", "This repo is too big to read whole. Paste the link to one skill's folder.");
   const inside = await api<{ truncated?: boolean; tree?: TreeEntry[] }>(`${repoPath}/git/trees/${tree}?recursive=1`, options, folderMissing);
   if (inside.truncated) throw tooLarge();
   return inside.tree ?? [];
@@ -132,10 +158,40 @@ async function folderEntries(repoPath: string, rootTree: string, folder: string,
 const tooLarge = () => new GithubImportError("too_large",
   `This skill is too big to add (up to ${CLOUD_SAVE_LIMITS.maximumFileCount} files and ${CLOUD_SAVE_LIMITS.maximumTotalBytes / 1024 / 1024} MB).`, 413);
 
-function frontmatterField(markdown: string, field: string): string | null {
-  const block = markdown.replace(/^﻿/, "").match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/)?.[1];
-  const value = block?.match(new RegExp(`^${field}:[ \\t]*(.+)$`, "m"))?.[1];
-  return value?.trim().replace(/^(["'])(.*)\1$/, "$2").trim() || null;
+/**
+ * The SKILL.md name and description, read the way the Mac reads them (a YAML header that starts the file;
+ * both text; runs of spaces squeezed), so a skill added here is the same skill on the Mac. Only plain,
+ * one-line values are taken; any other form is refused with the reason rather than guessed at.
+ */
+export function skillMdHeader(markdown: string): { name: string; description: string } {
+  const unreadable = (why: string) => new GithubImportError("no_name", `Its SKILL.md ${why}, so omgskills can't read it.`);
+  if (!markdown.startsWith("---")) throw unreadable("doesn't start with a --- header");
+  const after = markdown.slice(3);
+  const end = after.indexOf("\n---");
+  if (end < 0) throw unreadable("header isn't closed with ---");
+  const lines = after.slice(0, end).split(/\r?\n/);
+  const field = (key: string) => {
+    const found = lines.flatMap((line, index) => line.startsWith(`${key}:`) ? [index] : []);
+    if (!found.length) throw unreadable(`has no ${key}`);
+    if (found.length > 1) throw unreadable(`has two ${key} lines`);
+    if (/^[ \t]+\S/.test(lines[found[0] + 1] ?? "")) throw unreadable(`${key} runs over several lines`);
+    let value = lines[found[0]].slice(key.length + 1).trim();
+    const double = value.match(/^"([^"\\]*)"(?:[ \t]+#.*)?$/);
+    const single = value.match(/^'((?:[^']|'')*)'(?:[ \t]+#.*)?$/);
+    if (double) value = double[1];
+    else if (single) value = single[1].replace(/''/g, "'");
+    else {
+      value = value.replace(/[ \t]+#.*$/, "");
+      if (!value || /^[|>\[{&*!%@`"'#]/.test(value) || /: |:$/.test(value)) throw unreadable(`${key} is in a form it doesn't take`);
+      if (/^(~|null|true|false|yes|no|on|off|[-+]?(\d[\d_]*(\.\d*)?|\.\d+)([eE][-+]?\d+)?|0x[0-9a-f]+|0o[0-7]+|[-+]?\.(inf|nan))$/i.test(value)) {
+        throw unreadable(`${key} isn't text`);
+      }
+    }
+    const text = value.replace(/\s+/g, " ").trim();
+    if (!text) throw unreadable(`has an empty ${key}`);
+    return text;
+  };
+  return { name: field("name"), description: field("description") };
 }
 
 export type GithubSkillFile = { path: string; mode: string; blobSha: string; data: Uint8Array };
@@ -147,7 +203,7 @@ export type GithubSkill = {
   /** The skill's folder in the repo, "" at the root. */
   folder: string;
   name: string;
-  description: string | null;
+  description: string;
   skillMd: string;
   labels: SkillLabel[];
   files: GithubSkillFile[];
@@ -167,6 +223,8 @@ export async function readGithubSkill(
     const commitSha = options.pinned.commitSha.toLowerCase();
     if (!SHA.test(commitSha)) throw new GithubImportError("invalid_link", "Find the skill again, then add it.", 400);
     const repoPath = `/repos/${encodeURIComponent(link.owner)}/${encodeURIComponent(link.repo)}`;
+    const notFound = () => new GithubImportError("not_found", "That repo wasn't found. Only public GitHub repos can be added.", 404);
+    if ((await api<{ private?: boolean }>(repoPath, options, notFound)).private) throw notFound();
     const commit = await api<{ tree?: { sha?: string } }>(`${repoPath}/git/commits/${commitSha}`, options,
       () => new GithubImportError("not_found", "That version is no longer on GitHub. Find the skill again.", 404));
     const rootTree = commit.tree?.sha?.toLowerCase();
@@ -208,15 +266,19 @@ export async function readGithubSkill(
     const path = target.folder ? `${target.folder}/${entry.path}` : entry.path!;
     // raw.githubusercontent.com has no API quota; the hash check below proves the file is the one in the tree.
     let response: Response;
+    let data: Uint8Array;
     try {
       response = await (options.fetcher ?? fetch)(
         `https://raw.githubusercontent.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${target.commitSha}/${encodePath(path)}`,
-        { signal: AbortSignal.timeout(10_000) });
-    } catch {
-      throw unavailable();
+        { signal: timeLeft(options, 10_000) });
+      const limited = await rateLimit(response, options);
+      if (limited) throw limited;
+      if (!response.ok) throw unavailable();
+      data = new Uint8Array(await response.arrayBuffer());
+    } catch (error) {
+      if (error instanceof GithubImportError && error.code !== "unavailable") throw error;
+      throw fetchFailed(options);
     }
-    if (!response.ok) throw unavailable();
-    const data = new Uint8Array(await response.arrayBuffer());
     if (gitObjectSha("blob", data) !== entry.sha!.toLowerCase()) throw unavailable();
     return { path: entry.path!, mode: entry.mode!, blobSha: entry.sha!.toLowerCase(), data };
   });
@@ -238,12 +300,16 @@ export async function readGithubSkill(
     }
     labels.push(scan.labels, pathLabels(file.path, file.mode));
   }
-  const skillMd = Buffer.from(files.find(file => file.path === "SKILL.md")!.data).toString("utf8");
-  const name = frontmatterField(skillMd, "name");
-  if (!name) throw new GithubImportError("no_name", "Its SKILL.md has no name, so it isn't a valid skill.");
+  let skillMd: string;
+  try {
+    skillMd = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(files.find(file => file.path === "SKILL.md")!.data);
+  } catch {
+    throw new GithubImportError("no_name", "Its SKILL.md isn't UTF-8 text, so omgskills can't read it.");
+  }
+  const { name, description } = skillMdHeader(skillMd);
   return {
     repo: `${owner}/${repo}`, commitSha: target.commitSha, folder: target.folder, name,
-    description: frontmatterField(skillMd, "description"), skillMd, labels: combineLabels(labels), files,
+    description, skillMd, labels: combineLabels(labels), files,
     totalBytes: files.reduce((sum, file) => sum + file.data.byteLength, 0),
   };
 }

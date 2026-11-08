@@ -57,14 +57,17 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
   // A link pasted in search arrives already filled in.
   useEffect(() => { if (initialLink) find(initialLink); return () => request.current?.abort(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const added = (id: string) => additions.skills.some(skill => skill.catalogId === id);
-  const setGithub = (github: GithubResult) => setFound(old => old?.state === "ready" ? { ...old, github } : old);
+  // An add's result belongs to the link it was made from; a search for another link meanwhile keeps its own results.
+  const setGithub = (forLink: string, github: GithubResult) =>
+    setFound(old => old?.state === "ready" && old.link === forLink ? { ...old, github } : old);
   const addFromGithub = (preview: GithubSkillPreview) => {
-    if (!additions.addGithubSkill) return;
-    setGithub({ state: "preview", preview, adding: true });
+    if (!additions.addGithubSkill || found?.state !== "ready") return;
+    const forLink = found.link;
+    setGithub(forLink, { state: "preview", preview, adding: true });
     additions.addGithubSkill(preview).then(saved => {
-      setGithub({ state: "added", name: saved.name });
+      setGithub(forLink, { state: "added", name: saved.name });
       notify(`Added ${saved.name} to My skills`);
-    }, error => setGithub({ state: "preview", preview, error: reason(error, "The skill couldn't be added. Try again.") }));
+    }, error => setGithub(forLink, { state: "preview", preview, error: reason(error, "The skill couldn't be added. Try again.") }));
   };
   return <div className="ua-add-skill">
     <form onSubmit={event => { event.preventDefault(); find(link); }}>

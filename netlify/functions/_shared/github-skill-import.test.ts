@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { GithubImportError, parseGithubImportLink, readGithubSkill } from "./github-skill-import.js";
+import { GithubImportError, parseGithubImportLink, readGithubSkill, skillMdHeader } from "./github-skill-import.js";
 import { githubSkillKey } from "./github-skill-save.js";
 import { gitObjectSha } from "./skill-package.js";
 
@@ -10,7 +10,7 @@ const ROOT = "a".repeat(40);
 type RepoFile = { text: string; mode?: string; type?: string };
 
 /** A pretend public repo on GitHub: refs, one recursive tree, and raw files. */
-function github(files: Record<string, RepoFile>, options: { refs?: string[]; private?: boolean; limited?: boolean; tamper?: string } = {}) {
+function github(files: Record<string, RepoFile>, options: { refs?: string[]; private?: boolean; limited?: boolean; secondary?: boolean; tamper?: string; truncated?: boolean } = {}) {
   const calls: string[] = [];
   const blob = (file: RepoFile) => gitObjectSha("blob", Buffer.from(file.text));
   const fetcher = (async (input: string | URL) => {
@@ -18,6 +18,7 @@ function github(files: Record<string, RepoFile>, options: { refs?: string[]; pri
     calls.push(url);
     const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
     if (options.limited) return new Response("{}", { status: 403, headers: { "x-ratelimit-remaining": "0", "x-ratelimit-reset": String(Date.now() / 1000 + 600) } });
+    if (options.secondary) return new Response('{"message":"You have exceeded a secondary rate limit."}', { status: 403, headers: { "x-ratelimit-remaining": "4000" } });
     const raw = url.match(/^https:\/\/raw\.githubusercontent\.com\/o\/r\/([0-9a-f]{40})\/(.+)$/);
     if (raw) {
       const path = raw[2].split("/").map(decodeURIComponent).join("/");
@@ -36,7 +37,7 @@ function github(files: Record<string, RepoFile>, options: { refs?: string[]; pri
     if (path === `/repos/o/r/git/trees/${ROOT}?recursive=1`) {
       const folders = new Set<string>();
       for (const name of Object.keys(files)) name.split("/").slice(0, -1).forEach((_, index, parts) => folders.add(parts.slice(0, index + 1).join("/")));
-      return json({ truncated: false, tree: [
+      return json({ truncated: options.truncated ?? false, tree: [
         ...[...folders].map(folder => ({ path: folder, mode: "040000", type: "tree", sha: "b".repeat(40) })),
         ...Object.entries(files).map(([name, file]) => ({ path: name, mode: file.mode ?? "100644", type: file.type ?? "blob",
           sha: blob(file), size: Buffer.byteLength(file.text) })),
@@ -116,4 +117,34 @@ test("the saved key is the folder name, then folder@agents", () => {
   assert.equal(githubSkillKey(skill, new Set(["pdf"])), "pdf@agents");
   assert.equal(githubSkillKey(skill, new Set(["pdf", "pdf@agents"])), "pdf@agents-2");
   assert.equal(githubSkillKey({ folder: "", repo: "o/My-Skill", name: "x" }, new Set()), "my-skill");
+  assert.equal(githubSkillKey({ folder: "x".repeat(250), repo: "o/r", name: "y".repeat(250) }, new Set()), null);
+});
+
+test("SKILL.md is read the way the Mac reads it, or refused with the reason", () => {
+  assert.deepEqual(skillMdHeader("---\nname:  My   Skill \ndescription: 'It''s  good' # note\n---\n"), { name: "My Skill", description: "It's good" });
+  assert.deepEqual(skillMdHeader('---\nname: "pdf"\ndescription: Read # and write\n---'), { name: "pdf", description: "Read" });
+  for (const [text, why] of [
+    ["\uFEFF---\nname: x\ndescription: y\n---", /doesn't start with a --- header/],
+    ["---\nname: x\n---", /has no description/],
+    ["---\nname: 123\ndescription: y\n---", /name isn't text/],
+    ["---\nname: >-\n  x\ndescription: y\n---", /name runs over several lines|form/],
+    ["---\nname: x\ndescription: \"a \\\" b\"\n---", /form it doesn't take/],
+    ["---\nname: x\nname: y\ndescription: y\n---", /two name lines/],
+  ] as const) {
+    assert.throws(() => skillMdHeader(text), (error) => error instanceof GithubImportError && why.test(error.message), text);
+  }
+});
+
+test("GitHub's secondary limits and slow reads say so", async () => {
+  await fails(read("https://github.com/o/r", github({ "SKILL.md": { text: skillMd("x") } }, { secondary: true })), "rate_limited");
+  const repo = github({ "SKILL.md": { text: skillMd("x") } });
+  await fails(readGithubSkill(parseGithubImportLink("github.com/o/r")!, { fetcher: repo.fetcher, token: "", deadline: Date.now() - 1 }),
+    "too_slow", /took too long/);
+  await fails(read("https://github.com/o/r", github({ "a/SKILL.md": { text: skillMd("a") } }, { truncated: true })), "several_skills", /too big to read whole/);
+});
+
+test("a pinned read checks the repo is still public", async () => {
+  const repo = github({ "pdf/SKILL.md": { text: skillMd("pdf") } }, { private: true });
+  await fails(readGithubSkill(parseGithubImportLink("https://github.com/o/r/tree/main/pdf")!,
+    { fetcher: repo.fetcher, token: "", pinned: { commitSha: COMMIT, folder: "pdf" } }), "not_found");
 });

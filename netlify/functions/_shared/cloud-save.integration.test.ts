@@ -1614,5 +1614,8 @@ test("a skill added from GitHub saves like a Mac's, with no device, and a Mac ca
     // The same skill again is refused; another skill in a same-name folder gets its own key.
     await refused(saveGithubSkill(pool, store, userId, skill("pdf", "x/pdf")), "already_added");
     assert.equal((await saveGithubSkill(pool, store, userId, skill("pdf-tools", "other/pdf"))).key, "pdf@agents");
+    // A save from no device never replaces a saved skill, even with a stale list of keys (two adds at once).
+    await rejects(saveCloudVersion(pool, { userId, deviceId: null, skillKey: "pdf", files: manifest(v1), skillName: "notes" }), "name_taken");
+    assert.equal((await readCloudSave(pool, userId)).skills.find((item) => item.key === "pdf")?.name, "pdf");
   });
 });

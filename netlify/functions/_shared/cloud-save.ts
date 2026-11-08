@@ -319,6 +319,11 @@ export async function readCloudRecordNames(db: Database, userId: string): Promis
  */
 async function checkSkillName(db: Database, input: { userId: string; deviceId: string | null; skillKey: string;
   skillName: string | null }, existing: { name: string | null; deviceId: string | null } | undefined) {
+  // A save from no device (a skill added on the web from GitHub) only ever starts a new skill, so two adds
+  // racing for one key can't replace each other.
+  if (existing && input.deviceId === null) {
+    throw new CloudSaveError("name_taken", "Another skill is saved under this key");
+  }
   const wanted = [];
   if (!input.skillName) wanted.push({ key: input.skillKey, deviceId: input.deviceId });
   const reportedHere = wanted.length ? await reportedNames(db, input.userId, wanted) : new Map<string, string>();
