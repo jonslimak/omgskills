@@ -8,7 +8,9 @@ test("search offers Add skill only for GitHub links", () => {
   for (const link of ["https://github.com/anthropics/skills", "github.com/a/b/tree/main/x", " http://www.github.com/a/b "]) {
     assert.equal(looksLikeGithubLink(link), true, link);
   }
-  for (const text of ["pdf", "github", "github.com/anthropics", "https://gitlab.com/a/b", "see github.com/a/b"]) {
+  assert.equal(looksLikeGithubLink("https://github.com/a/b/blob/main/skills/x/SKILL.md"), true);
+  for (const text of ["pdf", "github", "github.com/anthropics", "https://gitlab.com/a/b", "see github.com/a/b",
+    "github.com/a/b/issues/3", "https://github.com/a/b/blob/main/README.md", "https://github.com/a/b/tree/"]) {
     assert.equal(looksLikeGithubLink(text), false, text);
   }
 });
@@ -33,4 +35,7 @@ test("Add skill is on your own My skills only, beside Edit", () => {
   assert.match(source, /const findByGithubLink = signedIn && !readOnlyAccount && !management \? additions\?\.findByGithubLink : undefined;/);
   assert.match(source, /\{findByGithubLink && nav\.view === "all" && !nav\.id && !editing && <button/);
   assert.match(source, /\{githubLinkSearch \? \(/);
+  const dialog = readFileSync(new URL("../src/app/unified/AddSkillDialog.tsx", import.meta.url), "utf8");
+  assert.match(dialog, /<input autoFocus type="text"/, "a link without https:// can be submitted");
+  assert.match(dialog, /found\.link\.trim\(\) === link\.trim\(\)/, "results hide once the link is edited");
 });

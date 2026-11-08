@@ -39,7 +39,7 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
     <form onSubmit={event => { event.preventDefault(); find(link); }}>
       <label>
         GitHub link
-        <input autoFocus type="url" inputMode="url" value={link} maxLength={500} required
+        <input autoFocus type="text" inputMode="url" autoComplete="off" spellCheck={false} value={link} maxLength={500} required
           placeholder="https://github.com/owner/repo" onChange={event => setLink(event.target.value)} />
       </label>
       <p className="ua-muted">A repo, a folder or a SKILL.md.</p>
@@ -47,7 +47,8 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
         {found?.state === "loading" ? "Finding…" : "Find skills"}
       </button>
     </form>
-    {found && found.state !== "loading" && <div role="status" aria-live="polite">
+    {/* Results belong to the link they were found for; editing the link hides them until Find runs again. */}
+    {found && found.state !== "loading" && found.link.trim() === link.trim() && <div role="status" aria-live="polite">
       {found.state === "error" ? <p className="ua-add-skill-note">{found.message}</p>
         : !found.skills.length ? <p className="ua-add-skill-note">No library skills at that link yet. Adding other GitHub skills is coming soon.</p>
         : <ul className="ua-add-skill-list" aria-label="Skills at this link">

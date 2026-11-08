@@ -61,7 +61,10 @@ export async function findSkillsAtGithubLink(api: PortalApi, link: string, signa
   };
 }
 
-/** Whether text reads as a GitHub link (pasted in search, it offers "Add skill"). */
+/**
+ * Whether text reads as a GitHub link "Add skill" can read (pasted in search, it offers Add skill):
+ * a repo, a /tree/ folder or a /blob/…/SKILL.md, as the server takes them.
+ */
 export function looksLikeGithubLink(text: string) {
-  return /^\s*(https?:\/\/)?(www\.)?github\.com\/[^/\s]+\/[^/\s]+/i.test(text);
+  return /^\s*(https?:\/\/)?(www\.)?github\.com\/[\w.-]+\/[\w.-]+(\/?|\/tree\/[^\s?#]+|\/blob\/[^\s?#]+\/skill\.md)([?#]\S*)?\s*$/i.test(text);
 }
