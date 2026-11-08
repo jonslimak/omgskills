@@ -24,7 +24,7 @@ import { f2Cases, f2CaseNavigation, f2NavigationSearch, readF2CaseKey } from "./
 import { createPreviewCatalogStore, createPreviewInstallStore, PublicInstallSetup } from "./PublicInstallSetup";
 import { CatalogInstallSetup } from "../../app/unified/CatalogInstallSetup";
 import { previewCloudState } from "./cloud-fixture";
-import type { MySkillAddition } from "../../app/my-skills-additions";
+import type { MySkillAddition, PickedFolder } from "../../app/my-skills-additions";
 
 const installClient = import.meta.env.DEV ? previewInstallClient(import.meta.env.DEV,
   import.meta.env.VITE_NEWMAC_F1, import.meta.env.VITE_NEWMAC_SETUP_TEST, location.hostname) : null;
@@ -77,7 +77,20 @@ function Preview() {
         files: [{ path: "SKILL.md", bytes: 1024 }, { path: "scripts/run.sh", bytes: 1024 }],
         blocker: /taken/i.test(link) ? `You already have a skill named "${name}" in My skills.` : null };
     },
-    addGithubSkill: async (preview: { name: string }) => ({ key: preview.name.toLowerCase(), name: preview.name }) };
+    addGithubSkill: async (preview: { name: string }) => ({ key: preview.name.toLowerCase(), name: preview.name }),
+    // A folder from this computer, read here instead of on the server: its SKILL.md name, or why it can't be added.
+    previewUpload: async (folder: PickedFolder) => {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const skillMd = folder.files.find(item => item.path === "SKILL.md");
+      if (!skillMd) throw new PortalApiError("No SKILL.md in this folder, so it isn't a skill.", 422);
+      const text = await skillMd.file.text();
+      const name = text.match(/^name:\s*(.+)$/m)?.[1]?.trim() || folder.name || "skill";
+      return { link: "", repo: "", commitSha: "", folder: folder.name, name, description: text.match(/^description:\s*(.+)$/m)?.[1]?.trim() ?? null,
+        skillMd: text, skillMdTruncated: false, labels: [], fileCount: folder.files.length,
+        totalBytes: folder.files.reduce((sum, item) => sum + item.file.size, 0),
+        files: folder.files.map(item => ({ path: item.path, bytes: item.file.size })), blocker: null };
+    },
+    addUpload: async (folder: PickedFolder) => ({ key: folder.name || "skill", name: folder.name || "skill" }) };
   const [signedOutNav, setSignedOutNav] = useState<Navigation | null>(null);
   const [liveCatalog, setLiveCatalog] = useState(true);
   const publicData = usePublicCatalog(publicClient, nav, liveCatalog);

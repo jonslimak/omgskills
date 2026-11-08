@@ -2885,6 +2885,10 @@ main:has(> .ua-az-anchor) .ua-content {
 /* A GitHub skill that isn't in the library, shown before it is added. */
 .ua-github-skill { display: flex; flex-direction: column; gap: 10px; }
 .ua-github-skill-head { display: flex; align-items: flex-start; gap: 10px; }
+.ua-add-skill-upload { display: flex; flex-direction: column; gap: 10px; padding-top: 14px; border-top: 1px solid var(--ua-line); }
+.ua-add-skill-upload > p { margin: 0; }
+.ua-add-skill-upload-buttons { display: flex; gap: 8px; }
+.ua-add-skill-upload-buttons > .ua-pill { flex: 1; justify-content: center; }
 .ua-add-skill-loading[hidden] { display: none; }
 .ua-add-skill-loading { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 40px; margin: 0;
   color: var(--ua-muted); }

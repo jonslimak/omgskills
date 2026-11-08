@@ -156,7 +156,7 @@ async function folderEntries(repoPath: string, rootTree: string, folder: string,
   return inside.tree ?? [];
 }
 
-const tooLarge = () => new GithubImportError("too_large",
+export const tooLarge = () => new GithubImportError("too_large",
   `This skill is too big to add (up to ${CLOUD_SAVE_LIMITS.maximumFileCount} files and ${CLOUD_SAVE_LIMITS.maximumTotalBytes / 1024 / 1024} MB).`, 413);
 
 /** Yams's default resolver rules for null, bool, int, float and timestamp (Resolver.swift); a plain value matching one isn't text on the Mac. */
@@ -265,15 +265,11 @@ export async function readGithubSkill(
     target = await resolveLink(link, options);
   }
   let blobs = (await folderEntries(target.repoPath, target.rootTree, target.folder, options)).filter(entry => entry.type !== "tree");
-  if (!blobs.some(entry => entry.path === "SKILL.md")) {
-    const nested = blobs.flatMap(entry => entry.path?.endsWith("/SKILL.md") ? [entry.path.slice(0, -"/SKILL.md".length)] : []);
-    if (nested.length > 1) throw new GithubImportError("several_skills",
-      `This ${target.folder ? "folder" : "repo"} has ${nested.length} skills. Paste the link to one skill's folder.`);
-    if (!nested.length) throw new GithubImportError("no_skill", `No SKILL.md in this ${target.folder ? "folder" : "repo"}, so it isn't a skill.`);
-    // The only skill here is in a folder below: that is the skill the link means.
-    const prefix = `${nested[0]}/`;
+  const below = skillFolderIn(blobs.map(entry => entry.path!), target.folder ? "folder" : "repo", "Paste the link to one skill's folder.");
+  if (below) {
+    const prefix = `${below}/`;
     blobs = blobs.filter(entry => entry.path!.startsWith(prefix)).map(entry => ({ ...entry, path: entry.path!.slice(prefix.length) }));
-    target = { ...target, folder: target.folder ? `${target.folder}/${nested[0]}` : nested[0] };
+    target = { ...target, folder: target.folder ? `${target.folder}/${below}` : below };
   }
   if (blobs.length > CLOUD_SAVE_LIMITS.maximumFileCount) throw tooLarge();
   let declared = 0;
@@ -319,6 +315,23 @@ export async function readGithubSkill(
     if (!data) throw fetchFailed(options);
     return { path: entry.path!, mode: entry.mode!, blobSha: entry.sha!.toLowerCase(), data };
   });
+  return { repo: `${owner}/${repo}`, commitSha: target.commitSha, folder: target.folder, ...checkSkillFiles(files) };
+}
+
+/**
+ * Where the skill is among a folder's file paths: "" when SKILL.md is at the top, else the one folder below that
+ * holds a SKILL.md (that is the skill meant). Several, or none, are refused.
+ */
+export function skillFolderIn(paths: string[], what: "folder" | "repo", pickOne: string): string {
+  if (paths.includes("SKILL.md")) return "";
+  const nested = paths.flatMap(path => path.endsWith("/SKILL.md") ? [path.slice(0, -"/SKILL.md".length)] : []);
+  if (nested.length > 1) throw new GithubImportError("several_skills", `This ${what} has ${nested.length} skills. ${pickOne}`);
+  if (!nested.length) throw new GithubImportError("no_skill", `No SKILL.md in this ${what}, so it isn't a skill.`);
+  return nested[0];
+}
+
+/** A skill's files checked the way cloud save checks a Mac's upload: valid package, no secrets, a readable SKILL.md. */
+export function checkSkillFiles(files: GithubSkillFile[]): Pick<GithubSkill, "name" | "description" | "skillMd" | "labels" | "files" | "totalBytes"> {
   const manifest = manifestOf(files);
   try {
     validateSkillManifest(manifest, CLOUD_SAVE_LIMITS);
@@ -345,8 +358,7 @@ export async function readGithubSkill(
   }
   const { name, description } = skillMdHeader(skillMd);
   return {
-    repo: `${owner}/${repo}`, commitSha: target.commitSha, folder: target.folder, name,
-    description, skillMd, labels: combineLabels(labels), files,
+    name, description, skillMd, labels: combineLabels(labels), files,
     totalBytes: files.reduce((sum, file) => sum + file.data.byteLength, 0),
   };
 }

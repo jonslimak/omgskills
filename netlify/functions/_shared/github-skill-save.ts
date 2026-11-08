@@ -21,7 +21,24 @@ export function githubSkillKey(skill: Pick<GithubSkill, "folder" | "repo" | "nam
   return null;
 }
 
-const SYNC_OFF = "Sync is off. Turn on Sync My skills (menu → Sync) to add skills from GitHub.";
+const SYNC_OFF = "Sync is off. Turn on Sync My skills (menu → Sync) to add skills here.";
+const MAX_SKILL_MD_CHARS = 20_000;
+const MAX_LISTED_FILES = 100;
+
+/** What the web shows before adding: the skill, its files, and anything that stops it being added. */
+export async function skillPreview(pool: Pool, userId: string, skill: GithubSkill) {
+  const [settings, records] = await Promise.all([readCloudSaveSettings(pool, userId), readCloudRecordNames(pool, userId)]);
+  const blocker = !settings.enabled ? SYNC_OFF
+    : records.some(record => record.name === cloudNameKey(skill.name)) ? `You already have a skill named "${skill.name}" in My skills.`
+    : null;
+  return {
+    repo: skill.repo, commitSha: skill.commitSha, folder: skill.folder, name: skill.name, description: skill.description,
+    skillMd: skill.skillMd.slice(0, MAX_SKILL_MD_CHARS), skillMdTruncated: skill.skillMd.length > MAX_SKILL_MD_CHARS,
+    labels: skill.labels, fileCount: skill.files.length, totalBytes: skill.totalBytes,
+    files: skill.files.slice(0, MAX_LISTED_FILES).map(file => ({ path: file.path, bytes: file.data.byteLength })),
+    blocker,
+  };
+}
 
 // Refusals use 409, never 403: the web treats 403 as lost access.
 export async function saveGithubSkill(pool: Pool, store: CloudObjectStore, userId: string, skill: GithubSkill) {

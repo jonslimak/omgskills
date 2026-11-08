@@ -18,7 +18,7 @@ import { McpPanel } from "../../app/unified/McpPanel";
 import { CloudSavePanel } from "../../cloud-save/CloudSavePanel";
 import { confirmCloudReview, loadCloudSave, loadSavedSkillMd, loadSavedVersions, loadSharedSkillMd, type CloudSaveState } from "../../cloud-save/cloud-save";
 import type { CloudInfo } from "../../app/unified/CloudStatus";
-import { addGithubSkill, addMySkill, findSkillsAtGithubLink, loadMySkillAdditions, previewGithubSkill, removeMySkill, type GithubSkillPreview,
+import { addGithubSkill, addMySkill, addUpload, previewUpload, type PickedFolder, findSkillsAtGithubLink, loadMySkillAdditions, previewGithubSkill, removeMySkill, type GithubSkillPreview,
   type MySkillAddition, type MySkillAdditions } from "../../app/my-skills-additions";
 import { ProfilePanel } from "./ProfilePanel";
 import { entryNavigation, staticPageAddress, unknownAppAddress } from "./entry-navigation";
@@ -123,6 +123,8 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean, cloudChanged: () 
     previewGithubSkill: (link: string, signal?: AbortSignal) => previewGithubSkill(apiRef.current, link, signal),
     // A GitHub skill is saved like a synced one, so the synced list reloads to show it.
     addGithubSkill: async (preview: GithubSkillPreview) => { const saved = await addGithubSkill(apiRef.current, preview); cloudChanged(); return saved; },
+    previewUpload: (folder: PickedFolder, signal?: AbortSignal) => previewUpload(apiRef.current, folder, signal),
+    addUpload: async (folder: PickedFolder) => { const saved = await addUpload(apiRef.current, folder); cloudChanged(); return saved; },
   } : undefined, [skills, pending, change, cloudChanged]);
   return { additions, loaded };
 }
