@@ -28,7 +28,17 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
   const [link, setLink] = useState(initialLink);
   const [found, setFound] = useState<Found | null>(null);
   const request = useRef<AbortController | null>(null);
+  const input = useRef<HTMLInputElement>(null);
+  const loading = found?.state === "loading";
+  // The Find button is gone while a link is read; if it had focus, focus returns to the link field after.
+  const refocus = useRef(false);
+  useEffect(() => {
+    if (loading || !refocus.current) return;
+    refocus.current = false;
+    if (!(document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLButtonElement)) input.current?.focus();
+  }, [loading]);
   const find = (value: string) => {
+    refocus.current = document.activeElement instanceof HTMLButtonElement && document.activeElement.type === "submit";
     request.current?.abort();
     if (!value.trim()) { setFound(null); return; }
     const controller = new AbortController();
@@ -74,17 +84,19 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
       .finally(() => { adding.current = false; });
   };
   return <div className="ua-add-skill">
-    <form onSubmit={event => { event.preventDefault(); find(link); }}>
+    {/* Enter submits a form with no button too, so a read in progress is never restarted from here. */}
+    <form onSubmit={event => { event.preventDefault(); if (!loading) find(link); }}>
       <label>
         GitHub link
-        <input autoFocus type="text" inputMode="url" autoComplete="off" spellCheck={false} value={link} maxLength={500} required
+        <input ref={input} autoFocus type="text" inputMode="url" autoComplete="off" spellCheck={false} value={link} maxLength={500} required
           placeholder="https://github.com/owner/repo" onChange={event => setLink(event.target.value)} />
       </label>
       <p className="ua-muted">A repo, a folder or a SKILL.md.</p>
-      {/* While a link is read the button gives way to a spinner, so a second Find can't start. */}
-      {found?.state === "loading"
-        ? <div className="ua-add-skill-loading" role="status"><span className="ua-loader" aria-hidden="true" />Inspecting skill…</div>
-        : <button type="submit" className="ua-pill ua-primary" disabled={!link.trim()}>Find skills</button>}
+      {/* While a link is read the button gives way to a spinner. The status stays mounted so its text is announced. */}
+      <div className="ua-add-skill-loading" role="status" hidden={!loading}>
+        {loading && <><span className="ua-loader" aria-hidden="true" />Inspecting &amp; verifying skill…</>}
+      </div>
+      {!loading && <button type="submit" className="ua-pill ua-primary" disabled={!link.trim()}>Find skills</button>}
     </form>
     {/* Results belong to the link they were found for; editing the link hides them until Find runs again. */}
     {found && found.state !== "loading" && found.link.trim() === link.trim() && <div role="status" aria-live="polite">

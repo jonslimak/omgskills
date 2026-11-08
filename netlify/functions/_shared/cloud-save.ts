@@ -731,7 +731,7 @@ export async function saveCloudVersion(
     expectedTreeSha?: unknown;
     /** The skill's SKILL.md name. Macs before names were kept leave it out. */
     skillName?: unknown;
-    /** The SKILL.md description, for a skill added from GitHub; Macs leave it out and keep any already saved. */
+    /** The SKILL.md description, for a skill added from GitHub; a Mac's save leaves it out and clears any saved one. */
     skillDescription?: string | null;
   }
 ): Promise<SaveCloudVersionResult> {
@@ -879,11 +879,14 @@ export async function saveCloudVersion(
         ON CONFLICT (source_id) DO UPDATE SET
           current_release_id = EXCLUDED.current_release_id,
           skill_name = COALESCE(EXCLUDED.skill_name, cloud_saved_skills.skill_name),
-          skill_description = COALESCE(EXCLUDED.skill_description, cloud_saved_skills.skill_description),
+          -- A Mac's save may have changed SKILL.md, so a description kept from GitHub is dropped then.
+          skill_description = CASE WHEN EXCLUDED.skill_description IS NOT NULL THEN EXCLUDED.skill_description
+            WHEN $7::boolean THEN NULL ELSE cloud_saved_skills.skill_description END,
           deleted_locally_at = NULL,
           updated_at = now()
       `,
-      [sourceId, input.userId, skillKey, releaseId, keptName, input.skillDescription?.slice(0, MAX_SAVED_DESCRIPTION) || null]
+      [sourceId, input.userId, skillKey, releaseId, keptName, input.skillDescription?.slice(0, MAX_SAVED_DESCRIPTION) || null,
+        input.deviceId !== null]
     );
     await client.query("DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2", [input.userId, skillKey]);
     await client.query("COMMIT");
