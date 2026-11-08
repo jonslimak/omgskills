@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { Activity, ArrowRight, Braces, Check, Copy, Database, Globe, Package, ShieldCheck, type LucideIcon } from "lucide-react";
+import { MY_SKILLS_MCP_URL } from "./McpPanel";
+import { Activity, ArrowRight, Braces, Check, Copy, Database, Globe, Package, ShieldCheck, UserRound, type LucideIcon } from "lucide-react";
 
 // The app's version of the static /developers/ page (scripts/build-web-library.mjs,
 // renderDevelopersPage); keep the two in step.
@@ -52,6 +53,12 @@ export function DevelopersPage() {
         <p>Public, read-only, no authentication. Available tools: <code>search_skills</code>, <code>get_skill</code>,{" "}
           <code>get_install_plan</code>, <code>get_skill_content</code>, <code>related_skills</code>, and more.</p>
       </Card>
+      <Card icon={UserRound} title="My skills MCP (your library)">
+        <CopyValue value={MY_SKILLS_MCP_URL} />
+        <p>Your own skills for your agents, read only. Add this address as a custom connector or MCP server (Claude, ChatGPT, Cursor, Codex, Grok), then sign in to omgskills. Tools: <code>search_my_skills</code>,{" "}
+          <code>read_my_skill</code>, <code>read_skill_file</code>. Skills that can't sync, or that contain a key or password,
+          are never shared. See and disconnect agents in the app under MCP.</p>
+      </Card>
       <Card icon={Package} title="npm local MCP">
         <CopyValue value="npx -y omgskills-mcp" />
         <pre>{localConfig}</pre>
@@ -74,7 +81,8 @@ export function DevelopersPage() {
       <Card icon={ShieldCheck} title="Links & safety">
         <Item title="npm package" href="https://www.npmjs.com/package/omgskills-mcp">Install the local MCP server.</Item>
         <Item title="Source" href="https://github.com/jonslimak/omgskills">Repository, documentation, and issue tracking.</Item>
-        <Item title="Safety">The MCP tools only read public catalog data. They do not install skills, write files, run shell commands, or receive private skill content.</Item>
+        <Item title="Safety">The public MCP tools only read public catalog data. The My skills MCP reads only your own skills, after you sign in.
+          Neither installs skills, writes files, or runs shell commands.</Item>
       </Card>
     </div>
   </div>;
