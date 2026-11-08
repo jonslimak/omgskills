@@ -202,5 +202,7 @@ test("detail pane and sheet share the 1024px boundary and aligned header grid", 
   assert.ok(header.includes('label="Close skill details"'));
   assert.ok(source.includes('title={`Open ${skill.name} details`}'));
   assert.ok(source.includes('<ChevronRight aria-hidden="true" />'));
-  assert.equal((source.match(/aria-label="Go to Discover"/g) ?? []).length, 2);
+  // Both logos are home: My skills when signed in, Discover when not.
+  assert.equal((source.match(/aria-label=\{signedIn \? "Go to My skills" : "Go to Discover"\}/g) ?? []).length, 2);
+  assert.equal((source.match(/go\(signedIn \? "all" : "discover"\)/g) ?? []).length, 2);
 });

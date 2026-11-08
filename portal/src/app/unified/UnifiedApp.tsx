@@ -1328,7 +1328,8 @@ export function UnifiedApp({
         data-detail={!!selected && wide}
       >
         <aside className="ua-sidebar" aria-label="Main navigation">
-          <button type="button" className="ua-brand" aria-label="Go to Discover" onClick={() => go("discover")}>
+          {/* The logo is home: My skills when signed in, Discover otherwise. */}
+          <button type="button" className="ua-brand" aria-label={signedIn ? "Go to My skills" : "Go to Discover"} onClick={() => go(signedIn ? "all" : "discover")}>
             <span aria-hidden="true">👀</span>
             <strong>omgskills</strong>
           </button>
@@ -1433,7 +1434,8 @@ export function UnifiedApp({
         </aside>
         <div className="ua-content-column">
           <header className="ua-mobile-header">
-            <button type="button" className="ua-mobile-logo" aria-label="Go to Discover" onClick={() => go("discover")}>👀</button>
+            <button type="button" className="ua-mobile-logo" aria-label={signedIn ? "Go to My skills" : "Go to Discover"}
+              onClick={() => go(signedIn ? "all" : "discover")}>👀</button>
             {search(true)}
             {signedIn ? <Dialog.Root open={drawerOpen} onOpenChange={open => {
               if (open) drawerNavigating.current = false;
