@@ -2888,4 +2888,6 @@ main:has(> .ua-az-anchor) .ua-content {
   /* Narrow screens: Add skill is just its + icon, so the heading keeps its width. */
   .ua-heading-actions > .ua-pill.ua-add-skill-button { width: 28px; padding-inline: 0; justify-content: center; }
   .ua-add-skill-label { display: none; }
+  /* The Show filter drops its "Show" label on phones; the select says what it filters. */
+  .ua-heading-actions .ua-filter-label { display: none; }
 }
