@@ -81,9 +81,10 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
           placeholder="https://github.com/owner/repo" onChange={event => setLink(event.target.value)} />
       </label>
       <p className="ua-muted">A repo, a folder or a SKILL.md.</p>
-      <button type="submit" className="ua-pill ua-primary" disabled={!link.trim() || found?.state === "loading"}>
-        {found?.state === "loading" ? "Finding…" : "Find skills"}
-      </button>
+      {/* While a link is read the button gives way to a spinner, so a second Find can't start. */}
+      {found?.state === "loading"
+        ? <div className="ua-add-skill-loading" role="status"><span className="ua-loader" aria-hidden="true" />Inspecting skill…</div>
+        : <button type="submit" className="ua-pill ua-primary" disabled={!link.trim()}>Find skills</button>}
     </form>
     {/* Results belong to the link they were found for; editing the link hides them until Find runs again. */}
     {found && found.state !== "loading" && found.link.trim() === link.trim() && <div role="status" aria-live="polite">
@@ -124,11 +125,15 @@ function GithubSkill({ result, onAdd }: { result: GithubResult; onAdd: (preview:
     Open it there to install it on a Mac.</p>;
   const { preview } = result;
   const where = `github.com/${preview.repo}${preview.folder ? `/${preview.folder}` : ""}`;
+  const owner = preview.repo.split("/")[0] ?? "";
   return <div className="ua-github-skill">
-    <span className="ua-add-skill-text">
-      <strong>{preview.name}</strong>
-      {preview.description && <small>{preview.description}</small>}
-    </span>
+    <div className="ua-github-skill-head">
+      <Avatar src={owner ? `https://github.com/${encodeURIComponent(owner)}.png?size=80` : undefined} name={owner || preview.name} />
+      <span className="ua-add-skill-text">
+        <strong>{preview.name}</strong>
+        {preview.description && <small>{preview.description}</small>}
+      </span>
+    </div>
     <p className="ua-muted">Not in the library. From {where} · {preview.fileCount} file{preview.fileCount === 1 ? "" : "s"},{" "}
       {formatBytes(preview.totalBytes)}. Added as it is now; it won't update by itself.</p>
     {preview.labels.length > 0 && <ul className="ua-github-skill-labels" aria-label="Check before adding">

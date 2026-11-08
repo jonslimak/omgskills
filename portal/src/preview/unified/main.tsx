@@ -66,9 +66,12 @@ function Preview() {
       : { skills: [], more: false },
     // Sample GitHub skills outside the library: "secret" can't be read, "taken" is already added, the rest preview.
     previewGithubSkill: async (link: string) => {
+      // Slow like a real GitHub read, so the spinner shows.
+      await new Promise(resolve => setTimeout(resolve, 2500));
       if (/secret/i.test(link)) throw new PortalApiError("\"config.env\" line 3 looks like a password or key (AWS secret key), so the skill wasn't added.", 422);
       const name = link.replace(/\/+$/, "").split("/").at(-1) || "skill";
-      return { link, repo: "someone/skills", commitSha: "c".repeat(40), folder: `skills/${name}`, name,
+      const repo = link.match(/github\.com\/([^/]+\/[^/?#]+)/i)?.[1] ?? "someone/skills";
+      return { link, repo, commitSha: "c".repeat(40), folder: `skills/${name}`, name,
         description: `Helps with ${name}.`, skillMd: `---\nname: ${name}\ndescription: Helps with ${name}.\n---\n# ${name}\n\nSteps…\n`,
         skillMdTruncated: false, labels: ["scripts"], fileCount: 2, totalBytes: 2048,
         files: [{ path: "SKILL.md", bytes: 1024 }, { path: "scripts/run.sh", bytes: 1024 }],

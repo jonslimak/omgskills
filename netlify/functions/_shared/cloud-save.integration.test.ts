@@ -1607,7 +1607,7 @@ test("a skill added from GitHub saves like a Mac's, with no device, and a Mac ca
     await updateCloudSaveSettings(pool, userId, { enabled: true });
     assert.deepEqual(await saveGithubSkill(pool, store, userId, skill("PDF", "skills/pdf")), { key: "pdf", name: "PDF" });
     const saved = (await readCloudSave(pool, userId)).skills;
-    assert.deepEqual(saved.map((item) => [item.key, item.name, item.currentVersion.deviceId]), [["pdf", "pdf", null]]);
+    assert.deepEqual(saved.map((item) => [item.key, item.name, item.description, item.currentVersion.deviceId]), [["pdf", "pdf", "d", null]]);
     const loaded = await loadCloudVersionPackage(pool, store, { userId, releaseId: saved[0].currentVersion.id });
     assert.deepEqual(loaded.package.entries.map((entry) => [entry.path, entry.mode]).sort(), [["SKILL.md", "100644"], ["run.sh", "100755"]]);
 

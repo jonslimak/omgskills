@@ -4,6 +4,7 @@ import { PortalApiError } from "../src/api-error";
 import { cloudSkillKey, cloudSkillRows, deleteCloudSaved, loadSavedSkillMd, formatBytes, isDeletingAllCloudSkills, isDeletingCloudSkill, loadCloudSave, type CloudSaveState } from "../src/cloud-save/cloud-save";
 import type { SyncedSkill } from "../src/synced-skill-grouping";
 import { savedSkillKeys } from "../src/app/unified/SkillReadme";
+import { notInstalledSkills } from "../src/app/unified/model";
 
 const installed = (name: string, extra: Partial<SyncedSkill> = {}): SyncedSkill => ({
   id: name, name, description: null, githubUrl: null, isLocalOnly: true, source: "claude", lastSeenAt: "2026-11-01", ...extra,
@@ -287,4 +288,11 @@ test("removing from My skills names the skill in the query, since catalog IDs co
   const calls: [string, RequestInit | undefined][] = [];
   await removeMySkill((async (path: string, init?: RequestInit) => { calls.push([path, init]); return {}; }) as never, "owner/repo:skill");
   assert.deepEqual(calls, [["/api/portal/my-skills?catalogSkillId=owner%2Frepo%3Askill", { method: "DELETE" }]]);
+});
+
+test("a skill added from GitHub shows its saved description before any Mac has it", () => {
+  const rows = cloudSkillRows(state({ skills: [{ ...saved("prompt-architect"), description: "Improves prompts" }, saved("notes")] }), []);
+  assert.deepEqual(rows.map(row => [row.key, row.description]), [["notes", ""], ["prompt-architect", "Improves prompts"]]);
+  const shown = notInstalledSkills(rows, [], [], () => []);
+  assert.equal(shown.find(skill => skill.cloudKey === "prompt-architect")?.description, "Improves prompts");
 });

@@ -42,7 +42,7 @@ const cloud = {
   settings: { enabled: true, excludedSkillKeys: ["left-out"] },
   usage: { bytes: 0, limitBytes: 1 },
   skills: [saved("notes"), saved("pdf"), saved("gone-now", { deletedLocallyAt: recent }), saved("old-legacy"),
-    saved("only-saved"), saved("twin-a"), saved("confirmed", { labels: ["confirmed_secret"] })],
+    saved("only-saved"), { ...saved("from-github"), description: "Added from GitHub" }, saved("twin-a"), saved("confirmed", { labels: ["confirmed_secret"] })],
   needsReview: [{ key: "secrets", deviceId: "mac-a", files: [], confirmed: false, updatedAt: recent }],
   skipped: { big: "too_large" },
 };
@@ -78,6 +78,7 @@ test("the server builds the same My skills list and count as the web", () => {
     server.skills.map(skill => shape(skill, skill.installed, skill.status)).sort(),
     web.all.map(skill => shape(skill, !!skill.installed, web.status(skill))).sort());
   assert.equal(new Set(server.skills.map(skill => skill.id)).size, server.skills.length, "IDs are unique");
+  assert.equal(server.skills.find(skill => skill.id === "key:from-github")?.description, "Added from GitHub");
 });
 
 test("what an agent may read of each skill", () => {

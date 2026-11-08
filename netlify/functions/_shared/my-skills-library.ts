@@ -85,7 +85,7 @@ function keysOf(copies: SyncedSkill[]) {
   return [...new Set(copies.map(copyKey))];
 }
 
-type CloudRow = { key: string; name: string; status: LibraryCloudStatus; savedAt: string | null; confirmedSecret: boolean;
+type CloudRow = { key: string; name: string; description: string | null; status: LibraryCloudStatus; savedAt: string | null; confirmedSecret: boolean;
   onMac: boolean; origin: "library" | "set" | null };
 
 const statusOrder: Record<LibraryCloudStatus, number> = {
@@ -132,7 +132,7 @@ function cloudRows(state: CloudSaveState, installed: SyncedSkill[]): Map<string,
       : state.skipped[key] ?? "waiting";
     const status = found === "library" && fromLibrary.has(key) && !fromCatalog.has(key) ? "set" : found;
     return [key, {
-      key, name: label(key), status, savedAt: copy?.currentVersion.savedAt ?? null,
+      key, name: label(key), description: copy?.description ?? null, status, savedAt: copy?.currentVersion.savedAt ?? null,
       confirmedSecret: !!copy?.currentVersion.labels?.includes("confirmed_secret"),
       onMac: names.has(key), origin: fromCatalog.has(key) ? "library" : fromLibrary.has(key) ? "set" : null,
     }];
@@ -228,7 +228,7 @@ export function buildMySkills(input: MySkillsInputs): MySkillsLibrary {
     return {
       id: catalogId ? `lib:${catalogId}` : `key:${row.key}`,
       name: from?.name ?? row.name,
-      description: from?.description || "",
+      description: from?.description || row.description || "",
       author: from ? (catalogId ? catalog.get(catalogId)?.author || catalogOwner(catalogId) : "") : "",
       catalogId,
       githubUrl: from?.githubUrl ?? null,

@@ -48,7 +48,8 @@ export async function saveGithubSkill(pool: Pool, store: CloudObjectStore, userI
       const key = githubSkillKey(skill, taken);
       if (!key) throw new GithubImportError("unsupported_file", "This skill's folder name can't be used as a skill name.", 422);
       try {
-        const saved = await saveCloudVersion(pool, { userId, deviceId: null, skillKey: key, files: manifestOf(skill.files), skillName: skill.name });
+        const saved = await saveCloudVersion(pool, { userId, deviceId: null, skillKey: key, files: manifestOf(skill.files), skillName: skill.name,
+          skillDescription: skill.description });
         if (saved.status !== "saved") throw new GithubImportError("unavailable", "The skill couldn't be saved. Try again.", 503);
         return { key: saved.skill.key, name: skill.name };
       } catch (error) {

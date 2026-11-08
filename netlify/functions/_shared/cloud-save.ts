@@ -140,6 +140,8 @@ export type CloudSavedSkill = {
   key: string;
   /** The skill's SKILL.md name as cloud save compares it; null when saved before names were kept. */
   name: string | null;
+  /** The SKILL.md description, kept only for skills added from GitHub; a Mac's report gives it otherwise. */
+  description: string | null;
   currentVersion: CloudSavedVersion;
   versionCount: number;
   deletedLocallyAt: string | null;
@@ -160,6 +162,8 @@ export type CloudSkillReview = {
 export type CloudSkipReason = "library" | "links" | "too_large" | "unreadable" | "failed";
 const SKIP_REASONS: readonly CloudSkipReason[] = ["library", "links", "too_large", "unreadable", "failed"];
 const MAX_SKIP_REPORT_KEYS = 2000;
+
+const MAX_SAVED_DESCRIPTION = 2000;
 
 export type CloudSaveState = {
   settings: CloudSaveSettings;
@@ -342,11 +346,12 @@ export async function readCloudSave(db: Database, userId: string): Promise<Cloud
   const [settings, bytes, skills, needsReview, skipped] = await Promise.all([
     readCloudSaveSettings(db, userId),
     usedBytes(db, userId),
-    db.query<CloudSavedVersion & { key: string; name: string | null; versionCount: number; deletedLocallyAt: string | null; setCount: number }>(
+    db.query<CloudSavedVersion & { key: string; name: string | null; description: string | null; versionCount: number; deletedLocallyAt: string | null; setCount: number }>(
       `
         SELECT
           saved.skill_key AS key,
           saved.skill_name AS name,
+          saved.skill_description AS description,
           to_char(saved.deleted_locally_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "deletedLocallyAt",
           (SELECT count(*)::int FROM skill_releases WHERE source_id = saved.source_id) AS "versionCount",
           (SELECT count(DISTINCT item.group_id)::int FROM skill_group_items item WHERE item.source_id = saved.source_id) AS "setCount",
@@ -369,9 +374,10 @@ export async function readCloudSave(db: Database, userId: string): Promise<Cloud
     needsReview,
     skipped,
     usage: { bytes, limitBytes: CLOUD_SAVE_LIMITS.maximumUserBytes },
-    skills: skills.rows.map(({ key, name, versionCount, deletedLocallyAt, setCount, ...version }) => ({
+    skills: skills.rows.map(({ key, name, description, versionCount, deletedLocallyAt, setCount, ...version }) => ({
       key,
       name: name ?? reported.get(key) ?? null,
+      description,
       versionCount,
       deletedLocallyAt,
       setCount,
@@ -725,6 +731,8 @@ export async function saveCloudVersion(
     expectedTreeSha?: unknown;
     /** The skill's SKILL.md name. Macs before names were kept leave it out. */
     skillName?: unknown;
+    /** The SKILL.md description, for a skill added from GitHub; Macs leave it out and keep any already saved. */
+    skillDescription?: string | null;
   }
 ): Promise<SaveCloudVersionResult> {
   const skillKey = normalizeSkillKey(input.skillKey);
@@ -866,15 +874,16 @@ export async function saveCloudVersion(
     );
     await client.query(
       `
-        INSERT INTO cloud_saved_skills (source_id, user_id, skill_key, current_release_id, skill_name)
-        VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO cloud_saved_skills (source_id, user_id, skill_key, current_release_id, skill_name, skill_description)
+        VALUES ($1, $2, $3, $4, $5, $6)
         ON CONFLICT (source_id) DO UPDATE SET
           current_release_id = EXCLUDED.current_release_id,
           skill_name = COALESCE(EXCLUDED.skill_name, cloud_saved_skills.skill_name),
+          skill_description = COALESCE(EXCLUDED.skill_description, cloud_saved_skills.skill_description),
           deleted_locally_at = NULL,
           updated_at = now()
       `,
-      [sourceId, input.userId, skillKey, releaseId, keptName]
+      [sourceId, input.userId, skillKey, releaseId, keptName, input.skillDescription?.slice(0, MAX_SAVED_DESCRIPTION) || null]
     );
     await client.query("DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND skill_key = $2", [input.userId, skillKey]);
     await client.query("COMMIT");
