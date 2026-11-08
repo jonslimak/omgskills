@@ -625,7 +625,8 @@ export function UnifiedApp({
     ? data.sets.filter((set) => (!set.hidden || (showHidden && nav.view === "sets")) && !set.isFavorites)
     : [];
   // "Add skill" (GitHub link) is for your own My skills.
-  const findByGithubLink = signedIn && !readOnlyAccount && !management ? additions?.findByGithubLink : undefined;
+  // Signed-in accounts that can edit My skills (the live app always passes management).
+  const findByGithubLink = signedIn && (!readOnlyAccount || !!management) ? additions?.findByGithubLink : undefined;
   const githubLinkSearch = !!findByGithubLink && looksLikeGithubLink(nav.query);
   const openAddSkill = (link = "") => { setAddSkillLink(link); setDialog("add-skill"); };
   const editableView =
