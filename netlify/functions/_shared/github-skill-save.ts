@@ -29,9 +29,8 @@ export async function saveGithubSkill(pool: Pool, store: CloudObjectStore, userI
   if (!settings.enabled) throw new GithubImportError("sync_off", SYNC_OFF, 409);
   const records = await readCloudRecordNames(pool, userId);
   const name = cloudNameKey(skill.name);
-  if (records.some(record => record.name === name)) {
-    throw new GithubImportError("already_added", `You already have a skill named "${skill.name}" in My skills.`, 409);
-  }
+  const alreadyAdded = () => new GithubImportError("already_added", `You already have a skill named "${skill.name}" in My skills.`, 409);
+  if (records.some(record => record.name === name)) throw alreadyAdded();
   // Keys held by saved skills, skills left out of sync, and Mac saves waiting for review are all taken.
   const reviews = await pool.query<{ key: string }>("SELECT skill_key AS key FROM cloud_skill_reviews WHERE user_id = $1", [userId]);
   const taken = new Set([...records.map(record => record.key), ...settings.excludedSkillKeys, ...reviews.rows.map(row => row.key)]);
@@ -54,6 +53,8 @@ export async function saveGithubSkill(pool: Pool, store: CloudObjectStore, userI
         return { key: saved.skill.key, name: skill.name };
       } catch (error) {
         if (!(error instanceof CloudSaveError && error.code === "name_taken")) throw error;
+        // The key was taken meanwhile: by this same skill (a second tab or click), or by another one.
+        if ((await readCloudRecordNames(pool, userId)).some(record => record.name === name)) throw alreadyAdded();
         taken.add(key);
       }
     }

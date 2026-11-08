@@ -60,14 +60,18 @@ export function AddSkillForm({ additions, initialLink = "", notify }: {
   // An add's result belongs to the link it was made from; a search for another link meanwhile keeps its own results.
   const setGithub = (forLink: string, github: GithubResult) =>
     setFound(old => old?.state === "ready" && old.link === forLink ? { ...old, github } : old);
+  // One add at a time: a double click sends one request.
+  const adding = useRef(false);
   const addFromGithub = (preview: GithubSkillPreview) => {
-    if (!additions.addGithubSkill || found?.state !== "ready") return;
+    if (!additions.addGithubSkill || found?.state !== "ready" || adding.current) return;
+    adding.current = true;
     const forLink = found.link;
     setGithub(forLink, { state: "preview", preview, adding: true });
     additions.addGithubSkill(preview).then(saved => {
       setGithub(forLink, { state: "added", name: saved.name });
       notify(`Added ${saved.name} to My skills`);
-    }, error => setGithub(forLink, { state: "preview", preview, error: reason(error, "The skill couldn't be added. Try again.") }));
+    }, error => setGithub(forLink, { state: "preview", preview, error: reason(error, "The skill couldn't be added. Try again.") }))
+      .finally(() => { adding.current = false; });
   };
   return <div className="ua-add-skill">
     <form onSubmit={event => { event.preventDefault(); find(link); }}>

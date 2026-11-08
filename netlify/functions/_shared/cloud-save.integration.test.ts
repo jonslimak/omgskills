@@ -1617,5 +1617,13 @@ test("a skill added from GitHub saves like a Mac's, with no device, and a Mac ca
     // A save from no device never replaces a saved skill, even with a stale list of keys (two adds at once).
     await rejects(saveCloudVersion(pool, { userId, deviceId: null, skillKey: "pdf", files: manifest(v1), skillName: "notes" }), "name_taken");
     assert.equal((await readCloudSave(pool, userId)).skills.find((item) => item.key === "pdf")?.name, "pdf");
+
+    // The same skill added twice at once (two tabs, a double click) is saved once.
+    const both = await Promise.allSettled([saveGithubSkill(pool, store, userId, skill("twin", "a/twin")),
+      saveGithubSkill(pool, store, userId, skill("twin", "a/twin"))]);
+    assert.equal(both.filter((result) => result.status === "fulfilled").length, 1);
+    assert.ok(both.some((result) => result.status === "rejected" && result.reason instanceof GithubImportError
+      && result.reason.code === "already_added"));
+    assert.equal((await readCloudSave(pool, userId)).skills.filter((item) => item.name === "twin").length, 1);
   });
 });
