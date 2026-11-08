@@ -32,7 +32,7 @@ test("a GitHub link asks the library which skills live there", async () => {
 
 test("Add skill is on your own My skills only, beside Edit", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
-  assert.match(source, /const findByGithubLink = signedIn && !readOnlyAccount && !management \? additions\?\.findByGithubLink : undefined;/);
+  assert.match(source, /const findByGithubLink = signedIn && \(!readOnlyAccount \|\| !!management\) \? additions\?\.findByGithubLink : undefined;/);
   assert.match(source, /\{findByGithubLink && nav\.view === "all" && !nav\.id && !editing && <button/);
   assert.match(source, /\{githubLinkSearch \? \(/);
   const dialog = readFileSync(new URL("../src/app/unified/AddSkillDialog.tsx", import.meta.url), "utf8");
