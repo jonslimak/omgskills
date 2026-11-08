@@ -95,6 +95,7 @@ import {
   matchesSearch,
   skillDisplays,
   liveSkill,
+  installSavedLink,
   matchVersionsLink,
   maxRemoveFromMac,
   removeFromMacLink,
@@ -581,6 +582,8 @@ export function UnifiedApp({
   // Installed means a Mac has it now; the install card can still add it for the agent that doesn't.
   const installedAgents = [...new Set((detailLive?.sources ?? []).map(agentKind))].sort().join(",");
   const installedHere = !!detailLive;
+  // A synced personal skill no Mac has installs from the account's saved copy (the Mac app checks it's kept).
+  const savedInstall = !!(onMac && signedIn && (!readOnlyAccount || management) && detail?.cloudKey && !detail.catalogId);
   const missingAgent = installedHere && !(installedAgents.includes("claude") && installedAgents.includes("codex"));
   // An install that finishes changes where the skill is; close the card and drop its intent.
   const installDone = useRef(installedAgents);
@@ -2033,6 +2036,13 @@ export function UnifiedApp({
                       </button>
                     )
                   )}
+                  {/* A synced personal skill no Mac has: the Mac app installs its newest saved version. */}
+                  {savedInstall && (
+                    <button type="button" className="ua-pill ua-primary" title="Install with the OMGSkills Mac app"
+                      onClick={() => window.location.assign(installSavedLink(detail.name, detail.cloudKey!))}>
+                      Install <Download />
+                    </button>
+                  )}
                   {/* A library skill can join My skills without installing it. */}
                   {signedIn && additions && detail.catalogId && !installedHere && !detail.cloudKey && (inMySkills(detail.catalogId) ? (
                     <button type="button" className="ua-pill ua-detail-copy" aria-label="In My skills. Remove from My skills"
@@ -2050,7 +2060,7 @@ export function UnifiedApp({
                     <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
                       Copy <Copy />
                     </button>
-                  ) : !(onMac && signedIn && publicInstallAction && detail.catalogId) && (
+                  ) : !(onMac && signedIn && publicInstallAction && detail.catalogId) && !savedInstall && (
                     <span className="ua-pill">
                       {detail.installed?.isLocalOnly && <User aria-hidden="true" />}
                       {detail.setItemCloudShared ? cloudSharedLabel(detail, activeSet?.role)
