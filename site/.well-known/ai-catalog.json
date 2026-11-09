@@ -8,7 +8,7 @@
   "entries": [
     {
       "identifier": "urn:air:omgskills.com:mcp:catalog",
-      "displayName": "omgskills Catalog MCP",
+      "displayName": "omgskills Library MCP",
       "type": "application/mcp-server-card+json",
       "data": {
         "name": "omgskills",
@@ -57,7 +57,7 @@
           }
         ]
       },
-      "description": "Read-only MCP server for discovering and inspecting public AI agent skills from the omgskills catalog.",
+      "description": "Read-only MCP server for discovering and inspecting public agent skills in the omgskills library. No sign-in.",
       "tags": [
         "agent-skills",
         "claude",
@@ -88,6 +88,58 @@
         "documentationUrl": "https://omgskills.com/developers/",
         "healthUrl": "https://omgskills.com/mcp/health",
         "npmPackage": "omgskills-mcp"
+      }
+    },
+    {
+      "identifier": "urn:air:omgskills.com:mcp:my-skills",
+      "displayName": "omgskills My skills MCP",
+      "type": "application/mcp-server-card+json",
+      "data": {
+        "name": "omgskills-my-skills",
+        "description": "Search and read the signed-in user's own skills in omgskills (My skills).",
+        "version": "0.1.0",
+        "endpoint": "https://omgskills.com/my/mcp",
+        "transport": "streamable-http",
+        "authentication": "oauth2",
+        "access": "read-only",
+        "tools": [
+          {
+            "name": "search_my_skills",
+            "description": "List or search the user's own skills: personal skills and library skills they installed or added."
+          },
+          {
+            "name": "read_my_skill",
+            "description": "Read one skill from My skills by ID: its SKILL.md and a list of its other files."
+          },
+          {
+            "name": "read_skill_file",
+            "description": "Read one other file of a skill in My skills, by skill ID and file path."
+          }
+        ]
+      },
+      "description": "Read-only MCP server that lets an agent the user connects and allows read that user's own skills. Requires signing in to omgskills.",
+      "tags": [
+        "agent-skills",
+        "claude",
+        "chatgpt",
+        "cursor",
+        "mcp",
+        "oauth"
+      ],
+      "capabilities": [
+        "search_my_skills",
+        "read_my_skill",
+        "read_skill_file"
+      ],
+      "representativeQueries": [
+        "list my skills",
+        "find my code review skill",
+        "read my release checklist skill"
+      ],
+      "version": "0.1.0",
+      "metadata": {
+        "documentationUrl": "https://omgskills.com/developers/",
+        "protectedResourceMetadataUrl": "https://omgskills.com/.well-known/oauth-protected-resource/my/mcp"
       }
     }
   ]

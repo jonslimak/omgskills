@@ -9,6 +9,12 @@ running it.
   `omgskills.com`.
 - Scans local Claude, Codex, and agent skill folders to show installed skills.
 - Installs skills from public GitHub repositories when the user chooses to do so.
+- Connects to the user's omgskills account when the user chooses to, and reports
+  installed skills (names, metadata and fingerprints, not full local paths).
+- With Sync My skills on, uploads skill files to the user's private My skills.
+  Files that look like they contain a key or password are held back until the
+  user confirms them.
+- Installs Sets the user has access to, including private skills shared with them.
 - Uses Apple's Developer ID signing and notarization flow for public releases.
 
 ## What should not be public

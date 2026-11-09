@@ -1059,7 +1059,7 @@ function renderDevelopersPage() {
     </div>
 
     <div class="section">
-      <div class="eyebrow">Hosted MCP</div>
+      <div class="eyebrow">Library MCP</div>
       <h2>Connect to the live catalog</h2>
       <p>The hosted server is public, read-only, and requires no authentication. Add this server URL to an MCP client:</p>
       <div class="install-box"><pre class="install"><code>${origin}/mcp</code></pre></div>
@@ -1126,7 +1126,7 @@ function renderDevelopersPage() {
 
     <div class="section">
       <div class="eyebrow">Safety</div>
-      <p>The MCP tools only read public catalog data. They do not install skills, write files, run shell commands, or receive private skill content.</p>
+      <p>Both MCP servers are read only. The Library MCP reads only public catalog data. The My skills MCP reads only the signed-in user's own skills. Neither installs skills, writes files, or runs shell commands.</p>
     </div>
     </div>`;
 
@@ -1335,7 +1335,7 @@ function renderDevelopersMarkdown() {
 
 ${agentWhenToUse}
 
-## Hosted MCP
+## Library MCP
 
 - Server URL: ${origin}/mcp
 - Health: ${origin}/mcp/health
@@ -1385,7 +1385,7 @@ ${markdownCodeBlock(`{
 
 ## Safety
 
-The MCP tools only read public catalog data. They do not install skills, write files, run shell commands, or receive private skill content.
+Both MCP servers are read only. The Library MCP reads only public catalog data. The My skills MCP reads only the signed-in user's own skills. Neither installs skills, writes files, or runs shell commands.
 
 ## Links
 
@@ -1484,7 +1484,7 @@ Yes. Skills are open-source Markdown files on GitHub. Every skill indexed here i
 function renderAgentsText() {
   return `# omgskills agent discovery
 
-> omgskills puts your team's agent skills in one place: find skills in an open library, add them to a shared set, and keep everyone's Claude Code and Codex in sync.
+> omgskills shares skills across teams & agents: keep your skills in My skills, share them with your team in a set, and use them in Claude, ChatGPT, Cursor, Grok, Muse and more.
 
 ## When to use omgskills
 
@@ -1492,10 +1492,9 @@ ${agentWhenToUse}
 
 ## Preferred access
 
-- Hosted MCP endpoint: ${origin}/mcp
+- Library MCP endpoint: ${origin}/mcp (no sign-in, read-only)
 - MCP health: ${origin}/mcp/health
-- Authentication: none
-- Access: read-only
+- My skills MCP endpoint: ${origin}/my/mcp (sign in to omgskills, read-only, your own skills)
 - Developer resources: ${origin}/developers/index.md
 - Markdown library: ${origin}/skills/index.md
 - Curated Gold export: ${origin}/llms-gold.txt
@@ -1508,7 +1507,7 @@ Append \`index.md\` to any generated library page URL.
 
 ## Safety
 
-The MCP tools only read public catalog data. They do not install skills, write files, run shell commands, or receive private skill content. To install, call get_install_plan and run the commit-pinned script it returns; it verifies SKILL.md before copying the skill into your agent's skills folder.
+Both MCP servers are read only. The Library MCP reads only public catalog data. The My skills MCP reads only the signed-in user's own skills. Neither installs skills, writes files, or runs shell commands. To install, call get_install_plan and run the commit-pinned script it returns; it verifies SKILL.md before copying the skill into your agent's skills folder.
 `;
 }
 
@@ -1524,7 +1523,7 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
     : null;
   return `# omgskills
 
-> omgskills puts your team's agent skills in one place: find skills in an open library, add them to a shared set, and keep everyone's Claude Code and Codex in sync.
+> omgskills shares skills across teams & agents: keep your skills in My skills, share them with your team in a set, and use them in Claude, ChatGPT, Cursor, Grok, Muse and more.
 
 ## Start here
 
@@ -1539,8 +1538,9 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
 - [Developer resources](${origin}/developers/index.md)
 - Agent discovery guide: ${origin}/agents.md
 - OpenAPI specification: ${origin}/openapi.json
-- Hosted MCP endpoint: ${origin}/mcp
+- Library MCP endpoint: ${origin}/mcp
 - MCP health: ${origin}/mcp/health
+- My skills MCP endpoint: ${origin}/my/mcp
 - npm package: https://www.npmjs.com/package/omgskills-mcp
 - Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
 - Public catalog manifest: ${origin}/data/crawl4/manifest.json
