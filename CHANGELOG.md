@@ -4,6 +4,11 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.37] - 2026-11-09
+
+### App
+- Keep different skills in same-name folders separate in cloud save.
+
 ## [0.0.36] - 2026-11-06
 
 ### App
