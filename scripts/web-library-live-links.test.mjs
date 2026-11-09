@@ -8,7 +8,7 @@ import { skillPathForId } from "./web-library-skill-urls.mjs";
 
 const origin = "https://preview.example";
 const internalStatus = (status) => [200, 301, 302, 308].includes(status);
-const llmsStatus = (status, path) => status === 200 || (path === "/mcp" && status === 405);
+const llmsStatus = (status, path) => status === 200 || (path === "/mcp" && status === 405) || (path === "/my/mcp" && status === 401);
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 function deferred() {
   let resolve;
@@ -132,6 +132,11 @@ test("preserves internal redirect allowances, missing-link failures and MCP exce
   });
   await mcp(["/mcp"], { label: "llms.txt", acceptStatus: llmsStatus });
   await assert.rejects(mcp(["/other"], { label: "llms.txt", acceptStatus: llmsStatus }), /returned 405/);
+  const myMcp = createLiveLinkVerifier({
+    origin, log: () => {}, fetchLive: async () => ({ status: 401, body: null }),
+  });
+  await myMcp(["/my/mcp"], { label: "llms.txt", acceptStatus: llmsStatus });
+  await assert.rejects(myMcp(["/mcp"], { label: "llms.txt", acceptStatus: llmsStatus }), /returned 401/);
 });
 
 test("stops scheduling on failure and waits for already active work", async () => {
@@ -197,7 +202,7 @@ test("main verifier wires both link sweeps without weakening timeouts or retries
   assert.match(transport, /const attempts = 3;/);
   assert.match(transport, /AbortSignal.timeout\(timeoutMs\)/);
   assert.match(transport, /const delay = 500 \* attempt/);
-  assert.match(source, /status === 200 \|\| \(urlPath === "\/mcp" && status === 405\)/);
+  assert.match(source, /status === 200 \|\| \(urlPath === "\/mcp" && status === 405\) \|\| \(urlPath === "\/my\/mcp" && status === 401\)/);
   assert.match(source, /\[200, 301, 302, 308\]\.includes\(status\)/);
 });
 

@@ -42,10 +42,13 @@ export function DevelopersPage() {
   return <div className="ua-dev">
     <section className="ua-dev-intro">
       <h2>When to use omgskills</h2>
-      <p>Use omgskills when you need to find or evaluate trusted skills for Claude Code, Codex, or other coding agents.
-        Search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors, or JSON
-        manifests. For supported skills, <code>get_install_plan</code> returns commit-pinned installation instructions for your agent to run locally;
-        the MCP server itself does not write files. You can also install individual public skills through the omgskills web app and Mac companion.</p>
+      <p>Use omgskills to find trusted skills for Claude Code, Codex, and other agents, and to use your own skill library from any agent.</p>
+      <p><strong>Discover:</strong> search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors,
+        or JSON manifests. For supported skills, <code>get_install_plan</code> returns commit-pinned installation instructions for your
+        agent to run locally; the server itself does not write files.</p>
+      <p><strong>Your library:</strong> connect the My skills MCP to any agent that supports MCP, such as Claude, ChatGPT, Cursor, Codex,
+        Grok, or Muse, and sign in. The agent can then search and read the skills in your omgskills library, so the same skills work
+        in every agent without copying files. Both servers are read-only.</p>
     </section>
     <div className="ua-dev-grid">
       <Card icon={Globe} title="Hosted MCP (live catalog)">
@@ -55,7 +58,7 @@ export function DevelopersPage() {
       </Card>
       <Card icon={UserRound} title="My skills MCP (your library)">
         <CopyValue value={MY_SKILLS_MCP_URL} />
-        <p>Your own skills for your agents, read only. Add this address as a custom connector or MCP server (Claude, ChatGPT, Cursor, Codex, Grok), then sign in to omgskills. Tools: <code>search_my_skills</code>,{" "}
+        <p>Your own skills for your agents, read only. Add this address as a custom connector or MCP server (Claude, ChatGPT, Cursor, Codex, Grok, Muse), then sign in to omgskills. Tools: <code>search_my_skills</code>,{" "}
           <code>read_my_skill</code>, <code>read_skill_file</code>. Skills that can't sync, or that contain a key or password,
           are never shared. See and disconnect agents in the app under MCP.</p>
       </Card>
