@@ -332,6 +332,15 @@
   border-top: 1px solid var(--ua-line);
   padding: 8px;
 }
+.ua-signin-pitch {
+  margin: 2px 8px 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+}
+.ua-workspace[data-rail="true"] .ua-signin-pitch {
+  display: none;
+}
 .ua-account-footer > .ua-primary {
   display: flex;
   width: calc(100% - 16px);

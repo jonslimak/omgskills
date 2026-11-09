@@ -199,7 +199,7 @@ test("set header distinguishes email access from confirmed members", () => {
 test("set header never shows inactive saved emails or owner-only access records to readers", () => {
   const set = { ...makeFixtures().sets[0], ownerName: "Owner", role: "owner" as const,
     allowedEmails: [{ id: "one", email: "person@example.test" }] };
-  assert.deepEqual(setAccessSummary({ ...set, visibility: "private" }), { people: ["Owner"], label: "Only you" });
+  assert.deepEqual(setAccessSummary({ ...set, visibility: "private" }), { people: ["Owner"], label: "Only me" });
   assert.deepEqual(setAccessSummary({ ...set, visibility: "public" }), { people: ["Owner"], label: "Public access" });
   assert.deepEqual(setAccessSummary({ ...set, visibility: "restricted", role: "invited" }), { people: ["Owner"], label: "Invite only" });
 });

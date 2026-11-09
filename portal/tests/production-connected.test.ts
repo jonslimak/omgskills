@@ -89,11 +89,11 @@ test("production install handoff preserves both agents and cannot offer the test
     returnRoute: "/app/?view=discover&skill=catalog%3Aowner%2Frepo", store }));
   assert.ok(markup.includes(productionDistribution.url));
   assert.ok(markup.includes(productionDistribution.checksumURL));
-  assert.ok(markup.includes(`Download OMGSkills ${productionDistribution.version}`));
+  assert.ok(markup.includes(`Download the Mac app ${productionDistribution.version}`));
   assert.match(markup, /Apple silicon Mac, macOS 14\.0 or later/);
-  assert.match(markup, /replaces your existing OMGSkills app/);
+  assert.match(markup, /replaces your existing omgskills Mac app/);
   assert.match(markup, /installed skills stay in their current folders/);
-  assert.match(markup, /Quit OMGSkills[^]*Move <strong>omgskills\.app<\/strong> into <strong>Applications/);
+  assert.match(markup, /Quit the omgskills Mac app[^]*Move <strong>omgskills\.app<\/strong> into <strong>Applications/);
   assert.match(markup, /Try opening again/);
   assert.doesNotMatch(markup, /not been published|Disposable VM|F1 Test|Download test candidate|netlify\.app|omgskills-mac\.dmg/);
   const withCandidate = renderToStaticMarkup(createElement(module.exports.CatalogInstallSetup, { skill, detailReady: true,

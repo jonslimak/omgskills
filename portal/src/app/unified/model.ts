@@ -16,7 +16,7 @@ export function setAccessSummary(set: PortalSet) {
   return {
     people: [set.ownerName || "Owner", ...(emails ?? [])],
     label: set.visibility === "public" ? "Public access"
-      : set.visibility === "private" ? "Only you"
+      : set.visibility === "private" ? "Only me"
       : emails ? `${emails.length} ${emails.length === 1 ? "email" : "emails"} with access` : "Invite only",
   };
 }

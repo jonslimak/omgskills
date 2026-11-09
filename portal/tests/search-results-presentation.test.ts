@@ -8,7 +8,7 @@ const search = source.slice(source.indexOf('<div className="ua-search-results">'
 
 test("public search hides personal labels and the sign-in prompt when there are no personal matches", () => {
   assert.ok(search.includes('matchingMine.length > 0 && <details'));
-  assert.ok(search.includes('matchingMine.length > 0 && <h2 className="ua-search-library-label">Library</h2>'));
+  assert.ok(search.includes('matchingMine.length > 0 && <h2 className="ua-search-library-label">In the library</h2>'));
   assert.equal(search.includes('In my skills'), false);
   assert.equal(search.includes('Sign in to see your skills.'), false);
   assert.ok(source.includes('const everMine = signedIn ? models.mine : [];'));
@@ -20,7 +20,7 @@ test("personal results use a native disclosure that starts collapsed for each se
   assert.ok(search.includes('onToggle={event => setExpandedSearchScope(event.currentTarget.open ? scopeKey : null)}'));
   assert.ok(search.includes('<summary className="ua-search-personal-toggle">'));
   assert.ok(source.includes('const [expandedSearchScope, setExpandedSearchScope] = useState<string | null>(null);'));
-  assert.ok(search.includes('My library'));
+  assert.ok(search.includes('In My skills'));
   assert.ok(search.includes('{matchingMine.length} {matchingMine.length === 1 ? "skill" : "skills"}'));
   assert.ok(search.includes('{rows(matchingMine)}'));
   assert.ok(source.includes('const scopeKey = `${nav.view}:${nav.id}:${nav.query}:${nav.source}:${signedIn}`;'));
@@ -116,7 +116,7 @@ test("editing the query or leaving its page resets the submitted title, unlike s
 
 test("personal-only matches do not show a misleading Nothing matches message", () => {
   assert.ok(search.includes('matchingMine.length > 0 && !matchingLibrary.length ? ('));
-  assert.ok(search.includes('<Empty title="No library matches">'));
+  assert.ok(search.includes('<Empty title="No matches in the library">'));
 });
 
 test("private and set searches keep their existing results rather than collapsing them", () => {

@@ -349,7 +349,7 @@ function ManagedSetHeader({ set, skills, management, theme, headingActions }: {
       {editable && <>
         <button className="ua-pill ua-set-action" type="button" aria-label="Add skill" title="Add skill" disabled={disabled} onClick={() => management.add([], set)}><Plus /><span>Add skill</span></button>
       </>}
-      {installLink && !disabled && <a className="ua-pill ua-set-action" href={installLink} title="Install this Set with the OMGSkills Mac app">
+      {installLink && !disabled && <a className="ua-pill ua-set-action" href={installLink} title="Install this Set with the omgskills Mac app">
         <Download /><span>Install on Mac</span></a>}
       <IconButton label="Copy link" onClick={() => management.copyLink(set)}><Copy /></IconButton>
       {set.hidden && <span className="ua-muted">Hidden from other people</span>}
@@ -860,7 +860,7 @@ export function UnifiedApp({
         Profile
       </MenuItem>}
       {supportsView("agents") && <MenuItem icon={Bot} onSelect={() => goFromAccount("agents")}>
-        Agents <small>{sources.length} observed</small>
+        Agents <small>{sources.length}</small>
       </MenuItem>}
       {(!readOnlyAccount || accountPages) && <>{supportsView("devices") && <MenuItem icon={Monitor} onSelect={() => goFromAccount("devices")}>
         Devices {!readOnlyAccount && <small>{data.devices.length}</small>}
@@ -1059,6 +1059,7 @@ export function UnifiedApp({
           ? "Try a creator or a task."
           : publicStatus && nav.view === "creator" ? `No creator called @${nav.id} is in the catalog.`
           : publicStatus && nav.view === "collection" ? "This collection doesn't exist or was removed."
+          : nav.view === "all" ? "Turn on Sync My skills to bring in skills from your Mac, add one from a GitHub link or a folder, or explore the library."
           : "Explore the library for your next useful skill."}
       </Empty>
     );
@@ -1255,7 +1256,7 @@ export function UnifiedApp({
     : nav.view === "all"
       ? notInstalledAll.length ? `${allMine.length} skills · ${notInstalledAll.length} not installed` : `${mine.length} skills across ${sources.length} sources`
       : nav.view === "discover"
-        ? "Find your next useful skill."
+        ? "Find skills to add to My skills."
         : nav.view === "favorites"
           ? "Your favorites are shared publicly."
           : nav.view === "set"
@@ -1417,6 +1418,7 @@ export function UnifiedApp({
             <div className="ua-account-footer">{accountMenu()}</div>
           ) : (
             <div className="ua-account-footer">
+              <p className="ua-muted ua-signin-pitch">Share skills across teams &amp; agents.</p>
               <button
                 type="button"
                 className="ua-pill ua-primary"
@@ -1433,7 +1435,7 @@ export function UnifiedApp({
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Get the Mac app for Apple silicon, macOS 14 or later"
-                title="OMGSkills 0.0.37 for Apple silicon, macOS 14 or later"
+                title="omgskills Mac app 0.0.37 for Apple silicon, macOS 14 or later"
               ><span className="ua-apple-mark" aria-hidden="true">&#63743;</span><span>Get the Mac app<small className="ua-download-requirements">Apple silicon, macOS 14+</small></span></a>}
             </div>
           )}
@@ -1466,7 +1468,7 @@ export function UnifiedApp({
                   </div>
                   <nav aria-label="Mobile navigation">
                     {([
-                      ["all", "My Skills", User, true, ""],
+                      ["all", "My skills", User, true, ""],
                       ["favorites", "Favorites", Heart, false, ""],
                       ["sets", "Sets", Shapes, false, ""],
                       ["discover", "Discover", Compass, true, ""],
@@ -1679,7 +1681,7 @@ export function UnifiedApp({
                     onToggle={event => setExpandedSearchScope(event.currentTarget.open ? scopeKey : null)}>
                     <summary className="ua-search-personal-toggle">
                       <span className="ua-search-personal-title">
-                        My library
+                        In My skills
                         <span className="ua-search-personal-count">
                           {matchingMine.length} {matchingMine.length === 1 ? "skill" : "skills"}
                           <ChevronRight aria-hidden="true" />
@@ -1690,9 +1692,9 @@ export function UnifiedApp({
                     {rows(matchingMine)}
                   </details>}
                   <section className="ua-search-library">
-                    {matchingMine.length > 0 && <h2 className="ua-search-library-label">Library</h2>}
+                    {matchingMine.length > 0 && <h2 className="ua-search-library-label">In the library</h2>}
                     {matchingMine.length > 0 && !matchingLibrary.length ? (
-                      <Empty title="No library matches">Try a creator or a task.</Empty>
+                      <Empty title="No matches in the library">Try a creator or a task.</Empty>
                     ) : rows(matchingLibrary)}
                   </section>
                 </div>
@@ -1771,8 +1773,8 @@ export function UnifiedApp({
                     </button>
                   ))}
                   {!sets.length && (
-                    <Empty title="Your sets start here">
-                      Group useful skills for your next project.
+                    <Empty title="Share skills with your team">
+                      Make a set, add skills, and invite people. Everyone gets the same version.
                     </Empty>
                   )}
                 </div>
@@ -1797,7 +1799,7 @@ export function UnifiedApp({
                         </div>
                       ))}
                       <p className="ua-muted">
-                        Sources observed in your synced skills. Remote
+                        Agents your synced skills are installed in. Remote
                         installation is not available here.
                       </p>
                     </>
@@ -1837,17 +1839,21 @@ export function UnifiedApp({
                           : "No private sources connected"
                       }
                     >
-                      Private source management will keep its existing account
-                      controls.
+                      Connect a private GitHub source to add its skills to My skills.
                     </Empty>
                   )}
                   {nav.view === "mcp" && (
                     <>
                       <Server />
-                      <h2>omgskills MCP server</h2>
+                      <h2>My skills MCP</h2>
+                      <code>https://omgskills.com/my/mcp</code>
+                      <p className="ua-muted">
+                        Your own skills for your agents, read only. Sign in to omgskills when your agent asks.
+                      </p>
+                      <h2>Library MCP</h2>
                       <code>https://omgskills.com/mcp</code>
                       <p className="ua-muted">
-                        Public, read-only skill discovery for your agent.
+                        Search the open library from any agent. No account needed.
                       </p>
                       <a
                         className="ua-link"
@@ -2060,7 +2066,7 @@ export function UnifiedApp({
                   )}
                   {/* A synced personal skill no Mac has: the Mac app installs its newest saved version. */}
                   {savedInstall && (
-                    <button type="button" className="ua-pill ua-primary" title="Install with the OMGSkills Mac app"
+                    <button type="button" className="ua-pill ua-primary" title="Install with the omgskills Mac app"
                       onClick={() => window.location.assign(installSavedLink(detail.name, detail.cloudKey!))}>
                       Install <Download />
                     </button>
