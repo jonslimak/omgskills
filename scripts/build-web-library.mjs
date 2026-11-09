@@ -210,7 +210,7 @@ const siteFooterHtml = `  <footer class="site-footer">
     <div class="site-footer-inner">
       <div class="site-footer-brand">
         <a class="brand" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>
-        <p>Your team's agent skills in one place. Open library, shared sets, free.</p>
+        <p>Share skills across teams &amp; agents. Free.</p>
       </div>
       <div class="site-footer-col">
         <h2>Library</h2>
@@ -1428,15 +1428,15 @@ It is like asking an AI for good dinner ideas versus asking while sharing a reci
 
 ## How to use a skill
 
-Find a skill in the [omgskills web library](${origin}/app/), open its install panel, choose Claude or Codex, and open OMGSkills. Approve the installation on your Mac. If you need the companion, follow the setup link in the install panel and return to the skill.
+Find a skill in the [omgskills web library](${origin}/app/), open its install panel, choose Claude or Codex, and open OMGSkills. Approve the installation on your Mac. If you need the Mac app, follow the setup link in the install panel and return to the skill.
 
-Connect the companion to your account to see installed skills in My skills. Browsing and individual public skill installs do not require an account. Sync reports installed skills; it does not update their files.
+Keep and share your skills: connect the Mac app to your account, turn on Sync My skills to keep them in My skills, share them in a set, or use them in any MCP agent through the My skills MCP (${origin}/my/mcp). Browsing and individual public skill installs do not require an account.
 
 Use the skill in a new agent session. Your agent can load it when relevant, or you can use \`/skill-name\` where supported. You can also share a GitHub source link with your agent to install it yourself.
 
 ## Sharing skills as a team
 
-Create a [Set](${origin}/app/?view=sets), add skills and share it with your team. Install a whole Set from the Mac companion. **Automatic team updates: Coming soon.** Teams maintaining their own skills can also use a shared GitHub repository.
+Create a [Set](${origin}/app/?view=sets), add skills and share it with your team. Install a whole Set from the Mac app. **Automatic team updates: Coming soon.** Teams maintaining their own skills can also use a shared GitHub repository.
 
 ## How to find good skills
 
@@ -1475,9 +1475,9 @@ Yes. Skills are open-source Markdown files on GitHub. Every skill indexed here i
 
 - HTML guide: ${origin}/guide/
 - Browse skills: ${origin}/skills/
-- Mac companion (Apple silicon, macOS 14+): ${origin}/download
+- Mac app (Apple silicon, macOS 14+): ${origin}/download
 - Original Mac app download: ${origin}/downloads/omgskills-mac.dmg
-- Companion setup: open a skill's install panel at ${origin}/app/
+- Mac app setup: open a skill's install panel at ${origin}/app/
 `;
 }
 

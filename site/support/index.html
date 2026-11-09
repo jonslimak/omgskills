@@ -4,7 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Support | omgskills</title>
-  <meta name="description" content="Help with the omgskills web app, companion Mac app, account connection, installed-skills sync, and agent integrations.">
+  <meta name="description" content="Help with omgskills: My skills and sync, adding skills, sets, the Mac app, and connecting your agents.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="omgskills">
+  <meta property="og:title" content="Support | omgskills">
+  <meta property="og:description" content="Help with omgskills: My skills and sync, adding skills, sets, the Mac app, and connecting your agents.">
+  <meta property="og:url" content="https://omgskills.com/support/">
+  <meta property="og:image" content="https://omgskills.com/banner.webp">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <style>
     *{box-sizing:border-box}
@@ -17,29 +24,40 @@
     h2{font-size:18px;margin:32px 0 8px}
     p{font-size:14px;color:#3f3f46;margin:0 0 14px}
     footer{max-width:760px;margin:0 auto;padding:0 24px 48px;display:flex;gap:18px;font-size:13px}
+    code{font-size:13px;overflow-wrap:anywhere}
   </style>
 </head>
 <body>
   <main>
     <a class="back" href="/">Back to omgskills</a>
     <h1>Support</h1>
-    <p class="intro">Help with the omgskills web app, companion Mac app, and agent integrations.</p>
+    <p class="intro">Help with My skills, sets, the Mac app, and connecting your agents.</p>
 
     <h2>Contact</h2>
     <p>Email <a href="mailto:hi@omgskills.com">hi@omgskills.com</a>. Include what you were trying to do, the page or tool involved, and when the issue happened.</p>
 
     <h2>Installing a skill</h2>
-    <p><a href="/download">Download OMGSkills</a> for Apple silicon, macOS 14+. Unzip the downloaded <strong>OMGSkills-Connected</strong> file, quit OMGSkills if it is running, move <strong>omgskills.app</strong> into <strong>Applications</strong>, then open it. Replacing an older copy is your choice; no update is pushed to existing users.</p>
+    <p><a href="/download">Download the Mac app</a> for Apple silicon, macOS 14+. Unzip the downloaded <strong>OMGSkills-Connected</strong> file, quit OMGSkills if it is running, move <strong>omgskills.app</strong> into <strong>Applications</strong>, then open it. Replacing an older copy is your choice; no update is pushed to existing users.</p>
     <p>Need the older app? <a href="/downloads/omgskills-mac.dmg">Download the original Mac app 0.0.20</a>. Its download and update feed are unchanged.</p>
-    <p>Open a skill in the <a href="/app/">web library</a>, choose Claude or Codex, and open OMGSkills. Approve the installation in the Mac app. If you need the companion, use the setup link in that skill's install panel and return to the same page afterward.</p>
-    <p>The companion currently requires an Apple silicon Mac with macOS 14 or later. Some installs also require Git; follow the app's setup guidance if it is unavailable. You do not need an account to browse or install public skills.</p>
+    <p>Open a skill in the <a href="/app/">web library</a>, choose Claude or Codex, and open OMGSkills. Approve the installation in the Mac app. If you need the Mac app, use the setup link in that skill's install panel and return to the same page afterward.</p>
+    <p>The Mac app currently requires an Apple silicon Mac with macOS 14 or later. Some installs also require Git; follow the app's setup guidance if it is unavailable. You do not need an account to browse or install public skills.</p>
 
     <h2>Connecting your Mac and My skills</h2>
-    <p>Sign in on the website, then choose <strong>Connect account</strong> in the Mac companion and approve the browser request. This lets the companion report installed skill metadata to your account, including supported skills installed outside omgskills.</p>
-    <p>If a skill is missing from My skills, check that the companion is running and connected to the same account. Open its menu-bar panel, choose <strong>Resync</strong>, then refresh My skills. Include the agent, skill name, last report time, app version and macOS version when contacting support. Do not send connection codes, tokens or private skill files.</p>
-    <p>Sync updates your installed-skills list, not the skill files themselves. Disconnecting stops reporting; it does not uninstall your skills. Set installation is available in the companion; automatic skill updates are coming soon.</p>
+    <p>Sign in on the website, then choose <strong>Connect account</strong> in the Mac app and approve the browser request. This lets the Mac app report installed skill metadata to your account, including supported skills installed outside omgskills.</p>
+    <p>If a skill is missing from My skills, check that the Mac app is running and connected to the same account. Open its menu-bar panel, choose <strong>Resync</strong>, then refresh My skills. Include the agent, skill name, last report time, app version and macOS version when contacting support. Do not send connection codes, tokens or private skill files.</p>
+    <p>Turn on <strong>Sync My skills</strong> under <strong>Sync</strong> in your account menu to keep a private copy of each skill's files in My skills. You can leave out any skill. A file that looks like it contains a key or password isn't synced until you review it and choose <strong>It's safe, sync it</strong>.</p>
+    <p>Deleting a synced copy on the web never touches the skill on your Mac. Disconnecting the Mac app stops reporting; it does not uninstall your skills. Set installation is available in the Mac app; automatic skill updates are coming soon.</p>
 
-    <h2>ChatGPT and MCP</h2>
+    <h2>Adding a skill</h2>
+    <p>Choose <strong>Add skill</strong> in My skills, then paste a GitHub link (a repository, folder or SKILL.md) or pick a folder on your computer. To add a skill that isn't in the library, or to upload a folder, Sync My skills must be on. A folder upload can be up to 4 MB; for bigger skills, sync them from your Mac instead. A skill with a file that looks like it contains a key or password can't be added.</p>
+
+    <h2>Sharing with your team</h2>
+    <p>Create a set, add skills, and choose public, invite-only, or only-me access. For invite-only, add each teammate's email, then send them the set's link; no invitation email is sent. Teammates install the whole set from the Mac app at this version, or choose Keep updated to see changes when they reopen the set. You can change access or remove people at any time. Favorites are always public.</p>
+
+    <h2>Connecting your agents (MCP)</h2>
+    <p>To use your skills in Claude, ChatGPT, Cursor, Grok, Muse or another agent that supports MCP, add <code>https://omgskills.com/my/mcp</code> as a custom connector or MCP server, then sign in to omgskills and approve the request. If the agent says to sign in at omgskills.com first, sign in on the website once, then try again.</p>
+    <p>The agent can search and read your skills, read-only. Skills that can't sync, or that contain a key or password, show by name only. To cut an agent off, choose <strong>Disconnect</strong> under <strong>MCP server</strong> in your account menu; choose <strong>Allow again</strong> to restore it.</p>
+    <p>The public Library MCP, <code>https://omgskills.com/mcp</code>, needs no account and only searches the open library.</p>
     <p>For agent integration issues, include the client name, tool name, and prompt or search terms that produced the problem. Do not send secrets, private files, or credentials.</p>
 
     <h2>Public library data</h2>
@@ -49,7 +67,7 @@
     <div class="site-footer-inner">
       <div class="site-footer-brand">
         <a class="site-footer-brand-logo" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>
-        <p>The best and latest agent skills from trusted sources. Open web library, free companion Mac app.</p>
+        <p>Share skills across teams &amp; agents. Free.</p>
       </div>
       <div class="site-footer-col">
         <h2>Library</h2>

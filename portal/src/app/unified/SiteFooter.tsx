@@ -19,7 +19,7 @@ export const siteFooterColumns = [
 
 export function SiteFooter() {
   return <footer className="ua-site-footer">
-    <p>The best and latest agent skills from trusted sources. Open web library, free companion Mac app.</p>
+    <p>Share skills across teams &amp; agents. Free.</p>
     {siteFooterColumns.map(column => <nav key={column.title} aria-label={column.title}>
       <h2>{column.title}</h2>
       {column.links.map(([label, href]) =>
