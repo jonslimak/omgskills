@@ -14,23 +14,23 @@
       } catch (error) {}
     })();
   </script>
-  <title>omgskills - share agent skills with your team (Claude Code &amp; Codex)</title>
-  <meta name="description" content="Put your team's agent skills in one place. Share a set once, and everyone's Claude Code and Codex stay in sync. Free, with an open library of agent skills.">
+  <title>omgskills: share skills across teams &amp; agents</title>
+  <meta name="description" content="Share skills across teams &amp; agents. Keep your skills in one place and use them in Claude, ChatGPT, Cursor, Grok, Muse and more. Free, with an open library of agent skills.">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="canonical" href="https://omgskills.com/">
   <link rel="alternate" type="application/ai-catalog+json" href="/.well-known/ai-catalog.json">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="omgskills">
-  <meta property="og:title" content="omgskills - share agent skills with your team (Claude Code &amp; Codex)">
-  <meta property="og:description" content="Put your team's agent skills in one place. Share a set once, and everyone's Claude Code and Codex stay in sync. Free, with an open library of agent skills.">
+  <meta property="og:title" content="omgskills: share skills across teams &amp; agents">
+  <meta property="og:description" content="Share skills across teams &amp; agents. Keep your skills in one place and use them in Claude, ChatGPT, Cursor, Grok, Muse and more. Free, with an open library of agent skills.">
   <meta property="og:url" content="https://omgskills.com/">
   <meta property="og:image" content="https://omgskills.com/images/guide/share.png?v=20260822">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="omgskills skills library social preview">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="omgskills - share agent skills with your team (Claude Code &amp; Codex)">
-  <meta name="twitter:description" content="Put your team's agent skills in one place. Share a set once, and everyone's Claude Code and Codex stay in sync. Free, with an open library of agent skills.">
+  <meta name="twitter:title" content="omgskills: share skills across teams &amp; agents">
+  <meta name="twitter:description" content="Share skills across teams &amp; agents. Keep your skills in one place and use them in Claude, ChatGPT, Cursor, Grok, Muse and more. Free, with an open library of agent skills.">
   <meta name="twitter:image" content="https://omgskills.com/images/guide/share.png?v=20260822">
   <meta name="twitter:image:alt" content="omgskills skills library social preview">
   <script type="application/ld+json">
@@ -63,7 +63,7 @@
         "@id": "https://omgskills.com/#website",
         "name": "omgskills",
         "url": "https://omgskills.com/",
-        "description": "A public library for discovering agent skills from trusted creators and sources.",
+        "description": "Share skills across teams & agents. Keep your skills in one place and use them in any agent, with an open library of skills from trusted creators.",
         "publisher": {
           "@id": "https://omgskills.com/#organization"
         }
@@ -77,7 +77,7 @@
         "operatingSystem": "macOS 14 or later",
         "softwareRequirements": "Apple silicon Mac",
         "applicationCategory": "UtilitiesApplication",
-        "description": "The free companion Mac app that installs skills chosen on the omgskills web library and keeps them in sync.",
+        "description": "The free omgskills Mac app installs your skills and sets into Claude Code and Codex, and syncs My skills.",
         "isAccessibleForFree": true,
         "offers": {
           "@type": "Offer",
@@ -96,7 +96,7 @@
         "applicationCategory": "DeveloperApplication",
         "operatingSystem": "Any",
         "browserRequirements": "Requires JavaScript",
-        "description": "Find agent skills, add them to sets and share them with your team, all in the browser.",
+        "description": "Keep your skills in My skills, share them with your team in sets, and connect them to your agents, all in the browser.",
         "isAccessibleForFree": true,
         "offers": {
           "@type": "Offer",
@@ -162,10 +162,9 @@
   <main id="main">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-text">
-      <h1 id="hero-title">share skills<br>with your team</h1>
-      <p class="hero-copy">Put your team's agent skills in one place. Share a set once, and everyone's Claude Code and Codex stay in sync.</p>
-      <small class="coming-soon" data-planned-feature="team-sync">Automatic team skill updates: Coming soon</small>
-      <div class="actions hero-actions"><a class="button" href="/app/?view=sets" data-humblytics="Home Hero Create Team Set">Create a team set</a><a class="button secondary" href="/app/" data-humblytics="Home Hero Explore Library">Explore the library</a></div>
+      <h1 id="hero-title">share skills<br>across teams &amp; agents</h1>
+      <p class="hero-copy">Keep your skills in one place. Use them in Claude, ChatGPT, Cursor, Grok, Muse and more.</p>
+            <div class="actions hero-actions"><a class="button" href="/app/?view=all" data-humblytics="Home Hero Get Started">Get started</a><a class="button secondary" href="/app/" data-humblytics="Home Hero Explore Library">Explore the library</a></div>
       </div>
       <div class="hero-visual">
         <iframe id="library-animation" src="/home/animation.html" title="Illustration of discovering, organizing, and sharing skills" width="470" height="540" scrolling="no"></iframe>
@@ -175,7 +174,7 @@
     <section class="slab search-section" aria-labelledby="search-title">
       <div class="section-inner">
         <h2 id="search-title">Find skills worth sharing</h2>
-        <p class="section-copy">Skills from creators you trust. Find one, add it to a set.</p>
+        <p class="section-copy">Skills from creators you trust. Find one, add it to My skills or a set.</p>
         <form class="search" action="/app/" method="get" role="search" data-humblytics="Home Search">
           <input type="hidden" name="view" value="discover">
           <svg aria-hidden="true"><use href="/home/icons.svg#search"></use></svg>
@@ -206,21 +205,21 @@
     </section>
 
     <section class="section wide" aria-labelledby="features-title">
-      <h2 id="features-title">One library, every agent</h2>
+      <h2 id="features-title">Your skills, your team, your agents</h2>
       <div class="features">
         <article class="feature">
-          <div><h3>Keep your skills <br>together</h3><p>See what's installed on every Mac and agent, in one place. Find what you need without digging through folders.</p></div>
+          <div><h3>Keep your skills <br>in one place</h3><p>My skills holds your own skills and the ones you add. It syncs from your Macs, so you can see, restore and share them anywhere. Add one from a GitHub link or a folder.</p></div>
           <div class="feature-demo library-demo" aria-label="Example skill library">
-            <div class="demo-heading"><div><strong>your library</strong><span class="muted">Skills for the way you work</span></div></div>
+            <div class="demo-heading"><div><strong>My skills</strong><span class="muted">Skills for the way you work</span></div></div>
             <div class="demo-skill"><img class="avatar" src="https://github.com/anthropics.png?size=72" alt="" width="32" height="32" loading="lazy"><span>frontend-design</span><small>Claude</small></div>
             <div class="demo-skill"><img class="avatar" src="https://github.com/mattpocock.png?size=72" alt="" width="32" height="32" loading="lazy"><span>code-review</span><small>Codex</small></div>
             <div class="demo-skill"><img class="avatar" src="https://github.com/twostraws.png?size=72" alt="" width="32" height="32" loading="lazy"><span>swiftui-pro</span><small>Claude</small></div>
             <div class="demo-footer"><span class="status-dot"></span>All in one place</div>
           </div>
-          <a class="text-link" href="/app/?view=all">Open your library <svg aria-hidden="true"><use href="/home/icons.svg#arrow-right"></use></svg></a>
+          <a class="text-link" href="/app/?view=all">Open My skills <svg aria-hidden="true"><use href="/home/icons.svg#arrow-right"></use></svg></a>
         </article>
         <article class="feature">
-          <div><h3>Create sets and <br>invite your team</h3><p>Public, invite only, or only me. Share one link, and when you update a set, your team gets the change.</p></div>
+          <div><h3>Share with <br>your team</h3><p>Public, invite only, or only me. Share one link, and when you update a set, your team gets the change.</p></div>
           <small class="coming-soon" data-planned-feature="set-subscription">Automatic updates to installed Sets: Coming soon</small>
           <div class="feature-demo" aria-label="Example design team set">
             <div class="demo-heading"><div><strong>design team</strong><span class="muted">3 skills</span></div><span class="tag"><svg aria-hidden="true"><use href="/home/icons.svg#lock"></use></svg>invite only</span></div>
@@ -233,11 +232,11 @@
           <a class="text-link" href="/app/?view=sets">Create a set <svg aria-hidden="true"><use href="/home/icons.svg#arrow-right"></use></svg></a>
         </article>
         <article class="feature mcp-feature">
-          <div><h3>Agents take care <br>of it with MCP</h3><p>Let your agent find, read and install skills itself through a public, read-only MCP server. No account needed.</p></div>
+          <div><h3>Share with <br>your agents</h3><p>Connect My skills to Claude, ChatGPT, Cursor, Grok, Muse or any agent that supports MCP. Sign in once, and it can read your skills. Agents can also search the open library with no account.</p></div>
           <div class="copy-rows">
-            <div class="copy-row"><code>https://omgskills.com/mcp</code><button class="icon-button" data-copy="https://omgskills.com/mcp" aria-label="Copy MCP server URL" title="Copy MCP server URL" hidden><svg aria-hidden="true"><use href="/home/icons.svg#copy"></use></svg></button></div>
-            <div class="copy-row"><code>npx -y omgskills-mcp</code><button class="icon-button" data-copy="npx -y omgskills-mcp" aria-label="Copy MCP command" title="Copy MCP command" hidden><svg aria-hidden="true"><use href="/home/icons.svg#copy"></use></svg></button></div>
-            <div class="tool-tags"><code>search_skills</code><code>get_skill_content</code><code>get_install_plan</code><code>related_skills</code></div>
+            <div class="copy-row"><code>https://omgskills.com/my/mcp</code><button class="icon-button" data-copy="https://omgskills.com/my/mcp" aria-label="Copy My skills MCP URL" title="Copy My skills MCP URL" hidden><svg aria-hidden="true"><use href="/home/icons.svg#copy"></use></svg></button></div>
+            <div class="copy-row"><code>https://omgskills.com/mcp</code><button class="icon-button" data-copy="https://omgskills.com/mcp" aria-label="Copy Library MCP URL" title="Copy Library MCP URL" hidden><svg aria-hidden="true"><use href="/home/icons.svg#copy"></use></svg></button></div>
+                        <div class="tool-tags"><code>search_my_skills</code><code>read_my_skill</code><code>search_skills</code><code>get_install_plan</code></div>
           </div>
           <a class="text-link" href="/developers/">Developer docs <svg aria-hidden="true"><use href="/home/icons.svg#arrow-right"></use></svg></a>
         </article>
@@ -262,10 +261,13 @@
 
     <section class="section faq" aria-labelledby="faq-title">
       <h2 id="faq-title">Questions?</h2>
-      <details><summary>what is omgskills?</summary><p>A shared home for agent skills. Keep your skills in one library, group them into sets, and share them with your team. The open library helps you find good ones. New to skills? Read <a href="/guide/">the guide</a>.</p></details>
-      <details><summary>how much does it cost?</summary><p>Free. The library, sets, sharing, the MCP server and the companion app cost nothing.</p></details>
-      <details><summary>which agents does it work with?</summary><p>Claude Code and Codex. Sets install into both, and any agent that supports MCP can search the library.</p></details>
-      <details><summary>do my teammates need to install anything?</summary><p>To browse the library and join a set, no. The web works on its own. To install skills on a Mac, they use the free companion app.</p></details>
+      <details><summary>what is omgskills?</summary><p>A way to share skills across teams &amp; agents. Keep yours in My skills, share sets with your team, and connect My skills to Claude, ChatGPT, Cursor, Grok, Muse and more. The open library helps you find good ones. New to skills? Read <a href="/guide/">the guide</a>.</p></details>
+      <details><summary>how much does it cost?</summary><p>Free. My skills, sets, sharing, both MCP servers and the Mac app cost nothing.</p></details>
+      <details><summary>which agents does it work with?</summary><p>The Mac app installs skills and sets into Claude Code and Codex. Any agent that supports MCP, such as Claude, ChatGPT, Cursor, Grok and Muse, can read your skills through the My skills MCP.</p></details>
+      <details><summary>can I add my own skills?</summary><p>Yes. Sync them from your Mac, or add one on the web from a GitHub link or a folder on your computer.</p></details>
+      <details><summary>are my skills private?</summary><p>Yes. My skills is private to you until you add a skill to a set you share. A file that looks like it contains a key or password isn't synced unless you confirm it's safe.</p></details>
+      <details><summary>how do I use my skills in ChatGPT, Claude or Cursor?</summary><p>Add <code>https://omgskills.com/my/mcp</code> as a custom connector or MCP server, then sign in to omgskills. Your agent can then search and read your skills. See <a href="/developers/">developer resources</a>.</p></details>
+      <details><summary>do my teammates need to install anything?</summary><p>To browse the library and join a set, no. The web works on its own. To install skills on a Mac, they use the free Mac app.</p></details>
       <details><summary>how do I share skills with my team?</summary><p>Create a set, add skills, and invite teammates by email or share its link. Everyone installs the same skills at the same version.</p></details>
       <details><summary>can I keep a set private?</summary><p>Yes. Choose only-me access for a personal set, or invite-only access for specific people. You can change access from the set's page at any time.</p></details>
     </section>
@@ -279,7 +281,7 @@
       <a class="button secondary" href="/data/">See full leaderboard</a>
     </div></section>
 
-    <section class="section closing" aria-labelledby="closing-title"><h2 id="closing-title">Your team's skills, every agent</h2><div class="actions"><a class="button" href="/app/?view=sets" data-humblytics="Home Closing Create Team Set">Create a team set</a><a class="button secondary" href="/app/" data-humblytics="Home Closing Explore Library">Explore the library</a></div></section>
+    <section class="section closing" aria-labelledby="closing-title"><h2 id="closing-title">Share skills across teams &amp; agents</h2><div class="actions"><a class="button" href="/app/?view=all" data-humblytics="Home Closing Get Started">Get started</a><a class="button secondary" href="/app/" data-humblytics="Home Closing Explore Library">Explore the library</a></div></section>
   </main>
   <footer class="site-footer">
     <div class="site-footer-inner">
