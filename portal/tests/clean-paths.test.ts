@@ -153,3 +153,13 @@ test("only addresses nothing recognizes count as unknown", async () => {
   }
   assert.equal(unknownAppAddress("/library/anthropics/", "/app/"), false, "outside the app base");
 });
+
+test("both developer pages list the public MCP and the My skills MCP", async () => {
+  const { readFileSync } = await import("node:fs");
+  const app = readFileSync(new URL("../src/app/unified/DevelopersPage.tsx", import.meta.url), "utf8");
+  assert.match(app, /<CopyValue value=\{`\$\{site\}\/mcp`\} \/>/);
+  assert.match(app, /<CopyValue value=\{MY_SKILLS_MCP_URL\} \/>/);
+  const built = readFileSync(new URL("../../scripts/build-web-library.mjs", import.meta.url), "utf8");
+  assert.match(built, /<code>\$\{origin\}\/my\/mcp<\/code>/);
+  assert.match(built, /- Server URL: \$\{origin\}\/my\/mcp/);
+});

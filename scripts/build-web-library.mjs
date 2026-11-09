@@ -1066,6 +1066,14 @@ function renderDevelopersPage() {
     </div>
 
     <div class="section">
+      <div class="eyebrow">My skills MCP</div>
+      <h2>Connect your own library</h2>
+      <p>Your own skills for your agents, read only. Add this address as a custom connector or MCP server (Claude, ChatGPT, Cursor, Codex, Grok), then sign in to omgskills. Skills that can't sync, or that contain a key or password, are never shared.</p>
+      <div class="install-box"><pre class="install"><code>${origin}/my/mcp</code></pre></div>
+      <p>Available tools: <code>search_my_skills</code>, <code>read_my_skill</code>, and <code>read_skill_file</code>. See and disconnect agents in the app under MCP.</p>
+    </div>
+
+    <div class="section">
       <div class="eyebrow">Local MCP</div>
       <h2>Run from npm</h2>
       <p>Use the published package with any client that can launch a local MCP process:</p>
@@ -1334,6 +1342,14 @@ ${agentWhenToUse}
 - Access: read-only
 
 Available tools: \`search_skills\`, \`get_skill\`, \`get_skills\`, \`list_trending\`, \`list_gold_basket\`, \`list_by_author\`, \`related_skills\`, \`get_install_plan\`, and \`get_skill_content\`.
+
+## My skills MCP
+
+- Server URL: ${origin}/my/mcp
+- Authentication: sign in to omgskills (OAuth)
+- Access: read-only, your own skills only
+
+Your own skills for your agents, read only. Add this address as a custom connector or MCP server (Claude, ChatGPT, Cursor, Codex, Grok), then sign in to omgskills. Available tools: \`search_my_skills\`, \`read_my_skill\`, and \`read_skill_file\`.
 
 ## Local MCP
 
