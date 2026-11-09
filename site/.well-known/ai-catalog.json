@@ -12,7 +12,7 @@
       "type": "application/mcp-server-card+json",
       "data": {
         "name": "omgskills",
-        "description": "Search and inspect the public omgskills agent skill catalog.",
+        "description": "Search the omgskills open library of agent skills.",
         "version": "0.2.2",
         "endpoint": "https://omgskills.com/mcp",
         "transport": "streamable-http",

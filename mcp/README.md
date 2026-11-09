@@ -2,11 +2,11 @@
 
 Read-only MCP server for the omgskills open library of agent skills.
 
+Requires Node.js 20.3 or newer.
+
 ## Your own skills
 
 This server reads the public library only. To give an agent your own skills (My skills), add the My skills MCP at `https://omgskills.com/my/mcp` as a custom connector or MCP server and sign in to omgskills. It is hosted only, read-only, and needs no install. See [developer resources](https://omgskills.com/developers/).
-
-Requires Node.js 20.3 or newer.
 
 ## What It Does
 
