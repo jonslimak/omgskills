@@ -1395,6 +1395,8 @@ export function UnifiedApp({
                   </button>
                 </div>
                 </>}
+                {/* Your library over MCP lives on the Developers page too. */}
+                <div className="ua-nav-group">{navItem("developers", "Developers", CodeXml)}</div>
               </>
             )}
           </nav>

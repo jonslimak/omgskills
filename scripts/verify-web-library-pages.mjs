@@ -1025,7 +1025,8 @@ async function verifyLiveLlmsLinks() {
   const text = await response.text();
   await verifyLiveLinks(llmsUrls(text), {
     label: `${origin}/llms.txt`,
-    acceptStatus: (status, urlPath) => status === 200 || (urlPath === "/mcp" && status === 405),
+    // The My skills MCP needs a sign-in, so signed out it answers 401.
+    acceptStatus: (status, urlPath) => status === 200 || (urlPath === "/mcp" && status === 405) || (urlPath === "/my/mcp" && status === 401),
   });
 }
 

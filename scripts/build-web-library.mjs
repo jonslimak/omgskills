@@ -35,8 +35,9 @@ if (!Number.isSafeInteger(llmsGoldMaxBytes) || llmsGoldMaxBytes <= 0) {
 const generatedDirs = ["skills", "profiles", "creators", "library", "collections", "developers"];
 const goldBundlePages = [];
 const agentWhenToUse = [
-  "Use omgskills when you need to find or evaluate trusted skills for Claude Code, Codex, or other coding agents.",
-  "Search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors, or JSON manifests. For supported skills, get_install_plan returns commit-pinned installation instructions for your agent to run locally; the MCP server itself does not write files. People can also add skills to shared sets in the omgskills web app and install them with its free companion.",
+  "Use omgskills to find trusted skills for Claude Code, Codex, and other agents, and to use your own skill library from any agent.",
+  "Discover: search the public catalog by task, tool, or creator through the read-only MCP endpoint, Markdown mirrors, or JSON manifests. For supported skills, get_install_plan returns commit-pinned installation instructions for your agent to run locally; the server itself does not write files.",
+  `Your library: connect the My skills MCP (${origin}/my/mcp) to any agent that supports MCP, such as Claude, ChatGPT, Cursor, Codex, Grok, or Muse, and sign in. The agent can then search and read the skills in your omgskills library, so the same skills work in every agent without copying files. Both servers are read-only.`,
 ].join(" ");
 
 function escapeHtml(value) {
@@ -1068,7 +1069,7 @@ function renderDevelopersPage() {
     <div class="section">
       <div class="eyebrow">My skills MCP</div>
       <h2>Connect your own library</h2>
-      <p>Your own skills for your agents, read only. Add this address as a custom connector or MCP server (Claude, ChatGPT, Cursor, Codex, Grok), then sign in to omgskills. Skills that can't sync, or that contain a key or password, are never shared.</p>
+      <p>Your own skills for your agents, read only. Add this address as a custom connector or MCP server (Claude, ChatGPT, Cursor, Codex, Grok, Muse), then sign in to omgskills. Skills that can't sync, or that contain a key or password, are never shared.</p>
       <div class="install-box"><pre class="install"><code>${origin}/my/mcp</code></pre></div>
       <p>Available tools: <code>search_my_skills</code>, <code>read_my_skill</code>, and <code>read_skill_file</code>. See and disconnect agents in the app under MCP.</p>
     </div>
@@ -1349,7 +1350,7 @@ Available tools: \`search_skills\`, \`get_skill\`, \`get_skills\`, \`list_trendi
 - Authentication: sign in to omgskills (OAuth)
 - Access: read-only, your own skills only
 
-Your own skills for your agents, read only. Add this address as a custom connector or MCP server (Claude, ChatGPT, Cursor, Codex, Grok), then sign in to omgskills. Available tools: \`search_my_skills\`, \`read_my_skill\`, and \`read_skill_file\`.
+Your own skills for your agents, read only. Add this address as a custom connector or MCP server (Claude, ChatGPT, Cursor, Codex, Grok, Muse), then sign in to omgskills. Available tools: \`search_my_skills\`, \`read_my_skill\`, and \`read_skill_file\`.
 
 ## Local MCP
 
