@@ -52,7 +52,7 @@ export function PublicInstallSetup({ skill, detailReady, commit, returnRoute, st
         <a className="ua-f1-install" href={download.url} rel="noreferrer" aria-describedby={downloadStatus}><Download /> Download {appName}</a>
         <ol id={downloadStatus}>
           <li>Extract <strong>{download.filename}</strong>.</li>
-          <li>Copy <strong>{download.app}</strong> to Applications, then open it. Keep any existing OMGSkills app.</li>
+          <li>Copy <strong>{download.app}</strong> to Applications, then open it. Keep any existing omgskills Mac app.</li>
           <li>Return to this page and choose <strong>Try opening again</strong>, then <strong>Review in {appName}</strong>.</li>
         </ol>
       </> : <>

@@ -68,9 +68,9 @@ export function DevicesPanel({ api, denied, local = true, readOnly = false, brow
     </div>
     {state.devices?.length === 0 && !state.loading && !state.error && <EmptyState title="No connected devices" />}
     {!readOnly && connecting && (browserConnection
-      ? <Modal title="Connect OMGSkills" theme={theme} close={() => setConnecting(false)}>
-        <p>Open OMGSkills and choose Connect account. Review and approve the connection in your browser.</p>
-        <Action asChild><a href="omgskills://connect"><ArrowUpRight /> Open OMGSkills</a></Action>
+      ? <Modal title="Connect the Mac app" theme={theme} close={() => setConnecting(false)}>
+        <p>Open the omgskills Mac app and choose Connect account. Review and approve the connection in your browser.</p>
+        <Action asChild><a href="omgskills://connect"><ArrowUpRight /> Open the Mac app</a></Action>
       </Modal>
       : <ConnectionDialog api={api} denied={denied} local={local} theme={theme} close={() => setConnecting(false)} />)}
     {!readOnly && confirm && <Modal title={`Revoke ${confirm.deviceName}?`} theme={theme} close={() => { if (!state.revoking) setConfirm(null); }}>

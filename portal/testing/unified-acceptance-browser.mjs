@@ -76,7 +76,7 @@ try {
         await page.keyboard.press("Escape");
         await focused("Account menu");
         assert.deepEqual(await drawer.getByRole("navigation").getByRole("button").allTextContents(),
-          ["My Skills", "Favorites", "Sets", "Discover", "Trending", "Creators", "Collections"]);
+          ["My skills", "Favorites", "Sets", "Discover", "Trending", "Creators", "Collections"]);
         await page.keyboard.press("Escape");
         await drawer.waitFor({ state: "hidden" });
         await focused("Open navigation");

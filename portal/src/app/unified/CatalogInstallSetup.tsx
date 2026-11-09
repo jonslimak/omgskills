@@ -58,7 +58,7 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
           : <button type="button" className="ua-f1-install ua-primary" disabled={!action.href || busy || state.restartRequired}
             onClick={() => void session.retry()}><RefreshCw /> {busy ? "Checking details..." : "Try opening again"}</button>}
         {state.phase !== "setup" && <button type="button" className="ua-link ua-install-setup-link" disabled={!action.href || busy || state.restartRequired}
-          onClick={() => session.showSetup(skill)}>Set up Mac companion</button>}
+          onClick={() => session.showSetup(skill)}>Set up the Mac app</button>}
       </div>
     </div>
     <p role="status">{!action.href ? action.reason : state.message}</p>
@@ -66,12 +66,12 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
     {state.phase === "setup" && <div className="ua-install-help">
       <h4>Mac setup</h4>
       {productionDownload ? <>
-        <p>OMGSkills {productionDownload.version}. Apple silicon Mac, macOS {productionDownload.minimumOS} or later.</p>
-        <a className="ua-f1-install" href={productionDownload.url} rel="noreferrer" aria-describedby={downloadId} data-humblytics="App Setup Download"><Download /> Download OMGSkills {productionDownload.version}</a>
-        <p>Installing this version manually replaces your existing OMGSkills app. Your installed skills stay in their current folders.</p>
+        <p>omgskills Mac app {productionDownload.version}. Apple silicon Mac, macOS {productionDownload.minimumOS} or later.</p>
+        <a className="ua-f1-install" href={productionDownload.url} rel="noreferrer" aria-describedby={downloadId} data-humblytics="App Setup Download"><Download /> Download the Mac app {productionDownload.version}</a>
+        <p>Installing this version manually replaces your existing omgskills Mac app. Your installed skills stay in their current folders.</p>
         <ol id={downloadId}>
           <li>Double-click <strong>{productionDownload.filename}</strong> in Finder to unzip it.</li>
-          <li>Quit OMGSkills if it is running. Move <strong>{productionDownload.app}</strong> into <strong>Applications</strong>.</li>
+          <li>Quit the omgskills Mac app if it is running. Move <strong>{productionDownload.app}</strong> into <strong>Applications</strong>.</li>
           <li>Open <strong>{productionDownload.app}</strong> from <strong>Applications</strong>. If macOS asks, choose <strong>Open</strong>.</li>
           <li>Return here and choose <strong>Try opening again</strong>, then <strong>Open in {appName}</strong>. Approve installation in the app.</li>
         </ol>
