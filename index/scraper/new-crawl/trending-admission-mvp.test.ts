@@ -155,6 +155,41 @@ test("canonical redirect aliases preserve existing path identity instead of mint
   assert.deepEqual(result.snapshot.cutoverSkills, [existing]);
 });
 
+test("an indexed skill name resolves a different folder name without rewriting its historical ID", async () => {
+  const existing = { ...skill("leonxlnx/taste-skill:imagegen-frontend-mobile", "skills/taste-skill/SKILL.md"),
+    name: "Design-Taste-Frontend" };
+  const result = await run({ entries: [entry("leonxlnx/taste-skill", "design-taste-frontend")], baseline: [existing], deps: {
+    lookupRepo: async () => ({ repo: "Leonxlnx/taste-skill", commit, paths: [existing.skill_md_path!],
+      meta: { stars: 0, lastUpdated: date, tags: [], githubUrl: "https://github.com/Leonxlnx/taste-skill" } }),
+    enrich: async () => { throw new Error("existing name/path must not be enriched"); },
+    pin: async () => { throw new Error("existing name/path must not be pinned"); },
+    inspectAttribution: async () => { throw new Error("existing name/path needs no attribution fetch"); },
+  } });
+  assert.equal(result.outcomes[0]?.status, "existing");
+  assert.equal(result.outcomes[0]?.path, existing.skill_md_path);
+  assert.equal(result.outcomes[0]?.existingId, existing.id);
+  assert.deepEqual(result.snapshot, createTrendingMvpSnapshot([existing], date));
+});
+
+test("indexed-name lookup ignores missing paths and other repositories, and never chooses an ambiguous match", async () => {
+  const named = (id: string, path: string) => ({ ...skill(id, path), name: "one" });
+  const first = "skills/first/SKILL.md", second = "skills/second/SKILL.md";
+  for (const baseline of [
+    [named("owner/repo:historical", "skills/removed/SKILL.md")],
+    [named("other/repo:historical", first)],
+    [named("owner/repo:first", first), named("owner/repo:second", second)],
+    [named("owner/repo:unsafe", "../first/SKILL.md")],
+  ]) {
+    const result = await run({ baseline, deps: {
+      lookupRepo: async repo => ({ repo, commit, paths: [first, second, "../first/SKILL.md"],
+        meta: { stars: 0, lastUpdated: date, tags: [], githubUrl: `https://github.com/${repo}` } }),
+      enrich: async () => { throw new Error("unverified or ambiguous name/path must not be enriched"); },
+    } });
+    assert.equal(result.outcomes[0]?.status, "unresolved");
+    assert.deepEqual(result.snapshot.cutoverSkills, baseline);
+  }
+});
+
 test("repo/owner/catalog/suppression exclusions win even for trusted or manual sources", async () => {
   for (const kind of ["repo", "owner", "catalog", "suppression", "override", "provenance"] as const) {
     const policy = seeds();

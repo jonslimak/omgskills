@@ -111,10 +111,16 @@ async function verifyEntry(entry: SourceTrendingEntry, skills: ShadowSkillRecord
   const details = { ...outcome, id, repo: repo.repo, stars: repo.meta.stars };
   const canonicalBlock = trendingMvpPolicyReason(id, repoUrl, seeds);
   if (canonicalBlock) return { outcome: { ...details, status: "blocked", reason: canonicalBlock } };
-  const indexedPaths = skills.filter(skill => repoFromGithubUrl(skill.github_url) === repo.repo.toLowerCase())
-    .map(skill => normalizePath(skill.skill_md_path ?? "")).filter(path => repo.paths.includes(path)).sort();
+  const indexedSkills = skills.filter(skill => repoFromGithubUrl(skill.github_url) === repo.repo.toLowerCase());
+  const indexedPaths = indexedSkills.map(skill => normalizePath(skill.skill_md_path ?? ""))
+    .filter(path => repo.paths.includes(path)).sort();
   const preferredPath = indexedPaths.find(path => normalizedName(path.split("/").at(-2) ?? "") === normalizedName(entry.skillId));
-  const path = resolveTrendingMvpPath(repo.paths, entry.skillId, repo.packagesByPath, preferredPath);
+  // A catalog name can differ from its folder; only reuse a unique path still in the current tree.
+  const namedPaths = [...new Set(indexedSkills.filter(skill => normalizedName(skill.name) === normalizedName(entry.skillId))
+    .map(skill => normalizePath(skill.skill_md_path ?? "")).filter(path => indexedPaths.includes(path)))];
+  const namedPath = namedPaths.length === 1 ? namedPaths[0] : undefined;
+  const path = resolveTrendingMvpPath(repo.paths, entry.skillId, repo.packagesByPath, preferredPath)
+    ?? (namedPath ? resolveTrendingMvpPath([namedPath], namedPath.split("/").at(-2) ?? entry.skillId) : null);
   if (!path) return { outcome: details };
   if (path === "SKILL.md" && seeds.rootSkillInvalidRepos?.has(repo.repo.toLowerCase())) {
     return { outcome: { ...details, path, status: "blocked", reason: "known-invalid-root" } };
