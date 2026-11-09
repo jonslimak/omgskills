@@ -7,16 +7,16 @@ const read = file => readFileSync(new URL(`../${file}`, import.meta.url), "utf8"
 test("homepage marketing stays intact with adjacent Coming soon labels", () => {
   const home = read("site/index.html");
   for (const copy of [
-    '<h1 id="hero-title">share skills<br>with your team</h1>',
-    "Put your team's agent skills in one place. Share a set once, and everyone's Claude Code and Codex stay in sync.",
+    '<h1 id="hero-title">share skills<br>across teams &amp; agents</h1>',
+    "Keep your skills in one place. Use them in Claude, ChatGPT, Cursor, Grok, Muse and more.",
     'From your library to your team\'s agents. No zip files, no Slack threads, no "which version do you have?"',
     "Add teammates by email, or share one link. Everyone gets the same skills, at the same version.",
     "Install the set in Claude Code or Codex. When the set changes, everyone stays up to date.",
     "Public, invite only, or only me. Share one link, and when you update a set, your team gets the change.",
-    '<h2 id="closing-title">Your team\'s skills, every agent</h2>',
+    '<h2 id="closing-title">Share skills across teams &amp; agents</h2>',
   ]) assert.ok(home.includes(copy), copy);
   const labels = [...home.matchAll(/<small class="coming-soon" data-planned-feature="([^"]+)">([^<]+)<\/small>/g)];
-  assert.deepEqual(labels.map(m => m[1]), ["team-sync", "set-updates", "set-subscription"]);
+  assert.deepEqual(labels.map(m => m[1]), ["set-subscription"]);
   for (const label of labels) assert.match(label[2], /Coming soon/);
 });
 

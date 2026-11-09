@@ -150,11 +150,11 @@ test('data refresh preserves the handoff layout and static feature artwork', asy
     '$1$3',
   );
   assert.equal(withoutGeneratedContent(refreshed), withoutGeneratedContent(html));
-  assert.match(refreshed, /Your team's skills, every agent/);
+  assert.match(refreshed, /Share skills across teams &amp; agents<\/h2>/);
   const sectionTitles = [...refreshed.matchAll(/<h2\b[^>]*>([\s\S]*?)<\/h2>/g)];
   assert.equal(sectionTitles.filter(([tag]) => !tag.includes('site-footer') && !/<h2>(Library|Developers|Company)<\/h2>/.test(tag)).length, 7);
   for (const [, title] of sectionTitles) assert.match(title, /^[A-Z]/);
-  assert.match(refreshed, /<h1 id="hero-title">share skills<br>with your team<\/h1>/);
+  assert.match(refreshed, /<h1 id="hero-title">share skills<br>across teams &amp; agents<\/h1>/);
   assert.doesNotMatch(refreshed, /mac-section|Download for macOS/);
   assert.match(refreshed, /Example design team set/);
   assert.match(refreshed, /<div class="demo-footer">keep updated<span class="switch" aria-hidden="true"><\/span><\/div>/);
