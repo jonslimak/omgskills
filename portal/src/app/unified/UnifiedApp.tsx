@@ -309,7 +309,7 @@ function ManagedSetHeader({ set, skills, management, theme, headingActions }: {
   const installLink = set.isFavorites ? null : management.installLink?.(set) ?? null;
   const descriptions = {
     public: "Anyone with the link can view this set.",
-    restricted: "Only you and people granted email access.",
+    restricted: "You and people granted email access.",
     private: "Just you, on your account.",
   };
   return <>
@@ -1059,7 +1059,8 @@ export function UnifiedApp({
           ? "Try a creator or a task."
           : publicStatus && nav.view === "creator" ? `No creator called @${nav.id} is in the catalog.`
           : publicStatus && nav.view === "collection" ? "This collection doesn't exist or was removed."
-          : nav.view === "all" ? "Turn on Sync My skills to bring in skills from your Mac, add one from a GitHub link or a folder, or explore the library."
+          : nav.view === "all" && !nav.id && !nav.show && nav.source === "all"
+            ? "Connect the Mac app to bring in skills from your Mac, add one from a GitHub link or a folder, or explore the library."
           : "Explore the library for your next useful skill."}
       </Empty>
     );
@@ -1799,7 +1800,7 @@ export function UnifiedApp({
                         </div>
                       ))}
                       <p className="ua-muted">
-                        Agents your synced skills are installed in. Remote
+                        Agents your skills are installed in on your Macs. Remote
                         installation is not available here.
                       </p>
                     </>

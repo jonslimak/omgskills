@@ -68,7 +68,7 @@ try {
     await page.getByRole("heading", { name: "Today", exact: true }).waitFor();
     if (!await mainFocused()) failures.push(`${width}: browser Forward lost focus`);
     const accountMenu = page.getByRole("button", { name: "Account menu", exact: true }).filter({ visible: true });
-    for (const destination of ["Profile", "Agents 2 observed"]) {
+    for (const destination of ["Profile", "Agents 2"]) {
       if (width < 760) await page.getByRole("button", { name: "Open navigation", exact: true }).click();
       await accountMenu.press("Enter");
       await page.getByRole("menuitem", { name: destination, exact: true }).press("Enter");
