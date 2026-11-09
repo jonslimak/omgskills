@@ -20,10 +20,12 @@ import type {
 
 export const MANUAL_CURATION_SOURCE = "manual-curation";
 export const CREATOR_BACKFILL_SOURCE = "creator-backfill";
+export const TRENDING_ADMISSION_SOURCE = "trending";
 
 export type ShadowSkillPersistenceSource =
   | typeof MANUAL_CURATION_SOURCE
-  | typeof CREATOR_BACKFILL_SOURCE;
+  | typeof CREATOR_BACKFILL_SOURCE
+  | typeof TRENDING_ADMISSION_SOURCE;
 
 export type ShadowSkillPersistencePaths = {
   skillOverlay: string;
@@ -92,8 +94,8 @@ function skillForSource(
   skill: ShadowSkillRecord,
   source: ShadowSkillPersistenceSource,
 ): ShadowSkillRecord {
-  if (source !== CREATOR_BACKFILL_SOURCE) return skill;
-  return { ...skill, source_tag: CREATOR_BACKFILL_SOURCE };
+  if (source !== CREATOR_BACKFILL_SOURCE && source !== TRENDING_ADMISSION_SOURCE) return skill;
+  return { ...skill, source_tag: source };
 }
 
 export function defaultShadowSkillPersistencePaths(): ShadowSkillPersistencePaths {
