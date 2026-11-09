@@ -37,6 +37,11 @@ test("signed in, the logo on every site page opens My skills; signed out, it sta
     const logos = (text.match(/class="(brand|eyes|site-footer-brand-logo)"[^>]*href="\/"/g) ?? []).length;
     assert.equal(text.includes('<script src="/signed-in-logo.js"></script>'), logos > 0, page);
   }
+  // The generated library, skill and developer pages all share one page shell.
+  const generator = await readFile(new URL("./build-web-library.mjs", import.meta.url), "utf8");
+  const shell = generator.slice(generator.indexOf("function pageShell("), generator.indexOf("function pageHeading("));
+  assert.match(shell, /<a class="brand" href="\/"|\$\{siteFooterHtml\}/);
+  assert.ok(shell.includes('<script src="/signed-in-logo.js"></script>\n</body>'));
   const run = (cookie) => {
     const links = ["brand", "eyes", "site-footer-brand-logo", "other"].map((name) => ({ name, href: "/", setAttribute(key, value) { this[key] = value; } }));
     const document = { cookie, querySelectorAll: (selector) => links.filter((link) => selector.includes(`a.${link.name}[href="/"]`)) };

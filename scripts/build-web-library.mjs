@@ -464,6 +464,7 @@ ${siteFooterHtml}
       button.addEventListener("click", () => applySkillView(button.dataset.nextView, true));
     });
   </script>
+  <script src="/signed-in-logo.js"></script>
 </body>
 </html>
 `;
