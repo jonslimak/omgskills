@@ -21,7 +21,7 @@ const isLive = process.argv.includes("--live");
 const livePageHtmlByPath = new Map();
 const verifyLiveLinks = createLiveLinkVerifier({ origin, fetchLive });
 // Served by functions or by the app build, which is copied into the site after this check.
-const dynamicLocalPaths = new Set(["/mcp", "/mcp/health", "/app/"]);
+const dynamicLocalPaths = new Set(["/mcp", "/mcp/health", "/my/mcp", "/app/"]);
 
 const editorialCollections = JSON.parse(
   await readFile(path.join(repoRoot, "index", "curations", "collections.json"), "utf8"),
