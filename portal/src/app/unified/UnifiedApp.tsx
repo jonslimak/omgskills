@@ -620,6 +620,10 @@ export function UnifiedApp({
   const creatorGroups = useMemo(() => discoveryCreatorGroups(catalog.creators), [catalog.creators]);
   const creatorHeader = nav.view === "creator" && !nav.query;
   const discovery = !signedIn || isDiscovery(nav.view);
+  // Developers is in both sidebars: opened from My skills, the sidebar stays on My skills.
+  const sidebarMine = useRef(false);
+  if (nav.view !== "developers") sidebarMine.current = !discovery;
+  const sidebarDiscovery = discovery && !(nav.view === "developers" && signedIn && sidebarMine.current);
   const favorites = mine.filter((skill) => isFavorite(data, skill));
   const sets = signedIn
     ? data.sets.filter((set) => (!set.hidden || (showHidden && nav.view === "sets")) && !set.isFavorites)
@@ -1337,7 +1341,7 @@ export function UnifiedApp({
             <div className="ua-modes" role="group" aria-label="App mode">
               <button
                 type="button"
-                aria-pressed={!discovery}
+                aria-pressed={!sidebarDiscovery}
                 title="My skills"
                 onClick={() => go("all")}
               >
@@ -1346,7 +1350,7 @@ export function UnifiedApp({
               </button>
               <button
                 type="button"
-                aria-pressed={discovery}
+                aria-pressed={sidebarDiscovery}
                 title="Discover"
                 onClick={() => go("discover")}
               >
@@ -1363,7 +1367,7 @@ export function UnifiedApp({
             search()
           )}
           <nav className="ua-nav">
-            {discovery ? (
+            {sidebarDiscovery ? (
               <>
                 {navItem("discover", "Discover", Compass)}
                 {navItem("top", publicStatus ? "Trending skills" : "Top this week", TrendingUp)}
