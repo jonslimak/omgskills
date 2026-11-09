@@ -16,7 +16,7 @@ test("homepage marketing stays intact with adjacent Coming soon labels", () => {
     '<h2 id="closing-title">Share skills across teams &amp; agents</h2>',
   ]) assert.ok(home.includes(copy), copy);
   const labels = [...home.matchAll(/<small class="coming-soon" data-planned-feature="([^"]+)">([^<]+)<\/small>/g)];
-  assert.deepEqual(labels.map(m => m[1]), ["set-updates", "set-subscription"]);
+  assert.deepEqual(labels.map(m => m[1]), ["set-subscription"]);
   for (const label of labels) assert.match(label[2], /Coming soon/);
 });
 
