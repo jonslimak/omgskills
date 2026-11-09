@@ -15,7 +15,7 @@ export interface SkillsShHit {
   tags?: string[];
 }
 
-interface SkillsShEntry {
+export interface SkillsShEntry {
   source: string;
   skillId: string;
   name: string;
@@ -47,6 +47,7 @@ interface SkillsShOptions {
   repoConcurrency?: number;
   pageRetryBaseDelayMs?: number;
   requestTimeoutMs?: number;
+  boardData?: { entries: SkillsShEntry[]; total: number };
 }
 
 const ROOT_URL = "https://skills.sh";
@@ -230,6 +231,13 @@ async function getRepoMeta(repoFullName: string): Promise<RepoMeta | null> {
   }
 }
 
+/** Raw board order, including non-GitHub sources; no repository lookups or admission. */
+export function fetchSkillsShBoard(options: Pick<SkillsShOptions, "board" | "topLimit" | "pageConcurrency" | "pageRetryBaseDelayMs" | "requestTimeoutMs"> = {}) {
+  return fetchBoardEntries(options.board ?? "trending", options.topLimit ?? DEFAULT_TOP_LIMIT, false,
+    options.pageConcurrency ?? DEFAULT_PAGE_CONCURRENCY, options.pageRetryBaseDelayMs ?? PAGE_RETRY_BASE_DELAY_MS,
+    options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS);
+}
+
 /**
  * All-time install totals keyed by lowercased `owner/repo:skillId`, from the board pages only
  * (no GitHub lookups). Lets a trending-ranked list keep lifetime install counts.
@@ -263,7 +271,7 @@ export async function searchSkillsSh(options: SkillsShOptions = {}): Promise<Ski
   const pageRetryBaseDelayMs = options.pageRetryBaseDelayMs ?? PAGE_RETRY_BASE_DELAY_MS;
   const requestTimeoutMs = options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
 
-  const { entries, total } = await fetchBoardEntries(
+  const { entries, total } = options.boardData ?? await fetchBoardEntries(
     board,
     topLimit,
     crawlAll,

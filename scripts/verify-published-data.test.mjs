@@ -21,7 +21,7 @@ function writeAsset(dataDir, name, value) {
   };
 }
 
-function verifyFixture({ skills, shaHistory, collections, skillEquivalence, earlierShaHistory }) {
+function verifyFixture({ skills, shaHistory, collections, skillEquivalence, earlierShaHistory, sourceTrending }) {
   const root = mkdtempSync(join(tmpdir(), "verify-published-data-test-"));
   const dataRoot = join(root, "isolated-data");
   const dataDir = join(dataRoot, "test");
@@ -38,6 +38,7 @@ function verifyFixture({ skills, shaHistory, collections, skillEquivalence, earl
     if (collections !== undefined) {
       manifest.collections = writeAsset(dataDir, "collections.json", collections);
     }
+    if (sourceTrending !== undefined) manifest.sourceTrending = writeAsset(dataDir, "source-trending.json", sourceTrending);
     if (skillEquivalence !== undefined) {
       manifest.skillEquivalence = writeAsset(dataDir, "skill-equivalence.json", skillEquivalence);
     }
@@ -115,6 +116,17 @@ test("accepts historical SHA assets without canonicalBySha", () => {
   assert.equal(JSON.parse(result.stdout).canonicalByShaCount, 0);
   assert.equal(JSON.parse(result.stdout).collectionsCount, 0);
   assert.equal(JSON.parse(result.stdout).skillEquivalenceGroupCount, 0);
+});
+
+test("optional source Trending accepts external discoveries but rejects invalid catalog links", () => {
+  const feed = { version: 1, source: "skills.sh", board: "trending", fetchedAt: "2026-11-09T10:00:00Z", entries: [
+    { source: "new/repo", skillId: "new", name: "New", rank: 1, installs24h: 123, sourceUrl: "https://skills.sh/new/repo/new" },
+  ] };
+  const fixture = { skills: [skill("owner/repo:one", shaA)], shaHistory: history(undefined), sourceTrending: feed };
+  assert.equal(verifyFixture(fixture).status, 0);
+  const invalid = verifyFixture({ ...fixture, sourceTrending: { ...feed, entries: [{ ...feed.entries[0], catalogId: "missing/repo:skill" }] } });
+  assert.notEqual(invalid.status, 0);
+  assert.match(invalid.stderr, /catalog link is missing/);
 });
 
 test("rejects a SHA asset that drops canonicalBySha an earlier asset published", () => {

@@ -251,11 +251,14 @@ for key, value in existing.items():
 manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
 PY
 fi
+if [ -n "$DATA_TRACK_SUBDIR" ]; then
+    node "$REPO_ROOT/scripts/prepare-source-trending.mjs" "$REPO_ROOT" "$DATA_DIR" "$next_manifest_tmp" "$SKILLS"
+fi
 node "$REPO_ROOT/scripts/search-catalog-cli.mjs" "$DATA_DIR" "$next_manifest_tmp" "$existing_manifest_tmp"
 node "$REPO_ROOT/scripts/publish-catalog-manifest.mjs" \
     "$DATA_DIR" "$next_manifest_tmp" "$existing_manifest_tmp" \
     skills trending trending-leaderboard leaderboard-view-data x-trending \
-    skill-signals author-signals author-leaderboards
+    skill-signals author-signals author-leaderboards source-trending
 
 if [ -z "$DATA_TRACK_SUBDIR" ]; then
     HEALTH_PUBLISHED_AT="${HEALTH_PUBLISHED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}" \

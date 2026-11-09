@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import {
   canKeepLastGoodSkillsShData,
   fetchSkillsShInstallTotals,
+  fetchSkillsShBoard,
   searchSkillsSh,
 } from "./sources/skillssh.js";
 import type { SkillsShHit } from "./sources/skillssh.js";
@@ -12,6 +13,7 @@ import type { SkillsShHit } from "./sources/skillssh.js";
 // "installs" counts that skill pages, the Mac app and search signals display.
 const RANK_BOARD = "trending" as const;
 import type { Skill } from "./types.js";
+import { refreshSourceTrending, sourceTrendingPolicy } from "./build-source-trending.js";
 
 interface TrendingEntry {
   id: string;
@@ -137,7 +139,13 @@ async function main() {
   let hits;
   let totals: Map<string, number>;
   try {
-    ({ hits, totals } = await loadTrendingSourceData());
+    const boardData = await fetchSkillsShBoard({ board: RANK_BOARD });
+    await refreshSourceTrending({ entries: boardData.entries, skills: [...library.values()],
+      policy: sourceTrendingPolicy(), outputPath: join(here, "..", "source-trending.json") });
+    ({ hits, totals } = await loadTrendingSourceData({
+      search: () => searchSkillsSh({ board: RANK_BOARD, boardData }),
+      fetchInstallTotals: () => fetchSkillsShInstallTotals(), warn: console.warn,
+    }));
   } catch (error) {
     if (!canKeepLastGoodSkillsShData(error, existing.entries.size)) throw error;
     console.warn(

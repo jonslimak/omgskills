@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { validateSearchCatalog } from "./search-catalog.mjs";
+import { validateSourceTrending } from "./source-trending-format.mjs";
 
 const repoRoot = process.cwd();
 const dataRoot = process.env.OMGSKILLS_DATA_ROOT ?? join(repoRoot, "site", "data");
@@ -79,6 +80,8 @@ if (typeof manifest.version !== "number") {
 
 const skills = assertAsset("skills", manifest.skills);
 const trending = assertAsset("trending", manifest.trending);
+const sourceTrending = manifest.sourceTrending ? assertAsset("sourceTrending", manifest.sourceTrending) : null;
+if (sourceTrending) validateSourceTrending(sourceTrending.decoded);
 const trendingLeaderboard = manifest.trendingLeaderboard
   ? assertAsset("trendingLeaderboard", manifest.trendingLeaderboard)
   : null;
@@ -119,6 +122,9 @@ if (skillEquivalence && (!skillEquivalence.decoded || Array.isArray(skillEquival
 
 const skillsById = new Map(skills.decoded.map((item) => [item?.id, item]).filter(([id]) => Boolean(id)));
 const skillIds = new Set(skillsById.keys());
+for (const entry of sourceTrending?.decoded.entries ?? []) {
+  if (entry.catalogId && !skillIds.has(entry.catalogId)) fail(`sourceTrending catalog link is missing: ${entry.catalogId}`);
+}
 const authorHandles = new Set(skills.decoded.map((item) => item?.author_handle).filter(Boolean));
 let staleCollectionReferenceCount = 0;
 let skillEquivalenceGroupCount = 0;
