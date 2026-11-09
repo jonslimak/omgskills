@@ -4,45 +4,36 @@
 
 # omgskills
 
-**Share agent skills with your team.**
+**Share skills across teams & agents.**
 
-OMGSkills helps teams organize and share skills for Claude Code and Codex, alongside a library of useful skills from trusted creators and sources.
+Keep your skills in one place. Use them in Claude, ChatGPT, Cursor, Grok, Muse and more.
 
-[Create sets of skills to share](https://omgskills.com/app/?view=sets) or [explore the library](https://omgskills.com/app/). The web app works on its own; the Mac companion is optional for installing skills and reporting what is installed.
+[Open omgskills](https://omgskills.com/app/) or [download the Mac app](https://omgskills.com/download) (Apple silicon, macOS 14 or later). The web app works on its own; the Mac app installs skills into Claude Code and Codex.
 
-## Share skills with your team
+## Keep your skills in My skills
+
+- My skills holds the skills you write and the ones you add from the library.
+- Turn on Sync My skills, and your connected Macs keep a private copy of each skill's files in My skills. You can leave out any skill.
+- Add a skill from a GitHub link or a folder on your computer.
+- A file that looks like it contains a key or password is not synced unless you confirm it's safe, and a skill with one can't be added.
+
+## Share with your team
 
 Bring the skills for a project or team together in a Set:
 
-- Organize skills in one place so teammates can find what to use.
 - Choose public, invite-only, or only-me access.
-- Grant teammates access and share the Set's link. Access can be revoked later.
-
-You can create and share Sets now. Invitations provide a copyable link; they do not send an invitation email.
-
-Teammates install a whole Set from the Mac companion, either at a fixed version or kept updated (the companion shows changes when they open the Set again and asks before applying them).
+- Share the Set's link with teammates. Access can be revoked later. Invitations give you a link to send; they do not send an email.
+- Teammates install the whole Set from the Mac app, either at a fixed version or kept updated (the Mac app shows changes when they open the Set again and asks before applying them).
 
 **Coming soon:** automatic skill updates in the background.
 
-## Find useful skills
+## Share with your agents
 
-Browse the public library without an account. Discover skills through search, collections, trending lists, and creator and company profiles. Read a skill's description, SKILL.md and available README before deciding to use it.
+- **Mac app:** installs skills and Sets into Claude Code and Codex.
+- **My skills MCP:** add `https://omgskills.com/my/mcp` as a custom connector or MCP server in Claude, ChatGPT, Cursor, Codex, Grok, Muse or any agent that supports MCP, then sign in to omgskills. The agent can search and read your skills. It is read-only, and you can disconnect any agent under **MCP server** in your account menu.
+- **Library MCP:** `https://omgskills.com/mcp` lets agents search the public library, read skills, find related skills and get commit-pinned install plans. No sign-in.
 
-Save useful skills to your library and Sets when signed in. The library complements your team's own skills, giving you a starting point for coding, design, marketing and other work.
-
-"Trusted sources" describes where skills come from, not a guarantee that every skill is safe or security-audited. Review third-party instructions and code before using them.
-
-## Optional Mac companion
-
-Start at [omgskills.com/app/](https://omgskills.com/app/). Browse public skills without an account, organize Sets on the web, and choose a skill to open its Mac installation flow. [Download the Mac companion 0.0.28](https://omgskills.com/download) for Apple silicon and macOS 14 or later, or use the skill's setup panel. The [original Mac app](https://omgskills.com/downloads/omgskills-mac.dmg) and its update feed remain available separately. Existing users are not automatically upgraded.
-
-Connect the companion to your account to see installed skills by Mac and agent, including supported external installs. Sync keeps the installed-skills list up to date; it does not update skill files.
-
-## Use the library from your agent
-
-The read-only MCP server lets agents search the public library, inspect skills and their content, find related skills, and request commit-pinned install plans where available.
-
-Install the npm package:
+To run the Library MCP locally, install the npm package:
 
 ```bash
 npm install -g omgskills-mcp
@@ -60,9 +51,15 @@ Add it to your MCP client:
 }
 ```
 
-No repository checkout is needed. The MCP server reads public catalog data, not your private library or Sets. It returns install instructions but does not execute them or install skills itself.
+The Library MCP reads public catalog data only. It returns install instructions but does not run them or install skills itself. See [MCP setup, tools and data sources](mcp/README.md) for hosted access, filters, paging and local configuration.
 
-See [MCP setup, tools and data sources](mcp/README.md) for hosted access, filters, paging and local configuration.
+## Discover skills
+
+Browse the public library without an account. Find skills through search, collections, trending lists, and creator and company profiles. Read a skill's description, SKILL.md and README before you use it, then add it to My skills or a Set.
+
+"Trusted sources" describes where skills come from, not a guarantee that every skill is safe or security-audited. Review third-party instructions and code before using them.
+
+The [original Mac app](https://omgskills.com/downloads/omgskills-mac.dmg) and its update feed remain available separately. Existing users are not automatically upgraded.
 
 ## Development
 
@@ -70,11 +67,11 @@ This repository contains the web app, catalog pipeline, MCP server and Mac code.
 
 | Directory | Purpose |
 | --- | --- |
-| `portal/` | React/Vite web app: discovery, personal library, Sets and sharing |
-| `netlify/` | Backend functions for the web app, public catalog and connected Macs |
+| `portal/` | React/Vite web app: My skills, the library, Sets and sharing |
+| `netlify/` | Backend functions for the web app, public catalog, connected Macs and both MCP servers |
 | `index/` | Catalog discovery, metadata, curation and data generation |
-| `mcp/` | Read-only MCP server, published as `omgskills-mcp` |
-| `menubar/` | Mac companion and original Mac app code |
+| `mcp/` | Library MCP server, published as `omgskills-mcp` |
+| `menubar/` | Mac app and original Mac app code |
 | `site/` | Public website, hosted data and release assets |
 | `scripts/` | Builds, verification, data publication and release tooling |
 
@@ -97,9 +94,9 @@ See [web app setup](portal/README.md) for authentication requirements, public ca
 
 ## Security and privacy
 
-The public catalog can be browsed without signing in. Sets have their own access controls; public MCP tools do not expose private account data.
+The public catalog can be browsed without signing in. Sets have their own access controls. The Library MCP reads only public data; the My skills MCP reads only your own skills, after you sign in and allow the agent.
 
-With your approval, the Mac companion scans supported local skill folders and reports inventory to your account. Inventory reports include skill metadata and fingerprints, not full local paths or full skill files. See the [privacy policy](https://omgskills.com/privacy/) for details.
+With your approval, the Mac app scans supported local skill folders and reports installed skills to your account: names, metadata and fingerprints, not full local paths. With Sync My skills off, no skill files are uploaded. With it on, skill files are kept privately in My skills. See the [privacy policy](https://omgskills.com/privacy/) for details.
 
 Do not commit `.env` files, API tokens, signing certificates, release credentials or private diagnostic logs. Report security issues privately using [SECURITY.md](SECURITY.md).
 

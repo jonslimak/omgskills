@@ -46,5 +46,5 @@ test("help and privacy distinguish reporting, local installs and account deletio
   for (const copy of ["Clerk", "SKILL.md fingerprint", "Inventory reports do not upload full local paths or full skill files", "Sets and invitations", "account-deletion request", "hi@omgskills.com"]) {
     assert.ok(privacy.includes(copy), copy);
   }
-  assert.match(read("site/terms/index.html"), /Set installation is available in the companion; automatic skill updates are coming soon/);
+  assert.match(read("site/terms/index.html"), /Set installation is available in the Mac app; automatic skill updates are coming soon/);
 });

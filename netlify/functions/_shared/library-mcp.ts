@@ -172,7 +172,7 @@ export async function handleLibraryMcp(req: Request, deps: LibraryMcpDependencie
 
   if (blocked) {
     return json({ error: "disconnected", error_description:
-      "You disconnected this agent from My skills. To use it again, choose Allow again at omgskills.com (account menu, MCP)." }, 403);
+      "You disconnected this agent from My skills. To use it again, choose Allow again at omgskills.com (account menu, MCP server)." }, 403);
   }
 
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405, { Allow: "POST, OPTIONS" });

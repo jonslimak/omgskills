@@ -51,7 +51,7 @@ export function DevelopersPage() {
         in every agent without copying files. Both servers are read-only.</p>
     </section>
     <div className="ua-dev-grid">
-      <Card icon={Globe} title="Hosted MCP (live catalog)">
+      <Card icon={Globe} title="Library MCP">
         <CopyValue value={`${site}/mcp`} />
         <p>Public, read-only, no authentication. Available tools: <code>search_skills</code>, <code>get_skill</code>,{" "}
           <code>get_install_plan</code>, <code>get_skill_content</code>, <code>related_skills</code>, and more.</p>
@@ -84,7 +84,7 @@ export function DevelopersPage() {
       <Card icon={ShieldCheck} title="Links & safety">
         <Item title="npm package" href="https://www.npmjs.com/package/omgskills-mcp">Install the local MCP server.</Item>
         <Item title="Source" href="https://github.com/jonslimak/omgskills">Repository, documentation, and issue tracking.</Item>
-        <Item title="Safety">The public MCP tools only read public catalog data. The My skills MCP reads only your own skills, after you sign in.
+        <Item title="Safety">The Library MCP reads only public catalog data. The My skills MCP reads only your own skills, after you sign in.
           Neither installs skills, writes files, or runs shell commands.</Item>
       </Card>
     </div>

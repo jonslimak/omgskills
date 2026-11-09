@@ -142,7 +142,7 @@ const rootFiles = [
   },
   {
     path: "/llms.txt",
-    text: "omgskills puts your team's agent skills in one place",
+    text: "omgskills shares skills across teams & agents",
   },
   {
     path: "/agents.md",
@@ -573,7 +573,7 @@ function verifyMetadata(html, page, label) {
     assertIncludes(html, "/data/crawl4/manifest.json", label);
     assertIncludes(html, "/.well-known/ai-catalog.json", label);
     assertIncludes(html, "/skills/index.md", label);
-    assertIncludes(html, "The MCP tools only read public catalog data.", label);
+    assertIncludes(html, "The Library MCP reads only public catalog data.", label);
   }
 
   if (page.githubAuthor) {
