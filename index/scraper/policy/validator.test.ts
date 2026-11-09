@@ -49,6 +49,20 @@ test("accepts a valid complete policy", () => {
   assert.deepEqual(validatePolicy(fixture(), catalogContext), []);
 });
 
+test("reviewed copy hashes require exact skill-scoped copy evidence", () => {
+  const rule = { id: "mirror/repo:demo", upstreamRepo: "original/repo", provenanceType: "mirrored" as const, reviewedSkillMdSha: "A".repeat(40) };
+  assert.deepEqual(validatePolicy(fixture({ provenanceOverrides: [rule] }), catalogContext), []);
+  for (const reviewedSkillMdSha of ["short", "g".repeat(40), null, 42]) {
+    const loaded = fixture();
+    loaded.raw.provenanceOverrides = [{ ...rule, reviewedSkillMdSha }];
+    assert.ok(validatePolicy(loaded, catalogContext).some(issue => issue.code === "invalid-reviewed-skill-md-sha"));
+  }
+  for (const change of [{ id: undefined, repo: "mirror/repo" }, { upstreamRepo: undefined }, { provenanceType: "original" as const }]) {
+    assert.ok(validatePolicy(fixture({ provenanceOverrides: [{ ...rule, ...change }] }), catalogContext)
+      .some(issue => issue.code === "invalid-reviewed-copy-target"));
+  }
+});
+
 test("company presentation is optional boolean metadata, independent of vendor trust", () => {
   for (const value of [true, false, undefined]) {
     const loaded = fixture({ creators: { creators: [{ handle: "openai", roles: ["creator"], watch: true, featured: true }] } });

@@ -7,7 +7,7 @@ import { isKnownCatalogRepo } from "./catalog-policy.js";
 import { pinnedPackageMetadataFromSkill, type PinnedPackageMetadata } from "./package-metadata.js";
 import { prepareShadowSkillPersistence, TRENDING_ADMISSION_SOURCE, type ShadowSkillPersistenceSnapshot } from "./shadow-skill-persistence.js";
 import type { ShadowSkillRecord, TrustedSeeds } from "./types.js";
-import type { TrendingAttributionResult } from "./trending-attribution.js";
+import { checkReviewedTrendingContent, type TrendingAttributionResult } from "./trending-attribution.js";
 
 export const TRENDING_MVP_LIMIT = 20;
 const githubRepo = /^[A-Za-z0-9][A-Za-z0-9_.-]*\/[A-Za-z0-9][A-Za-z0-9_.-]*$/;
@@ -34,10 +34,12 @@ export type TrendingMvpRepo = {
   meta: RepoMeta;
   paths: string[];
   readmePath?: string;
+  packagesByPath?: Record<string, { blobSha: string; treeSha: string }>;
 };
 
 export type TrendingMvpDependencies = {
   lookupRepo: (source: string) => Promise<TrendingMvpRepo>;
+  canonicalRepo: (source: string) => Promise<string>;
   enrich: (candidate: Candidate, meta: RepoMeta) => Promise<EnrichResult>;
   pin: (skill: Skill, commit: string) => Promise<PinnedPackageMetadata | null>;
   inspectAttribution: (skill: Skill, commit: string, entry: SourceTrendingEntry) => Promise<TrendingAttributionResult>;
@@ -57,13 +59,28 @@ export function selectTrendingMvpCandidates(feed: SourceTrendingFeed, skills: Sk
 }
 
 // Match a unique skill folder, not an arbitrary substring or the first tree result.
-export function resolveTrendingMvpPath(paths: string[], hint: string): string | null {
+export function resolveTrendingMvpPath(paths: string[], hint: string,
+  packagesByPath: TrendingMvpRepo["packagesByPath"] = {}, preferredPath?: string): string | null {
   const safe = [...new Set(paths)].filter(path => (path === "SKILL.md" || path.endsWith("/SKILL.md"))
     && !path.startsWith("/") && !path.includes("\\")
     && !path.split("/").some(part => !part || part === "." || part === ".."));
   const exact = safe.filter(path => path !== "SKILL.md"
     && normalizedName(path.split("/").at(-2)!) === normalizedName(hint));
   if (exact.length === 1) return exact[0]!;
+  if (exact.length > 1) {
+    const first = packagesByPath[exact[0]!];
+    const identical = first && shaPattern.test(first.blobSha) && shaPattern.test(first.treeSha)
+      && exact.every(path => {
+        const coordinates = packagesByPath[path];
+        return coordinates && shaPattern.test(coordinates.blobSha) && shaPattern.test(coordinates.treeSha)
+          && coordinates.blobSha.toLowerCase() === first.blobSha.toLowerCase()
+          && coordinates.treeSha.toLowerCase() === first.treeSha.toLowerCase();
+      });
+    if (!identical) return null;
+    if (preferredPath && exact.includes(preferredPath)) return preferredPath;
+    return exact.sort((a, b) => Number(!/^skills\/[^/]+\/SKILL\.md$/.test(a)) - Number(!/^skills\/[^/]+\/SKILL\.md$/.test(b))
+      || a.split("/").length - b.split("/").length || a.localeCompare(b))[0]!;
+  }
   if (safe.length === 1 && safe[0] === "SKILL.md") return "SKILL.md";
   return null;
 }
@@ -94,7 +111,10 @@ async function verifyEntry(entry: SourceTrendingEntry, skills: ShadowSkillRecord
   const details = { ...outcome, id, repo: repo.repo, stars: repo.meta.stars };
   const canonicalBlock = trendingMvpPolicyReason(id, repoUrl, seeds);
   if (canonicalBlock) return { outcome: { ...details, status: "blocked", reason: canonicalBlock } };
-  const path = resolveTrendingMvpPath(repo.paths, entry.skillId);
+  const indexedPaths = skills.filter(skill => repoFromGithubUrl(skill.github_url) === repo.repo.toLowerCase())
+    .map(skill => normalizePath(skill.skill_md_path ?? "")).filter(path => repo.paths.includes(path)).sort();
+  const preferredPath = indexedPaths.find(path => normalizedName(path.split("/").at(-2) ?? "") === normalizedName(entry.skillId));
+  const path = resolveTrendingMvpPath(repo.paths, entry.skillId, repo.packagesByPath, preferredPath);
   if (!path) return { outcome: details };
   if (path === "SKILL.md" && seeds.rootSkillInvalidRepos?.has(repo.repo.toLowerCase())) {
     return { outcome: { ...details, path, status: "blocked", reason: "known-invalid-root" } };
@@ -119,9 +139,15 @@ async function verifyEntry(entry: SourceTrendingEntry, skills: ShadowSkillRecord
   if (skill.id !== id || skill.skill_md_path !== path || repoFromGithubUrl(skill.github_url) !== repo.repo.toLowerCase()) {
     return { outcome: { ...details, path, status: "failed", reason: "content-identity-mismatch" } };
   }
+  const reviewed = await checkReviewedTrendingContent({ repo: repo.repo, skillMdSha: skill.skill_md_sha },
+    seeds.provenanceOverrides, deps.canonicalRepo);
+  if (reviewed?.status === "copy") {
+    return { outcome: { ...details, path, attribution: reviewed, status: "blocked", reason: reviewed.reason } };
+  }
   const provenance = resolveShadowProvenance(skill, seeds);
   if (provenance.provenanceType !== "original") return { outcome: { ...details, path, status: "blocked", reason: "non-original-provenance" } };
-  const attribution = await deps.inspectAttribution(skill, repo.commit, entry);
+  const inspected = await deps.inspectAttribution(skill, repo.commit, entry);
+  const attribution = inspected.status === "clear" && reviewed ? reviewed : inspected;
   if (attribution.status === "copy") {
     return { outcome: { ...details, path, attribution, status: "blocked", reason: attribution.reason } };
   }

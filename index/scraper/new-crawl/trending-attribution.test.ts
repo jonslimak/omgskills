@@ -1,11 +1,47 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { checkTrendingSourceAttribution, compareTrendingSourceContent, findTrendingSelfInstallRepos,
-  type TrendingAttributionDependencies } from "./trending-attribution.js";
+  checkReviewedTrendingContent, type TrendingAttributionDependencies } from "./trending-attribution.js";
+import type { ProvenanceOverride } from "./types.js";
 
 const body = "# Useful skill\n\nPerform the task, check the result, and report any limitations.\n";
 const skill = (name = "demo", description = "Useful guidance") => `---\nname: ${name}\ndescription: ${description}\nlicense: MIT\n---\n\n${body}`;
 const install = (command: string, title = "Install this skill") => `## ${title}\n\n\`\`\`bash\n${command}\n\`\`\`\n`;
+const reviewedSha = "a".repeat(40);
+const reviewedRules: ProvenanceOverride[] = [{ id: "reviewed/copy:demo", upstreamRepo: "original/repo",
+  provenanceType: "repackaged", reviewedSkillMdSha: reviewedSha }];
+
+test("reviewed full-content fingerprints identify copies under a new repository name", async () => {
+  const result = await checkReviewedTrendingContent({ repo: "new/copy", skillMdSha: reviewedSha }, reviewedRules, async repo => repo);
+  assert.equal(result?.status, "copy");
+  assert.equal(result?.reason, "reviewed-copy-content");
+  assert.equal(result?.reviewedSkillId, "reviewed/copy:demo");
+  assert.equal(result?.upstreamRepo, "original/repo");
+});
+
+test("the recorded original and its verified rename remain allowed", async () => {
+  const original = await checkReviewedTrendingContent({ repo: "ORIGINAL/Repo", skillMdSha: reviewedSha }, reviewedRules,
+    async () => { throw new Error("canonical source needs no lookup"); });
+  assert.equal(original?.status, "clear");
+  const renamed = await checkReviewedTrendingContent({ repo: "new-owner/repo", skillMdSha: reviewedSha }, reviewedRules, async () => "new-owner/repo");
+  assert.equal(renamed?.status, "clear");
+});
+
+test("changed or unreviewed content is not rejected, and ordinary policy rules are not fingerprints", async () => {
+  const noFetch = async () => { throw new Error("must not fetch for an unmatched hash"); };
+  assert.equal(await checkReviewedTrendingContent({ repo: "new/copy", skillMdSha: "b".repeat(40) }, reviewedRules, noFetch), null);
+  assert.equal(await checkReviewedTrendingContent({ repo: "new/copy" }, reviewedRules, noFetch), null);
+  assert.equal(await checkReviewedTrendingContent({ repo: "new/copy", skillMdSha: "short" }, reviewedRules, noFetch), null);
+  assert.equal(await checkReviewedTrendingContent({ repo: "new/copy", skillMdSha: reviewedSha }, [{ ...reviewedRules[0]!, reviewedSkillMdSha: undefined }], noFetch), null);
+  assert.equal(await checkReviewedTrendingContent({ repo: "new/copy", skillMdSha: reviewedSha }, [{ ...reviewedRules[0]!, provenanceType: "original" }], noFetch), null);
+});
+
+test("conflicting reviewed origins stay advisory, and network failure does not fabricate a verdict", async () => {
+  const rules = [...reviewedRules, { ...reviewedRules[0]!, id: "other/copy:demo", upstreamRepo: "another/origin" }];
+  assert.equal((await checkReviewedTrendingContent({ repo: "new/copy", skillMdSha: reviewedSha }, rules, async repo => repo))?.status, "advisory");
+  await assert.rejects(checkReviewedTrendingContent({ repo: "new/copy", skillMdSha: reviewedSha }, reviewedRules,
+    async () => { throw new Error("upstream unavailable"); }), /unavailable/);
+});
 
 function dependencies(overrides: Partial<TrendingAttributionDependencies> = {}): TrendingAttributionDependencies {
   return { canonicalRepo: async repo => repo,

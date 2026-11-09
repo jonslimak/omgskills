@@ -39,6 +39,7 @@ function feed(entries: SourceTrendingEntry[]): SourceTrendingFeed {
 
 function dependencies(overrides: Partial<TrendingMvpDependencies> = {}): TrendingMvpDependencies {
   return {
+    canonicalRepo: async repo => repo,
     lookupRepo: async repo => ({ repo, commit, paths: ["skills/one/SKILL.md"],
       meta: { stars: 0, lastUpdated: date, tags: [], githubUrl: `https://github.com/${repo}` } }),
     enrich: async candidate => ({ skill: skill(candidate.id, candidate.skill_md_path) }),
@@ -73,6 +74,41 @@ test("path resolution supports nonstandard folders without fuzzy guesses, ambigu
   assert.equal(resolveTrendingMvpPath(["skills/one/SKILL.md", "other/one/SKILL.md"], "one"), null);
   assert.equal(resolveTrendingMvpPath(["skills/someone/SKILL.md"], "one"), null);
   assert.equal(resolveTrendingMvpPath(["../one/SKILL.md", "/one/SKILL.md"], "one"), null);
+});
+
+test("identical complete packages prefer the standard path, preserving an existing path when supplied", () => {
+  const standard = "skills/one/SKILL.md", bundled = ".github/plugins/demo/skills/one/SKILL.md";
+  const packages = { [standard]: { blobSha: blob, treeSha: tree }, [bundled]: { blobSha: blob, treeSha: tree } };
+  assert.equal(resolveTrendingMvpPath([bundled, standard], "one", packages), standard);
+  assert.equal(resolveTrendingMvpPath([standard, bundled], "one", packages, bundled), bundled);
+  assert.equal(resolveTrendingMvpPath([bundled, standard], "one", { ...packages, [bundled]: { blobSha: blob, treeSha: "4".repeat(40) } }), null,
+    "identical SKILL.md alone does not prove companion files are identical");
+  assert.equal(resolveTrendingMvpPath([bundled, standard], "one", { ...packages, [bundled]: { blobSha: "4".repeat(40), treeSha: tree } }), null);
+  assert.equal(resolveTrendingMvpPath([bundled, standard], "one", { [standard]: packages[standard] }), null);
+});
+
+test("an existing indexed package and stable ID survive identical plugin packaging", async () => {
+  const standard = "skills/one/SKILL.md", bundled = ".github/plugins/demo/skills/one/SKILL.md";
+  const existing = skill("owner/repo:historical", bundled);
+  const result = await run({ baseline: [existing], deps: {
+    lookupRepo: async repo => ({ repo, commit, paths: [standard, bundled],
+      packagesByPath: { [standard]: { blobSha: blob, treeSha: tree }, [bundled]: { blobSha: blob, treeSha: tree } },
+      meta: { stars: 0, lastUpdated: date, tags: [], githubUrl: `https://github.com/${repo}` } }),
+    enrich: async () => { throw new Error("do not re-enrich or rewrite the existing package"); },
+  } });
+  assert.equal(result.outcomes[0]?.status, "existing");
+  assert.equal(result.outcomes[0]?.path, bundled);
+  assert.equal(result.outcomes[0]?.existingId, existing.id);
+  assert.deepEqual(result.snapshot.cutoverSkills, [existing]);
+});
+
+test("a genuinely new skill resolves equivalent package copies without an extra path fetch", async () => {
+  const standard = "skills/one/SKILL.md", bundled = ".github/plugins/demo/skills/one/SKILL.md";
+  const result = await run({ deps: { lookupRepo: async repo => ({ repo, commit, paths: [bundled, standard],
+    packagesByPath: { [standard]: { blobSha: blob, treeSha: tree }, [bundled]: { blobSha: blob, treeSha: tree } },
+    meta: { stars: 0, lastUpdated: date, tags: [], githubUrl: `https://github.com/${repo}` } }) } });
+  assert.equal(result.outcomes[0]?.status, "added");
+  assert.equal(result.outcomes[0]?.path, standard);
 });
 
 test("a fresh batch excludes previously reviewed source IDs without changing source ranks or the cap", () => {
@@ -214,6 +250,27 @@ test("confirmed upstream copies cannot reach pinning or persistence", async () =
   assert.equal(result.outcomes[0]?.status, "blocked");
   assert.equal(result.outcomes[0]?.attribution?.upstreamRepo, "original/repo");
   assert.equal(result.snapshot.cutoverSkills.length, 0);
+});
+
+test("a reviewed-content copy under a new ID is blocked without name matching", async () => {
+  const policy = seeds();
+  policy.provenanceOverrides.push({ id: "reviewed/copy:one", upstreamRepo: "original/repo", provenanceType: "repackaged", reviewedSkillMdSha: blob });
+  const result = await run({ seeds: policy, deps: {
+    inspectAttribution: async () => { throw new Error("known copy needs no heuristic inspection"); },
+    pin: async () => { throw new Error("known copy must not be pinned"); },
+  } });
+  assert.equal(result.outcomes[0]?.status, "blocked");
+  assert.equal(result.outcomes[0]?.reason, "reviewed-copy-content");
+  assert.equal(result.snapshot.cutoverSkills.length, 0);
+});
+
+test("upstream originals, renamed originals, and changed hashes remain eligible", async () => {
+  const policy = seeds();
+  policy.provenanceOverrides.push({ id: "reviewed/copy:one", upstreamRepo: "original/repo", provenanceType: "repackaged", reviewedSkillMdSha: blob });
+  assert.equal((await run({ seeds: policy, entries: [entry("original/repo")] })).outcomes[0]?.status, "added");
+  assert.equal((await run({ seeds: policy, entries: [entry("new-owner/repo")],
+    deps: { canonicalRepo: async () => "new-owner/repo" } })).outcomes[0]?.status, "added");
+  assert.equal((await run({ seeds: policy, deps: { enrich: async candidate => ({ skill: { ...skill(candidate.id, candidate.skill_md_path), skill_md_sha: "4".repeat(40) } }) } })).outcomes[0]?.status, "added");
 });
 
 test("advisory hints do not introduce a new admission threshold; attribution outages defer only that skill", async () => {

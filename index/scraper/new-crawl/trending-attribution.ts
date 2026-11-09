@@ -1,5 +1,6 @@
 import { isDeepStrictEqual } from "node:util";
 import { parse as parseYaml } from "yaml";
+import type { ProvenanceOverride } from "./types.js";
 
 export type TrendingAttributionResult = {
   status: "clear" | "advisory" | "copy";
@@ -8,6 +9,7 @@ export type TrendingAttributionResult = {
   upstreamPath?: string;
   upstreamCommit?: string;
   match?: "identical-content" | "name-only-change";
+  reviewedSkillId?: string;
 };
 
 export type TrendingAttributionDependencies = {
@@ -18,6 +20,29 @@ export type TrendingAttributionDependencies = {
 };
 
 const normalizeName = (value: string) => value.toLowerCase().replace(/[_\s]+/g, "-");
+const normalizeRepo = (value: string) => value.trim().replace(/\.git$/i, "").toLowerCase();
+
+export async function checkReviewedTrendingContent(input: { repo: string; skillMdSha?: string },
+  rules: ProvenanceOverride[], canonicalRepo: (repo: string) => Promise<string>): Promise<TrendingAttributionResult | null> {
+  if (!input.skillMdSha || !/^[0-9a-f]{40}$/i.test(input.skillMdSha)) return null;
+  const matches = rules.filter(rule => rule.id && !rule.repo && rule.upstreamRepo
+    && ["mirrored", "repackaged"].includes(rule.provenanceType ?? "")
+    && rule.reviewedSkillMdSha?.toLowerCase() === input.skillMdSha!.toLowerCase())
+    .sort((a, b) => a.id!.localeCompare(b.id!));
+  if (!matches.length) return null;
+  const source = normalizeRepo(input.repo);
+  const upstreams = [...new Set(matches.map(rule => normalizeRepo(rule.upstreamRepo!)))];
+  if (upstreams.includes(source)) return { status: "clear", reason: "reviewed-content-upstream" };
+  const resolved = new Set<string>();
+  for (const upstream of upstreams) {
+    const canonical = normalizeRepo(await canonicalRepo(upstream));
+    if (canonical === source) return { status: "clear", reason: "reviewed-content-upstream" };
+    resolved.add(canonical);
+  }
+  if (resolved.size !== 1) return { status: "advisory", reason: "conflicting-reviewed-origins" };
+  return { status: "copy", reason: "reviewed-copy-content", match: "identical-content",
+    upstreamRepo: [...resolved][0], reviewedSkillId: matches[0]!.id };
+}
 
 function installRepos(markdown: string, names: string[], allowPreamble: boolean): string[] {
   const wanted = new Set(names.map(normalizeName));

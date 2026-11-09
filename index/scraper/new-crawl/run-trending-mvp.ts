@@ -146,15 +146,28 @@ async function main() {
   const { enrichCandidate } = await import("../enrich.js");
   const { createPinnedPackageMetadataResolver } = await import("./package-metadata.js");
   const pin = createPinnedPackageMetadataResolver(octokit);
-  const lookupRepo = memoize(async (source: string): Promise<TrendingMvpRepo> => {
+  const repoMetadata = memoize(async (source: string) => {
     const [owner, name] = source.split("/");
     const { data } = await octokit.rest.repos.get({ owner: owner!, repo: name! });
+    return data;
+  });
+  const canonicalRepo = async (source: string) => (await repoMetadata(source)).full_name;
+  const lookupRepo = memoize(async (source: string): Promise<TrendingMvpRepo> => {
+    const data = await repoMetadata(source);
     const [canonicalOwner, canonicalName] = data.full_name.split("/");
     const { data: commit } = await octokit.rest.repos.getCommit({ owner: canonicalOwner!, repo: canonicalName!, ref: data.default_branch });
     const { data: tree } = await octokit.rest.git.getTree({ owner: canonicalOwner!, repo: canonicalName!, tree_sha: commit.commit.tree.sha, recursive: "true" });
     if (tree.truncated) throw new Error("Incomplete repository tree; defer rather than guess paths");
+    const byPath = new Map((tree.tree ?? []).map(row => [row.path, row]));
+    const packagesByPath: NonNullable<TrendingMvpRepo["packagesByPath"]> = {};
+    for (const row of tree.tree ?? []) {
+      if (row.type !== "blob" || !row.path || !row.sha || !(row.path === "SKILL.md" || row.path.endsWith("/SKILL.md"))) continue;
+      const parent = row.path === "SKILL.md" ? null : byPath.get(row.path.slice(0, -"/SKILL.md".length));
+      const treeSha = row.path === "SKILL.md" ? commit.commit.tree.sha : parent?.type === "tree" ? parent.sha : undefined;
+      if (treeSha) packagesByPath[row.path] = { blobSha: row.sha, treeSha };
+    }
     const readmePath = (tree.tree ?? []).find(row => row.type === "blob" && row.path?.toLowerCase() === "readme.md")?.path;
-    return { repo: data.full_name, commit: commit.sha, readmePath, paths: (tree.tree ?? []).filter(row => row.type === "blob")
+    return { repo: data.full_name, commit: commit.sha, readmePath, packagesByPath, paths: (tree.tree ?? []).filter(row => row.type === "blob")
       .map(row => row.path!).filter(path => path === "SKILL.md" || path.endsWith("/SKILL.md")),
       meta: { stars: data.stargazers_count, lastUpdated: data.pushed_at ?? data.updated_at, tags: data.topics ?? [], githubUrl: `https://github.com/${data.full_name}` } };
   });
@@ -183,17 +196,17 @@ async function main() {
     const readme = repo.readmePath
       ? (await readSourceFile(JSON.stringify({ repo: repo.repo, commit, path: repo.readmePath }))).content : null;
     return checkTrendingSourceAttribution({ repo: repo.repo, names: [entry.skillId, skill.name], content: source.content, readme }, {
-      canonicalRepo: async hint => (await lookupRepo(hint)).repo,
+      canonicalRepo,
       upstreamSkill: async (upstreamRepo, names) => {
         const upstream = await lookupRepo(upstreamRepo);
-        const matching = [...new Set(names.map(hint => resolveTrendingMvpPath(upstream.paths, hint)).filter((path): path is string => !!path))];
+        const matching = [...new Set(names.map(hint => resolveTrendingMvpPath(upstream.paths, hint, upstream.packagesByPath)).filter((path): path is string => !!path))];
         if (matching.length !== 1) return null;
         const path = matching[0]!;
         return { ...(await readSourceFile(JSON.stringify({ repo: upstream.repo, commit: upstream.commit, path }))), path, commit: upstream.commit };
       },
     });
   });
-  const deps: TrendingMvpDependencies = { lookupRepo,
+  const deps: TrendingMvpDependencies = { lookupRepo, canonicalRepo,
     enrich: (candidate, meta) => enrich(JSON.stringify({ candidate, meta })), pin: (skill, commit) => pinCached(JSON.stringify({ skill, commit })),
     inspectAttribution: (skill, commit, entry) => inspectAttribution(JSON.stringify({ skill, commit, entry })),
     beforeCandidate: async index => {

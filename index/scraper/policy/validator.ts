@@ -655,6 +655,20 @@ function validateProvenanceOverrides(loaded: LoadedPolicySources, issues: Policy
     if (entry.upstreamRepo !== undefined) {
       validateRepoValue(loaded, "provenanceOverrides", entry.upstreamRepo, `${location}/upstreamRepo`, issues);
     }
+    if (entry.reviewedSkillMdSha !== undefined) {
+      if (typeof entry.reviewedSkillMdSha !== "string" || !/^[0-9a-f]{40}$/i.test(entry.reviewedSkillMdSha)) {
+        issues.push(issue(loaded, {
+          code: "invalid-reviewed-skill-md-sha", source: "provenanceOverrides", location: `${location}/reviewedSkillMdSha`,
+          message: "Reviewed copy fingerprint must be a full 40-character Git blob SHA.",
+        }));
+      }
+      if (!id || repo || !entry.upstreamRepo || !["mirrored", "repackaged"].includes(String(entry.provenanceType))) {
+        issues.push(issue(loaded, {
+          code: "invalid-reviewed-copy-target", source: "provenanceOverrides", location,
+          message: "Reviewed copy fingerprints require a skill-level mirrored/repackaged rule and an upstream repository.",
+        }));
+      }
+    }
     if (entry.provenanceType !== undefined && !PROVENANCE_TYPES.has(String(entry.provenanceType))) {
       issues.push(issue(loaded, {
         code: "invalid-provenance-type",

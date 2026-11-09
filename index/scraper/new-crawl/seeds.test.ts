@@ -37,7 +37,7 @@ test("buildTrustedSeeds normalizes and dedupes official repo entries", () => {
     },
     overridesJson: [],
     catalogJson: [],
-    provenanceJson: [],
+    provenanceJson: [{ id: "Mirror/Repo:Skill", upstreamRepo: "Original/Repo", provenanceType: "mirrored", reviewedSkillMdSha: "A".repeat(40) }],
   });
 
   assert.deepEqual([...seeds.officialTier1Repos], ["openai/codex"]);
@@ -47,6 +47,8 @@ test("buildTrustedSeeds normalizes and dedupes official repo entries", () => {
   assert.deepEqual([...(seeds.doNotCrawlOwners ?? [])], ["blockedowner"]);
   assert.deepEqual([...(seeds.suppressedSkillIds ?? [])], ["owner/repo:skill"]);
   assert.equal(seeds.suppressedSkillRules?.[0]?.id, "Owner/Repo:Skill");
+  assert.equal(seeds.provenanceOverrides[0]?.reviewedSkillMdSha, "a".repeat(40));
+  assert.equal(seeds.provenanceOverrides[0]?.upstreamRepo, "original/repo");
 });
 
 test("buildTrustedSeeds derives trust only from the creator registry", () => {

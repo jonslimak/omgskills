@@ -118,6 +118,7 @@ export function buildTrustedSeeds(input: {
         authorHandle: override.authorHandle ? normalizeHandle(override.authorHandle) : undefined,
         publisherHandle: override.publisherHandle ? normalizeHandle(override.publisherHandle) : undefined,
         upstreamRepo: override.upstreamRepo ? normalizeRepo(override.upstreamRepo) : undefined,
+        reviewedSkillMdSha: override.reviewedSkillMdSha?.trim().toLowerCase(),
       }))
       .filter((override) => override.id || override.repo),
   };
