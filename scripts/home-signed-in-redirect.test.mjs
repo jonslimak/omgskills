@@ -27,3 +27,29 @@ test("signed-out visitors and links from inside the site stay on the home page",
   assert.equal(visit({ cookie: "x__client_uat=5" }), null);
   assert.equal(visit({ cookie: "__client_uat=1731000000", referrer: "https://omgskills.com/guide/" }), null);
 });
+
+test("signed in, the logo on every site page opens My skills; signed out, it stays a link home", async () => {
+  const { execFileSync } = await import("node:child_process");
+  const logoScript = await readFile(new URL("../site/signed-in-logo.js", import.meta.url), "utf8");
+  const pages = execFileSync("git", ["ls-files", "site/*.html", "site/**/*.html"], { encoding: "utf8" }).trim().split("\n");
+  for (const page of pages) {
+    const text = await readFile(new URL(`../${page}`, import.meta.url), "utf8");
+    const logos = (text.match(/class="(brand|eyes|site-footer-brand-logo)"[^>]*href="\/"/g) ?? []).length;
+    assert.equal(text.includes('<script src="/signed-in-logo.js"></script>'), logos > 0, page);
+  }
+  // The generated library, skill and developer pages all share one page shell.
+  const generator = await readFile(new URL("./build-web-library.mjs", import.meta.url), "utf8");
+  const shell = generator.slice(generator.indexOf("function pageShell("), generator.indexOf("function pageHeading("));
+  assert.match(shell, /<a class="brand" href="\/"|\$\{siteFooterHtml\}/);
+  assert.ok(shell.includes('<script src="/signed-in-logo.js"></script>\n</body>'));
+  const run = (cookie) => {
+    const links = [["brand", "/"], ["brand", "/skills/"], ["eyes", "/"], ["site-footer-brand-logo", "/"], ["other", "/"]]
+      .map(([name, href]) => ({ name, href, setAttribute(key, value) { this[key] = value; } }));
+    const document = { cookie, querySelectorAll: (selector) => links.filter((link) => selector.includes(`a.${link.name}[href="${link.href}"]`)) };
+    vm.runInNewContext(logoScript, { document });
+    return links.map((link) => link.href);
+  };
+  assert.deepEqual(run("__client_uat=1731000000"), ["/app/?view=all", "/app/?view=all", "/app/?view=all", "/app/?view=all", "/"]);
+  assert.deepEqual(run("__client_uat=0"), ["/", "/skills/", "/", "/", "/"]);
+  assert.deepEqual(run(""), ["/", "/skills/", "/", "/", "/"]);
+});
