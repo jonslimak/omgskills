@@ -44,14 +44,16 @@ export type TrendingMvpDependencies = {
   beforeCandidate?: (index: number) => Promise<void>;
 };
 
-export function selectTrendingMvpCandidates(feed: SourceTrendingFeed, skills: Skill[], limit = TRENDING_MVP_LIMIT, now = Date.now()) {
+export function selectTrendingMvpCandidates(feed: SourceTrendingFeed, skills: Skill[], limit = TRENDING_MVP_LIMIT,
+  now = Date.now(), excludedSourceIds: ReadonlySet<string> = new Set()) {
   validateSourceTrending(feed);
   if (!Number.isInteger(limit) || limit < 1 || limit > TRENDING_MVP_LIMIT) throw new Error("Trending MVP limit must be 1..20");
   const age = now - Date.parse(feed.fetchedAt);
   if (age > SOURCE_TRENDING_STALE_MS || age < -5 * 60_000) throw new Error("Trending MVP requires a fresh source snapshot");
   const known = new Set(skills.map(skill => skill.id.toLowerCase()));
   return feed.entries.filter(entry => githubRepo.test(entry.source)
-    && !known.has(`${entry.source}:${entry.skillId}`.toLowerCase())).slice(0, limit);
+    && !known.has(`${entry.source}:${entry.skillId}`.toLowerCase())
+    && !excludedSourceIds.has(`${entry.source}:${entry.skillId}`.toLowerCase())).slice(0, limit);
 }
 
 // Match a unique skill folder, not an arbitrary substring or the first tree result.

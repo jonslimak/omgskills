@@ -75,6 +75,14 @@ test("path resolution supports nonstandard folders without fuzzy guesses, ambigu
   assert.equal(resolveTrendingMvpPath(["../one/SKILL.md", "/one/SKILL.md"], "one"), null);
 });
 
+test("a fresh batch excludes previously reviewed source IDs without changing source ranks or the cap", () => {
+  const entries = Array.from({ length: 45 }, (_, i) => entry("owner/repo", `skill-${i}`, i + 1));
+  const excluded = new Set(entries.slice(0, 20).map(row => `${row.source}:${row.skillId}`));
+  const selected = selectTrendingMvpCandidates(feed(entries), [], 20, Date.parse(date), excluded);
+  assert.equal(selected.length, 20);
+  assert.deepEqual(selected.map(row => row.rank), Array.from({ length: 20 }, (_, i) => i + 21));
+});
+
 test("zero-star, one-install skill enters library with trending source and no creator trust", async () => {
   const result = await run();
   assert.equal(result.outcomes[0]?.status, "added");
@@ -255,6 +263,11 @@ test("local replay preserves the original candidates and rejects baseline or can
   assert.throws(() => loadTrendingMvpReplay(directory, [], "changed", 1), /same original catalog baseline/);
   writeFileSync(join(directory, "candidates.json"), JSON.stringify([entry("different/repo")]));
   assert.throws(() => loadTrendingMvpReplay(directory, [], "original", 1), /differ/);
+  const next = entry("next/repo", "one", 2);
+  writeFileSync(join(directory, "source-trending.json"), JSON.stringify(feed([...entries, next])));
+  writeFileSync(join(directory, "candidates.json"), JSON.stringify([next]));
+  writeFileSync(join(directory, "report.json"), JSON.stringify({ localOnly: true, baseline: { sha256: "original" }, excludedSourceIds: ["owner/repo:one"] }));
+  assert.deepEqual(loadTrendingMvpReplay(directory, [], "original", 1).entries, [next]);
 });
 
 function indexPath(path: string) { return join(shadowRoot, "..", path); }

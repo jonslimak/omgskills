@@ -75,21 +75,25 @@ export function loadTrendingMvpReplay(directory: string, skills: ShadowSkillReco
   if (report.localOnly !== true || report.baseline?.sha256 !== baselineSha) throw new Error("Replay requires the same original catalog baseline");
   const feed: SourceTrendingFeed = JSON.parse(readFileSync(join(directory, "source-trending.json"), "utf8"));
   const entries: SourceTrendingEntry[] = JSON.parse(readFileSync(join(directory, "candidates.json"), "utf8"));
+  const excludedSourceIds: string[] = report.excludedSourceIds ?? [];
+  if (!Array.isArray(excludedSourceIds) || !excludedSourceIds.every(id => typeof id === "string")) throw new Error("Invalid recorded MVP exclusions");
   // An explicit local replay uses the recorded board, never claims its timestamp is fresh.
-  const selected = selectTrendingMvpCandidates(feed, skills, limit, Date.parse(feed.fetchedAt));
+  const selected = selectTrendingMvpCandidates(feed, skills, limit, Date.parse(feed.fetchedAt), new Set(excludedSourceIds));
   assert.equal(entries.length, limit, "Replay candidate count changed");
   assert.deepEqual(selected, entries, "Replay candidates differ from the original source snapshot");
-  return { feed, entries };
+  return { feed, entries, excludedSourceIds };
 }
 
 async function main() {
   const args = process.argv.slice(2);
-  if (args.some(arg => !/^--limit=\d+$/.test(arg) && !/^--replay-batch=.+$/.test(arg))) {
-    throw new Error("Usage: npm run crawl4:trending-mvp -- [--limit=20] [--replay-batch=<previous-local-batch>]");
+  if (args.some(arg => !/^--limit=\d+$/.test(arg) && !/^--(?:replay|exclude)-batch=.+$/.test(arg))) {
+    throw new Error("Usage: npm run crawl4:trending-mvp -- [--limit=20] [--replay-batch=<batch> | --exclude-batch=<batch>]");
   }
   if (new Set(args.map(arg => arg.split("=")[0])).size !== args.length) throw new Error("Duplicate MVP arguments");
   const limit = Number(args.find(arg => arg.startsWith("--limit="))?.split("=")[1] ?? 20);
   const replayBatch = args.find(arg => arg.startsWith("--replay-batch="))?.slice("--replay-batch=".length);
+  const excludeBatch = args.find(arg => arg.startsWith("--exclude-batch="))?.slice("--exclude-batch=".length);
+  if (replayBatch && excludeBatch) throw new Error("Choose replay or a fresh batch, not both");
   if (!Number.isInteger(limit) || limit < 1 || limit > 20) throw new Error("MVP limit must be 1..20");
   const generatedAt = new Date().toISOString();
   const baselinePath = join(indexRoot, "skills.json");
@@ -101,16 +105,22 @@ async function main() {
   await assertGitHubCoreQuotaAvailable(3500, "local Trending MVP");
   let feed: SourceTrendingFeed;
   let entries: SourceTrendingEntry[];
+  let excludedSourceIds: string[] = [];
   if (replayBatch) {
-    ({ feed, entries } = loadTrendingMvpReplay(resolve(replayBatch), initial.cutoverSkills, digest(baselineBytes), limit));
+    ({ feed, entries, excludedSourceIds } = loadTrendingMvpReplay(resolve(replayBatch), initial.cutoverSkills, digest(baselineBytes), limit));
   } else {
+    if (excludeBatch) {
+      const previous = loadTrendingMvpReplay(resolve(excludeBatch), initial.cutoverSkills, digest(baselineBytes), limit);
+      excludedSourceIds = [...new Set([...previous.excludedSourceIds,
+        ...previous.entries.map(entry => `${entry.source}:${entry.skillId}`.toLowerCase())])].sort();
+    }
     const { fetchSkillsShBoard } = await import("../sources/skillssh.js");
     const { buildSourceTrending } = await import("../build-source-trending.js");
     const board = await fetchSkillsShBoard({ board: "trending", topLimit: 500, pageConcurrency: 1 });
     // Preserve raw candidates in the report so policy rejections are visible, not silently lost.
     feed = buildSourceTrending(board.entries, initial.cutoverSkills,
       { blockedRepos: [], blockedOwners: [], catalogRepos: [], suppressedIds: [] }, generatedAt);
-    entries = selectTrendingMvpCandidates(feed, initial.cutoverSkills, limit);
+    entries = selectTrendingMvpCandidates(feed, initial.cutoverSkills, limit, Date.now(), new Set(excludedSourceIds));
   }
   if (entries.length !== limit) throw new Error(`Only ${entries.length} unindexed GitHub entries available; expected ${limit}`);
   const root = join(shadowRoot, "trending-mvp");
@@ -208,6 +218,7 @@ async function main() {
     .map(status => [status, first.outcomes.filter(row => row.status === status).length]));
   const report = { version: 1, localOnly: true, generatedAt, sourceFetchedAt: feed.fetchedAt,
     replayOf: replayBatch ? resolve(replayBatch) : null, candidateSha256: digest(JSON.stringify(entries)),
+    excludesBatch: excludeBatch ? resolve(excludeBatch) : null, excludedSourceIds,
     baseline: { path: baselinePath, sha256: digest(baselineBytes), skillCount: initial.cutoverSkills.length,
       note: "Current catalog copied into a local validation scaffold; no refresh/promotion or signal generation performed" },
     candidateCount: entries.length, counts, finalSkillCount: stored.cutoverSkills.length, outcomes: first.outcomes,
