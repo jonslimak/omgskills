@@ -26,18 +26,18 @@ test("guide, structured answers and generated Markdown describe the same availab
   const structured = [...html.matchAll(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/g)].map(m => JSON.parse(m[1]));
   const faq = structured.find(item => item["@type"] === "FAQPage");
   const answer = name => faq.mainEntity.find(item => item.name === name).acceptedAnswer.text;
-  assert.match(answer("What is the easiest way to share skills with a team?"), /Install a whole Set from the Mac companion\. Automatic team updates are coming soon/);
+  assert.match(answer("What is the easiest way to share skills with a team?"), /Install a whole Set from the Mac app\. Automatic team updates are coming soon/);
   assert.match(answer("Are skills safe?"), /not a security audit/);
-  assert.equal(structured.find(item => item["@type"] === "TechArticle").dateModified, "2026-10-28");
+  assert.equal(structured.find(item => item["@type"] === "TechArticle").dateModified, "2026-11-09");
   for (const text of [html, generator]) {
-    assert.match(text, /Sync reports installed skills; it does not update their files\./);
+    assert.match(text, /turn on Sync My skills to keep them in My skills/);
     assert.match(text, /Automatic team updates: Coming soon\./);
     assert.match(text, /Original Mac app/);
   }
 });
 
 test("help and privacy distinguish reporting, local installs and account deletion", () => {
-  assert.match(read("site/about/index.html"), /Sync reports what is installed; it does not automatically update skill files/);
+  assert.match(read("site/about/index.html"), /With Sync My skills on, it keeps a private copy of your skills in My skills/);
   const support = read("site/support/index.html");
   assert.match(support, /Resync/);
   assert.match(support, /same account/);
