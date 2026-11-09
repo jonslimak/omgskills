@@ -1,6 +1,10 @@
 # omgskills MCP
 
-Read-only MCP server for agent access to the omgskills library.
+Read-only MCP server for the omgskills open library of agent skills.
+
+## Your own skills
+
+This server reads the public library only. To give an agent your own skills (My skills), add the My skills MCP at `https://omgskills.com/my/mcp` as a custom connector or MCP server and sign in to omgskills. It is hosted only, read-only, and needs no install. See [developer resources](https://omgskills.com/developers/).
 
 Requires Node.js 20.3 or newer.
 
@@ -261,10 +265,6 @@ without discarding a successful SKILL.md read. Returned scripts are inert text;
 nothing is executed, installed or written.
 This is file inspection, **not** a security audit or a safe-to-install verdict.
 
-Additional #203 requests (security summaries, collections, agent-capability/date/
-niche filters, resources and prompts) remain separate follow-ups; this tool does
-not infer those capabilities from filenames or claim to finish that issue.
-
 ## Setup
 
 Install from npm:
@@ -354,17 +354,6 @@ For development:
 - No scraper imports.
 - No shell commands exposed to agents.
 - JSON files are the boundary between `index/` and `mcp/`.
-
-## Future Upgrades
-
-The storage layer can change without changing agent tools.
-
-Good next steps:
-
-- SQLite for faster startup and filtering.
-- Full-text search index for better ranking.
-- Embeddings for semantic search.
-- More advanced production search indexes if catalog size makes the current cached JSON loader too slow.
 
 ## License
 
