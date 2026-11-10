@@ -171,11 +171,13 @@ jobs:
         run: |
           git config user.name "omgskills-bot"
           git config user.email "actions@users.noreply.github.com"
-          if git diff --quiet -- index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots site/data/manifest.json site/data/skills-*.json site/data/trending-*.json site/data/trending-leaderboard-*.json site/data/leaderboard-view-data-*.json site/data/x-trending-*.json site/data/skill-signals-*.json site/data/author-signals-*.json site/data/author-leaderboards-*.json; then
+          git add index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots
+          git add -A -- site/data
+          if [ -f index/source-trending.json ]; then git add index/source-trending.json; fi
+          # Stage first, then check, so a new dated snapshot or a source-Trending-only refresh is committed too.
+          if git diff --cached --quiet; then
             echo "No library data changes"
           else
-            git add index/skills.json index/trending.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots
-            git add -A -- site/data
             git commit -m "scrape: update library data ($(date -u +%Y-%m-%d))"
             git pull --rebase --autostash origin main
             git push

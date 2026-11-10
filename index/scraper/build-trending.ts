@@ -150,7 +150,7 @@ async function main() {
     const boardData = await fetchSkillsShBoard({ board: RANK_BOARD });
     ({ hits, totals } = await loadTrendingSourceData({
       refreshSourceSnapshot: () => refreshSourceTrending({ entries: boardData.entries, skills: [...library.values()],
-        policy: sourceTrendingPolicy(), outputPath: join(here, "..", "source-trending.json") }),
+        policy: sourceTrendingPolicy(), outputPath: join(here, "..", "source-trending.json"), snapshotDir: snapshotsDir }),
       search: () => searchSkillsSh({ board: RANK_BOARD, boardData }),
       fetchInstallTotals: () => fetchSkillsShInstallTotals(), warn: console.warn,
     }));

@@ -57,7 +57,9 @@ test("old successful fetches remain visibly stale regardless of manifest publica
 
 test("unindexed entries render source links only, while indexed entries open catalog details", () => {
   const html = renderToStaticMarkup(createElement(SourceTrendingRows, { entries: feed.entries, onOpen() {} }));
-  assert.match(html, /Source rank 13/);
+  // Our list counts 1, 2, 3 even when source ranks have gaps (13 here).
+  assert.match(html, /<span class="ua-rank">2<\/span>/);
+  assert.doesNotMatch(html, />13</);
   assert.match(html, /href="https:\/\/github.com\/new\/repo"/);
   assert.match(html, /aria-label="View New skill on GitHub, not reviewed"/);
   assert.match(html, /Not reviewed/);

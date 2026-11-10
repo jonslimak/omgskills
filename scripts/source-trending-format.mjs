@@ -34,8 +34,48 @@ export function validateSourceTrending(value) {
   return value;
 }
 
+// Repo of a library skill, lowercased: its GitHub URL, else repo_slug, else the ID prefix.
+const skillRepo = skill => (skill.github_url?.match(/^https:\/\/github\.com\/([^/]+\/[^/?#]+)/i)?.[1]?.replace(/\.git$/i, "")
+  ?? skill.repo_slug ?? skill.id.split(":")[0]).toLowerCase();
+// Folder that holds the skill's SKILL.md (skills.sh names skills by it); none for a root SKILL.md.
+const skillFolder = skill => {
+  const path = (skill.skill_md_path ?? "").replace(/\\/g, "/").replace(/^\.\//, "");
+  const parts = path ? path.split("/") : skill.id.split(":").slice(1).join(":").split("/").concat("SKILL.md");
+  return parts.length >= 2 ? parts.at(-2).toLowerCase() : undefined;
+};
+
+/**
+ * Same-repo, same-folder library skills, keyed "owner/repo:folder". Library IDs often carry the
+ * folder path ("owner/repo:skills/copywriting") while skills.sh uses the folder name ("copywriting").
+ * Ambiguous keys (two library skills) are dropped; a display name alone never links.
+ */
+function skillsByRepoFolder(skills) {
+  const map = new Map();
+  for (const skill of skills) {
+    const folder = skillFolder(skill);
+    if (!folder) continue;
+    const key = `${skillRepo(skill)}:${folder}`;
+    map.set(key, map.has(key) ? null : skill);
+  }
+  return map;
+}
+
+/** Hidden by the Trending intake: skills it blocked, and unreviewed skills from repos it found copying. */
+export function intakeHiddenPolicy(state) {
+  const reviews = Array.isArray(state?.reviews) ? state.reviews : [];
+  const blocked = reviews.filter(review => review?.outcome === "blocked" && typeof review.sourceId === "string");
+  return {
+    reviewBlockedIds: blocked.map(review => review.sourceId),
+    copyRepos: [...new Set(blocked.filter(review => review.reason === "non-original-provenance")
+      .map(review => review.sourceId.split(":")[0]))],
+  };
+}
+
 export function filterSourceTrending(feed, policy, skills) {
   validateSourceTrending(feed);
+  const reviewBlocked = new Set((policy.reviewBlockedIds ?? []).map(id => id.toLowerCase()));
+  const copyRepos = new Set((policy.copyRepos ?? []).map(repo => repo.toLowerCase()));
+  const byRepoFolder = skillsByRepoFolder(skills);
   const blockedRepos = new Set([...policy.blockedRepos, ...policy.catalogRepos].map(normalizePolicyRepo));
   const blockedOwners = new Set(policy.blockedOwners.map(normalizePolicyHandle));
   const suppressed = new Set(policy.suppressedIds.map(normalizePolicySkillId));
@@ -48,7 +88,10 @@ export function filterSourceTrending(feed, policy, skills) {
   return { ...feed, entries: feed.entries.flatMap(entry => {
     if (blocked(entry.source) || suppressed.has(`${entry.source}:${entry.skillId}`.toLowerCase())
       || (entry.catalogId && suppressed.has(entry.catalogId.toLowerCase()))) return [];
-    const skill = byId.get(entry.catalogId) ?? byExactSource.get(`${entry.source}:${entry.skillId}`.toLowerCase());
+    const sourceId = `${entry.source}:${entry.skillId}`.toLowerCase();
+    const skill = byId.get(entry.catalogId) ?? byExactSource.get(sourceId) ?? byRepoFolder.get(sourceId) ?? undefined;
+    // Library skills always show; anything else the intake blocked, or that comes from a copying repo, does not.
+    if (!skill && (reviewBlocked.has(sourceId) || copyRepos.has(entry.source.toLowerCase()))) return [];
     const publisher = skill?.github_url?.match(/^https:\/\/github\.com\/([^/]+\/[^/?#]+)/i)?.[1]?.replace(/\.git$/i, "");
     if (skill && (blocked(skill.id.split(":")[0]) || (skill.repo_slug && blocked(skill.repo_slug))
       || (publisher && blocked(publisher)))) return [];

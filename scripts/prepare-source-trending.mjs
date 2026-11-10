@@ -2,7 +2,12 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { filterSourceTrending, validateSourceTrending } from "./source-trending-format.mjs";
+import { filterSourceTrending, intakeHiddenPolicy, validateSourceTrending } from "./source-trending-format.mjs";
+
+function readIntakeState(repoRoot) {
+  const path = join(repoRoot, "index/trending-intake-state.json");
+  return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : undefined;
+}
 
 // Prepare an optional asset; the caller still activates its entire manifest atomically.
 export function prepareSourceTrending({ repoRoot, dataDir, manifest, skills }) {
@@ -12,7 +17,8 @@ export function prepareSourceTrending({ repoRoot, dataDir, manifest, skills }) {
   const blocked = readSeed("do-not-crawl");
   const policy = { blockedRepos: blocked.repos.map(rule => rule.repo), blockedOwners: blocked.owners.map(rule => rule.owner),
     catalogRepos: readSeed("catalog-repos").map(rule => rule.repo),
-    suppressedIds: readSeed("suppressed-skills").skills.map(rule => rule.id) };
+    suppressedIds: readSeed("suppressed-skills").skills.map(rule => rule.id),
+    ...intakeHiddenPolicy(readIntakeState(repoRoot)) };
   const feed = filterSourceTrending(validateSourceTrending(JSON.parse(readFileSync(input, "utf8"))), policy, skills);
   const bytes = Buffer.from(`${JSON.stringify(feed, null, 2)}\n`);
   const sha256 = createHash("sha256").update(bytes).digest("hex");
