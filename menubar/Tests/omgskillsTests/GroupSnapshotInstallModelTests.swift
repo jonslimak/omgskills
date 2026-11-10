@@ -35,7 +35,7 @@ struct GroupSnapshotInstallModelTests {
         #expect(model.items.dropFirst().map(\.availability) == [
             .metadataOnly(reason: "No published version is available."),
             .metadataOnly(reason: "The skill source is unavailable."),
-            .metadataOnly(reason: "The skill source no longer matches this group."),
+            .metadataOnly(reason: "The skill source no longer matches this set."),
             .metadataOnly(reason: "The published version is incomplete."),
             .metadataOnly(reason: "The published version could not be verified."),
             .metadataOnly(reason: "The published version does not match its source."),

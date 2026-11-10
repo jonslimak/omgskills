@@ -18,7 +18,7 @@ enum GroupSkillPackageLoaderError: LocalizedError, Equatable, Sendable {
     var errorDescription: String? {
         switch self {
         case .metadataOnly:
-            return "This group item contains information only and cannot be installed."
+            return "This set item contains information only and cannot be installed."
         case .catalogSkillUnavailable:
             return "This catalog skill is no longer available."
         case .invalidCatalogRepository, .invalidPublicRepository:

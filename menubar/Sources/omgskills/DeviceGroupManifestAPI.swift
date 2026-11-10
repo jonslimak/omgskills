@@ -14,21 +14,21 @@ enum DeviceGroupManifestAPIError: LocalizedError, Equatable, Sendable {
     var errorDescription: String? {
         switch self {
         case .invalidConfiguration:
-            return "Group loading is not configured correctly."
+            return "Set loading is not configured correctly."
         case .contentReadRequired:
             return "Reconnect this Mac and allow access to shared skill content."
         case .reconnectRequired:
-            return "This Mac is no longer connected. Connect it again to load this group."
+            return "This Mac is no longer connected. Connect it again to load this set."
         case .groupUnavailable:
-            return "This skill group is unavailable or you no longer have access."
+            return "This set is unavailable or you no longer have access."
         case .rateLimited:
             return "Too many requests. Wait briefly and try again."
         case .temporarilyUnavailable:
             return "Sets are temporarily unavailable."
         case .server:
-            return "The web portal could not load this group. Try again shortly."
+            return "omgskills could not load this set. Try again shortly."
         case .responseTooLarge, .invalidResponse:
-            return "The web portal returned an invalid group."
+            return "omgskills returned an invalid set."
         }
     }
 }

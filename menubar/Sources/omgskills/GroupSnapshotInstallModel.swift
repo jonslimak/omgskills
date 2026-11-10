@@ -402,7 +402,7 @@ final class GroupSnapshotInstallModel {
         case .sourceUnavailable:
             "The skill source is unavailable."
         case .sourceMismatch:
-            "The skill source no longer matches this group."
+            "The skill source no longer matches this set."
         case .incompleteRelease:
             "The published version is incomplete."
         case .invalidRelease:
@@ -428,7 +428,7 @@ final class GroupSnapshotInstallModel {
             )
         }
 
-        let message = loaderError.errorDescription ?? "The group could not be installed."
+        let message = loaderError.errorDescription ?? "The set could not be installed."
         let kind: GroupSnapshotInstallFailure.Kind = switch loaderError {
         case .reconnectRequired:
             .reconnectRequired
