@@ -63,7 +63,7 @@ function pruneSnapshots() {
   let removed = 0;
 
   for (const entry of readdirSync(snapshotsDir)) {
-    const match = entry.match(/^trending-(\d{4}-\d{2}-\d{2})\.json$/);
+    const match = entry.match(/^(?:source-)?trending-(\d{4}-\d{2}-\d{2})\.json$/);
     if (!match) continue;
     const snapshotDate = new Date(`${match[1]}T00:00:00Z`);
     if (Number.isNaN(snapshotDate.getTime())) continue;

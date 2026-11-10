@@ -1,9 +1,8 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync, existsSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { fetchSkillsShBoard, isSkillsShUnavailableError, type SkillsShEntry } from "./sources/skillssh.js";
 import { loadTrustedSeeds } from "./new-crawl/seeds.js";
-import { filterSourceTrending, intakeHiddenPolicy, sourceTrendingUrl, validateSourceTrending,
+import { filterSourceTrending, sourceTrendingUrl, validateSourceTrending,
   type SourceTrendingFeed, type SourceTrendingPolicy } from "../../scripts/source-trending-format.mjs";
 
 type LibrarySkill = { id: string; name: string; repo_slug?: string; skill_md_path?: string; github_url?: string };
@@ -56,12 +55,10 @@ export async function refreshSourceTrending({ entries, skills, policy, outputPat
   return feed;
 }
 
-const intakeStatePath = join(dirname(fileURLToPath(import.meta.url)), "..", "trending-intake-state.json");
-
-export function sourceTrendingPolicy(statePath = intakeStatePath) {
+// Seed policy only. The intake reads this feed, so what it blocked must stay in it to be re-checked;
+// publication (scripts/prepare-source-trending.mjs) hides intake-blocked entries from the public list.
+export function sourceTrendingPolicy() {
   const seeds = loadTrustedSeeds();
-  const state = existsSync(statePath) ? JSON.parse(readFileSync(statePath, "utf8")) : undefined;
   return { blockedRepos: [...(seeds.doNotCrawlRepos ?? [])], blockedOwners: [...(seeds.doNotCrawlOwners ?? [])],
-    catalogRepos: seeds.catalogRepoRules.map(rule => rule.repo), suppressedIds: [...(seeds.suppressedSkillIds ?? [])],
-    ...intakeHiddenPolicy(state) };
+    catalogRepos: seeds.catalogRepoRules.map(rule => rule.repo), suppressedIds: [...(seeds.suppressedSkillIds ?? [])] };
 }
