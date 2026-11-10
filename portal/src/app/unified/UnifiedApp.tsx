@@ -584,6 +584,15 @@ export function UnifiedApp({
   const detailOpen = useRef(false);
   detailOpen.current = !!selected;
   const remoteDetail = !!publicStatus && nav.selected.startsWith("catalog:");
+  // An address can carry an ID that differs from the catalog's only by case (hosting lowercases
+  // addresses); once the skill loads, select its real ID so actions and the address use it.
+  const resolvedDetailId = remoteDetail && publicStatus.detail === "ready" ? publicStatus.detailId : undefined;
+  useEffect(() => {
+    if (resolvedDetailId && resolvedDetailId !== nav.selected.slice(8)
+      && resolvedDetailId.toLowerCase() === nav.selected.slice(8).toLowerCase()) {
+      navigate({ ...nav, selected: `catalog:${resolvedDetailId}` }, true);
+    }
+  }, [resolvedDetailId, nav.selected]);
   const detailPending = remoteDetail && publicStatus.detail !== "ready";
   // Keep the last skill rendered while the panel animates out after the selection clears.
   const closingDetail = useRef<{ skill: SkillDisplay; pending: boolean } | null>(null);

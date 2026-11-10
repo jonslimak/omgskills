@@ -360,7 +360,9 @@ export class PublicCatalogClient {
       if (payload.found === false) return null;
       if (payload.found !== true) throw new Error("The catalog returned an invalid skill result.");
       const skill = parseSkill(payload.skill);
-      if (skill.id !== id) throw new Error("The catalog returned a different skill.");
+      // Hosting lowercases addresses with capitals (/library/AgriciDaniel/... -> /library/agricidaniel/...),
+      // so an ID from an address may differ from the catalog's only by case. The caller adopts skill.id.
+      if (skill.id.toLowerCase() !== id.toLowerCase()) throw new Error("The catalog returned a different skill.");
       return skill;
     }, signal);
   }
