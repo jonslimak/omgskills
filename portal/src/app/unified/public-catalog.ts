@@ -363,6 +363,7 @@ export class PublicCatalogClient {
       // Hosting lowercases addresses with capitals (/library/AgriciDaniel/... -> /library/agricidaniel/...),
       // so an ID from an address may differ from the catalog's only by case. The caller adopts skill.id.
       if (skill.id.toLowerCase() !== id.toLowerCase()) throw new Error("The catalog returned a different skill.");
+      if (skill.id !== id) this.remember(`skill:${skill.id}`, skill);
       return skill;
     }, signal);
   }
