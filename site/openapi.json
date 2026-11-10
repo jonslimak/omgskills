@@ -4,7 +4,7 @@
     "title": "omgskills public API",
     "version": "1.0.0",
     "summary": "Read-only public API for the omgskills agent skill catalog",
-    "description": "Public, unauthenticated, read-only endpoints for the omgskills library of Claude Code and Codex agent skills. The catalog is published as static JSON assets addressed through a manifest, plus a hosted MCP (Model Context Protocol) server for tool-based access. No API key is required. All endpoints are GET unless noted. For guides and MCP client setup see https://omgskills.com/developers/",
+    "description": "Public, unauthenticated, read-only endpoints for the omgskills library of Claude Code and Codex agent skills. The catalog is published as static JSON assets addressed through a manifest, plus a hosted MCP (Model Context Protocol) server for tool-based access. No API key is required. All endpoints are GET unless noted. For guides and MCP client setup see https://omgskills.com/developers/. Your own skills: the My skills MCP at https://omgskills.com/my/mcp (sign-in required).",
     "contact": {
       "name": "omgskills support",
       "email": "hi@omgskills.com",
