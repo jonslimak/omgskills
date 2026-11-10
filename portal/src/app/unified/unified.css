@@ -1827,11 +1827,11 @@
 }
 /* Full width: the panel covers the list, the sidebar stays. */
 .ua-detail[data-expanded="true"] {
-  left: 224px;
+  left: 213px;
   width: auto;
 }
 .ua-detail[data-expanded="true"][data-rail="true"] {
-  left: 72px;
+  left: 61px;
 }
 .ua-detail[data-expanded="true"] :is(.ua-detail-header, .ua-detail-body) {
   width: 100%;
@@ -1864,9 +1864,6 @@
   flex-direction: column;
   gap: 4px;
   list-style: decimal;
-}
-.ua-detail-section > :not(summary) + :not(summary) {
-  margin-top: 8px;
 }
 .ua-detail-section .ua-pill {
   align-self: flex-start;
