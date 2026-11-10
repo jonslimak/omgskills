@@ -828,8 +828,6 @@
   align-self: stretch;
   padding: 8px 0;
 }
-.ua-source-trending-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 16px; font-size: 12px; }
-.ua-source-trending-meta a { color: inherit; }
 .ua-source-trending-row { min-height: 64px; gap: 10px; }
 .ua-source-trending-row .ua-rank { flex: 0 0 30px; text-align: right; font-variant-numeric: tabular-nums; }
 .ua-source-trending-row .ua-row-main { color: inherit; text-decoration: none; text-align: left; }

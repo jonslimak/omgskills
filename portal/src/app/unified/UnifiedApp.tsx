@@ -132,7 +132,7 @@ import { DataPage } from "./DataPage";
 import { DevelopersPage } from "./DevelopersPage";
 import { isMacDevice } from "./install-command";
 import { SiteFooter } from "./SiteFooter";
-import { SourceTrending } from "./SourceTrending";
+import { SourceTrending, sourceTrendingUpdated } from "./SourceTrending";
 import type { SourceTrendingEntry } from "../../../../scripts/source-trending-format.mjs";
 import { saveTheme, storedTheme, type Theme } from "./theme-preference";
 import { trackEvent } from "./analytics";
@@ -492,6 +492,7 @@ export function UnifiedApp({
   const [onMac] = useState(() => isMacDevice());
   const supportsView = (view: View) => !supportedAccountViews || isDiscovery(view) || supportedAccountViews.includes(view);
   const [rail, setRail] = useState(false);
+  const [trendingUpdated, setTrendingUpdated] = useState("");
   const [theme, setTheme] = useState<Theme>(() => storedTheme());
   function toggleTheme() {
     const next = theme === "light" ? "dark" : "light";
@@ -1276,7 +1277,7 @@ export function UnifiedApp({
               : nav.view === "creator"
                 ? creator?.tagline
                 : nav.view === "top"
-                  ? "Trending skills around the world"
+                  ? ["Trending skills around the world", trendingUpdated].filter(Boolean).join(" · ")
                   : "";
   const headingActions = listState === "ready" && !nav.query &&
     (editableView || (readOnlyAccount && signedIn && nav.view === "all")) ? (
@@ -1709,7 +1710,7 @@ export function UnifiedApp({
                   </section>
                 </div>
               ) : sourceTrendingPage ? (
-                <SourceTrending onOpen={openTrending} />
+                <SourceTrending onOpen={openTrending} onLoad={feed => setTrendingUpdated(sourceTrendingUpdated(feed))} />
               ) : developersPage ? (
                 <DevelopersPage />
               ) : dataPage ? (
@@ -1728,7 +1729,7 @@ export function UnifiedApp({
                       title={publicStatus ? "Trending skills" : "Top this week"}
                       action={() => go("top")}
                     />
-                    {publicStatus ? <SourceTrending limit={9} onOpen={openTrending} /> : publicSection("list", "trending skills", <div className="ua-trending">
+                    {publicStatus ? <SourceTrending limit={9} grid onOpen={openTrending} /> : publicSection("list", "trending skills", <div className="ua-trending">
                       {top
                         .slice(0, 9)
                         .map((skill, i) => renderRow(skill, i + 1, true))}
