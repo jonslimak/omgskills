@@ -1,0 +1,202 @@
+name: trending-intake
+
+on:
+  schedule:
+    - cron: "7 12 * * *"
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Admit verified additions, publish both tracks, and deploy
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+
+concurrency:
+  group: app-data-writers
+  cancel-in-progress: false
+
+jobs:
+  trending-intake:
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.CRAWL4_TRENDING_INTAKE_ENABLED == '1' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      INTAKE_APPLY: ${{ github.event_name == 'schedule' || inputs.apply == true }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Sync latest main
+        run: |
+          git fetch origin main --depth=1
+          git reset --hard origin/main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.19.5"
+          cache: npm
+          cache-dependency-path: index/package-lock.json
+
+      - name: Install intake dependencies
+        working-directory: index
+        run: npm ci
+
+      - name: Restore app publication assets
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: node ./scripts/data-store.mjs pull --dir site/data/v2 --dir site/data/crawl4
+
+      - name: Validate policy and snapshot publication baselines
+        working-directory: index
+        run: |
+          npm run policy:validate -- --profile strict
+          npm run publication:impact -- snapshot --track v2 --output "$RUNNER_TEMP/trending-v2.json"
+          npm run publication:impact -- snapshot --track crawl4 --output "$RUNNER_TEMP/trending-crawl4.json"
+
+      - name: Capture live appcast baseline
+        if: env.INTAKE_APPLY == 'true'
+        run: curl --retry 3 --retry-all-errors -fsSL https://omgskills.com/appcast.xml | sha256sum | awk '{print $1}' > "$RUNNER_TEMP/appcast.sha256"
+
+      - name: Refresh Trending only
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: npm run scrape:trending
+
+      - name: Verify up to 20 unreviewed Trending candidates
+        working-directory: index
+        env:
+          GITHUB_TOKEN: ${{ secrets.SCRAPER_GITHUB_TOKEN }}
+        run: |
+          args=()
+          if [ "$INTAKE_APPLY" = "true" ]; then args+=(--apply); fi
+          npm run crawl4:trending-intake -- "${args[@]}"
+
+      - name: Upload intake evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trending-intake-${{ github.run_id }}
+          path: |
+            index/shadow/trending-mvp/intake-*/report.json
+            index/shadow/trending-mvp/intake-*/additions.json
+            index/shadow/trending-mvp/intake-*/proposed-state.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Rebuild affected reports
+        if: env.INTAKE_APPLY == 'true'
+        working-directory: index
+        run: |
+          npm run policy:validate -- --profile strict
+          npm run content:overlays
+          npm run content:author-leaderboards
+          npm run content:trending-leaderboard
+          npm run content:leaderboard-view-data
+
+      - name: Publish and verify both tracks
+        if: env.INTAKE_APPLY == 'true'
+        run: |
+          node ./scripts/publish-content-data.mjs v2
+          node ./scripts/publish-content-data.mjs crawl4
+          OMGSKILLS_DATA_SUBDIR=v2 node ./scripts/verify-published-data.mjs
+          OMGSKILLS_DATA_SUBDIR=crawl4 node ./scripts/verify-published-data.mjs
+
+      - name: Check publication impact
+        if: env.INTAKE_APPLY == 'true'
+        working-directory: index
+        run: |
+          npm run publication:impact -- check --track v2 --baseline "$RUNNER_TEMP/trending-v2.json" --json shadow/publication-impact.v2.json --markdown shadow/publication-impact.v2.md
+          npm run publication:impact -- check --track crawl4 --baseline "$RUNNER_TEMP/trending-crawl4.json" --json shadow/publication-impact.crawl4.json --markdown shadow/publication-impact.crawl4.md
+          cat shadow/publication-impact.v2.md shadow/publication-impact.crawl4.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload publication impact
+        if: always() && env.INTAKE_APPLY == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: publication-impact-trending-${{ github.run_id }}
+          path: |
+            index/shadow/publication-impact.v2.*
+            index/shadow/publication-impact.crawl4.*
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload publication assets
+        if: env.INTAKE_APPLY == 'true'
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: node ./scripts/data-store.mjs push --dir site/data/v2 --dir site/data/crawl4
+
+      - name: Commit verified intake
+        if: env.INTAKE_APPLY == 'true'
+        run: |
+          git config user.name "omgskills-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index/skills.json index/source-trending.json index/trending.json index/trending.backup.json index/snapshots index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/trending-leaderboard.json index/leaderboard-view-data.json
+          if [ -f index/trending-intake-state.json ]; then git add index/trending-intake-state.json; fi
+          git add -A -- site/data/v2 site/data/crawl4
+          if ! git diff --cached --quiet; then
+            git commit -m "trending: publish verified intake ($(date -u +%Y-%m-%d))"
+            git push origin HEAD:main
+          fi
+
+      - name: Restore latest health snapshot
+        if: env.INTAKE_APPLY == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node ./scripts/restore-health-snapshot.mjs
+
+      - name: Prepare release assets for Netlify deploy
+        if: env.INTAKE_APPLY == 'true'
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: node ./scripts/prepare-netlify-site-deploy.mjs
+
+      - name: Install site dependencies
+        if: env.INTAKE_APPLY == 'true'
+        run: npm ci
+
+      - name: Build combined Netlify artifact
+        if: env.INTAKE_APPLY == 'true'
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+        run: npm run build:netlify
+
+      - name: Deploy site to Netlify
+        if: env.INTAKE_APPLY == 'true'
+        id: production_deploy
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: dfdb618d-b748-4c4f-a535-646dc5db449f
+        run: npm run deploy:production
+
+      - name: Upload production deploy receipt
+        if: always() && steps.production_deploy.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deploy-trending-${{ github.run_id }}
+          path: dist/netlify-deploy-receipt.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Confirm public appcast is unchanged
+        if: env.INTAKE_APPLY == 'true'
+        run: |
+          curl --retry 3 --retry-all-errors -fsSL https://omgskills.com/appcast.xml | sha256sum | awk '{print $1}' > "$RUNNER_TEMP/appcast.after.sha256"
+          diff -u "$RUNNER_TEMP/appcast.sha256" "$RUNNER_TEMP/appcast.after.sha256"
