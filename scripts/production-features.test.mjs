@@ -31,15 +31,15 @@ test("loads the tracked production feature state", async () => {
 test("loads disabled, web-only, and full production feature states", async () => {
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":true,"skillGroupsAuthEnabled":true}')),
-    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false, takeoverPilotEnabled: false },
+    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: true, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false, takeoverPilotEnabled: false, takeoverAllPagesEnabled: false },
   );
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":true,"skillGroupsAuthEnabled":false}')),
-    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false, takeoverPilotEnabled: false },
+    { skillGroupsWebEnabled: true, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false, takeoverPilotEnabled: false, takeoverAllPagesEnabled: false },
   );
   assert.deepEqual(
     await loadProductionFeatures(await configUrl('{"skillGroupsWebEnabled":false,"skillGroupsAuthEnabled":false}')),
-    { skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false, takeoverPilotEnabled: false },
+    { skillGroupsWebEnabled: false, skillGroupsAuthEnabled: false, portalRedesignEnabled: false, portalUnifiedEnabled: false, catalogSearchEnabled: false, connectedInventoryReadEnabled: false, connectedInventorySyncEnabled: false, takeoverPilotEnabled: false, takeoverAllPagesEnabled: false },
   );
 });
 
@@ -166,4 +166,7 @@ test("the takeover pilot setting is a boolean that needs the unified app", async
   assert.equal(validateProductionFeatures(base).takeoverPilotEnabled, false);
   assert.throws(() => validateProductionFeatures({ ...base, takeoverPilotEnabled: "1" }), /takeoverPilotEnabled must be a boolean/);
   assert.throws(() => validateProductionFeatures({ ...base, portalUnifiedEnabled: false, takeoverPilotEnabled: true }), /requires the unified web app/);
+  assert.equal(validateProductionFeatures({ ...base, takeoverPilotEnabled: true, takeoverAllPagesEnabled: true }).takeoverAllPagesEnabled, true);
+  assert.equal(validateProductionFeatures({ ...base, takeoverPilotEnabled: true }).takeoverAllPagesEnabled, false);
+  assert.throws(() => validateProductionFeatures({ ...base, takeoverAllPagesEnabled: true }), /requires takeoverPilotEnabled/);
 });

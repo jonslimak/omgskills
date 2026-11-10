@@ -52,6 +52,12 @@
     Cache-Control = "private, no-store"
     Referrer-Policy = "no-referrer"
 
+# Library pages load the app through this fixed file; it changes with every app release.
+[[headers]]
+  for = "/app/takeover.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
 [[headers]]
   for = "/app/release-config.json"
   [headers.values]
