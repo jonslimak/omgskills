@@ -6,6 +6,8 @@ import { createCompactMcpLibraryLoader, type CompactMcpLoader } from "./_shared/
 import featureConfig from "../../config/production-features.json" with { type: "json" };
 import { validateProductionFeatures } from "../../config/production-features.mjs";
 import { catalogInstallRecord, catalogInstallRecordPath } from "./_shared/catalog-install-record.js";
+import type { CatalogReader } from "../../mcp/src/catalog-reader.js";
+import type { SkillResult } from "../../mcp/src/library.js";
 
 const maximumRequestBytes = 64 * 1024;
 
@@ -40,10 +42,25 @@ function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader, optio
 
     const startedAt = performance.now();
     const cold = !loader.status().hasSnapshot;
+    let started: ReturnType<typeof loader.get> | undefined;
+    // Cold start: answer a single get_skill from small assets while the full catalog loads.
+    if (cold && "quickSkill" in loader && loader.quickSkill) {
+      const body = await request.text();
+      if (new TextEncoder().encode(body).byteLength > maximumRequestBytes) return jsonRpcError(413, -32000, "Request body too large");
+      // Start the full load first so a slow quick read never delays it; it continues after the response.
+      started = loader.get();
+      context.waitUntil(started.then(() => undefined, () => undefined));
+      const quick = await quickGetSkill(body, loader.quickSkill);
+      if (quick) {
+        return respond(createOmgskillsServer(quickLibrary(quick), options), new Request(request, { body }), context,
+          `catalog;dur=${(performance.now() - startedAt).toFixed(1)};desc="quick"`, startedAt);
+      }
+      request = new Request(request, { body });
+    }
     let snapshot;
     let catalogMs = 0;
     try {
-      snapshot = await loader.get();
+      snapshot = await (started ?? loader.get());
       catalogMs = performance.now() - startedAt;
       if (cold) console.info(`MCP catalog cold load: ${Math.round(catalogMs)}ms (${snapshot.skillCount} skills)`);
       keepRefreshAlive(loader, context);
@@ -52,24 +69,48 @@ function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader, optio
       return jsonRpcError(503, -32603, "Catalog temporarily unavailable");
     }
 
-    const server = createOmgskillsServer(snapshot.library, options);
-    const transport = new WebStandardStreamableHTTPServerTransport({
-      sessionIdGenerator: undefined,
-      enableJsonResponse: true,
-      maxRequestBodySize: maximumRequestBytes
-    });
-
-    try {
-      await server.connect(transport);
-      const response = await transport.handleRequest(request);
-      context.waitUntil(server.close());
-      return hardened(response, serverTiming(cold, catalogMs, performance.now() - startedAt));
-    } catch (error) {
-      console.error("MCP request failed:", error);
-      context.waitUntil(server.close());
-      return jsonRpcError(500, -32603, "Internal server error");
-    }
+    return respond(createOmgskillsServer(snapshot.library, options), request, context,
+      `catalog;dur=${catalogMs.toFixed(1)};desc="${cold ? "cold load" : "warm"}"`, startedAt);
   };
+}
+
+async function respond(server: ReturnType<typeof createOmgskillsServer>, request: Request, context: Pick<Context, "waitUntil">,
+  catalogTiming: string, startedAt: number): Promise<Response> {
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    sessionIdGenerator: undefined,
+    enableJsonResponse: true,
+    maxRequestBodySize: maximumRequestBytes
+  });
+  try {
+    await server.connect(transport);
+    const response = await transport.handleRequest(request);
+    context.waitUntil(server.close());
+    return hardened(response, `${catalogTiming}, total;dur=${(performance.now() - startedAt).toFixed(1)}`);
+  } catch (error) {
+    console.error("MCP request failed:", error);
+    context.waitUntil(server.close());
+    return jsonRpcError(500, -32603, "Internal server error");
+  }
+}
+
+/** The skill for a single JSON-RPC tools/call get_skill request, if the quick reader has it. */
+async function quickGetSkill(body: string, quickSkill: (id: string) => Promise<SkillResult | undefined>) {
+  let message: unknown;
+  try { message = JSON.parse(body); } catch { return undefined; }
+  const call = message as { method?: unknown; params?: { name?: unknown; arguments?: { id?: unknown } } };
+  if (!call || Array.isArray(call) || call.method !== "tools/call" || call.params?.name !== "get_skill") return undefined;
+  const id = call.params.arguments?.id;
+  return typeof id === "string" && id.length <= 500 ? quickSkill(id) : undefined;
+}
+
+/** A reader that only answers get_skill for the one skill already read. */
+function quickLibrary(skill: SkillResult): CatalogReader {
+  return new Proxy({ getSkill: async (id: string) => id.trim().replace(/^catalog:/i, "") === skill.id ? skill : undefined } as CatalogReader, {
+    get(target, property) {
+      if (property in target) return target[property as keyof CatalogReader];
+      throw new Error(`Quick catalog cannot answer ${String(property)}`);
+    }
+  });
 }
 
 export function createConfiguredMcpHandler(enabled: boolean, loaders?: { legacy: McpLibraryLoader; compact: CompactMcpLoader }) {
@@ -159,12 +200,6 @@ function hardened(response: Response, timing?: string): Response {
 }
 
 // Visible in browser dev tools and curl; lets production show load versus request time.
-function serverTiming(cold: boolean, catalogMs: number, totalMs: number): string {
-  return [
-    `catalog;dur=${catalogMs.toFixed(1)};desc="${cold ? "cold load" : "warm"}"`,
-    `total;dur=${totalMs.toFixed(1)}`
-  ].join(", ");
-}
 
 function responseHeaders(): Record<string, string> {
   return {

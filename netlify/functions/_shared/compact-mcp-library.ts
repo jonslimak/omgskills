@@ -1,5 +1,6 @@
 import type { OmgskillsLibrary } from "../../../mcp/src/library.js";
-import { loadCatalogReader, readCatalogVersion, type CatalogReadOptions, type SearchCatalogReader } from "../../../mcp/src/search-catalog.js";
+import { loadCatalogReader, QuickSkillReader, readCatalogVersion, type CatalogReadOptions, type SearchCatalogReader } from "../../../mcp/src/search-catalog.js";
+import type { SkillResult } from "../../../mcp/src/library.js";
 import type { McpLibraryLoader, McpLibrarySnapshot, McpCatalogTrack } from "./mcp-library.js";
 import { productionMcpTracks, fetchWithTimeout } from "./mcp-library.js";
 
@@ -9,6 +10,8 @@ export type CompactMcpLoader = Omit<McpLibraryLoader, "get" | "refresh" | "pendi
   get: () => Promise<CompactMcpSnapshot>;
   refresh: () => Promise<CompactMcpSnapshot>;
   pendingRefresh: () => Promise<CompactMcpSnapshot> | null;
+  /** Before the first full load: one skill by exact ID from small assets, or undefined. */
+  quickSkill?: (id: string) => Promise<SkillResult | undefined>;
 };
 
 /** Candidate-only loader. Production retains loadProductionMcpLibrary until activation is reviewed. */
@@ -20,6 +23,15 @@ export function createCompactMcpLibraryLoader(options: CatalogReadOptions & {
   let snapshot: CompactMcpSnapshot | null = null;
   let pending: Promise<CompactMcpSnapshot> | null = null;
   let lastRefreshFailed = false;
+  let quick: Promise<QuickSkillReader | null> | null = null;
+  // Uses the first track only, without the full loader's membership checks; if that track is
+  // rejected the full load falls back and quick answers stop once it lands (accepted: brief, verified data).
+  async function quickReader() {
+    const track = (options.tracks ?? productionMcpTracks)[0];
+    if (!track) return null;
+    quick ??= QuickSkillReader.load(track.manifestUrl, readerOptions).catch(() => { quick = null; return null; });
+    return quick;
+  }
   async function load() {
     let lastError: unknown;
     for (const track of options.tracks ?? productionMcpTracks) {
@@ -40,7 +52,7 @@ export function createCompactMcpLibraryLoader(options: CatalogReadOptions & {
   }
   function refresh() {
     if (pending) return pending;
-    pending = load().then(next => { snapshot = next; lastRefreshFailed = false; return next; }, error => {
+    pending = load().then(next => { snapshot = next; quick = null; lastRefreshFailed = false; return next; }, error => {
       lastRefreshFailed = true;
       if (snapshot) return snapshot;
       throw error;
@@ -55,6 +67,10 @@ export function createCompactMcpLibraryLoader(options: CatalogReadOptions & {
     },
     refresh,
     pendingRefresh: () => pending,
+    async quickSkill(id: string) {
+      if (snapshot) return undefined;
+      try { return await (await quickReader())?.getSkill(id); } catch { return undefined; }
+    },
     status: () => ({ hasSnapshot: !!snapshot, refreshing: !!pending, lastRefreshFailed, maxAgeMs }),
   };
 }

@@ -297,6 +297,11 @@ export class OmgskillsLibrary {
     return this.idsByLowerId.get(trimmed.toLowerCase()) ?? this.idsByShortId.get(trimmed.toLowerCase()) ?? undefined;
   }
 
+  /** Trending and curated fields for a catalog record this library may not hold (quick cold reads). */
+  enrichRecord(skill: Skill): SkillResult {
+    return this.enrich(skill, 0);
+  }
+
   getSkill(id: string): SkillResult | undefined {
     const canonical = this.canonicalId(id);
     const skill = canonical ? this.skillsById.get(canonical) ?? this.goldById.get(canonical) : undefined;
