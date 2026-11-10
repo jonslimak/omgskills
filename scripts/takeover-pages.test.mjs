@@ -50,7 +50,7 @@ test("the pilot writes only the pilot pages from their static sources", async t 
 
 test("pages load the app through the fixed loader, which adds the current stylesheet and entry", () => {
   const html = addTakeover(page);
-  assert.ok(html.includes(`<script src="${takeoverLoaderPath}"></script>`));
+  assert.ok(html.includes(`<script defer src="${takeoverLoaderPath}"></script>`));
   assert.doesNotMatch(html, /\/app\/assets\//, "page bytes do not change when the app does");
   const loader = takeoverLoader(appShellTags(shell));
   assert.match(loader, /\["\/app\/assets\/index-def\.css"\]/);
@@ -81,12 +81,13 @@ test("all pages: every creator page in place, each skill at its /library/ addres
     "othmanadi/planning-with-files:planning-with-files": "/skills/b/",
     "OthmanAdi/planning-with-files:planning-with-files": "/skills/c/",
     "n8n-io/n8n:packages/@n8n/x": "/skills/d/",
+    "abpframework/abp:.claude/skills/abp-angular": "/skills/a/",
   } }));
   const { urls, skipped } = await writeTakeover(out, { all: true });
   assert.deepEqual(urls, ["/developers/", "/library/anthropics/", "/library/othmanadi/",
     "/library/anthropics/skills/skills/frontend-design/", "/library/othmanadi/planning-with-files/planning-with-files/",
     "/library/n8n-io/n8n/packages/@n8n/x/"]);
-  assert.deepEqual(skipped, ["OthmanAdi/planning-with-files:planning-with-files"]);
+  assert.deepEqual(skipped, ["OthmanAdi/planning-with-files:planning-with-files", "abpframework/abp:.claude/skills/abp-angular"]);
   assert.match(await readFile(path.join(out, "library/n8n-io/n8n/packages/@n8n/x/index.html"), "utf8"), /id="omgskills-static"/);
   assert.match(await readFile(path.join(out, "app/takeover.js"), "utf8"), /index-abc\.js/);
   assert.equal(await readFile(path.join(out, "skills/a/index.html"), "utf8"), page, "source pages unchanged");

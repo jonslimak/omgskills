@@ -53,7 +53,8 @@ export function appShellTags(appIndexHtml) {
 /** Pages load the app through this fixed, uncached file, so an app release changes one file
  * instead of every page (deploys upload only changed files). */
 export const takeoverLoaderPath = "/app/takeover.js";
-const loaderTag = `<script src="${takeoverLoaderPath}"></script>`;
+// defer: runs after the page is parsed, so #root exists and first paint isn't blocked.
+const loaderTag = `<script defer src="${takeoverLoaderPath}"></script>`;
 
 /** Classic script that adds the current app's stylesheet and entry module to the page. */
 export function takeoverLoader(tags) {
@@ -116,7 +117,9 @@ export async function takeoverAllPages(outputDir) {
     const url = librarySkillPath(id);
     // Disk paths are decoded; a creator page already lives at /library/<owner>/ (no skill part).
     const file = url && decodeURIComponent(url);
-    if (!url || taken.has(file.toLowerCase())) { skipped.push(id); continue; }
+    // Netlify's deploy drops files and folders whose names start with "." (e.g. .claude/), so
+    // those skills keep only their /skills/ page until the app has a dot-safe address (move.md step 3).
+    if (!url || file.split("/").some(part => part.startsWith(".")) || taken.has(file.toLowerCase())) { skipped.push(id); continue; }
     taken.add(file.toLowerCase());
     pages.push({ url: file, source });
   }
