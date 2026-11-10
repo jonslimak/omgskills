@@ -492,6 +492,7 @@ export function UnifiedApp({
   const [onMac] = useState(() => isMacDevice());
   const supportsView = (view: View) => !supportedAccountViews || isDiscovery(view) || supportedAccountViews.includes(view);
   const [rail, setRail] = useState(false);
+  const [trendingUpdated, setTrendingUpdated] = useState("");
   const [theme, setTheme] = useState<Theme>(() => storedTheme());
   function toggleTheme() {
     const next = theme === "light" ? "dark" : "light";
@@ -518,7 +519,6 @@ export function UnifiedApp({
   const [historyOpen, setHistoryOpen] = useState(false);
   useEffect(() => { setInstallOpen(false); setDescriptionOpen(false); setHistoryOpen(false); }, [nav.selected]);
   const [showHidden, setShowHidden] = useState(false);
-  const [trendingUpdated, setTrendingUpdated] = useState("");
   const [collectionPageIndex, setCollectionPageIndex] = useState(0);
   const [expandedSearchScope, setExpandedSearchScope] = useState<string | null>(null);
   const [submittedQuery, setSubmittedQuery] = useState<string | null>(null);
