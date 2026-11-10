@@ -23,6 +23,8 @@ test("dot-safe library addresses open the original skill, and old dot addresses 
     assert.equal(parsePublicNavigationPath(path, "")?.selected, `catalog:${id}`, id);
   }
   assert.equal(catalogSkillPath("o/r:.dot-x/y"), null);
+  assert.equal(parsePublicNavigationPath("library/o/r/dot-/", ""), null);
+  assert.equal(parsePublicNavigationPath("library/o/r/x/dot-./", ""), null);
   assert.equal(parsePublicNavigationPath("library/abpframework/abp/.claude/skills/abp-angular/", "")?.selected,
     "catalog:abpframework/abp:.claude/skills/abp-angular");
 });

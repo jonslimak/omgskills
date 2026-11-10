@@ -302,6 +302,8 @@ export function catalogSkillPath(id: string): string | null {
 }
 function catalogIdFromSegments([owner, repo = "", ...skill]: string[]) {
   const [safeRepo, ...safeSkill] = [repo, ...skill].map(fromDotSafe);
+  // "dot-" / "dot-." would decode to "." / ".."; no catalog ID has those.
+  if ([safeRepo, ...safeSkill].some(part => part === "." || part === "..")) return null;
   return skill.length ? `${owner}/${safeRepo}:${safeSkill.join("/")}` : `${owner}/${safeRepo}`;
 }
 
@@ -342,8 +344,9 @@ export function parsePublicNavigationPath(relative: string, search: string): Nav
   else if (segments.length === 2 && first === "collections") nav = { ...base, view: "collection", id: second! };
   else if (!reservedLibraryNames.has(first.toLowerCase())) {
     // A direct skill address opens its creator's list with that skill selected.
+    const id = segments.length === 1 ? "" : catalogIdFromSegments(segments);
     nav = segments.length === 1 ? { ...base, view: "creator", id: first }
-      : { ...base, view: "creator", id: first.toLowerCase(), selected: `catalog:${catalogIdFromSegments(segments)}` };
+      : id ? { ...base, view: "creator", id: first.toLowerCase(), selected: `catalog:${id}` } : null;
   }
   if (!nav) return null;
   const sort = params.get("sort");
