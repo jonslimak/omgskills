@@ -264,9 +264,9 @@ actor ManagedSkillInstaller {
             case .invalidTransactionJournal:
                 return "A previous group installation cannot be recovered safely"
             case .subscriptionNotFound:
-                return "This Skill Group subscription is no longer installed"
+                return "This set subscription is no longer installed"
             case .subscriptionChanged:
-                return "The installed Skill Group changed. Refresh it and try again"
+                return "The installed set changed. Refresh it and try again"
             case .subscriptionHasLocalConflicts:
                 return "Resolve the local skill changes before applying this group update"
             case .operationInProgress:

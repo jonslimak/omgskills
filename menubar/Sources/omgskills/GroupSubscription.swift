@@ -9,11 +9,11 @@ enum GroupSubscriptionError: LocalizedError, Equatable, Sendable {
     var errorDescription: String? {
         switch self {
         case .invalidRecord:
-            "The saved Skill Group subscription is invalid."
+            "The saved set subscription is invalid."
         case .recordTooLarge:
-            "The saved Skill Group subscription is too large."
+            "The saved set subscription is too large."
         case .filesystem(let message):
-            message.isEmpty ? "The Skill Group subscription could not be saved." : message
+            message.isEmpty ? "The set subscription could not be saved." : message
         }
     }
 }

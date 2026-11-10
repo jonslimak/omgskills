@@ -51,7 +51,7 @@ struct GroupSnapshotInstallSheet: View {
         )
         .interactiveDismissDisabled(model.isOperationActive)
         .confirmationDialog(
-            "Apply this Skill Group update?",
+            "Apply this set update?",
             isPresented: $showsUpdateConfirmation,
             titleVisibility: .visible
         ) {

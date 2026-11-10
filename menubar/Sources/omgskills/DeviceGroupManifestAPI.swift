@@ -24,7 +24,7 @@ enum DeviceGroupManifestAPIError: LocalizedError, Equatable, Sendable {
         case .rateLimited:
             return "Too many requests. Wait briefly and try again."
         case .temporarilyUnavailable:
-            return "Skill Groups are temporarily unavailable."
+            return "Sets are temporarily unavailable."
         case .server:
             return "The web portal could not load this group. Try again shortly."
         case .responseTooLarge, .invalidResponse:

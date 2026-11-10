@@ -29,7 +29,7 @@ enum DeviceSyncAPIError: LocalizedError, Equatable, Sendable {
         case .invalidResponse:
             return "The web portal returned an invalid response."
         case .inventoryChanged:
-            return "Inventory changed. Resync to scan again."
+            return "Your skills changed. Choose Resync to check again."
         case .unsupportedReportMode:
             return "This inventory reporting mode is not configured."
         case .unsupportedReconnect:

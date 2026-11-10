@@ -49,6 +49,7 @@ struct ConnectedInventoryView: View {
                     if let runtime { runtime.connect(deviceName: deviceName) }
                     else { model.connectWithBrowser(deviceName: deviceName, installations: [], replacingExisting: true) }
                 }
+                Text("Share skills across teams & agents.").font(.caption).foregroundStyle(.secondary)
             }
             if let warning = model.continuityWarning {
                 Text(warning).font(.caption).foregroundStyle(.secondary)
@@ -135,8 +136,8 @@ struct ConnectedInventoryView: View {
     static func reportMessage(_ status: DeviceConnectionModel.ReportStatus) -> String {
         switch status {
         case .idle: return "Connected. Inventory has not been reported yet."
-        case .pending: return "Inventory report pending."
-        case .reporting: return "Reporting installed skills..."
+        case .pending: return "Waiting to check your skills."
+        case .reporting: return "Checking your skills..."
         case .failed(let message): return "Inventory needs attention. " + message
         case .uncertain(let message): return "Report outcome uncertain. " + message + " Resync to check with a fresh scan."
         case .reported(let result, let issues):
