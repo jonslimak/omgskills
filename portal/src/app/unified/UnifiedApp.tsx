@@ -41,6 +41,8 @@ import {
   Globe,
   Heart,
   Laptop,
+  Maximize2,
+  Minimize2,
   ListPlus,
   ListChecks,
   Lock,
@@ -431,6 +433,9 @@ function AgentList({ sources }: { sources: string[] }) {
     </strong>
   );
 }
+// Only the app's first mount on a page load counts as a direct visit; remounts (sign in/out) don't.
+let pageEntryMounted = false;
+
 const categoryIcons: Record<string, LucideIcon> = {
   "Design system": Palette,
   SwiftUI: Smartphone,
@@ -519,6 +524,11 @@ export function UnifiedApp({
   const [historyOpen, setHistoryOpen] = useState(false);
   useEffect(() => { setInstallOpen(false); setDescriptionOpen(false); setHistoryOpen(false); }, [nav.selected]);
   const [showHidden, setShowHidden] = useState(false);
+  // A skill opened straight from its address (search, shared link) starts as a full-width page;
+  // one opened by a click in the app starts as the side panel. Either can switch with the expand button.
+  const [detailExpanded, setDetailExpanded] = useState(() => !pageEntryMounted && !!nav.selected);
+  useEffect(() => { pageEntryMounted = true; }, []);
+  useEffect(() => { if (!nav.selected) setDetailExpanded(false); }, [nav.selected]);
   const [collectionPageIndex, setCollectionPageIndex] = useState(0);
   const [expandedSearchScope, setExpandedSearchScope] = useState<string | null>(null);
   const [submittedQuery, setSubmittedQuery] = useState<string | null>(null);
@@ -613,6 +623,10 @@ export function UnifiedApp({
     ? management?.detail.set ?? data.sets.find((set) => set.id === nav.id)
     : undefined;
   const collection = catalog.collections.find((item) => item.id === nav.id);
+  const detailCollections = detail?.catalogId
+    ? catalog.collections.filter((item) => item.skillIds.includes(detail.catalogId!))
+    : [];
+  const expanded = wide && detailExpanded;
   const collectionHeader = nav.view === "collection" && !nav.query ? collection : undefined;
   const showCollectionPager = nav.view === "discover" && !nav.query;
   const trendingHeader = nav.view === "top" && !nav.query;
@@ -1510,7 +1524,7 @@ export function UnifiedApp({
               </button>
             )}
           </header>
-          <main className="ua-main" data-view={nav.view} ref={main} id="unified-main" tabIndex={-1}>
+          <main className="ua-main" data-view={nav.view} ref={main} id="unified-main" tabIndex={-1} inert={!!selected && expanded}>
             {railList && <AlphaRail scroller={main} letters={railLetters(visible)} count={visible.length} />}
             <div className="ua-content">
               {!collectionHeader && !creatorHeader && ((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
@@ -1981,6 +1995,8 @@ export function UnifiedApp({
               <Dialog.Content
                 className="ua-detail ua-theme"
                 data-theme={theme}
+                data-expanded={expanded}
+                data-rail={rail}
                 aria-describedby={undefined}
                 onCloseAutoFocus={(event) => {
                   event.preventDefault();
@@ -1996,13 +2012,29 @@ export function UnifiedApp({
                 }}
               >
                 <div className="ua-detail-header">
+                {expanded && detail.author && (
+                  <button type="button" className="ua-link ua-detail-back" aria-label={`Back to @${detail.author}`} onClick={() => go("creator", detail.author)}>
+                    <ArrowLeft />@{detail.author}
+                  </button>
+                )}
                 <div className="ua-detail-top">
                   <span className="ua-grabber" />
-                  <Dialog.Close asChild>
-                    <IconButton label="Close skill details">
-                      <X />
-                    </IconButton>
-                  </Dialog.Close>
+                  <span className="ua-detail-window">
+                    {wide && (
+                      <IconButton
+                        label={expanded ? "Show as side panel" : "Expand to full width"}
+                        data-plain
+                        onClick={() => setDetailExpanded((value) => !value)}
+                      >
+                        {expanded ? <Minimize2 /> : <Maximize2 />}
+                      </IconButton>
+                    )}
+                    <Dialog.Close asChild>
+                      <IconButton label="Close skill details">
+                        <X />
+                      </IconButton>
+                    </Dialog.Close>
+                  </span>
                   {!detailHeadingKnown ? <Dialog.Title>{publicStatus?.detailMissing ? "Skill not found" : "Skill details"}</Dialog.Title> : (
                     <div className="ua-detail-heading">
                       <Avatar
@@ -2232,6 +2264,40 @@ export function UnifiedApp({
                   <a className="ua-link" href={detail.publicUrl} target="_blank" rel="noreferrer">
                     View public skill page <ArrowUpRight />
                   </a>
+                )}
+                {detail.githubUrl && (
+                  <details className="ua-detail-section" key={`files:${detail.key}`}>
+                    <summary>Files in this skill</summary>
+                    <p className="ua-muted">The skill folder holds SKILL.md and any scripts or references it uses.</p>
+                    <a className="ua-link" href={detail.githubUrl} target="_blank" rel="noreferrer">
+                      Browse the files on GitHub <ArrowUpRight />
+                    </a>
+                  </details>
+                )}
+                {detail.installCommand && (
+                  <details className="ua-detail-section" key={`how:${detail.key}`}>
+                    <summary>How to install</summary>
+                    {!onMac && <ol>
+                      <li>Add it to My skills to use it in Claude, ChatGPT, Cursor and more through the My skills MCP.</li>
+                      <li>Or install it on this computer with the command below.</li>
+                    </ol>}
+                    <code className="ua-detail-command">{detail.installCommand}</code>
+                    <button type="button" className="ua-pill" onClick={() => void copyInstall(detail)}>
+                      <Copy />Copy command
+                    </button>
+                  </details>
+                )}
+                {detailCollections.length > 0 && (
+                  <details className="ua-detail-section" key={`in:${detail.key}`}>
+                    <summary>In collections</summary>
+                    <div className="ua-set-chips">
+                      {detailCollections.map((item) => (
+                        <button type="button" className="ua-pill" key={item.id} onClick={() => go("collection", item.id)}>
+                          <Folder />{item.name}
+                        </button>
+                      ))}
+                    </div>
+                  </details>
                 )}
                 {relatedSkills.length > 0 && (
                   <section className="ua-more">
