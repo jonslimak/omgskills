@@ -57,6 +57,12 @@
       "reason": "non-original-provenance"
     },
     {
+      "sourceId": "gencraft-labs/skills:ai-video-generation",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
       "sourceId": "gencraft-labs/skills:image-to-video",
       "checkedAt": "2026-11-10T11:17:49.752Z",
       "outcome": "blocked",
@@ -71,6 +77,72 @@
     {
       "sourceId": "heygen-com/hyperframes:media-use",
       "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "heygen-com/hyperframes:reverse-any-video",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "heygen-com/hyperframes:style-sampling",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "its-a-skill-issue/superpowers:ai-avatar-video",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "its-a-skill-issue/superpowers:ai-image-generation",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "its-a-skill-issue/superpowers:ai-video-generation",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "its-a-skill-issue/superpowers:twitter-automation",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "magentosh/superpowers:ai-avatar-video",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "magentosh/superpowers:ai-image-generation",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "magentosh/superpowers:ai-video-generation",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "mattpocock/skills:grill-me",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:grilling",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
     },
@@ -105,6 +177,48 @@
       "reason": "catalog-identity-or-path"
     },
     {
+      "sourceId": "qu-skills/superpowers:ai-avatar-video",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "qu-skills/superpowers:ai-image-generation",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "qu-skills/superpowers:ai-video-generation",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "qu-skills/superpowers:twitter-automation",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "remotion-dev/skills:remotion-docs",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "remotion-dev/skills:remotion-license",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "skills-shell/superpowers:ai-avatar-video",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
       "sourceId": "skills-shell/superpowers:ai-image-generation",
       "checkedAt": "2026-11-10T11:17:49.752Z",
       "outcome": "blocked",
@@ -113,6 +227,12 @@
     {
       "sourceId": "skills-shell/superpowers:ai-video-generation",
       "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "skills-shell/superpowers:twitter-automation",
+      "checkedAt": "2026-11-10T19:41:25.403Z",
       "outcome": "blocked",
       "reason": "non-original-provenance"
     },
