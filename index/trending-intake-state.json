@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "policyDigest": "sha256:6f73171923895a3c5c400fdd10204f66864a1523dd6ad6fd7a5ab7a001644a94",
+  "reviews": [
+    {
+      "sourceId": "bankai-skills/superpowers:ai-avatar-video",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "bankai-skills/superpowers:ai-image-generation",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "bankai-skills/superpowers:ai-video-generation",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "bankai-skills/superpowers:twitter-automation",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "designed-by-ai/skills:design-mobile-apps",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "flowkit-labs/skills:doany-website-builder",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "flowkit-labs/skills:reddit-automation",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "gencraft-labs/skills:ai-image-generation",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "gencraft-labs/skills:ai-music",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "gencraft-labs/skills:image-to-video",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "gencraft-labs/skills:video-edit",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "heygen-com/hyperframes:media-use",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "microsoft/azure-skills:azure-app-onboard",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "microsoft/azure-skills:azure-app-onboard-prereq",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "microsoft/azure-skills:azure-reliability",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "microsoft/azure-skills:discover-azure-skills",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "microsoft/azure-skills:python-appservice-deploy",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "skills-shell/superpowers:ai-image-generation",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "skills-shell/superpowers:ai-video-generation",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "blocked",
+      "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "uizze/uizze:uizze-ui",
+      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    }
+  ]
+}
