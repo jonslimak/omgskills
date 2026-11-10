@@ -1,4 +1,6 @@
 // Shared by the producer, publication checks, and the web reader.
+import { normalizePolicyRepo, normalizePolicyHandle, normalizePolicySkillId } from "./policy-identifiers.mjs";
+
 export const SOURCE_TRENDING_MAX_ENTRIES = 500;
 export const SOURCE_TRENDING_STALE_MS = 36 * 60 * 60 * 1000;
 const sourcePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,99}(?:\/[a-zA-Z0-9][a-zA-Z0-9_.-]{0,99})?$/;
@@ -34,12 +36,14 @@ export function validateSourceTrending(value) {
 
 export function filterSourceTrending(feed, policy, skills) {
   validateSourceTrending(feed);
-  const lowerSet = values => new Set(values.map(value => value.trim().toLowerCase()));
-  const blockedRepos = lowerSet([...policy.blockedRepos, ...policy.catalogRepos]);
-  const blockedOwners = lowerSet(policy.blockedOwners);
-  const suppressed = lowerSet(policy.suppressedIds);
+  const blockedRepos = new Set([...policy.blockedRepos, ...policy.catalogRepos].map(normalizePolicyRepo));
+  const blockedOwners = new Set(policy.blockedOwners.map(normalizePolicyHandle));
+  const suppressed = new Set(policy.suppressedIds.map(normalizePolicySkillId));
   const byId = new Map(skills.map(skill => [skill.id, skill]));
-  const blocked = (repo) => blockedRepos.has(repo.toLowerCase()) || blockedOwners.has(repo.split("/")[0].toLowerCase());
+  const blocked = repo => {
+    const normalized = normalizePolicyRepo(repo);
+    return blockedRepos.has(normalized) || blockedOwners.has(normalized.split("/")[0]);
+  };
   return { ...feed, entries: feed.entries.flatMap(entry => {
     if (blocked(entry.source) || suppressed.has(`${entry.source}:${entry.skillId}`.toLowerCase())
       || (entry.catalogId && suppressed.has(entry.catalogId.toLowerCase()))) return [];

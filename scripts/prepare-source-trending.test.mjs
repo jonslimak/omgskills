@@ -56,6 +56,17 @@ test("reapplies current policy to retained snapshots and clears removed catalog 
   assert.deepEqual(feed.entries, [entry("safe/repo", 2)]);
 });
 
+test("publication normalizes repo rules and linked identities the same way as crawler policy", t => {
+  const f = fixture(t), manifest = {};
+  f.seed("do-not-crawl", { repos: [{ repo: " BLOCKED/REPO.git " }, { repo: "https://github.com/Blocked/Publisher.git" }], owners: [] });
+  f.seed("catalog-repos", [{ repo: "Catalog/Repo.GIT" }]);
+  f.input(snapshot([entry("blocked/repo", 1), entry("catalog/repo", 2),
+    entry("old/repo", 3, "old/repo:skill"), entry("safe/repo", 4)]));
+  prepareSourceTrending({ ...f, manifest, skills: [{ id: "old/repo:skill", repo_slug: "Blocked/Publisher.GIT" }] });
+  const feed = JSON.parse(readFileSync(join(f.dataDir, manifest.sourceTrending.path)));
+  assert.deepEqual(feed.entries, [entry("safe/repo", 4)]);
+});
+
 test("missing optional feed is a no-op; malformed feed or unsafe URLs fail", t => {
   const f = fixture(t), manifest = { trending: { path: "legacy.json" } };
   prepareSourceTrending({ ...f, manifest, skills: [] });
