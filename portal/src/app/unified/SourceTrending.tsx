@@ -17,7 +17,10 @@ function SourceTrendingGrid({ entries, onOpen }: { entries: SourceTrendingEntry[
     const content = <>
       <Avatar src={github ? `https://github.com/${encodeURIComponent(owner)}.png?size=80` : undefined} name={entry.source} />
       <span className="ua-row-text">
-        <span className="ua-row-heading"><span className="ua-row-name">{entry.name}</span></span>
+        <span className="ua-row-heading">
+          <span className="ua-row-name">{entry.name}</span>
+          <span className="ua-row-stars ua-row-stars-mobile" aria-label={installs}><Download aria-hidden="true" />{compactCount.format(entry.installs24h)}</span>
+        </span>
         <span className="ua-row-description">
           {github ? `@${owner}` : owner}
           <span className="ua-trending-separator" aria-hidden="true"> · </span>
@@ -33,8 +36,8 @@ function SourceTrendingGrid({ entries, onOpen }: { entries: SourceTrendingEntry[
         : <a className="ua-row-main" href={destination.href} target="_blank" rel="noopener noreferrer" aria-label={label}>{content}</a>}
       <span className="ua-row-stars" />
       {entry.catalogId
-        ? <button type="button" className="ua-pill ua-link ua-row-open" aria-label={label} title={label} onClick={() => onOpen(entry)}><ChevronRight aria-hidden="true" /></button>
-        : <a className="ua-pill ua-link ua-row-open" href={destination.href} target="_blank" rel="noopener noreferrer" aria-label={label} title={label}><ArrowUpRight aria-hidden="true" /></a>}
+        ? <button type="button" className="ua-pill ua-link ua-row-open" aria-label={`${label} details`} title={`${label} details`} onClick={() => onOpen(entry)}><ChevronRight aria-hidden="true" /></button>
+        : <a className="ua-pill ua-link ua-row-open" href={destination.href} target="_blank" rel="noopener noreferrer" tabIndex={-1} aria-hidden="true"><ArrowUpRight aria-hidden="true" /></a>}
     </div>;
   })}</div>;
 }
