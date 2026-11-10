@@ -4,7 +4,7 @@ import type { CatalogReader } from "./catalog-reader.js";
 import type { PageOptions, PagedSearchOptions, SkillPage } from "./paging.js";
 import type { RankedSearchOptions } from "./search-ranking.js";
 import {
-  assetReference, descriptor, detailBucket, detailIndex, installablePayload, object, searchCatalogLimits,
+  assetReference, descriptor, detailBucket, detailIndex, installablePayload, object, projectSearchSkill, searchCatalogLimits,
   searchPayload, rankingPayload, validateShard, verifyBytes,
   type AssetReference, type DetailIndex, type RawSkill, type SearchDescriptor,
 } from "./search-catalog-format.mjs";
@@ -232,6 +232,44 @@ export class SearchCatalogReader implements CatalogReader {
       getStats: () => this.getStats(),
       diagnostics: () => this.diagnostics(),
     };
+  }
+}
+
+/**
+ * Cold-start reads of one skill by its exact ID. A fresh server otherwise parses the whole search
+ * index (~33 MB, ~10 s on Netlify) before it can answer; this loads only the detail index, trending
+ * and curated signals, then the one detail shard holding the skill. Integrity comes from the same
+ * hash chain (manifest -> descriptor -> detail index -> shard). Anything else (other letter case,
+ * curated-only rows, search) returns undefined so the caller waits for the full reader.
+ */
+export class QuickSkillReader {
+  private constructor(private readonly manifestUrl: string, private readonly details: DetailIndex,
+    private readonly signalLibrary: OmgskillsLibrary, private readonly options: CatalogReadOptions) {}
+  static async load(manifestUrl: string, options: CatalogReadOptions = {}): Promise<QuickSkillReader | null> {
+    const fetcher = options.fetcher ?? fetch;
+    const manifest = await manifestAt(manifestUrl, fetcher);
+    if (!manifest.searchCatalog) return null;
+    const ref = assetReference(manifest.searchCatalog, searchCatalogLimits.metadata);
+    const desc = descriptor(await json(assetUrl(manifestUrl, ref), fetcher, ref.bytes, ref), manifest.skills);
+    const [rawIndex, signalData] = await Promise.all([
+      json(assetUrl(manifestUrl, desc.details), fetcher, desc.details.bytes, desc.details),
+      signals(manifestUrl, manifest, options),
+    ]);
+    // Same trending and curated signals the full reader enriches with; no catalog rows needed.
+    const signalLibrary = OmgskillsLibrary.fromData({ skills: [], trending: signalData.trending, goldBasket: signalData.goldBasket });
+    return new QuickSkillReader(manifestUrl, detailIndex(rawIndex, desc), signalLibrary, options);
+  }
+  async getSkill(id: string): Promise<SkillResult | undefined> {
+    const exact = id.trim().replace(/^catalog:/i, "");
+    const bucket = detailBucket(exact);
+    const ref = this.details.shards[bucket];
+    if (!ref) return undefined;
+    const rows = await json(assetUrl(this.manifestUrl, ref), this.options.fetcher ?? fetch, ref.bytes, ref);
+    if (!Array.isArray(rows)) throw new Error("Detail shard must be an array");
+    const raw = rows.find(row => object(row) && (row as RawSkill).id === exact) as RawSkill | undefined;
+    if (!raw || detailBucket(raw.id) !== bucket) return undefined;
+    // Matches the full reader: the enriched search row, then the detail record's fields.
+    return { ...this.signalLibrary.enrichRecord(projectSearchSkill(raw) as Skill), ...slimSkill(raw as Skill) };
   }
 }
 

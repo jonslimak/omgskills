@@ -76,10 +76,31 @@ test("the candidate handler serves existing MCP routes and diagnostics without c
   assert.equal(response.status, 200);
   assert.equal(result.result.structuredContent.skill.pinned_install.commit_sha, "a".repeat(40));
   assert.equal(response.headers.get("cache-control"), "no-store");
+  // Cold: get_skill is answered from the small assets while the full catalog loads.
+  assert.match(response.headers.get("server-timing") ?? "", /desc="quick"/);
+  await Promise.allSettled(work);
+  const warm = await handler(new Request("https://host.test/mcp", { method: "POST", headers: {
+    "content-type": "application/json", accept: "application/json, text/event-stream",
+  }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "get_skill", arguments: { id: rows[0].id } } }) }), ctx);
+  assert.match(warm.headers.get("server-timing") ?? "", /desc="warm"/);
+  assert.deepEqual((await warm.json()).result, result.result, "quick and full answers match");
   const health = await (await handler(new Request("https://host.test/mcp/health"), ctx)).json();
   assert.equal(health.catalog.mode, "compact");
   assert.equal(health.catalog.detailFetches, 1);
   assert.equal(health.skillCount, rows.length);
+  await Promise.allSettled(work);
+});
+
+test("cold get_skill for an unknown or differently cased ID waits for the full catalog", async context => {
+  const f = catalogFixture(context);
+  const loader = createCompactMcpLibraryLoader({ ...f.options, tracks: [{ name: "test", manifestUrl: f.url }] });
+  const handler = createCompactMcpHandler(loader);
+  const work: Promise<unknown>[] = [], ctx = { waitUntil: (promise: Promise<unknown>) => { work.push(promise); } };
+  const response = await handler(new Request("https://host.test/mcp", { method: "POST", headers: {
+    "content-type": "application/json", accept: "application/json, text/event-stream",
+  }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "get_skill", arguments: { id: rows[0].id.toUpperCase() } } }) }), ctx);
+  assert.match(response.headers.get("server-timing") ?? "", /desc="cold load"/);
+  assert.equal((await response.json()).result.structuredContent.skill.id, rows[0].id);
   await Promise.allSettled(work);
 });
 

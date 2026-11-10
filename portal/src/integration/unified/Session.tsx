@@ -158,9 +158,11 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
   const available = signedIn && !leaving;
   const nav = navigation(requested, available);
   const publicData = usePublicCatalog(publicClient, publicNavigation(nav), true);
-  // On a static library page, swap the app in once its first public view has rendered.
+  // On a static library page, swap the app in once its first public view has rendered. A skill
+  // page opens on that skill (full width), so its loaded detail is enough; the list loads behind it.
   const listState = publicData.status.list;
-  useEffect(() => { if (takeover && listState === "ready") announceAppReady(); }, [takeover, listState]);
+  const skillReady = nav.selected.startsWith("catalog:") && publicData.status.detail === "ready";
+  useEffect(() => { if (takeover && (listState === "ready" || skillReady)) announceAppReady(); }, [takeover, listState, skillReady]);
   const navigate = (next: Navigation, replace = false) => {
     const safe = navigation(next, available);
     clearOtherIntent(safe);
