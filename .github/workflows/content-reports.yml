@@ -165,6 +165,7 @@ jobs:
           git config user.name "omgskills-bot"
           git config user.email "actions@users.noreply.github.com"
           git add index/external-essentials.json index/gold-basket.json index/proposed-creators.json index/proposed-creators.md index/stats.json index/trending.json index/trending.backup.json index/trending-leaderboard.json index/leaderboard-view-data.json index/skill-signals.json index/author-signals.json index/author-leaderboards.json index/snapshots index/stats-report.html index/leaderboards.html index/growth-report.html index/gold-basket-review.html index/dashboard.html
+          if [ -f index/source-trending.json ]; then git add index/source-trending.json; fi
           git add -A -- site/data/v2 site/data/crawl4
           if git diff --cached --quiet; then
             echo "No content report changes"

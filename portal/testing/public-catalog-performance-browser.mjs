@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 
 // Exercise real public hooks/UI against controlled browser responses, not a disposable backend.
 const origin = process.env.PORTAL_REVIEW_ORIGIN || "http://127.0.0.1:5191";
@@ -9,6 +10,13 @@ const base = "/app/testing/unified-acceptance/?view=discover";
 const skill = id => ({ id, name: id.split(":")[1], description: "Sample public skill", author_handle: "example",
   github_url: "https://github.com/example/skills", stars: 20, tags: [] });
 const ids = Array.from({ length: 6 }, (_, i) => `example/skills:sample-${i}`);
+const sourceFeed = { version: 1, source: "skills.sh", board: "trending", fetchedAt: new Date().toISOString(), entries: [
+  { source: "new/skills", skillId: "new-arrival", name: "new-arrival", rank: 1, installs24h: 50, sourceUrl: "https://skills.sh/new/skills/new-arrival" },
+  ...ids.map((id, index) => ({ source: "example/skills", skillId: `sample-${index}`, name: `sample-${index}`,
+    rank: index + 2, installs24h: 40 - index, sourceUrl: `https://skills.sh/example/skills/sample-${index}`, catalogId: id })),
+] };
+const feedBytes = JSON.stringify(sourceFeed), feedHash = createHash("sha256").update(feedBytes).digest("hex");
+const sourceTrending = { path: `source-trending-${feedHash.slice(0, 12)}.json`, sha256: feedHash, bytes: Buffer.byteLength(feedBytes) };
 const metadata = { collections: [
   { id: "starter", type: "topic", title: "Sample collection", subtitle: "Public examples", skillIds: ids },
   { id: "example", type: "author", title: "Sample Creator", authorHandle: "example" },
@@ -35,10 +43,16 @@ async function setup({ holdList = false, holdMetadata = false, failList = false,
     const json = (body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
     if (url.pathname.endsWith("manifest.json")) {
       calls.push("manifest");
-      if (holdMetadata) await meta.promise;
-      return failingMetadata ? json({}, 503) : json({ collections: { path: "collections-abc123.json" } });
+      return json({ collections: { path: "collections-abc123.json" }, sourceTrending });
     }
-    if (url.pathname.includes("collections-abc123")) { calls.push("metadata"); return json(metadata); }
+    if (url.pathname.includes("collections-abc123")) {
+      calls.push("metadata"); if (holdMetadata) await meta.promise;
+      return failingMetadata ? json({}, 503) : json(metadata);
+    }
+    if (url.pathname.includes("source-trending-")) {
+      calls.push("source-trending"); if (holdList) await list.promise;
+      return failingList ? json({}, 503) : route.fulfill({ contentType: "application/json", body: feedBytes });
+    }
     if (url.pathname === "/catalog-skill-urls.json") return json({ skills: {} });
     if (url.pathname === "/mcp") {
       const { id, params } = request.postDataJSON();
@@ -85,11 +99,12 @@ try {
   await page.getByRole("dialog").getByRole("heading", { name: "sample-5", exact: true }).waitFor();
   assert.equal(calls.filter(call => call.name === "get_skill").length, 0, "Batch results must seed the detail cache");
   await page.keyboard.press("Escape");
-  const before = calls.length;
+  const catalogReads = () => calls.filter(call => typeof call === "object").length;
+  const before = catalogReads();
   await page.getByRole("button", { name: "Discover", exact: true }).first().click();
   await page.getByRole("button", { name: /Collection Sample collection/ }).click();
   await page.getByRole("button", { name: "Open sample-5", exact: true }).waitFor();
-  assert.equal(calls.length, before, "Fresh revisits must not refetch");
+  assert.equal(catalogReads(), before, "Fresh revisits must not refetch catalog lists/details");
   await review.close();
 
   const slowMetadata = await setup({ holdMetadata: true, failMetadata: true });

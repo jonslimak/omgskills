@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   canKeepLastGoodSkillsShData,
   fetchSkillsShInstallTotals,
+  fetchSkillsShBoard,
   isSkillsShUnavailableError,
   searchSkillsSh,
   SkillsShUnavailableError,
@@ -12,6 +13,19 @@ import { octokit } from "../client.js";
 function skill(source: string, skillId: string, installs: number) {
   return { source, skillId, name: skillId, installs };
 }
+
+test("raw source board keeps non-GitHub entries and makes no GitHub metadata requests", async () => {
+  const originalFetch = globalThis.fetch, originalGet = octokit.rest.repos.get;
+  const rows = [skill("uizze.sh", "ui-taste", 20_000), skill("new/repo", "new", 100)];
+  let calls = 0;
+  globalThis.fetch = (async input => { calls++; assert.equal(String(input), "https://skills.sh/api/skills/trending/0");
+    return Response.json({ total: 2, skills: rows }); }) as typeof fetch;
+  octokit.rest.repos.get = (async () => { throw new Error("raw feed must not call GitHub"); }) as unknown as typeof originalGet;
+  try {
+    const board = await fetchSkillsShBoard({ topLimit: 50 });
+    assert.deepEqual(board.entries, rows); assert.equal(calls, 1);
+  } finally { globalThis.fetch = originalFetch; octokit.rest.repos.get = originalGet; }
+});
 
 for (const board of ["trending", "all-time", "hot"] as const) {
   for (const scenario of [

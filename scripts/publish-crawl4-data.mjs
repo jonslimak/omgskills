@@ -5,6 +5,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { publishCatalogManifest } from "./publish-catalog-manifest.mjs";
 import { prepareSearchCatalog } from "./search-catalog.mjs";
+import { prepareSourceTrending } from "./prepare-source-trending.mjs";
 
 const repoRoot = process.cwd();
 const shadowDir = join(repoRoot, "index", "shadow");
@@ -92,10 +93,11 @@ if (existsSync(xTrendingPath)) {
 }
 
 preserveForeignManifestAssets(manifest, existingManifest);
+prepareSourceTrending({ repoRoot, dataDir, manifest, skills });
 prepareSearchCatalog(dataDir, manifest, existingManifest);
 publishCatalogManifest({
   dataDir, manifest, previousManifest: existingManifest,
-  prefixes: ["skills", "trending", "x-trending"],
+  prefixes: ["skills", "trending", "x-trending", "source-trending"],
 });
 
 console.log("✓ Published Crawl 4 data");

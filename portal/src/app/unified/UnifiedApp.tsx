@@ -132,6 +132,8 @@ import { DataPage } from "./DataPage";
 import { DevelopersPage } from "./DevelopersPage";
 import { isMacDevice } from "./install-command";
 import { SiteFooter } from "./SiteFooter";
+import { SourceTrending } from "./SourceTrending";
+import type { SourceTrendingEntry } from "../../../../scripts/source-trending-format.mjs";
 import { saveTheme, storedTheme, type Theme } from "./theme-preference";
 import { trackEvent } from "./analytics";
 import { SavedSkillReadme, SavedVersionsList, SharedSkillReadme, SkillReadme, savedSkillKeys } from "./SkillReadme";
@@ -613,6 +615,8 @@ export function UnifiedApp({
   const collectionHeader = nav.view === "collection" && !nav.query ? collection : undefined;
   const showCollectionPager = nav.view === "discover" && !nav.query;
   const trendingHeader = nav.view === "top" && !nav.query;
+  const sourceTrendingPage = !!publicStatus && trendingHeader;
+  const sourceTrendingView = !!publicStatus && !nav.query.trim() && ["top", "discover"].includes(nav.view);
   const swipeCollections = showCollectionPager && phone;
   const collectionPage = discoverCollectionPage(catalog.collections, collectionPageIndex);
   const collectionsReady = !publicStatus || (publicStatus.metadata ?? publicStatus.list) === "ready";
@@ -643,13 +647,13 @@ export function UnifiedApp({
   const privateSearch = readOnlyAccount && !discovery;
   const dataPage = nav.view === "data" && !nav.query.trim();
   const developersPage = nav.view === "developers" && !nav.query.trim();
-  const publicList = !!publicStatus && !dataPage && !developersPage && (isDiscovery(nav.view) || (!privateSearch && !!nav.query.trim()));
+  const publicList = !!publicStatus && !sourceTrendingView && !dataPage && !developersPage && (isDiscovery(nav.view) || (!privateSearch && !!nav.query.trim()));
   const setPage = !!management && ["set", "favorites"].includes(nav.view);
   const progressiveDiscover = publicList && nav.view === "discover" && !nav.query.trim();
   const metadataOnly = !nav.query.trim() && ["creators", "collections"].includes(nav.view);
   const publicListState = metadataOnly ? publicStatus?.metadata ?? publicStatus?.list : publicStatus?.list;
   const publicListError = metadataOnly ? publicStatus?.metadataError : publicStatus?.error;
-  const listState = dataPage || developersPage || progressiveDiscover ? "ready" : publicList ? publicListState : setPage && state === "ready" ? management.detail.state
+  const listState = dataPage || developersPage || progressiveDiscover || sourceTrendingView ? "ready" : publicList ? publicListState : setPage && state === "ready" ? management.detail.state
     : nav.view === "all" && state === "ready" && mySkillsLoading ? "loading" : state;
   const myCountReady = state === "ready" && !mySkillsLoading;
   const canManage = !!management && !management.blocked && !management.busy;
@@ -715,6 +719,11 @@ export function UnifiedApp({
     if (!trigger?.closest(".ua-detail")) detailTrigger.current = trigger;
     if (skill.key.startsWith("catalog:")) trackEvent("App Skill Open");
     navigate(openSkillNavigation(nav, skill));
+  }
+  function openTrending(entry: SourceTrendingEntry) {
+    if (!entry.catalogId) return;
+    open({ key: `catalog:${entry.catalogId}`, catalogId: entry.catalogId, name: entry.name,
+      author: entry.source.split("/")[0], description: "", githubUrl: null, tags: [] });
   }
   function closeDetail() {
     navigate({ ...nav, selected: "" });
@@ -1640,7 +1649,7 @@ export function UnifiedApp({
               </div>}
               {!nav.query && catalogControls}
               {!nav.query && catalogNote && <p className="ua-muted ua-catalog-note" role="status">{catalogNote}</p>}
-              {publicList && !progressiveDiscover && publicListError && listState === "ready" && <div className="ua-toolbar" role="status">
+              {publicList && !progressiveDiscover && !sourceTrendingPage && publicListError && listState === "ready" && <div className="ua-toolbar" role="status">
                 <span className="ua-muted">Could not refresh. Showing saved results.</span>
                 <button type="button" className="ua-pill" onClick={publicStatus.retry}>Retry</button>
               </div>}
@@ -1699,6 +1708,8 @@ export function UnifiedApp({
                     ) : rows(matchingLibrary)}
                   </section>
                 </div>
+              ) : sourceTrendingPage ? (
+                <SourceTrending onOpen={openTrending} />
               ) : developersPage ? (
                 <DevelopersPage />
               ) : dataPage ? (
@@ -1717,7 +1728,7 @@ export function UnifiedApp({
                       title={publicStatus ? "Trending skills" : "Top this week"}
                       action={() => go("top")}
                     />
-                    {publicSection("list", "trending skills", <div className="ua-trending">
+                    {publicStatus ? <SourceTrending limit={9} onOpen={openTrending} /> : publicSection("list", "trending skills", <div className="ua-trending">
                       {top
                         .slice(0, 9)
                         .map((skill, i) => renderRow(skill, i + 1, true))}
@@ -1948,7 +1959,7 @@ export function UnifiedApp({
                       ))}
                 </>
               )}
-              {publicList && (publicStatus.page?.hasMore || publicStatus.moreError) && <div className="ua-catalog-more">
+              {publicList && !sourceTrendingPage && (publicStatus.page?.hasMore || publicStatus.moreError) && <div className="ua-catalog-more">
                 {publicStatus.moreError && <p className="ua-muted" role="status">{publicStatus.moreError}</p>}
                 <button type="button" className="ua-pill" disabled={publicStatus.moreState === "loading"} onClick={event => { if (event.detail < 2) publicStatus.loadMore?.(); }}>
                   {publicStatus.moreState === "loading" && <LoaderCircle className="ua-page-spinner" aria-hidden="true" />}

@@ -26,6 +26,7 @@ export type ProvenanceOverride = {
   authorHandle?: string;
   publisherHandle?: string;
   upstreamRepo?: string;
+  reviewedSkillMdSha?: string;
   provenanceType?: ProvenanceType;
   authorConfidence?: AuthorConfidence;
   notes?: string;

@@ -30,5 +30,167 @@
     "provenanceType": "repackaged",
     "authorConfidence": "low",
     "notes": "Marketplace bundle repo. Do not treat the repo owner as the original skill author."
+  },
+  {
+    "id": "skills-shell/superpowers:ai-image-generation",
+    "reviewedSkillMdSha": "ae947be9b70f47543ed07a00aa74b42fe023538b",
+    "upstreamRepo": "inference-sh/skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: install instructions name inference-sh/skills; near-copy of its same-path skill with older API examples. Separate GitHub repository, not a rename."
+  },
+  {
+    "id": "skills-shell/superpowers:ai-video-generation",
+    "reviewedSkillMdSha": "8dffe856e4a794cf0a15648ab93eb26058eb42b9",
+    "upstreamRepo": "inference-sh/skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: install instructions name inference-sh/skills; near-copy of its same-path skill with older API examples. Separate GitHub repository, not a rename."
+  },
+  {
+    "id": "skills-shell/superpowers:twitter-automation",
+    "reviewedSkillMdSha": "b1fb25358abf768a20c6050861202c1ed93b3d6a",
+    "upstreamRepo": "inference-sh/skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: install instructions name inference-sh/skills; near-copy of its same-path skill with older API examples. Separate GitHub repository, not a rename."
+  },
+  {
+    "id": "skills-shell/superpowers:ai-avatar-video",
+    "reviewedSkillMdSha": "aa0009f92c7dfe54fe2dcf1c60cdf782adf81840",
+    "upstreamRepo": "inference-sh/skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: install instructions name inference-sh/skills; near-copy of its same-path skill with older API examples. Separate GitHub repository, not a rename."
+  },
+  {
+    "id": "gencraft-labs/skills:ai-image-generation",
+    "reviewedSkillMdSha": "399d33c5330e41df4d25b1142db9909c868ec4c1",
+    "upstreamRepo": "prime-skills/runcomfy-agent-skills",
+    "provenanceType": "mirrored",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact upstream blob 399d33c5330e41df4d25b1142db9909c868ec4c1. Referenced agentspace-so/runcomfy-agent-skills redirects to prime-skills/runcomfy-agent-skills, a separate repository."
+  },
+  {
+    "id": "gencraft-labs/skills:ai-music",
+    "reviewedSkillMdSha": "4009596b2e187145f4437823a00e8fce6de890b0",
+    "upstreamRepo": "prime-skills/runcomfy-agent-skills",
+    "provenanceType": "mirrored",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact upstream blob 4009596b2e187145f4437823a00e8fce6de890b0. Referenced agentspace-so/runcomfy-agent-skills redirects to prime-skills/runcomfy-agent-skills, a separate repository."
+  },
+  {
+    "id": "gencraft-labs/skills:ai-video-generation",
+    "reviewedSkillMdSha": "14519cbf2a64097485228ec00c39c3b959b0adbc",
+    "upstreamRepo": "prime-skills/runcomfy-agent-skills",
+    "provenanceType": "mirrored",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact upstream blob 14519cbf2a64097485228ec00c39c3b959b0adbc. Referenced agentspace-so/runcomfy-agent-skills redirects to prime-skills/runcomfy-agent-skills, a separate repository."
+  },
+  {
+    "id": "gencraft-labs/skills:image-to-video",
+    "reviewedSkillMdSha": "09ad3bd9f7dddbb4edede0524f09144392cbc01b",
+    "upstreamRepo": "prime-skills/runcomfy-agent-skills",
+    "provenanceType": "mirrored",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact upstream blob 09ad3bd9f7dddbb4edede0524f09144392cbc01b. Referenced agentspace-so/runcomfy-agent-skills redirects to prime-skills/runcomfy-agent-skills, a separate repository."
+  },
+  {
+    "id": "gencraft-labs/skills:video-edit",
+    "reviewedSkillMdSha": "04e413e9d56c0f80039794dff564d835c66b4efd",
+    "upstreamRepo": "prime-skills/runcomfy-agent-skills",
+    "provenanceType": "mirrored",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact upstream blob 04e413e9d56c0f80039794dff564d835c66b4efd. Referenced agentspace-so/runcomfy-agent-skills redirects to prime-skills/runcomfy-agent-skills, a separate repository."
+  },
+  {
+    "id": "designed-by-ai/skills:design-mobile-apps",
+    "reviewedSkillMdSha": "065cfb10a9f23d5d5ad20cd32b1ba2eff83cb801",
+    "upstreamRepo": "sleekdotdesign/agent-skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: identical body and metadata except name versus sleekdotdesign/agent-skills at fb90438ab2263b7a87cdce1ca7747d371fccb438. Install instructions name that separate upstream repository."
+  },
+  {
+    "id": "flowkit-labs/skills:reddit-automation",
+    "reviewedSkillMdSha": "62ef926781dbc1503f6fe798450c8ef3c8887942",
+    "upstreamRepo": "doany-skills/skills",
+    "provenanceType": "mirrored",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact upstream blob 62ef926781dbc1503f6fe798450c8ef3c8887942 at doany-skills/skills; skill links to that separate repository."
+  },
+  {
+    "id": "bankai-skills/superpowers:ai-image-generation",
+    "reviewedSkillMdSha": "ae947be9b70f47543ed07a00aa74b42fe023538b",
+    "upstreamRepo": "inference-sh/skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact blob ae947be9b70f47543ed07a00aa74b42fe023538b matches the reviewed skills-shell copy of inference-sh/skills. Prevent sibling mirrors becoming keepers after the first copy is excluded."
+  },
+  {
+    "id": "bankai-skills/superpowers:ai-video-generation",
+    "reviewedSkillMdSha": "8dffe856e4a794cf0a15648ab93eb26058eb42b9",
+    "upstreamRepo": "inference-sh/skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact blob 8dffe856e4a794cf0a15648ab93eb26058eb42b9 matches the reviewed skills-shell copy of inference-sh/skills. Prevent sibling mirrors becoming keepers after the first copy is excluded."
+  },
+  {
+    "id": "bankai-skills/superpowers:twitter-automation",
+    "reviewedSkillMdSha": "b1fb25358abf768a20c6050861202c1ed93b3d6a",
+    "upstreamRepo": "inference-sh/skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact blob b1fb25358abf768a20c6050861202c1ed93b3d6a matches the reviewed skills-shell copy of inference-sh/skills. Prevent sibling mirrors becoming keepers after the first copy is excluded."
+  },
+  {
+    "id": "bankai-skills/superpowers:ai-avatar-video",
+    "reviewedSkillMdSha": "aa0009f92c7dfe54fe2dcf1c60cdf782adf81840",
+    "upstreamRepo": "inference-sh/skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact blob aa0009f92c7dfe54fe2dcf1c60cdf782adf81840 matches the reviewed skills-shell copy of inference-sh/skills. Prevent sibling mirrors becoming keepers after the first copy is excluded."
+  },
+  {
+    "id": "101-skills/superpowers:ai-image-generation",
+    "reviewedSkillMdSha": "ae947be9b70f47543ed07a00aa74b42fe023538b",
+    "upstreamRepo": "inference-sh/skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact blob ae947be9b70f47543ed07a00aa74b42fe023538b matches the reviewed skills-shell copy of inference-sh/skills. Prevent sibling mirrors becoming keepers after the first copy is excluded."
+  },
+  {
+    "id": "101-skills/superpowers:ai-video-generation",
+    "reviewedSkillMdSha": "8dffe856e4a794cf0a15648ab93eb26058eb42b9",
+    "upstreamRepo": "inference-sh/skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact blob 8dffe856e4a794cf0a15648ab93eb26058eb42b9 matches the reviewed skills-shell copy of inference-sh/skills. Prevent sibling mirrors becoming keepers after the first copy is excluded."
+  },
+  {
+    "id": "101-skills/superpowers:twitter-automation",
+    "reviewedSkillMdSha": "b1fb25358abf768a20c6050861202c1ed93b3d6a",
+    "upstreamRepo": "inference-sh/skills",
+    "provenanceType": "repackaged",
+    "authorHandle": "",
+    "authorConfidence": "low",
+    "notes": "Trending review 2026-11-09: exact blob b1fb25358abf768a20c6050861202c1ed93b3d6a matches the reviewed skills-shell copy of inference-sh/skills. Prevent sibling mirrors becoming keepers after the first copy is excluded."
   }
 ]

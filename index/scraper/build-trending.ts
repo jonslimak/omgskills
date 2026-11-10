@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import {
   canKeepLastGoodSkillsShData,
   fetchSkillsShInstallTotals,
+  fetchSkillsShBoard,
   searchSkillsSh,
 } from "./sources/skillssh.js";
 import type { SkillsShHit } from "./sources/skillssh.js";
@@ -12,6 +13,7 @@ import type { SkillsShHit } from "./sources/skillssh.js";
 // "installs" counts that skill pages, the Mac app and search signals display.
 const RANK_BOARD = "trending" as const;
 import type { Skill } from "./types.js";
+import { refreshSourceTrending, sourceTrendingPolicy } from "./build-source-trending.js";
 
 interface TrendingEntry {
   id: string;
@@ -59,6 +61,7 @@ function loadExisting(): { entries: Map<string, TrendingEntry>; lightweight: boo
 }
 
 interface TrendingSourceDependencies {
+  refreshSourceSnapshot?: () => Promise<unknown>;
   search: () => Promise<SkillsShHit[]>;
   fetchInstallTotals: () => Promise<Map<string, number>>;
   warn: (message: string) => void;
@@ -71,6 +74,13 @@ export async function loadTrendingSourceData(
     warn: console.warn,
   },
 ): Promise<{ hits: SkillsShHit[]; totals: Map<string, number> }> {
+  try {
+    await dependencies.refreshSourceSnapshot?.();
+  } catch (error) {
+    dependencies.warn(
+      `[optional-source-unavailable] source Trending snapshot unavailable: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
   const hits = await dependencies.search();
   try {
     return { hits, totals: await dependencies.fetchInstallTotals() };
@@ -137,7 +147,13 @@ async function main() {
   let hits;
   let totals: Map<string, number>;
   try {
-    ({ hits, totals } = await loadTrendingSourceData());
+    const boardData = await fetchSkillsShBoard({ board: RANK_BOARD });
+    ({ hits, totals } = await loadTrendingSourceData({
+      refreshSourceSnapshot: () => refreshSourceTrending({ entries: boardData.entries, skills: [...library.values()],
+        policy: sourceTrendingPolicy(), outputPath: join(here, "..", "source-trending.json") }),
+      search: () => searchSkillsSh({ board: RANK_BOARD, boardData }),
+      fetchInstallTotals: () => fetchSkillsShInstallTotals(), warn: console.warn,
+    }));
   } catch (error) {
     if (!canKeepLastGoodSkillsShData(error, existing.entries.size)) throw error;
     console.warn(

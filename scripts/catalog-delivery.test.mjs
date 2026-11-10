@@ -33,7 +33,7 @@ function fixture(t, track) {
   cpSync(join(scripts, "..", "mcp", "src", "search-catalog-format.mjs"), join(root, "mcp", "src", "search-catalog-format.mjs"));
   cpSync(join(scripts, "..", "mcp", "src", "search-ranking-policy.mjs"), join(root, "mcp", "src", "search-ranking-policy.mjs"));
   cpSync(join(scripts, "..", "mcp", "src", "install-record.mjs"), join(root, "mcp", "src", "install-record.mjs"));
-  for (const name of ["publish-data.sh", "publish-crawl4-data.mjs", "publish-catalog-manifest.mjs", "search-catalog.mjs", "search-catalog-cli.mjs"]) {
+  for (const name of ["publish-data.sh", "publish-crawl4-data.mjs", "publish-catalog-manifest.mjs", "search-catalog.mjs", "search-catalog-cli.mjs", "prepare-source-trending.mjs", "source-trending-format.mjs", "policy-identifiers.mjs"]) {
     cpSync(join(scripts, name), join(root, "scripts", name));
   }
   // Health generation is unrelated to catalog retention and has its own tests.
@@ -105,6 +105,25 @@ for (const track of ["v1", "v2", "crawl4"]) {
     assert.match(result.stderr, /missing|ENOENT/i);
     assert.deepEqual(readFileSync(join(f.dir, "manifest.json")), manifestBytes);
     assert.ok(existsSync(join(f.dir, orphan.path)));
+  });
+}
+
+for (const track of ["v2", "crawl4"]) {
+  test(`${track}: full publisher adds source Trending without admitting external skills`, t => {
+    const f = fixture(t, track);
+    mkdirSync(join(f.root, "index/seeds"), { recursive: true });
+    json(join(f.root, "index/seeds/do-not-crawl.json"), { repos: [], owners: [] });
+    json(join(f.root, "index/seeds/catalog-repos.json"), []);
+    json(join(f.root, "index/seeds/suppressed-skills.json"), { skills: [] });
+    const feed = { version: 1, source: "skills.sh", board: "trending", fetchedAt: "2026-11-09T10:00:00Z", entries: [
+      { source: "new/repo", skillId: "new", name: "New skill", rank: 1, installs24h: 123, sourceUrl: "https://skills.sh/new/repo/new" },
+      { source: "owner/repo", skillId: "skill", name: "Known skill", rank: 13, installs24h: 12, sourceUrl: "https://skills.sh/owner/repo/skill", catalogId: "owner/repo:skill" },
+    ] };
+    json(join(f.root, "index/source-trending.json"), feed);
+    const next = f.publish();
+    assert.deepEqual(JSON.parse(readFileSync(join(f.dir, next.sourceTrending.path))), feed);
+    assert.equal(JSON.parse(readFileSync(join(f.dir, next.skills.path))).length, 1);
+    assert.deepEqual(JSON.parse(readFileSync(join(f.dir, next.trending.path))), [{ id: "owner/repo:skill" }]);
   });
 }
 

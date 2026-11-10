@@ -4,6 +4,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { assetReference, verifyBytes } from "../mcp/src/search-catalog-format.mjs";
 import { publishCatalogManifest } from "./publish-catalog-manifest.mjs";
+import { prepareSourceTrending } from "./prepare-source-trending.mjs";
 
 const defaultRepoRoot = fileURLToPath(new URL("..", import.meta.url));
 const reportAssets = {
@@ -59,7 +60,9 @@ export function publishContentData({ repoRoot = defaultRepoRoot, track = "v2", g
   for (const { path, bytes } of pending) {
     if (!existsSync(join(dataDir, path))) writeFileSync(join(dataDir, path), bytes, { flag: "wx" });
   }
-  publishCatalogManifest({ dataDir, manifest, previousManifest, prefixes: Object.values(ownedAssets) });
+  prepareSourceTrending({ repoRoot, dataDir, manifest, skills: records });
+  if (JSON.stringify(manifest) !== JSON.stringify(previousManifest)) manifest.generatedAt = generatedAt;
+  publishCatalogManifest({ dataDir, manifest, previousManifest, prefixes: [...Object.values(ownedAssets), "source-trending"] });
   return manifest;
 }
 
