@@ -61,7 +61,10 @@ test("pages load the app through the fixed loader, which adds the current styles
 
 test("library skill addresses match the app mapping, including reserved owners and encoded parts", () => {
   assert.equal(librarySkillPath("anthropics/skills:skills/frontend-design"), "/library/anthropics/skills/skills/frontend-design/");
-  assert.equal(librarySkillPath("abpframework/abp:.claude/skills/abp-angular"), "/library/abpframework/abp/.claude/skills/abp-angular/");
+  assert.equal(librarySkillPath("abpframework/abp:.claude/skills/abp-angular"), "/library/abpframework/abp/dot-claude/skills/abp-angular/");
+  assert.equal(librarySkillPath("CROW-B3/.claude:skills/x"), "/library/CROW-B3/dot-claude/skills/x/");
+  assert.equal(librarySkillPath("o/r:dot-claude/x"), "/library/o/r/dot-dot-claude/x/");
+  assert.equal(librarySkillPath("o/r:.dot-claude/x"), null);
   assert.equal(librarySkillPath("n8n-io/n8n:packages/@n8n/x"), "/library/n8n-io/n8n/packages/%40n8n/x/");
   assert.equal(librarySkillPath("trending/repo:skill"), null);
   assert.equal(librarySkillPath("owner/repo:../x"), null);
@@ -86,8 +89,9 @@ test("all pages: every creator page in place, each skill at its /library/ addres
   const { urls, skipped } = await writeTakeover(out, { all: true });
   assert.deepEqual(urls, ["/developers/", "/library/anthropics/", "/library/othmanadi/",
     "/library/anthropics/skills/skills/frontend-design/", "/library/othmanadi/planning-with-files/planning-with-files/",
-    "/library/n8n-io/n8n/packages/@n8n/x/"]);
-  assert.deepEqual(skipped, ["OthmanAdi/planning-with-files:planning-with-files", "abpframework/abp:.claude/skills/abp-angular"]);
+    "/library/n8n-io/n8n/packages/@n8n/x/", "/library/abpframework/abp/dot-claude/skills/abp-angular/"]);
+  assert.deepEqual(skipped, ["OthmanAdi/planning-with-files:planning-with-files"]);
+  assert.match(await readFile(path.join(out, "library/abpframework/abp/dot-claude/skills/abp-angular/index.html"), "utf8"), /id="omgskills-static"/);
   assert.match(await readFile(path.join(out, "library/n8n-io/n8n/packages/@n8n/x/index.html"), "utf8"), /id="omgskills-static"/);
   assert.match(await readFile(path.join(out, "app/takeover.js"), "utf8"), /index-abc\.js/);
   assert.equal(await readFile(path.join(out, "skills/a/index.html"), "utf8"), page, "source pages unchanged");

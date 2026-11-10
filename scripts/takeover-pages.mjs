@@ -21,11 +21,14 @@ export const takeoverAllPagesEnabled = (env = process.env, features = {}) => tak
 export const reservedLibraryNames = new Set(["trending", "companies", "creators", "collections", "data", "categories", "me", "library", "search"]);
 export function librarySkillPath(id) {
   const segment = value => value && value !== "." && value !== ".." ? encodeURIComponent(value) : null;
+  // Repo and skill-path parts: ".x" -> "dot-x", "dot-x" -> "dot-dot-x" (hosting drops dot-named folders).
+  const dotSafe = value => value.startsWith(".dot-") || value === "." || value === ".." ? null
+    : segment(value.startsWith(".") ? `dot-${value.slice(1)}` : value.startsWith("dot-") ? `dot-${value}` : value);
   const colon = id.indexOf(":");
   const [owner = "", repo = "", ...extra] = (colon < 0 ? id : id.slice(0, colon)).split("/");
   const skill = colon < 0 ? [] : id.slice(colon + 1).split("/");
   if (extra.length || (colon >= 0 && !id.slice(colon + 1))) return null;
-  const segments = [reservedLibraryNames.has(owner.toLowerCase()) ? null : segment(owner), segment(repo), ...skill.map(segment)];
+  const segments = [reservedLibraryNames.has(owner.toLowerCase()) ? null : segment(owner), dotSafe(repo), ...skill.map(dotSafe)];
   return segments.every(Boolean) ? `/library/${segments.join("/")}/` : null;
 }
 
@@ -117,8 +120,7 @@ export async function takeoverAllPages(outputDir) {
     const url = librarySkillPath(id);
     // Disk paths are decoded; a creator page already lives at /library/<owner>/ (no skill part).
     const file = url && decodeURIComponent(url);
-    // Netlify's deploy drops files and folders whose names start with "." (e.g. .claude/), so
-    // those skills keep only their /skills/ page until the app has a dot-safe address (move.md step 3).
+    // Addresses are dot-safe; the check stays as a guard (Netlify's deploy drops dot-named folders).
     if (!url || file.split("/").some(part => part.startsWith(".")) || taken.has(file.toLowerCase())) { skipped.push(id); continue; }
     taken.add(file.toLowerCase());
     pages.push({ url: file, source });
