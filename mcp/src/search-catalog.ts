@@ -267,7 +267,7 @@ export class QuickSkillReader {
     const rows = await json(assetUrl(this.manifestUrl, ref), this.options.fetcher ?? fetch, ref.bytes, ref);
     if (!Array.isArray(rows)) throw new Error("Detail shard must be an array");
     const raw = rows.find(row => object(row) && (row as RawSkill).id === exact) as RawSkill | undefined;
-    if (!raw || detailBucket(raw.id) !== bucket) return undefined;
+    if (!raw) return undefined;
     // Matches the full reader: the enriched search row, then the detail record's fields.
     return { ...this.signalLibrary.enrichRecord(projectSearchSkill(raw) as Skill), ...slimSkill(raw as Skill) };
   }

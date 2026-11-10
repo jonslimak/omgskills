@@ -42,13 +42,16 @@ function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader, optio
 
     const startedAt = performance.now();
     const cold = !loader.status().hasSnapshot;
+    let started: ReturnType<typeof loader.get> | undefined;
     // Cold start: answer a single get_skill from small assets while the full catalog loads.
     if (cold && "quickSkill" in loader && loader.quickSkill) {
       const body = await request.text();
+      if (new TextEncoder().encode(body).byteLength > maximumRequestBytes) return jsonRpcError(413, -32000, "Request body too large");
+      // Start the full load first so a slow quick read never delays it; it continues after the response.
+      started = loader.get();
+      context.waitUntil(started.then(() => undefined, () => undefined));
       const quick = await quickGetSkill(body, loader.quickSkill);
       if (quick) {
-        // The full load continues after the response so the next request is warm.
-        context.waitUntil(loader.get().then(() => undefined, () => undefined));
         return respond(createOmgskillsServer(quickLibrary(quick), options), new Request(request, { body }), context,
           `catalog;dur=${(performance.now() - startedAt).toFixed(1)};desc="quick"`, startedAt);
       }
@@ -57,7 +60,7 @@ function createReadMcpHandler(loader: McpLibraryLoader | CompactMcpLoader, optio
     let snapshot;
     let catalogMs = 0;
     try {
-      snapshot = await loader.get();
+      snapshot = await (started ?? loader.get());
       catalogMs = performance.now() - startedAt;
       if (cold) console.info(`MCP catalog cold load: ${Math.round(catalogMs)}ms (${snapshot.skillCount} skills)`);
       keepRefreshAlive(loader, context);

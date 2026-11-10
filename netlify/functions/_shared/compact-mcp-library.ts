@@ -24,6 +24,8 @@ export function createCompactMcpLibraryLoader(options: CatalogReadOptions & {
   let pending: Promise<CompactMcpSnapshot> | null = null;
   let lastRefreshFailed = false;
   let quick: Promise<QuickSkillReader | null> | null = null;
+  // Uses the first track only, without the full loader's membership checks; if that track is
+  // rejected the full load falls back and quick answers stop once it lands (accepted: brief, verified data).
   async function quickReader() {
     const track = (options.tracks ?? productionMcpTracks)[0];
     if (!track) return null;
@@ -50,7 +52,7 @@ export function createCompactMcpLibraryLoader(options: CatalogReadOptions & {
   }
   function refresh() {
     if (pending) return pending;
-    pending = load().then(next => { snapshot = next; lastRefreshFailed = false; return next; }, error => {
+    pending = load().then(next => { snapshot = next; quick = null; lastRefreshFailed = false; return next; }, error => {
       lastRefreshFailed = true;
       if (snapshot) return snapshot;
       throw error;
