@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
@@ -31,4 +32,17 @@ test("intake uses the shared writer lock, strict gates, and complete guarded art
     assert.match(steps[names.indexOf(name)], /\n        if: env.INTAKE_APPLY == 'true'\n/);
   }
   assert.match(source, /if: always\(\) && steps\.production_deploy\.outcome != 'skipped'/);
+});
+
+test("both impact checks run on either failure and block publication together", () => {
+  const step = steps[names.indexOf("Check publication impact")];
+  const script = step.split("        run: |\n")[1].split("\n").map(line => line.slice(10)).join("\n");
+  for (const [v2, crawl4] of [[1, 0], [0, 1], [0, 0]]) {
+    const mock = `npm() { if [[ "$*" == *"--track v2"* ]]; then echo checked-v2; return ${v2}; fi; echo checked-crawl4; return ${crawl4}; }\n`;
+    const result = spawnSync("bash", ["--noprofile", "--norc", "-e", "-o", "pipefail", "-c", mock + script], { encoding: "utf8" });
+    assert.equal(result.status, v2 || crawl4, result.stderr);
+    assert.match(result.stdout, /checked-v2\nchecked-crawl4/);
+  }
+  assert.match(steps[names.indexOf("Summarize publication impact")], /if: always\(\) && env.INTAKE_APPLY == 'true'/);
+  assert.match(steps[names.indexOf("Upload publication impact")], /if-no-files-found: error/);
 });
