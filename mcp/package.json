@@ -4,16 +4,19 @@
   "engines": {
     "node": ">=20.3.0"
   },
-  "description": "Read-only MCP server for searching the omgskills agent skill library.",
+  "description": "Read-only MCP server for the omgskills open library of agent skills. For your own skills, use the My skills MCP at https://omgskills.com/my/mcp.",
   "homepage": "https://omgskills.com/developers/",
   "bugs": "https://github.com/jonslimak/omgskills/issues",
   "keywords": [
     "agent-skills",
     "claude",
+    "claude-code",
     "codex",
+    "cursor",
     "mcp",
     "model-context-protocol",
-    "omgskills"
+    "omgskills",
+    "skills"
   ],
   "license": "MIT",
   "type": "module",

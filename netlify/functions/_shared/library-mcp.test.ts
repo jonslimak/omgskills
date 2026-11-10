@@ -151,7 +151,7 @@ test("a library skill with no synced copy reads its labeled public version", asy
   const { value } = deps();
   const read = await call(value, "read_my_skill", { id: "lib:o/r:pdf" });
   assert.equal(read.isError, false);
-  assert.match(read.text, /Public library version; your Mac copy may differ/);
+  assert.match(read.text, /Open library version; your Mac copy may differ/);
   assert.match(read.text, /Public pdf skill/);
   assert.match((await call(value, "read_skill_file", { id: "lib:o/r:pdf", path: "pdf/ref.md" })).text, /public file/);
 });
