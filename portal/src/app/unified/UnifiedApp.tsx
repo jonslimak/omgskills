@@ -575,10 +575,16 @@ export function UnifiedApp({
   // A Discover skill counts as yours only while a Mac has it, so Favorites and Sets get a live copy.
   const library = useMemo(() => models.library.map((skill) =>
     signedIn ? liveSkill(skill) : { ...skill, installed: undefined }), [signedIn, models]);
+  // An address can carry an ID that differs from the catalog's only by case (hosting lowercases
+  // addresses). Use the loaded skill's real ID for the selection; the address itself is left alone
+  // so a static library page keeps its own address and search tags.
+  const resolvedDetailId = publicStatus && nav.selected.startsWith("catalog:") && publicStatus.detail === "ready"
+    && publicStatus.detailId?.toLowerCase() === nav.selected.slice(8).toLowerCase() ? publicStatus.detailId : undefined;
+  const selectedKey = resolvedDetailId ? `catalog:${resolvedDetailId}` : nav.selected;
   const pendingSelection: SkillDisplay | undefined = publicStatus && nav.selected.startsWith("catalog:")
-    ? { key: nav.selected, catalogId: nav.selected.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
+    ? { key: selectedKey, catalogId: selectedKey.slice(8), name: "Skill details", description: "", author: "", githubUrl: null, tags: [] }
     : undefined;
-  const selected = [...mine, ...notInstalledAll, ...library, ...setRows, ...everMine].find((s) => s.key === nav.selected
+  const selected = [...mine, ...notInstalledAll, ...library, ...setRows, ...everMine].find((s) => s.key === selectedKey
     || (nav.selected.startsWith("synced:") && s.key.startsWith("synced:")
       && s.installed?.allSkillIds.includes(nav.selected.slice(7)))) || pendingSelection;
   const detailOpen = useRef(false);

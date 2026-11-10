@@ -8,6 +8,8 @@ export type PublicStatus = {
   list: LoadState; error?: string; note?: string;
   metadata?: LoadState; metadataError?: string;
   detail: LoadState; detailError?: string; detailMissing?: boolean;
+  /** The loaded skill's catalog ID; can differ from the selection only by case. */
+  detailId?: string;
   retry: () => void; retryDetail: () => void;
   page?: PublicPageInfo; loaded?: number; moreState?: LoadState; moreError?: string;
   restartPages?: boolean; loadMore?: () => void;
@@ -129,7 +131,7 @@ export function usePublicCatalog(client: PublicCatalogClient, nav: Navigation, e
         return;
       }
       if (!controller.signal.aborted) setDetail({ key: selectedId, skill, state: "ready", error: "", missing: false });
-      const publicUrl = await client.publicUrl(selectedId, controller.signal).catch(() => undefined);
+      const publicUrl = await client.publicUrl(skill.id, controller.signal).catch(() => undefined);
       if (!controller.signal.aborted && publicUrl) setDetail({ key: selectedId, skill: { ...skill, publicUrl }, state: "ready", error: "", missing: false });
     }).catch((error) => {
       if (!controller.signal.aborted) setDetail({ key: selectedId, skill: null, state: "error", error: message(error), missing: false });
@@ -146,6 +148,7 @@ export function usePublicCatalog(client: PublicCatalogClient, nav: Navigation, e
     metadata: active ? current.metadata : "ready", metadataError: current.metadataError,
     error: current.error, note: current.note,
     detail: currentDetail?.state ?? "loading", detailError: currentDetail?.error, detailMissing: currentDetail?.missing,
+    detailId: currentDetail?.skill?.id,
     retry,
     retryDetail: () => setDetailRevision((value) => value + 1),
     page: current.page, loaded: current.catalog.resultIds?.length ?? 0,

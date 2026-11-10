@@ -206,6 +206,9 @@ test("MCP text fallback works but unsafe links and mismatched identities fail cl
   assert.equal((await fallback.list("list_trending", {}, signal()))[0].id, "author/repo:pdf");
   const wrong = new PublicCatalogClient(async (_path, init) => reply(init, { found: true, skill: skill("other/repo:pdf") }));
   await assert.rejects(wrong.skill("author/repo:pdf", signal()), /different skill/);
+  // Hosting lowercases addresses; a case-only difference returns the catalog's real ID.
+  const cased = new PublicCatalogClient(async (_path, init) => reply(init, { found: true, skill: skill("Author/Repo:pdf") }));
+  assert.equal((await cased.skill("author/repo:pdf", signal()))?.id, "Author/Repo:pdf");
   const unsafe = new PublicCatalogClient(async (_path, init) => reply(init, { skills: [{ ...skill(), github_url: "javascript:alert(1)" }] }));
   await assert.rejects(unsafe.list("search_skills", {}, signal()));
 });
