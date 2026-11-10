@@ -273,6 +273,20 @@ export const reservedLibraryNames = new Set(["trending", "companies", "creators"
 function pathSegment(value: string) {
   return value && value !== "." && value !== ".." ? encodeURIComponent(value) : null;
 }
+// Static hosting drops files and folders whose names start with "." (.claude/, .agents/), so a
+// repo or skill-path segment ".x" is written "dot-x"; a real "dot-x" is written "dot-dot-x".
+// ".dot-x" would be ambiguous and has no clean address.
+function dotSafe(value: string) {
+  if (value.startsWith(".dot-")) return null;
+  return value.startsWith(".") ? `dot-${value.slice(1)}` : value.startsWith("dot-") ? `dot-${value}` : value;
+}
+function fromDotSafe(value: string) {
+  return value.startsWith("dot-dot-") ? value.slice(4) : value.startsWith("dot-") ? `.${value.slice(4)}` : value;
+}
+function idSegment(value: string) {
+  const safe = value !== "." && value !== ".." ? dotSafe(value) : null;
+  return safe ? pathSegment(safe) : null;
+}
 function ownerSegment(owner: string) {
   return reservedLibraryNames.has(owner.toLowerCase()) ? null : pathSegment(owner);
 }
@@ -283,11 +297,12 @@ export function catalogSkillPath(id: string): string | null {
   const [owner = "", repo = "", ...extra] = (colon < 0 ? id : id.slice(0, colon)).split("/");
   const skill = colon < 0 ? [] : id.slice(colon + 1).split("/");
   if (extra.length || (colon >= 0 && !id.slice(colon + 1))) return null;
-  const segments = [ownerSegment(owner), pathSegment(repo), ...skill.map(pathSegment)];
+  const segments = [ownerSegment(owner), idSegment(repo), ...skill.map(idSegment)];
   return segments.every(Boolean) ? `library/${segments.join("/")}/` : null;
 }
-function catalogIdFromSegments([owner, repo, ...skill]: string[]) {
-  return skill.length ? `${owner}/${repo}:${skill.join("/")}` : `${owner}/${repo}`;
+function catalogIdFromSegments([owner, repo = "", ...skill]: string[]) {
+  const [safeRepo, ...safeSkill] = [repo, ...skill].map(fromDotSafe);
+  return skill.length ? `${owner}/${safeRepo}:${safeSkill.join("/")}` : `${owner}/${safeRepo}`;
 }
 
 export function publicNavigationPath(nav: Navigation): string | null {
