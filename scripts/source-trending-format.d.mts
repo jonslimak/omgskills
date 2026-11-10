@@ -19,10 +19,15 @@ export interface SourceTrendingPolicy {
   blockedOwners: string[];
   catalogRepos: string[];
   suppressedIds: string[];
+  /** Source IDs ("owner/repo:skill") the Trending intake blocked. */
+  reviewBlockedIds?: string[];
+  /** Source repos the intake found publishing copies; their unreviewed entries are hidden. */
+  copyRepos?: string[];
 }
+export function intakeHiddenPolicy(state: unknown): { reviewBlockedIds: string[]; copyRepos: string[] };
 export const SOURCE_TRENDING_MAX_ENTRIES: number;
 export const SOURCE_TRENDING_STALE_MS: number;
 export function sourceTrendingUrl(source: string, skillId: string): string;
 export function validateSourceTrending(value: unknown): SourceTrendingFeed;
 export function filterSourceTrending(feed: SourceTrendingFeed, policy: SourceTrendingPolicy,
-  skills: Array<{ id: string; repo_slug?: string; github_url?: string }>): SourceTrendingFeed;
+  skills: Array<{ id: string; repo_slug?: string; github_url?: string; skill_md_path?: string }>): SourceTrendingFeed;

@@ -1,10 +1,12 @@
-import { readFileSync, renameSync, writeFileSync, existsSync } from "node:fs";
+import { mkdirSync, readFileSync, renameSync, writeFileSync, existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { fetchSkillsShBoard, isSkillsShUnavailableError, type SkillsShEntry } from "./sources/skillssh.js";
 import { loadTrustedSeeds } from "./new-crawl/seeds.js";
-import { filterSourceTrending, sourceTrendingUrl, validateSourceTrending,
+import { filterSourceTrending, intakeHiddenPolicy, sourceTrendingUrl, validateSourceTrending,
   type SourceTrendingFeed, type SourceTrendingPolicy } from "../../scripts/source-trending-format.mjs";
 
-type LibrarySkill = { id: string; name: string; repo_slug?: string; skill_md_path?: string };
+type LibrarySkill = { id: string; name: string; repo_slug?: string; skill_md_path?: string; github_url?: string };
 
 export function buildSourceTrending(entries: SkillsShEntry[], skills: LibrarySkill[], policy: SourceTrendingPolicy,
   fetchedAt = new Date().toISOString()): SourceTrendingFeed {
@@ -24,9 +26,11 @@ export function buildSourceTrending(entries: SkillsShEntry[], skills: LibrarySki
   return filterSourceTrending(validateSourceTrending(feed), policy, skills);
 }
 
-export async function refreshSourceTrending({ entries, skills, policy, outputPath,
+export async function refreshSourceTrending({ entries, skills, policy, outputPath, snapshotDir,
   fetchBoard = () => fetchSkillsShBoard({ board: "trending" }), now = () => new Date().toISOString(),
 }: { entries?: SkillsShEntry[]; skills: LibrarySkill[]; policy: SourceTrendingPolicy; outputPath: string;
+  /** Also keep a dated copy (source-trending-YYYY-MM-DD.json) for day-over-day growth. */
+  snapshotDir?: string;
   fetchBoard?: () => Promise<{ entries: SkillsShEntry[] }>; now?: () => string }): Promise<SourceTrendingFeed> {
   let feed;
   try {
@@ -39,13 +43,25 @@ export async function refreshSourceTrending({ entries, skills, policy, outputPat
     console.warn("[source-unavailable] Keeping source Trending with its original fetch timestamp");
     return previous;
   }
-  writeFileSync(`${outputPath}.tmp`, `${JSON.stringify(feed, null, 2)}\n`);
+  const bytes = `${JSON.stringify(feed, null, 2)}\n`;
+  writeFileSync(`${outputPath}.tmp`, bytes);
   renameSync(`${outputPath}.tmp`, outputPath);
+  if (snapshotDir) {
+    // One file per UTC day of the fetch; a later run the same day replaces it. Outages keep nothing new.
+    mkdirSync(snapshotDir, { recursive: true });
+    const snapshotPath = join(snapshotDir, `source-trending-${feed.fetchedAt.slice(0, 10)}.json`);
+    writeFileSync(`${snapshotPath}.tmp`, bytes);
+    renameSync(`${snapshotPath}.tmp`, snapshotPath);
+  }
   return feed;
 }
 
-export function sourceTrendingPolicy() {
+const intakeStatePath = join(dirname(fileURLToPath(import.meta.url)), "..", "trending-intake-state.json");
+
+export function sourceTrendingPolicy(statePath = intakeStatePath) {
   const seeds = loadTrustedSeeds();
+  const state = existsSync(statePath) ? JSON.parse(readFileSync(statePath, "utf8")) : undefined;
   return { blockedRepos: [...(seeds.doNotCrawlRepos ?? [])], blockedOwners: [...(seeds.doNotCrawlOwners ?? [])],
-    catalogRepos: seeds.catalogRepoRules.map(rule => rule.repo), suppressedIds: [...(seeds.suppressedSkillIds ?? [])] };
+    catalogRepos: seeds.catalogRepoRules.map(rule => rule.repo), suppressedIds: [...(seeds.suppressedSkillIds ?? [])],
+    ...intakeHiddenPolicy(state) };
 }

@@ -9,7 +9,7 @@ const compactCount = new Intl.NumberFormat("en-US", { notation: "compact", maxim
 // Today's three-column grid, built like the compact catalog rows it replaced:
 // rank, avatar, name, "@owner · installs", and a round open button (link-out arrow when not reviewed).
 function SourceTrendingGrid({ entries, onOpen }: { entries: SourceTrendingEntry[]; onOpen: (entry: SourceTrendingEntry) => void }) {
-  return <div className="ua-trending">{entries.map(entry => {
+  return <div className="ua-trending">{entries.map((entry, index) => {
     const github = entry.source.includes("/");
     const owner = github ? entry.source.split("/")[0] : entry.source;
     const destination = sourceTrendingDestination(entry);
@@ -30,7 +30,7 @@ function SourceTrendingGrid({ entries, onOpen }: { entries: SourceTrendingEntry[
     </>;
     const label = entry.catalogId ? `Open ${entry.name}` : `View ${entry.name} on ${destination.label}, not reviewed`;
     return <div className="ua-row ua-row-compact" key={`${entry.source}:${entry.skillId}`}>
-      <span className="ua-rank">{entry.rank}</span>
+      <span className="ua-rank">{index + 1}</span>
       {entry.catalogId
         ? <button type="button" className="ua-row-main" onClick={() => onOpen(entry)} aria-label={label}>{content}</button>
         : <a className="ua-row-main" href={destination.href} target="_blank" rel="noopener noreferrer" aria-label={label}>{content}</a>}
@@ -42,8 +42,9 @@ function SourceTrendingGrid({ entries, onOpen }: { entries: SourceTrendingEntry[
   })}</div>;
 }
 
+// Ranks count 1, 2, 3 in our list; skills we hide (copies, blocked) leave no gaps.
 export function SourceTrendingRows({ entries, onOpen }: { entries: SourceTrendingEntry[]; onOpen: (entry: SourceTrendingEntry) => void }) {
-  return <div className="ua-source-trending-rows">{entries.map(entry => {
+  return <div className="ua-source-trending-rows">{entries.map((entry, index) => {
     const github = entry.source.includes("/");
     const destination = sourceTrendingDestination(entry);
     const content = <>
@@ -53,7 +54,7 @@ export function SourceTrendingRows({ entries, onOpen }: { entries: SourceTrendin
       {!entry.catalogId && <ArrowUpRight aria-hidden="true" />}
     </>;
     return <div className="ua-row ua-source-trending-row" key={`${entry.source}:${entry.skillId}`}>
-      <span className="ua-rank" aria-label={`Source rank ${entry.rank}`}>{entry.rank}</span>
+      <span className="ua-rank">{index + 1}</span>
       {entry.catalogId ? <button type="button" className="ua-row-main" onClick={() => onOpen(entry)} aria-label={`Open ${entry.name}`}>{content}</button>
         : <a className="ua-row-main" href={destination.href} target="_blank" rel="noopener noreferrer" aria-label={`View ${entry.name} on ${destination.label}, not reviewed`}>{content}</a>}
       <span className="ua-source-trending-installs" aria-label={`${entry.installs24h.toLocaleString("en-US")} installs in 24 hours`}>

@@ -94,3 +94,16 @@ test("a linked skill cannot bypass a publisher repo block through a historical I
   prepareSourceTrending({ ...f, manifest, skills: [{ id: "old/repo:skill", github_url: "https://github.com/blocked/publisher.git" }] });
   assert.deepEqual(JSON.parse(readFileSync(join(f.dataDir, manifest.sourceTrending.path))).entries, []);
 });
+
+test("publication hides what the Trending intake blocked", t => {
+  const f = fixture(t);
+  writeFileSync(join(f.repoRoot, "index/trending-intake-state.json"), JSON.stringify({ version: 1, reviews: [
+    { sourceId: "copy/repo:skill", outcome: "blocked", reason: "non-original-provenance" },
+    { sourceId: "added/repo:skill", outcome: "added", reason: "verified-trending" },
+  ] }));
+  f.input(snapshot([entry("copy/repo", 1), entry("added/repo", 2), entry("new/repo", 3)]));
+  const manifest = {};
+  prepareSourceTrending({ repoRoot: f.repoRoot, dataDir: f.dataDir, manifest, skills: [] });
+  const feed = JSON.parse(readFileSync(join(f.dataDir, manifest.sourceTrending.path), "utf8"));
+  assert.deepEqual(feed.entries.map(e => e.source), ["added/repo", "new/repo"]);
+});
