@@ -1461,7 +1461,7 @@ export function UnifiedApp({
                 rel="noreferrer"
                 aria-label="Get the Mac app for Apple silicon, macOS 14 or later"
                 title="omgskills Mac app 0.0.37 for Apple silicon, macOS 14 or later"
-              ><span className="ua-apple-mark" aria-hidden="true">&#63743;</span><span>Get the Mac app<small className="ua-download-requirements">Apple silicon, macOS 14+</small></span></a>}
+              ><span className="ua-apple-mark" aria-hidden="true">&#63743;</span><span>Get the Mac app</span></a>}
             </div>
           )}
         </aside>
