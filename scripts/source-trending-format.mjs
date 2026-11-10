@@ -40,6 +40,7 @@ export function filterSourceTrending(feed, policy, skills) {
   const blockedOwners = new Set(policy.blockedOwners.map(normalizePolicyHandle));
   const suppressed = new Set(policy.suppressedIds.map(normalizePolicySkillId));
   const byId = new Map(skills.map(skill => [skill.id, skill]));
+  const byExactSource = new Map(skills.map(skill => [skill.id.toLowerCase(), skill]));
   const blocked = repo => {
     const normalized = normalizePolicyRepo(repo);
     return blockedRepos.has(normalized) || blockedOwners.has(normalized.split("/")[0]);
@@ -47,12 +48,12 @@ export function filterSourceTrending(feed, policy, skills) {
   return { ...feed, entries: feed.entries.flatMap(entry => {
     if (blocked(entry.source) || suppressed.has(`${entry.source}:${entry.skillId}`.toLowerCase())
       || (entry.catalogId && suppressed.has(entry.catalogId.toLowerCase()))) return [];
-    const skill = byId.get(entry.catalogId);
+    const skill = byId.get(entry.catalogId) ?? byExactSource.get(`${entry.source}:${entry.skillId}`.toLowerCase());
     const publisher = skill?.github_url?.match(/^https:\/\/github\.com\/([^/]+\/[^/?#]+)/i)?.[1]?.replace(/\.git$/i, "");
     if (skill && (blocked(skill.id.split(":")[0]) || (skill.repo_slug && blocked(skill.repo_slug))
       || (publisher && blocked(publisher)))) return [];
     // A retained snapshot may refer to a skill removed since its last refresh.
-    const { catalogId, ...external } = entry;
-    return [{ ...external, ...(skill ? { catalogId } : {}) }];
+    const { catalogId: _catalogId, ...external } = entry;
+    return [{ ...external, ...(skill ? { catalogId: skill.id } : {}) }];
   }) };
 }

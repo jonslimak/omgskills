@@ -56,6 +56,14 @@ test("reapplies current policy to retained snapshots and clears removed catalog 
   assert.deepEqual(feed.entries, [entry("safe/repo", 2)]);
 });
 
+test("newly admitted exact source IDs become catalog links, never a same-name skill from another repo", t => {
+  const f = fixture(t), manifest = {};
+  f.input(snapshot([entry("new/repo", 1), entry("other/repo", 2)]));
+  prepareSourceTrending({ ...f, manifest, skills: [{ id: "New/Repo:skill" }] });
+  const feed = JSON.parse(readFileSync(join(f.dataDir, manifest.sourceTrending.path)));
+  assert.deepEqual(feed.entries, [entry("new/repo", 1, "New/Repo:skill"), entry("other/repo", 2)]);
+});
+
 test("publication normalizes repo rules and linked identities the same way as crawler policy", t => {
   const f = fixture(t), manifest = {};
   f.seed("do-not-crawl", { repos: [{ repo: " BLOCKED/REPO.git " }, { repo: "https://github.com/Blocked/Publisher.git" }], owners: [] });

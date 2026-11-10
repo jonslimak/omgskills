@@ -10,6 +10,7 @@ export const DATA_WRITER_WORKFLOWS = new Set([
   "publish-collections",
   "scrape",
   "shadow-crawl-health",
+  "trending-intake",
   "x-refresh",
 ]);
 

@@ -13,10 +13,12 @@ test("finds queued and running data writers deterministically", () => {
       { id: 1, name: "scrape", status: "completed" },
       { id: 4, name: "pipeline-health", status: "in_progress" },
       { id: 5, name: "deploy-current-main", status: "waiting" },
+      { id: 6, name: "trending-intake", status: "queued" },
     ]),
     [
       { id: "5", name: "deploy-current-main", status: "waiting" },
       { id: "2", name: "shadow-crawl-health", status: "in_progress" },
+      { id: "6", name: "trending-intake", status: "queued" },
       { id: "3", name: "x-refresh", status: "queued" },
     ],
   );
