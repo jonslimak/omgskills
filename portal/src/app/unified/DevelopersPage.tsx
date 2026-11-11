@@ -74,7 +74,7 @@ export function DevelopersPage() {
         <Item title="Agent guide" href={`${site}/agents.md`}>When to use omgskills and the preferred machine-readable access paths.</Item>
         <Item title="Catalog manifest" href={`${site}/data/crawl4/manifest.json`}>Current public data assets and hashes.</Item>
         <Item title="AI catalog" href={`${site}/.well-known/ai-catalog.json`}>ARD discovery manifest for the hosted MCP server.</Item>
-        <Item title="Markdown library" href={`${site}/skills/index.md`}>Profiles, collections, and selected skill pages.</Item>
+        <Item title="Markdown library" href={`${site}/library/index.md`}>Profiles, collections, and selected skill pages.</Item>
         <Item title="Curated export" href={`${site}/llms-gold.txt`}>One-file export of the generated Gold library.</Item>
       </Card>
       <Card icon={Activity} title="Status & support">

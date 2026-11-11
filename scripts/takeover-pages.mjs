@@ -98,7 +98,7 @@ export async function takeoverAllPages(outputDir) {
     }
   }
   const { skills } = JSON.parse(await readFile(path.join(outputDir, catalogSkillUrlsFilename), "utf8"));
-  for (const url of Object.values(skills)) {
+  for (const url of new Set(Object.values(skills))) {
     const file = urlPathToFilePath(url);
     pages.push({ url: file, source: file });
   }

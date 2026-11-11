@@ -32,7 +32,10 @@ export function librarySkillPath(id) {
  * opens both. Null when the ID has no library address.
  */
 export function skillPathForId(id) {
-  return librarySkillPath(String(id).toLowerCase());
+  // Hosting also 301s encoded "@" and ":" (and the other characters a path may hold as they
+  // are) to their plain form, so the page uses that form too.
+  return librarySkillPath(String(id).toLowerCase())
+    ?.replace(/%(40|3A|24|26|2B|2C|3B|3D)/g, (_, hex) => String.fromCharCode(Number.parseInt(hex, 16))) ?? null;
 }
 
 /** Disk path for a page URL (segments like %3A are written decoded, as hosting serves them). */
@@ -40,7 +43,7 @@ export function urlPathToFilePath(urlPath) {
   return decodeURIComponent(urlPath);
 }
 
-const generatedSkillPathPattern = /^\/library\/(?:(?:[a-z0-9._~!'()*-]|%[0-9A-F]{2})+\/){2,}$/;
+const generatedSkillPathPattern = /^\/library\/(?:(?:[a-z0-9._~!'()*@:$&+,;=-]|%[0-9A-F]{2})+\/){2,}$/;
 
 function slugSegment(value) {
   let slug = String(value ?? "")
@@ -97,34 +100,30 @@ export function buildLegacySkillUrlMap(skills) {
 }
 
 /**
- * Each skill's page address. A skill with no library address, or whose address another skill
- * already has (IDs that differ only by case), gets no page: the first in catalog order keeps it.
+ * Each skill's page address; a skill with no library address gets none. IDs that differ only by
+ * case share one address (and one page).
  */
 export function buildSkillUrlMap(skills) {
   const urlById = new Map();
-  const idByUrl = new Map();
   for (const skill of skills) {
     if (urlById.has(skill.id)) throw new Error(`Duplicate catalog skill ID: ${skill.id}`);
     const urlPath = skillPathForId(skill.id);
-    if (!urlPath || urlPathToFilePath(urlPath).split("/").some(part => part.startsWith(".")) || idByUrl.has(urlPath)) continue;
+    if (!urlPath || urlPathToFilePath(urlPath).split("/").some(part => part.startsWith("."))) continue;
     urlById.set(skill.id, urlPath);
-    idByUrl.set(urlPath, skill.id);
   }
   return urlById;
 }
 
-/**
- * Redirect rules: each old /skills/ page (and its Markdown copy) -> the skill's page. A skill
- * that lost its page to a case twin redirects to the twin's page.
- */
+/** Redirect rules: each old /skills/ page (and its Markdown copy) -> the skill's page. */
 export function legacySkillRedirectLines(generatedUrlById, legacyUrlById) {
-  const generatedUrls = new Set(generatedUrlById.values());
   const lines = [];
   for (const [id, legacyPath] of legacyUrlById) {
-    const urlPath = generatedUrlById.get(id) ?? (generatedUrls.has(skillPathForId(id)) ? skillPathForId(id) : null);
+    const urlPath = generatedUrlById.get(id);
     // The catch-all /skills/* -> /library/:splat covers pages whose address only changed prefix.
     if (!urlPath || legacyPath.replace(/^\/skills\//, "/library/") === urlPath) continue;
-    lines.push(`${legacyPath}  ${urlPath}  301`, `${legacyPath}index.md  ${urlPath}index.md  301`);
+    // ":" stays encoded here so _redirects can't read it as a :placeholder (one extra hop).
+    const target = urlPath.replaceAll(":", "%3A");
+    lines.push(`${legacyPath}  ${target}  301`, `${legacyPath}index.md  ${target}index.md  301`);
   }
   return lines;
 }

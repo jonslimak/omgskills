@@ -431,9 +431,10 @@ async function verifyLocalMarkdownParity() {
       if (!(await fileExists(markdownPath))) failures.push(`Missing Markdown mirror for ${htmlPath}`);
       const html = await readFile(htmlPath, "utf8");
       const relativeDirectory = path.relative(siteDir, path.dirname(htmlPath)).split(path.sep).join("/");
-      const urlPath = `/${relativeDirectory.split("/").map(encodeURIComponent).join("/")}/`;
-      const alternate = `<link rel="alternate" type="text/markdown" href="${urlPath}index.md">`;
-      if (!html.includes(alternate)) failures.push(`${htmlPath} is missing ${alternate}`);
+      // Pages may encode characters in their address (disk paths are decoded).
+      const expected = `/${relativeDirectory}/index.md`;
+      const href = html.match(/<link rel="alternate" type="text\/markdown" href="([^"]+)">/)?.[1];
+      if (!href || decodeURIComponent(href) !== expected) failures.push(`${htmlPath} is missing its Markdown alternate ${expected}`);
     }
     for (const markdownPath of markdownFiles.filter((filePath) => path.basename(filePath) === "index.md")) {
       const htmlPath = path.join(path.dirname(markdownPath), "index.html");

@@ -28,9 +28,9 @@ test("dot folders get dot-safe segments and odd characters are encoded", () => {
   );
   assert.equal(
     skillPathForId("n8n-io/n8n:packages/@n8n/instance-ai/skills/agent-builder"),
-    "/library/n8n-io/n8n/packages/%40n8n/instance-ai/skills/agent-builder/",
+    "/library/n8n-io/n8n/packages/@n8n/instance-ai/skills/agent-builder/",
   );
-  assert.equal(urlPathToFilePath("/library/n8n-io/n8n/packages/%40n8n/x/"), "/library/n8n-io/n8n/packages/@n8n/x/");
+  assert.equal(urlPathToFilePath("/library/a/b/x%20y/"), "/library/a/b/x y/");
 });
 
 test("old /skills/ addresses are rebuilt exactly, including hash suffixes for colliding slugs", () => {
@@ -44,7 +44,7 @@ test("old /skills/ addresses are rebuilt exactly, including hash suffixes for co
   assert.notEqual(urls.get("Owner/Repo:skills/Foo Bar"), urls.get("owner/repo:skills/foo-bar"));
 });
 
-test("a case twin gets no page of its own; the first in catalog order keeps the address", () => {
+test("case twins share one address; IDs without a library address get none", () => {
   const urls = buildSkillUrlMap([
     { id: "othmanadi/planning-with-files:planning-with-files" },
     { id: "OthmanAdi/planning-with-files:planning-with-files" },
@@ -52,10 +52,11 @@ test("a case twin gets no page of its own; the first in catalog order keeps the 
   ]);
   assert.deepEqual([...urls], [
     ["othmanadi/planning-with-files:planning-with-files", "/library/othmanadi/planning-with-files/planning-with-files/"],
+    ["OthmanAdi/planning-with-files:planning-with-files", "/library/othmanadi/planning-with-files/planning-with-files/"],
   ]);
 });
 
-test("redirects: exact rules only where the address changed beyond the prefix; twins go to the kept page", () => {
+test("redirects: exact rules only where the address changed beyond the prefix; twins go to the shared page", () => {
   const skills = [
     { id: "owner/repo:skills/plain" },
     { id: "n8n-io/n8n:packages/@n8n/x" },
@@ -64,8 +65,8 @@ test("redirects: exact rules only where the address changed beyond the prefix; t
   ];
   const lines = legacySkillRedirectLines(buildSkillUrlMap(skills), buildLegacySkillUrlMap(skills));
   assert.deepEqual(lines.slice(0, 2), [
-    "/skills/n8n-io/n8n/packages/n8n/x/  /library/n8n-io/n8n/packages/%40n8n/x/  301",
-    "/skills/n8n-io/n8n/packages/n8n/x/index.md  /library/n8n-io/n8n/packages/%40n8n/x/index.md  301",
+    "/skills/n8n-io/n8n/packages/n8n/x/  /library/n8n-io/n8n/packages/@n8n/x/  301",
+    "/skills/n8n-io/n8n/packages/n8n/x/index.md  /library/n8n-io/n8n/packages/@n8n/x/index.md  301",
   ]);
   for (const line of lines.slice(2)) assert.match(line, /^\/skills\/a\/r\/x--[a-f0-9]{8}\/(?:index\.md)?  \/library\/a\/r\/x\/(?:index\.md)?  301$/);
   assert.equal(lines.length, 6, "both case twins' old hashed pages redirect");

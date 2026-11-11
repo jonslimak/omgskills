@@ -43,13 +43,13 @@ test("signed in, the logo on every site page opens My skills; signed out, it sta
   assert.match(shell, /<a class="brand" href="\/"|\$\{siteFooterHtml\}/);
   assert.ok(shell.includes('<script src="/signed-in-logo.js"></script>\n</body>'));
   const run = (cookie) => {
-    const links = [["brand", "/"], ["brand", "/skills/"], ["eyes", "/"], ["site-footer-brand-logo", "/"], ["other", "/"]]
+    const links = [["brand", "/"], ["brand", "/library/"], ["eyes", "/"], ["site-footer-brand-logo", "/"], ["other", "/"]]
       .map(([name, href]) => ({ name, href, setAttribute(key, value) { this[key] = value; } }));
     const document = { cookie, querySelectorAll: (selector) => links.filter((link) => selector.includes(`a.${link.name}[href="${link.href}"]`)) };
     vm.runInNewContext(logoScript, { document });
     return links.map((link) => link.href);
   };
   assert.deepEqual(run("__client_uat=1731000000"), ["/app/?view=all", "/app/?view=all", "/app/?view=all", "/app/?view=all", "/"]);
-  assert.deepEqual(run("__client_uat=0"), ["/", "/skills/", "/", "/", "/"]);
-  assert.deepEqual(run(""), ["/", "/skills/", "/", "/", "/"]);
+  assert.deepEqual(run("__client_uat=0"), ["/", "/library/", "/", "/", "/"]);
+  assert.deepEqual(run(""), ["/", "/library/", "/", "/", "/"]);
 });

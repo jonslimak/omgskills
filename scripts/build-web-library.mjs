@@ -1747,13 +1747,19 @@ async function main() {
   const addNoindexReason = (reason) => noindexReasons.set(reason, (noindexReasons.get(reason) || 0) + 1);
   const includedSkills = [];
   const generatedSkillUrlById = new Map();
+  const generatedPageUrls = new Set();
   for (const id of includedSkillIds) {
     const skill = skillById.get(id);
     if (!skill) continue;
     Object.assign(skill, trendingById.get(skill.id) || {});
-    // No page for a skill without a library address of its own (see buildSkillUrlMap).
+    // No page for a skill without a library address; case twins share the first one's page.
     const urlPath = skillUrlById.get(skill.id);
     if (!urlPath) continue;
+    if (generatedPageUrls.has(urlPath)) {
+      generatedSkillUrlById.set(skill.id, urlPath);
+      continue;
+    }
+    generatedPageUrls.add(urlPath);
     const indexDecision = skillIndexDecision(skill, {
       isEditorial: editorialSkillIds.has(skill.id),
       isTrending: trendingById.has(skill.id),
