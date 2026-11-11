@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import {
   canKeepLastGoodSkillsShData,
   fetchSkillsShInstallTotals,
+  fetchSkillsShAllTime,
+  skillsShInstallTotals,
   fetchSkillsShBoard,
   searchSkillsSh,
 } from "./sources/skillssh.js";
@@ -148,11 +150,19 @@ async function main() {
   let totals: Map<string, number>;
   try {
     const boardData = await fetchSkillsShBoard({ board: RANK_BOARD });
+    // One all-time fetch: lifetime totals here, and weekly history to mark new skills in source Trending.
+    const allTime = await fetchSkillsShAllTime().catch(error => {
+      console.warn(`[optional-source-unavailable] skills.sh all-time board: ${error instanceof Error ? error.message : String(error)}`);
+      return undefined;
+    });
     ({ hits, totals } = await loadTrendingSourceData({
-      refreshSourceSnapshot: () => refreshSourceTrending({ entries: boardData.entries, skills: [...library.values()],
+      refreshSourceSnapshot: () => refreshSourceTrending({ entries: boardData.entries, allTime, skills: [...library.values()],
         policy: sourceTrendingPolicy(), outputPath: join(here, "..", "source-trending.json"), snapshotDir: snapshotsDir }),
       search: () => searchSkillsSh({ board: RANK_BOARD, boardData }),
-      fetchInstallTotals: () => fetchSkillsShInstallTotals(), warn: console.warn,
+      fetchInstallTotals: async () => {
+        if (!allTime) throw new Error("all-time board unavailable");
+        return skillsShInstallTotals(allTime);
+      }, warn: console.warn,
     }));
   } catch (error) {
     if (!canKeepLastGoodSkillsShData(error, existing.entries.size)) throw error;

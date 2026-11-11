@@ -823,6 +823,9 @@
   align-self: stretch;
   padding: 8px 0;
 }
+.ua-trending-tabs { display: flex; gap: 8px; margin-bottom: 8px; }
+.ua-trending-tabs .ua-pill { --ua-pill-bg: transparent; color: var(--ua-muted, inherit); }
+.ua-trending-tabs .ua-pill[aria-pressed="true"] { --ua-pill-bg: var(--ua-chip); color: var(--ua-ink); }
 .ua-source-trending-row { min-height: 64px; gap: 10px; }
 .ua-source-trending-row .ua-rank { flex: 0 0 30px; text-align: right; font-variant-numeric: tabular-nums; }
 .ua-source-trending-row .ua-row-main { color: inherit; text-decoration: none; text-align: left; }

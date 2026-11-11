@@ -89,3 +89,16 @@ test("keeps a dated copy of each refreshed feed, and none on a source outage", a
     fetchBoard: async () => { throw new SkillsShUnavailableError("timeout"); } });
   assert.throws(() => readFileSync(join(snapshotDir, "source-trending-2026-11-10.json")));
 });
+
+test("marks new skills from the all-time board's weekly installs; nothing without it", () => {
+  const allTime = (source: string, weeklyInstalls: number[]) => ({ ...row(source), weeklyInstalls });
+  const feed = buildSourceTrending([row("new/repo"), row("old/repo"), row("spike/repo"), row("unlisted/repo")], [], policy, date, [
+    allTime("new/repo", [0, 0, 0, 0, 0, 3, 900, 4000]),
+    allTime("old/repo", [5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000]),
+    allTime("spike/repo", [9000, 7000, 8000, 9000, 7000, 8000, 7500, 75000]),
+  ]);
+  assert.deepEqual(feed.entries.map(e => [e.source, e.fresh]), [
+    ["new/repo", true], ["old/repo", undefined], ["spike/repo", undefined], ["unlisted/repo", true],
+  ]);
+  assert.ok(buildSourceTrending([row("new/repo")], [], policy, date).entries.every(e => e.fresh === undefined));
+});

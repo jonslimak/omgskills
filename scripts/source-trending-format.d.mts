@@ -6,6 +6,8 @@ export interface SourceTrendingEntry {
   installs24h: number;
   sourceUrl: string;
   catalogId?: string;
+  /** New on skills.sh: nearly all its lifetime installs came in the last few weeks. */
+  fresh?: true;
 }
 export interface SourceTrendingFeed {
   version: 1;
@@ -27,6 +29,9 @@ export interface SourceTrendingPolicy {
 export function intakeHiddenPolicy(state: unknown): { reviewBlockedIds: string[]; copyRepos: string[] };
 export const SOURCE_TRENDING_MAX_ENTRIES: number;
 export const SOURCE_TRENDING_STALE_MS: number;
+export const SOURCE_TRENDING_RISING_PER_REPO: number;
+export function risingSourceTrending(entries: SourceTrendingEntry[]): SourceTrendingEntry[];
+export function isFreshSkill(weeklyInstalls: unknown): boolean;
 export function sourceTrendingUrl(source: string, skillId: string): string;
 export function validateSourceTrending(value: unknown): SourceTrendingFeed;
 export function filterSourceTrending(feed: SourceTrendingFeed, policy: SourceTrendingPolicy,

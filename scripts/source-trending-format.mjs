@@ -24,6 +24,7 @@ export function validateSourceTrending(value) {
       || typeof entry.name !== "string" || !entry.name.trim() || entry.name.length > 300
       || !Number.isSafeInteger(entry.rank) || entry.rank <= lastRank
       || !Number.isSafeInteger(entry.installs24h) || entry.installs24h < 0
+      || (entry.fresh !== undefined && entry.fresh !== true)
       || entry.sourceUrl !== sourceTrendingUrl(entry.source, entry.skillId)
       || (entry.catalogId !== undefined && (typeof entry.catalogId !== "string" || !entry.catalogId.trim()))) fail();
     const key = `${entry.source}:${entry.skillId}`.toLowerCase();
@@ -99,4 +100,33 @@ export function filterSourceTrending(feed, policy, skills) {
     const { catalogId: _catalogId, ...external } = entry;
     return [{ ...external, ...(skill ? { catalogId: skill.id } : {}) }];
   }) };
+}
+
+export const SOURCE_TRENDING_RISING_PER_REPO = 2;
+
+/** New and rising: the new skills on the list, in its order (24h installs), with no repo filling it. */
+export function risingSourceTrending(entries) {
+  const perRepo = new Map();
+  return entries.filter(entry => {
+    if (!entry.fresh) return false;
+    const repo = entry.source.toLowerCase();
+    const count = perRepo.get(repo) ?? 0;
+    perRepo.set(repo, count + 1);
+    return count < SOURCE_TRENDING_RISING_PER_REPO;
+  });
+}
+
+/** Weeks counted as "recent" when deciding whether a skill is new. */
+const FRESH_RECENT_WEEKS = 3;
+
+/**
+ * New on skills.sh: nearly all its installs came in the last few weeks. `weeklyInstalls` is the
+ * all-time board's per-week history, oldest first.
+ */
+export function isFreshSkill(weeklyInstalls) {
+  if (!Array.isArray(weeklyInstalls) || weeklyInstalls.length <= FRESH_RECENT_WEEKS) return false;
+  const counts = weeklyInstalls.map(value => Number.isFinite(value) && value > 0 ? value : 0);
+  const recent = counts.slice(-FRESH_RECENT_WEEKS).reduce((sum, value) => sum + value, 0);
+  const older = counts.slice(0, -FRESH_RECENT_WEEKS).reduce((sum, value) => sum + value, 0);
+  return recent > 0 && older <= 0.1 * recent;
 }
