@@ -57,6 +57,12 @@
       "reason": "non-original-provenance"
     },
     {
+      "sourceId": "bankai-skills/superpowers:python-executor",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
+    },
+    {
       "sourceId": "bankai-skills/superpowers:twitter-automation",
       "checkedAt": "2026-11-10T11:17:49.752Z",
       "outcome": "blocked",
@@ -83,6 +89,12 @@
     {
       "sourceId": "coreyhaines31/marketingskills:conversion-tracking",
       "checkedAt": "2026-11-11T13:17:51.486Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "coreyhaines31/marketingskills:reverse-engineer-marketing",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
       "outcome": "added",
       "reason": "verified-trending"
     },
@@ -121,6 +133,12 @@
       "checkedAt": "2026-11-10T11:17:49.752Z",
       "outcome": "blocked",
       "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "flowkit-labs/skills:website-builder",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "added",
+      "reason": "verified-trending"
     },
     {
       "sourceId": "gencraft-labs/skills:ai-image-generation",
@@ -207,6 +225,12 @@
       "reason": "reviewed-copy-content"
     },
     {
+      "sourceId": "lemomo-ai/lemo-opuscar:lemo-opuscar",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
       "sourceId": "leonxlnx/taste-skill:design-taste-frontend",
       "checkedAt": "2026-11-11T13:17:51.486Z",
       "outcome": "existing",
@@ -237,6 +261,30 @@
       "reason": "reviewed-copy-content"
     },
     {
+      "sourceId": "mattpocock/skills:ask-matt",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:code-review",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:codebase-design",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:diagnosing-bugs",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
       "sourceId": "mattpocock/skills:domain-modeling",
       "checkedAt": "2026-11-11T13:17:51.486Z",
       "outcome": "existing",
@@ -251,6 +299,66 @@
     {
       "sourceId": "mattpocock/skills:grilling",
       "checkedAt": "2026-11-10T19:41:25.403Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:handoff",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:implement",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:research",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:tdd",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "mattpocock/skills:teach",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:to-questionnaire",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:to-spec",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:to-tickets",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:wayfinder",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:wizard",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
     },
@@ -361,6 +469,18 @@
       "checkedAt": "2026-11-11T13:17:51.486Z",
       "outcome": "added",
       "reason": "verified-trending"
+    },
+    {
+      "sourceId": "vercel-labs/agent-skills:vercel-react-best-practices",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "vercel-labs/agent-skills:web-design-guidelines",
+      "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
     }
   ]
 }
