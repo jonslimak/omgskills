@@ -32,16 +32,16 @@ test("the installer downloads the published Mac app and nothing else", async () 
 // Runs the real script against stand-in system tools and a fake app, on a Mac only.
 const mac = process.platform === "darwin";
 
-async function sandbox(t, { arm64 = "1", macos = "15.1", team = "S4R7UHY755", spctl = 0, running = false, existingBuild, badChecksum = false } = {}) {
+async function sandbox(t, { arm64 = "1", macos = "15.1", team = "S4R7UHY755", spctl = 0, running = false, existingBuild, userBuild, foreign = false, readOnlyApps = false, badChecksum = false } = {}) {
   const root = await mkdtemp(path.join(os.tmpdir(), "omgskills-install-test-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   const home = path.join(root, "home"); const apps = path.join(root, "Applications"); const bin = path.join(root, "bin");
   await Promise.all([mkdir(home, { recursive: true }), mkdir(apps), mkdir(bin)]);
-  const makeApp = async (dir, build) => {
+  const makeApp = async (dir, build, id = "com.jonslimak.omgskills") => {
     const contents = path.join(dir, "omgskills.app", "Contents");
     await mkdir(contents, { recursive: true });
     await writeFile(path.join(contents, "Info.plist"), `<?xml version="1.0" encoding="UTF-8"?>
-<plist version="1.0"><dict><key>CFBundleIdentifier</key><string>com.jonslimak.omgskills</string>
+<plist version="1.0"><dict><key>CFBundleIdentifier</key><string>${id}</string>
 <key>CFBundleVersion</key><string>${build}</string><key>CFBundleShortVersionString</key><string>0.0.${build}</string></dict></plist>`);
   };
   const staging = path.join(root, "staging");
@@ -50,6 +50,9 @@ async function sandbox(t, { arm64 = "1", macos = "15.1", team = "S4R7UHY755", sp
   assert.equal(spawnSync("/usr/bin/ditto", ["-c", "-k", "--keepParent", path.join(staging, "omgskills.app"), zip]).status, 0);
   const sha = badChecksum ? "0".repeat(64) : createHash("sha256").update(await readFile(zip)).digest("hex");
   if (existingBuild) await makeApp(apps, existingBuild);
+  if (userBuild) await makeApp(path.join(home, "Applications"), userBuild);
+  if (foreign) await makeApp(apps, "1", "com.example.other");
+  if (readOnlyApps) { await chmod(apps, 0o555); t.after(() => chmod(apps, 0o755).catch(() => {})); }
   const log = path.join(root, "calls.log");
   const stub = async (name, body) => { await writeFile(path.join(bin, name), `#!/bin/bash\n${body}\n`); await chmod(path.join(bin, name), 0o755); };
   await stub("uname", 'echo Darwin');
@@ -63,14 +66,14 @@ async function sandbox(t, { arm64 = "1", macos = "15.1", team = "S4R7UHY755", sp
   const script = (await read("site/install.sh"))
     .replace(/^SHA256=".*"$/m, `SHA256="${sha}"`)
     .replace(/^APPLICATIONS_DIR=".*"$/m, `APPLICATIONS_DIR="${apps}"`);
-  const run = () => {
-    const result = spawnSync("/bin/bash", ["-s"], { input: script, encoding: "utf8",
+  const run = (input = script) => {
+    const result = spawnSync("/bin/bash", ["-s"], { input, encoding: "utf8",
       env: { HOME: home, PATH: `${bin}:/usr/bin:/bin:/usr/sbin`, TMPDIR: root } });
     return { ...result, output: result.stdout + result.stderr };
   };
   const calls = async () => { try { return await readFile(log, "utf8"); } catch { return ""; } };
   const build = async dir => (spawnSync("/usr/libexec/PlistBuddy", ["-c", "Print :CFBundleVersion", path.join(dir, "omgskills.app/Contents/Info.plist")], { encoding: "utf8" }).stdout || "").trim();
-  return { run, calls, apps, home, build };
+  return { run, calls, apps, home, build, script };
 }
 
 test("installs into Applications and opens it", { skip: !mac }, async t => {
@@ -130,6 +133,7 @@ test("the site and the app offer the same prompt, next to Download, on a Mac onl
   assert.equal(prompt(widget), prompt(app));
   assert.match(prompt(app), /curl -fsSL https:\/\/omgskills\.com\/install\.sh \| bash/);
   assert.match(prompt(app), /Don't connect anything unless I say yes/);
+  assert.match(prompt(app), /older copy goes to the Trash/);
   for (const source of [widget, app]) assert.match(source, /maxTouchPoints > 1/);
   for (const page of ["site/guide/index.html", "site/support/index.html", "site/connect-stripe-to-claude/index.html"]) {
     const html = await read(page);
@@ -137,4 +141,39 @@ test("the site and the app offer the same prompt, next to Download, on a Mac onl
     assert.match(html, /data-setup-prompt[^>]*hidden/, page);
   }
   assert.match(await read("portal/src/app/unified/CatalogInstallSetup.tsx"), /<AgentSetupPrompt \/>/);
+});
+
+test("a script cut off mid-download runs nothing", { skip: !mac }, async t => {
+  const box = await sandbox(t, { existingBuild: "20" });
+  const cut = box.script.slice(0, box.script.indexOf("main \"$@\"")) + "\n";
+  const result = box.run(cut);
+  assert.equal(result.status, 0, result.output);
+  assert.equal(result.output, "");
+  assert.equal(await box.build(box.apps), "20");
+  assert.equal(await box.calls(), "");
+});
+
+test("something else named omgskills.app is left alone", { skip: !mac }, async t => {
+  const box = await sandbox(t, { foreign: true });
+  const result = box.run();
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /is not the omgskills app/);
+  assert.doesNotMatch(await box.calls(), /curl/);
+});
+
+test("a newer copy in ~/Applications is opened, not replaced", { skip: !mac }, async t => {
+  const box = await sandbox(t, { existingBuild: "20", userBuild: "37" });
+  const result = box.run();
+  assert.equal(result.status, 0, result.output);
+  assert.match(await box.calls(), /open .*home\/Applications\/omgskills\.app/);
+  assert.equal(await box.build(box.apps), "20");
+  assert.doesNotMatch(await box.calls(), /curl/);
+});
+
+test("without access to /Applications it installs into ~/Applications", { skip: !mac || process.getuid?.() === 0 }, async t => {
+  const box = await sandbox(t, { readOnlyApps: true });
+  const result = box.run();
+  assert.equal(result.status, 0, result.output);
+  assert.equal(await box.build(path.join(box.home, "Applications")), "37");
+  assert.deepEqual(await readdir(box.apps), []);
 });

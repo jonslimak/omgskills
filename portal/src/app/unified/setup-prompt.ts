@@ -1,6 +1,6 @@
 // "Set up with your agent" (setup-prompt.md). Same text as site/setup-prompt.js (checked by tests).
 export const SETUP_PROMPT = "Install the omgskills Mac app for me.\n"
-  + "1. First tell me in one line what it adds: the omgskills app in Applications, nothing else.\n"
+  + "1. First tell me in one line what it does: installs the omgskills app in Applications (an older copy goes to the Trash), nothing else.\n"
   + "2. Then run: curl -fsSL https://omgskills.com/install.sh | bash\n"
   + "3. When it opens, I'll sign in.\n"
   + "4. Then ask me if you should connect My skills (https://omgskills.com/my/mcp) to you. Don't connect anything unless I say yes.";

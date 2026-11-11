@@ -3,7 +3,7 @@
 // The prompt text matches portal/src/app/unified/setup-prompt.ts (checked by tests).
 (function () {
   var PROMPT = "Install the omgskills Mac app for me.\n"
-    + "1. First tell me in one line what it adds: the omgskills app in Applications, nothing else.\n"
+    + "1. First tell me in one line what it does: installs the omgskills app in Applications (an older copy goes to the Trash), nothing else.\n"
     + "2. Then run: curl -fsSL https://omgskills.com/install.sh | bash\n"
     + "3. When it opens, I'll sign in.\n"
     + "4. Then ask me if you should connect My skills (https://omgskills.com/my/mcp) to you. Don't connect anything unless I say yes.";
@@ -29,7 +29,8 @@
     + ".sp-copy:hover{opacity:.85}"
     + ".sp-close{appearance:none;border:1px solid #e4e4e7;border-radius:999px;background:#fff;color:#1d1d1f;font:inherit;font-size:14px;height:40px;padding:0 16px;cursor:pointer}"
     + ".sp-dialog small{display:block;margin-top:14px;color:#6e7380;font-size:12px}"
-    + ".sp-dialog small a{color:inherit}";
+    + ".sp-dialog small a{color:inherit}"
+    + "[data-setup-prompt][hidden]{display:none!important}";
   document.head.appendChild(style);
 
   var dialog = document.createElement("dialog");
@@ -38,9 +39,9 @@
   dialog.innerHTML = '<h2 id="sp-title">Set up with your agent</h2>'
     + "<p>Paste this into Claude Code or Codex. Your agent installs the Mac app and asks before connecting anything.</p>"
     + "<pre></pre>"
-    + '<div class="sp-row"><button type="button" class="sp-copy" data-humblytics="Setup Prompt Copy">Copy prompt</button>'
+    + '<div class="sp-row"><button type="button" class="sp-copy" data-humblytics="Setup Prompt Copy" aria-live="polite">Copy prompt</button>'
     + '<button type="button" class="sp-close">Close</button></div>'
-    + '<small>Apple silicon, macOS 14+. <a href="/install.sh" target="_blank" rel="noopener">See what it runs</a> · <a href="/download">Download instead</a></small>';
+    + '<small>Apple silicon, macOS 14+. <a href="https://omgskills.com/install.sh" target="_blank" rel="noopener">See what it runs</a> · <a href="/download">Download instead</a></small>';
   dialog.querySelector("pre").textContent = PROMPT;
   document.body.appendChild(dialog);
 
@@ -53,6 +54,7 @@
   function select() {
     var range = document.createRange(); range.selectNodeContents(dialog.querySelector("pre"));
     var selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
+    copy.textContent = "Press ⌘C to copy";
   }
   dialog.querySelector(".sp-close").addEventListener("click", function () { dialog.close(); });
   dialog.addEventListener("click", function (event) {
@@ -67,6 +69,7 @@
     trigger.className = "sp-trigger";
     trigger.textContent = spot.getAttribute("data-label") || "or set up with your agent";
     trigger.setAttribute("data-humblytics", "Setup Prompt Open");
+    trigger.setAttribute("aria-haspopup", "dialog");
     trigger.addEventListener("click", function () { dialog.showModal(); });
     spot.appendChild(trigger);
     spot.hidden = false;
