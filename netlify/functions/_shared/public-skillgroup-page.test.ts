@@ -65,7 +65,7 @@ function dependencies(
     pool: sequenceClient(rowsByQuery),
     loadPublicGroupManifest,
     async loadCatalogSkillUrls() {
-      return new Map([["owner/repo:design", "/skills/owner/repo/design/"]]);
+      return new Map([["owner/repo:design", "/library/owner/repo/design/"]]);
     },
     async recordAnalytics() {},
     skillGroupsEnabled: false,

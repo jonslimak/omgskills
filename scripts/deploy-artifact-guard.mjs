@@ -4,6 +4,7 @@ import { verifyHelperReleaseAssets } from "./helper-release-assets.mjs";
 import {
   catalogSkillUrlEntries,
   catalogSkillUrlsFilename,
+  urlPathToFilePath,
 } from "./web-library-skill-urls.mjs";
 
 const requiredWebLibraryArtifacts = [
@@ -11,8 +12,8 @@ const requiredWebLibraryArtifacts = [
   "library/anthropics/index.md",
   "collections/starter-pack/index.html",
   "collections/starter-pack/index.md",
-  "skills/index.html",
-  "skills/index.md",
+  "library/index.html",
+  "library/index.md",
   "sitemap.xml",
   "robots.txt",
   "agents.md",
@@ -73,7 +74,7 @@ export async function verifyWebLibraryDeployArtifacts(rootDir, label = "deploy a
   const missingSkillPages = [];
   for (const [catalogSkillId, urlPath] of entries) {
     for (const filename of ["index.html", "index.md"]) {
-      const relativePath = path.posix.join(urlPath.replace(/^\/+/, ""), filename);
+      const relativePath = path.posix.join(urlPathToFilePath(urlPath).replace(/^\/+/, ""), filename);
       if (!(await isFile(path.join(rootDir, relativePath)))) {
         missingSkillPages.push(`${catalogSkillId} -> ${relativePath}`);
       }

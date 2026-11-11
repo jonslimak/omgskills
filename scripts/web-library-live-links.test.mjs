@@ -214,7 +214,7 @@ test("OpenAI verification examples remain featured and are not suppressed", asyn
   const featuredPaths = new Set(curations.authorOverrides.openai.featuredSkillIds
     .filter((id) => !suppressedIds.has(id))
     .map(skillPathForId));
-  const examples = [...source.matchAll(/path: "(\/skills\/openai\/[^"]+)"/g)].map((match) => match[1]);
+  const examples = [...source.matchAll(/path: "(\/library\/openai\/[^"]+\/[^"]+)"/g)].map((match) => match[1]);
   assert.equal(examples.length, 2);
   for (const example of examples) {
     assert(featuredPaths.has(example), `${example} must remain an active featured skill, not a removed example`);
