@@ -8,11 +8,11 @@ import { filterSourceTrending, sourceTrendingUrl, validateSourceTrending,
 type LibrarySkill = { id: string; name: string; repo_slug?: string; skill_md_path?: string; github_url?: string };
 
 export function buildSourceTrending(entries: SkillsShEntry[], skills: LibrarySkill[], policy: SourceTrendingPolicy,
-  fetchedAt = new Date().toISOString()): SourceTrendingFeed {
+  fetchedAt = new Date().toISOString(), hotEntries?: SkillsShEntry[]): SourceTrendingFeed {
   const byId = new Map(skills.map(skill => [skill.id.toLowerCase(), skill]));
-  const seen = new Set<string>();
-  const feed: SourceTrendingFeed = { version: 1, source: "skills.sh", board: "trending", fetchedAt,
-    entries: entries.flatMap((entry, index) => {
+  const toFeedEntries = (rows: SkillsShEntry[], hot: boolean) => {
+    const seen = new Set<string>();
+    return rows.flatMap((entry, index) => {
       const id = `${entry.source}:${entry.skillId}`.toLowerCase();
       if (seen.has(id)) return [];
       seen.add(id);
@@ -20,14 +20,21 @@ export function buildSourceTrending(entries: SkillsShEntry[], skills: LibrarySki
       const skill = byId.get(id);
       return [{ source: entry.source, skillId: entry.skillId, name: entry.name || entry.skillId,
         rank: index + 1, installs24h: entry.installs,
+        ...(hot && Number.isSafeInteger(entry.installsYesterday) && entry.installsYesterday! >= 0
+          ? { installsYesterday: entry.installsYesterday } : {}),
         sourceUrl: sourceTrendingUrl(entry.source, entry.skillId), ...(skill ? { catalogId: skill.id } : {}) }];
-    }) };
+    });
+  };
+  const feed: SourceTrendingFeed = { version: 1, source: "skills.sh", board: "trending", fetchedAt,
+    entries: toFeedEntries(entries, false), ...(hotEntries?.length ? { hot: toFeedEntries(hotEntries, true) } : {}) };
   return filterSourceTrending(validateSourceTrending(feed), policy, skills);
 }
 
-export async function refreshSourceTrending({ entries, skills, policy, outputPath, snapshotDir,
+export async function refreshSourceTrending({ entries, hotEntries, skills, policy, outputPath, snapshotDir,
   fetchBoard = () => fetchSkillsShBoard({ board: "trending" }), now = () => new Date().toISOString(),
-}: { entries?: SkillsShEntry[]; skills: LibrarySkill[]; policy: SourceTrendingPolicy; outputPath: string;
+}: { entries?: SkillsShEntry[];
+  /** skills.sh "hot" board (fastest risers); optional, so a hot outage still refreshes the main list. */
+  hotEntries?: SkillsShEntry[]; skills: LibrarySkill[]; policy: SourceTrendingPolicy; outputPath: string;
   /** Also keep a dated copy (source-trending-YYYY-MM-DD.json) for day-over-day growth. */
   snapshotDir?: string;
   fetchBoard?: () => Promise<{ entries: SkillsShEntry[] }>; now?: () => string }): Promise<SourceTrendingFeed> {
@@ -35,7 +42,7 @@ export async function refreshSourceTrending({ entries, skills, policy, outputPat
   try {
     const source = entries ?? (await fetchBoard()).entries;
     if (!source.length) throw new Error("Source Trending returned no entries");
-    feed = buildSourceTrending(source, skills, policy, now());
+    feed = buildSourceTrending(source, skills, policy, now(), hotEntries);
   } catch (error) {
     if (!isSkillsShUnavailableError(error) || !existsSync(outputPath)) throw error;
     const previous = validateSourceTrending(JSON.parse(readFileSync(outputPath, "utf8")));

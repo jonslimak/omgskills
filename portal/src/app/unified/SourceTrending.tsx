@@ -70,10 +70,18 @@ export function sourceTrendingUpdated(feed: SourceTrendingFeed) {
   return sourceTrendingIsStale(feed) ? `Last updated ${time}` : `Updated ${time}`;
 }
 
-export function SourceTrending({ limit, onOpen, onLoad, grid = false }: {
+/** Rising: skills.sh fastest risers (new and gaining). Older feeds without it fall back to the main board. */
+export function sourceTrendingList(feed: SourceTrendingFeed, list: "rising" | "popular") {
+  return list === "rising" && feed.hot?.length ? feed.hot : feed.entries;
+}
+
+export function SourceTrending({ limit, onOpen, onLoad, grid = false, tabs = false }: {
   limit?: number; onOpen: (entry: SourceTrendingEntry) => void; onLoad?: (feed: SourceTrendingFeed) => void; grid?: boolean;
+  /** Show the Rising / Popular switch (the Trending page). */
+  tabs?: boolean;
 }) {
   const [feed, setFeed] = useState<SourceTrendingFeed>();
+  const [list, setList] = useState<"rising" | "popular">("rising");
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
   useEffect(() => {
@@ -87,11 +95,16 @@ export function SourceTrending({ limit, onOpen, onLoad, grid = false }: {
     return () => controller.abort();
   }, [revision]);
   if (!feed && !error) return <p className="ua-muted" role="status" aria-label="Loading trending skills">Loading Trending...</p>;
+  const entries = feed ? sourceTrendingList(feed, list).slice(0, limit) : [];
   return <div className="ua-source-trending">
+    {tabs && feed?.hot?.length ? <div className="ua-trending-tabs" role="group" aria-label="Trending list">
+      <button type="button" className="ua-pill" aria-pressed={list === "rising"} onClick={() => setList("rising")}>New and rising</button>
+      <button type="button" className="ua-pill" aria-pressed={list === "popular"} onClick={() => setList("popular")}>Most installed</button>
+    </div> : null}
     {error && <p className="ua-muted" role="status">{error}{feed && " Showing the previous snapshot."}{" "}
       <button type="button" className="ua-pill" aria-label="Retry trending skills" onClick={() => setRevision(value => value + 1)}>Retry</button></p>}
-    {feed && (grid ? <SourceTrendingGrid entries={feed.entries.slice(0, limit)} onOpen={onOpen} />
-      : <SourceTrendingRows entries={feed.entries.slice(0, limit)} onOpen={onOpen} />)}
-    {feed && !feed.entries.length && <p className="ua-muted">No Trending entries available.</p>}
+    {feed && (grid ? <SourceTrendingGrid entries={entries} onOpen={onOpen} />
+      : <SourceTrendingRows entries={entries} onOpen={onOpen} />)}
+    {feed && !entries.length && <p className="ua-muted">No Trending entries available.</p>}
   </div>;
 }

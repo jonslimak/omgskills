@@ -1730,7 +1730,7 @@ export function UnifiedApp({
                   </section>
                 </div>
               ) : sourceTrendingPage ? (
-                <SourceTrending onOpen={openTrending} onLoad={feed => setTrendingUpdated(sourceTrendingUpdated(feed))} />
+                <SourceTrending tabs onOpen={openTrending} onLoad={feed => setTrendingUpdated(sourceTrendingUpdated(feed))} />
               ) : developersPage ? (
                 <DevelopersPage />
               ) : dataPage ? (

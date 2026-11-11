@@ -12,11 +12,18 @@ export function sourceTrendingUrl(source, skillId) {
 export function validateSourceTrending(value) {
   const fail = () => { throw new Error("Invalid source Trending feed"); };
   if (!value || value.version !== 1 || value.source !== "skills.sh" || value.board !== "trending"
-    || typeof value.fetchedAt !== "string" || !Number.isFinite(Date.parse(value.fetchedAt))
-    || !Array.isArray(value.entries) || value.entries.length > SOURCE_TRENDING_MAX_ENTRIES) fail();
+    || typeof value.fetchedAt !== "string" || !Number.isFinite(Date.parse(value.fetchedAt))) fail();
+  validateEntries(value.entries, fail);
+  // Optional "hot" list: skills.sh fastest risers (installs today versus yesterday).
+  if (value.hot !== undefined) validateEntries(value.hot, fail, true);
+  return value;
+}
+
+function validateEntries(entries, fail, hot = false) {
+  if (!Array.isArray(entries) || entries.length > SOURCE_TRENDING_MAX_ENTRIES) fail();
   const seen = new Set();
   let lastRank = 0;
-  for (const entry of value.entries) {
+  for (const entry of entries) {
     if (!entry || typeof entry.source !== "string" || !sourcePattern.test(entry.source)
       || entry.source.split("/").some(part => part === "." || part === "..")
       || typeof entry.skillId !== "string" || !entry.skillId.trim() || entry.skillId.length > 200
@@ -24,6 +31,7 @@ export function validateSourceTrending(value) {
       || typeof entry.name !== "string" || !entry.name.trim() || entry.name.length > 300
       || !Number.isSafeInteger(entry.rank) || entry.rank <= lastRank
       || !Number.isSafeInteger(entry.installs24h) || entry.installs24h < 0
+      || (entry.installsYesterday !== undefined && (!hot || !Number.isSafeInteger(entry.installsYesterday) || entry.installsYesterday < 0))
       || entry.sourceUrl !== sourceTrendingUrl(entry.source, entry.skillId)
       || (entry.catalogId !== undefined && (typeof entry.catalogId !== "string" || !entry.catalogId.trim()))) fail();
     const key = `${entry.source}:${entry.skillId}`.toLowerCase();
@@ -31,7 +39,6 @@ export function validateSourceTrending(value) {
     seen.add(key);
     lastRank = entry.rank;
   }
-  return value;
 }
 
 // Repo of a library skill, lowercased: its GitHub URL, else repo_slug, else the ID prefix.
@@ -85,7 +92,7 @@ export function filterSourceTrending(feed, policy, skills) {
     const normalized = normalizePolicyRepo(repo);
     return blockedRepos.has(normalized) || blockedOwners.has(normalized.split("/")[0]);
   };
-  return { ...feed, entries: feed.entries.flatMap(entry => {
+  const keep = entry => {
     if (blocked(entry.source) || suppressed.has(`${entry.source}:${entry.skillId}`.toLowerCase())
       || (entry.catalogId && suppressed.has(entry.catalogId.toLowerCase()))) return [];
     const sourceId = `${entry.source}:${entry.skillId}`.toLowerCase();
@@ -98,5 +105,24 @@ export function filterSourceTrending(feed, policy, skills) {
     // A retained snapshot may refer to a skill removed since its last refresh.
     const { catalogId: _catalogId, ...external } = entry;
     return [{ ...external, ...(skill ? { catalogId: skill.id } : {}) }];
-  }) };
+  };
+  const hot = feed.hot && curateHot(feed.hot.flatMap(keep));
+  return { ...feed, entries: feed.entries.flatMap(keep), ...(hot ? { hot } : {}) };
+}
+
+export const SOURCE_TRENDING_HOT_MIN_INSTALLS = 10;
+export const SOURCE_TRENDING_HOT_PER_REPO = 2;
+/** Today must be at least this multiple of yesterday, so big steady skills don't count as rising. */
+export const SOURCE_TRENDING_HOT_MIN_GROWTH = 1.5;
+
+/** New and rising only: real volume today, clearly growing since yesterday, and no repo filling the list. */
+function curateHot(entries) {
+  const perRepo = new Map();
+  return entries.filter(entry => {
+    if (entry.installs24h < SOURCE_TRENDING_HOT_MIN_INSTALLS || entry.installs24h < SOURCE_TRENDING_HOT_MIN_GROWTH * (entry.installsYesterday ?? 0)) return false;
+    const repo = entry.source.toLowerCase();
+    const count = perRepo.get(repo) ?? 0;
+    perRepo.set(repo, count + 1);
+    return count < SOURCE_TRENDING_HOT_PER_REPO;
+  });
 }

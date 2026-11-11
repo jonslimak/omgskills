@@ -148,8 +148,13 @@ async function main() {
   let totals: Map<string, number>;
   try {
     const boardData = await fetchSkillsShBoard({ board: RANK_BOARD });
+    // New and rising skills for our Trending list; the main board above still feeds Popular.
+    const hotEntries = await fetchSkillsShBoard({ board: "hot", topLimit: 200 }).then(data => data.entries, error => {
+      console.warn(`[source-unavailable] skills.sh hot board: ${error instanceof Error ? error.message : String(error)}`);
+      return undefined;
+    });
     ({ hits, totals } = await loadTrendingSourceData({
-      refreshSourceSnapshot: () => refreshSourceTrending({ entries: boardData.entries, skills: [...library.values()],
+      refreshSourceSnapshot: () => refreshSourceTrending({ entries: boardData.entries, hotEntries, skills: [...library.values()],
         policy: sourceTrendingPolicy(), outputPath: join(here, "..", "source-trending.json"), snapshotDir: snapshotsDir }),
       search: () => searchSkillsSh({ board: RANK_BOARD, boardData }),
       fetchInstallTotals: () => fetchSkillsShInstallTotals(), warn: console.warn,

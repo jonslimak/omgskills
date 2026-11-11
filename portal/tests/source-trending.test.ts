@@ -5,7 +5,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import test from "node:test";
 import { sourceTrendingUrl, type SourceTrendingFeed } from "../../scripts/source-trending-format.mjs";
 import { loadSourceTrending, sourceTrendingDestination, sourceTrendingIsStale } from "../src/app/unified/source-trending";
-import { SourceTrendingRows } from "../src/app/unified/SourceTrending";
+import { SourceTrendingRows, sourceTrendingList } from "../src/app/unified/SourceTrending";
+import { validateSourceTrending } from "../../scripts/source-trending-format.mjs";
 
 const feed: SourceTrendingFeed = { version: 1, source: "skills.sh", board: "trending", fetchedAt: "2026-11-09T10:00:00Z",
   entries: [{ source: "new/repo", skillId: "new", name: "New skill", rank: 1, installs24h: 123,
@@ -90,4 +91,17 @@ test("non-GitHub entries use the original website and remain unreviewed external
   assert.match(html, /target="_blank" rel="noopener noreferrer"/);
   assert.match(html, /View UI taste on uizze.sh, not reviewed/);
   assert.doesNotMatch(html, /<button|Install|omgskills:\/\//);
+});
+
+test("Rising shows the hot list; older feeds without one fall back to the main board", () => {
+  const rising = { ...feed.entries[0], skillId: "rising", sourceUrl: sourceTrendingUrl("new/repo", "rising"), installsYesterday: 4 };
+  const withHot = validateSourceTrending({ ...feed, hot: [rising] });
+  assert.deepEqual(sourceTrendingList(withHot, "rising"), [rising]);
+  assert.equal(sourceTrendingList(withHot, "popular"), withHot.entries);
+  assert.equal(sourceTrendingList(feed, "rising"), feed.entries);
+  assert.equal(sourceTrendingList({ ...feed, hot: [] }, "rising"), feed.entries);
+  // Yesterday's count belongs to the hot list only, and must be a whole, non-negative number.
+  assert.throws(() => validateSourceTrending({ ...feed, entries: [{ ...feed.entries[0], installsYesterday: 1 }] }), /Invalid/);
+  assert.throws(() => validateSourceTrending({ ...feed, hot: [{ ...rising, installsYesterday: -1 }] }), /Invalid/);
+  assert.throws(() => validateSourceTrending({ ...feed, hot: "x" }), /Invalid/);
 });
