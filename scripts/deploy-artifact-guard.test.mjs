@@ -29,6 +29,8 @@ async function fixture() {
   const files = [
     "downloads/omgskills-mac.dmg",
     "downloads/omgskills-mac.dmg.sha256",
+    "install.sh",
+    "setup-prompt.js",
     "updates/omgskills-1.0.0.zip",
     "updates/omgskills1-09.delta",
   ];

@@ -52,6 +52,13 @@
     Cache-Control = "private, no-store"
     Referrer-Policy = "no-referrer"
 
+# The Mac app installer for "Set up with your agent": readable in a browser, always current.
+[[headers]]
+  for = "/install.sh"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
 # Library pages load the app through this fixed file; it changes with every app release.
 [[headers]]
   for = "/app/takeover.js"

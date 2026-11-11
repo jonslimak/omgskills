@@ -24,6 +24,9 @@ const requiredWebLibraryArtifacts = [
 const requiredStaticReleaseAssets = [
   "downloads/omgskills-mac.dmg",
   "downloads/omgskills-mac.dmg.sha256",
+  // "Set up with your agent" (setup-prompt.md): the installer and the page widget.
+  "install.sh",
+  "setup-prompt.js",
 ];
 
 async function isFile(filePath) {

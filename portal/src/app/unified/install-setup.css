@@ -23,3 +23,9 @@
 .ua-install-setup .ua-f1-install svg { flex-shrink: 0; }
 .ua-install-target { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 14px; }
 .ua-install-target select { border: 1px solid var(--ua-line); border-radius: 6px; padding: 6px 10px; color: var(--ua-body); background: var(--ua-chip); max-width: 100%; }
+.ua-agent-setup { border-top: 1px solid var(--ua-line); margin-top: 16px; padding-top: 16px; }
+.ua-agent-setup h5 { margin: 0 0 4px; font-size: 14px; font-weight: 600; color: var(--ua-body); }
+.ua-agent-setup p { margin: 0 0 10px; font-size: 13px; color: var(--ua-muted); }
+.ua-agent-setup pre { margin: 0 0 10px; padding: 12px 14px; border-radius: 10px; background: var(--ua-chip); color: var(--ua-body); white-space: pre-wrap; word-break: break-word; font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.ua-agent-setup-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 13px; }
+.ua-agent-setup-row a { color: var(--ua-muted); }

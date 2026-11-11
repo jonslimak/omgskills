@@ -222,6 +222,7 @@
     }
     .mac-download { text-align: right; }
     .mac-download small { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; }
+    .cta-actions { display: grid; justify-items: center; gap: 10px; flex-shrink: 0; }
     .apple-icon {
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 15px;
@@ -433,6 +434,7 @@
       .button { width: 100%; }
     }
   </style>
+<script defer src="/setup-prompt.js"></script>
 </head>
 <body>
   <div class="shell">
@@ -440,7 +442,7 @@
       <a class="brand" href="/" aria-label="omgskills home">
         <span aria-hidden="true">&#128064;</span>
       </a>
-      <div class="mac-download"><a class="nav-button" href="/download"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for Mac</a><small>Apple silicon, macOS 14+</small></div>
+      <div class="mac-download"><a class="nav-button" href="/download"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for Mac</a><small>Apple silicon, macOS 14+</small><small data-setup-prompt hidden></small></div>
     </header>
 
     <main>
@@ -609,7 +611,7 @@
               <p>Keep your skills in one place and use them in Claude, ChatGPT, Cursor, Grok, Muse and more. Download the Mac app for Apple silicon, macOS 14+.</p>
               <p><a href="/downloads/omgskills-mac.dmg">Original Mac app 0.0.20</a> remains available. Existing apps are not automatically upgraded.</p>
             </div>
-            <a class="button" href="/download">Download for Mac</a>
+            <div class="cta-actions"><a class="button" href="/download">Download for Mac</a><span data-setup-prompt hidden></span></div>
           </div>
         </article>
       </div>
