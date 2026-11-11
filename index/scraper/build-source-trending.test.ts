@@ -90,26 +90,15 @@ test("keeps a dated copy of each refreshed feed, and none on a source outage", a
   assert.throws(() => readFileSync(join(snapshotDir, "source-trending-2026-11-10.json")));
 });
 
-test("rising list: fastest risers that are growing, with real volume, at most two per repo, copies hidden", () => {
-  const hot = (source: string, skillId: string, installs: number, installsYesterday: number) =>
-    ({ ...row(source, skillId, installs), installsYesterday });
-  const feed = buildSourceTrending([row("big/repo")], [], { ...policy, copyRepos: ["copy/repo"] }, date, [
-    hot("copy/repo", "a", 500, 0), hot("new/repo", "a", 90, 1), hot("new/repo", "b", 80, 2), hot("new/repo", "c", 70, 3),
-    hot("tiny/repo", "a", 9, 0), hot("flat/repo", "a", 40, 40), hot("steady/repo", "a", 230, 206), hot("other/repo", "a", 12, 4),
+test("marks new skills from the all-time board's weekly installs; nothing without it", () => {
+  const allTime = (source: string, weeklyInstalls: number[]) => ({ ...row(source), weeklyInstalls });
+  const feed = buildSourceTrending([row("new/repo"), row("old/repo"), row("spike/repo"), row("unlisted/repo")], [], policy, date, [
+    allTime("new/repo", [0, 0, 0, 0, 0, 3, 900, 4000]),
+    allTime("old/repo", [5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000]),
+    allTime("spike/repo", [9000, 7000, 8000, 9000, 7000, 8000, 7500, 75000]),
   ]);
-  assert.deepEqual(feed.hot?.map(e => [e.source, e.skillId, e.rank, e.installs24h, e.installsYesterday]), [
-    ["new/repo", "a", 2, 90, 1], ["new/repo", "b", 3, 80, 2], ["other/repo", "a", 8, 12, 4],
+  assert.deepEqual(feed.entries.map(e => [e.source, e.fresh]), [
+    ["new/repo", true], ["old/repo", undefined], ["spike/repo", undefined], ["unlisted/repo", true],
   ]);
-  assert.deepEqual(feed.entries.map(e => e.source), ["big/repo"]);
-  assert.equal(buildSourceTrending([row("big/repo")], [], policy, date).hot, undefined);
-});
-
-test("refresh keeps the main list when the rising board is unavailable", async () => {
-  const dir = mkdtempSync(join(tmpdir(), "source-hot-"));
-  try {
-    const outputPath = join(dir, "source-trending.json");
-    const feed = await refreshSourceTrending({ entries: [row("new/repo")], hotEntries: undefined, skills: [], policy, outputPath, now: () => date });
-    assert.equal(feed.hot, undefined);
-    assert.equal(JSON.parse(readFileSync(outputPath, "utf8")).entries.length, 1);
-  } finally { rmSync(dir, { recursive: true }); }
+  assert.ok(buildSourceTrending([row("new/repo")], [], policy, date).entries.every(e => e.fresh === undefined));
 });

@@ -22,6 +22,8 @@ export interface SkillsShEntry {
   installs: number;
   installsYesterday?: number;
   change?: number;
+  /** All-time board only: installs per week, oldest first (about 8 weeks). */
+  weeklyInstalls?: number[];
 }
 
 interface SkillsShResponse {
@@ -238,19 +240,23 @@ export function fetchSkillsShBoard(options: Pick<SkillsShOptions, "board" | "top
     options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS);
 }
 
-/**
- * All-time install totals keyed by lowercased `owner/repo:skillId`, from the board pages only
- * (no GitHub lookups). Lets a trending-ranked list keep lifetime install counts.
- */
-export async function fetchSkillsShInstallTotals(options: Pick<SkillsShOptions, "topLimit" | "pageConcurrency" | "pageRetryBaseDelayMs" | "requestTimeoutMs"> = {}): Promise<Map<string, number>> {
-  const { entries } = await fetchBoardEntries(
+/** All-time board, top entries (with weekly installs); no GitHub lookups. */
+export async function fetchSkillsShAllTime(options: Pick<SkillsShOptions, "topLimit" | "pageConcurrency" | "pageRetryBaseDelayMs" | "requestTimeoutMs"> = {}): Promise<SkillsShEntry[]> {
+  return (await fetchBoardEntries(
     "all-time",
     options.topLimit ?? 3000,
     false,
     options.pageConcurrency ?? DEFAULT_PAGE_CONCURRENCY,
     options.pageRetryBaseDelayMs ?? PAGE_RETRY_BASE_DELAY_MS,
     options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS,
-  );
+  )).entries;
+}
+
+/**
+ * All-time install totals keyed by lowercased `owner/repo:skillId`, from the board pages only
+ * (no GitHub lookups). Lets a trending-ranked list keep lifetime install counts.
+ */
+export function skillsShInstallTotals(entries: SkillsShEntry[]): Map<string, number> {
   const totals = new Map<string, number>();
   for (const entry of entries) {
     if (!isValidRepo(entry.source) || !entry.skillId || !Number.isFinite(entry.installs)) continue;
@@ -259,6 +265,10 @@ export async function fetchSkillsShInstallTotals(options: Pick<SkillsShOptions, 
     totals.set(key, Math.max(totals.get(key) ?? 0, entry.installs));
   }
   return totals;
+}
+
+export async function fetchSkillsShInstallTotals(options: Pick<SkillsShOptions, "topLimit" | "pageConcurrency" | "pageRetryBaseDelayMs" | "requestTimeoutMs"> = {}): Promise<Map<string, number>> {
+  return skillsShInstallTotals(await fetchSkillsShAllTime(options));
 }
 
 export async function searchSkillsSh(options: SkillsShOptions = {}): Promise<SkillsShHit[]> {

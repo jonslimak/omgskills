@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowUpRight, ChevronRight, Download } from "lucide-react";
-import type { SourceTrendingEntry, SourceTrendingFeed } from "../../../../scripts/source-trending-format.mjs";
+import { risingSourceTrending, type SourceTrendingEntry, type SourceTrendingFeed } from "../../../../scripts/source-trending-format.mjs";
 import { loadSourceTrending, sourceTrendingDestination, sourceTrendingIsStale } from "./source-trending";
 import { Avatar } from "./Avatar";
 
@@ -70,9 +70,17 @@ export function sourceTrendingUpdated(feed: SourceTrendingFeed) {
   return sourceTrendingIsStale(feed) ? `Last updated ${time}` : `Updated ${time}`;
 }
 
-/** Rising: skills.sh fastest risers (new and gaining). Older feeds without it fall back to the main board. */
-export function sourceTrendingList(feed: SourceTrendingFeed, list: "rising" | "popular") {
-  return list === "rising" && feed.hot?.length ? feed.hot : feed.entries;
+/**
+ * Rising: the new skills on the list (none of the old favorites), at most two per repo. Older feeds
+ * without new-skill marks show the full list. With a limit (Today's grid), the rest of the list fills
+ * any empty places.
+ */
+export function sourceTrendingList(feed: SourceTrendingFeed, list: "rising" | "popular", limit?: number) {
+  const rising = list === "rising" ? risingSourceTrending(feed.entries) : [];
+  if (!rising.length) return feed.entries.slice(0, limit);
+  if (limit === undefined) return rising;
+  const shown = new Set(rising);
+  return [...rising, ...feed.entries.filter(entry => !shown.has(entry))].slice(0, limit);
 }
 
 export function SourceTrending({ limit, onOpen, onLoad, grid = false, tabs = false }: {
@@ -95,9 +103,9 @@ export function SourceTrending({ limit, onOpen, onLoad, grid = false, tabs = fal
     return () => controller.abort();
   }, [revision]);
   if (!feed && !error) return <p className="ua-muted" role="status" aria-label="Loading trending skills">Loading Trending...</p>;
-  const entries = feed ? sourceTrendingList(feed, list).slice(0, limit) : [];
+  const entries = feed ? sourceTrendingList(feed, list, limit) : [];
   return <div className="ua-source-trending">
-    {tabs && feed?.hot?.length ? <div className="ua-trending-tabs" role="group" aria-label="Trending list">
+    {tabs && feed && risingSourceTrending(feed.entries).length ? <div className="ua-trending-tabs" role="group" aria-label="Trending list">
       <button type="button" className="ua-pill" aria-pressed={list === "rising"} onClick={() => setList("rising")}>New and rising</button>
       <button type="button" className="ua-pill" aria-pressed={list === "popular"} onClick={() => setList("popular")}>Most installed</button>
     </div> : null}

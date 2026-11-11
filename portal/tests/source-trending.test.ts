@@ -93,15 +93,15 @@ test("non-GitHub entries use the original website and remain unreviewed external
   assert.doesNotMatch(html, /<button|Install|omgskills:\/\//);
 });
 
-test("Rising shows the hot list; older feeds without one fall back to the main board", () => {
-  const rising = { ...feed.entries[0], skillId: "rising", sourceUrl: sourceTrendingUrl("new/repo", "rising"), installsYesterday: 4 };
-  const withHot = validateSourceTrending({ ...feed, hot: [rising] });
-  assert.deepEqual(sourceTrendingList(withHot, "rising"), [rising]);
-  assert.equal(sourceTrendingList(withHot, "popular"), withHot.entries);
-  assert.equal(sourceTrendingList(feed, "rising"), feed.entries);
-  assert.equal(sourceTrendingList({ ...feed, hot: [] }, "rising"), feed.entries);
-  // Yesterday's count belongs to the hot list only, and must be a whole, non-negative number.
-  assert.throws(() => validateSourceTrending({ ...feed, entries: [{ ...feed.entries[0], installsYesterday: 1 }] }), /Invalid/);
-  assert.throws(() => validateSourceTrending({ ...feed, hot: [{ ...rising, installsYesterday: -1 }] }), /Invalid/);
-  assert.throws(() => validateSourceTrending({ ...feed, hot: "x" }), /Invalid/);
+test("Rising shows new skills only, two per repo; Today fills empty places; old feeds show everything", () => {
+  const entry = (source: string, skillId: string, rank: number, fresh = false) => ({ source, skillId, name: skillId, rank,
+    installs24h: 100, sourceUrl: sourceTrendingUrl(source, skillId), ...(fresh ? { fresh: true as const } : {}) });
+  const entries = [entry("old/repo", "a", 1), entry("new/repo", "a", 2, true), entry("new/repo", "b", 3, true),
+    entry("new/repo", "c", 4, true), entry("other/repo", "a", 5, true), entry("old/repo", "b", 6)];
+  const marked = validateSourceTrending({ ...feed, entries });
+  assert.deepEqual(sourceTrendingList(marked, "rising").map(e => `${e.source}:${e.skillId}`), ["new/repo:a", "new/repo:b", "other/repo:a"]);
+  assert.deepEqual(sourceTrendingList(marked, "rising", 5).map(e => e.rank), [2, 3, 5, 1, 4]);
+  assert.equal(sourceTrendingList(marked, "popular").length, 6);
+  assert.deepEqual(sourceTrendingList(feed, "rising"), feed.entries);
+  assert.throws(() => validateSourceTrending({ ...feed, entries: [{ ...entries[0], fresh: false }] }), /Invalid/);
 });

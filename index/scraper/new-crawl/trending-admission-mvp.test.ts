@@ -67,11 +67,10 @@ test("selects first 20 missing GitHub skills in rank order, including existing r
   assert.throws(() => selectTrendingMvpCandidates(feed(entries), [], 20, Date.parse(date) + 37 * 3600_000), /fresh/);
 });
 
-test("rising skills are reviewed first, then the main board, without repeats", () => {
-  const rising = [entry("hot/repo", "new", 1), entry("owner/repo", "both", 2)];
-  const selected = selectTrendingMvpCandidates({ ...feed([entry("owner/repo", "both", 1), entry("owner/repo", "main", 2)]), hot: rising },
-    [], 20, Date.parse(date));
-  assert.deepEqual(selected.map(row => row.skillId), ["new", "both", "main"]);
+test("new skills are reviewed first, then the rest in list order", () => {
+  const selected = selectTrendingMvpCandidates(feed([entry("owner/repo", "old", 1), { ...entry("owner/repo", "new", 2), fresh: true },
+    entry("owner/repo", "next", 3)]), [], 20, Date.parse(date));
+  assert.deepEqual(selected.map(row => row.skillId), ["new", "old", "next"]);
 });
 
 test("path resolution supports nonstandard folders without fuzzy guesses, ambiguity, or traversal", () => {

@@ -53,14 +53,9 @@ export function selectTrendingMvpCandidates(feed: SourceTrendingFeed, skills: Sk
   const age = now - Date.parse(feed.fetchedAt);
   if (age > SOURCE_TRENDING_STALE_MS || age < -5 * 60_000) throw new Error("Trending MVP requires a fresh source snapshot");
   const known = new Set(skills.map(skill => skill.id.toLowerCase()));
-  // New and rising skills first, so the library catches them early; then the main board.
-  const seen = new Set<string>();
-  return [...(feed.hot ?? []), ...feed.entries].filter(entry => {
-    const key = `${entry.source}:${entry.skillId}`.toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  }).filter(entry => githubRepo.test(entry.source)
+  // New skills first, so the library catches them early; then the rest in list order.
+  return [...feed.entries.filter(entry => entry.fresh), ...feed.entries.filter(entry => !entry.fresh)]
+    .filter(entry => githubRepo.test(entry.source)
     && !known.has(`${entry.source}:${entry.skillId}`.toLowerCase())
     && !excludedSourceIds.has(`${entry.source}:${entry.skillId}`.toLowerCase())).slice(0, limit);
 }
