@@ -66,7 +66,7 @@ enum SkillRemoval {
     /// What Delete everywhere does, said before it happens.
     static func everywhereWarning(count: Int, sets: Int?) -> String {
         let them = count == 1 ? "it" : "them"
-        var text = "Takes \(them) out of My skills and your account. This can't be undone. "
+        var text = "Takes \(them) out of My skills and your account; synced versions are deleted for good. "
             + "Copies here move to the Trash; copies on other Macs stay there but stop syncing."
         if let sets, sets > 0 {
             // Counts add up per skill, so for several skills one Set may be counted twice; don't give a number.
@@ -190,7 +190,7 @@ final class SkillRemovalController {
             state = Self.partialFailure(outcome, kept: true)
             return
         }
-        state = .working(title: "Deleting \(SkillRemoval.title(outcome.removed))…")
+        state = .working(title: "Removing \(SkillRemoval.title(outcome.removed))…")
         let gone = outcome.copies.filter { outcome.removed.map(SkillRemoval.normalizedName).contains(SkillRemoval.normalizedName($0.name)) }
         var forgotten = true
         do { try await forget(Self.keys(gone, among: installed, records: records), Array(Set(gone.compactMap(\.catalogSkillId))).sorted()) }
