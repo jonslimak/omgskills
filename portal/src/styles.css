@@ -331,7 +331,17 @@ pre {
 
 .connect-panel {
   max-width: 460px;
+  text-align: center;
   width: 100%;
+}
+
+.connect-panel .actions {
+  justify-content: center;
+}
+
+.connect-details ul,
+.connect-details p {
+  text-align: left;
 }
 
 .connect-panel h1 {
