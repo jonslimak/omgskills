@@ -331,7 +331,17 @@ pre {
 
 .connect-panel {
   max-width: 460px;
+  text-align: center;
   width: 100%;
+}
+
+.connect-panel .actions {
+  justify-content: center;
+}
+
+.connect-details ul,
+.connect-details p {
+  text-align: left;
 }
 
 .connect-panel h1 {
@@ -344,17 +354,40 @@ pre {
   line-height: 1.5;
 }
 
-.connect-permission {
-  border-bottom: 1px solid #dfe4ea;
-  border-top: 1px solid #dfe4ea;
-  display: flex;
-  justify-content: space-between;
-  margin-top: 24px;
-  padding: 16px 0;
+.connect-logo {
+  display: block;
+  font-size: 44px;
+  line-height: 1;
+  margin-bottom: 16px;
 }
 
-.connect-permission span {
+.connect-panel .connect-lead {
+  font-size: 17px;
+  margin: 0 0 20px;
+}
+
+.connect-details {
+  border-bottom: 1px solid #dfe4ea;
+  border-top: 1px solid #dfe4ea;
   color: #4b5563;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+  padding: 12px 0;
+}
+
+.connect-details summary {
+  color: #0b57d0;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.connect-details p { margin: 10px 0 0; }
+
+.connect-permission {
+  list-style: disc;
+  margin: 10px 0 0;
+  padding-left: 20px;
 }
 
 .connect-error {

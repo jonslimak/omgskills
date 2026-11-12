@@ -14,8 +14,10 @@ export function accountNavigation(nav: Navigation, signedIn: boolean): Navigatio
   // "attention" is the only list filter My skills keeps in the address.
   // A Not installed skill is a My skills row, or a search result anywhere that lists your skills.
   const notInstalled = personalKey(nav.selected) && !nav.selected.startsWith("synced:") && (nav.view === "all" || !!nav.query.trim());
+  // A library skill saved to My skills opens there with its library details.
+  const savedLibrary = nav.view === "all" && nav.selected.startsWith("catalog:");
   return { ...nav, id: nav.view === "set" || (nav.view === "all" && nav.id === "attention") ? nav.id : "",
-    selected: list && (nav.selected.startsWith("synced:") || notInstalled
+    selected: list && (nav.selected.startsWith("synced:") || notInstalled || savedLibrary
       || (nav.view !== "all" && nav.selected.startsWith("set-item:"))) ? nav.selected : "" };
 }
 
@@ -28,5 +30,6 @@ function personalKey(selected: string) {
 export function publicNavigation(nav: Navigation): Navigation {
   return isDiscovery(nav.view)
     ? { ...nav, selected: nav.selected.startsWith("catalog:") ? nav.selected : "" }
-    : { ...initialNavigation };
+    // Only the public skill's ID: no private search, set or source.
+    : { ...initialNavigation, selected: nav.view === "all" && nav.selected.startsWith("catalog:") ? nav.selected : "" };
 }

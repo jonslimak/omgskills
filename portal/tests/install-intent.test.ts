@@ -282,7 +282,7 @@ test("preview wiring gates setup, disables download and suppresses the normal ap
   assert.doesNotMatch(component, /https:\/\/omgskills.com\/download|setTimeout|visibilitychange|window.open/);
   const ui = read("../src/app/unified/UnifiedApp.tsx");
   assert.match(ui, /!publicInstallAction && <a\s+className="ua-sidebar-download"\s+href="\/download"/);
-  assert.match(ui, /publicInstallAction\?\.\(selected, !detailPending\)/);
+  assert.match(ui, /publicInstallAction\(\{ \.\.\.selected, key: `catalog:\$\{selected\.catalogId\}` \}, !detailPending, data\.devices\.length > 0\)/);
   const production = read("../src/unified-main.tsx");
   assert.doesNotMatch(production, /PublicInstallSetup|InstallSetupSession|publicInstallAction|install-intent/);
 });

@@ -14,15 +14,19 @@ export function ConsentContent({ request, policy, snapshot, approve, cancel }: {
   const finished = ["returning", "cancelled"].includes(snapshot.phase);
   return <main className="shell auth-shell connect-shell">
     <section className="connect-panel">
-      <p className="eyebrow">omgskills</p>
-      <h1>Connect this Mac?</h1>
-      <p>Keep your installed-skills list up to date on the web. This reports what is installed; it does not update skill files.</p>
-      {policy.disclosure && <p>{policy.disclosure}</p>}
-      <div className="connect-permission">
-        <strong>Access</strong><span>Report installed-skill metadata</span>
-        {request && policy.scopes(request).includes("content:read") && <span>Read private skills shared with you</span>}
-        {request && policy.scopes(request).includes("content:write") && <span>Sync My skills</span>}
-      </div>
+      <span className="connect-logo" role="img" aria-label="omgskills">👀</span>
+      <h1>Connect Mac</h1>
+      <p className="connect-lead">See this Mac's skills in omgskills and keep them in sync.</p>
+      <details className="connect-details">
+        <summary>Show details</summary>
+        <p>This reports what is installed; it does not update skill files.</p>
+        {policy.disclosure && <p>{policy.disclosure}</p>}
+        <ul className="connect-permission" aria-label="Access">
+          <li>Report installed-skill metadata</li>
+          {request && policy.scopes(request).includes("content:read") && <li>Read private skills shared with you</li>}
+          {request && policy.scopes(request).includes("content:write") && <li>Sync My skills</li>}
+        </ul>
+      </details>
       {snapshot.status && <p role={snapshot.phase === "invalid" || snapshot.phase === "error" ? "alert" : "status"}
         className={snapshot.phase === "invalid" ? "connect-error" : "status"}>{snapshot.status}</p>}
       <div className="actions">

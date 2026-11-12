@@ -274,7 +274,7 @@ test("actual shared page renders with fake account context without approving or 
   try {
     for (const policy of [consent, normalPairingConsent, f1PairingConsent]) {
       const html = renderToStaticMarkup(createElement(ConnectPage, { policy }));
-      assert.match(html, /Connect this Mac\?/); assert.match(html, />Approve</);
+      assert.match(html, /<h1>Connect Mac<\/h1>/); assert.match(html, />Approve</);
       assert.equal(html.includes("Read private skills shared with you"), policy !== consent);
       assert.equal(location.hash, hash);
     }
@@ -292,7 +292,7 @@ test("rendered consent buttons run the real approval/cancellation actions with p
     approve: () => { void f.session.approve(); }, cancel: () => f.session.cancel() });
   const before = render();
   const html = renderToStaticMarkup(before);
-  assert.match(html, /Connect this Mac\?/); assert.match(html, /outside OMGSkills/);
+  assert.match(html, /<h1>Connect Mac<\/h1>/); assert.match(html, /outside OMGSkills/);
   assert.doesNotMatch(html, /Read private skills|content:read|href=|\.zip|\.dmg/);
   assert.deepEqual(f.calls, []);
   const buttons = elements(before).filter(element => typeof element.props.onClick === "function");

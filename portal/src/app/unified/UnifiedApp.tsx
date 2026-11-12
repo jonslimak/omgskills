@@ -145,7 +145,7 @@ import { CloudStatusBadge, CloudStatusSection, type CloudInfo } from "./CloudSta
 import { looksLikeGithubLink, type MySkillAdditions } from "../my-skills-additions";
 import { AddSkillForm } from "./AddSkillDialog";
 import { PortalApiError } from "../../api-error";
-import { cloudSkillRows, needsAttention, skillCloudRow, statusText } from "../../cloud-save/cloud-save";
+import { cloudSkillRows, needsAttention, setsNote, skillCloudRow, statusText } from "../../cloud-save/cloud-save";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
@@ -186,7 +186,8 @@ type Props = {
   additions?: MySkillAdditions;
   /** My skills is still waiting on its cloud and added skills, so its count would jump. */
   mySkillsLoading?: boolean;
-  publicInstallAction?: (skill: SkillDisplay, detailReady: boolean) => ReactNode;
+  /** appKnown: the account has a connected Mac, so the app is most likely installed. */
+  publicInstallAction?: (skill: SkillDisplay, detailReady: boolean, appKnown: boolean) => ReactNode;
   /** Clears a saved install request when the user cancels from the Install button. */
   onInstallCancel?: () => void;
   /** Shown once on arrival, e.g. after a broken address fell back to Discover. */
@@ -417,22 +418,6 @@ function Empty({
   );
 }
 /** The agents a skill is in, with their logos, for the skill panel. */
-function AgentList({ sources }: { sources: string[] }) {
-  return (
-    <strong className="ua-agent-list">
-      {displaySourceNames(sources).map((source) => (
-        <span key={source} className="ua-agent-name">
-          {agentKind(source) !== "other" && (
-            <span className="ua-agent-tile" data-present="true" aria-hidden="true">
-              <span className="ua-agent-logo" data-agent={agentKind(source)} />
-            </span>
-          )}
-          {source}
-        </span>
-      ))}
-    </strong>
-  );
-}
 // Only the app's first mount on a page load counts as a direct visit; remounts (sign in/out) don't.
 let pageEntryMounted = false;
 
@@ -508,6 +493,9 @@ export function UnifiedApp({
   const drawerNavigating = useRef(false);
   const [editing, setEditing] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
+  // Saved-only skills waiting on "Remove from My skills?"; hidden ones stay hidden while the change saves.
+  const [removing, setRemoving] = useState<SkillDisplay[] | null>(null);
+  const [removed, setRemoved] = useState<string[]>([]);
   const [dialog, setDialog] = useState<
     "new-set" | "membership" | "signin" | "add-skill" | null
   >(null);
@@ -554,6 +542,9 @@ export function UnifiedApp({
   const notInstalledAll = useMemo(() => [...notInstalled, ...added.filter(skill =>
     !notInstalled.some(other => other.catalogId === skill.catalogId))], [notInstalled, added]);
   const allMine = useMemo(() => [...mine, ...notInstalledAll], [mine, notInstalledAll]);
+  // Forget removed keys once the list no longer has them, so a skill added again shows.
+  useEffect(() => { setRemoved(old => old.length && old.some(key => !allMine.some(skill => skill.key === key))
+    ? old.filter(key => allMine.some(skill => skill.key === key)) : old); }, [allMine]);
   const inMySkills = (catalogId: string | undefined) => !!catalogId && !!additions?.skills.some(skill => skill.catalogId === catalogId);
   const changeMySkills = (catalogId: string, add: boolean) => {
     if (!additions || additions.pending.includes(catalogId)) return;
@@ -607,6 +598,8 @@ export function UnifiedApp({
   // A synced personal skill no Mac has installs from the account's saved copy (the Mac app checks it's kept).
   const savedInstall = !!(onMac && signedIn && (!readOnlyAccount || management) && detail?.cloudKey && !detail.catalogId);
   const missingAgent = installedHere && !(installedAgents.includes("claude") && installedAgents.includes("codex"));
+  // The app installs any library skill, from Discover or My skills (Set rows keep the copy command).
+  const canInstall = !!(onMac && signedIn && publicInstallAction && detail?.catalogId && !detail.setItemKind && !detail.installed?.isLocalOnly);
   // An install that finishes changes where the skill is; close the card and drop its intent.
   const installDone = useRef(installedAgents);
   useEffect(() => {
@@ -745,6 +738,34 @@ export function UnifiedApp({
     if (!entry.catalogId) return;
     open({ key: `catalog:${entry.catalogId}`, catalogId: entry.catalogId, name: entry.name,
       author: entry.source.split("/")[0], description: "", githubUrl: null, tags: [] });
+  }
+  // Synced copies are deleted for good (every version, and from Sets); say so before it happens.
+  function removeWarning(skills: SkillDisplay[]) {
+    const rows = skills.flatMap(skill => { const row = skill.cloudKey ? cloudRow(skill) : null; return row ? [row] : []; });
+    const one = skills.length === 1;
+    if (!rows.length) return `${one ? "It's" : "They're"} taken out of My skills. You can add ${one ? "it" : "them"} again from the library.`;
+    const versions = rows.reduce((total, row) => total + row.versionCount, 0);
+    const sets = rows.reduce((total, row) => total + row.setCount, 0);
+    return `This deletes ${one ? "its" : "their"} synced ${versions === 1 ? "copy" : `copies (${versions} versions)`} from your account. It can't be undone.${setsNote(sets)}`;
+  }
+  async function removeSaved(skills: SkillDisplay[]) {
+    setRemoving(null);
+    const keys = skills.map(skill => skill.key);
+    setRemoved(old => [...old, ...keys]);
+    setPicked(old => old.filter(key => !keys.includes(key)));
+    const results = await Promise.allSettled(skills.map(async skill => {
+      if (skill.cloudKey && cloud?.remove) {
+        await cloud.remove(skill.cloudKey);
+        // The same library skill can also be in My skills as an addition; take that out too.
+        if (skill.catalogId && additions && inMySkills(skill.catalogId)) await additions.remove(skill.catalogId);
+      } else if (additions && skill.catalogId) await additions.remove(skill.catalogId);
+      else throw new Error("unavailable");
+    }));
+    const failed = skills.filter((_, index) => results[index].status === "rejected");
+    if (failed.length) {
+      setRemoved(old => old.filter(key => !failed.some(skill => skill.key === key)));
+      setNotice(failed.length === skills.length ? "Couldn't remove. Try again." : `Couldn't remove ${failed.map(skill => skill.name).join(", ")}. Try again.`);
+    } else setNotice(skills.length === 1 ? `Removed ${skills[0].name}` : `Removed ${skills.length} skills`);
   }
   function closeDetail() {
     navigate({ ...nav, selected: "" });
@@ -924,7 +945,7 @@ export function UnifiedApp({
   }
 
   function renderRow(skill: SkillDisplay, rank?: number, compact = false) {
-    const canSelect = editing && !!skill.installed;
+    const canSelect = editing;
     const liveCopies = !discovery ? liveCopiesOf(skill) : undefined;
     const versionCount = liveCopies ? skillVersions(liveCopies).length : 0;
     const fromSets = !discovery && skill.installed ? installedSetNames(skill.installed) : [];
@@ -932,7 +953,7 @@ export function UnifiedApp({
       <div
         key={skill.key}
         className={`ua-row ${compact ? "ua-row-compact" : ""}`}
-        data-selected={selected?.key === skill.key}
+        data-selected={selected?.key === skill.key || (!!skill.added && selected?.key === `catalog:${skill.catalogId}`)}
         data-letter={!discovery && !compact ? railLetter(skill.name) : undefined}
       >
         {canSelect && (
@@ -1246,6 +1267,8 @@ export function UnifiedApp({
     visible = visible.filter((skill) =>
       skill.installed && displaySourceNames(skill.installed.sources).includes(displaySourceName(nav.source)),
     );
+  // Removed from My skills: gone at once, before the change comes back.
+  if (removed.length && !discovery) visible = visible.filter(skill => !removed.includes(skill.key));
   const origin = !isDiscovery(nav.view) && !setPage && nav.show && ["personal", "public", "origin"].includes(nav.show) ? skillsByOrigin(visible) : null;
   if (origin && nav.show !== "origin") visible = nav.show === "personal" ? origin.personal : origin.public;
   // My own lists are in name order, so a letter index can jump through them.
@@ -1304,7 +1327,7 @@ export function UnifiedApp({
     <div className="ua-heading-actions">
       {editableView && <button
         type="button"
-        className="ua-pill"
+        className={editing ? "ua-pill ua-primary" : "ua-pill"}
         onClick={() => {
           setEditing(!editing);
           setPicked([]);
@@ -1906,44 +1929,36 @@ export function UnifiedApp({
                       <button
                         type="button"
                         className="ua-link"
-                        onClick={() =>
-                          setPicked(
-                            visible.filter(s => s.installed).every(s => picked.includes(s.key))
-                              ? []
-                              : visible.filter(s => s.installed).map((s) => s.key),
-                          )
-                        }
+                        onClick={() => setPicked(visible.every(s => picked.includes(s.key)) ? [] : visible.map((s) => s.key))}
                       >
-                        {visible.filter(s => s.installed).every(s => picked.includes(s.key)) && picked.length
-                          ? "Deselect all"
-                          : "Select all"}
+                        {visible.every(s => picked.includes(s.key)) && picked.length ? "Deselect all" : "Select all"}
                       </button>
                       <span>{picked.length} selected</span>
-                      <button type="button" className="ua-pill" disabled={!picked.length || (!!management && !canManage)}
-                        onClick={() => newSet(visible.filter(skill => picked.includes(skill.key)))}><Plus />New set</button>
-                      <button
-                        type="button"
-                        className="ua-pill"
-                        disabled={!picked.length || (!!management && !canManage)}
-                        onClick={() =>
-                          addToSet(
-                            visible.filter((s) => picked.includes(s.key)),
-                          )
-                        }
-                      >
-                        <ListPlus />
-                        Add to set
-                      </button>
-                      {(!readOnlyAccount || management) && (() => {
-                        const names = [...new Map(visible.filter(skill => picked.includes(skill.key))
-                          .flatMap(skill => liveCopiesOf(skill)?.name ?? [])
+                      {(() => {
+                        // Sets hold installed skills; saved-only skills can be removed from My skills here.
+                        const chosen = visible.filter(skill => picked.includes(skill.key));
+                        const installed = chosen.filter(skill => skill.installed);
+                        const savedOnly = chosen.filter(skill => !skill.installed && (skill.cloudKey || (skill.added && skill.catalogId)));
+                        const setHint = chosen.length && !installed.length ? "Sets hold installed skills" : undefined;
+                        const names = [...new Map(installed.flatMap(skill => liveCopiesOf(skill)?.name ?? [])
                           .map(name => [name.trim().toLowerCase(), name] as const)).values()];
                         const tooMany = names.length > maxRemoveFromMac;
-                        return <button type="button" className="ua-pill ua-pill-danger" disabled={!names.length || tooMany}
-                          title={tooMany ? `Select up to ${maxRemoveFromMac} skills` : undefined}
-                          onClick={() => window.location.assign(removeFromMacLink(names))}>
-                          <Trash2 />Delete from my Mac
-                        </button>;
+                        return <>
+                          <button type="button" className="ua-pill" title={setHint} disabled={!installed.length || (!!management && !canManage)}
+                            onClick={() => newSet(installed)}><Plus />New set</button>
+                          <button type="button" className="ua-pill" title={setHint} disabled={!installed.length || (!!management && !canManage)}
+                            onClick={() => addToSet(installed)}><ListPlus />Add to set</button>
+                          {(!readOnlyAccount || management) && <button type="button" className="ua-pill ua-pill-danger" disabled={!names.length || tooMany}
+                            title={tooMany ? `Select up to ${maxRemoveFromMac} skills` : "The Mac app asks first"}
+                            onClick={() => window.location.assign(removeFromMacLink(names))}>
+                            <Trash2 />Delete from Mac
+                          </button>}
+                          {(cloud?.remove || additions) && <button type="button" className="ua-pill ua-pill-danger" disabled={!savedOnly.length}
+                            title={savedOnly.length ? undefined : "For skills not on a Mac"}
+                            onClick={() => setRemoving(savedOnly)}>
+                            <X />Remove from My skills
+                          </button>}
+                        </>;
                       })()}
                     </div>
                   )}
@@ -2085,35 +2100,21 @@ export function UnifiedApp({
                 </div>
                 {!panelPending && <>
                 <div className="ua-detail-actions">
-                  {/* Already on a Mac: say so instead of offering to install it again. */}
-                  {onMac && signedIn && publicInstallAction && detail.catalogId && installedHere && (
-                    <span className="ua-pill"><Check aria-hidden="true" />Installed</span>
-                  )}
-                  {onMac && signedIn && publicInstallAction && detail.catalogId && installedHere && missingAgent && !installOpen && (
-                    <button type="button" className="ua-pill ua-detail-copy" aria-expanded={false} onClick={() => setInstallOpen(true)}>
-                      Add to another agent
+                  {/* Where it's installed, in one place; + adds it to the agent that doesn't have it. */}
+                  {detailLive && <span className="ua-on-agents">
+                    <span className="ua-pill ua-on-agents-label" title={`Installed on ${displaySourceNames(detailLive.sources).join(", ")}`}>
+                      {[...new Set(detailLive.sources.map(agentKind))].filter(kind => kind !== "other").map(kind =>
+                        <span key={kind} className="ua-agent-logo" data-agent={kind} aria-hidden="true" />)}
+                      On {displaySourceNames(detailLive.sources).join(", ")}
+                    </span>
+                    {canInstall && missingAgent && <IconButton label="Add to another agent" aria-haspopup="dialog" onClick={() => setInstallOpen(true)}>
+                      <Plus />
+                    </IconButton>}
+                  </span>}
+                  {canInstall && !installedHere && (
+                    <button type="button" className="ua-pill ua-primary" aria-haspopup="dialog" onClick={() => setInstallOpen(true)}>
+                      Install <Download />
                     </button>
-                  )}
-                  {onMac && signedIn && publicInstallAction && detail.catalogId && (!installedHere || (missingAgent && installOpen)) && (
-                    installOpen ? (
-                      <button
-                        type="button"
-                        className="ua-pill ua-detail-copy"
-                        aria-expanded
-                        onClick={() => { setInstallOpen(false); onInstallCancel?.(); }}
-                      >
-                        Cancel <X />
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="ua-pill ua-primary"
-                        aria-expanded={false}
-                        onClick={() => setInstallOpen(true)}
-                      >
-                        Install <Download />
-                      </button>
-                    )
                   )}
                   {/* A synced personal skill no Mac has: the Mac app installs its newest saved version. */}
                   {savedInstall && (
@@ -2135,11 +2136,12 @@ export function UnifiedApp({
                       Add to My skills <Plus aria-hidden="true" />
                     </button>
                   ))}
-                  {detail.installCommand ? (
+                  {/* On a Mac the app installs it, so the terminal command isn't a second button. */}
+                  {detail.installCommand && !canInstall ? (
                     <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
                       Copy <Copy />
                     </button>
-                  ) : !(onMac && signedIn && publicInstallAction && detail.catalogId) && !savedInstall && (
+                  ) : !canInstall && !savedInstall && (
                     <span className="ua-pill">
                       {detail.installed?.isLocalOnly && <User aria-hidden="true" />}
                       {detail.setItemCloudShared ? cloudSharedLabel(detail, activeSet?.role)
@@ -2176,7 +2178,9 @@ export function UnifiedApp({
                     </IconButton>
                   )}
                   </span>
-                  {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && <CloudStatusBadge row={cloudRow(detail)} notInstalled={!!detail.cloudKey} />}
+                  {/* Sync runs in the background; it only shows here when something needs you. */}
+                  {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && needsAttention(cloudRow(detail)?.status ?? "saved")
+                    && <CloudStatusBadge row={cloudRow(detail)} notInstalled={!!detail.cloudKey} />}
                   {!signedIn && (
                     <button type="button" className="ua-pill ua-primary ua-detail-signin" onClick={signIn} data-humblytics="App Sign In">
                       Sign in to manage skills
@@ -2188,8 +2192,12 @@ export function UnifiedApp({
                     Paste in your terminal (macOS, Linux or WSL). <a className="ua-link" href="/developers/">Use with any agent (MCP)</a>
                   </p>
                 )}
-                {installOpen && selected && signedIn && (
-                  <div className="ua-install-card">{publicInstallAction?.(selected, !detailPending)}</div>
+                {installOpen && selected && signedIn && publicInstallAction && (
+                  <Modal title={installedHere ? "Add to another agent" : `Install ${selected.name}`} theme={theme}
+                    close={() => { setInstallOpen(false); onInstallCancel?.(); }}>
+                    {/* Installed as the library skill it is, whichever row it was opened from. */}
+                    {publicInstallAction({ ...selected, key: `catalog:${selected.catalogId}` }, !detailPending, data.devices.length > 0)}
+                  </Modal>
                 )}
                 {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}
                 </>}
@@ -2227,10 +2235,6 @@ export function UnifiedApp({
                 </div>
                 {detail.installed && (
                   <section className="ua-detail-account">
-                    <div>
-                      <span>Installed on</span>
-                      <AgentList sources={detail.installed.sources} />
-                    </div>
                     {detailVersions.length > 1 && <div className="ua-detail-versions">
                       <span>{detailVersions.length} versions</span>
                       <strong>{detailVersions.map(sources => sources.join(", ")).join(" · ")}</strong>
@@ -2353,6 +2357,13 @@ export function UnifiedApp({
         )}
       </div>
       {management?.dialog(theme)}
+      {removing && (
+        <Modal title={removing.length === 1 ? `Remove ${removing[0].name}?` : `Remove ${removing.length} skills?`} theme={theme} close={() => setRemoving(null)}>
+          <p className="ua-muted">{removeWarning(removing)}</p>
+          <button type="button" className="ua-pill ua-pill-danger ua-modal-action" onClick={() => void removeSaved(removing)}>
+            {removing.some(skill => skill.cloudKey) ? "Delete" : "Remove"}</button>
+        </Modal>
+      )}
       {!readOnlyAccount && dialog === "new-set" && (
         <Modal title="New set" theme={theme} close={() => setDialog(null)}>
           <form

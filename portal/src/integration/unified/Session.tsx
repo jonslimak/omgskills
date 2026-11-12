@@ -16,7 +16,7 @@ import { DevicesPanel } from "../DevicesPanel";
 import { PrivateSourcesPanel } from "../PrivateSourcesPanel";
 import { McpPanel } from "../../app/unified/McpPanel";
 import { CloudSavePanel } from "../../cloud-save/CloudSavePanel";
-import { confirmCloudReview, loadCloudSave, loadSavedSkillMd, loadSavedVersions, loadSharedSkillMd, type CloudSaveState } from "../../cloud-save/cloud-save";
+import { confirmCloudReview, deleteCloudSaved, loadCloudSave, loadSavedSkillMd, loadSavedVersions, loadSharedSkillMd, type CloudSaveState } from "../../cloud-save/cloud-save";
 import type { CloudInfo } from "../../app/unified/CloudStatus";
 import { addGithubSkill, addMySkill, addUpload, previewUpload, type PickedFolder, findSkillsAtGithubLink, loadMySkillAdditions, previewGithubSkill, removeMySkill, type GithubSkillPreview,
   type MySkillAddition, type MySkillAdditions } from "../../app/my-skills-additions";
@@ -74,6 +74,7 @@ function useCloudStatus(api: PortalApi, enabled: boolean, revision: unknown): { 
   const info = useMemo(() => state ? {
     state,
     confirm: async (key: string) => { await confirmCloudReview(apiRef.current, key); setReload(value => value + 1); },
+    remove: async (key: string) => { await deleteCloudSaved(apiRef.current, key); setReload(value => value + 1); },
   } : undefined, [state]);
   const reloadCloud = useCallback(() => setReload(value => value + 1), []);
   return { info, loaded, reload: reloadCloud };
@@ -259,8 +260,8 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
       key={skill.key} skill={skill} detailReady={detailReady} client={installClient} store={installStore}
       returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`}
       action={normalInstallAction} distribution={setupTestDistribution} />
-      : catalogStore ? (skill, detailReady) => <CatalogInstallSetup key={skill.key}
-        skill={skill} detailReady={detailReady} store={catalogStore}
+      : catalogStore ? (skill, detailReady, appKnown) => <CatalogInstallSetup key={skill.key}
+        skill={skill} detailReady={detailReady} store={catalogStore} appKnown={appKnown}
         returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} /> : undefined)}
     onInstallCancel={() => catalogStore?.clear()}
     readOnlyAccount
