@@ -36,7 +36,7 @@
 .ua-install-now svg { width: 17px; height: 17px; }
 .ua-install-now:disabled { opacity: .5; cursor: default; }
 .ua-install-secondary { background: var(--ua-chip); color: var(--ua-body); border: 1px solid var(--ua-line); }
-.ua-install-pop .ua-install-lead { font-size: 14px; color: var(--ua-body); }
+.ua-install-pop .ua-install-lead { font-size: 14px; color: var(--ua-body); text-align: center; }
 .ua-install-get { display: flex; flex-direction: column; gap: 8px; }
 .ua-install-pop .ua-link { font-size: 13px; }
 .ua-install-switch { align-self: center; margin-top: 10px; }
