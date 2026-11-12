@@ -20,7 +20,7 @@ export function AgentSetupPrompt() {
   return <div className="ua-agent-setup">
     <button type="button" className="ua-install-now ua-install-secondary" onClick={copy} data-humblytics="App Setup Prompt Copy" aria-live="polite"
       title="Paste into Claude Code or Codex. It installs the app and asks before connecting anything.">
-      {copied === "copied" ? <><Check /> Copied. Paste it in your agent</> : copied === "failed" ? <>Select it below, then ⌘C</> : <><Copy /> Set up app with your agent instead</>}
+      {copied === "copied" ? <><Check /> Copied. Paste it in your agent</> : copied === "failed" ? <>Select it below, then ⌘C</> : <><Copy /> Install with your agent instead</>}
     </button>
     <button type="button" className="ua-link ua-agent-setup-toggle" aria-expanded={shown} onClick={() => setShown(open => !open)}>
       {shown ? "Hide prompt" : "Show prompt"} <ChevronDown aria-hidden="true" data-open={shown || undefined} />
