@@ -69,7 +69,7 @@ function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appK
   const action = detailReady ? catalogInstallAction(skill, agent, store.client) : { href: null, reason: "Loading..." };
   const busy = state.phase === "checking";
   const ready = state.phase === "idle" || state.phase === "ready";
-  // A connected Mac means the app is there; "Don't have the app?" (or a saved setup) shows how to get it.
+  // A connected Mac means the app is there; "Don't have the Mac install helper?" (or a saved setup) shows how to get it.
   const getApp = state.phase === "setup" || (!appKnown && state.phase === "idle");
   // Only what needs the person: approving in the app, or what went wrong.
   const status = !action.href ? (detailReady ? action.reason : "")
@@ -92,7 +92,7 @@ function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appK
       {picker}
       {install}
       <button type="button" className="ua-link ua-install-switch" disabled={!action.href || busy || state.restartRequired}
-        onClick={() => session.showSetup(skill)}>Don't have the app?</button>
+        onClick={() => session.showSetup(skill)}>Don't have the Mac install helper?</button>
     </>}
     <p role="status" className="ua-install-status">{getApp ? "" : status}</p>
     {state.restartRequired && <button type="button" className="ua-link ua-install-switch" onClick={() => session.reset()}>Start over</button>}

@@ -96,7 +96,7 @@ test("production install handoff preserves both agents and cannot offer the test
     returnRoute: "/app/?view=discover&skill=catalog%3Aowner%2Frepo", appKnown: true,
     store: new CatalogInstallIntentStore(() => ({ getItem: () => null, setItem() {}, removeItem() {} }), "production") }));
   assert.match(known, /Install now/);
-  assert.match(known, /Don&#x27;t have the app\?/);
+  assert.match(known, /Don&#x27;t have the Mac install helper\?/);
   assert.doesNotMatch(known, /Download app/);
   assert.doesNotMatch(markup, /not been published|Disposable VM|F1 Test|Download test candidate|netlify\.app|omgskills-mac\.dmg/);
   const withCandidate = renderToStaticMarkup(createElement(module.exports.CatalogInstallSetup, { skill, detailReady: true,
