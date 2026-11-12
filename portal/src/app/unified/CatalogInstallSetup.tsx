@@ -5,6 +5,7 @@ import { catalogInstallAction, catalogInstallClients, type CatalogInstallAgent }
 import { CatalogInstallIntentStore, CatalogInstallSetupSession } from "./catalog-install-intent";
 import { refreshInstallSkill } from "./PublicInstallSetup";
 import { productionDistribution } from "./production-distribution";
+import { AgentSetupPrompt } from "./AgentSetupPrompt";
 import type { CandidateDistribution } from "../../candidate/distribution";
 import "./install-setup.css";
 
@@ -76,6 +77,7 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
           <li>Return here and choose <strong>Try opening again</strong>, then <strong>Open in {appName}</strong>. Approve installation in the app.</li>
         </ol>
         <a href={productionDownload.checksumURL} rel="noreferrer">SHA-256 checksum</a>
+        <AgentSetupPrompt />
       </> : download ? <>
         <p>Apple silicon Mac, macOS {download.minimumOS} or later. Candidate {download.version} (build {download.build}). Disposable VM only.</p>
         <p>This test candidate uses the public app's identity. Install only inside the disposable VM, never alongside or over your normal Mac app.</p>

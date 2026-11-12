@@ -154,6 +154,12 @@ export async function verifyProductionDeploy({
     }
   }
 
+  // "Set up with your agent" installs the same app as /download.
+  const installer = await expectStatus(fetchImpl, origin, "/install.sh", 200, { keepBody: true });
+  if (!(await installer.text()).includes(`URL="${defaultDownloadURL}"`)) {
+    throw new Error(`${origin}/install.sh does not install ${defaultDownloadURL}`);
+  }
+
   const appcast = await expectStatus(fetchImpl, origin, "/appcast.xml", 200, { keepBody: true });
   const updateAssets = extractUpdateAssetPaths(await appcast.text());
   if (updateAssets.length === 0) {

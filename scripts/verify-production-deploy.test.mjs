@@ -18,6 +18,7 @@ function responseFor(path, options = {}, features = disabledFeatures) {
       headers: { location: defaultDownloadURL },
     });
   }
+  if (path === "/install.sh") return new Response(`URL="${defaultDownloadURL}"\n`, { status: 200 });
   if (path === "/appcast.xml") return new Response(appcast, { status: 200 });
   if (path === "/health/" || path === "/data/health.json") {
     return new Response("Authentication required", { status: 401 });
@@ -132,6 +133,7 @@ test("verifies the complete production deploy surface", async () => {
     { path: "/data/crawl4/manifest.json", method: "GET" },
     { path: "/download", method: "GET" },
     { path: "/download/", method: "GET" },
+    { path: "/install.sh", method: "GET" },
     { path: "/appcast.xml", method: "GET" },
     { path: "/downloads/omgskills-mac.dmg", method: "HEAD" },
     { path: "/downloads/omgskills-mac.dmg.sha256", method: "HEAD" },
@@ -341,6 +343,22 @@ test("fails when a required release asset is missing", async () => {
       },
     }),
     /downloads\/omgskills-mac\.dmg returned 404, expected 200/,
+  );
+});
+
+test("fails when the installer would install a different app than /download", async () => {
+  await assert.rejects(
+    verifyProductionDeploy({
+      origin,
+      expectedFeatures: disabledFeatures,
+      expectedHelperRelease: disabledHelper,
+      fetchImpl: async (url, options) => {
+        const path = new URL(url).pathname;
+        if (path === "/install.sh") return new Response('URL="https://example.com/old.zip"\n', { status: 200 });
+        return responseFor(path, options);
+      },
+    }),
+    /install\.sh does not install/,
   );
 });
 
