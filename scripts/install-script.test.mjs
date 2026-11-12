@@ -134,6 +134,7 @@ test("the site and the app offer the same prompt, next to Download, on a Mac onl
   assert.match(prompt(app), /curl -fsSL https:\/\/omgskills\.com\/install\.sh \| bash/);
   assert.match(prompt(app), /Don't connect anything unless I say yes/);
   assert.match(prompt(app), /older copy goes to the Trash/);
+  assert.match(prompt(app), /missing issuer \(iss\) error, your Codex is too old/);
   for (const source of [widget, app]) assert.match(source, /maxTouchPoints > 1/);
   for (const page of ["site/guide/index.html", "site/support/index.html", "site/connect-stripe-to-claude/index.html"]) {
     const html = await read(page);

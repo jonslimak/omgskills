@@ -3,7 +3,7 @@ export const SETUP_PROMPT = "Install the omgskills Mac app for me.\n"
   + "1. First tell me in one line what it does: installs the omgskills app in Applications (an older copy goes to the Trash), nothing else.\n"
   + "2. Then run: curl -fsSL https://omgskills.com/install.sh | bash\n"
   + "3. When it opens, I'll sign in.\n"
-  + "4. Then ask me if you should connect My skills (https://omgskills.com/my/mcp) to you. Don't connect anything unless I say yes.";
+  + "4. Then ask me if you should connect My skills (https://omgskills.com/my/mcp) to you. Don't connect anything unless I say yes. If sign-in fails with a missing issuer (iss) error, your Codex is too old: tell me to update it, then try again.";
 
 /** A Mac (not an iPad asking for the desktop site). */
 export function isMacBrowser(nav: Pick<Navigator, "platform" | "maxTouchPoints"> & { userAgentData?: { platform?: string } } = navigator) {
