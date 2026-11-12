@@ -101,9 +101,9 @@ function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appK
           onClick={() => { if (state.phase === "idle") session.showSetup(skill); }}><Download /> Download app</a>
         <AgentSetupPrompt />
       </div>
-      {/* Only when no connected Mac was found: a way on for someone who installed the app but hasn't signed in yet. */}
-      {!appKnown && <button type="button" className="ua-link ua-install-switch" disabled={!action.href || busy || state.restartRequired}
-        onClick={() => { if (state.phase === "idle") session.showSetup(skill); void session.retry(); }}>I have the app</button>}
+      {/* Hidden when a connected Mac was found, unless they chose this screen: then it's the way back to Install now. */}
+      {(!appKnown || wantApp) && <button type="button" className="ua-link ua-install-switch" disabled={!action.href || busy || state.restartRequired}
+        onClick={() => { setWantApp(false); if (state.phase === "idle") session.showSetup(skill); void session.retry(); }}>I have the app</button>}
     </> : <>
       {picker}
       {install}
