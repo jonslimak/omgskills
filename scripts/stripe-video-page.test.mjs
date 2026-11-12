@@ -15,7 +15,7 @@ const skills = [
 test('all five skills have canonical links and persistent installer commands', () => {
   assert.equal([...html.matchAll(/data-cmd="/g)].length, 5);
   for (const [repo, skill, path] of skills) {
-    assert.ok(html.includes(`href="/skills/stripe/${path}/"`));
+    assert.ok(html.includes(`href="/library/stripe/${path}/"`));
     assert.ok(html.includes(`data-cmd="npx skills add stripe/${repo} --skill ${skill} --agent claude-code --global"`));
     assert.ok(html.includes(`data-humblytics="Stripe Guide Copy ${skill}"`));
   }

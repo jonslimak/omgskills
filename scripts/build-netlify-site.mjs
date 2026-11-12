@@ -131,9 +131,8 @@ async function main() {
   );
   if (takeoverPilotEnabled(process.env, productionFeatures)) {
     const all = takeoverAllPagesEnabled(process.env, productionFeatures);
-    const { urls, skipped } = await writeTakeover(outputDir, { all });
-    console.log(all ? `Takeover pages: ${urls.length}${skipped.length ? `; skipped ${skipped.length} (dot folder, case clash or unmappable), e.g. ${skipped.slice(0, 3).join(", ")}` : ""}`
-      : `Takeover pilot pages: ${urls.join(", ")}`);
+    const urls = await writeTakeover(outputDir, { all });
+    console.log(all ? `Takeover pages: ${urls.length}` : `Takeover pilot pages: ${urls.join(", ")}`);
   }
   await mergeRedirects();
   await verifyRequiredOutput();

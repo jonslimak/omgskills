@@ -6,6 +6,7 @@ import {
   catalogSkillUrlEntries,
   catalogSkillUrlsFilename,
   legacyCatalogSkillRedirects,
+  urlPathToFilePath,
 } from "./web-library-skill-urls.mjs";
 import { homepageCollectionPaths } from "./home-preview-content.mjs";
 import { assertIndexStateMatchesSitemap } from "./web-library-index-verification.mjs";
@@ -79,8 +80,8 @@ const pages = [
     markdownText: `# ${starterPack.title}`,
   },
   {
-    path: "/skills/openai/codex/skill-creator/",
-    canonical: "https://omgskills.com/skills/openai/codex/skill-creator/",
+    path: "/library/openai/codex/skill-creator/",
+    canonical: "https://omgskills.com/library/openai/codex/skill-creator/",
     text: "skill-creator",
     titleText: "Claude skill by openai",
     descriptionText: "Install skill-creator",
@@ -95,8 +96,8 @@ const pages = [
     markdownText: "# skill-creator",
   },
   {
-    path: "/skills/obra/superpowers/systematic-debugging/",
-    canonical: "https://omgskills.com/skills/obra/superpowers/systematic-debugging/",
+    path: "/library/obra/superpowers/systematic-debugging/",
+    canonical: "https://omgskills.com/library/obra/superpowers/systematic-debugging/",
     text: "systematic-debugging",
     allowNoindex: true,
     profileAuthor: {
@@ -106,15 +107,15 @@ const pages = [
     markdownText: "# systematic-debugging",
   },
   {
-    path: "/skills/openai/skills/plugin-creator/",
-    canonical: "https://omgskills.com/skills/openai/skills/plugin-creator/",
+    path: "/library/openai/skills/plugin-creator/",
+    canonical: "https://omgskills.com/library/openai/skills/plugin-creator/",
     text: "plugin-creator",
     allowNoindex: true,
     markdownText: "# plugin-creator",
   },
   {
-    path: "/skills/",
-    canonical: "https://omgskills.com/skills/",
+    path: "/library/",
+    canonical: "https://omgskills.com/library/",
     text: "The best &amp; latest skills from the most trusted sources",
     directoryImages: true,
     skillLayout: true,
@@ -179,13 +180,26 @@ const redirects = [
     path: "/library/openai",
     location: "/library/openai/",
   },
+  // move.md step 3: old skill pages and the old index moved to /library/.
+  {
+    path: "/skills/",
+    location: "/library/",
+  },
+  {
+    path: "/skills/openai/codex/skill-creator/",
+    location: "/library/openai/codex/skill-creator/",
+  },
+  {
+    path: "/skills/openai/codex/skill-creator/index.md",
+    location: "/library/openai/codex/skill-creator/index.md",
+  },
 ];
 
 // Unknown creators must be real 404s, not a redirect back to the same address.
 const notFoundPaths = ["/library/omgskills-missing-creator-check/"];
 
 function localPathForUrlPath(urlPath) {
-  const cleanPath = urlPath.replace(/^\/+/, "");
+  const cleanPath = urlPathToFilePath(urlPath).replace(/^\/+/, "");
   return path.join(siteDir, cleanPath);
 }
 
@@ -195,6 +209,14 @@ async function fileExists(filePath) {
     return info.isFile() && info.size > 0;
   } catch {
     return false;
+  }
+}
+
+// llms-gold.txt includes skill pages (/library/owner/repo/...), not only creator pages.
+function assertSkillSource(contents, label) {
+  const escapedOrigin = publicOrigin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  if (!new RegExp(`^Source: ${escapedOrigin}/library/[^/\\s]+/[^/\\s]+/`, "m").test(contents)) {
+    throw new Error(`${label} did not include a skill page source`);
   }
 }
 
@@ -369,7 +391,7 @@ async function verifyAllLocalReferences() {
     dynamicLocalPaths.add(urlPath);
   }
   const failures = new Set();
-  const htmlRoots = ["skills", "library", "collections", "developers"].map((directory) => path.join(siteDir, directory));
+  const htmlRoots = ["library", "collections", "developers"].map((directory) => path.join(siteDir, directory));
   const generatedFiles = (await Promise.all(htmlRoots.flatMap((directory) => [
     collectFiles(directory, ".html"),
     collectFiles(directory, ".md"),
@@ -398,7 +420,7 @@ async function verifyAllLocalReferences() {
 
 async function verifyLocalMarkdownParity() {
   const failures = [];
-  const roots = ["skills", "library", "collections", "developers", "guide"].map((directory) => path.join(siteDir, directory));
+  const roots = ["library", "collections", "developers", "guide"].map((directory) => path.join(siteDir, directory));
   for (const root of roots) {
     const [htmlFiles, markdownFiles] = await Promise.all([
       collectFiles(root, ".html"),
@@ -409,9 +431,10 @@ async function verifyLocalMarkdownParity() {
       if (!(await fileExists(markdownPath))) failures.push(`Missing Markdown mirror for ${htmlPath}`);
       const html = await readFile(htmlPath, "utf8");
       const relativeDirectory = path.relative(siteDir, path.dirname(htmlPath)).split(path.sep).join("/");
-      const urlPath = `/${relativeDirectory}/`;
-      const alternate = `<link rel="alternate" type="text/markdown" href="${urlPath}index.md">`;
-      if (!html.includes(alternate)) failures.push(`${htmlPath} is missing ${alternate}`);
+      // Pages may encode characters in their address (disk paths are decoded).
+      const expected = `/${relativeDirectory}/index.md`;
+      const href = html.match(/<link rel="alternate" type="text\/markdown" href="([^"]+)">/)?.[1];
+      if (!href || decodeURIComponent(href) !== expected) failures.push(`${htmlPath} is missing its Markdown alternate ${expected}`);
     }
     for (const markdownPath of markdownFiles.filter((filePath) => path.basename(filePath) === "index.md")) {
       const htmlPath = path.join(path.dirname(markdownPath), "index.html");
@@ -433,7 +456,7 @@ async function verifyLiveInternalLinks(html, label) {
 function verifyMetadata(html, page, label) {
   assertIncludes(
     html,
-    '<a class="brand" href="/skills/" aria-label="omgskills skills library"><span aria-hidden="true">&#128064;</span></a>',
+    '<a class="brand" href="/library/" aria-label="omgskills skills library"><span aria-hidden="true">&#128064;</span></a>',
     label,
   );
   assertIncludes(
@@ -572,7 +595,7 @@ function verifyMetadata(html, page, label) {
     assertIncludes(html, "https://www.npmjs.com/package/omgskills-mcp", label);
     assertIncludes(html, "/data/crawl4/manifest.json", label);
     assertIncludes(html, "/.well-known/ai-catalog.json", label);
-    assertIncludes(html, "/skills/index.md", label);
+    assertIncludes(html, "/library/index.md", label);
     assertIncludes(html, "The Library MCP reads only public catalog data.", label);
   }
 
@@ -645,7 +668,7 @@ async function verifyLocalRootFile(file) {
     assertIncludes(contents, `${publicOrigin}/mcp`, filePath);
     assertIncludes(contents, `${publicOrigin}/.well-known/ai-catalog.json`, filePath);
     assertIncludes(contents, "https://www.npmjs.com/package/omgskills-mcp", filePath);
-    assertIncludes(contents, `${publicOrigin}/skills/index.md`, filePath);
+    assertIncludes(contents, `${publicOrigin}/library/index.md`, filePath);
     assertIncludes(contents, `${publicOrigin}/llms-gold.txt`, filePath);
     assertIncludes(contents, "## When to use omgskills", filePath);
     assertIncludes(contents, `${publicOrigin}/agents.md`, filePath);
@@ -663,7 +686,7 @@ async function verifyLocalRootFile(file) {
     verifyAiCatalog(JSON.parse(contents), filePath);
   }
   if (file.path === "/llms-gold.txt") {
-    assertIncludes(contents, `Source: ${publicOrigin}/skills/`, filePath);
+    assertSkillSource(contents, filePath);
     assertIncludes(contents, `Source: ${publicOrigin}/library/`, filePath);
     const sourcePaths = [...contents.matchAll(/^Source: (\S+)$/gm)].map((match) => {
       if (!match[1].startsWith(`${publicOrigin}/`)) {
@@ -762,6 +785,9 @@ async function verifyLiveGuide() {
   }
 }
 
+// /library/owner/repo/... (creator pages are /library/owner/).
+const isSkillPagePath = (urlPath) => urlPath.startsWith("/library/") && urlPath.split("/").length >= 5;
+
 function verifyCatalogSkillUrlCoverage(asset, label) {
   const entries = catalogSkillUrlEntries(asset);
   if (entries.length === 0) {
@@ -769,7 +795,7 @@ function verifyCatalogSkillUrlCoverage(asset, label) {
   }
   const generatedPaths = new Set(entries.map(([, urlPath]) => urlPath));
   for (const page of pages) {
-    if (page.path.startsWith("/skills/") && page.path !== "/skills/" && !generatedPaths.has(page.path)) {
+    if (isSkillPagePath(page.path) && !generatedPaths.has(page.path)) {
       throw new Error(`${label} did not map a generated page: ${page.path}`);
     }
   }
@@ -790,6 +816,10 @@ async function verifyLocalCatalogSkillUrls() {
 }
 
 async function verifyLocalGeneratedRedirects() {
+  // A file under /skills/ would be served instead of its 301 (move.md step 3).
+  if (await stat(path.join(siteDir, "skills")).then(() => true, () => false)) {
+    throw new Error(`${siteDir}/skills exists; old skill pages must only redirect to /library/`);
+  }
   const filePath = path.join(siteDir, "_web-library-redirects");
   if (!(await fileExists(filePath))) {
     throw new Error(`Missing generated web library redirects: ${filePath}`);
@@ -809,6 +839,10 @@ async function verifyLocalGeneratedRedirects() {
     assertIncludes(contents, `${redirect.path}  ${location}  301`, filePath);
   }
   assertNotIncludes(contents, "/library/:handle", filePath);
+  for (const line of ["/skills/  /library/  301", "/skills/*  /library/:splat  301"]) assertIncludes(contents, line, filePath);
+  if (contents.indexOf("/skills/*  /library/:splat  301") < contents.lastIndexOf("/skills/")) {
+    throw new Error(`${filePath}: the /skills/* catch-all must come after every exact /skills/ rule`);
+  }
   assertIncludes(contents, "/library/openai  /library/openai/  301", filePath);
 }
 
@@ -965,7 +999,7 @@ async function verifyLiveRootFile(file) {
     assertIncludes(contents, `${publicOrigin}/mcp`, url);
     assertIncludes(contents, `${publicOrigin}/.well-known/ai-catalog.json`, url);
     assertIncludes(contents, "https://www.npmjs.com/package/omgskills-mcp", url);
-    assertIncludes(contents, `${publicOrigin}/skills/index.md`, url);
+    assertIncludes(contents, `${publicOrigin}/library/index.md`, url);
     assertIncludes(contents, `${publicOrigin}/llms-gold.txt`, url);
     assertIncludes(contents, "## When to use omgskills", url);
     assertIncludes(contents, `${publicOrigin}/agents.md`, url);
@@ -1001,7 +1035,7 @@ async function verifyLiveRootFile(file) {
     if (!robots.toLowerCase().includes("noindex")) {
       throw new Error(`${url} returned X-Robots-Tag ${robots || "<missing>"}, expected noindex`);
     }
-    assertIncludes(contents, `Source: ${publicOrigin}/skills/`, url);
+    assertSkillSource(contents, url);
   }
 }
 

@@ -4,7 +4,7 @@
 (function () {
   try {
     if (!/(?:^|;\s*)__client_uat(?:_[^=;]*)?=[1-9][0-9]*(?:;|$)/.test(document.cookie)) return;
-    var logos = document.querySelectorAll('a.brand[href="/"], a.brand[href="/skills/"], a.eyes[href="/"], a.site-footer-brand-logo[href="/"]');
+    var logos = document.querySelectorAll('a.brand[href="/"], a.brand[href="/library/"], a.eyes[href="/"], a.site-footer-brand-logo[href="/"]');
     for (var i = 0; i < logos.length; i += 1) logos[i].setAttribute("href", "/app/?view=all");
   } catch (error) {}
 })();

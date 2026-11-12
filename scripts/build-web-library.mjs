@@ -14,8 +14,11 @@ import {
   buildCatalogSkillUrlsAsset,
   buildSkillUrlMap,
   catalogSkillUrlsFilename,
+  buildLegacySkillUrlMap,
   legacyCatalogSkillRedirects,
+  legacySkillRedirectLines,
   skillPathForId,
+  urlPathToFilePath,
 } from "./web-library-skill-urls.mjs";
 
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
@@ -126,6 +129,8 @@ function escapeMarkdownText(value) {
 
 function escapeMarkdownUrl(value) {
   return encodeURI(String(value || ""))
+    // Page addresses arrive already encoded (/library/n8n-io/n8n/packages/%40n8n/...): keep them.
+    .replace(/%25([0-9A-Fa-f]{2})/g, "%$1")
     .replace(/\(/g, "%28")
     .replace(/\)/g, "%29");
 }
@@ -215,7 +220,7 @@ const siteFooterHtml = `  <footer class="site-footer">
       <div class="site-footer-col">
         <h2>Library</h2>
         <a href="/app/">Discover</a>
-        <a href="/skills/">Skills</a>
+        <a href="/library/">Skills</a>
         <a href="/guide/">Skills guide</a>
         <a href="/data/">Data</a>
       </div>
@@ -409,7 +414,7 @@ function pageShell({
 </head>
 <body>
   <header>
-    <a class="brand" href="/skills/" aria-label="omgskills skills library"><span aria-hidden="true">&#128064;</span></a>
+    <a class="brand" href="/library/" aria-label="omgskills skills library"><span aria-hidden="true">&#128064;</span></a>
     <div class="mac-download"><a class="cta" href="/download"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for Mac</a><small>Apple silicon, macOS 14+</small></div>
   </header>
   <main>
@@ -525,7 +530,7 @@ async function readRootManifest() {
 }
 
 async function writeGeneratedPage(urlPath, { html, markdown, includeInGoldBundle = false }) {
-  const directory = path.join(siteDir, urlPath.replace(/^\/+/, ""));
+  const directory = path.join(siteDir, urlPathToFilePath(urlPath).replace(/^\/+/, ""));
   const markdownOutput = markdown.endsWith("\n") ? markdown : `${markdown}\n`;
   await mkdir(directory, { recursive: true });
   await Promise.all([
@@ -537,9 +542,9 @@ async function writeGeneratedPage(urlPath, { html, markdown, includeInGoldBundle
   }
 }
 
-async function writeWebLibraryRedirects(profileCollections, generatedSkillUrlById) {
+async function writeWebLibraryRedirects(profileCollections, generatedSkillUrlById, legacySkillUrlById) {
   const lines = [
-    "# generated web-library legacy profile redirects",
+    "# generated web-library legacy profile and skill redirects",
   ];
   for (const redirect of legacyCatalogSkillRedirects) {
     const targetPath = generatedSkillUrlById.get(redirect.catalogSkillId);
@@ -561,6 +566,10 @@ async function writeWebLibraryRedirects(profileCollections, generatedSkillUrlByI
     lines.push(`${to.replace(/\/$/, "")}  ${to}  301`);
   }
   lines.push("/profiles/*  /u/:splat  301");
+  // move.md step 3: skill pages moved from /skills/ to /library/. Exact rules where the address
+  // changed beyond the prefix (case, dots, old hash suffixes), then the index and a catch-all.
+  lines.push(...legacySkillRedirectLines(generatedSkillUrlById, legacySkillUrlById));
+  lines.push("/skills  /library/  301", "/skills/  /library/  301", "/skills/*  /library/:splat  301");
   await writeFile(path.join(siteDir, "_web-library-redirects"), `${lines.join("\n")}\n`);
 }
 
@@ -574,7 +583,7 @@ async function removeSitemapFiles() {
 
 function skillCards(skills, skillUrlById) {
   return skills.map((skill) => {
-    const href = skillUrlById.get(skill.id) || skillPathForId(skill.id);
+    const href = skillUrlById.get(skill.id) || skillPathForId(skill.id) || "/library/";
     const starCount = compactNumber(skill.stars);
     const author = skill.author_handle;
     const authorMarkup = author
@@ -833,7 +842,7 @@ function skillStructuredData(skill, urlPath, description, profilePathByCreatorHa
 function skillBreadcrumbData(skill, urlPath, profilePathByCreatorHandle) {
   const author = skillAuthorReference(skill, profilePathByCreatorHandle);
   const itemListElement = [
-    { "@type": "ListItem", position: 1, name: "Skills", item: `${origin}/skills/` },
+    { "@type": "ListItem", position: 1, name: "Skills", item: `${origin}/library/` },
   ];
   if (author.profilePath) {
     itemListElement.push({
@@ -879,7 +888,7 @@ function renderSkillPage(
   profilePathByCreatorHandle,
   indexDecision,
 ) {
-  const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
+  const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id) || "/library/";
   const description = skillMetaDescription(skill);
   const visibleDescription = visibleDescriptionForSkill(skill);
   const readmeSnippet = readmeSnippetForSkill(skill);
@@ -1030,7 +1039,7 @@ function renderSkillsIndexPage({ profileCollections, topicCollections, skills },
     // click rate under the generic "Skills - omgskills" title.
     title: "Claude & Codex agent skills: browse and install | omgskills",
     description: "Agent skills for Claude Code and Codex from Anthropic, OpenAI, Vercel and more. Browse curated collections and trending skills, and install them with omgskills.",
-    path: "/skills/",
+    path: "/library/",
     ogImage: sharedSocialImageUrl,
     ogImageWidth: "1200",
     ogImageHeight: "630",
@@ -1042,7 +1051,7 @@ function renderSkillsIndexPage({ profileCollections, topicCollections, skills },
       "@type": "CollectionPage",
       name: "Claude & Codex agent skills",
       description: "Agent skills for Claude Code and Codex from trusted creators, curated collections and trending skills.",
-      url: `${origin}/skills/`,
+      url: `${origin}/library/`,
     },
   });
 }
@@ -1096,7 +1105,7 @@ function renderDevelopersPage() {
         <a class="card" href="/agents.md"><h2>Agent guide</h2><p>When to use omgskills and the preferred machine-readable access paths.</p></a>
         <a class="card" href="/data/crawl4/manifest.json"><h2>Catalog manifest</h2><p>Current public data assets and hashes.</p></a>
         <a class="card" href="/.well-known/ai-catalog.json"><h2>AI catalog</h2><p>ARD discovery manifest for the hosted MCP server.</p></a>
-        <a class="card" href="/skills/index.md"><h2>Markdown library</h2><p>Profiles, collections, and selected skill pages.</p></a>
+        <a class="card" href="/library/index.md"><h2>Markdown library</h2><p>Profiles, collections, and selected skill pages.</p></a>
         <a class="card" href="/llms-gold.txt"><h2>Curated export</h2><p>One-file export of the generated Gold library.</p></a>
       </div>
     </div>
@@ -1177,7 +1186,7 @@ function renderMarkdownSkillList(
 ) {
   if (!skills.length) return "_No skills available._";
   return skills.map((skill, index) => {
-    const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
+    const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id) || "/library/";
     const prefix = ordered ? `${index + 1}.` : "-";
     const details = [
       markdownAuthorLink(skill, profilePathByCreatorHandle),
@@ -1201,7 +1210,7 @@ function renderSkillMarkdown(
   skillUrlById,
   profilePathByCreatorHandle,
 ) {
-  const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
+  const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id) || "/library/";
   const metadata = [
     `Claude/Codex skill by ${markdownAuthorLink(skill, profilePathByCreatorHandle)}`,
     `${compactNumber(skill.stars)} stars`,
@@ -1322,7 +1331,7 @@ ${renderMarkdownSkillList(skills, skillUrlById, profilePathByCreatorHandle)}
 
 ## Links
 
-- HTML page: ${origin}/skills/
+- HTML page: ${origin}/library/
 `;
 }
 
@@ -1370,7 +1379,7 @@ ${markdownCodeBlock(`{
 - Agent guide: ${origin}/agents.md
 - Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
 - Catalog manifest: ${origin}/data/crawl4/manifest.json
-- Markdown library: ${origin}/skills/index.md
+- Markdown library: ${origin}/library/index.md
 - Curated Gold export: ${origin}/llms-gold.txt
 - Markdown convention: append \`index.md\` to a generated library page URL
 
@@ -1416,9 +1425,9 @@ It is like asking an AI for good dinner ideas versus asking while sharing a reci
 
 ## Some examples
 
-- Use [swiftui-pro](${origin}/skills/twostraws/swiftui-agent-skill/swiftui-pro/index.md) to create an iOS app signup screen following Apple's best practices.
-- Use [grill-me](${origin}/skills/mattpocock/skills/grill-me/index.md) to ask questions until an idea is fully explained.
-- Use [ad-creative](${origin}/skills/coreyhaines31/marketingskills/skills/ad-creative/index.md) to generate ad alternatives for an Instagram campaign.
+- Use [swiftui-pro](${origin}/library/twostraws/swiftui-agent-skill/swiftui-pro/index.md) to create an iOS app signup screen following Apple's best practices.
+- Use [grill-me](${origin}/library/mattpocock/skills/grill-me/index.md) to ask questions until an idea is fully explained.
+- Use [ad-creative](${origin}/library/coreyhaines31/marketingskills/skills/ad-creative/index.md) to generate ad alternatives for an Instagram campaign.
 
 ## When not to use skills
 
@@ -1440,7 +1449,7 @@ Create a [Set](${origin}/app/?view=sets), add skills and share it with your team
 
 ## How to find good skills
 
-Most people host skills on GitHub and share them on X, Twitter, and Reddit. Use [omgskills](${origin}/skills/), [skills.sh](https://skills.sh/), or similar tools to find, read, install, and share them.
+Most people host skills on GitHub and share them on X, Twitter, and Reddit. Use [omgskills](${origin}/library/), [skills.sh](https://skills.sh/), or similar tools to find, read, install, and share them.
 
 ## How to make a skill
 
@@ -1474,7 +1483,7 @@ Yes. Skills are open-source Markdown files on GitHub. Every skill indexed here i
 ## Links
 
 - HTML guide: ${origin}/guide/
-- Browse skills: ${origin}/skills/
+- Browse skills: ${origin}/library/
 - Mac app (Apple silicon, macOS 14+): ${origin}/download
 - Original Mac app download: ${origin}/downloads/omgskills-mac.dmg
 - Mac app setup: open a skill's install panel at ${origin}/app/
@@ -1496,7 +1505,7 @@ ${agentWhenToUse}
 - MCP health: ${origin}/mcp/health
 - My skills MCP endpoint: ${origin}/my/mcp (sign in to omgskills, read-only, your own skills)
 - Developer resources: ${origin}/developers/index.md
-- Markdown library: ${origin}/skills/index.md
+- Markdown library: ${origin}/library/index.md
 - Curated Gold export: ${origin}/llms-gold.txt
 - Public catalog manifest: ${origin}/data/crawl4/manifest.json
 - Agentic Resource Discovery catalog: ${origin}/.well-known/ai-catalog.json
@@ -1519,7 +1528,7 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
     .map((collection) => `- ${markdownLink(collection.title, markdownMirrorUrl(collectionPath(collection.id)))}`)
     .join("\n");
   const exampleSkillPath = exampleSkill
-    ? skillUrlById.get(exampleSkill.id) || skillPathForId(exampleSkill.id)
+    ? skillUrlById.get(exampleSkill.id) || skillPathForId(exampleSkill.id) || "/library/"
     : null;
   return `# omgskills
 
@@ -1529,8 +1538,8 @@ function renderLlmsText(profileCollections, topicCollections, exampleSkill, skil
 
 - [Skills: The Complete Guide](${origin}/guide/index.md)
 - [HTML skills guide](${origin}/guide/)
-- [Markdown library index](${origin}/skills/index.md)
-- [HTML library index](${origin}/skills/)
+- [Markdown library index](${origin}/library/index.md)
+- [HTML library index](${origin}/library/)
 - [Curated Gold library export](${origin}/llms-gold.txt)
 
 ## For agents & developers
@@ -1738,11 +1747,19 @@ async function main() {
   const addNoindexReason = (reason) => noindexReasons.set(reason, (noindexReasons.get(reason) || 0) + 1);
   const includedSkills = [];
   const generatedSkillUrlById = new Map();
+  const generatedPageUrls = new Set();
   for (const id of includedSkillIds) {
     const skill = skillById.get(id);
     if (!skill) continue;
     Object.assign(skill, trendingById.get(skill.id) || {});
-    const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id);
+    // No page for a skill without a library address; case twins share the first one's page.
+    const urlPath = skillUrlById.get(skill.id);
+    if (!urlPath) continue;
+    if (generatedPageUrls.has(urlPath)) {
+      generatedSkillUrlById.set(skill.id, urlPath);
+      continue;
+    }
+    generatedPageUrls.add(urlPath);
     const indexDecision = skillIndexDecision(skill, {
       isEditorial: editorialSkillIds.has(skill.id),
       isTrending: trendingById.has(skill.id),
@@ -1861,12 +1878,12 @@ async function main() {
     });
   }
 
-  registerUrl(allUrls, "/skills/", "skills index");
-  allUrls.set("/skills/", { source: "skills index", indexTier: "indexable" });
-  sitemapUrls.set("/skills/", { source: "skills index" });
+  registerUrl(allUrls, "/library/", "library index");
+  allUrls.set("/library/", { source: "library index", indexTier: "indexable" });
+  sitemapUrls.set("/library/", { source: "library index" });
   indexableCount += 1;
   const skillsIndexData = { profileCollections, topicCollections, skills: includedSkills };
-  await writeGeneratedPage("/skills/", {
+  await writeGeneratedPage("/library/", {
     html: renderSkillsIndexPage(skillsIndexData, skillUrlById),
     markdown: renderSkillsIndexMarkdown(skillsIndexData, skillUrlById, profilePathByCreatorHandle),
     includeInGoldBundle: true,
@@ -1880,7 +1897,7 @@ async function main() {
     markdown: renderDevelopersMarkdown(),
   });
   await writeFile(path.join(siteDir, "guide", "index.md"), renderGuideMarkdown());
-  await writeWebLibraryRedirects(profileCollections, generatedSkillUrlById);
+  await writeWebLibraryRedirects(profileCollections, generatedSkillUrlById, buildLegacySkillUrlMap(skills));
   await writeFile(
     path.join(siteDir, catalogSkillUrlsFilename),
     `${JSON.stringify(buildCatalogSkillUrlsAsset(generatedSkillUrlById), null, 2)}\n`,

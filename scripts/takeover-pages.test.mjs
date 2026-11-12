@@ -34,7 +34,7 @@ test("a static page keeps its content and metadata, gains the app, and marks its
   assert.throws(() => appShellTags("<html></html>"), /entry script not found/);
 });
 
-test("the pilot writes only the pilot pages from their static sources", async t => {
+test("the pilot converts only the pilot pages, in place", async t => {
   const out = await mkdtemp(path.join(os.tmpdir(), "takeover-pilot-"));
   t.after(() => rm(out, { recursive: true, force: true }));
   await mkdir(path.join(out, "app"), { recursive: true });
@@ -44,8 +44,10 @@ test("the pilot writes only the pilot pages from their static sources", async t 
     await writeFile(path.join(out, source, "index.html"), page);
   }
   assert.deepEqual(await writeTakeoverPilot(out), takeoverPilotPages.map(p => p.url));
-  for (const { url } of takeoverPilotPages) assert.match(await readFile(path.join(out, url, "index.html"), "utf8"), /id="omgskills-static"/);
-  assert.equal(await readFile(path.join(out, "skills/anthropics/skills/skills/frontend-design/index.html"), "utf8"), page, "source pages unchanged");
+  for (const { url, source } of takeoverPilotPages) {
+    assert.equal(url, source, "pages are converted in place");
+    assert.match(await readFile(path.join(out, url, "index.html"), "utf8"), /id="omgskills-static"/);
+  }
 });
 
 test("pages load the app through the fixed loader, which adds the current stylesheet and entry", () => {
@@ -71,28 +73,24 @@ test("library skill addresses match the app mapping, including reserved owners a
   assert.equal(librarySkillPath("owner/repo:"), null);
 });
 
-test("all pages: every creator page in place, each skill at its /library/ address, case clashes once", async t => {
+test("all pages: the library index, every creator page and every skill page, converted in place", async t => {
   const out = await mkdtemp(path.join(os.tmpdir(), "takeover-all-"));
   t.after(() => rm(out, { recursive: true, force: true }));
   const write = async (dir, html = page) => { await mkdir(path.join(out, dir), { recursive: true }); await writeFile(path.join(out, dir, "index.html"), html); };
   await mkdir(path.join(out, "app"), { recursive: true });
   await writeFile(path.join(out, "app", "index.html"), shell);
-  await write("developers"); await write("library/anthropics"); await write("library/othmanadi");
-  await write("skills/a"); await write("skills/b"); await write("skills/c"); await write("skills/d");
+  await write("developers"); await write("library"); await write("library/anthropics"); await write("library/othmanadi");
+  await write("library/anthropics/skills/skills/frontend-design"); await write("library/othmanadi/planning-with-files/planning-with-files");
+  await write("library/n8n-io/n8n/packages/@n8n/x");
   await writeFile(path.join(out, "catalog-skill-urls.json"), JSON.stringify({ version: 1, skills: {
-    "anthropics/skills:skills/frontend-design": "/skills/a/",
-    "othmanadi/planning-with-files:planning-with-files": "/skills/b/",
-    "OthmanAdi/planning-with-files:planning-with-files": "/skills/c/",
-    "n8n-io/n8n:packages/@n8n/x": "/skills/d/",
-    "abpframework/abp:.claude/skills/abp-angular": "/skills/a/",
+    "anthropics/skills:skills/frontend-design": "/library/anthropics/skills/skills/frontend-design/",
+    "othmanadi/planning-with-files:planning-with-files": "/library/othmanadi/planning-with-files/planning-with-files/",
+    "n8n-io/n8n:packages/@n8n/x": "/library/n8n-io/n8n/packages/%40n8n/x/",
   } }));
-  const { urls, skipped } = await writeTakeover(out, { all: true });
-  assert.deepEqual(urls, ["/developers/", "/library/anthropics/", "/library/othmanadi/",
+  const urls = await writeTakeover(out, { all: true });
+  assert.deepEqual(urls, ["/developers/", "/library/", "/library/anthropics/", "/library/othmanadi/",
     "/library/anthropics/skills/skills/frontend-design/", "/library/othmanadi/planning-with-files/planning-with-files/",
-    "/library/n8n-io/n8n/packages/@n8n/x/", "/library/abpframework/abp/dot-claude/skills/abp-angular/"]);
-  assert.deepEqual(skipped, ["OthmanAdi/planning-with-files:planning-with-files"]);
-  assert.match(await readFile(path.join(out, "library/abpframework/abp/dot-claude/skills/abp-angular/index.html"), "utf8"), /id="omgskills-static"/);
-  assert.match(await readFile(path.join(out, "library/n8n-io/n8n/packages/@n8n/x/index.html"), "utf8"), /id="omgskills-static"/);
+    "/library/n8n-io/n8n/packages/@n8n/x/"]);
+  for (const url of urls) assert.match(await readFile(path.join(out, url, "index.html"), "utf8"), /id="omgskills-static"/, url);
   assert.match(await readFile(path.join(out, "app/takeover.js"), "utf8"), /index-abc\.js/);
-  assert.equal(await readFile(path.join(out, "skills/a/index.html"), "utf8"), page, "source pages unchanged");
 });

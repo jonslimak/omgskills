@@ -11,7 +11,8 @@ export type PublicSkillLink =
   | { kind: "metadata" };
 
 function isGeneratedSkillPath(value: unknown): value is string {
-  return typeof value === "string" && /^\/skills\/[a-z0-9._-]+(?:\/[a-z0-9._-]+)*\/$/.test(value);
+  // Same rule as scripts/web-library-skill-urls.mjs: lower-case /library/ pages (move.md step 3).
+  return typeof value === "string" && /^\/library\/(?:(?:[a-z0-9._~!'()*@:$&+,;=-]|%[0-9A-F]{2})+\/){2,}$/.test(value) && !value.includes("/.");
 }
 
 export function parseCatalogSkillUrlsAsset(value: unknown): Map<string, string> {

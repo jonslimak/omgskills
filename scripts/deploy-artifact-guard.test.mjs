@@ -161,15 +161,15 @@ test("web library verification requires the generated catalog skill URL asset", 
     "library/anthropics/index.md",
     "collections/starter-pack/index.html",
     "collections/starter-pack/index.md",
-    "skills/index.html",
-    "skills/index.md",
+    "library/index.html",
+    "library/index.md",
     "sitemap.xml",
     "robots.txt",
     "agents.md",
     "llms.txt",
     "llms-gold.txt",
-    "skills/example/repo/useful-skill/index.html",
-    "skills/example/repo/useful-skill/index.md",
+    "library/example/repo/useful-skill/index.html",
+    "library/example/repo/useful-skill/index.md",
   ];
   try {
     for (const relativePath of files) {
@@ -181,17 +181,17 @@ test("web library verification requires the generated catalog skill URL asset", 
       JSON.stringify({
         version: 1,
         skills: {
-          "example/repo:useful-skill": "/skills/example/repo/useful-skill/",
+          "example/repo:useful-skill": "/library/example/repo/useful-skill/",
         },
       }),
     );
     await verifyWebLibraryDeployArtifacts(root);
-    await rm(join(root, "skills/example/repo/useful-skill/index.md"));
+    await rm(join(root, "library/example/repo/useful-skill/index.md"));
     await assert.rejects(
       verifyWebLibraryDeployArtifacts(root, "test artifact"),
-      /example\/repo:useful-skill -> skills\/example\/repo\/useful-skill\/index\.md/,
+      /example\/repo:useful-skill -> library\/example\/repo\/useful-skill\/index\.md/,
     );
-    await writeFile(join(root, "skills/example/repo/useful-skill/index.md"), "fixture");
+    await writeFile(join(root, "library/example/repo/useful-skill/index.md"), "fixture");
     await rm(join(root, "catalog-skill-urls.json"));
     await assert.rejects(
       verifyWebLibraryDeployArtifacts(root, "test artifact"),
@@ -209,8 +209,8 @@ test("web library verification rejects invalid or empty catalog skill URL assets
     "library/anthropics/index.md",
     "collections/starter-pack/index.html",
     "collections/starter-pack/index.md",
-    "skills/index.html",
-    "skills/index.md",
+    "library/index.html",
+    "library/index.md",
     "sitemap.xml",
     "robots.txt",
     "agents.md",
@@ -249,8 +249,8 @@ test("web library verification rejects catalog URLs whose generated pages are mi
     "library/anthropics/index.md",
     "collections/starter-pack/index.html",
     "collections/starter-pack/index.md",
-    "skills/index.html",
-    "skills/index.md",
+    "library/index.html",
+    "library/index.md",
     "sitemap.xml",
     "robots.txt",
     "agents.md",
@@ -267,14 +267,14 @@ test("web library verification rejects catalog URLs whose generated pages are mi
       JSON.stringify({
         version: 1,
         skills: {
-          "example/repo:missing-skill": "/skills/example/repo/missing-skill/",
+          "example/repo:missing-skill": "/library/example/repo/missing-skill/",
         },
       }),
     );
 
     await assert.rejects(
       verifyWebLibraryDeployArtifacts(root, "test artifact"),
-      /example\/repo:missing-skill -> skills\/example\/repo\/missing-skill\/index\.html/,
+      /example\/repo:missing-skill -> library\/example\/repo\/missing-skill\/index\.html/,
     );
   } finally {
     await rm(root, { recursive: true, force: true });

@@ -8,19 +8,19 @@ import {
 const paths = parseCatalogSkillUrlsAsset({
   version: 1,
   skills: {
-    "owner/repo": "/skills/owner/repo/",
-    "owner/repo:skills/collision": "/skills/owner/repo/skills/collision--1234abcd/",
+    "owner/repo": "/library/owner/repo/",
+    "owner/repo:skills/.claude/x:y": "/library/owner/repo/skills/dot-claude/x%3Ay/",
   },
 });
 
-test("uses exact generated paths for normal, root, and collision-safe catalog IDs", () => {
+test("uses exact generated paths for normal, root, dot-safe and encoded catalog IDs", () => {
   assert.deepEqual(
     resolvePublicSkillLink({ catalogSkillId: "owner/repo" }, paths),
-    { kind: "skillPage", url: "/skills/owner/repo/" },
+    { kind: "skillPage", url: "/library/owner/repo/" },
   );
   assert.deepEqual(
-    resolvePublicSkillLink({ catalogSkillId: "owner/repo:skills/collision" }, paths),
-    { kind: "skillPage", url: "/skills/owner/repo/skills/collision--1234abcd/" },
+    resolvePublicSkillLink({ catalogSkillId: "owner/repo:skills/.claude/x:y" }, paths),
+    { kind: "skillPage", url: "/library/owner/repo/skills/dot-claude/x%3Ay/" },
   );
 });
 
@@ -61,6 +61,9 @@ test("rejects malformed generated URL assets", () => {
     }),
     /invalid entry/,
   );
+  for (const old of ["/skills/owner/repo/", "/library/owner/", "/library/Owner/repo/", "/library/owner/repo/.claude/x/"]) {
+    assert.throws(() => parseCatalogSkillUrlsAsset({ version: 1, skills: { "owner/repo": old } }), /invalid entry/, old);
+  }
   assert.throws(
     () => parseCatalogSkillUrlsAsset({ version: 2, skills: {} }),
     /invalid shape/,

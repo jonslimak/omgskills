@@ -1,12 +1,16 @@
-// Static-page takeover (urls.md step 2 pilot; move.md step 2 for every page). Switched on by
+// Static-page takeover (urls.md step 2 pilot; move.md steps 2-3 for every page). Switched on by
 // the reviewed production setting takeoverPilotEnabled (config/production-features.json), or
 // locally by PORTAL_TAKEOVER_PILOT=1; PORTAL_TAKEOVER_PILOT=0 forces it off. On its own it adds
 // the app to /developers/, one creator page and one skill page; with takeoverAllPagesEnabled
-// (PORTAL_TAKEOVER_ALL) to every creator page and every generated skill page at its /library/
-// address. The homepage is the static landing page. With the switch off, the output is unchanged.
+// (PORTAL_TAKEOVER_ALL) to the /library/ index, every creator page and every generated skill
+// page. Pages are converted where they are (skill pages live at their /library/ address since
+// move.md step 3). The homepage is the static landing page. With the switch off, the output is
+// unchanged.
 import { access, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { catalogSkillUrlsFilename } from "./web-library-skill-urls.mjs";
+import { catalogSkillUrlsFilename, librarySkillPath, reservedLibraryNames, urlPathToFilePath } from "./web-library-skill-urls.mjs";
+
+export { librarySkillPath, reservedLibraryNames };
 
 export const takeoverPilotEnabled = (env = process.env, features = {}) =>
   env.PORTAL_TAKEOVER_PILOT === "1" || (env.PORTAL_TAKEOVER_PILOT !== "0" && features.takeoverPilotEnabled === true);
@@ -16,28 +20,11 @@ export const takeoverPilotEnabled = (env = process.env, features = {}) =>
 export const takeoverAllPagesEnabled = (env = process.env, features = {}) => takeoverPilotEnabled(env, features)
   && (env.PORTAL_TAKEOVER_ALL === "1" || (env.PORTAL_TAKEOVER_ALL !== "0" && features.takeoverAllPagesEnabled === true));
 
-// Same mapping as the app's catalogSkillPath (portal/src/app/unified/model.ts); a portal test
-// keeps the two in step. `owner/repo:skill/path` -> `/library/owner/repo/skill/path/`.
-export const reservedLibraryNames = new Set(["trending", "companies", "creators", "collections", "data", "categories", "me", "library", "search"]);
-export function librarySkillPath(id) {
-  const segment = value => value && value !== "." && value !== ".." ? encodeURIComponent(value) : null;
-  // Repo and skill-path parts: ".x" -> "dot-x", "dot-x" -> "dot-dot-x" (hosting drops dot-named folders).
-  const dotSafe = value => value.startsWith(".dot-") || value === "." || value === ".." ? null
-    : segment(value.startsWith(".") ? `dot-${value.slice(1)}` : value.startsWith("dot-") ? `dot-${value}` : value);
-  const colon = id.indexOf(":");
-  const [owner = "", repo = "", ...extra] = (colon < 0 ? id : id.slice(0, colon)).split("/");
-  const skill = colon < 0 ? [] : id.slice(colon + 1).split("/");
-  if (extra.length || (colon >= 0 && !id.slice(colon + 1))) return null;
-  const segments = [reservedLibraryNames.has(owner.toLowerCase()) ? null : segment(owner), dotSafe(repo), ...skill.map(dotSafe)];
-  return segments.every(Boolean) ? `/library/${segments.join("/")}/` : null;
-}
-
-// Page URL -> static page it is built from. The skill page keeps its source's canonical
-// (/skills/...) so the new address is not a competing duplicate during the pilot.
+// Page URL -> static page it is built from (the same page, converted in place).
 export const takeoverPilotPages = [
   { url: "/developers/", source: "/developers/" },
   { url: "/library/anthropics/", source: "/library/anthropics/" },
-  { url: "/library/anthropics/skills/skills/frontend-design/", source: "/skills/anthropics/skills/skills/frontend-design/" },
+  { url: "/library/anthropics/skills/skills/frontend-design/", source: "/library/anthropics/skills/skills/frontend-design/" },
 ];
 
 // Keeps the app's CSS reset (Tailwind preflight) from moving the static page before the
@@ -100,48 +87,38 @@ async function exists(file) {
   try { await access(file); return true; } catch { return false; }
 }
 
-/**
- * Every generated skill page also at its /library/ address (canonical stays /skills/...), plus
- * every creator page and /developers/ in place. Addresses that differ only by case are written
- * once (the first in catalog order) so the output is the same on case-insensitive disks.
- */
+/** The /library/ index, every creator page, /developers/ and every generated skill page. */
 export async function takeoverAllPages(outputDir) {
   const pages = [{ url: "/developers/", source: "/developers/" }];
   const library = path.join(outputDir, "library");
+  if (await exists(path.join(library, "index.html"))) pages.push({ url: "/library/", source: "/library/" });
   for (const entry of await readdir(library, { withFileTypes: true })) {
     if (entry.isDirectory() && await exists(path.join(library, entry.name, "index.html"))) {
       pages.push({ url: `/library/${entry.name}/`, source: `/library/${entry.name}/` });
     }
   }
   const { skills } = JSON.parse(await readFile(path.join(outputDir, catalogSkillUrlsFilename), "utf8"));
-  const taken = new Set(pages.map(page => page.url.toLowerCase()));
-  const skipped = [];
-  for (const [id, source] of Object.entries(skills)) {
-    const url = librarySkillPath(id);
-    // Disk paths are decoded; a creator page already lives at /library/<owner>/ (no skill part).
-    const file = url && decodeURIComponent(url);
-    // Addresses are dot-safe; the check stays as a guard (Netlify's deploy drops dot-named folders).
-    if (!url || file.split("/").some(part => part.startsWith(".")) || taken.has(file.toLowerCase())) { skipped.push(id); continue; }
-    taken.add(file.toLowerCase());
-    pages.push({ url: file, source });
+  for (const url of new Set(Object.values(skills))) {
+    const file = urlPathToFilePath(url);
+    pages.push({ url: file, source: file });
   }
-  return { pages, skipped };
+  return pages;
 }
 
 export async function writeTakeover(outputDir, { all = false } = {}) {
   const tags = appShellTags(await readFile(path.join(outputDir, "app", "index.html"), "utf8"));
   await writeFile(path.join(outputDir, takeoverLoaderPath), takeoverLoader(tags));
-  const { pages, skipped } = all ? await takeoverAllPages(outputDir) : { pages: takeoverPilotPages, skipped: [] };
+  const pages = all ? await takeoverAllPages(outputDir) : takeoverPilotPages;
   for (const page of pages) {
     const source = await readFile(path.join(outputDir, page.source, "index.html"), "utf8");
     const target = path.join(outputDir, page.url, "index.html");
     await mkdir(path.dirname(target), { recursive: true });
     await writeFile(target, addTakeover(source));
   }
-  return { urls: pages.map(page => page.url), skipped };
+  return pages.map(page => page.url);
 }
 
 /** The three pilot pages only (kept for the pilot setting on its own). */
 export async function writeTakeoverPilot(outputDir) {
-  return (await writeTakeover(outputDir)).urls;
+  return writeTakeover(outputDir);
 }

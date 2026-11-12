@@ -107,14 +107,7 @@
     Cache-Control = "public, max-age=300, must-revalidate"
 
 [[headers]]
-  for = "/skills/index.md"
-  [headers.values]
-    Content-Type = "text/markdown; charset=utf-8"
-    X-Robots-Tag = "noindex, follow"
-    Cache-Control = "public, max-age=300, must-revalidate"
-
-[[headers]]
-  for = "/skills/*/index.md"
+  for = "/library/index.md"
   [headers.values]
     Content-Type = "text/markdown; charset=utf-8"
     X-Robots-Tag = "noindex, follow"

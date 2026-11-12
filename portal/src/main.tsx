@@ -797,7 +797,7 @@ function SkillGroupsUnavailablePage() {
         <h1>Skill Groups are not available yet</h1>
         <p>Browse the public skill library while we finish preparing this feature.</p>
         <div className="actions">
-          <Button onClick={() => window.location.assign("/skills/")}>Browse skills</Button>
+          <Button onClick={() => window.location.assign("/library/")}>Browse skills</Button>
         </div>
       </section>
     </main>
