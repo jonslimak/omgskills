@@ -1,0 +1,4360 @@
+{
+  "version": 1,
+  "source": "skills.sh",
+  "board": "trending",
+  "fetchedAt": "2026-11-12T00:43:34.615Z",
+  "entries": [
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "ai-video-generation",
+      "name": "ai-video-generation",
+      "rank": 1,
+      "installs24h": 28094,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/ai-video-generation"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "ai-image-generation",
+      "name": "ai-image-generation",
+      "rank": 2,
+      "installs24h": 28074,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/ai-image-generation"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "twitter-automation",
+      "name": "twitter-automation",
+      "rank": 3,
+      "installs24h": 28073,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/twitter-automation"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "ai-avatar-video",
+      "name": "ai-avatar-video",
+      "rank": 4,
+      "installs24h": 28072,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/ai-avatar-video"
+    },
+    {
+      "source": "designed-by-ai/skills",
+      "skillId": "design-mobile-apps",
+      "name": "design-mobile-apps",
+      "rank": 5,
+      "installs24h": 21209,
+      "sourceUrl": "https://skills.sh/designed-by-ai/skills/design-mobile-apps"
+    },
+    {
+      "source": "vercel-labs/agent-browser",
+      "skillId": "agent-browser",
+      "name": "agent-browser",
+      "rank": 6,
+      "installs24h": 17436,
+      "sourceUrl": "https://skills.sh/vercel-labs/agent-browser/agent-browser",
+      "catalogId": "vercel-labs/agent-browser:agent-browser"
+    },
+    {
+      "source": "vercel-labs/skills",
+      "skillId": "find-skills",
+      "name": "find-skills",
+      "rank": 7,
+      "installs24h": 17244,
+      "sourceUrl": "https://skills.sh/vercel-labs/skills/find-skills",
+      "catalogId": "vercel-labs/skills:find-skills"
+    },
+    {
+      "source": "heygen-com/hyperframes",
+      "skillId": "hyperframes-cli",
+      "name": "hyperframes-cli",
+      "rank": 8,
+      "installs24h": 16993,
+      "sourceUrl": "https://skills.sh/heygen-com/hyperframes/hyperframes-cli",
+      "catalogId": "heygen-com/hyperframes:hyperframes-cli"
+    },
+    {
+      "source": "heygen-com/hyperframes",
+      "skillId": "media-use",
+      "name": "media-use",
+      "rank": 9,
+      "installs24h": 16950,
+      "sourceUrl": "https://skills.sh/heygen-com/hyperframes/media-use",
+      "catalogId": "heygen-com/hyperframes:skills/media-use"
+    },
+    {
+      "source": "heygen-com/hyperframes",
+      "skillId": "hyperframes",
+      "name": "hyperframes",
+      "rank": 10,
+      "installs24h": 16943,
+      "sourceUrl": "https://skills.sh/heygen-com/hyperframes/hyperframes",
+      "catalogId": "heygen-com/hyperframes:hyperframes"
+    },
+    {
+      "source": "heygen-com/hyperframes",
+      "skillId": "reverse-any-video",
+      "name": "reverse-any-video",
+      "rank": 11,
+      "installs24h": 16081,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/heygen-com/hyperframes/reverse-any-video",
+      "catalogId": "heygen-com/hyperframes:reverse-any-video"
+    },
+    {
+      "source": "heygen-com/hyperframes",
+      "skillId": "style-sampling",
+      "name": "style-sampling",
+      "rank": 12,
+      "installs24h": 15980,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/heygen-com/hyperframes/style-sampling",
+      "catalogId": "heygen-com/hyperframes:style-sampling"
+    },
+    {
+      "source": "heygen-com/hyperframes",
+      "skillId": "hyperframes-registry",
+      "name": "hyperframes-registry",
+      "rank": 13,
+      "installs24h": 15609,
+      "sourceUrl": "https://skills.sh/heygen-com/hyperframes/hyperframes-registry",
+      "catalogId": "heygen-com/hyperframes:hyperframes-registry"
+    },
+    {
+      "source": "gencraft-labs/skills",
+      "skillId": "ai-image-generation",
+      "name": "ai-image-generation",
+      "rank": 14,
+      "installs24h": 14812,
+      "sourceUrl": "https://skills.sh/gencraft-labs/skills/ai-image-generation"
+    },
+    {
+      "source": "gencraft-labs/skills",
+      "skillId": "ai-video-generation",
+      "name": "ai-video-generation",
+      "rank": 15,
+      "installs24h": 14735,
+      "sourceUrl": "https://skills.sh/gencraft-labs/skills/ai-video-generation"
+    },
+    {
+      "source": "flowkit-labs/skills",
+      "skillId": "reddit-automation",
+      "name": "reddit-automation",
+      "rank": 16,
+      "installs24h": 14709,
+      "sourceUrl": "https://skills.sh/flowkit-labs/skills/reddit-automation"
+    },
+    {
+      "source": "gencraft-labs/skills",
+      "skillId": "image-to-video",
+      "name": "image-to-video",
+      "rank": 17,
+      "installs24h": 14700,
+      "sourceUrl": "https://skills.sh/gencraft-labs/skills/image-to-video"
+    },
+    {
+      "source": "gencraft-labs/skills",
+      "skillId": "ai-music",
+      "name": "ai-music",
+      "rank": 18,
+      "installs24h": 14677,
+      "sourceUrl": "https://skills.sh/gencraft-labs/skills/ai-music"
+    },
+    {
+      "source": "gencraft-labs/skills",
+      "skillId": "video-edit",
+      "name": "video-edit",
+      "rank": 19,
+      "installs24h": 14598,
+      "sourceUrl": "https://skills.sh/gencraft-labs/skills/video-edit"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "microsoft-foundry",
+      "name": "microsoft-foundry",
+      "rank": 20,
+      "installs24h": 9972,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/microsoft-foundry",
+      "catalogId": "microsoft/azure-skills:microsoft-foundry"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-ai",
+      "name": "azure-ai",
+      "rank": 21,
+      "installs24h": 9968,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-ai",
+      "catalogId": "microsoft/azure-skills:azure-ai"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-diagnostics",
+      "name": "azure-diagnostics",
+      "rank": 22,
+      "installs24h": 9967,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-diagnostics",
+      "catalogId": "microsoft/azure-skills:azure-diagnostics"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-prepare",
+      "name": "azure-prepare",
+      "rank": 23,
+      "installs24h": 9964,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-prepare",
+      "catalogId": "microsoft/azure-skills:azure-prepare"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-validate",
+      "name": "azure-validate",
+      "rank": 24,
+      "installs24h": 9963,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-validate",
+      "catalogId": "microsoft/azure-skills:azure-validate"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-deploy",
+      "name": "azure-deploy",
+      "rank": 25,
+      "installs24h": 9962,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-deploy",
+      "catalogId": "microsoft/azure-skills:azure-deploy"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "python-appservice-deploy",
+      "name": "python-appservice-deploy",
+      "rank": 26,
+      "installs24h": 9962,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/python-appservice-deploy",
+      "catalogId": "microsoft/azure-skills:.github/plugins/azure-skills/skills/python-appservice-deploy"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-cloud-migrate",
+      "name": "azure-cloud-migrate",
+      "rank": 27,
+      "installs24h": 9961,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-cloud-migrate",
+      "catalogId": "microsoft/azure-skills:azure-cloud-migrate"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "entra-app-registration",
+      "name": "entra-app-registration",
+      "rank": 28,
+      "installs24h": 9961,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/entra-app-registration",
+      "catalogId": "microsoft/azure-skills:entra-app-registration"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-kubernetes",
+      "name": "azure-kubernetes",
+      "rank": 29,
+      "installs24h": 9961,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-kubernetes",
+      "catalogId": "microsoft/azure-skills:azure-kubernetes"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-compute",
+      "name": "azure-compute",
+      "rank": 30,
+      "installs24h": 9961,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-compute",
+      "catalogId": "microsoft/azure-skills:azure-compute"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-kusto",
+      "name": "azure-kusto",
+      "rank": 31,
+      "installs24h": 9961,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-kusto",
+      "catalogId": "microsoft/azure-skills:azure-kusto"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-storage",
+      "name": "azure-storage",
+      "rank": 32,
+      "installs24h": 9961,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-storage",
+      "catalogId": "microsoft/azure-skills:azure-storage"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-enterprise-infra-planner",
+      "name": "azure-enterprise-infra-planner",
+      "rank": 33,
+      "installs24h": 9960,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-enterprise-infra-planner",
+      "catalogId": "microsoft/azure-skills:azure-enterprise-infra-planner"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "appinsights-instrumentation",
+      "name": "appinsights-instrumentation",
+      "rank": 34,
+      "installs24h": 9960,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/appinsights-instrumentation",
+      "catalogId": "microsoft/azure-skills:appinsights-instrumentation"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-resource-lookup",
+      "name": "azure-resource-lookup",
+      "rank": 35,
+      "installs24h": 9960,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-resource-lookup",
+      "catalogId": "microsoft/azure-skills:azure-resource-lookup"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-reliability",
+      "name": "azure-reliability",
+      "rank": 36,
+      "installs24h": 9960,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-reliability",
+      "catalogId": "microsoft/azure-skills:.github/plugins/azure-skills/skills/azure-reliability"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-upgrade",
+      "name": "azure-upgrade",
+      "rank": 37,
+      "installs24h": 9960,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-upgrade",
+      "catalogId": "microsoft/azure-skills:azure-upgrade"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-resource-visualizer",
+      "name": "azure-resource-visualizer",
+      "rank": 38,
+      "installs24h": 9960,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-resource-visualizer",
+      "catalogId": "microsoft/azure-skills:azure-resource-visualizer"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-messaging",
+      "name": "azure-messaging",
+      "rank": 39,
+      "installs24h": 9960,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-messaging",
+      "catalogId": "microsoft/azure-skills:azure-messaging"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "discover-azure-skills",
+      "name": "discover-azure-skills",
+      "rank": 40,
+      "installs24h": 9959,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/discover-azure-skills",
+      "catalogId": "microsoft/azure-skills:discover-azure-skills"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-aigateway",
+      "name": "azure-aigateway",
+      "rank": 41,
+      "installs24h": 9959,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-aigateway",
+      "catalogId": "microsoft/azure-skills:azure-aigateway"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-app-onboard",
+      "name": "azure-app-onboard",
+      "rank": 42,
+      "installs24h": 9959,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-app-onboard"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "entra-agent-id",
+      "name": "entra-agent-id",
+      "rank": 43,
+      "installs24h": 9959,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/entra-agent-id",
+      "catalogId": "microsoft/azure-skills:entra-agent-id"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-compliance",
+      "name": "azure-compliance",
+      "rank": 44,
+      "installs24h": 9959,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-compliance",
+      "catalogId": "microsoft/azure-skills:azure-compliance"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-quotas",
+      "name": "azure-quotas",
+      "rank": 45,
+      "installs24h": 9959,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-quotas",
+      "catalogId": "microsoft/azure-skills:azure-quotas"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "azure-app-onboard-prereq",
+      "name": "azure-app-onboard-prereq",
+      "rank": 46,
+      "installs24h": 9958,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/azure-app-onboard-prereq"
+    },
+    {
+      "source": "microsoft/azure-skills",
+      "skillId": "airunway-aks-setup",
+      "name": "airunway-aks-setup",
+      "rank": 47,
+      "installs24h": 9958,
+      "sourceUrl": "https://skills.sh/microsoft/azure-skills/airunway-aks-setup",
+      "catalogId": "microsoft/azure-skills:airunway-aks-setup"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "ai-image-generation",
+      "name": "ai-image-generation",
+      "rank": 48,
+      "installs24h": 9692,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/ai-image-generation"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "ai-video-generation",
+      "name": "ai-video-generation",
+      "rank": 49,
+      "installs24h": 9685,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/ai-video-generation"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "twitter-automation",
+      "name": "twitter-automation",
+      "rank": 50,
+      "installs24h": 9684,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/twitter-automation"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "ai-avatar-video",
+      "name": "ai-avatar-video",
+      "rank": 51,
+      "installs24h": 9684,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/ai-avatar-video"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "ai-avatar-video",
+      "name": "ai-avatar-video",
+      "rank": 52,
+      "installs24h": 8961,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/ai-avatar-video"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "ai-image-generation",
+      "name": "ai-image-generation",
+      "rank": 53,
+      "installs24h": 8959,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/ai-image-generation"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "ai-video-generation",
+      "name": "ai-video-generation",
+      "rank": 54,
+      "installs24h": 8959,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/ai-video-generation"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "twitter-automation",
+      "name": "twitter-automation",
+      "rank": 55,
+      "installs24h": 8959,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/twitter-automation"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-best-practices",
+      "name": "remotion-best-practices",
+      "rank": 56,
+      "installs24h": 8180,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-best-practices",
+      "catalogId": "remotion-dev/skills:remotion-best-practices"
+    },
+    {
+      "source": "its-a-skill-issue/superpowers",
+      "skillId": "twitter-automation",
+      "name": "twitter-automation",
+      "rank": 57,
+      "installs24h": 7975,
+      "sourceUrl": "https://skills.sh/its-a-skill-issue/superpowers/twitter-automation"
+    },
+    {
+      "source": "its-a-skill-issue/superpowers",
+      "skillId": "ai-avatar-video",
+      "name": "ai-avatar-video",
+      "rank": 58,
+      "installs24h": 7974,
+      "sourceUrl": "https://skills.sh/its-a-skill-issue/superpowers/ai-avatar-video"
+    },
+    {
+      "source": "its-a-skill-issue/superpowers",
+      "skillId": "ai-video-generation",
+      "name": "ai-video-generation",
+      "rank": 59,
+      "installs24h": 7974,
+      "sourceUrl": "https://skills.sh/its-a-skill-issue/superpowers/ai-video-generation"
+    },
+    {
+      "source": "its-a-skill-issue/superpowers",
+      "skillId": "ai-image-generation",
+      "name": "ai-image-generation",
+      "rank": 60,
+      "installs24h": 7974,
+      "sourceUrl": "https://skills.sh/its-a-skill-issue/superpowers/ai-image-generation"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-render",
+      "name": "remotion-render",
+      "rank": 61,
+      "installs24h": 7589,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-render",
+      "catalogId": "remotion-dev/skills:remotion-render"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-captions",
+      "name": "remotion-captions",
+      "rank": 62,
+      "installs24h": 7580,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-captions",
+      "catalogId": "remotion-dev/skills:remotion-captions"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-create",
+      "name": "remotion-create",
+      "rank": 63,
+      "installs24h": 7524,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-create",
+      "catalogId": "remotion-dev/skills:remotion-create"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-studio",
+      "name": "remotion-studio",
+      "rank": 64,
+      "installs24h": 7450,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-studio",
+      "catalogId": "remotion-dev/skills:remotion-studio"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-markup",
+      "name": "remotion-markup",
+      "rank": 65,
+      "installs24h": 7446,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-markup",
+      "catalogId": "remotion-dev/skills:remotion-markup"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-multimedia",
+      "name": "remotion-multimedia",
+      "rank": 66,
+      "installs24h": 7420,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-multimedia",
+      "catalogId": "remotion-dev/skills:remotion-multimedia"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-docs",
+      "name": "remotion-docs",
+      "rank": 67,
+      "installs24h": 7396,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-docs",
+      "catalogId": "remotion-dev/skills:skills/remotion"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-upgrade",
+      "name": "remotion-upgrade",
+      "rank": 68,
+      "installs24h": 7368,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-upgrade",
+      "catalogId": "remotion-dev/skills:remotion-upgrade"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-interactivity",
+      "name": "remotion-interactivity",
+      "rank": 69,
+      "installs24h": 7363,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-interactivity",
+      "catalogId": "remotion-dev/skills:remotion-interactivity"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-maps",
+      "name": "remotion-maps",
+      "rank": 70,
+      "installs24h": 7350,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-maps",
+      "catalogId": "remotion-dev/skills:remotion-maps"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-license",
+      "name": "remotion-license",
+      "rank": 71,
+      "installs24h": 7350,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-license",
+      "catalogId": "remotion-dev/skills:remotion-license"
+    },
+    {
+      "source": "remotion-dev/skills",
+      "skillId": "remotion-saas",
+      "name": "remotion-saas",
+      "rank": 72,
+      "installs24h": 7333,
+      "sourceUrl": "https://skills.sh/remotion-dev/skills/remotion-saas",
+      "catalogId": "remotion-dev/skills:remotion-saas"
+    },
+    {
+      "source": "heygen-com/hyperframes",
+      "skillId": "remotion-to-hyperframes",
+      "name": "remotion-to-hyperframes",
+      "rank": 73,
+      "installs24h": 6361,
+      "sourceUrl": "https://skills.sh/heygen-com/hyperframes/remotion-to-hyperframes",
+      "catalogId": "heygen-com/hyperframes:website-to-hyperframes"
+    },
+    {
+      "source": "flowkit-labs/skills",
+      "skillId": "website-builder",
+      "name": "website-builder",
+      "rank": 74,
+      "installs24h": 6350,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/flowkit-labs/skills/website-builder",
+      "catalogId": "flowkit-labs/skills:website-builder"
+    },
+    {
+      "source": "heygen-com/hyperframes",
+      "skillId": "slideshow",
+      "name": "slideshow",
+      "rank": 75,
+      "installs24h": 6290,
+      "sourceUrl": "https://skills.sh/heygen-com/hyperframes/slideshow",
+      "catalogId": "heygen-com/hyperframes:slideshow"
+    },
+    {
+      "source": "magentosh/superpowers",
+      "skillId": "ai-image-generation",
+      "name": "ai-image-generation",
+      "rank": 76,
+      "installs24h": 6264,
+      "sourceUrl": "https://skills.sh/magentosh/superpowers/ai-image-generation"
+    },
+    {
+      "source": "magentosh/superpowers",
+      "skillId": "ai-video-generation",
+      "name": "ai-video-generation",
+      "rank": 77,
+      "installs24h": 6253,
+      "sourceUrl": "https://skills.sh/magentosh/superpowers/ai-video-generation"
+    },
+    {
+      "source": "magentosh/superpowers",
+      "skillId": "ai-avatar-video",
+      "name": "ai-avatar-video",
+      "rank": 78,
+      "installs24h": 6249,
+      "sourceUrl": "https://skills.sh/magentosh/superpowers/ai-avatar-video"
+    },
+    {
+      "source": "magentosh/superpowers",
+      "skillId": "twitter-automation",
+      "name": "twitter-automation",
+      "rank": 79,
+      "installs24h": 6249,
+      "sourceUrl": "https://skills.sh/magentosh/superpowers/twitter-automation"
+    },
+    {
+      "source": "heygen-com/hyperframes",
+      "skillId": "figma",
+      "name": "figma",
+      "rank": 80,
+      "installs24h": 6224,
+      "sourceUrl": "https://skills.sh/heygen-com/hyperframes/figma",
+      "catalogId": "heygen-com/hyperframes:figma"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "grill-me",
+      "name": "grill-me",
+      "rank": 81,
+      "installs24h": 6086,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/grill-me",
+      "catalogId": "mattpocock/skills:batch-grill-me"
+    },
+    {
+      "source": "flowkit-labs/skills",
+      "skillId": "doany-website-builder",
+      "name": "doany-website-builder",
+      "rank": 82,
+      "installs24h": 5870,
+      "sourceUrl": "https://skills.sh/flowkit-labs/skills/doany-website-builder",
+      "catalogId": "flowkit-labs/skills:doany-website-builder"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-shared",
+      "name": "lark-shared",
+      "rank": 83,
+      "installs24h": 5843,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-shared"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-doc",
+      "name": "lark-doc",
+      "rank": 84,
+      "installs24h": 5820,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-doc"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-drive",
+      "name": "lark-drive",
+      "rank": 85,
+      "installs24h": 5800,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-drive"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-wiki",
+      "name": "lark-wiki",
+      "rank": 86,
+      "installs24h": 5791,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-wiki"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-sheets",
+      "name": "lark-sheets",
+      "rank": 87,
+      "installs24h": 5770,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-sheets"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-base",
+      "name": "lark-base",
+      "rank": 88,
+      "installs24h": 5770,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-base"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-im",
+      "name": "lark-im",
+      "rank": 89,
+      "installs24h": 5764,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-im"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-contact",
+      "name": "lark-contact",
+      "rank": 90,
+      "installs24h": 5759,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-contact"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-markdown",
+      "name": "lark-markdown",
+      "rank": 91,
+      "installs24h": 5756,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-markdown"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-calendar",
+      "name": "lark-calendar",
+      "rank": 92,
+      "installs24h": 5752,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-calendar"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-approval",
+      "name": "lark-approval",
+      "rank": 93,
+      "installs24h": 5752,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-approval"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-slides",
+      "name": "lark-slides",
+      "rank": 94,
+      "installs24h": 5752,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-slides"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-event",
+      "name": "lark-event",
+      "rank": 95,
+      "installs24h": 5751,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-event"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-whiteboard",
+      "name": "lark-whiteboard",
+      "rank": 96,
+      "installs24h": 5751,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-whiteboard"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-openapi-explorer",
+      "name": "lark-openapi-explorer",
+      "rank": 97,
+      "installs24h": 5751,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-openapi-explorer"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-mail",
+      "name": "lark-mail",
+      "rank": 98,
+      "installs24h": 5750,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-mail"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-task",
+      "name": "lark-task",
+      "rank": 99,
+      "installs24h": 5748,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-task"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-skill-maker",
+      "name": "lark-skill-maker",
+      "rank": 100,
+      "installs24h": 5748,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-skill-maker"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-meeting",
+      "name": "lark-meeting",
+      "rank": 101,
+      "installs24h": 5747,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-meeting"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-apps",
+      "name": "lark-apps",
+      "rank": 102,
+      "installs24h": 5746,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-apps"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-attendance",
+      "name": "lark-attendance",
+      "rank": 103,
+      "installs24h": 5746,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-attendance"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-okr",
+      "name": "lark-okr",
+      "rank": 104,
+      "installs24h": 5746,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-okr"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-workflow-standup-report",
+      "name": "lark-workflow-standup-report",
+      "rank": 105,
+      "installs24h": 5741,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-workflow-standup-report"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-workflow-meeting-summary",
+      "name": "lark-workflow-meeting-summary",
+      "rank": 106,
+      "installs24h": 5739,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-workflow-meeting-summary"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-vc",
+      "name": "lark-vc",
+      "rank": 107,
+      "installs24h": 5596,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-vc"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-minutes",
+      "name": "lark-minutes",
+      "rank": 108,
+      "installs24h": 5594,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-minutes"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-vc-agent",
+      "name": "lark-vc-agent",
+      "rank": 109,
+      "installs24h": 5593,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-vc-agent"
+    },
+    {
+      "source": "open.feishu.cn",
+      "skillId": "lark-note",
+      "name": "lark-note",
+      "rank": 110,
+      "installs24h": 5592,
+      "sourceUrl": "https://skills.sh/open.feishu.cn/lark-note"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "grilling",
+      "name": "grilling",
+      "rank": 111,
+      "installs24h": 5571,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/grilling",
+      "catalogId": "mattpocock/skills:skills/productivity/grilling"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "agent-browser",
+      "name": "agent-browser",
+      "rank": 112,
+      "installs24h": 5482,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/agent-browser"
+    },
+    {
+      "source": "leonxlnx/taste-skill",
+      "skillId": "design-taste-frontend",
+      "name": "design-taste-frontend",
+      "rank": 113,
+      "installs24h": 4880,
+      "sourceUrl": "https://skills.sh/leonxlnx/taste-skill/design-taste-frontend"
+    },
+    {
+      "source": "101-skills/superpowers",
+      "skillId": "ai-video-generation",
+      "name": "ai-video-generation",
+      "rank": 114,
+      "installs24h": 4667,
+      "sourceUrl": "https://skills.sh/101-skills/superpowers/ai-video-generation"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "grill-with-docs",
+      "name": "grill-with-docs",
+      "rank": 115,
+      "installs24h": 4640,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/grill-with-docs",
+      "catalogId": "mattpocock/skills:grill-with-docs"
+    },
+    {
+      "source": "anthropics/skills",
+      "skillId": "frontend-design",
+      "name": "frontend-design",
+      "rank": 116,
+      "installs24h": 4625,
+      "sourceUrl": "https://skills.sh/anthropics/skills/frontend-design",
+      "catalogId": "anthropics/skills:skills/frontend-design"
+    },
+    {
+      "source": "101-skills/superpowers",
+      "skillId": "ai-image-generation",
+      "name": "ai-image-generation",
+      "rank": 117,
+      "installs24h": 4609,
+      "sourceUrl": "https://skills.sh/101-skills/superpowers/ai-image-generation"
+    },
+    {
+      "source": "101-skills/superpowers",
+      "skillId": "ai-avatar-video",
+      "name": "ai-avatar-video",
+      "rank": 118,
+      "installs24h": 4608,
+      "sourceUrl": "https://skills.sh/101-skills/superpowers/ai-avatar-video"
+    },
+    {
+      "source": "101-skills/superpowers",
+      "skillId": "twitter-automation",
+      "name": "twitter-automation",
+      "rank": 119,
+      "installs24h": 4603,
+      "sourceUrl": "https://skills.sh/101-skills/superpowers/twitter-automation"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "domain-modeling",
+      "name": "domain-modeling",
+      "rank": 120,
+      "installs24h": 4514,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/domain-modeling",
+      "catalogId": "mattpocock/skills:skills/engineering/domain-modeling"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "code-review",
+      "name": "code-review",
+      "rank": 121,
+      "installs24h": 4315,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/code-review",
+      "catalogId": "mattpocock/skills:review"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "codebase-design",
+      "name": "codebase-design",
+      "rank": 122,
+      "installs24h": 4292,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/codebase-design",
+      "catalogId": "mattpocock/skills:skills/engineering/codebase-design"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "improve-codebase-architecture",
+      "name": "improve-codebase-architecture",
+      "rank": 123,
+      "installs24h": 4200,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/improve-codebase-architecture",
+      "catalogId": "mattpocock/skills:improve-codebase-architecture"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "tdd",
+      "name": "tdd",
+      "rank": 124,
+      "installs24h": 4180,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/tdd",
+      "catalogId": "mattpocock/skills:tdd"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "diagnosing-bugs",
+      "name": "diagnosing-bugs",
+      "rank": 125,
+      "installs24h": 4131,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/diagnosing-bugs",
+      "catalogId": "mattpocock/skills:skills/engineering/diagnosing-bugs"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "to-spec",
+      "name": "to-spec",
+      "rank": 126,
+      "installs24h": 4095,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/to-spec",
+      "catalogId": "mattpocock/skills:skills/engineering/to-spec"
+    },
+    {
+      "source": "vercel-labs/agent-skills",
+      "skillId": "web-design-guidelines",
+      "name": "web-design-guidelines",
+      "rank": 127,
+      "installs24h": 4062,
+      "sourceUrl": "https://skills.sh/vercel-labs/agent-skills/web-design-guidelines"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "handoff",
+      "name": "handoff",
+      "rank": 128,
+      "installs24h": 4038,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/handoff",
+      "catalogId": "mattpocock/skills:skills/productivity/handoff"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "to-tickets",
+      "name": "to-tickets",
+      "rank": 129,
+      "installs24h": 4035,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/to-tickets",
+      "catalogId": "mattpocock/skills:skills/engineering/to-tickets"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "setup-matt-pocock-skills",
+      "name": "setup-matt-pocock-skills",
+      "rank": 130,
+      "installs24h": 4014,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/setup-matt-pocock-skills",
+      "catalogId": "mattpocock/skills:setup-matt-pocock-skills"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "prototype",
+      "name": "prototype",
+      "rank": 131,
+      "installs24h": 4000,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/prototype",
+      "catalogId": "mattpocock/skills:prototype"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "research",
+      "name": "research",
+      "rank": 132,
+      "installs24h": 3946,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/research",
+      "catalogId": "mattpocock/skills:skills/engineering/research"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "writing-for-agents",
+      "name": "writing-for-agents",
+      "rank": 133,
+      "installs24h": 3883,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/writing-for-agents",
+      "catalogId": "mattpocock/skills:writing-for-agents"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "implement",
+      "name": "implement",
+      "rank": 134,
+      "installs24h": 3862,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/implement",
+      "catalogId": "mattpocock/skills:skills/engineering/implement"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "teach",
+      "name": "teach",
+      "rank": 135,
+      "installs24h": 3859,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/teach",
+      "catalogId": "mattpocock/skills:skills/productivity/teach"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "wayfinder",
+      "name": "wayfinder",
+      "rank": 136,
+      "installs24h": 3830,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/wayfinder",
+      "catalogId": "mattpocock/skills:skills/engineering/wayfinder"
+    },
+    {
+      "source": "google/agents-cli",
+      "skillId": "google-agents-cli-adk-code",
+      "name": "google-agents-cli-adk-code",
+      "rank": 137,
+      "installs24h": 3658,
+      "sourceUrl": "https://skills.sh/google/agents-cli/google-agents-cli-adk-code",
+      "catalogId": "google/agents-cli:google-agents-cli-adk-code"
+    },
+    {
+      "source": "google/agents-cli",
+      "skillId": "google-agents-cli-publish",
+      "name": "google-agents-cli-publish",
+      "rank": 138,
+      "installs24h": 3652,
+      "sourceUrl": "https://skills.sh/google/agents-cli/google-agents-cli-publish",
+      "catalogId": "google/agents-cli:google-agents-cli-publish"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "triage",
+      "name": "triage",
+      "rank": 139,
+      "installs24h": 3651,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/triage",
+      "catalogId": "mattpocock/skills:triage"
+    },
+    {
+      "source": "google/agents-cli",
+      "skillId": "google-agents-cli-deploy",
+      "name": "google-agents-cli-deploy",
+      "rank": 140,
+      "installs24h": 3648,
+      "sourceUrl": "https://skills.sh/google/agents-cli/google-agents-cli-deploy",
+      "catalogId": "google/agents-cli:google-agents-cli-deploy"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "retro",
+      "name": "retro",
+      "rank": 141,
+      "installs24h": 3636,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/retro",
+      "catalogId": "mattpocock/skills:retro"
+    },
+    {
+      "source": "vercel-labs/agent-skills",
+      "skillId": "vercel-react-best-practices",
+      "name": "vercel-react-best-practices",
+      "rank": 142,
+      "installs24h": 3632,
+      "sourceUrl": "https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices"
+    },
+    {
+      "source": "google/agents-cli",
+      "skillId": "google-agents-cli-eval",
+      "name": "google-agents-cli-eval",
+      "rank": 143,
+      "installs24h": 3628,
+      "sourceUrl": "https://skills.sh/google/agents-cli/google-agents-cli-eval",
+      "catalogId": "google/agents-cli:google-agents-cli-eval"
+    },
+    {
+      "source": "google/agents-cli",
+      "skillId": "google-agents-cli-observability",
+      "name": "google-agents-cli-observability",
+      "rank": 144,
+      "installs24h": 3627,
+      "sourceUrl": "https://skills.sh/google/agents-cli/google-agents-cli-observability",
+      "catalogId": "google/agents-cli:google-agents-cli-observability"
+    },
+    {
+      "source": "google/agents-cli",
+      "skillId": "google-agents-cli-workflow",
+      "name": "google-agents-cli-workflow",
+      "rank": 145,
+      "installs24h": 3626,
+      "sourceUrl": "https://skills.sh/google/agents-cli/google-agents-cli-workflow",
+      "catalogId": "google/agents-cli:google-agents-cli-workflow"
+    },
+    {
+      "source": "google/agents-cli",
+      "skillId": "google-agents-cli-scaffold",
+      "name": "google-agents-cli-scaffold",
+      "rank": 146,
+      "installs24h": 3626,
+      "sourceUrl": "https://skills.sh/google/agents-cli/google-agents-cli-scaffold",
+      "catalogId": "google/agents-cli:google-agents-cli-scaffold"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "ask-matt",
+      "name": "ask-matt",
+      "rank": 147,
+      "installs24h": 3549,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/ask-matt",
+      "catalogId": "mattpocock/skills:skills/engineering/ask-matt"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "python-executor",
+      "name": "python-executor",
+      "rank": 148,
+      "installs24h": 3540,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/python-executor"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "web-search",
+      "name": "web-search",
+      "rank": 149,
+      "installs24h": 3527,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/web-search"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "infsh-cli",
+      "name": "infsh-cli",
+      "rank": 150,
+      "installs24h": 3527,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/infsh-cli"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "agent-tools",
+      "name": "agent-tools",
+      "rank": 151,
+      "installs24h": 3527,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/agent-tools"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "remotion-render",
+      "name": "remotion-render",
+      "rank": 152,
+      "installs24h": 3527,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/remotion-render"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "wait-what",
+      "name": "wait-what",
+      "rank": 153,
+      "installs24h": 3520,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/wait-what",
+      "catalogId": "mattpocock/skills:wait-what"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "emil-design-eng",
+      "name": "emil-design-eng",
+      "rank": 154,
+      "installs24h": 3502,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/emil-design-eng",
+      "catalogId": "emilkowalski/skills:emil-design-eng"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "implement-spec",
+      "name": "implement-spec",
+      "rank": 155,
+      "installs24h": 3472,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/implement-spec",
+      "catalogId": "mattpocock/skills:implement-spec"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "to-questionnaire",
+      "name": "to-questionnaire",
+      "rank": 156,
+      "installs24h": 3471,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/to-questionnaire",
+      "catalogId": "mattpocock/skills:skills/productivity/to-questionnaire"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "wizard",
+      "name": "wizard",
+      "rank": 157,
+      "installs24h": 3445,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/wizard",
+      "catalogId": "mattpocock/skills:skills/engineering/wizard"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "pr",
+      "name": "pr",
+      "rank": 158,
+      "installs24h": 3426,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/pr",
+      "catalogId": "mattpocock/skills:pr"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "apple-design",
+      "name": "apple-design",
+      "rank": 159,
+      "installs24h": 3215,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/apple-design",
+      "catalogId": "emilkowalski/skills:apple-design"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "review-animations",
+      "name": "review-animations",
+      "rank": 160,
+      "installs24h": 3066,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/review-animations",
+      "catalogId": "emilkowalski/skills:review-animations"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "animate",
+      "name": "animate",
+      "rank": 161,
+      "installs24h": 3036,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/animate",
+      "catalogId": "emilkowalski/skills:animate"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "improve-animations",
+      "name": "improve-animations",
+      "rank": 162,
+      "installs24h": 2974,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/improve-animations",
+      "catalogId": "emilkowalski/skills:improve-animations"
+    },
+    {
+      "source": "cloudflare/security-audit-skill",
+      "skillId": "security-audit",
+      "name": "security-audit",
+      "rank": 163,
+      "installs24h": 2879,
+      "sourceUrl": "https://skills.sh/cloudflare/security-audit-skill/security-audit",
+      "catalogId": "cloudflare/security-audit-skill:security-audit-skill"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "find-animation-opportunities",
+      "name": "find-animation-opportunities",
+      "rank": 164,
+      "installs24h": 2876,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/find-animation-opportunities",
+      "catalogId": "emilkowalski/skills:find-animation-opportunities"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "animation-performance",
+      "name": "animation-performance",
+      "rank": 165,
+      "installs24h": 2873,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/animation-performance"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "prototype",
+      "name": "prototype",
+      "rank": 166,
+      "installs24h": 2846,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/prototype",
+      "catalogId": "emilkowalski/skills:prototype"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "animation-vocabulary",
+      "name": "animation-vocabulary",
+      "rank": 167,
+      "installs24h": 2838,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/animation-vocabulary",
+      "catalogId": "emilkowalski/skills:animation-vocabulary"
+    },
+    {
+      "source": "higgsfield-ai/skills",
+      "skillId": "higgsfield-generate",
+      "name": "higgsfield-generate",
+      "rank": 168,
+      "installs24h": 2834,
+      "sourceUrl": "https://skills.sh/higgsfield-ai/skills/higgsfield-generate",
+      "catalogId": "higgsfield-ai/skills:higgsfield-generate"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "break-ui",
+      "name": "break-ui",
+      "rank": 169,
+      "installs24h": 2833,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/break-ui"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "pick-ui-library",
+      "name": "pick-ui-library",
+      "rank": 170,
+      "installs24h": 2812,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/pick-ui-library",
+      "catalogId": "emilkowalski/skills:pick-ui-library"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "mobile-native",
+      "name": "mobile-native",
+      "rank": 171,
+      "installs24h": 2791,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/mobile-native",
+      "catalogId": "emilkowalski/skills:mobile-native"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "choreograph",
+      "name": "choreograph",
+      "rank": 172,
+      "installs24h": 2770,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/choreograph",
+      "catalogId": "emilkowalski/skills:choreograph"
+    },
+    {
+      "source": "higgsfield-ai/skills",
+      "skillId": "higgsfield-faceless-video",
+      "name": "higgsfield-faceless-video",
+      "rank": 173,
+      "installs24h": 2741,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/higgsfield-ai/skills/higgsfield-faceless-video",
+      "catalogId": "higgsfield-ai/skills:higgsfield-faceless-video"
+    },
+    {
+      "source": "higgsfield-ai/skills",
+      "skillId": "higgsfield-product-photoshoot",
+      "name": "higgsfield-product-photoshoot",
+      "rank": 174,
+      "installs24h": 2741,
+      "sourceUrl": "https://skills.sh/higgsfield-ai/skills/higgsfield-product-photoshoot",
+      "catalogId": "higgsfield-ai/skills:higgsfield-product-photoshoot"
+    },
+    {
+      "source": "higgsfield-ai/skills",
+      "skillId": "higgsfield-youtube-thumbnail",
+      "name": "higgsfield-youtube-thumbnail",
+      "rank": 175,
+      "installs24h": 2737,
+      "sourceUrl": "https://skills.sh/higgsfield-ai/skills/higgsfield-youtube-thumbnail",
+      "catalogId": "higgsfield-ai/skills:higgsfield-youtube-thumbnail"
+    },
+    {
+      "source": "higgsfield-ai/skills",
+      "skillId": "higgsfield-websites",
+      "name": "higgsfield-websites",
+      "rank": 176,
+      "installs24h": 2728,
+      "sourceUrl": "https://skills.sh/higgsfield-ai/skills/higgsfield-websites",
+      "catalogId": "higgsfield-ai/skills:higgsfield-websites"
+    },
+    {
+      "source": "higgsfield-ai/skills",
+      "skillId": "higgsfield-soul-id",
+      "name": "higgsfield-soul-id",
+      "rank": 177,
+      "installs24h": 2728,
+      "sourceUrl": "https://skills.sh/higgsfield-ai/skills/higgsfield-soul-id",
+      "catalogId": "higgsfield-ai/skills:higgsfield-soul-id"
+    },
+    {
+      "source": "higgsfield-ai/skills",
+      "skillId": "higgsfield-video-explainer",
+      "name": "higgsfield-video-explainer",
+      "rank": 178,
+      "installs24h": 2726,
+      "sourceUrl": "https://skills.sh/higgsfield-ai/skills/higgsfield-video-explainer",
+      "catalogId": "higgsfield-ai/skills:higgsfield-video-explainer"
+    },
+    {
+      "source": "higgsfield-ai/skills",
+      "skillId": "higgsfield-brandkit",
+      "name": "higgsfield-brandkit",
+      "rank": 179,
+      "installs24h": 2721,
+      "sourceUrl": "https://skills.sh/higgsfield-ai/skills/higgsfield-brandkit",
+      "catalogId": "higgsfield-ai/skills:higgsfield-brandkit"
+    },
+    {
+      "source": "higgsfield-ai/skills",
+      "skillId": "higgsfield-marketplace-cards",
+      "name": "higgsfield-marketplace-cards",
+      "rank": 180,
+      "installs24h": 2715,
+      "sourceUrl": "https://skills.sh/higgsfield-ai/skills/higgsfield-marketplace-cards",
+      "catalogId": "higgsfield-ai/skills:higgsfield-marketplace-cards"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "gestures",
+      "name": "gestures",
+      "rank": 181,
+      "installs24h": 2708,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/gestures",
+      "catalogId": "emilkowalski/skills:gestures"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "remove-animations",
+      "name": "remove-animations",
+      "rank": 182,
+      "installs24h": 2694,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/remove-animations",
+      "catalogId": "emilkowalski/skills:remove-animations"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "ask-sonner",
+      "name": "ask-sonner",
+      "rank": 183,
+      "installs24h": 2586,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/ask-sonner",
+      "catalogId": "emilkowalski/skills:ask-sonner"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "animate-expo",
+      "name": "animate-expo",
+      "rank": 184,
+      "installs24h": 2573,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/animate-expo",
+      "catalogId": "emilkowalski/skills:animate-expo"
+    },
+    {
+      "source": "googlechrome/modern-web-guidance",
+      "skillId": "modern-web-guidance",
+      "name": "modern-web-guidance",
+      "rank": 185,
+      "installs24h": 2557,
+      "sourceUrl": "https://skills.sh/googlechrome/modern-web-guidance/modern-web-guidance",
+      "catalogId": "googlechrome/modern-web-guidance:modern-web-guidance"
+    },
+    {
+      "source": "emilkowalski/skills",
+      "skillId": "write-swift",
+      "name": "write-swift",
+      "rank": 186,
+      "installs24h": 2525,
+      "sourceUrl": "https://skills.sh/emilkowalski/skills/write-swift",
+      "catalogId": "emilkowalski/skills:write-swift"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "setup-pre-commit",
+      "name": "setup-pre-commit",
+      "rank": 187,
+      "installs24h": 2452,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/setup-pre-commit",
+      "catalogId": "mattpocock/skills:setup-pre-commit"
+    },
+    {
+      "source": "pbakaus/impeccable",
+      "skillId": "impeccable",
+      "name": "impeccable",
+      "rank": 188,
+      "installs24h": 2447,
+      "sourceUrl": "https://skills.sh/pbakaus/impeccable/impeccable",
+      "catalogId": "pbakaus/impeccable:impeccable"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "git-guardrails-claude-code",
+      "name": "git-guardrails-claude-code",
+      "rank": 189,
+      "installs24h": 2446,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/git-guardrails-claude-code",
+      "catalogId": "mattpocock/skills:git-guardrails-claude-code"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "chief-of-staff",
+      "name": "chief-of-staff",
+      "rank": 190,
+      "installs24h": 2438,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/chief-of-staff"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "claude-handoff",
+      "name": "claude-handoff",
+      "rank": 191,
+      "installs24h": 2436,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/claude-handoff",
+      "catalogId": "mattpocock/skills:claude-handoff"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "loop-me",
+      "name": "loop-me",
+      "rank": 192,
+      "installs24h": 2420,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/loop-me",
+      "catalogId": "mattpocock/skills:skills/in-progress/loop-me"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "writing-shape",
+      "name": "writing-shape",
+      "rank": 193,
+      "installs24h": 2419,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/writing-shape",
+      "catalogId": "mattpocock/skills:skills/in-progress/writing-shape"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "writing-beats",
+      "name": "writing-beats",
+      "rank": 194,
+      "installs24h": 2412,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/writing-beats",
+      "catalogId": "mattpocock/skills:skills/in-progress/writing-beats"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "writing-fragments",
+      "name": "writing-fragments",
+      "rank": 195,
+      "installs24h": 2404,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/writing-fragments",
+      "catalogId": "mattpocock/skills:skills/in-progress/writing-fragments"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "scaffold-exercises",
+      "name": "scaffold-exercises",
+      "rank": 196,
+      "installs24h": 2398,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/scaffold-exercises",
+      "catalogId": "mattpocock/skills:scaffold-exercises"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "migrate-to-shoehorn",
+      "name": "migrate-to-shoehorn",
+      "rank": 197,
+      "installs24h": 2391,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/migrate-to-shoehorn",
+      "catalogId": "mattpocock/skills:migrate-to-shoehorn"
+    },
+    {
+      "source": "mattpocock/skills",
+      "skillId": "setup-ts-deep-modules",
+      "name": "setup-ts-deep-modules",
+      "rank": 198,
+      "installs24h": 2383,
+      "sourceUrl": "https://skills.sh/mattpocock/skills/setup-ts-deep-modules",
+      "catalogId": "mattpocock/skills:setup-ts-deep-modules"
+    },
+    {
+      "source": "vercel-labs/agent-skills",
+      "skillId": "vercel-composition-patterns",
+      "name": "vercel-composition-patterns",
+      "rank": 199,
+      "installs24h": 2029,
+      "sourceUrl": "https://skills.sh/vercel-labs/agent-skills/vercel-composition-patterns"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman",
+      "name": "caveman",
+      "rank": 200,
+      "installs24h": 2027,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman",
+      "catalogId": "juliusbrussee/caveman:caveman"
+    },
+    {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "skillId": "ui-ux-pro-max",
+      "name": "ui-ux-pro-max",
+      "rank": 201,
+      "installs24h": 1882,
+      "sourceUrl": "https://skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max",
+      "catalogId": "nextlevelbuilder/ui-ux-pro-max-skill:ui-ux-pro-max-skill"
+    },
+    {
+      "source": "prisma/skills",
+      "skillId": "prisma-client-api",
+      "name": "prisma-client-api",
+      "rank": 202,
+      "installs24h": 1835,
+      "sourceUrl": "https://skills.sh/prisma/skills/prisma-client-api",
+      "catalogId": "prisma/skills:prisma-client-api"
+    },
+    {
+      "source": "prisma/skills",
+      "skillId": "prisma-cli",
+      "name": "prisma-cli",
+      "rank": 203,
+      "installs24h": 1826,
+      "sourceUrl": "https://skills.sh/prisma/skills/prisma-cli",
+      "catalogId": "prisma/skills:prisma-cli"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "competitor-teardown",
+      "name": "competitor-teardown",
+      "rank": 204,
+      "installs24h": 1818,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/competitor-teardown"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "landing-page-design",
+      "name": "landing-page-design",
+      "rank": 205,
+      "installs24h": 1818,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/landing-page-design"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "storyboard-creation",
+      "name": "storyboard-creation",
+      "rank": 206,
+      "installs24h": 1817,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/storyboard-creation"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "app-store-screenshots",
+      "name": "app-store-screenshots",
+      "rank": 207,
+      "installs24h": 1817,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/app-store-screenshots"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "youtube-thumbnail-design",
+      "name": "youtube-thumbnail-design",
+      "rank": 208,
+      "installs24h": 1817,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/youtube-thumbnail-design"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "video-ad-specs",
+      "name": "video-ad-specs",
+      "rank": 209,
+      "installs24h": 1817,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/video-ad-specs"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "character-design-sheet",
+      "name": "character-design-sheet",
+      "rank": 210,
+      "installs24h": 1817,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/character-design-sheet"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "image-to-video",
+      "name": "image-to-video",
+      "rank": 211,
+      "installs24h": 1817,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/image-to-video"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "product-photography",
+      "name": "product-photography",
+      "rank": 212,
+      "installs24h": 1817,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/product-photography"
+    },
+    {
+      "source": "bankai-skills/superpowers",
+      "skillId": "product-hunt-launch",
+      "name": "product-hunt-launch",
+      "rank": 213,
+      "installs24h": 1817,
+      "sourceUrl": "https://skills.sh/bankai-skills/superpowers/product-hunt-launch"
+    },
+    {
+      "source": "prisma/skills",
+      "skillId": "prisma-orm-setup",
+      "name": "prisma-orm-setup",
+      "rank": 214,
+      "installs24h": 1811,
+      "sourceUrl": "https://skills.sh/prisma/skills/prisma-orm-setup",
+      "catalogId": "prisma/skills:prisma-orm-setup"
+    },
+    {
+      "source": "prisma/skills",
+      "skillId": "prisma-postgres-setup",
+      "name": "prisma-postgres-setup",
+      "rank": 215,
+      "installs24h": 1799,
+      "sourceUrl": "https://skills.sh/prisma/skills/prisma-postgres-setup",
+      "catalogId": "prisma/skills:prisma-postgres-setup"
+    },
+    {
+      "source": "prisma/skills",
+      "skillId": "prisma-database-setup",
+      "name": "prisma-database-setup",
+      "rank": 216,
+      "installs24h": 1798,
+      "sourceUrl": "https://skills.sh/prisma/skills/prisma-database-setup",
+      "catalogId": "prisma/skills:prisma-database-setup"
+    },
+    {
+      "source": "prisma/skills",
+      "skillId": "prisma-postgres",
+      "name": "prisma-postgres",
+      "rank": 217,
+      "installs24h": 1796,
+      "sourceUrl": "https://skills.sh/prisma/skills/prisma-postgres",
+      "catalogId": "prisma/skills:prisma-postgres"
+    },
+    {
+      "source": "prisma/skills",
+      "skillId": "prisma-driver-adapter-implementation",
+      "name": "prisma-driver-adapter-implementation",
+      "rank": 218,
+      "installs24h": 1795,
+      "sourceUrl": "https://skills.sh/prisma/skills/prisma-driver-adapter-implementation",
+      "catalogId": "prisma/skills:prisma-driver-adapter-implementation"
+    },
+    {
+      "source": "prisma/skills",
+      "skillId": "prisma-upgrade-v7",
+      "name": "prisma-upgrade-v7",
+      "rank": 219,
+      "installs24h": 1794,
+      "sourceUrl": "https://skills.sh/prisma/skills/prisma-upgrade-v7",
+      "catalogId": "prisma/skills:prisma-upgrade-v7"
+    },
+    {
+      "source": "prisma/skills",
+      "skillId": "prisma-compute",
+      "name": "prisma-compute",
+      "rank": 220,
+      "installs24h": 1792,
+      "sourceUrl": "https://skills.sh/prisma/skills/prisma-compute",
+      "catalogId": "prisma/skills:prisma-compute"
+    },
+    {
+      "source": "prisma/skills",
+      "skillId": "prisma-postgres-upgrade",
+      "name": "prisma-postgres-upgrade",
+      "rank": 221,
+      "installs24h": 1786,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/prisma/skills/prisma-postgres-upgrade",
+      "catalogId": "prisma/skills:prisma-postgres-upgrade"
+    },
+    {
+      "source": "prisma/skills",
+      "skillId": "prisma-mongodb-upgrade",
+      "name": "prisma-mongodb-upgrade",
+      "rank": 222,
+      "installs24h": 1785,
+      "sourceUrl": "https://skills.sh/prisma/skills/prisma-mongodb-upgrade",
+      "catalogId": "prisma/skills:prisma-mongodb-upgrade"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "agent-browser",
+      "name": "agent-browser",
+      "rank": 223,
+      "installs24h": 1776,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/agent-browser"
+    },
+    {
+      "source": "nutlope/hallmark",
+      "skillId": "hallmark",
+      "name": "hallmark",
+      "rank": 224,
+      "installs24h": 1701,
+      "sourceUrl": "https://skills.sh/nutlope/hallmark/hallmark",
+      "catalogId": "nutlope/hallmark:hallmark"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "agent-browser",
+      "name": "agent-browser",
+      "rank": 225,
+      "installs24h": 1679,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/agent-browser"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "systematic-debugging",
+      "name": "systematic-debugging",
+      "rank": 226,
+      "installs24h": 1565,
+      "sourceUrl": "https://skills.sh/obra/superpowers/systematic-debugging",
+      "catalogId": "obra/superpowers:systematic-debugging"
+    },
+    {
+      "source": "wind-alice/alicemarket",
+      "skillId": "wind-mcp-skill",
+      "name": "wind-mcp-skill",
+      "rank": 227,
+      "installs24h": 1512,
+      "sourceUrl": "https://skills.sh/wind-alice/alicemarket/wind-mcp-skill",
+      "catalogId": "wind-alice/alicemarket:wind-mcp-skill"
+    },
+    {
+      "source": "its-a-skill-issue/superpowers",
+      "skillId": "agent-browser",
+      "name": "agent-browser",
+      "rank": 228,
+      "installs24h": 1469,
+      "sourceUrl": "https://skills.sh/its-a-skill-issue/superpowers/agent-browser"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "verification-before-completion",
+      "name": "verification-before-completion",
+      "rank": 229,
+      "installs24h": 1465,
+      "sourceUrl": "https://skills.sh/obra/superpowers/verification-before-completion",
+      "catalogId": "obra/superpowers:verification-before-completion"
+    },
+    {
+      "source": "shadcn-ui/ui",
+      "skillId": "shadcn",
+      "name": "shadcn",
+      "rank": 230,
+      "installs24h": 1463,
+      "sourceUrl": "https://skills.sh/shadcn-ui/ui/shadcn",
+      "catalogId": "shadcn-ui/ui:shadcn"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-compress",
+      "name": "caveman-compress",
+      "rank": 231,
+      "installs24h": 1405,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-compress",
+      "catalogId": "juliusbrussee/caveman:compress"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-stats",
+      "name": "caveman-stats",
+      "rank": 233,
+      "installs24h": 1349,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-stats",
+      "catalogId": "juliusbrussee/caveman:caveman-stats"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "remotion-render",
+      "name": "remotion-render",
+      "rank": 234,
+      "installs24h": 1281,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/remotion-render"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "web-search",
+      "name": "web-search",
+      "rank": 235,
+      "installs24h": 1281,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/web-search"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "infsh-cli",
+      "name": "infsh-cli",
+      "rank": 236,
+      "installs24h": 1281,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/infsh-cli"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "agent-tools",
+      "name": "agent-tools",
+      "rank": 237,
+      "installs24h": 1281,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/agent-tools"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "python-executor",
+      "name": "python-executor",
+      "rank": 238,
+      "installs24h": 1281,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/python-executor"
+    },
+    {
+      "source": "dietrichgebert/ponytail",
+      "skillId": "ponytail",
+      "name": "ponytail",
+      "rank": 239,
+      "installs24h": 1230,
+      "sourceUrl": "https://skills.sh/dietrichgebert/ponytail/ponytail",
+      "catalogId": "dietrichgebert/ponytail:ponytail"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-commit",
+      "name": "caveman-commit",
+      "rank": 240,
+      "installs24h": 1227,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-commit",
+      "catalogId": "juliusbrussee/caveman:caveman-commit"
+    },
+    {
+      "source": "autonnel/autonnel-skills",
+      "skillId": "landing-page-conversion-audit",
+      "name": "landing-page-conversion-audit",
+      "rank": 241,
+      "installs24h": 1217,
+      "sourceUrl": "https://skills.sh/autonnel/autonnel-skills/landing-page-conversion-audit",
+      "catalogId": "autonnel/autonnel-skills:landing-page-conversion-audit"
+    },
+    {
+      "source": "mastra-ai/skills",
+      "skillId": "mastra",
+      "name": "mastra",
+      "rank": 242,
+      "installs24h": 1217,
+      "sourceUrl": "https://skills.sh/mastra-ai/skills/mastra",
+      "catalogId": "mastra-ai/skills:mastra"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-review",
+      "name": "caveman-review",
+      "rank": 243,
+      "installs24h": 1215,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-review",
+      "catalogId": "juliusbrussee/caveman:caveman-review"
+    },
+    {
+      "source": "autonnel/autonnel-skills",
+      "skillId": "self-hosted-funnel-launch",
+      "name": "self-hosted-funnel-launch",
+      "rank": 244,
+      "installs24h": 1213,
+      "sourceUrl": "https://skills.sh/autonnel/autonnel-skills/self-hosted-funnel-launch",
+      "catalogId": "autonnel/autonnel-skills:self-hosted-funnel-launch"
+    },
+    {
+      "source": "magentosh/superpowers",
+      "skillId": "agent-browser",
+      "name": "agent-browser",
+      "rank": 245,
+      "installs24h": 1212,
+      "sourceUrl": "https://skills.sh/magentosh/superpowers/agent-browser"
+    },
+    {
+      "source": "antibrow/anti-detect-browser-skills",
+      "skillId": "multi-account-isolation",
+      "name": "multi-account-isolation",
+      "rank": 246,
+      "installs24h": 1204,
+      "sourceUrl": "https://skills.sh/antibrow/anti-detect-browser-skills/multi-account-isolation"
+    },
+    {
+      "source": "autonnel/autonnel-skills",
+      "skillId": "funnel-platform-picker",
+      "name": "funnel-platform-picker",
+      "rank": 247,
+      "installs24h": 1204,
+      "sourceUrl": "https://skills.sh/autonnel/autonnel-skills/funnel-platform-picker",
+      "catalogId": "autonnel/autonnel-skills:funnel-platform-picker"
+    },
+    {
+      "source": "antibrow/anti-detect-browser-skills",
+      "skillId": "browser-mcp-agent",
+      "name": "browser-mcp-agent",
+      "rank": 248,
+      "installs24h": 1203,
+      "sourceUrl": "https://skills.sh/antibrow/anti-detect-browser-skills/browser-mcp-agent"
+    },
+    {
+      "source": "autonnel/autonnel-skills",
+      "skillId": "server-side-conversion-tracking",
+      "name": "server-side-conversion-tracking",
+      "rank": 249,
+      "installs24h": 1202,
+      "sourceUrl": "https://skills.sh/autonnel/autonnel-skills/server-side-conversion-tracking",
+      "catalogId": "autonnel/autonnel-skills:server-side-conversion-tracking"
+    },
+    {
+      "source": "autonnel/autonnel-skills",
+      "skillId": "sales-funnel-blueprint",
+      "name": "sales-funnel-blueprint",
+      "rank": 250,
+      "installs24h": 1201,
+      "sourceUrl": "https://skills.sh/autonnel/autonnel-skills/sales-funnel-blueprint",
+      "catalogId": "autonnel/autonnel-skills:sales-funnel-blueprint"
+    },
+    {
+      "source": "antibrow/anti-detect-browser-skills",
+      "skillId": "anti-detect-browser",
+      "name": "anti-detect-browser",
+      "rank": 251,
+      "installs24h": 1197,
+      "sourceUrl": "https://skills.sh/antibrow/anti-detect-browser-skills/anti-detect-browser",
+      "catalogId": "antibrow/anti-detect-browser-skills:anti-detect-browser"
+    },
+    {
+      "source": "autonnel/autonnel-skills",
+      "skillId": "post-purchase-upsell-flow",
+      "name": "post-purchase-upsell-flow",
+      "rank": 252,
+      "installs24h": 1195,
+      "sourceUrl": "https://skills.sh/autonnel/autonnel-skills/post-purchase-upsell-flow",
+      "catalogId": "autonnel/autonnel-skills:post-purchase-upsell-flow"
+    },
+    {
+      "source": "mcollina/skills",
+      "skillId": "fastify-best-practices",
+      "name": "fastify-best-practices",
+      "rank": 253,
+      "installs24h": 1184,
+      "sourceUrl": "https://skills.sh/mcollina/skills/fastify-best-practices"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "ultracave",
+      "name": "ultracave",
+      "rank": 254,
+      "installs24h": 1182,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/ultracave",
+      "catalogId": "juliusbrussee/caveman:ultracave"
+    },
+    {
+      "source": "vercel-labs/agent-skills",
+      "skillId": "vercel-react-view-transitions",
+      "name": "vercel-react-view-transitions",
+      "rank": 255,
+      "installs24h": 1181,
+      "sourceUrl": "https://skills.sh/vercel-labs/agent-skills/vercel-react-view-transitions"
+    },
+    {
+      "source": "spillwavesolutions/design-doc-mermaid",
+      "skillId": "design-doc-mermaid",
+      "name": "design-doc-mermaid",
+      "rank": 256,
+      "installs24h": 1177,
+      "sourceUrl": "https://skills.sh/spillwavesolutions/design-doc-mermaid/design-doc-mermaid",
+      "catalogId": "spillwavesolutions/design-doc-mermaid:design-doc-mermaid"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-help",
+      "name": "caveman-help",
+      "rank": 257,
+      "installs24h": 1177,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-help",
+      "catalogId": "juliusbrussee/caveman:caveman-help"
+    },
+    {
+      "source": "vercel-labs/agent-skills",
+      "skillId": "deploy-to-vercel",
+      "name": "deploy-to-vercel",
+      "rank": 258,
+      "installs24h": 1174,
+      "sourceUrl": "https://skills.sh/vercel-labs/agent-skills/deploy-to-vercel",
+      "catalogId": "vercel-labs/claude-skills:deploy-to-vercel"
+    },
+    {
+      "source": "liarjsdev/liarjs-skills",
+      "skillId": "playwright-stealth-verify",
+      "name": "playwright-stealth-verify",
+      "rank": 259,
+      "installs24h": 1168,
+      "sourceUrl": "https://skills.sh/liarjsdev/liarjs-skills/playwright-stealth-verify"
+    },
+    {
+      "source": "liarjsdev/liarjs-skills",
+      "skillId": "fingerprint-ci-gate",
+      "name": "fingerprint-ci-gate",
+      "rank": 260,
+      "installs24h": 1163,
+      "sourceUrl": "https://skills.sh/liarjsdev/liarjs-skills/fingerprint-ci-gate"
+    },
+    {
+      "source": "nrwl/nx-ai-agents-config",
+      "skillId": "nx-workspace",
+      "name": "nx-workspace",
+      "rank": 261,
+      "installs24h": 1162,
+      "sourceUrl": "https://skills.sh/nrwl/nx-ai-agents-config/nx-workspace"
+    },
+    {
+      "source": "liarjsdev/liarjs-skills",
+      "skillId": "fingerprint-failure-triage",
+      "name": "fingerprint-failure-triage",
+      "rank": 262,
+      "installs24h": 1162,
+      "sourceUrl": "https://skills.sh/liarjsdev/liarjs-skills/fingerprint-failure-triage"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "cavecrew",
+      "name": "cavecrew",
+      "rank": 263,
+      "installs24h": 1160,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/cavecrew",
+      "catalogId": "juliusbrussee/caveman:cavecrew"
+    },
+    {
+      "source": "vercel-labs/agent-skills",
+      "skillId": "vercel-react-native-skills",
+      "name": "vercel-react-native-skills",
+      "rank": 264,
+      "installs24h": 1157,
+      "sourceUrl": "https://skills.sh/vercel-labs/agent-skills/vercel-react-native-skills"
+    },
+    {
+      "source": "liarjsdev/liarjs-skills",
+      "skillId": "browser-fingerprint-audit",
+      "name": "browser-fingerprint-audit",
+      "rank": 265,
+      "installs24h": 1157,
+      "sourceUrl": "https://skills.sh/liarjsdev/liarjs-skills/browser-fingerprint-audit"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "lean-build",
+      "name": "lean-build",
+      "rank": 266,
+      "installs24h": 1155,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/lean-build",
+      "catalogId": "juliusbrussee/caveman:lean-build"
+    },
+    {
+      "source": "amplitude/mcp-marketplace",
+      "skillId": "discover-analytics-patterns",
+      "name": "discover-analytics-patterns",
+      "rank": 267,
+      "installs24h": 1154,
+      "sourceUrl": "https://skills.sh/amplitude/mcp-marketplace/discover-analytics-patterns",
+      "catalogId": "amplitude/mcp-marketplace:plugins/amplitude/skills/discover-analytics-patterns"
+    },
+    {
+      "source": "amplitude/mcp-marketplace",
+      "skillId": "discover-event-surfaces",
+      "name": "discover-event-surfaces",
+      "rank": 268,
+      "installs24h": 1154,
+      "sourceUrl": "https://skills.sh/amplitude/mcp-marketplace/discover-event-surfaces",
+      "catalogId": "amplitude/mcp-marketplace:plugins/amplitude/skills/discover-event-surfaces"
+    },
+    {
+      "source": "amplitude/mcp-marketplace",
+      "skillId": "diff-intake",
+      "name": "diff-intake",
+      "rank": 269,
+      "installs24h": 1154,
+      "sourceUrl": "https://skills.sh/amplitude/mcp-marketplace/diff-intake",
+      "catalogId": "amplitude/mcp-marketplace:plugins/amplitude/skills/diff-intake"
+    },
+    {
+      "source": "amplitude/mcp-marketplace",
+      "skillId": "instrument-events",
+      "name": "instrument-events",
+      "rank": 270,
+      "installs24h": 1154,
+      "sourceUrl": "https://skills.sh/amplitude/mcp-marketplace/instrument-events",
+      "catalogId": "amplitude/mcp-marketplace:plugins/amplitude/skills/instrument-events"
+    },
+    {
+      "source": "amplitude/mcp-marketplace",
+      "skillId": "taxonomy",
+      "name": "taxonomy",
+      "rank": 271,
+      "installs24h": 1153,
+      "sourceUrl": "https://skills.sh/amplitude/mcp-marketplace/taxonomy",
+      "catalogId": "amplitude/mcp-marketplace:plugins/amplitude/skills/taxonomy"
+    },
+    {
+      "source": "amplitude/mcp-marketplace",
+      "skillId": "add-analytics-instrumentation",
+      "name": "add-analytics-instrumentation",
+      "rank": 272,
+      "installs24h": 1153,
+      "sourceUrl": "https://skills.sh/amplitude/mcp-marketplace/add-analytics-instrumentation",
+      "catalogId": "amplitude/mcp-marketplace:plugins/amplitude/skills/add-analytics-instrumentation"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "safe-refactor",
+      "name": "safe-refactor",
+      "rank": 273,
+      "installs24h": 1153,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/safe-refactor",
+      "catalogId": "juliusbrussee/caveman:safe-refactor"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-explore",
+      "name": "caveman-explore",
+      "rank": 274,
+      "installs24h": 1146,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-explore",
+      "catalogId": "juliusbrussee/caveman:caveman-explore"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "megacave",
+      "name": "megacave",
+      "rank": 275,
+      "installs24h": 1146,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/megacave",
+      "catalogId": "juliusbrussee/caveman:megacave"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "verify-and-stop",
+      "name": "verify-and-stop",
+      "rank": 276,
+      "installs24h": 1143,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/verify-and-stop",
+      "catalogId": "juliusbrussee/caveman:verify-and-stop"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "investigate-first",
+      "name": "investigate-first",
+      "rank": 277,
+      "installs24h": 1141,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/investigate-first",
+      "catalogId": "juliusbrussee/caveman:investigate-first"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-optimize",
+      "name": "caveman-optimize",
+      "rank": 278,
+      "installs24h": 1139,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-optimize",
+      "catalogId": "juliusbrussee/caveman:caveman-optimize"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "surgical-patch",
+      "name": "surgical-patch",
+      "rank": 279,
+      "installs24h": 1139,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/surgical-patch",
+      "catalogId": "juliusbrussee/caveman:surgical-patch"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-learn",
+      "name": "caveman-learn",
+      "rank": 280,
+      "installs24h": 1138,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-learn",
+      "catalogId": "juliusbrussee/caveman:caveman-learn"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "migration",
+      "name": "migration",
+      "rank": 281,
+      "installs24h": 1133,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/migration",
+      "catalogId": "juliusbrussee/caveman:migration"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-setup",
+      "name": "caveman-setup",
+      "rank": 282,
+      "installs24h": 1133,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-setup",
+      "catalogId": "juliusbrussee/caveman:caveman-setup"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-discover",
+      "name": "caveman-discover",
+      "rank": 283,
+      "installs24h": 1132,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-discover",
+      "catalogId": "juliusbrussee/caveman:caveman-discover"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-evidence-review",
+      "name": "caveman-evidence-review",
+      "rank": 284,
+      "installs24h": 1131,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-evidence-review",
+      "catalogId": "juliusbrussee/caveman:caveman-evidence-review"
+    },
+    {
+      "source": "juliusbrussee/caveman",
+      "skillId": "caveman-manage",
+      "name": "caveman-manage",
+      "rank": 285,
+      "installs24h": 1128,
+      "sourceUrl": "https://skills.sh/juliusbrussee/caveman/caveman-manage",
+      "catalogId": "juliusbrussee/caveman:caveman-manage"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "brainstorming",
+      "name": "brainstorming",
+      "rank": 286,
+      "installs24h": 1126,
+      "sourceUrl": "https://skills.sh/obra/superpowers/brainstorming",
+      "catalogId": "obra/superpowers:brainstorming"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "web-search",
+      "name": "web-search",
+      "rank": 287,
+      "installs24h": 1081,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/web-search"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "python-executor",
+      "name": "python-executor",
+      "rank": 288,
+      "installs24h": 1081,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/python-executor"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "agent-tools",
+      "name": "agent-tools",
+      "rank": 289,
+      "installs24h": 1081,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/agent-tools"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "remotion-render",
+      "name": "remotion-render",
+      "rank": 290,
+      "installs24h": 1081,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/remotion-render"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "infsh-cli",
+      "name": "infsh-cli",
+      "rank": 291,
+      "installs24h": 1081,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/infsh-cli"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "copywriting",
+      "name": "copywriting",
+      "rank": 292,
+      "installs24h": 1080,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/copywriting",
+      "catalogId": "coreyhaines31/marketingskills:skills/copywriting"
+    },
+    {
+      "source": "vercel-labs/agent-skills",
+      "skillId": "writing-guidelines",
+      "name": "writing-guidelines",
+      "rank": 293,
+      "installs24h": 1069,
+      "sourceUrl": "https://skills.sh/vercel-labs/agent-skills/writing-guidelines",
+      "catalogId": "vercel-labs/agent-skills:skills/writing-guidelines"
+    },
+    {
+      "source": "vercel-labs/agent-skills",
+      "skillId": "vercel-optimize",
+      "name": "vercel-optimize",
+      "rank": 294,
+      "installs24h": 1059,
+      "sourceUrl": "https://skills.sh/vercel-labs/agent-skills/vercel-optimize",
+      "catalogId": "vercel-labs/claude-skills:vercel-optimize"
+    },
+    {
+      "source": "supabase/agent-skills",
+      "skillId": "supabase",
+      "name": "supabase",
+      "rank": 295,
+      "installs24h": 1056,
+      "sourceUrl": "https://skills.sh/supabase/agent-skills/supabase",
+      "catalogId": "supabase/agent-skills:supabase"
+    },
+    {
+      "source": "microsoft/playwright-cli",
+      "skillId": "playwright-cli",
+      "name": "playwright-cli",
+      "rank": 296,
+      "installs24h": 1055,
+      "sourceUrl": "https://skills.sh/microsoft/playwright-cli/playwright-cli",
+      "catalogId": "microsoft/playwright-cli:playwright-cli"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-doc",
+      "name": "lark-doc",
+      "rank": 297,
+      "installs24h": 1025,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-doc",
+      "catalogId": "larksuite/cli:lark-doc"
+    },
+    {
+      "source": "iannuttall/seo",
+      "skillId": "seo",
+      "name": "seo",
+      "rank": 298,
+      "installs24h": 1023,
+      "sourceUrl": "https://skills.sh/iannuttall/seo/seo",
+      "catalogId": "iannuttall/seo:seo"
+    },
+    {
+      "source": "lllllllama/rigorpilot-skills",
+      "skillId": "ai-research-explore",
+      "name": "ai-research-explore",
+      "rank": 299,
+      "installs24h": 1019,
+      "sourceUrl": "https://skills.sh/lllllllama/rigorpilot-skills/ai-research-explore",
+      "catalogId": "lllllllama/rigorpilot-skills:ai-research-explore"
+    },
+    {
+      "source": "lllllllama/rigorpilot-skills",
+      "skillId": "safe-debug",
+      "name": "safe-debug",
+      "rank": 300,
+      "installs24h": 1019,
+      "sourceUrl": "https://skills.sh/lllllllama/rigorpilot-skills/safe-debug",
+      "catalogId": "lllllllama/rigorpilot-skills:safe-debug"
+    },
+    {
+      "source": "lllllllama/rigorpilot-skills",
+      "skillId": "explore-code",
+      "name": "explore-code",
+      "rank": 301,
+      "installs24h": 1019,
+      "sourceUrl": "https://skills.sh/lllllllama/rigorpilot-skills/explore-code",
+      "catalogId": "lllllllama/rigorpilot-skills:explore-code"
+    },
+    {
+      "source": "lllllllama/rigorpilot-skills",
+      "skillId": "paper-context-resolver",
+      "name": "paper-context-resolver",
+      "rank": 302,
+      "installs24h": 1018,
+      "sourceUrl": "https://skills.sh/lllllllama/rigorpilot-skills/paper-context-resolver",
+      "catalogId": "lllllllama/rigorpilot-skills:paper-context-resolver"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-shared",
+      "name": "lark-shared",
+      "rank": 303,
+      "installs24h": 1018,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-shared",
+      "catalogId": "larksuite/cli:lark-shared"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "test-driven-development",
+      "name": "test-driven-development",
+      "rank": 304,
+      "installs24h": 1017,
+      "sourceUrl": "https://skills.sh/obra/superpowers/test-driven-development",
+      "catalogId": "obra/superpowers:test-driven-development"
+    },
+    {
+      "source": "lllllllama/rigorpilot-skills",
+      "skillId": "analyze-project",
+      "name": "analyze-project",
+      "rank": 305,
+      "installs24h": 1017,
+      "sourceUrl": "https://skills.sh/lllllllama/rigorpilot-skills/analyze-project",
+      "catalogId": "lllllllama/rigorpilot-skills:analyze-project"
+    },
+    {
+      "source": "lllllllama/rigorpilot-skills",
+      "skillId": "run-train",
+      "name": "run-train",
+      "rank": 306,
+      "installs24h": 1016,
+      "sourceUrl": "https://skills.sh/lllllllama/rigorpilot-skills/run-train",
+      "catalogId": "lllllllama/rigorpilot-skills:run-train"
+    },
+    {
+      "source": "lllllllama/rigorpilot-skills",
+      "skillId": "explore-run",
+      "name": "explore-run",
+      "rank": 307,
+      "installs24h": 1016,
+      "sourceUrl": "https://skills.sh/lllllllama/rigorpilot-skills/explore-run",
+      "catalogId": "lllllllama/rigorpilot-skills:explore-run"
+    },
+    {
+      "source": "lllllllama/rigorpilot-skills",
+      "skillId": "env-and-assets-bootstrap",
+      "name": "env-and-assets-bootstrap",
+      "rank": 308,
+      "installs24h": 1016,
+      "sourceUrl": "https://skills.sh/lllllllama/rigorpilot-skills/env-and-assets-bootstrap",
+      "catalogId": "lllllllama/rigorpilot-skills:env-and-assets-bootstrap"
+    },
+    {
+      "source": "lllllllama/rigorpilot-skills",
+      "skillId": "ai-research-reproduction",
+      "name": "ai-research-reproduction",
+      "rank": 309,
+      "installs24h": 1016,
+      "sourceUrl": "https://skills.sh/lllllllama/rigorpilot-skills/ai-research-reproduction",
+      "catalogId": "lllllllama/rigorpilot-skills:ai-research-reproduction"
+    },
+    {
+      "source": "lllllllama/rigorpilot-skills",
+      "skillId": "minimal-run-and-audit",
+      "name": "minimal-run-and-audit",
+      "rank": 310,
+      "installs24h": 1016,
+      "sourceUrl": "https://skills.sh/lllllllama/rigorpilot-skills/minimal-run-and-audit",
+      "catalogId": "lllllllama/rigorpilot-skills:minimal-run-and-audit"
+    },
+    {
+      "source": "lllllllama/rigorpilot-skills",
+      "skillId": "repo-intake-and-plan",
+      "name": "repo-intake-and-plan",
+      "rank": 311,
+      "installs24h": 1016,
+      "sourceUrl": "https://skills.sh/lllllllama/rigorpilot-skills/repo-intake-and-plan",
+      "catalogId": "lllllllama/rigorpilot-skills:repo-intake-and-plan"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-drive",
+      "name": "lark-drive",
+      "rank": 312,
+      "installs24h": 1011,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-drive",
+      "catalogId": "larksuite/cli:lark-drive"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-base",
+      "name": "lark-base",
+      "rank": 313,
+      "installs24h": 1011,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-base",
+      "catalogId": "larksuite/cli:lark-base"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-wiki",
+      "name": "lark-wiki",
+      "rank": 314,
+      "installs24h": 1007,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-wiki",
+      "catalogId": "larksuite/cli:lark-wiki"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-im",
+      "name": "lark-im",
+      "rank": 315,
+      "installs24h": 1007,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-im",
+      "catalogId": "larksuite/cli:lark-im"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-sheets",
+      "name": "lark-sheets",
+      "rank": 316,
+      "installs24h": 1005,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-sheets",
+      "catalogId": "larksuite/cli:lark-sheets"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "writing-plans",
+      "name": "writing-plans",
+      "rank": 317,
+      "installs24h": 1003,
+      "sourceUrl": "https://skills.sh/obra/superpowers/writing-plans",
+      "catalogId": "obra/superpowers:writing-plans"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-task",
+      "name": "lark-task",
+      "rank": 318,
+      "installs24h": 1002,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-task",
+      "catalogId": "larksuite/cli:lark-task"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-whiteboard",
+      "name": "lark-whiteboard",
+      "rank": 319,
+      "installs24h": 1001,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-whiteboard",
+      "catalogId": "larksuite/cli:lark-whiteboard"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-markdown",
+      "name": "lark-markdown",
+      "rank": 320,
+      "installs24h": 999,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-markdown",
+      "catalogId": "larksuite/cli:lark-markdown"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-contact",
+      "name": "lark-contact",
+      "rank": 322,
+      "installs24h": 996,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-contact",
+      "catalogId": "larksuite/cli:lark-contact"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-event",
+      "name": "lark-event",
+      "rank": 323,
+      "installs24h": 995,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-event",
+      "catalogId": "larksuite/cli:lark-event"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-slides",
+      "name": "lark-slides",
+      "rank": 324,
+      "installs24h": 994,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-slides",
+      "catalogId": "larksuite/cli:lark-slides"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-workflow-standup-report",
+      "name": "lark-workflow-standup-report",
+      "rank": 325,
+      "installs24h": 993,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-workflow-standup-report",
+      "catalogId": "larksuite/cli:lark-workflow-standup-report"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-mail",
+      "name": "lark-mail",
+      "rank": 326,
+      "installs24h": 993,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-mail",
+      "catalogId": "larksuite/cli:lark-mail"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-calendar",
+      "name": "lark-calendar",
+      "rank": 327,
+      "installs24h": 993,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-calendar",
+      "catalogId": "larksuite/cli:lark-calendar"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "seo-audit",
+      "name": "seo-audit",
+      "rank": 328,
+      "installs24h": 993,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/seo-audit",
+      "catalogId": "coreyhaines31/marketingskills:skills/seo-audit"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-skill-maker",
+      "name": "lark-skill-maker",
+      "rank": 329,
+      "installs24h": 993,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-skill-maker",
+      "catalogId": "larksuite/cli:lark-skill-maker"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-workflow-meeting-summary",
+      "name": "lark-workflow-meeting-summary",
+      "rank": 330,
+      "installs24h": 992,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-workflow-meeting-summary",
+      "catalogId": "larksuite/cli:lark-workflow-meeting-summary"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-apps",
+      "name": "lark-apps",
+      "rank": 331,
+      "installs24h": 991,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-apps",
+      "catalogId": "larksuite/cli:lark-apps"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-openapi-explorer",
+      "name": "lark-openapi-explorer",
+      "rank": 332,
+      "installs24h": 991,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-openapi-explorer",
+      "catalogId": "larksuite/cli:lark-openapi-explorer"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-okr",
+      "name": "lark-okr",
+      "rank": 333,
+      "installs24h": 989,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-okr",
+      "catalogId": "larksuite/cli:lark-okr"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-note",
+      "name": "lark-note",
+      "rank": 334,
+      "installs24h": 989,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-note",
+      "catalogId": "larksuite/cli:lark-note"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-attendance",
+      "name": "lark-attendance",
+      "rank": 335,
+      "installs24h": 988,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-attendance",
+      "catalogId": "larksuite/cli:lark-attendance"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-approval",
+      "name": "lark-approval",
+      "rank": 336,
+      "installs24h": 988,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-approval",
+      "catalogId": "larksuite/cli:lark-approval"
+    },
+    {
+      "source": "its-a-skill-issue/superpowers",
+      "skillId": "web-search",
+      "name": "web-search",
+      "rank": 337,
+      "installs24h": 986,
+      "sourceUrl": "https://skills.sh/its-a-skill-issue/superpowers/web-search"
+    },
+    {
+      "source": "its-a-skill-issue/superpowers",
+      "skillId": "agent-tools",
+      "name": "agent-tools",
+      "rank": 338,
+      "installs24h": 986,
+      "sourceUrl": "https://skills.sh/its-a-skill-issue/superpowers/agent-tools"
+    },
+    {
+      "source": "its-a-skill-issue/superpowers",
+      "skillId": "remotion-render",
+      "name": "remotion-render",
+      "rank": 339,
+      "installs24h": 986,
+      "sourceUrl": "https://skills.sh/its-a-skill-issue/superpowers/remotion-render"
+    },
+    {
+      "source": "its-a-skill-issue/superpowers",
+      "skillId": "infsh-cli",
+      "name": "infsh-cli",
+      "rank": 340,
+      "installs24h": 986,
+      "sourceUrl": "https://skills.sh/its-a-skill-issue/superpowers/infsh-cli"
+    },
+    {
+      "source": "its-a-skill-issue/superpowers",
+      "skillId": "python-executor",
+      "name": "python-executor",
+      "rank": 341,
+      "installs24h": 986,
+      "sourceUrl": "https://skills.sh/its-a-skill-issue/superpowers/python-executor"
+    },
+    {
+      "source": "larksuite/cli",
+      "skillId": "lark-meeting",
+      "name": "lark-meeting",
+      "rank": 342,
+      "installs24h": 973,
+      "sourceUrl": "https://skills.sh/larksuite/cli/lark-meeting",
+      "catalogId": "larksuite/cli:lark-meeting"
+    },
+    {
+      "source": "archify.si",
+      "skillId": "archify",
+      "name": "archify",
+      "rank": 343,
+      "installs24h": 934,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/archify.si/archify"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "cloudflare",
+      "name": "cloudflare",
+      "rank": 344,
+      "installs24h": 931,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/cloudflare",
+      "catalogId": "cloudflare/skills:cloudflare"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "requesting-code-review",
+      "name": "requesting-code-review",
+      "rank": 345,
+      "installs24h": 919,
+      "sourceUrl": "https://skills.sh/obra/superpowers/requesting-code-review",
+      "catalogId": "obra/superpowers:requesting-code-review"
+    },
+    {
+      "source": "neondatabase/agent-skills",
+      "skillId": "neon",
+      "name": "neon",
+      "rank": 346,
+      "installs24h": 917,
+      "sourceUrl": "https://skills.sh/neondatabase/agent-skills/neon",
+      "catalogId": "neondatabase/agent-skills:skills/neon"
+    },
+    {
+      "source": "neondatabase/agent-skills",
+      "skillId": "neon-postgres",
+      "name": "neon-postgres",
+      "rank": 347,
+      "installs24h": 910,
+      "sourceUrl": "https://skills.sh/neondatabase/agent-skills/neon-postgres",
+      "catalogId": "neondatabase/agent-skills:neon-postgres"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "workers-best-practices",
+      "name": "workers-best-practices",
+      "rank": 348,
+      "installs24h": 906,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/workers-best-practices",
+      "catalogId": "cloudflare/skills:workers-best-practices"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "wrangler",
+      "name": "wrangler",
+      "rank": 349,
+      "installs24h": 893,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/wrangler",
+      "catalogId": "cloudflare/skills:wrangler"
+    },
+    {
+      "source": "101-skills/superpowers",
+      "skillId": "agent-browser",
+      "name": "agent-browser",
+      "rank": 350,
+      "installs24h": 889,
+      "sourceUrl": "https://skills.sh/101-skills/superpowers/agent-browser"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "web-perf",
+      "name": "web-perf",
+      "rank": 351,
+      "installs24h": 887,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/web-perf",
+      "catalogId": "cloudflare/skills:web-perf"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "receiving-code-review",
+      "name": "receiving-code-review",
+      "rank": 352,
+      "installs24h": 885,
+      "sourceUrl": "https://skills.sh/obra/superpowers/receiving-code-review",
+      "catalogId": "obra/superpowers:receiving-code-review"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "security-and-hardening",
+      "name": "security-and-hardening",
+      "rank": 353,
+      "installs24h": 879,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/security-and-hardening",
+      "catalogId": "addyosmani/agent-skills:security-and-hardening"
+    },
+    {
+      "source": "anthropics/skills",
+      "skillId": "skill-creator",
+      "name": "skill-creator",
+      "rank": 354,
+      "installs24h": 877,
+      "sourceUrl": "https://skills.sh/anthropics/skills/skill-creator",
+      "catalogId": "anthropics/skills:skills/skill-creator"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "executing-plans",
+      "name": "executing-plans",
+      "rank": 355,
+      "installs24h": 874,
+      "sourceUrl": "https://skills.sh/obra/superpowers/executing-plans",
+      "catalogId": "obra/superpowers:executing-plans"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "finishing-a-development-branch",
+      "name": "finishing-a-development-branch",
+      "rank": 356,
+      "installs24h": 865,
+      "sourceUrl": "https://skills.sh/obra/superpowers/finishing-a-development-branch",
+      "catalogId": "obra/superpowers:finishing-a-development-branch"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "code-review-and-quality",
+      "name": "code-review-and-quality",
+      "rank": 357,
+      "installs24h": 859,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/code-review-and-quality",
+      "catalogId": "addyosmani/agent-skills:code-review-and-quality"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "subagent-driven-development",
+      "name": "subagent-driven-development",
+      "rank": 358,
+      "installs24h": 854,
+      "sourceUrl": "https://skills.sh/obra/superpowers/subagent-driven-development",
+      "catalogId": "obra/superpowers:subagent-driven-development"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "cf-cli",
+      "name": "cf-cli",
+      "rank": 359,
+      "installs24h": 854,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/cf-cli",
+      "catalogId": "cloudflare/skills:cf-cli"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "durable-objects",
+      "name": "durable-objects",
+      "rank": 360,
+      "installs24h": 850,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/durable-objects",
+      "catalogId": "cloudflare/skills:durable-objects"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "workers-development",
+      "name": "workers-development",
+      "rank": 361,
+      "installs24h": 848,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/workers-development",
+      "catalogId": "cloudflare/skills:workers-development"
+    },
+    {
+      "source": "greensock/gsap-skills",
+      "skillId": "gsap-core",
+      "name": "gsap-core",
+      "rank": 362,
+      "installs24h": 844,
+      "sourceUrl": "https://skills.sh/greensock/gsap-skills/gsap-core",
+      "catalogId": "greensock/gsap-skills:skills/gsap-core"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "agents-sdk",
+      "name": "agents-sdk",
+      "rank": 363,
+      "installs24h": 835,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/agents-sdk",
+      "catalogId": "cloudflare/skills:agents-sdk"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "turnstile-spin",
+      "name": "turnstile-spin",
+      "rank": 364,
+      "installs24h": 834,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/turnstile-spin",
+      "catalogId": "cloudflare/skills:turnstile-spin"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "cloudflare-email-service",
+      "name": "cloudflare-email-service",
+      "rank": 365,
+      "installs24h": 833,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/cloudflare-email-service",
+      "catalogId": "cloudflare/skills:cloudflare-email-service"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "cloudflare-one",
+      "name": "cloudflare-one",
+      "rank": 366,
+      "installs24h": 832,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/cloudflare-one",
+      "catalogId": "cloudflare/skills:cloudflare-one"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "frameworks-on-cloudflare",
+      "name": "frameworks-on-cloudflare",
+      "rank": 367,
+      "installs24h": 831,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/frameworks-on-cloudflare",
+      "catalogId": "cloudflare/skills:frameworks-on-cloudflare"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "frontend-ui-engineering",
+      "name": "frontend-ui-engineering",
+      "rank": 368,
+      "installs24h": 830,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/frontend-ui-engineering",
+      "catalogId": "addyosmani/agent-skills:frontend-ui-engineering"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "dispatching-parallel-agents",
+      "name": "dispatching-parallel-agents",
+      "rank": 369,
+      "installs24h": 828,
+      "sourceUrl": "https://skills.sh/obra/superpowers/dispatching-parallel-agents",
+      "catalogId": "obra/superpowers:dispatching-parallel-agents"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "using-superpowers",
+      "name": "using-superpowers",
+      "rank": 370,
+      "installs24h": 827,
+      "sourceUrl": "https://skills.sh/obra/superpowers/using-superpowers",
+      "catalogId": "obra/superpowers:using-superpowers"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "nextjs-on-cloudflare",
+      "name": "nextjs-on-cloudflare",
+      "rank": 371,
+      "installs24h": 826,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/nextjs-on-cloudflare",
+      "catalogId": "cloudflare/skills:nextjs-on-cloudflare"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "workers-profiling",
+      "name": "workers-profiling",
+      "rank": 372,
+      "installs24h": 826,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/workers-profiling",
+      "catalogId": "cloudflare/skills:workers-profiling"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "cloudflare-app-bootstrap",
+      "name": "cloudflare-app-bootstrap",
+      "rank": 373,
+      "installs24h": 824,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/cloudflare-app-bootstrap",
+      "catalogId": "cloudflare/skills:cloudflare-app-bootstrap"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "using-git-worktrees",
+      "name": "using-git-worktrees",
+      "rank": 374,
+      "installs24h": 824,
+      "sourceUrl": "https://skills.sh/obra/superpowers/using-git-worktrees",
+      "catalogId": "obra/superpowers:using-git-worktrees"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "cloudflare-one-migrations",
+      "name": "cloudflare-one-migrations",
+      "rank": 375,
+      "installs24h": 822,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/cloudflare-one-migrations",
+      "catalogId": "cloudflare/skills:cloudflare-one-migrations"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "sandbox-stable",
+      "name": "sandbox-stable",
+      "rank": 376,
+      "installs24h": 821,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/sandbox-stable",
+      "catalogId": "cloudflare/skills:sandbox-stable"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "gateway-workers",
+      "name": "gateway-workers",
+      "rank": 377,
+      "installs24h": 817,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/gateway-workers",
+      "catalogId": "cloudflare/skills:gateway-workers"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "basin",
+      "name": "basin",
+      "rank": 378,
+      "installs24h": 816,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/basin",
+      "catalogId": "cloudflare/skills:basin"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "k2",
+      "name": "k2",
+      "rank": 379,
+      "installs24h": 816,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/k2",
+      "catalogId": "cloudflare/skills:k2"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "sandbox-migrate-to-next",
+      "name": "sandbox-migrate-to-next",
+      "rank": 380,
+      "installs24h": 815,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/sandbox-migrate-to-next",
+      "catalogId": "cloudflare/skills:sandbox-migrate-to-next"
+    },
+    {
+      "source": "cloudflare/skills",
+      "skillId": "sandbox-next",
+      "name": "sandbox-next",
+      "rank": 381,
+      "installs24h": 815,
+      "sourceUrl": "https://skills.sh/cloudflare/skills/sandbox-next",
+      "catalogId": "cloudflare/skills:sandbox-next"
+    },
+    {
+      "source": "greensock/gsap-skills",
+      "skillId": "gsap-scrolltrigger",
+      "name": "gsap-scrolltrigger",
+      "rank": 382,
+      "installs24h": 815,
+      "sourceUrl": "https://skills.sh/greensock/gsap-skills/gsap-scrolltrigger",
+      "catalogId": "greensock/gsap-skills:skills/gsap-scrolltrigger"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "writing-skills",
+      "name": "writing-skills",
+      "rank": 383,
+      "installs24h": 812,
+      "sourceUrl": "https://skills.sh/obra/superpowers/writing-skills",
+      "catalogId": "obra/superpowers:writing-skills"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "performance-optimization",
+      "name": "performance-optimization",
+      "rank": 384,
+      "installs24h": 805,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/performance-optimization",
+      "catalogId": "addyosmani/agent-skills:performance-optimization"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "api-and-interface-design",
+      "name": "api-and-interface-design",
+      "rank": 385,
+      "installs24h": 798,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/api-and-interface-design",
+      "catalogId": "addyosmani/agent-skills:skills/api-and-interface-design"
+    },
+    {
+      "source": "greensock/gsap-skills",
+      "skillId": "gsap-timeline",
+      "name": "gsap-timeline",
+      "rank": 386,
+      "installs24h": 795,
+      "sourceUrl": "https://skills.sh/greensock/gsap-skills/gsap-timeline",
+      "catalogId": "greensock/gsap-skills:skills/gsap-timeline"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "documentation-and-adrs",
+      "name": "documentation-and-adrs",
+      "rank": 387,
+      "installs24h": 790,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/documentation-and-adrs",
+      "catalogId": "addyosmani/agent-skills:documentation-and-adrs"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "planning-and-task-breakdown",
+      "name": "planning-and-task-breakdown",
+      "rank": 388,
+      "installs24h": 786,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/planning-and-task-breakdown",
+      "catalogId": "addyosmani/agent-skills:planning-and-task-breakdown"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "debugging-and-error-recovery",
+      "name": "debugging-and-error-recovery",
+      "rank": 389,
+      "installs24h": 784,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/debugging-and-error-recovery",
+      "catalogId": "addyosmani/agent-skills:debugging-and-error-recovery"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "spec-driven-development",
+      "name": "spec-driven-development",
+      "rank": 390,
+      "installs24h": 782,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/spec-driven-development",
+      "catalogId": "addyosmani/agent-skills:spec-driven-development"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "code-simplification",
+      "name": "code-simplification",
+      "rank": 391,
+      "installs24h": 779,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/code-simplification",
+      "catalogId": "addyosmani/agent-skills:code-simplification"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "social",
+      "name": "social",
+      "rank": 392,
+      "installs24h": 777,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/social",
+      "catalogId": "coreyhaines31/marketingskills:skills/social"
+    },
+    {
+      "source": "greensock/gsap-skills",
+      "skillId": "gsap-performance",
+      "name": "gsap-performance",
+      "rank": 393,
+      "installs24h": 773,
+      "sourceUrl": "https://skills.sh/greensock/gsap-skills/gsap-performance",
+      "catalogId": "greensock/gsap-skills:skills/gsap-performance"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "cro",
+      "name": "cro",
+      "rank": 394,
+      "installs24h": 770,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/cro",
+      "catalogId": "coreyhaines31/marketingskills:skills/cro"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "observability-and-instrumentation",
+      "name": "observability-and-instrumentation",
+      "rank": 395,
+      "installs24h": 767,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/observability-and-instrumentation",
+      "catalogId": "addyosmani/agent-skills:skills/observability-and-instrumentation"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "context-engineering",
+      "name": "context-engineering",
+      "rank": 396,
+      "installs24h": 766,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/context-engineering",
+      "catalogId": "addyosmani/agent-skills:context-engineering"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "interview-me",
+      "name": "interview-me",
+      "rank": 397,
+      "installs24h": 765,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/interview-me",
+      "catalogId": "addyosmani/agent-skills:skills/interview-me"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "incremental-implementation",
+      "name": "incremental-implementation",
+      "rank": 398,
+      "installs24h": 761,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/incremental-implementation",
+      "catalogId": "addyosmani/agent-skills:incremental-implementation"
+    },
+    {
+      "source": "magentosh/superpowers",
+      "skillId": "remotion-render",
+      "name": "remotion-render",
+      "rank": 399,
+      "installs24h": 760,
+      "sourceUrl": "https://skills.sh/magentosh/superpowers/remotion-render"
+    },
+    {
+      "source": "magentosh/superpowers",
+      "skillId": "infsh-cli",
+      "name": "infsh-cli",
+      "rank": 400,
+      "installs24h": 760,
+      "sourceUrl": "https://skills.sh/magentosh/superpowers/infsh-cli"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "ai-seo",
+      "name": "ai-seo",
+      "rank": 401,
+      "installs24h": 760,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/ai-seo",
+      "catalogId": "coreyhaines31/marketingskills:skills/ai-seo"
+    },
+    {
+      "source": "magentosh/superpowers",
+      "skillId": "python-executor",
+      "name": "python-executor",
+      "rank": 402,
+      "installs24h": 760,
+      "sourceUrl": "https://skills.sh/magentosh/superpowers/python-executor"
+    },
+    {
+      "source": "magentosh/superpowers",
+      "skillId": "web-search",
+      "name": "web-search",
+      "rank": 403,
+      "installs24h": 760,
+      "sourceUrl": "https://skills.sh/magentosh/superpowers/web-search"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "test-driven-development",
+      "name": "test-driven-development",
+      "rank": 404,
+      "installs24h": 759,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/test-driven-development",
+      "catalogId": "addyosmani/agent-skills:test-driven-development"
+    },
+    {
+      "source": "magentosh/superpowers",
+      "skillId": "agent-tools",
+      "name": "agent-tools",
+      "rank": 405,
+      "installs24h": 759,
+      "sourceUrl": "https://skills.sh/magentosh/superpowers/agent-tools"
+    },
+    {
+      "source": "anthropics/skills",
+      "skillId": "webapp-testing",
+      "name": "webapp-testing",
+      "rank": 406,
+      "installs24h": 759,
+      "sourceUrl": "https://skills.sh/anthropics/skills/webapp-testing",
+      "catalogId": "anthropics/skills:webapp-testing"
+    },
+    {
+      "source": "anthropics/skills",
+      "skillId": "pptx",
+      "name": "pptx",
+      "rank": 407,
+      "installs24h": 758,
+      "sourceUrl": "https://skills.sh/anthropics/skills/pptx",
+      "catalogId": "anthropics/skills:pptx"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "marketing-psychology",
+      "name": "marketing-psychology",
+      "rank": 408,
+      "installs24h": 758,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/marketing-psychology",
+      "catalogId": "coreyhaines31/marketingskills:skills/marketing-psychology"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "ci-cd-and-automation",
+      "name": "ci-cd-and-automation",
+      "rank": 409,
+      "installs24h": 757,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/ci-cd-and-automation",
+      "catalogId": "addyosmani/agent-skills:ci-cd-and-automation"
+    },
+    {
+      "source": "benjitaylor/skills",
+      "skillId": "stageshow",
+      "name": "stageshow",
+      "rank": 410,
+      "installs24h": 757,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/benjitaylor/skills/stageshow",
+      "catalogId": "benjitaylor/skills:stageshow"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "git-workflow-and-versioning",
+      "name": "git-workflow-and-versioning",
+      "rank": 411,
+      "installs24h": 754,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/git-workflow-and-versioning",
+      "catalogId": "addyosmani/agent-skills:git-workflow-and-versioning"
+    },
+    {
+      "source": "vercel/next.js",
+      "skillId": "next-cache-components-adoption",
+      "name": "next-cache-components-adoption",
+      "rank": 412,
+      "installs24h": 746,
+      "sourceUrl": "https://skills.sh/vercel/next.js/next-cache-components-adoption"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "source-driven-development",
+      "name": "source-driven-development",
+      "rank": 413,
+      "installs24h": 743,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/source-driven-development",
+      "catalogId": "addyosmani/agent-skills:source-driven-development"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "browser-testing-with-devtools",
+      "name": "browser-testing-with-devtools",
+      "rank": 414,
+      "installs24h": 741,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/browser-testing-with-devtools",
+      "catalogId": "addyosmani/agent-skills:browser-testing-with-devtools"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "idea-refine",
+      "name": "idea-refine",
+      "rank": 415,
+      "installs24h": 740,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/idea-refine",
+      "catalogId": "addyosmani/agent-skills:idea-refine"
+    },
+    {
+      "source": "greensock/gsap-skills",
+      "skillId": "gsap-plugins",
+      "name": "gsap-plugins",
+      "rank": 416,
+      "installs24h": 740,
+      "sourceUrl": "https://skills.sh/greensock/gsap-skills/gsap-plugins",
+      "catalogId": "greensock/gsap-skills:skills/gsap-plugins"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "doubt-driven-development",
+      "name": "doubt-driven-development",
+      "rank": 417,
+      "installs24h": 739,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/doubt-driven-development",
+      "catalogId": "addyosmani/agent-skills:skills/doubt-driven-development"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "deprecation-and-migration",
+      "name": "deprecation-and-migration",
+      "rank": 418,
+      "installs24h": 739,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/deprecation-and-migration",
+      "catalogId": "addyosmani/agent-skills:deprecation-and-migration"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "shipping-and-launch",
+      "name": "shipping-and-launch",
+      "rank": 419,
+      "installs24h": 738,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/shipping-and-launch",
+      "catalogId": "addyosmani/agent-skills:shipping-and-launch"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "using-agent-skills",
+      "name": "using-agent-skills",
+      "rank": 420,
+      "installs24h": 736,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/using-agent-skills",
+      "catalogId": "addyosmani/agent-skills:using-agent-skills"
+    },
+    {
+      "source": "addyosmani/agent-skills",
+      "skillId": "constraint-driven-development",
+      "name": "constraint-driven-development",
+      "rank": 421,
+      "installs24h": 736,
+      "sourceUrl": "https://skills.sh/addyosmani/agent-skills/constraint-driven-development",
+      "catalogId": "addyosmani/agent-skills:skills/constraint-driven-development"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "content-strategy",
+      "name": "content-strategy",
+      "rank": 422,
+      "installs24h": 729,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/content-strategy",
+      "catalogId": "coreyhaines31/marketingskills:skills/content-strategy"
+    },
+    {
+      "source": "greensock/gsap-skills",
+      "skillId": "gsap-react",
+      "name": "gsap-react",
+      "rank": 423,
+      "installs24h": 718,
+      "sourceUrl": "https://skills.sh/greensock/gsap-skills/gsap-react",
+      "catalogId": "greensock/gsap-skills:skills/gsap-react"
+    },
+    {
+      "source": "obra/superpowers",
+      "skillId": "diagnosing-superpowers",
+      "name": "diagnosing-superpowers",
+      "rank": 424,
+      "installs24h": 715,
+      "sourceUrl": "https://skills.sh/obra/superpowers/diagnosing-superpowers",
+      "catalogId": "obra/superpowers:diagnosing-superpowers"
+    },
+    {
+      "source": "anthropics/skills",
+      "skillId": "pdf",
+      "name": "pdf",
+      "rank": 425,
+      "installs24h": 710,
+      "sourceUrl": "https://skills.sh/anthropics/skills/pdf",
+      "catalogId": "anthropics/skills:pdf"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "ad-creative",
+      "name": "ad-creative",
+      "rank": 426,
+      "installs24h": 708,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/ad-creative",
+      "catalogId": "coreyhaines31/marketingskills:skills/ad-creative"
+    },
+    {
+      "source": "greensock/gsap-skills",
+      "skillId": "gsap-utils",
+      "name": "gsap-utils",
+      "rank": 427,
+      "installs24h": 702,
+      "sourceUrl": "https://skills.sh/greensock/gsap-skills/gsap-utils",
+      "catalogId": "greensock/gsap-skills:skills/gsap-utils"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "product-marketing",
+      "name": "product-marketing",
+      "rank": 428,
+      "installs24h": 696,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/product-marketing",
+      "catalogId": "coreyhaines31/marketingskills:skills/product-marketing"
+    },
+    {
+      "source": "neondatabase/agent-skills",
+      "skillId": "neon-auth",
+      "name": "neon-auth",
+      "rank": 429,
+      "installs24h": 695,
+      "sourceUrl": "https://skills.sh/neondatabase/agent-skills/neon-auth",
+      "catalogId": "neondatabase/agent-skills:skills/neon-auth"
+    },
+    {
+      "source": "neondatabase/agent-skills",
+      "skillId": "neon-object-storage",
+      "name": "neon-object-storage",
+      "rank": 430,
+      "installs24h": 691,
+      "sourceUrl": "https://skills.sh/neondatabase/agent-skills/neon-object-storage",
+      "catalogId": "neondatabase/agent-skills:skills/neon-object-storage"
+    },
+    {
+      "source": "neondatabase/agent-skills",
+      "skillId": "neon-functions",
+      "name": "neon-functions",
+      "rank": 431,
+      "installs24h": 686,
+      "sourceUrl": "https://skills.sh/neondatabase/agent-skills/neon-functions",
+      "catalogId": "neondatabase/agent-skills:skills/neon-functions"
+    },
+    {
+      "source": "neondatabase/agent-skills",
+      "skillId": "neon-ai-gateway",
+      "name": "neon-ai-gateway",
+      "rank": 432,
+      "installs24h": 682,
+      "sourceUrl": "https://skills.sh/neondatabase/agent-skills/neon-ai-gateway",
+      "catalogId": "neondatabase/agent-skills:skills/neon-ai-gateway"
+    },
+    {
+      "source": "neondatabase/agent-skills",
+      "skillId": "neon-realtime",
+      "name": "neon-realtime",
+      "rank": 433,
+      "installs24h": 679,
+      "sourceUrl": "https://skills.sh/neondatabase/agent-skills/neon-realtime"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "copy-editing",
+      "name": "copy-editing",
+      "rank": 434,
+      "installs24h": 678,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/copy-editing",
+      "catalogId": "coreyhaines31/marketingskills:skills/copy-editing"
+    },
+    {
+      "source": "lemomo-ai/lemo-opuscar",
+      "skillId": "lemo-opuscar",
+      "name": "lemo-opuscar",
+      "rank": 435,
+      "installs24h": 678,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/lemomo-ai/lemo-opuscar/lemo-opuscar",
+      "catalogId": "lemomo-ai/lemo-opuscar:lemo-opuscar"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "schema",
+      "name": "schema",
+      "rank": 436,
+      "installs24h": 675,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/schema",
+      "catalogId": "coreyhaines31/marketingskills:skills/schema"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "offers",
+      "name": "offers",
+      "rank": 437,
+      "installs24h": 673,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/offers",
+      "catalogId": "coreyhaines31/marketingskills:skills/offers"
+    },
+    {
+      "source": "greensock/gsap-skills",
+      "skillId": "gsap-frameworks",
+      "name": "gsap-frameworks",
+      "rank": 438,
+      "installs24h": 673,
+      "sourceUrl": "https://skills.sh/greensock/gsap-skills/gsap-frameworks",
+      "catalogId": "greensock/gsap-skills:skills/gsap-frameworks"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "pricing",
+      "name": "pricing",
+      "rank": 439,
+      "installs24h": 669,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/pricing",
+      "catalogId": "coreyhaines31/marketingskills:skills/pricing"
+    },
+    {
+      "source": "dietrichgebert/ponytail",
+      "skillId": "ponytail-review",
+      "name": "ponytail-review",
+      "rank": 440,
+      "installs24h": 663,
+      "sourceUrl": "https://skills.sh/dietrichgebert/ponytail/ponytail-review",
+      "catalogId": "dietrichgebert/ponytail:ponytail-review"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "storyboard-creation",
+      "name": "storyboard-creation",
+      "rank": 441,
+      "installs24h": 648,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/storyboard-creation"
+    },
+    {
+      "source": "dietrichgebert/ponytail",
+      "skillId": "ponytail-audit",
+      "name": "ponytail-audit",
+      "rank": 442,
+      "installs24h": 648,
+      "sourceUrl": "https://skills.sh/dietrichgebert/ponytail/ponytail-audit",
+      "catalogId": "dietrichgebert/ponytail:ponytail-audit"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "video-ad-specs",
+      "name": "video-ad-specs",
+      "rank": 443,
+      "installs24h": 647,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/video-ad-specs"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "image-to-video",
+      "name": "image-to-video",
+      "rank": 444,
+      "installs24h": 647,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/image-to-video"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "character-design-sheet",
+      "name": "character-design-sheet",
+      "rank": 445,
+      "installs24h": 647,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/character-design-sheet"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "product-photography",
+      "name": "product-photography",
+      "rank": 446,
+      "installs24h": 647,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/product-photography"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "competitor-teardown",
+      "name": "competitor-teardown",
+      "rank": 447,
+      "installs24h": 647,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/competitor-teardown"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "landing-page-design",
+      "name": "landing-page-design",
+      "rank": 448,
+      "installs24h": 647,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/landing-page-design"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "youtube-thumbnail-design",
+      "name": "youtube-thumbnail-design",
+      "rank": 449,
+      "installs24h": 647,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/youtube-thumbnail-design"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "product-hunt-launch",
+      "name": "product-hunt-launch",
+      "rank": 450,
+      "installs24h": 647,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/product-hunt-launch"
+    },
+    {
+      "source": "skills-shell/superpowers",
+      "skillId": "app-store-screenshots",
+      "name": "app-store-screenshots",
+      "rank": 451,
+      "installs24h": 647,
+      "sourceUrl": "https://skills.sh/skills-shell/superpowers/app-store-screenshots"
+    },
+    {
+      "source": "anthropics/skills",
+      "skillId": "docx",
+      "name": "docx",
+      "rank": 452,
+      "installs24h": 643,
+      "sourceUrl": "https://skills.sh/anthropics/skills/docx",
+      "catalogId": "anthropics/skills:docx"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "ads",
+      "name": "ads",
+      "rank": 453,
+      "installs24h": 642,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/ads",
+      "catalogId": "coreyhaines31/marketingskills:skills/ads"
+    },
+    {
+      "source": "herdrdev/herdr",
+      "skillId": "herdr",
+      "name": "herdr",
+      "rank": 454,
+      "installs24h": 638,
+      "sourceUrl": "https://skills.sh/herdrdev/herdr/herdr",
+      "catalogId": "herdrdev/herdr:herdr"
+    },
+    {
+      "source": "anthropics/skills",
+      "skillId": "xlsx",
+      "name": "xlsx",
+      "rank": 455,
+      "installs24h": 637,
+      "sourceUrl": "https://skills.sh/anthropics/skills/xlsx",
+      "catalogId": "anthropics/skills:xlsx"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "customer-research",
+      "name": "customer-research",
+      "rank": 456,
+      "installs24h": 633,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/customer-research",
+      "catalogId": "coreyhaines31/marketingskills:customer-research"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "analytics",
+      "name": "analytics",
+      "rank": 457,
+      "installs24h": 627,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/analytics",
+      "catalogId": "coreyhaines31/marketingskills:skills/analytics"
+    },
+    {
+      "source": "sentry/dev",
+      "skillId": "sentry-cli",
+      "name": "sentry-cli",
+      "rank": 458,
+      "installs24h": 627,
+      "sourceUrl": "https://skills.sh/sentry/dev/sentry-cli"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "site-architecture",
+      "name": "site-architecture",
+      "rank": 459,
+      "installs24h": 626,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/site-architecture",
+      "catalogId": "coreyhaines31/marketingskills:skills/site-architecture"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "programmatic-seo",
+      "name": "programmatic-seo",
+      "rank": 460,
+      "installs24h": 618,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/programmatic-seo",
+      "catalogId": "coreyhaines31/marketingskills:skills/programmatic-seo"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "marketing-plan",
+      "name": "marketing-plan",
+      "rank": 461,
+      "installs24h": 616,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/marketing-plan",
+      "catalogId": "coreyhaines31/marketingskills:skills/marketing-plan"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "cold-email",
+      "name": "cold-email",
+      "rank": 462,
+      "installs24h": 614,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/cold-email",
+      "catalogId": "coreyhaines31/marketingskills:cold-email"
+    },
+    {
+      "source": "wheresryan22/anatomy",
+      "skillId": "anatomy",
+      "name": "anatomy",
+      "rank": 463,
+      "installs24h": 614,
+      "sourceUrl": "https://skills.sh/wheresryan22/anatomy/anatomy"
+    },
+    {
+      "source": "101-skills/superpowers",
+      "skillId": "web-search",
+      "name": "web-search",
+      "rank": 464,
+      "installs24h": 614,
+      "sourceUrl": "https://skills.sh/101-skills/superpowers/web-search"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "video",
+      "name": "video",
+      "rank": 465,
+      "installs24h": 612,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/video",
+      "catalogId": "coreyhaines31/marketingskills:video"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "marketing-ideas",
+      "name": "marketing-ideas",
+      "rank": 466,
+      "installs24h": 606,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/marketing-ideas",
+      "catalogId": "coreyhaines31/marketingskills:skills/marketing-ideas"
+    },
+    {
+      "source": "101-skills/superpowers",
+      "skillId": "remotion-render",
+      "name": "remotion-render",
+      "rank": 467,
+      "installs24h": 606,
+      "sourceUrl": "https://skills.sh/101-skills/superpowers/remotion-render"
+    },
+    {
+      "source": "101-skills/superpowers",
+      "skillId": "python-executor",
+      "name": "python-executor",
+      "rank": 468,
+      "installs24h": 606,
+      "sourceUrl": "https://skills.sh/101-skills/superpowers/python-executor"
+    },
+    {
+      "source": "101-skills/superpowers",
+      "skillId": "agent-tools",
+      "name": "agent-tools",
+      "rank": 469,
+      "installs24h": 606,
+      "sourceUrl": "https://skills.sh/101-skills/superpowers/agent-tools"
+    },
+    {
+      "source": "101-skills/superpowers",
+      "skillId": "infsh-cli",
+      "name": "infsh-cli",
+      "rank": 470,
+      "installs24h": 605,
+      "sourceUrl": "https://skills.sh/101-skills/superpowers/infsh-cli"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "launch",
+      "name": "launch",
+      "rank": 471,
+      "installs24h": 604,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/launch",
+      "catalogId": "coreyhaines31/marketingskills:skills/launch"
+    },
+    {
+      "source": "dietrichgebert/ponytail",
+      "skillId": "ponytail-debt",
+      "name": "ponytail-debt",
+      "rank": 472,
+      "installs24h": 604,
+      "sourceUrl": "https://skills.sh/dietrichgebert/ponytail/ponytail-debt",
+      "catalogId": "dietrichgebert/ponytail:ponytail-debt"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "emails",
+      "name": "emails",
+      "rank": 473,
+      "installs24h": 602,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/emails",
+      "catalogId": "coreyhaines31/marketingskills:skills/emails"
+    },
+    {
+      "source": "dietrichgebert/ponytail",
+      "skillId": "ponytail-help",
+      "name": "ponytail-help",
+      "rank": 474,
+      "installs24h": 600,
+      "sourceUrl": "https://skills.sh/dietrichgebert/ponytail/ponytail-help",
+      "catalogId": "dietrichgebert/ponytail:ponytail-help"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "competitor-profiling",
+      "name": "competitor-profiling",
+      "rank": 475,
+      "installs24h": 599,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/competitor-profiling",
+      "catalogId": "coreyhaines31/marketingskills:competitor-profiling"
+    },
+    {
+      "source": "dietrichgebert/ponytail",
+      "skillId": "ponytail-gain",
+      "name": "ponytail-gain",
+      "rank": 476,
+      "installs24h": 596,
+      "sourceUrl": "https://skills.sh/dietrichgebert/ponytail/ponytail-gain",
+      "catalogId": "dietrichgebert/ponytail:ponytail-gain"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "conversion-tracking",
+      "name": "conversion-tracking",
+      "rank": 477,
+      "installs24h": 594,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/conversion-tracking",
+      "catalogId": "coreyhaines31/marketingskills:conversion-tracking"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "ab-testing",
+      "name": "ab-testing",
+      "rank": 478,
+      "installs24h": 585,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/ab-testing",
+      "catalogId": "coreyhaines31/marketingskills:skills/ab-testing"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "prospecting",
+      "name": "prospecting",
+      "rank": 479,
+      "installs24h": 584,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/prospecting",
+      "catalogId": "coreyhaines31/marketingskills:skills/prospecting"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "image",
+      "name": "image",
+      "rank": 480,
+      "installs24h": 583,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/image",
+      "catalogId": "coreyhaines31/marketingskills:image"
+    },
+    {
+      "source": "currents-dev/playwright-best-practices-skill",
+      "skillId": "playwright-best-practices",
+      "name": "playwright-best-practices",
+      "rank": 481,
+      "installs24h": 576,
+      "sourceUrl": "https://skills.sh/currents-dev/playwright-best-practices-skill/playwright-best-practices",
+      "catalogId": "currents-dev/playwright-best-practices-skill:playwright-best-practices"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "lead-magnets",
+      "name": "lead-magnets",
+      "rank": 482,
+      "installs24h": 574,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/lead-magnets",
+      "catalogId": "coreyhaines31/marketingskills:lead-magnets"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "sales-enablement",
+      "name": "sales-enablement",
+      "rank": 483,
+      "installs24h": 574,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/sales-enablement",
+      "catalogId": "coreyhaines31/marketingskills:skills/sales-enablement"
+    },
+    {
+      "source": "anthropics/skills",
+      "skillId": "canvas-design",
+      "name": "canvas-design",
+      "rank": 484,
+      "installs24h": 570,
+      "sourceUrl": "https://skills.sh/anthropics/skills/canvas-design",
+      "catalogId": "anthropics/skills:canvas-design"
+    },
+    {
+      "source": "vercel-labs/agent-desktop",
+      "skillId": "agent-desktop",
+      "name": "agent-desktop",
+      "rank": 485,
+      "installs24h": 568,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/vercel-labs/agent-desktop/agent-desktop",
+      "catalogId": "vercel-labs/agent-desktop:agent-desktop"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "competitors",
+      "name": "competitors",
+      "rank": 486,
+      "installs24h": 566,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/competitors",
+      "catalogId": "coreyhaines31/marketingskills:skills/competitors"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "onboarding",
+      "name": "onboarding",
+      "rank": 487,
+      "installs24h": 560,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/onboarding",
+      "catalogId": "coreyhaines31/marketingskills:skills/onboarding"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "referrals",
+      "name": "referrals",
+      "rank": 488,
+      "installs24h": 560,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/referrals",
+      "catalogId": "coreyhaines31/marketingskills:skills/referrals"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "community-marketing",
+      "name": "community-marketing",
+      "rank": 489,
+      "installs24h": 559,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/community-marketing",
+      "catalogId": "coreyhaines31/marketingskills:community-marketing"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "influencer-marketing",
+      "name": "influencer-marketing",
+      "rank": 490,
+      "installs24h": 557,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/influencer-marketing",
+      "catalogId": "coreyhaines31/marketingskills:skills/influencer-marketing"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "landing-page-design",
+      "name": "landing-page-design",
+      "rank": 491,
+      "installs24h": 556,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/landing-page-design"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "video-ad-specs",
+      "name": "video-ad-specs",
+      "rank": 492,
+      "installs24h": 556,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/video-ad-specs"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "product-hunt-launch",
+      "name": "product-hunt-launch",
+      "rank": 493,
+      "installs24h": 556,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/product-hunt-launch"
+    },
+    {
+      "source": "coreyhaines31/marketingskills",
+      "skillId": "reverse-engineer-marketing",
+      "name": "reverse-engineer-marketing",
+      "rank": 494,
+      "installs24h": 556,
+      "fresh": true,
+      "sourceUrl": "https://skills.sh/coreyhaines31/marketingskills/reverse-engineer-marketing",
+      "catalogId": "coreyhaines31/marketingskills:reverse-engineer-marketing"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "image-to-video",
+      "name": "image-to-video",
+      "rank": 495,
+      "installs24h": 556,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/image-to-video"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "competitor-teardown",
+      "name": "competitor-teardown",
+      "rank": 496,
+      "installs24h": 556,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/competitor-teardown"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "product-photography",
+      "name": "product-photography",
+      "rank": 497,
+      "installs24h": 556,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/product-photography"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "storyboard-creation",
+      "name": "storyboard-creation",
+      "rank": 498,
+      "installs24h": 556,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/storyboard-creation"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "character-design-sheet",
+      "name": "character-design-sheet",
+      "rank": 499,
+      "installs24h": 556,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/character-design-sheet"
+    },
+    {
+      "source": "qu-skills/superpowers",
+      "skillId": "youtube-thumbnail-design",
+      "name": "youtube-thumbnail-design",
+      "rank": 500,
+      "installs24h": 556,
+      "sourceUrl": "https://skills.sh/qu-skills/superpowers/youtube-thumbnail-design"
+    }
+  ]
+}
