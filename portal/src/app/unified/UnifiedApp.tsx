@@ -84,6 +84,7 @@ import {
 } from "lucide-react";
 import {
   isMember,
+  macAppSeen,
   visibilityLabels,
   type PortalData,
   type PortalSet,
@@ -2209,7 +2210,7 @@ export function UnifiedApp({
                       </div>
                     </div>
                     {/* Installed as the library skill it is, whichever row it was opened from. */}
-                    {publicInstallAction({ ...selected, key: `catalog:${selected.catalogId}` }, !detailPending, data.devices.length > 0)}
+                    {publicInstallAction({ ...selected, key: `catalog:${selected.catalogId}` }, !detailPending, macAppSeen(data.devices))}
                   </Modal>
                 )}
                 {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}
