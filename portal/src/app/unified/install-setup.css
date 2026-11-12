@@ -23,9 +23,33 @@
 .ua-install-setup .ua-f1-install svg { flex-shrink: 0; }
 .ua-install-target { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 14px; }
 .ua-install-target select { border: 1px solid var(--ua-line); border-radius: 6px; padding: 6px 10px; color: var(--ua-body); background: var(--ua-chip); max-width: 100%; }
-.ua-agent-setup { border-top: 1px solid var(--ua-line); margin-top: 16px; padding-top: 16px; }
-.ua-agent-setup h5 { margin: 0 0 4px; font-size: 14px; font-weight: 600; color: var(--ua-body); }
-.ua-agent-setup p { margin: 0 0 10px; font-size: 13px; color: var(--ua-muted); }
-.ua-agent-setup pre { margin: 0 0 10px; padding: 12px 14px; border-radius: 10px; background: var(--ua-chip); color: var(--ua-body); white-space: pre-wrap; word-break: break-word; font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
-.ua-agent-setup-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 13px; }
-.ua-agent-setup-row a { color: var(--ua-muted); }
+/* Install pop-over (production): one main action, few words. */
+.ua-install-pop { display: flex; flex-direction: column; gap: 14px; border-top: 0; padding-top: 4px; margin: 0; }
+.ua-install-pop p { margin: 0; }
+.ua-install-agents { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ua-install-agent { display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 12px;
+  border: 1px solid var(--ua-line); background: var(--ua-chip); color: var(--ua-body); font: inherit; font-size: 14px; cursor: pointer; }
+.ua-install-agent[aria-checked="true"] { border-color: var(--ua-blue); box-shadow: 0 0 0 1px var(--ua-blue) inset; color: var(--ua-text, inherit); font-weight: 600; }
+.ua-install-agent .ua-agent-logo { width: 18px; height: 18px; }
+.ua-install-now { display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 12px;
+  border: 0; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; box-sizing: border-box; }
+.ua-install-now svg { width: 17px; height: 17px; }
+.ua-install-now:disabled { opacity: .5; cursor: default; }
+.ua-install-secondary { background: var(--ua-chip); color: var(--ua-body); border: 1px solid var(--ua-line); }
+.ua-install-pop .ua-install-lead { font-size: 14px; color: var(--ua-body); }
+.ua-install-get { display: flex; flex-direction: column; gap: 8px; }
+.ua-install-pop .ua-link { font-size: 13px; }
+.ua-install-switch { align-self: center; margin-top: 10px; }
+.ua-install-foot { display: flex; align-items: center; justify-content: space-between; }
+.ua-install-help-toggle { display: inline-flex; color: var(--ua-muted); }
+.ua-install-help-toggle svg { width: 16px; height: 16px; }
+.ua-install-pop .ua-install-fine { font-size: 12px; color: var(--ua-muted); }
+.ua-install-fine a { color: inherit; }
+.ua-install-pop .ua-install-status { font-size: 12px; color: var(--ua-muted); text-align: center; margin-top: 8px; }
+.ua-install-pop .ua-install-status:empty { display: none; }
+.ua-agent-setup { display: flex; flex-direction: column; gap: 6px; }
+.ua-agent-setup-toggle { align-self: center; display: inline-flex; align-items: center; gap: 4px; color: var(--ua-muted); }
+.ua-agent-setup-toggle svg { width: 14px; height: 14px; transition: transform .15s; }
+.ua-agent-setup-toggle svg[data-open] { transform: rotate(180deg); }
+.ua-agent-setup pre { margin: 0; padding: 12px 14px; border-radius: 10px; background: var(--ua-chip); color: var(--ua-body); white-space: pre-wrap; word-break: break-word; font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.ua-agent-setup-source { align-self: flex-start; font-size: 12px; color: var(--ua-muted); }

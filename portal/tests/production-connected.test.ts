@@ -87,14 +87,17 @@ test("production install handoff preserves both agents and cannot offer the test
   const before = [...storage.entries()];
   const markup = renderToStaticMarkup(createElement(module.exports.CatalogInstallSetup, { skill, detailReady: true,
     returnRoute: "/app/?view=discover&skill=catalog%3Aowner%2Frepo", store }));
+  // No Mac connected yet: the pop-over offers the published download and the agent prompt, in few words.
   assert.ok(markup.includes(productionDistribution.url));
-  assert.ok(markup.includes(productionDistribution.checksumURL));
-  assert.ok(markup.includes(`Download the Mac app ${productionDistribution.version}`));
-  assert.match(markup, /Apple silicon Mac, macOS 14\.0 or later/);
-  assert.match(markup, /replaces your existing omgskills Mac app/);
-  assert.match(markup, /installed skills stay in their current folders/);
-  assert.match(markup, /Quit the omgskills Mac app[^]*Move <strong>omgskills\.app<\/strong> into <strong>Applications/);
-  assert.match(markup, /Try opening again/);
+  assert.match(markup, /Download app/);
+  assert.match(markup, /I have the app/);
+  assert.doesNotMatch(markup, /Double-click|Move <strong>|Cancel setup/);
+  const known = renderToStaticMarkup(createElement(module.exports.CatalogInstallSetup, { skill, detailReady: true,
+    returnRoute: "/app/?view=discover&skill=catalog%3Aowner%2Frepo", appKnown: true,
+    store: new CatalogInstallIntentStore(() => ({ getItem: () => null, setItem() {}, removeItem() {} }), "production") }));
+  assert.match(known, /Install now/);
+  assert.match(known, /Don&#x27;t have the app\?/);
+  assert.doesNotMatch(known, /Download app/);
   assert.doesNotMatch(markup, /not been published|Disposable VM|F1 Test|Download test candidate|netlify\.app|omgskills-mac\.dmg/);
   const withCandidate = renderToStaticMarkup(createElement(module.exports.CatalogInstallSetup, { skill, detailReady: true,
     returnRoute: "/app/?view=discover&skill=catalog%3Aowner%2Frepo", store, distribution: candidateDistribution }));

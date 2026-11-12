@@ -186,13 +186,14 @@ function Preview() {
       publicInstallAction={installClient ? (skill, detailReady) => <PublicInstallSetup
         key={`${skill.catalogId}:${f2CaseKey}`} skill={skill} detailReady={detailReady && liveCatalog}
         caseKey={f2CaseKey} returnRoute={`${base}${previewSearch(nav)}`} store={installStore!} client={installClient} />
-        : (skill, detailReady) => <CatalogInstallSetup key={skill.key} skill={skill} detailReady={detailReady && liveCatalog}
+        : (skill, detailReady, appKnown) => <CatalogInstallSetup key={skill.key} skill={skill} detailReady={detailReady && liveCatalog} appKnown={appKnown}
           store={catalogStore} returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} />}
       onInstallCancel={() => catalogStore.clear()}
       onSession={session}
       additions={signedIn ? additions : undefined}
       cloud={{ state: cloudState, confirm: async key => setCloudState(state => ({ ...state,
-        needsReview: state.needsReview.map(review => review.key === key ? { ...review, confirmed: true } : review) })) }}
+        needsReview: state.needsReview.map(review => review.key === key ? { ...review, confirmed: true } : review) })),
+        remove: async key => setCloudState(state => ({ ...state, skills: state.skills.filter(skill => skill.key !== key) })) }}
       state={
         scenario === "loading" || scenario === "error" ? scenario : "ready"
       }

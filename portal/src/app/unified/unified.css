@@ -3017,3 +3017,8 @@ main:has(> .ua-az-anchor) .ua-content {
 @media (pointer: coarse) {
   .ua-modal input, .ua-modal textarea, .ua-modal select { font-size: 16px; }
 }
+/* "On Claude, Codex" + add to another agent: where a skill is installed, in one place. */
+.ua-on-agents { display: inline-flex; align-items: center; gap: 2px; }
+.ua-on-agents-label { gap: 6px; cursor: default; }
+.ua-on-agents-label .ua-agent-logo { width: 14px; height: 14px; }
+.ua-modal .ua-modal-action { align-self: flex-start; min-height: 36px; padding: 0 16px; }

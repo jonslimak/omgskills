@@ -1,5 +1,5 @@
 import { useEffect, useId, useState, useSyncExternalStore, type ReactNode } from "react";
-import { Download, RefreshCw, X } from "lucide-react";
+import { CircleHelp, Download, RefreshCw, X } from "lucide-react";
 import { agentKind, type SkillDisplay } from "./model";
 import { catalogInstallAction, catalogInstallClients, type CatalogInstallAgent } from "./public-install";
 import { CatalogInstallIntentStore, CatalogInstallSetupSession } from "./catalog-install-intent";
@@ -9,9 +9,11 @@ import { AgentSetupPrompt } from "./AgentSetupPrompt";
 import type { CandidateDistribution } from "../../candidate/distribution";
 import "./install-setup.css";
 
-export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, distribution }: {
+export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, distribution, appKnown = false }: {
   skill: SkillDisplay; detailReady: boolean; returnRoute: string; store: CatalogInstallIntentStore;
   distribution?: CandidateDistribution;
+  /** The account has a connected Mac, so the app is most likely installed. */
+  appKnown?: boolean;
 }) {
   const saved = store.read().intent;
   // Start on the agent that doesn't have the skill yet.
@@ -19,9 +21,19 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
     : skill.installed?.sources.some(source => agentKind(source) === "claude")
       && !skill.installed.sources.some(source => agentKind(source) === "codex") ? "codex" : "claude");
   const selectId = useId();
+  const pick = (next: CatalogInstallAgent) => { store.clear(); setAgent(next); };
+  if (store.client === "production") return <section className="ua-install-setup ua-install-pop" aria-label="Install skill">
+    <ProductionInstall key={agent} skill={skill} detailReady={detailReady} returnRoute={returnRoute} store={store} agent={agent} appKnown={appKnown}
+      picker={<div className="ua-install-agents" role="radiogroup" aria-label="Agent">
+      {(["claude", "codex"] as const).map(kind => <button key={kind} type="button" role="radio" aria-checked={agent === kind}
+        className="ua-install-agent" onClick={() => pick(kind)}>
+        <span className="ua-agent-logo" data-agent={kind} aria-hidden="true" />{kind === "claude" ? "Claude" : "Codex"}
+      </button>)}
+    </div>} />
+  </section>;
   const picker = <>
     <label className="ua-sr" htmlFor={selectId}>Agent</label>
-    <select id={selectId} value={agent} onChange={event => { store.clear(); setAgent(event.target.value as CatalogInstallAgent); }}>
+    <select id={selectId} value={agent} onChange={event => pick(event.target.value as CatalogInstallAgent)}>
       <option value="claude">Claude</option><option value="codex">Codex</option>
     </select>
   </>;
@@ -31,14 +43,7 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
   </section>;
 }
 
-function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent, distribution, picker }: {
-  skill: SkillDisplay; detailReady: boolean; returnRoute: string; store: CatalogInstallIntentStore; agent: CatalogInstallAgent;
-  distribution?: CandidateDistribution; picker: ReactNode;
-}) {
-  const downloadId = useId();
-  const appName = catalogInstallClients[store.client].name;
-  const download = store.client === "candidate" && distribution?.client === "candidate" ? distribution : undefined;
-  const productionDownload = store.client === "production" ? productionDistribution : undefined;
+function useInstallSession(skill: SkillDisplay, agent: CatalogInstallAgent, returnRoute: string, store: CatalogInstallIntentStore) {
   const [session] = useState(() => new CatalogInstallSetupSession({ catalogId: skill.catalogId ?? "", agent,
     returnRoute, store, refresh: refreshInstallSkill, open: href => window.location.assign(href) }));
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot, session.getSnapshot);
@@ -47,6 +52,63 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
     window.addEventListener("pagehide", abort);
     return () => { window.removeEventListener("pagehide", abort); abort(); };
   }, [session]);
+  return { session, state };
+}
+
+/** The published app: one Install now when the app is there, else Download or an agent prompt. Few words. */
+function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appKnown, picker }: {
+  skill: SkillDisplay; detailReady: boolean; returnRoute: string; store: CatalogInstallIntentStore; agent: CatalogInstallAgent; appKnown: boolean;
+  picker: ReactNode;
+}) {
+  const { session, state } = useInstallSession(skill, agent, returnRoute, store);
+  const [help, setHelp] = useState(false);
+  const app = productionDistribution;
+  const action = detailReady ? catalogInstallAction(skill, agent, store.client) : { href: null, reason: "Loading..." };
+  const busy = state.phase === "checking";
+  const ready = state.phase === "idle" || state.phase === "ready";
+  // A connected Mac means the app is there; "Don't have the app?" (or a saved setup) shows how to get it.
+  const getApp = state.phase === "setup" || (!appKnown && state.phase === "idle");
+  // Only what needs the person: approving in the app, or what went wrong.
+  const status = !action.href ? (detailReady ? action.reason : "")
+    : state.phase === "opening" ? `Approve it in the ${catalogInstallClients[store.client].name} app.` : state.phase === "blocked" ? state.message : "";
+  const install = ready
+    ? <button type="button" className="ua-primary ua-install-now" disabled={!action.href}
+        onClick={() => session.open(skill)} data-humblytics="App Install Start"><Download /> Install now</button>
+    : <button type="button" className="ua-primary ua-install-now" disabled={!action.href || busy || state.restartRequired}
+        onClick={() => void session.retry()}><RefreshCw /> {busy ? "Checking..." : "Install now"}</button>;
+  return <div className="ua-install-pop" aria-busy={busy}>
+    {getApp ? <>
+      <p className="ua-install-lead">First, get the Mac app.</p>
+      <div className="ua-install-get">
+        <a className="ua-primary ua-install-now" href={app.url} rel="noreferrer" data-humblytics="App Setup Download"
+          onClick={() => { if (state.phase === "idle") session.showSetup(skill); }}><Download /> Download app</a>
+        <AgentSetupPrompt />
+      </div>
+      <div className="ua-install-foot">
+        <button type="button" className="ua-link" disabled={!action.href || busy || state.restartRequired}
+          onClick={() => { if (state.phase === "idle") session.showSetup(skill); void session.retry(); }}>I have the app</button>
+        <button type="button" className="ua-link ua-install-help-toggle" aria-expanded={help} aria-label="About the Mac app"
+          onClick={() => setHelp(open => !open)}><CircleHelp aria-hidden="true" /></button>
+      </div>
+      {help && <p className="ua-install-fine">omgskills {app.version} · Apple silicon, macOS {app.minimumOS.replace(/\.0$/, "")}+ · <a href={app.checksumURL} rel="noreferrer">SHA-256</a></p>}
+    </> : <>
+      {picker}
+      {install}
+      <button type="button" className="ua-link ua-install-switch" disabled={!action.href || busy || state.restartRequired}
+        onClick={() => session.showSetup(skill)}>Don't have the app?</button>
+    </>}
+    <p role="status" className="ua-install-status">{getApp ? "" : status}</p>
+  </div>;
+}
+
+function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent, distribution, picker }: {
+  skill: SkillDisplay; detailReady: boolean; returnRoute: string; store: CatalogInstallIntentStore; agent: CatalogInstallAgent;
+  distribution?: CandidateDistribution; picker: ReactNode;
+}) {
+  const downloadId = useId();
+  const appName = catalogInstallClients[store.client].name;
+  const download = store.client === "candidate" && distribution?.client === "candidate" ? distribution : undefined;
+  const { session, state } = useInstallSession(skill, agent, returnRoute, store);
   const action = detailReady ? catalogInstallAction(skill, agent, store.client) : { href: null, reason: "Waiting for current catalog details." };
   const busy = state.phase === "checking";
   const ready = state.phase === "idle" || state.phase === "ready";
@@ -66,19 +128,7 @@ function CatalogInstallControls({ skill, detailReady, returnRoute, store, agent,
     <p>Approve installation in the Mac app. No account is needed for public skills. Automatic skill updates: Coming soon.</p>
     {state.phase === "setup" && <div className="ua-install-help">
       <h4>Mac setup</h4>
-      {productionDownload ? <>
-        <p>omgskills Mac app {productionDownload.version}. Apple silicon Mac, macOS {productionDownload.minimumOS} or later.</p>
-        <a className="ua-f1-install" href={productionDownload.url} rel="noreferrer" aria-describedby={downloadId} data-humblytics="App Setup Download"><Download /> Download the Mac app {productionDownload.version}</a>
-        <p>Installing this version manually replaces your existing omgskills Mac app. Your installed skills stay in their current folders.</p>
-        <ol id={downloadId}>
-          <li>Double-click <strong>{productionDownload.filename}</strong> in Finder to unzip it.</li>
-          <li>Quit the omgskills Mac app if it is running. Move <strong>{productionDownload.app}</strong> into <strong>Applications</strong>.</li>
-          <li>Open <strong>{productionDownload.app}</strong> from <strong>Applications</strong>. If macOS asks, choose <strong>Open</strong>.</li>
-          <li>Return here and choose <strong>Try opening again</strong>, then <strong>Open in {appName}</strong>. Approve installation in the app.</li>
-        </ol>
-        <a href={productionDownload.checksumURL} rel="noreferrer">SHA-256 checksum</a>
-        <AgentSetupPrompt />
-      </> : download ? <>
+      {download ? <>
         <p>Apple silicon Mac, macOS {download.minimumOS} or later. Candidate {download.version} (build {download.build}). Disposable VM only.</p>
         <p>This test candidate uses the public app's identity. Install only inside the disposable VM, never alongside or over your normal Mac app.</p>
         <a className="ua-f1-install" href={download.url} download={download.filename} rel="noreferrer" aria-describedby={downloadId}><Download /> Download test candidate {download.version}</a>

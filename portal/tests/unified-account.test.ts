@@ -204,9 +204,15 @@ test("set header never shows inactive saved emails or owner-only access records 
   assert.deepEqual(setAccessSummary({ ...set, visibility: "restricted", role: "invited" }), { people: ["Owner"], label: "Invite only" });
 });
 
-test("an added My skills row opens its library detail so Install works", () => {
+test("an added My skills row opens its library detail so Install works, and stays on My skills", () => {
   const added = { key: "added:a/r:pdf", catalogId: "a/r:pdf", added: true, name: "PDF", author: "a", description: "", tags: [], githubUrl: null };
-  assert.deepEqual(openSkillNavigation(initialNavigation, added), { ...initialNavigation, view: "discover", selected: "catalog:a/r:pdf" });
+  const opened = openSkillNavigation(initialNavigation, added);
+  assert.deepEqual(opened, { ...initialNavigation, selected: "catalog:a/r:pdf" });
+  assert.equal(accountNavigation(opened, true).selected, "catalog:a/r:pdf");
+  // The public service gets only the public skill ID, never the private search.
+  assert.deepEqual(publicNavigation({ ...opened, query: "private" }), { ...initialNavigation, selected: "catalog:a/r:pdf" });
+  const inSet = { ...initialNavigation, view: "set" as const, id: "s1" };
+  assert.deepEqual(openSkillNavigation(inSet, added), { ...initialNavigation, view: "discover", selected: "catalog:a/r:pdf" });
   const discover = { ...initialNavigation, view: "discover" as const, query: "pdf" };
   assert.deepEqual(openSkillNavigation(discover, added), { ...discover, selected: "catalog:a/r:pdf" });
 });

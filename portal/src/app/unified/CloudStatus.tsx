@@ -3,7 +3,9 @@ import { Cloud, CloudOff, TriangleAlert } from "lucide-react";
 import { needsAttention, statusHelp, statusText, labelText, type CloudSaveState, type CloudSkillRow } from "../../cloud-save/cloud-save";
 
 /** The account's cloud save state, and confirming a skill flagged for a key is safe to save. */
-export type CloudInfo = { state: CloudSaveState; confirm: (key: string) => Promise<void> };
+export type CloudInfo = { state: CloudSaveState; confirm: (key: string) => Promise<void>;
+  /** Deletes a saved skill no Mac has, which takes it out of My skills. */
+  remove?: (key: string) => Promise<void> };
 
 /** A skill's cloud save status as one short label beside its actions; the detail shows on hover. */
 export function CloudStatusBadge({ row: shown, notInstalled = false }: { row: CloudSkillRow | null; notInstalled?: boolean }) {
