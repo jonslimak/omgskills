@@ -36,20 +36,29 @@
 .ua-install-now svg { width: 17px; height: 17px; }
 .ua-install-now:disabled { opacity: .5; cursor: default; }
 .ua-install-secondary { background: var(--ua-chip); color: var(--ua-body); border: 1px solid var(--ua-line); }
-.ua-install-pop .ua-install-lead { font-size: 14px; color: var(--ua-body); }
+.ua-install-pop .ua-install-lead { font-size: 14px; color: var(--ua-body); text-align: center; }
 .ua-install-get { display: flex; flex-direction: column; gap: 8px; }
-.ua-install-pop .ua-link { font-size: 13px; }
+.ua-install-pop .ua-link { font-size: 12px; }
 .ua-install-switch { align-self: center; margin-top: 10px; }
 .ua-install-foot { display: flex; align-items: center; justify-content: space-between; }
 .ua-install-help-toggle { display: inline-flex; color: var(--ua-muted); }
 .ua-install-help-toggle svg { width: 16px; height: 16px; }
-.ua-install-pop .ua-install-fine { font-size: 12px; color: var(--ua-muted); }
+.ua-install-pop .ua-install-fine { font-size: 11px; color: var(--ua-muted); }
 .ua-install-fine a { color: inherit; }
-.ua-install-pop .ua-install-status { font-size: 12px; color: var(--ua-muted); text-align: center; margin-top: 8px; }
+.ua-install-pop .ua-install-status { font-size: 11px; color: var(--ua-muted); text-align: center; margin-top: 8px; }
 .ua-install-pop .ua-install-status:empty { display: none; }
 .ua-agent-setup { display: flex; flex-direction: column; gap: 6px; }
 .ua-agent-setup-toggle { align-self: center; display: inline-flex; align-items: center; gap: 4px; color: var(--ua-muted); }
 .ua-agent-setup-toggle svg { width: 14px; height: 14px; transition: transform .15s; }
 .ua-agent-setup-toggle svg[data-open] { transform: rotate(180deg); }
 .ua-agent-setup pre { margin: 0; padding: 12px 14px; border-radius: 10px; background: var(--ua-chip); color: var(--ua-body); white-space: pre-wrap; word-break: break-word; font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
-.ua-agent-setup-source { align-self: flex-start; font-size: 12px; color: var(--ua-muted); }
+.ua-agent-setup-source { align-self: flex-start; font-size: 11px; color: var(--ua-muted); }
+.ua-install-skill { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; margin: 4px 0 18px; min-width: 0; }
+.ua-install-skill > div { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; max-width: 100%; }
+.ua-install-skill .ua-detail-meta { justify-content: center; }
+.ua-install-pop .ua-install-lead small { font-size: 12px; color: var(--ua-muted); }
+.ua-install-skill strong { font-size: 17px; letter-spacing: -.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ua-install-skill .ua-detail-meta { font-size: 11px; }
+.ua-install-pop .ua-install-lead a { color: var(--ua-blue); text-decoration: none; }
+.ua-install-pop .ua-install-lead a:hover { text-decoration: underline; }
+.ua-modal:has(.ua-install-skill) h2 { text-align: center; padding: 0 20px; }

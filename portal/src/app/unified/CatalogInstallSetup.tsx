@@ -1,5 +1,5 @@
 import { useEffect, useId, useState, useSyncExternalStore, type ReactNode } from "react";
-import { CircleHelp, Download, RefreshCw, X } from "lucide-react";
+import { Download, RefreshCw, X } from "lucide-react";
 import { agentKind, type SkillDisplay } from "./model";
 import { catalogInstallAction, catalogInstallClients, type CatalogInstallAgent } from "./public-install";
 import { CatalogInstallIntentStore, CatalogInstallSetupSession } from "./catalog-install-intent";
@@ -22,7 +22,7 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
       && !skill.installed.sources.some(source => agentKind(source) === "codex") ? "codex" : "claude");
   const selectId = useId();
   const pick = (next: CatalogInstallAgent) => { store.clear(); setAgent(next); };
-  // Once "I have the app" checks out, switching agents stays on Install now.
+  // Once a check succeeds, switching agents stays on Install now.
   const [confirmed, setConfirmed] = useState(false);
   if (store.client === "production") return <section className="ua-install-setup ua-install-pop" aria-label="Install skill">
     <ProductionInstall key={agent} skill={skill} detailReady={detailReady} returnRoute={returnRoute} store={store} agent={agent}
@@ -58,6 +58,8 @@ function useInstallSession(skill: SkillDisplay, agent: CatalogInstallAgent, retu
   return { session, state };
 }
 
+const OPEN_WAIT_MS = 5000;
+
 /** The published app: one Install now when the app is there, else Download or an agent prompt. Few words. */
 function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appKnown, onAppConfirmed, picker }: {
   skill: SkillDisplay; detailReady: boolean; returnRoute: string; store: CatalogInstallIntentStore; agent: CatalogInstallAgent; appKnown: boolean;
@@ -65,42 +67,48 @@ function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appK
 }) {
   const { session, state } = useInstallSession(skill, agent, returnRoute, store);
   useEffect(() => { if (state.phase === "ready") onAppConfirmed(); }, [state.phase, onAppConfirmed]);
-  const [help, setHelp] = useState(false);
+  // The page can't see whether the app opened, so after a few seconds it says how to try again.
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    setSlow(false);
+    if (state.phase !== "opening") return;
+    const timer = window.setTimeout(() => setSlow(true), OPEN_WAIT_MS);
+    return () => window.clearTimeout(timer);
+  }, [state.phase, state.intent]);
   const app = productionDistribution;
   const action = detailReady ? catalogInstallAction(skill, agent, store.client) : { href: null, reason: "Loading..." };
   const busy = state.phase === "checking";
   const ready = state.phase === "idle" || state.phase === "ready";
-  // A connected Mac means the app is there; "Don't have the app?" (or a saved setup) shows how to get it.
-  const getApp = state.phase === "setup" || (!appKnown && state.phase === "idle");
-  // Only what needs the person: approving in the app, or what went wrong.
+  // A connected Mac means the app is there, even after a saved Download step; "Don't have the Mac install helper?" shows how to get it.
+  const [wantApp, setWantApp] = useState(false);
+  const getApp = wantApp || (!appKnown && (state.phase === "idle" || state.phase === "setup"));
+  // Only what needs the person: opening the app, or what went wrong.
   const status = !action.href ? (detailReady ? action.reason : "")
     : state.restartRequired ? "This request is out of date."
-    : state.phase === "opening" ? `Approve it in the ${catalogInstallClients[store.client].name} app.` : state.phase === "blocked" ? state.message : "";
-  const install = ready
-    ? <button type="button" className="ua-primary ua-install-now" disabled={!action.href}
-        onClick={() => session.open(skill)} data-humblytics="App Install Start"><Download /> Install now</button>
+    : state.phase === "opening" ? (slow ? "Didn't open? Open omgskills from Applications, then try again." : "Opening omgskills...")
+    : state.phase === "blocked" ? state.message : "";
+  const install = ready || state.phase === "opening" || state.phase === "setup"
+    ? <button type="button" className="ua-primary ua-install-now" disabled={!action.href || state.restartRequired}
+        onClick={() => { if (ready) session.open(skill); else void session.retry().then(() => session.open(skill)); }}
+        data-humblytics="App Install Start"><Download /> Install now</button>
     : <button type="button" className="ua-primary ua-install-now" disabled={!action.href || busy || state.restartRequired}
         onClick={() => void session.retry()}><RefreshCw /> {busy ? "Checking..." : "Install now"}</button>;
   return <div className="ua-install-pop" aria-busy={busy}>
     {getApp ? <>
-      <p className="ua-install-lead">First, get the Mac app.</p>
+      <p className="ua-install-lead">Get the Mac install helper.<br /><small>Not sure? Have your agent <a href="https://omgskills.com/safety/" target="_blank" rel="noreferrer">check it's safe</a>.</small></p>
       <div className="ua-install-get">
         <a className="ua-primary ua-install-now" href={app.url} rel="noreferrer" data-humblytics="App Setup Download"
           onClick={() => { if (state.phase === "idle") session.showSetup(skill); }}><Download /> Download app</a>
         <AgentSetupPrompt />
       </div>
-      <div className="ua-install-foot">
-        <button type="button" className="ua-link" disabled={!action.href || busy || state.restartRequired}
-          onClick={() => { if (state.phase === "idle") session.showSetup(skill); void session.retry(); }}>I have the app</button>
-        <button type="button" className="ua-link ua-install-help-toggle" aria-expanded={help} aria-label="About the Mac app"
-          onClick={() => setHelp(open => !open)}><CircleHelp aria-hidden="true" /></button>
-      </div>
-      {help && <p className="ua-install-fine">omgskills {app.version} · Apple silicon, macOS {app.minimumOS.replace(/\.0$/, "")}+ · <a href={app.checksumURL} rel="noreferrer">SHA-256</a></p>}
+      {/* Hidden when a connected Mac was found, unless they chose this screen: then it's the way back to Install now. */}
+      {(!appKnown || wantApp) && <button type="button" className="ua-link ua-install-switch" disabled={!action.href || busy || state.restartRequired}
+        onClick={() => { setWantApp(false); if (state.phase === "idle") session.showSetup(skill); void session.retry(); }}>I have the app</button>}
     </> : <>
       {picker}
       {install}
       <button type="button" className="ua-link ua-install-switch" disabled={!action.href || busy || state.restartRequired}
-        onClick={() => session.showSetup(skill)}>Don't have the app?</button>
+        onClick={() => { session.showSetup(skill); setWantApp(true); }}>Don't have the Mac install helper?</button>
     </>}
     <p role="status" className="ua-install-status">{getApp ? "" : status}</p>
     {state.restartRequired && <button type="button" className="ua-link ua-install-switch" onClick={() => session.reset()}>Start over</button>}
