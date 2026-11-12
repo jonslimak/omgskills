@@ -1958,34 +1958,24 @@
 .ua-detail-signin {
   margin-left: auto;
 }
-.ua-install-card {
-  /* Sits 8px under the buttons that open it (the header's own gap is 16px). */
-  margin-top: -8px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--ua-chip);
-  max-height: 50vh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
 /* Install sits beside the agent picker at the same height, as a pill. */
-.ua-install-card .ua-install-buttons .ua-f1-install {
+.ua-modal .ua-install-buttons .ua-f1-install {
   min-height: 30px;
   padding: 0 14px;
   border-radius: 999px;
   line-height: 30px;
 }
-.ua-install-card .ua-install-buttons .ua-f1-install svg {
+.ua-modal .ua-install-buttons .ua-f1-install svg {
   width: 16px;
   height: 16px;
 }
-.ua-install-card .ua-install-setup {
+.ua-modal .ua-install-setup {
   border-top: 0;
   padding-top: 0;
   margin: 0;
 }
-.ua-install-card .ua-install-buttons select,
-.ua-install-card .ua-install-setup .ua-f1-install:not(.ua-primary) {
+.ua-modal .ua-install-buttons select,
+.ua-modal .ua-install-setup .ua-f1-install:not(.ua-primary) {
   background: var(--ua-bg);
 }
 .ua-detail-meta .ua-link {

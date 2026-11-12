@@ -29,7 +29,7 @@
 .ua-install-agents { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .ua-install-agent { display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 12px;
   border: 1px solid var(--ua-line); background: var(--ua-chip); color: var(--ua-body); font: inherit; font-size: 14px; cursor: pointer; }
-.ua-install-agent[aria-checked="true"] { border-color: var(--ua-blue); box-shadow: 0 0 0 1px var(--ua-blue) inset; color: var(--ua-text, inherit); font-weight: 600; }
+.ua-install-agent[aria-pressed="true"] { border-color: var(--ua-blue); box-shadow: 0 0 0 1px var(--ua-blue) inset; color: var(--ua-text, inherit); font-weight: 600; }
 .ua-install-agent .ua-agent-logo { width: 18px; height: 18px; }
 .ua-install-now { display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 12px;
   border: 0; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; box-sizing: border-box; }

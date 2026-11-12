@@ -145,7 +145,7 @@ import { CloudStatusBadge, CloudStatusSection, type CloudInfo } from "./CloudSta
 import { looksLikeGithubLink, type MySkillAdditions } from "../my-skills-additions";
 import { AddSkillForm } from "./AddSkillDialog";
 import { PortalApiError } from "../../api-error";
-import { cloudSkillRows, needsAttention, skillCloudRow, statusText } from "../../cloud-save/cloud-save";
+import { cloudSkillRows, needsAttention, setsNote, skillCloudRow, statusText } from "../../cloud-save/cloud-save";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
@@ -598,7 +598,8 @@ export function UnifiedApp({
   // A synced personal skill no Mac has installs from the account's saved copy (the Mac app checks it's kept).
   const savedInstall = !!(onMac && signedIn && (!readOnlyAccount || management) && detail?.cloudKey && !detail.catalogId);
   const missingAgent = installedHere && !(installedAgents.includes("claude") && installedAgents.includes("codex"));
-  const canInstall = !!(onMac && signedIn && publicInstallAction && detail?.catalogId);
+  // The app installs a library skill opened as itself (Set rows keep the copy command).
+  const canInstall = !!(onMac && signedIn && publicInstallAction && detail?.catalogId && detail.key === `catalog:${detail.catalogId}`);
   // An install that finishes changes where the skill is; close the card and drop its intent.
   const installDone = useRef(installedAgents);
   useEffect(() => {
@@ -738,13 +739,28 @@ export function UnifiedApp({
     open({ key: `catalog:${entry.catalogId}`, catalogId: entry.catalogId, name: entry.name,
       author: entry.source.split("/")[0], description: "", githubUrl: null, tags: [] });
   }
+  // Synced copies are deleted for good (every version, and from Sets); say so before it happens.
+  function removeWarning(skills: SkillDisplay[]) {
+    const rows = skills.flatMap(skill => { const row = skill.cloudKey ? cloudRow(skill) : null; return row ? [row] : []; });
+    const one = skills.length === 1;
+    if (!rows.length) return `${one ? "It's" : "They're"} taken out of My skills. You can add ${one ? "it" : "them"} again from the library.`;
+    const versions = rows.reduce((total, row) => total + row.versionCount, 0);
+    const sets = rows.reduce((total, row) => total + row.setCount, 0);
+    return `This deletes ${one ? "its" : "their"} synced ${versions === 1 ? "copy" : `copies (${versions} versions)`} from your account. It can't be undone.${setsNote(sets)}`;
+  }
   async function removeSaved(skills: SkillDisplay[]) {
     setRemoving(null);
     const keys = skills.map(skill => skill.key);
     setRemoved(old => [...old, ...keys]);
     setPicked(old => old.filter(key => !keys.includes(key)));
-    const results = await Promise.allSettled(skills.map(skill => skill.cloudKey && cloud?.remove
-      ? cloud.remove(skill.cloudKey) : additions ? additions.remove(skill.catalogId!) : Promise.reject(new Error("unavailable"))));
+    const results = await Promise.allSettled(skills.map(async skill => {
+      if (skill.cloudKey && cloud?.remove) {
+        await cloud.remove(skill.cloudKey);
+        // The same library skill can also be in My skills as an addition; take that out too.
+        if (skill.catalogId && additions && inMySkills(skill.catalogId)) await additions.remove(skill.catalogId);
+      } else if (additions && skill.catalogId) await additions.remove(skill.catalogId);
+      else throw new Error("unavailable");
+    }));
     const failed = skills.filter((_, index) => results[index].status === "rejected");
     if (failed.length) {
       setRemoved(old => old.filter(key => !failed.some(skill => skill.key === key)));
@@ -937,7 +953,7 @@ export function UnifiedApp({
       <div
         key={skill.key}
         className={`ua-row ${compact ? "ua-row-compact" : ""}`}
-        data-selected={selected?.key === skill.key}
+        data-selected={selected?.key === skill.key || (!!skill.added && selected?.key === `catalog:${skill.catalogId}`)}
         data-letter={!discovery && !compact ? railLetter(skill.name) : undefined}
       >
         {canSelect && (
@@ -2091,7 +2107,7 @@ export function UnifiedApp({
                         <span key={kind} className="ua-agent-logo" data-agent={kind} aria-hidden="true" />)}
                       On {displaySourceNames(detailLive.sources).join(", ")}
                     </span>
-                    {canInstall && missingAgent && <IconButton label="Add to another agent" onClick={() => setInstallOpen(true)}>
+                    {canInstall && missingAgent && <IconButton label="Add to another agent" aria-haspopup="dialog" onClick={() => setInstallOpen(true)}>
                       <Plus />
                     </IconButton>}
                   </span>}
@@ -2342,8 +2358,9 @@ export function UnifiedApp({
       {management?.dialog(theme)}
       {removing && (
         <Modal title={removing.length === 1 ? `Remove ${removing[0].name}?` : `Remove ${removing.length} skills?`} theme={theme} close={() => setRemoving(null)}>
-          <p className="ua-muted">{removing.length === 1 ? "It's removed from My skills." : "They're removed from My skills."} No Mac has {removing.length === 1 ? "it" : "them"}.</p>
-          <button type="button" className="ua-pill ua-pill-danger ua-modal-action" onClick={() => void removeSaved(removing)}>Remove</button>
+          <p className="ua-muted">{removeWarning(removing)}</p>
+          <button type="button" className="ua-pill ua-pill-danger ua-modal-action" onClick={() => void removeSaved(removing)}>
+            {removing.some(skill => skill.cloudKey) ? "Delete" : "Remove"}</button>
         </Modal>
       )}
       {!readOnlyAccount && dialog === "new-set" && (

@@ -22,10 +22,13 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
       && !skill.installed.sources.some(source => agentKind(source) === "codex") ? "codex" : "claude");
   const selectId = useId();
   const pick = (next: CatalogInstallAgent) => { store.clear(); setAgent(next); };
+  // Once "I have the app" checks out, switching agents stays on Install now.
+  const [confirmed, setConfirmed] = useState(false);
   if (store.client === "production") return <section className="ua-install-setup ua-install-pop" aria-label="Install skill">
-    <ProductionInstall key={agent} skill={skill} detailReady={detailReady} returnRoute={returnRoute} store={store} agent={agent} appKnown={appKnown}
-      picker={<div className="ua-install-agents" role="radiogroup" aria-label="Agent">
-      {(["claude", "codex"] as const).map(kind => <button key={kind} type="button" role="radio" aria-checked={agent === kind}
+    <ProductionInstall key={agent} skill={skill} detailReady={detailReady} returnRoute={returnRoute} store={store} agent={agent}
+      appKnown={appKnown || confirmed} onAppConfirmed={() => setConfirmed(true)}
+      picker={<div className="ua-install-agents" role="group" aria-label="Agent">
+      {(["claude", "codex"] as const).map(kind => <button key={kind} type="button" aria-pressed={agent === kind}
         className="ua-install-agent" onClick={() => pick(kind)}>
         <span className="ua-agent-logo" data-agent={kind} aria-hidden="true" />{kind === "claude" ? "Claude" : "Codex"}
       </button>)}
@@ -56,11 +59,12 @@ function useInstallSession(skill: SkillDisplay, agent: CatalogInstallAgent, retu
 }
 
 /** The published app: one Install now when the app is there, else Download or an agent prompt. Few words. */
-function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appKnown, picker }: {
+function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appKnown, onAppConfirmed, picker }: {
   skill: SkillDisplay; detailReady: boolean; returnRoute: string; store: CatalogInstallIntentStore; agent: CatalogInstallAgent; appKnown: boolean;
-  picker: ReactNode;
+  onAppConfirmed: () => void; picker: ReactNode;
 }) {
   const { session, state } = useInstallSession(skill, agent, returnRoute, store);
+  useEffect(() => { if (state.phase === "ready") onAppConfirmed(); }, [state.phase, onAppConfirmed]);
   const [help, setHelp] = useState(false);
   const app = productionDistribution;
   const action = detailReady ? catalogInstallAction(skill, agent, store.client) : { href: null, reason: "Loading..." };
@@ -70,6 +74,7 @@ function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appK
   const getApp = state.phase === "setup" || (!appKnown && state.phase === "idle");
   // Only what needs the person: approving in the app, or what went wrong.
   const status = !action.href ? (detailReady ? action.reason : "")
+    : state.restartRequired ? "This request is out of date."
     : state.phase === "opening" ? `Approve it in the ${catalogInstallClients[store.client].name} app.` : state.phase === "blocked" ? state.message : "";
   const install = ready
     ? <button type="button" className="ua-primary ua-install-now" disabled={!action.href}
@@ -98,6 +103,7 @@ function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appK
         onClick={() => session.showSetup(skill)}>Don't have the app?</button>
     </>}
     <p role="status" className="ua-install-status">{getApp ? "" : status}</p>
+    {state.restartRequired && <button type="button" className="ua-link ua-install-switch" onClick={() => session.reset()}>Start over</button>}
   </div>;
 }
 
