@@ -1,5 +1,5 @@
 import { useEffect, useId, useState, useSyncExternalStore, type ReactNode } from "react";
-import { CircleHelp, Download, RefreshCw, X } from "lucide-react";
+import { Download, RefreshCw, X } from "lucide-react";
 import { agentKind, type SkillDisplay } from "./model";
 import { catalogInstallAction, catalogInstallClients, type CatalogInstallAgent } from "./public-install";
 import { CatalogInstallIntentStore, CatalogInstallSetupSession } from "./catalog-install-intent";
@@ -65,7 +65,6 @@ function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appK
 }) {
   const { session, state } = useInstallSession(skill, agent, returnRoute, store);
   useEffect(() => { if (state.phase === "ready") onAppConfirmed(); }, [state.phase, onAppConfirmed]);
-  const [help, setHelp] = useState(false);
   const app = productionDistribution;
   const action = detailReady ? catalogInstallAction(skill, agent, store.client) : { href: null, reason: "Loading..." };
   const busy = state.phase === "checking";
@@ -89,13 +88,6 @@ function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appK
           onClick={() => { if (state.phase === "idle") session.showSetup(skill); }}><Download /> Download app</a>
         <AgentSetupPrompt />
       </div>
-      <div className="ua-install-foot">
-        <button type="button" className="ua-link" disabled={!action.href || busy || state.restartRequired}
-          onClick={() => { if (state.phase === "idle") session.showSetup(skill); void session.retry(); }}>I have the app</button>
-        <button type="button" className="ua-link ua-install-help-toggle" aria-expanded={help} aria-label="About the Mac app"
-          onClick={() => setHelp(open => !open)}><CircleHelp aria-hidden="true" /></button>
-      </div>
-      {help && <p className="ua-install-fine">omgskills {app.version} · Apple silicon, macOS {app.minimumOS.replace(/\.0$/, "")}+ · <a href={app.checksumURL} rel="noreferrer">SHA-256</a></p>}
     </> : <>
       {picker}
       {install}
