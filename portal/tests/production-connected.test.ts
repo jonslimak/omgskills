@@ -98,6 +98,11 @@ test("production install handoff preserves both agents and cannot offer the test
   assert.match(known, /Install now/);
   assert.match(known, /Don&#x27;t have the Mac install helper\?/);
   assert.doesNotMatch(known, /Download app/);
+  // A saved Download step (from before the Mac connected) doesn't keep a connected account on the get-app screen.
+  const savedThenConnected = renderToStaticMarkup(createElement(module.exports.CatalogInstallSetup, { skill, detailReady: true,
+    returnRoute: "/app/?view=discover&skill=catalog%3Aowner%2Frepo", appKnown: true, store }));
+  assert.match(savedThenConnected, /Install now/);
+  assert.doesNotMatch(savedThenConnected, /Download app/);
   assert.doesNotMatch(markup, /not been published|Disposable VM|F1 Test|Download test candidate|netlify\.app|omgskills-mac\.dmg/);
   const withCandidate = renderToStaticMarkup(createElement(module.exports.CatalogInstallSetup, { skill, detailReady: true,
     returnRoute: "/app/?view=discover&skill=catalog%3Aowner%2Frepo", store, distribution: candidateDistribution }));
