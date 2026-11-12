@@ -59,3 +59,4 @@
 .ua-install-skill .ua-detail-meta { font-size: 12px; }
 .ua-install-pop .ua-install-lead a { color: var(--ua-blue); text-decoration: none; }
 .ua-install-pop .ua-install-lead a:hover { text-decoration: underline; }
+.ua-modal:has(.ua-install-skill) h2 { text-align: center; padding: 0 20px; }
