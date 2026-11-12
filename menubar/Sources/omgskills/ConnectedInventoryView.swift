@@ -7,6 +7,20 @@ struct ConnectedInventoryView: View {
     let model: DeviceConnectionModel
     let deviceName: String
     var runtime: ConnectedInventoryRuntime? = nil
+    /// The panel shows Connect account on its top row, next to the app menu.
+    var connectInHeader = false
+
+    /// Signed out or failed: the one thing to do is connect.
+    static func needsConnect(_ model: DeviceConnectionModel) -> Bool {
+        switch model.state { case .disconnected, .failed: return true; default: return false }
+    }
+
+    static func connectButton(model: DeviceConnectionModel, deviceName: String, runtime: ConnectedInventoryRuntime?) -> some View {
+        Button("Connect account", systemImage: "person.crop.circle.badge.plus") {
+            if let runtime { runtime.connect(deviceName: deviceName) }
+            else { model.connectWithBrowser(deviceName: deviceName, installations: [], replacingExisting: true) }
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -45,10 +59,7 @@ struct ConnectedInventoryView: View {
                 if case .failed(let failure) = model.state {
                     Text(Self.connectionMessage(failure)).font(.callout).foregroundStyle(.red)
                 }
-                Button("Connect account", systemImage: "person.crop.circle.badge.plus") {
-                    if let runtime { runtime.connect(deviceName: deviceName) }
-                    else { model.connectWithBrowser(deviceName: deviceName, installations: [], replacingExisting: true) }
-                }
+                if !connectInHeader { Self.connectButton(model: model, deviceName: deviceName, runtime: runtime) }
                 Text("Share skills across teams & agents.").font(.caption).foregroundStyle(.secondary)
             }
             if let warning = model.continuityWarning {
