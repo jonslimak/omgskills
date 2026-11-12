@@ -367,11 +367,13 @@ function ManagedSetHeader({ set, skills, management, theme, headingActions }: {
 }
 export function Modal({
   title,
+  label,
   close,
   theme,
   children,
 }: {
   title: string;
+  label?: string;
   close: () => void;
   theme: string;
   children: ReactNode;
@@ -385,6 +387,7 @@ export function Modal({
           className="ua-modal ua-theme"
           data-theme={theme}
           aria-describedby={undefined}
+          aria-label={label}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             if (trigger.current?.isConnected) trigger.current.focus();
@@ -2193,15 +2196,15 @@ export function UnifiedApp({
                   </p>
                 )}
                 {installOpen && selected && signedIn && publicInstallAction && (
-                  <Modal title={installedHere ? "Add to another agent" : "Install"} theme={theme}
+                  <Modal title={installedHere ? "Add to another agent" : "Install"} label={`${installedHere ? "Add to another agent" : "Install"}: ${selected.name}`} theme={theme}
                     close={() => { setInstallOpen(false); onInstallCancel?.(); }}>
                     <div className="ua-install-skill">
-                      <Avatar src={detail?.avatar ?? selected.avatar} name={detail?.author || selected.author || selected.name} size="large" />
+                      <Avatar src={selected.avatar} name={selected.author || selected.name} size="large" />
                       <div>
                         <strong>{selected.name}</strong>
                         <div className="ua-detail-meta">
-                          {(detail?.author || selected.author) && <span>@{detail?.author || selected.author}</span>}
-                          {(detail?.stars ?? selected.stars) !== undefined && <span><Star />{starCount((detail?.stars ?? selected.stars)!)}</span>}
+                          {selected.author && <span>@{selected.author}</span>}
+                          {selected.stars !== undefined && <span><Star />{starCount(selected.stars)}</span>}
                         </div>
                       </div>
                     </div>

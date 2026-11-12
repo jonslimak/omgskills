@@ -30,9 +30,10 @@
 
     <h2>What it does</h2>
     <ul>
-      <li>Installs the skills you choose into your agents' skill folders, such as <code>~/.claude/skills</code> and <code>~/.agents/skills</code>. It asks you to approve each install.</li>
+      <li>Installs the skills you choose into your agents' skill folders, <code>~/.claude/skills</code> and <code>~/.codex/skills</code>. It asks you to approve each install.</li>
       <li>Shows the skills on your Mac, and syncs My skills only if you turn sync on.</li>
       <li>Fetches public skills from GitHub, and talks to omgskills.com for your account.</li>
+      <li>When your Mac is connected, it reports the list of skills on it (names and descriptions, not their files) and sends basic usage analytics. See the <a href="/privacy/">privacy policy</a>.</li>
       <li>Updates itself with signed updates.</li>
     </ul>
 
@@ -48,15 +49,15 @@
       <li><strong>Source code:</strong> <a href="https://github.com/jonslimak/omgskills/tree/main/menubar">github.com/jonslimak/omgskills</a> (the <code>menubar</code> folder).</li>
       <li><strong>Releases:</strong> every download is on <a href="https://github.com/jonslimak/omgskills/releases">GitHub Releases</a>, with a <code>.sha256</code> checksum next to it.</li>
       <li><strong>Signed and notarized by Apple:</strong> Developer ID team <code>S4R7UHY755</code>.</li>
-      <li><strong>Install script:</strong> <a href="/install.sh">omgskills.com/install.sh</a> downloads the app, checks the checksum and signature, and puts it in Applications. Read it before running it.</li>
+      <li><strong>Install script:</strong> <a href="/install.sh">omgskills.com/install.sh</a> downloads the app, checks the checksum and signature, puts it in Applications (or <code>~/Applications</code>), moves an older copy to the Trash, and opens it. Read it before running it.</li>
     </ul>
-    <p>After downloading, these commands confirm the app is ours and approved by macOS:</p>
+    <p>After installing, these commands confirm the app is ours and approved by macOS (use <code>~/Applications</code> if that's where it went):</p>
 <pre>codesign --verify --deep --strict /Applications/omgskills.app
 codesign -dv /Applications/omgskills.app 2&gt;&amp;1 | grep TeamIdentifier   # S4R7UHY755
 spctl --assess --type execute -v /Applications/omgskills.app        # accepted, Notarized Developer ID</pre>
 
     <h2>Remove it</h2>
-    <p>Quit omgskills from the menu bar and drag <code>omgskills.app</code> to the Trash. Skills it installed stay in your agents' folders until you delete them.</p>
+    <p>Quit omgskills from the menu bar and drag <code>omgskills.app</code> to the Trash. Skills it installed are links in your agents' folders to copies in <code>~/Library/Application Support/omgskills</code>; delete both to remove them.</p>
 
     <h2>Questions</h2>
     <p>See <a href="/support/">support</a>.</p>
