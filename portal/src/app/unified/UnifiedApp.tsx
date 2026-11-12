@@ -598,8 +598,8 @@ export function UnifiedApp({
   // A synced personal skill no Mac has installs from the account's saved copy (the Mac app checks it's kept).
   const savedInstall = !!(onMac && signedIn && (!readOnlyAccount || management) && detail?.cloudKey && !detail.catalogId);
   const missingAgent = installedHere && !(installedAgents.includes("claude") && installedAgents.includes("codex"));
-  // The app installs a library skill opened as itself (Set rows keep the copy command).
-  const canInstall = !!(onMac && signedIn && publicInstallAction && detail?.catalogId && detail.key === `catalog:${detail.catalogId}`);
+  // The app installs any library skill, from Discover or My skills (Set rows keep the copy command).
+  const canInstall = !!(onMac && signedIn && publicInstallAction && detail?.catalogId && !detail.setItemKind && !detail.installed?.isLocalOnly);
   // An install that finishes changes where the skill is; close the card and drop its intent.
   const installDone = useRef(installedAgents);
   useEffect(() => {
@@ -2195,7 +2195,8 @@ export function UnifiedApp({
                 {installOpen && selected && signedIn && publicInstallAction && (
                   <Modal title={installedHere ? "Add to another agent" : `Install ${selected.name}`} theme={theme}
                     close={() => { setInstallOpen(false); onInstallCancel?.(); }}>
-                    {publicInstallAction(selected, !detailPending, data.devices.length > 0)}
+                    {/* Installed as the library skill it is, whichever row it was opened from. */}
+                    {publicInstallAction({ ...selected, key: `catalog:${selected.catalogId}` }, !detailPending, data.devices.length > 0)}
                   </Modal>
                 )}
                 {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}
