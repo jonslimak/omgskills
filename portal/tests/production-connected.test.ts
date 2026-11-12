@@ -90,7 +90,7 @@ test("production install handoff preserves both agents and cannot offer the test
   // No Mac connected yet: the pop-over offers the published download and the agent prompt, in few words.
   assert.ok(markup.includes(productionDistribution.url));
   assert.match(markup, /Download app/);
-  assert.doesNotMatch(markup, /I have the app/);
+  assert.match(markup, /I have the app/);
   assert.doesNotMatch(markup, /Double-click|Move <strong>|Cancel setup/);
   const known = renderToStaticMarkup(createElement(module.exports.CatalogInstallSetup, { skill, detailReady: true,
     returnRoute: "/app/?view=discover&skill=catalog%3Aowner%2Frepo", appKnown: true,
@@ -98,6 +98,9 @@ test("production install handoff preserves both agents and cannot offer the test
   assert.match(known, /Install now/);
   assert.match(known, /Don&#x27;t have the Mac install helper\?/);
   assert.doesNotMatch(known, /Download app/);
+  const knownGetApp = renderToStaticMarkup(createElement(module.exports.CatalogInstallSetup, { skill, detailReady: true,
+    returnRoute: "/app/?view=discover&skill=catalog%3Aowner%2Frepo", appKnown: true, store }));
+  assert.doesNotMatch(knownGetApp, /I have the app/);
   // A saved Download step (from before the Mac connected) doesn't keep a connected account on the get-app screen.
   const savedThenConnected = renderToStaticMarkup(createElement(module.exports.CatalogInstallSetup, { skill, detailReady: true,
     returnRoute: "/app/?view=discover&skill=catalog%3Aowner%2Frepo", appKnown: true, store }));
