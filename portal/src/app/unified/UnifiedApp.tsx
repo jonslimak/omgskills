@@ -2193,8 +2193,18 @@ export function UnifiedApp({
                   </p>
                 )}
                 {installOpen && selected && signedIn && publicInstallAction && (
-                  <Modal title={installedHere ? "Add to another agent" : `Install ${selected.name}`} theme={theme}
+                  <Modal title={installedHere ? "Add to another agent" : "Install"} theme={theme}
                     close={() => { setInstallOpen(false); onInstallCancel?.(); }}>
+                    <div className="ua-install-skill">
+                      <Avatar src={detail?.avatar ?? selected.avatar} name={detail?.author || selected.author || selected.name} size="large" />
+                      <div>
+                        <strong>{selected.name}</strong>
+                        <div className="ua-detail-meta">
+                          {(detail?.author || selected.author) && <span>@{detail?.author || selected.author}</span>}
+                          {(detail?.stars ?? selected.stars) !== undefined && <span><Star />{starCount((detail?.stars ?? selected.stars)!)}</span>}
+                        </div>
+                      </div>
+                    </div>
                     {/* Installed as the library skill it is, whichever row it was opened from. */}
                     {publicInstallAction({ ...selected, key: `catalog:${selected.catalogId}` }, !detailPending, data.devices.length > 0)}
                   </Modal>

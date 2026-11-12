@@ -178,3 +178,13 @@ test("without access to /Applications it installs into ~/Applications", { skip: 
   assert.equal(await box.build(path.join(box.home, "Applications")), "37");
   assert.deepEqual(await readdir(box.apps), []);
 });
+
+test("the install pop-over points agents to a safety page that matches the app", async () => {
+  const pop = await read("portal/src/app/unified/CatalogInstallSetup.tsx");
+  assert.match(pop, /href="https:\/\/omgskills\.com\/safety\/"/);
+  const page = await read("site/safety/index.html");
+  const script = await read("site/install.sh");
+  assert.match(page, new RegExp(constant(script, "TEAM_ID")));
+  assert.match(page, /href="\/install\.sh"/);
+  assert.match(page, /github\.com\/jonslimak\/omgskills\/tree\/main\/menubar/);
+});

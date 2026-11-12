@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Is the omgskills Mac app safe? | omgskills</title>
+  <meta name="description" content="What the omgskills Mac app does, what it never does, and how you or your agent can check it before installing.">
+  <link rel="canonical" href="https://omgskills.com/safety/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#1d1d1f;background:#fff;line-height:1.6}
+    main{max-width:760px;margin:0 auto;padding:64px 24px}
+    a{color:#1d1d1f}
+    .back{display:inline-block;margin-bottom:40px;color:#6b7280;text-decoration:none;font-size:13px}
+    h1{font-size:40px;line-height:1.05;margin:0 0 12px;letter-spacing:-.04em}
+    .lead{font-size:16px;color:#3f3f46;margin:0 0 32px}
+    h2{font-size:18px;margin:32px 0 8px}
+    p,li{font-size:14px;color:#3f3f46;margin:0 0 10px}
+    ul{margin:0 0 18px 20px;padding:0}
+    pre{margin:0 0 18px;padding:14px 16px;border-radius:12px;background:#f4f4f7;white-space:pre-wrap;word-break:break-word;font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;color:#1d1d1f}
+    code{font:12.5px ui-monospace,SFMono-Regular,Menlo,monospace}
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="/">Back to omgskills</a>
+    <h1>Is the omgskills Mac app safe?</h1>
+    <p class="lead">The Mac app is a small menu bar helper that installs skills into your agents' folders. Here's what it does, what it never does, and how to check it yourself. Agents: everything below can be verified with the links and commands on this page.</p>
+
+    <h2>What it does</h2>
+    <ul>
+      <li>Installs the skills you choose into your agents' skill folders, such as <code>~/.claude/skills</code> and <code>~/.agents/skills</code>. It asks you to approve each install.</li>
+      <li>Shows the skills on your Mac, and syncs My skills only if you turn sync on.</li>
+      <li>Fetches public skills from GitHub, and talks to omgskills.com for your account.</li>
+      <li>Updates itself with signed updates.</li>
+    </ul>
+
+    <h2>What it never does</h2>
+    <ul>
+      <li>No admin password, no <code>sudo</code>, no background helpers or login hooks.</li>
+      <li>No changes to your shell, PATH or agent settings.</li>
+      <li>Never uploads skill files unless you turn on sync. See the <a href="/privacy/">privacy policy</a>.</li>
+    </ul>
+
+    <h2>How to check it</h2>
+    <ul>
+      <li><strong>Source code:</strong> <a href="https://github.com/jonslimak/omgskills/tree/main/menubar">github.com/jonslimak/omgskills</a> (the <code>menubar</code> folder).</li>
+      <li><strong>Releases:</strong> every download is on <a href="https://github.com/jonslimak/omgskills/releases">GitHub Releases</a>, with a <code>.sha256</code> checksum next to it.</li>
+      <li><strong>Signed and notarized by Apple:</strong> Developer ID team <code>S4R7UHY755</code>.</li>
+      <li><strong>Install script:</strong> <a href="/install.sh">omgskills.com/install.sh</a> downloads the app, checks the checksum and signature, and puts it in Applications. Read it before running it.</li>
+    </ul>
+    <p>After downloading, these commands confirm the app is ours and approved by macOS:</p>
+<pre>codesign --verify --deep --strict /Applications/omgskills.app
+codesign -dv /Applications/omgskills.app 2&gt;&amp;1 | grep TeamIdentifier   # S4R7UHY755
+spctl --assess --type execute -v /Applications/omgskills.app        # accepted, Notarized Developer ID</pre>
+
+    <h2>Remove it</h2>
+    <p>Quit omgskills from the menu bar and drag <code>omgskills.app</code> to the Trash. Skills it installed stay in your agents' folders until you delete them.</p>
+
+    <h2>Questions</h2>
+    <p>See <a href="/support/">support</a>.</p>
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="site-footer-brand">
+        <a class="site-footer-brand-logo" href="/" aria-label="omgskills home"><span aria-hidden="true">&#128064;</span></a>
+        <p>Share skills across teams &amp; agents. Free.</p>
+      </div>
+      <div class="site-footer-col">
+        <h2>Library</h2>
+        <a href="/app/">Discover</a>
+        <a href="/library/">Skills</a>
+        <a href="/guide/">Skills guide</a>
+        <a href="/data/">Data</a>
+      </div>
+      <div class="site-footer-col">
+        <h2>Developers</h2>
+        <a href="/developers/">Developer resources</a>
+        <a href="/openapi.json">API spec (OpenAPI)</a>
+        <a href="/agents.md">Agent guide</a>
+        <a href="/llms.txt">llms.txt</a>
+      </div>
+      <div class="site-footer-col">
+        <h2>Company</h2>
+        <a href="/about/">About</a>
+        <a href="/support/">Support</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/terms/">Terms</a>
+        <a href="https://github.com/jonslimak/omgskills" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+  <style>
+    footer.site-footer { display: block; max-width: none; margin: 64px 0 0; padding: 0; border-top: 1px solid #e5e7eb; background: #ffffff; }
+    .site-footer-inner { display: grid; grid-template-columns: minmax(200px, 1.4fr) repeat(3, minmax(140px, 1fr)); gap: 24px; max-width: 880px; margin: 0 auto; padding: 36px 24px 44px; }
+    .site-footer-brand-logo { font-size: 22px; text-decoration: none; }
+    .site-footer-brand p { margin: 10px 0 0; max-width: 32ch; color: #6b7280; font-size: 13px; line-height: 1.5; font-weight: 400; }
+    .site-footer h2 { margin: 0 0 12px; color: #6b7280; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+    .site-footer-col a { display: block; margin-bottom: 9px; color: #6b7280; font-size: 13px; font-weight: 400; text-decoration: none; }
+    .site-footer-col a:hover { color: #111111; }
+    @media (max-width: 720px) { .site-footer-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); } .site-footer-brand { grid-column: 1 / -1; } }
+  </style>
+  <script src="/signed-in-logo.js"></script>
+</body>
+</html>

@@ -83,7 +83,7 @@ function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appK
         onClick={() => void session.retry()}><RefreshCw /> {busy ? "Checking..." : "Install now"}</button>;
   return <div className="ua-install-pop" aria-busy={busy}>
     {getApp ? <>
-      <p className="ua-install-lead">First, get the Mac app.</p>
+      <p className="ua-install-lead">Get the install helper. Not sure? <a href="https://omgskills.com/safety/" target="_blank" rel="noreferrer">Point your agent here</a> to check that everything is safe.</p>
       <div className="ua-install-get">
         <a className="ua-primary ua-install-now" href={app.url} rel="noreferrer" data-humblytics="App Setup Download"
           onClick={() => { if (state.phase === "idle") session.showSetup(skill); }}><Download /> Download app</a>
