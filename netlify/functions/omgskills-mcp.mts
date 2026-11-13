@@ -119,7 +119,8 @@ export function createConfiguredMcpHandler(enabled: boolean, loaders?: { legacy:
   const legacy = loaders?.legacy ?? loadProductionMcpLibrary;
   // The legacy loader's first track, read from its small published assets until the full load lands.
   const quick = loaders ? loaders.installRecordQuick
-    : createQuickInstallRecordReader(productionMcpTracks[0].manifestUrl, { fetcher: fetchWithTimeout });
+    : createQuickInstallRecordReader(productionMcpTracks[0].manifestUrl,
+      { fetcher: fetchWithTimeout, track: productionMcpTracks[0].name });
   return enabled ? withInstallRecordRoute(createCompactMcpHandler(
     loaders?.compact ?? createCompactMcpLibraryLoader({ ranking: true }), { paging: true, ranking: true }), legacy, quick)
     : createMcpHandler(legacy, quick);

@@ -134,3 +134,62 @@ test("quick reads only run cold, and unavailable catalogs still fail closed", as
   assert.equal(manifests() - before, 1, "the detail index is reused");
   assert.equal(shardRequests(f.requested) - shards, 2, "one shard per record");
 });
+
+test("a quick hit is answered even when the full load then fails", async t => {
+  const f = catalogFixture(t);
+  const query = `id=${encodeURIComponent(rows[0].id)}`;
+  const expected = await (await createMcpHandler(loaderFor(f.legacy))(request(query), context)).text();
+  const work: Promise<unknown>[] = [];
+  const down = coldLoader(f.legacy, Promise.reject(Error("offline")));
+  const response = await createMcpHandler(down, createQuickInstallRecordReader(f.url, f.options))(request(query),
+    { waitUntil: promise => { work.push(promise); } });
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), expected);
+  await Promise.all(work);
+});
+
+test("after a full snapshot from another track, cold requests skip the quick reader", async t => {
+  const f = catalogFixture(t);
+  let hasSnapshot = false;
+  const source: McpLibraryLoader = { get: async () => { hasSnapshot = true;
+    return { library: f.legacy, sourceTrack: "v2", loadedAt: 0, skillCount: 0, trendingCount: 0, goldBasketCount: 0 }; },
+  refresh: async () => { throw Error("unused"); }, pendingRefresh: () => null,
+  status: () => ({ hasSnapshot, refreshing: false, lastRefreshFailed: false, maxAgeMs: 600_000 }) };
+  const inner = createQuickInstallRecordReader(f.url, { ...f.options, track: "crawl4" });
+  let calls = 0;
+  const quick = Object.assign(async (id: string) => { calls++; return inner(id); }, { track: "crawl4" }) as typeof inner;
+  const handler = createMcpHandler(source, quick);
+  const query = `id=${encodeURIComponent(rows[0].id)}`;
+  assert.equal((await handler(request(query), context)).status, 200);
+  assert.equal(calls, 1, "a fresh instance reads quickly");
+  assert.equal(quick.seenTrack, "v2");
+  hasSnapshot = false; // as if the snapshot were dropped: the v2 history still decides
+  assert.equal((await handler(request(query), context)).status, 200);
+  assert.equal(calls, 1);
+});
+
+test("a failed shard read clears the cached index so the next request reloads it", async t => {
+  const f = catalogFixture(t);
+  let failShards = true;
+  const fetcher: typeof fetch = async (input, init) =>
+    failShards && /skill-details-/.test(String(input)) ? new Response("gone", { status: 404 }) : f.fetcher(input, init);
+  const reader = createQuickInstallRecordReader(f.url, { ...f.options, fetcher });
+  const manifests = () => f.requested.filter(url => url.endsWith("/manifest.json")).length;
+  await assert.rejects(reader(rows[0].id));
+  failShards = false;
+  const before = manifests();
+  assert.equal((await reader(rows[0].id))?.id, rows[0].id);
+  assert.equal(manifests() - before, 1, "the index was reloaded");
+});
+
+test("concurrent reads of one shard share a single fetch", async t => {
+  const f = catalogFixture(t);
+  const reader = createQuickInstallRecordReader(f.url, f.options);
+  await reader(rows[2].id); // load the index
+  const before = shardRequests(f.requested);
+  const results = await Promise.all([reader(rows[0].id), reader(rows[0].id), reader(rows[0].id)]);
+  assert.deepEqual(results.map(row => row?.id), [rows[0].id, rows[0].id, rows[0].id]);
+  assert.equal(shardRequests(f.requested) - before, 1);
+  await reader(rows[0].id);
+  assert.equal(shardRequests(f.requested) - before, 2, "nothing is cached once settled");
+});

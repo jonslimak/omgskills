@@ -243,6 +243,7 @@ export class SearchCatalogReader implements CatalogReader {
  * curated-only rows, search) returns undefined so the caller waits for the full reader.
  */
 export class QuickSkillReader {
+  private readonly inFlight = new Map<string, Promise<unknown[]>>();
   private constructor(private readonly manifestUrl: string, private readonly details: DetailIndex,
     private readonly signalLibrary: OmgskillsLibrary, private readonly options: CatalogReadOptions) {}
   /** withSignals false skips trending and curated reads, for callers that only need getRawSkill. */
@@ -266,8 +267,16 @@ export class QuickSkillReader {
     const bucket = detailBucket(exact);
     const ref = this.details.shards[bucket];
     if (!ref) return undefined;
-    const rows = await json(assetUrl(this.manifestUrl, ref), this.options.fetcher ?? fetch, ref.bytes, ref);
-    if (!Array.isArray(rows)) throw new Error("Detail shard must be an array");
+    // Concurrent reads of one shard share a single fetch; nothing is kept once it settles.
+    let shard = this.inFlight.get(ref.path);
+    if (!shard) {
+      shard = json(assetUrl(this.manifestUrl, ref), this.options.fetcher ?? fetch, ref.bytes, ref).then(rows => {
+        if (!Array.isArray(rows)) throw new Error("Detail shard must be an array");
+        return rows;
+      }).finally(() => this.inFlight.delete(ref.path));
+      this.inFlight.set(ref.path, shard);
+    }
+    const rows = await shard;
     return rows.find(row => object(row) && (row as RawSkill).id === exact) as RawSkill | undefined;
   }
   async getSkill(id: string): Promise<SkillResult | undefined> {
