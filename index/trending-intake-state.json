@@ -93,6 +93,30 @@
       "reason": "confirmed-upstream-copy"
     },
     {
+      "sourceId": "beltsh/superpowers:ai-avatar-video",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "beltsh/superpowers:ai-image-generation",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "beltsh/superpowers:ai-video-generation",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "beltsh/superpowers:twitter-automation",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
       "sourceId": "cloudflare/security-audit-skill:security-audit",
       "checkedAt": "2026-11-12T19:52:55.556Z",
       "outcome": "existing",
@@ -543,6 +567,96 @@
       "reason": "verified-trending"
     },
     {
+      "sourceId": "revnu-app/revnu-plugin:ads",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:cold-email",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:find-leads",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:first-customers",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:linkedin-outreach",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:results",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:revnu",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:revnu-ai-crawler-access",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:revnu-ai-readiness-audit",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:revnu-fix-ai-claims",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:revnu-geo-check",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:revnu-get-listed",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:revnu-growth-context",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:revnu-landing-page-audit",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "revnu-app/revnu-plugin:seo-ai-answers",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
       "sourceId": "skills-shell/superpowers:agent-browser",
       "checkedAt": "2026-11-12T19:52:55.556Z",
       "outcome": "blocked",
@@ -601,6 +715,12 @@
       "checkedAt": "2026-11-11T19:33:08.232Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "vercel-labs/ui:ui-sdk",
+      "checkedAt": "2026-11-13T19:37:36.375Z",
+      "outcome": "added",
+      "reason": "verified-trending"
     }
   ]
 }
