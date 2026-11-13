@@ -187,4 +187,8 @@ test("the install pop-over points agents to a safety page that matches the app",
   assert.match(page, new RegExp(constant(script, "TEAM_ID")));
   assert.match(page, /href="\/install\.sh"/);
   assert.match(page, /github\.com\/jonslimak\/omgskills\/tree\/main\/menubar/);
+  // Open at login is opt-in, and the page says how to turn it off.
+  assert.doesNotMatch(page, /login hooks/);
+  assert.match(page, /"Open at login" \(off by default\)/);
+  assert.match(page, /System Settings &gt; General &gt; Login Items/);
 });
