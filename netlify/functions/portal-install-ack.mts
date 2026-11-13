@@ -24,11 +24,14 @@ export async function portalInstallAck(req: Request, _context: Context, dependen
       await recordInstallAck(getPgPool(), req, target);
       return new Response(null, { status: 204, headers: { ...corsHeaders(req), "Cache-Control": "no-store" } });
     }
-    const query = parseInstallAckQuery(new URL(req.url));
-    // The pop-over polls this every 1.5s, so it checks the Clerk session only (no Clerk profile load per poll).
+    const now = new Date();
+    const query = parseInstallAckQuery(new URL(req.url), now);
+    // The pop-over polls this every 2s, so it checks the Clerk session only (no Clerk profile load per poll).
     requireSkillGroupsWebFeature();
     const auth = await requireAuth(req);
-    return secretJsonResponse(req, { acked: await readInstallAck(getPgPool(), auth.clerkUserId, query) });
+    // now is the server's clock, for the pop-over's next since; a call without since only asks for it.
+    const acked = query.since ? await readInstallAck(getPgPool(), auth.clerkUserId, { ...query, since: query.since }) : false;
+    return secretJsonResponse(req, { acked, now: now.toISOString() });
   } catch (error) {
     if (error instanceof DeviceAuthError) return errorResponse(req, 401, error.message);
     if (error instanceof Response) return errorResponse(req, error.status, await error.text());
@@ -38,12 +41,17 @@ export async function portalInstallAck(req: Request, _context: Context, dependen
 
 export default (req: Request, context: Context) => portalInstallAck(req, context);
 
+/**
+ * The pop-over's polls (30 a minute per open pop-over), with room for several tabs behind one address.
+ * The Mac's POST is served by portal-install-ack-record.mts with its own limit, so polls can't crowd it out.
+ */
 export const config = {
   path: "/api/portal/install-ack",
+  method: ["GET", "OPTIONS"],
   rateLimit: {
     action: "rate_limit",
     aggregateBy: ["domain", "ip"],
-    windowLimit: 120,
+    windowLimit: 240,
     windowSize: 60
   }
 };

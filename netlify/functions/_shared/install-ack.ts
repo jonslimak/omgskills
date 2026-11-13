@@ -7,8 +7,8 @@ export type InstallAckTarget = { catalogId: string; agent: "claude" | "codex" };
 /** Rows kept per person; older ones only mattered while a pop-over was polling. */
 export const INSTALL_ACK_KEEP_ROWS = 20;
 const INSTALL_ACK_KEEP_FOR = "1 hour";
-/** The pop-over asks only about requests it just opened. */
-export const INSTALL_ACK_LOOKBACK_MS = 10 * 60 * 1000;
+/** The pop-over asks only about the request it just opened (it polls for 2 minutes). */
+export const INSTALL_ACK_LOOKBACK_MS = 3 * 60 * 1000;
 
 /** The Mac's own check: one non-empty catalog ID of at most 500 bytes, no control or format characters. */
 export function parseInstallAckTarget(catalogId: unknown, agent: unknown): InstallAckTarget {
@@ -27,14 +27,19 @@ export function parseInstallAckBody(body: Record<string, unknown>): InstallAckTa
   return parseInstallAckTarget(body.catalogId, body.agent);
 }
 
-/** GET query: one catalogId, one agent, one since time; since is clamped to the last 10 minutes. */
-export function parseInstallAckQuery(url: URL, now = new Date()): InstallAckTarget & { since: Date } {
+/**
+ * GET query: one catalogId, one agent, and optionally one since time. The pop-over's first call has no since and
+ * only learns the server's time; later calls send that time back, so the browser's clock never matters.
+ * since is clamped to the last 3 minutes.
+ */
+export function parseInstallAckQuery(url: URL, now = new Date()): InstallAckTarget & { since: Date | null } {
   const query = url.searchParams;
   if ([...query.keys()].some(key => !["catalogId", "agent", "since"].includes(key))
-    || ["catalogId", "agent", "since"].some(key => query.getAll(key).length !== 1)) {
-    throw new Response("catalogId, agent and since are required", { status: 400 });
+    || ["catalogId", "agent"].some(key => query.getAll(key).length !== 1) || query.getAll("since").length > 1) {
+    throw new Response("catalogId and agent are required", { status: 400 });
   }
   const target = parseInstallAckTarget(query.get("catalogId"), query.get("agent"));
+  if (!query.has("since")) return { ...target, since: null };
   const sinceMs = Date.parse(query.get("since") ?? "");
   if (!Number.isFinite(sinceMs)) throw new Response("since must be a time", { status: 400 });
   return { ...target, since: new Date(Math.max(sinceMs, now.getTime() - INSTALL_ACK_LOOKBACK_MS)) };

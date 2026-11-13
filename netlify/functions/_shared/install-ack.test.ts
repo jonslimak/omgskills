@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { Context } from "@netlify/functions";
 import type { Pool } from "pg";
-import { portalInstallAck } from "../portal-install-ack.mjs";
+import { config as pollConfig, portalInstallAck } from "../portal-install-ack.mjs";
+import { config as recordConfig } from "../portal-install-ack-record.mjs";
 import { createDeviceCredential } from "./crypto.js";
 import { INSTALL_ACK_LOOKBACK_MS, parseInstallAckBody, parseInstallAckQuery, parseInstallAckTarget } from "./install-ack.js";
 
@@ -28,13 +29,16 @@ test("catalog IDs follow the Mac's check: non-empty, at most 500 bytes, no contr
   assert.deepEqual(parseInstallAckBody({ catalogId: "x", agent: "codex", later: true }), { catalogId: "x", agent: "codex" });
 });
 
-test("the poll query needs exactly one of each field and clamps since to the last 10 minutes", () => {
+test("the poll query needs one catalogId and agent, at most one since, and clamps since to the last 3 minutes", () => {
   const now = new Date("2026-11-12T12:00:00.000Z");
   const query = (search: string) => parseInstallAckQuery(new URL(`${url}?${search}`), now);
   const recent = query("catalogId=a%2Fb&agent=claude&since=2026-11-12T11:59:00.000Z");
   assert.deepEqual(recent, { catalogId: "a/b", agent: "claude", since: new Date("2026-11-12T11:59:00.000Z") });
-  assert.equal(query("catalogId=a&agent=codex&since=2020-01-01T00:00:00Z").since.getTime(), now.getTime() - INSTALL_ACK_LOOKBACK_MS);
-  for (const search of ["catalogId=a&agent=claude", "agent=claude&since=2026-11-12T11:59:00Z",
+  assert.equal(INSTALL_ACK_LOOKBACK_MS, 3 * 60 * 1000);
+  assert.equal(query("catalogId=a&agent=codex&since=2026-11-12T11:50:00Z").since?.getTime(), now.getTime() - INSTALL_ACK_LOOKBACK_MS);
+  assert.deepEqual(query("catalogId=a&agent=claude"), { catalogId: "a", agent: "claude", since: null });
+  for (const search of ["agent=claude&since=2026-11-12T11:59:00Z", "catalogId=a&since=2026-11-12T11:59:00Z",
+    "catalogId=a&agent=claude&since=2026-11-12T11:59:00Z&since=2026-11-12T11:59:30Z",
     "catalogId=a&agent=claude&since=soon", "catalogId=a&catalogId=b&agent=claude&since=2026-11-12T11:59:00Z",
     "catalogId=a&agent=claude&since=2026-11-12T11:59:00Z&extra=1", "catalogId=a&agent=gpt&since=2026-11-12T11:59:00Z"]) {
     rejects400(() => query(search));
@@ -80,16 +84,37 @@ test("GET answers the signed-in person's ack state with no caching; bad queries 
     async readInstallAck(_pool: Pool, clerkUserId: string, query: unknown) { asked = { clerkUserId, query }; return true; }
   };
   const since = new Date(Date.now() - 1000).toISOString();
+  const before = Date.now();
   const response = await portalInstallAck(new Request(`${url}?catalogId=a%2Fb&agent=claude&since=${since}`), context, deps);
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("cache-control"), "no-store");
-  assert.deepEqual(await response.json(), { acked: true });
+  const body = await response.json() as { acked: boolean; now: string };
+  assert.equal(body.acked, true);
+  assert.ok(Date.parse(body.now) >= before && Date.parse(body.now) <= Date.now());
   assert.deepEqual(asked, { clerkUserId: "user_clerk", query: { catalogId: "a/b", agent: "claude", since: new Date(since) } });
+
+  // Without since, the call only gives the server's time: never acked, no database.
+  const first = { ...deps, readInstallAck: noDatabase };
+  const timeOnly = await portalInstallAck(new Request(`${url}?catalogId=a&agent=claude`), context, first);
+  assert.equal(timeOnly.status, 200);
+  const timeBody = await timeOnly.json() as { acked: boolean; now: string };
+  assert.equal(timeBody.acked, false);
+  assert.ok(Number.isFinite(Date.parse(timeBody.now)));
 
   const signedOut = { ...deps, readInstallAck: noDatabase,
     async requireAuth(): Promise<never> { throw new Response("Missing Clerk session token", { status: 401 }); } };
   assert.equal((await portalInstallAck(new Request(`${url}?catalogId=a&agent=claude&since=${since}`), context, signedOut)).status, 401);
   const noCall = { ...deps, requireAuth: noDatabase, readInstallAck: noDatabase };
-  assert.equal((await portalInstallAck(new Request(`${url}?catalogId=a&agent=claude`), context, noCall)).status, 400);
+  assert.equal((await portalInstallAck(new Request(`${url}?agent=claude&since=${since}`), context, noCall)).status, 400);
   assert.equal((await portalInstallAck(new Request(url, { method: "DELETE" }), context, noCall)).status, 405);
+});
+
+test("the Mac's POST has its own function and rate limit, apart from the pop-over's polls", () => {
+  assert.equal(pollConfig.path, "/api/portal/install-ack");
+  assert.equal(recordConfig.path, pollConfig.path);
+  assert.deepEqual(pollConfig.method, ["GET", "OPTIONS"]);
+  assert.equal(recordConfig.method, "POST");
+  // 30 polls a minute per pop-over: room for several tabs behind one address.
+  assert.ok(pollConfig.rateLimit.windowLimit / pollConfig.rateLimit.windowSize * 60 >= 8 * 30);
+  assert.ok(recordConfig.rateLimit.windowLimit >= 30);
 });
