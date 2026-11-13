@@ -18,7 +18,8 @@ final class BrowserPairingSession: BrowserPairingAuthorizing {
     typealias OpenURL = @MainActor (URL) -> Bool
     typealias Sleep = @Sendable (Duration) async throws -> Void
 
-    static let defaultTimeout: Duration = .seconds(600)
+    /// Long enough for a new user to sign up and verify their email.
+    static let defaultTimeout: Duration = .seconds(1_800)
 
     private let openURL: OpenURL
     private let timeout: Duration

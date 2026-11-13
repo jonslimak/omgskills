@@ -573,7 +573,7 @@ struct ConnectedInventoryRuntimeTests {
             authorizer: authorizer)
         runtime.firstLaunchDefaults = defaults
         runtime.start()
-        await runtime.offerFirstLaunchConnect(deviceName: "Test Mac").value
+        await runtime.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
         #expect(authorizer.authorizationURL != nil)
         #expect(FirstLaunchConnect.wasOffered(defaults))
         #expect(runtime.connection.state == .connected(inventoryCredential.connection))
@@ -585,7 +585,7 @@ struct ConnectedInventoryRuntimeTests {
         let next = ConnectedInventoryRuntime(connection: makeConnection(store: store, api: api, authorizer: again),
             authorizer: again)
         next.firstLaunchDefaults = defaults
-        await next.offerFirstLaunchConnect(deviceName: "Test Mac").value
+        await next.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
         #expect(again.authorizationURL == nil)
         #expect(next.connection.state == .disconnected)
         await next.stop()
@@ -598,7 +598,7 @@ struct ConnectedInventoryRuntimeTests {
         let connected = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(), api: api,
             authorizer: authorizer), authorizer: authorizer)
         connected.firstLaunchDefaults = stored
-        await connected.offerFirstLaunchConnect(deviceName: "Test Mac").value
+        await connected.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
         #expect(authorizer.authorizationURL == nil)
         #expect(FirstLaunchConnect.wasOffered(stored))
         await connected.stop()
@@ -613,7 +613,7 @@ struct ConnectedInventoryRuntimeTests {
             browserAuthorizer: keyAuthorizer, portalConnectURL: URL(string: "http://127.0.0.1:5201/app/connect")!,
             callbackScheme: BrowserPairing.connectedTestCallbackScheme), authorizer: keyAuthorizer)
         keyedRuntime.firstLaunchDefaults = keyed
-        await keyedRuntime.offerFirstLaunchConnect(deviceName: "Test Mac").value
+        await keyedRuntime.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
         #expect(keyAuthorizer.authorizationURL == nil)
         #expect(keyedRuntime.connection.state == .disconnected)
         await keyedRuntime.stop()
@@ -628,14 +628,14 @@ struct ConnectedInventoryRuntimeTests {
         runtime.firstLaunchDefaults = defaults
         await runtime.disconnect().value
         #expect(FirstLaunchConnect.wasOffered(defaults))
-        await runtime.offerFirstLaunchConnect(deviceName: "Test Mac").value
+        await runtime.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
         #expect(authorizer.authorizationURL == nil)
         await runtime.stop()
 
         let off = InventoryAuthorizerFixture()
         let unwired = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(record: nil),
             api: api, authorizer: off), authorizer: off)
-        await unwired.offerFirstLaunchConnect(deviceName: "Test Mac").value
+        await unwired.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
         #expect(off.authorizationURL == nil)
         await unwired.stop()
     }
@@ -647,11 +647,77 @@ struct ConnectedInventoryRuntimeTests {
         let runtime = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(record: nil),
             api: api, authorizer: authorizer), authorizer: authorizer)
         runtime.firstLaunchDefaults = defaults
-        let offer = runtime.offerFirstLaunchConnect(deviceName: "Test Mac")
+        let offer = runtime.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" })
         await runtime.connect(deviceName: "Test Mac").value
         await offer.value
         #expect(authorizer.authorizations == 1)
         await runtime.stop()
+    }
+
+    @Test func launchedBeforeRecognizesEarlierVersionsDefaults() {
+        let fresh = firstLaunchDefaults()
+        #expect(!FirstLaunchConnect.launchedBefore(fresh))
+        let telemetry = firstLaunchDefaults()
+        telemetry.set(true, forKey: "com.omgskills.telemetry.installTracked.v2")
+        #expect(FirstLaunchConnect.launchedBefore(telemetry))
+        let statusItem = firstLaunchDefaults()
+        statusItem.set(1200.0, forKey: "NSStatusItem Preferred Position Item-0")
+        #expect(FirstLaunchConnect.launchedBefore(statusItem))
+        #expect(Analytics.launchMarkerKeys.contains("com.omgskills.telemetry.installTracked.v2"))
+    }
+
+    @Test func upgradeFromAnEarlierVersionUsesUpTheOfferWithoutConnecting() async {
+        let defaults = firstLaunchDefaults()
+        let authorizer = InventoryAuthorizerFixture()
+        let runtime = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(record: nil),
+            api: InventoryAPIFixture(reportMode: .reconciliation), authorizer: authorizer), authorizer: authorizer)
+        runtime.firstLaunchDefaults = defaults
+        var namesAsked = 0
+        await runtime.offerFirstLaunchConnect(launchedBefore: true, deviceName: { namesAsked += 1; return "Test Mac" }).value
+        #expect(authorizer.authorizationURL == nil)
+        #expect(FirstLaunchConnect.wasOffered(defaults))
+        #expect(namesAsked == 0)
+        await runtime.stop()
+    }
+
+    @Test func firstLaunchFromAnInstallLinkLeavesTheOfferForALaterLaunch() async {
+        let defaults = firstLaunchDefaults()
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let runtime = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(record: nil),
+            api: api, authorizer: authorizer), authorizer: authorizer)
+        runtime.firstLaunchDefaults = defaults
+        var namesAsked = 0
+        await runtime.offerFirstLaunchConnect(launchedBefore: false, deferIf: { true },
+            deviceName: { namesAsked += 1; return "Test Mac" }).value
+        #expect(authorizer.authorizationURL == nil)
+        #expect(!FirstLaunchConnect.wasOffered(defaults))
+        #expect(namesAsked == 0)
+        await runtime.stop()
+
+        let later = InventoryAuthorizerFixture()
+        let next = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(record: nil),
+            api: api, authorizer: later), authorizer: later)
+        next.firstLaunchDefaults = defaults
+        await next.offerFirstLaunchConnect(launchedBefore: false, deviceName: { namesAsked += 1; return "Test Mac" }).value
+        #expect(later.authorizationURL != nil)
+        #expect(namesAsked == 1)
+        await next.stop()
+    }
+
+    @Test func installLinksDeferTheOfferButPairAndConnectLinksDoNot() throws {
+        let source = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().appendingPathComponent("Sources/omgskills/CatalogInstallView.swift")
+        let code = try String(contentsOf: source, encoding: .utf8)
+        let pair = try #require(code.range(of: "if connectedRuntime?.receivePairingCallback(url) == true { showStatus(); return }"))
+        let mark = try #require(code.range(of: "receivedLink = true"))
+        #expect(pair.upperBound <= mark.lowerBound)
+        #expect(code.contains("deferIf: { [weak self] in self?.receivedLink == true }"))
+        #expect(code.contains("deviceName: { Host.current().localizedName ?? \"Mac\" }"))
+        let launched = try #require(code.range(of: "let launchedBefore = FirstLaunchConnect.launchedBefore(.standard)"))
+        let tracker = try #require(code.range(of: "Analytics.connectedTracker(profile: candidate.profile)"))
+        #expect(launched.upperBound <= tracker.lowerBound)
+        #expect(BrowserPairingSession.defaultTimeout == .seconds(1_800))
     }
 
     // MARK: Connect in the default browser

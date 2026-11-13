@@ -6,6 +6,8 @@ enum Analytics {
     private static let namespace = "com.omgskills"
     private static let installTrackedKey = "com.omgskills.telemetry.installTracked"
     private static let installTrackedV2Key = "com.omgskills.telemetry.installTracked.v2"
+    /// Written on every production launch; their presence means the app has run before.
+    static let launchMarkerKeys = [installTrackedKey, installTrackedV2Key]
     static let identityResolutionSignalName = "identity.resolution_snapshot"
 
     static func start() {
