@@ -20,6 +20,12 @@ enum DeviceReconnectKeyStoreError: LocalizedError, Equatable, Sendable {
 
 protocol DeviceReconnectKeyStoring: Sendable {
     func loadOrCreate() async throws -> String
+    /// Whether this Mac already holds a reconnect key, i.e. it was connected before. Never creates one.
+    func hasKey() async throws -> Bool
+}
+
+extension DeviceReconnectKeyStoring {
+    func hasKey() async throws -> Bool { false }
 }
 
 actor DeviceReconnectKeyStore: DeviceReconnectKeyStoring {
@@ -82,6 +88,15 @@ actor DeviceReconnectKeyStore: DeviceReconnectKeyStoring {
         }
         guard status == errSecSuccess else { throw DeviceReconnectKeyStoreError.keychain(status) }
         return key
+    }
+
+    func hasKey() throws -> Bool {
+        var query = baseQuery()
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
+        let (status, _) = keychain.copyMatching(query)
+        if status == errSecItemNotFound { return false }
+        guard status == errSecSuccess else { throw DeviceReconnectKeyStoreError.keychain(status) }
+        return true
     }
 
     private func load() throws -> String? {

@@ -115,6 +115,16 @@ final class DeviceConnectionModel {
         self.inventoryAutomationEnabled = inventoryAutomationEnabled
     }
 
+    /// True when this Mac holds a device credential or a reconnect key, or when that can't be checked.
+    func hasPriorConnectionRecord() async -> Bool {
+        do {
+            if try await credentialStore.load() != nil { return true }
+            return try await reconnectKeyStore?.hasKey() ?? false
+        } catch {
+            return true
+        }
+    }
+
     @discardableResult
     func restore() -> Task<Void, Never> {
         resetInventoryBaseline()

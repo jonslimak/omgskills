@@ -19,9 +19,12 @@ enum BrowserPairingError: LocalizedError, Equatable, Sendable {
     case invalidCallback
     case stateMismatch
     case unavailable
+    case timedOut
 
     var errorDescription: String? {
         switch self {
+        case .timedOut:
+            return "Approval in the browser timed out. Connect again to retry."
         case .invalidConfiguration:
             return "Browser pairing is not configured correctly."
         case .invalidCallback:

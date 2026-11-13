@@ -15,6 +15,11 @@ struct ConnectedInventoryView: View {
         switch model.state { case .disconnected, .failed: return true; default: return false }
     }
 
+    /// While the connect page is open in the browser, say where the user has to act.
+    static func progressText(_ state: DeviceConnectionModel.State) -> String {
+        state == .authorizing ? "Waiting for approval in your browser..." : "Connecting..."
+    }
+
     static func connectButton(model: DeviceConnectionModel, deviceName: String, runtime: ConnectedInventoryRuntime?) -> some View {
         Button("Connect account", systemImage: "person.crop.circle.badge.plus") {
             if let runtime { runtime.connect(deviceName: deviceName) }
@@ -49,7 +54,7 @@ struct ConnectedInventoryView: View {
             case .authorizing, .exchanging, .storingCredential, .syncing:
                 HStack {
                     ProgressView().controlSize(.small)
-                    Text("Connecting...")
+                    Text(Self.progressText(model.state))
                     Spacer()
                     Button("Cancel") {
                         if let runtime { runtime.cancel() } else { model.cancelCurrentOperation() }
