@@ -89,6 +89,19 @@ struct LoginItemTests {
         #expect(controller.message == LoginItemController.turnOnFailed)
     }
 
+    @Test func aChangeInSystemSettingsClearsAnEarlierError() {
+        let service = FakeLoginItemService()
+        service.failure = .init()
+        let controller = LoginItemController(service: service)
+        controller.setEnabled(true)
+        #expect(controller.message == LoginItemController.turnOnFailed)
+        controller.refresh()
+        #expect(controller.message == LoginItemController.turnOnFailed, "Nothing changed, so the error stays")
+        service.status = .enabled // turned on in System Settings
+        controller.refresh()
+        #expect(controller.isOn && controller.message == nil)
+    }
+
     @Test func notFoundAsksToMoveTheAppToApplications() {
         let service = FakeLoginItemService()
         service.status = .notFound

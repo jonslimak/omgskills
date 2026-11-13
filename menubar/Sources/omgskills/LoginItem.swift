@@ -59,13 +59,16 @@ final class LoginItemController {
     var isOn: Bool { status == .enabled || status == .requiresApproval }
     var needsApproval: Bool { status == .requiresApproval }
 
-    /// Reads the system's status again; call each time the panel shows.
+    /// Reads the system's status again; call each time the panel shows. A change made elsewhere (System Settings)
+    /// settles the switch, so an earlier error no longer applies.
     func refresh() {
-        status = service.status
+        let current = service.status
+        if current != status { message = nil }
+        status = current
     }
 
     func setEnabled(_ on: Bool) {
-        refresh()
+        status = service.status
         guard on != isOn else { message = nil; return }
         do {
             if on { try service.register() } else { try service.unregister() }
@@ -73,7 +76,7 @@ final class LoginItemController {
         } catch {
             message = on ? Self.turnOnFailed : Self.turnOffFailed
         }
-        refresh()
+        status = service.status
         // macOS can't find the app where it is (e.g. run from Downloads or a disk image).
         if on, status == .notFound { message = Self.moveToApplications }
     }
