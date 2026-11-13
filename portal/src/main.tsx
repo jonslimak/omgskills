@@ -7,6 +7,7 @@ import {
   SignInButton,
   SignUpButton,
   UserButton,
+  useClerk,
   useUser
 } from "@clerk/clerk-react";
 import {
@@ -764,6 +765,14 @@ function Dashboard() {
 }
 
 function SignedOutPage({ isConnectRoute }: { isConnectRoute: boolean }) {
+  const clerk = useClerk();
+  const opened = useRef(false);
+  // Connecting a Mac: go straight to the sign-in pop-over (it also offers sign-up) and come back to Approve.
+  useEffect(() => {
+    if (!isConnectRoute || !clerk.loaded || opened.current) return;
+    opened.current = true;
+    clerk.openSignIn({ forceRedirectUrl: window.location.href, signUpForceRedirectUrl: window.location.href });
+  }, [isConnectRoute, clerk, clerk.loaded]);
   return (
     <main className="shell auth-shell">
       <section className="hero">
@@ -775,7 +784,8 @@ function SignedOutPage({ isConnectRoute }: { isConnectRoute: boolean }) {
             : "Sync local skills, build a private group, and share it with a teammate by email."}
         </p>
         <div className="actions">
-          <SignInButton mode="modal">
+          <SignInButton mode="modal" {...(isConnectRoute ? { forceRedirectUrl: window.location.href,
+            signUpForceRedirectUrl: window.location.href } : {})}>
             <Button>Sign in</Button>
           </SignInButton>
           {!isConnectRoute ? (
