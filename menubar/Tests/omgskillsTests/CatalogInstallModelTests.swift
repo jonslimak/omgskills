@@ -426,6 +426,34 @@ struct CatalogInstallModelTests {
         #expect(await service.installCount == 0)
     }
 
+    @Test func eachParsedLinkIsReportedOnceAndInvalidLinksAreNot() async {
+        var received: [CatalogInstallRequest] = []
+        let model = CatalogInstallModel(service: FlowStub(), coordinator: UpdateInstallCoordinator())
+        model.onRequestReceived = { received.append($0) }
+        model.receive(URL(string: "omgskills-f1://catalog-install?v=2&id=x&agent=codex")!)
+        #expect(received.isEmpty)
+        model.receive(link(agent: "claude"))
+        #expect(received.map(\.catalogID) == ["owner/repo:alias"])
+        #expect(received.map(\.target) == [.claude])
+        await model.operation?.value
+        model.receive(link(agent: "claude"))
+        #expect(received.count == 2)
+    }
+
+    @Test func aLinkTurnedAwayWhileBusyIsNotReported() async {
+        var received: [CatalogInstallRequest] = []
+        let model = CatalogInstallModel(service: FlowStub(), coordinator: UpdateInstallCoordinator())
+        model.onRequestReceived = { received.append($0) }
+        model.receive(link(agent: "codex"))
+        await model.operation?.value
+        #expect(model.phase == .confirm)
+        model.receive(link(agent: "claude"))
+        #expect(model.notice == "Finish or cancel the current request first.")
+        #expect(received.map(\.target) == [.codex])
+        model.receive(link(agent: "codex"))
+        #expect(received.map(\.target) == [.codex, .codex])
+    }
+
     private func productLink() -> URL {
         URL(string: "omgskills://catalog-install?v=1&id=owner%2Frepo%3Aalias&agent=codex")!
     }

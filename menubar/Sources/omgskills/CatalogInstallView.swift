@@ -277,6 +277,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
                 automation: connected.inventoryAutomation ? .live(paths: connected.filesystemPaths) : nil)
             connectedRuntime = runtime
             runtime.observeInstalls(in: model)
+            acknowledgeInstalls(CatalogInstallAck(uploadEndpoint: connected.uploadURL), runtime: runtime)
             setContent(connection: connection, inventoryRuntime: runtime)
             runtime.start()
         }
@@ -313,6 +314,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
                     coordinator: coordinator, automation: .live(paths: candidate.paths), track: track)
                 connectedRuntime = runtime
                 runtime.observeInstalls(in: model)
+                acknowledgeInstalls(CatalogInstallAck(uploadEndpoint: connected.uploadURL), runtime: runtime)
                 setInstall?.onInstalled = { [weak runtime] in runtime?.installed() }
                 let paths = candidate.paths
                 let removal = SkillRemovalController(
@@ -409,6 +411,13 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
             appUpdater: appUpdater, resizePanel: { [weak self] in self?.resizePanel(to: $0) }, connection: connection,
             inventoryRuntime: inventoryRuntime, connectionSetupError: connectionSetupError, setInstall: setInstall,
             removal: removal, versionMatch: versionMatch, restore: restore, savedInstall: savedInstall)
+    }
+
+    /// Lets the website know each install link arrived; only while this Mac is connected.
+    private func acknowledgeInstalls(_ ack: CatalogInstallAck, runtime: ConnectedInventoryRuntime) {
+        model.onRequestReceived = { [weak runtime] request in
+            ack.fire(request, credential: { runtime?.connection.currentCredential })
+        }
     }
 
     private func browserPresentationAnchor() -> NSWindow? {
