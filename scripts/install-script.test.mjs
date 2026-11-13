@@ -45,7 +45,7 @@ async function sandbox(t, { arm64 = "1", macos = "15.1", team = "S4R7UHY755", sp
 <key>CFBundleVersion</key><string>${build}</string><key>CFBundleShortVersionString</key><string>0.0.${build}</string></dict></plist>`);
   };
   const staging = path.join(root, "staging");
-  await makeApp(staging, "38");
+  await makeApp(staging, "39");
   const zip = path.join(root, "release.zip");
   assert.equal(spawnSync("/usr/bin/ditto", ["-c", "-k", "--keepParent", path.join(staging, "omgskills.app"), zip]).status, 0);
   const sha = badChecksum ? "0".repeat(64) : createHash("sha256").update(await readFile(zip)).digest("hex");
@@ -80,7 +80,7 @@ test("installs into Applications and opens it", { skip: !mac }, async t => {
   const box = await sandbox(t);
   const result = box.run();
   assert.equal(result.status, 0, result.output);
-  assert.equal(await box.build(box.apps), "38");
+  assert.equal(await box.build(box.apps), "39");
   assert.match(await box.calls(), new RegExp(`open ${box.apps.replace(/[.]/g, "\\.")}/omgskills\\.app`));
   assert.match(result.output, /Installed in .* and opened/);
 });
@@ -103,7 +103,7 @@ for (const [name, options, message] of [
 }
 
 test("an up-to-date install is opened, not downloaded again", { skip: !mac }, async t => {
-  const box = await sandbox(t, { existingBuild: "38" });
+  const box = await sandbox(t, { existingBuild: "39" });
   const result = box.run();
   assert.equal(result.status, 0, result.output);
   assert.match(result.output, /already installed/);
@@ -114,7 +114,7 @@ test("an older install is moved to the Trash and replaced", { skip: !mac }, asyn
   const box = await sandbox(t, { existingBuild: "20" });
   const result = box.run();
   assert.equal(result.status, 0, result.output);
-  assert.equal(await box.build(box.apps), "38");
+  assert.equal(await box.build(box.apps), "39");
   assert.match((await readdir(path.join(box.home, ".Trash"))).join(), /^omgskills-0\.0\.20-\d+\.app$/);
 });
 
@@ -163,7 +163,7 @@ test("something else named omgskills.app is left alone", { skip: !mac }, async t
 });
 
 test("a newer copy in ~/Applications is opened, not replaced", { skip: !mac }, async t => {
-  const box = await sandbox(t, { existingBuild: "20", userBuild: "38" });
+  const box = await sandbox(t, { existingBuild: "20", userBuild: "39" });
   const result = box.run();
   assert.equal(result.status, 0, result.output);
   assert.match(await box.calls(), /open .*home\/Applications\/omgskills\.app/);
@@ -175,7 +175,7 @@ test("without access to /Applications it installs into ~/Applications", { skip: 
   const box = await sandbox(t, { readOnlyApps: true });
   const result = box.run();
   assert.equal(result.status, 0, result.output);
-  assert.equal(await box.build(path.join(box.home, "Applications")), "38");
+  assert.equal(await box.build(path.join(box.home, "Applications")), "39");
   assert.deepEqual(await readdir(box.apps), []);
 });
 

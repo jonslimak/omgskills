@@ -105,7 +105,7 @@ test("signed-out Mac downloads sit centered below Sign in and hide in the collap
   assert.ok(footer.indexOf('<span>Sign in</span>') < footer.indexOf('className="ua-sidebar-download"'));
   assert.ok(footer.includes('href="/download"'));
   assert.ok(footer.includes('aria-label="Get the Mac app for Apple silicon, macOS 14 or later"'));
-  assert.ok(footer.includes('title="omgskills Mac app 0.0.38 for Apple silicon, macOS 14 or later"'));
+  assert.ok(footer.includes('title="omgskills Mac app 0.0.39 for Apple silicon, macOS 14 or later"'));
   // Requirements stay in the label and tooltip, not as visible text under the link.
   assert.ok(!footer.includes('Apple silicon, macOS 14+'));
   assert.ok(footer.includes('<span className="ua-apple-mark" aria-hidden="true">&#63743;</span>'));
