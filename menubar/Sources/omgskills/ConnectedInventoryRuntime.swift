@@ -93,22 +93,27 @@ final class ConnectedInventoryRuntime {
         return true
     }
 
-    /// Starts Connect once ever, on a launch where this Mac has never been connected.
-    /// Any connect or disconnect by the user also uses up the offer.
+    /// Starts Connect once ever, on the app's very first launch, when this Mac has never been connected.
+    /// Any connect or disconnect by the user also uses up the offer. A launch the app had before this
+    /// version (`launchedBefore`) uses it up without connecting. While `deferIf` is true (an install
+    /// link arrived and its review handles Connect) the offer is left for a later launch.
     @discardableResult
-    func offerFirstLaunchConnect(deviceName: String) -> Task<Void, Never> {
+    func offerFirstLaunchConnect(launchedBefore: Bool, deferIf: @escaping @MainActor () -> Bool = { false },
+                                 deviceName: @escaping @MainActor () -> String) -> Task<Void, Never> {
         guard let defaults = firstLaunchDefaults, !FirstLaunchConnect.wasOffered(defaults) else { return Task {} }
+        if launchedBefore { FirstLaunchConnect.markOffered(defaults); return Task {} }
         let startup = start()
         return Task { @MainActor [weak self] in
             await startup.value
-            guard let self, let defaults = firstLaunchDefaults, !FirstLaunchConnect.wasOffered(defaults) else { return }
+            guard let self, let defaults = firstLaunchDefaults, !FirstLaunchConnect.wasOffered(defaults),
+                  !deferIf() else { return }
             let current = session
             let hasPrior = await connection.hasPriorConnectionRecord()
-            guard !FirstLaunchConnect.wasOffered(defaults) else { return }
+            guard !FirstLaunchConnect.wasOffered(defaults), !deferIf() else { return }
             FirstLaunchConnect.markOffered(defaults)
             guard current == session, FirstLaunchConnect.shouldConnect(alreadyOffered: false,
                 state: connection.state, hasPriorConnection: hasPrior) else { return }
-            await connect(deviceName: deviceName).value
+            await connect(deviceName: deviceName()).value
         }
     }
 
@@ -253,6 +258,13 @@ enum FirstLaunchConnect {
     static let offeredKey = "OMGSkillsFirstLaunchConnectOffered"
 
     static func wasOffered(_ defaults: UserDefaults) -> Bool { defaults.bool(forKey: offeredKey) }
+
+    /// Whether an earlier version already ran: production 0.0.38 and earlier record install telemetry on
+    /// every launch, and AppKit saves status item positions. Read this before this launch writes either.
+    static func launchedBefore(_ defaults: UserDefaults) -> Bool {
+        if Analytics.launchMarkerKeys.contains(where: { defaults.object(forKey: $0) != nil }) { return true }
+        return defaults.dictionaryRepresentation().keys.contains { $0.hasPrefix("NSStatusItem ") }
+    }
     static func markOffered(_ defaults: UserDefaults) { defaults.set(true, forKey: offeredKey) }
 
     static func shouldConnect(alreadyOffered: Bool, state: DeviceConnectionModel.State,
