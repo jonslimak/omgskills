@@ -79,12 +79,17 @@ struct CatalogInstallView: View {
         inventoryRuntime?.connect(deviceName: Host.current().localizedName ?? "Mac")
     }
 
+    private var deviceName: String { Host.current().localizedName ?? "Test Mac" }
+
     private var accountContent: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .center, spacing: 8) {
                 if let connection, case .connected(let info) = connection.state {
                     Text(info.accountLabel).font(.headline).lineLimit(1).minimumScaleFactor(0.75)
                         .truncationMode(.middle).textSelection(.enabled).help(info.accountLabel)
+                } else if let connection, ConnectedInventoryView.needsConnect(connection) {
+                    // Signed out: Connect account sits on the same row as the app menu.
+                    ConnectedInventoryView.connectButton(model: connection, deviceName: deviceName, runtime: inventoryRuntime)
                 }
                 Spacer()
                 if let showAppMenu {
@@ -97,7 +102,7 @@ struct CatalogInstallView: View {
             }.frame(minHeight: Self.iconButtonSize)
             VStack(alignment: .leading, spacing: 16) {
                 if let connection {
-                    ConnectedInventoryView(model: connection, deviceName: Host.current().localizedName ?? "Test Mac", runtime: inventoryRuntime)
+                    ConnectedInventoryView(model: connection, deviceName: deviceName, runtime: inventoryRuntime, connectInHeader: true)
                 }
                 if let connectionSetupError {
                     Text(connectionSetupError).font(.callout).foregroundStyle(.red)

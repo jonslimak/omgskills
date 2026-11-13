@@ -66,8 +66,8 @@ enum SkillRemoval {
     /// What Delete everywhere does, said before it happens.
     static func everywhereWarning(count: Int, sets: Int?) -> String {
         let them = count == 1 ? "it" : "them"
-        var text = "Removes \(them) from My skills and your account, and moves the copies here to the Trash. "
-            + "Copies on other Macs stay there but stop syncing."
+        var text = "Takes \(them) out of My skills and your account; synced versions are deleted for good. "
+            + "Copies here move to the Trash; copies on other Macs stay there but stop syncing."
         if let sets, sets > 0 {
             // Counts add up per skill, so for several skills one Set may be counted twice; don't give a number.
             text += count == 1
@@ -174,7 +174,7 @@ final class SkillRemovalController {
         guard let forget, case .confirmEverywhere(let names, let asked, _) = state else { return }
         // Nothing goes to the Trash unless the account can forget it too.
         guard mayForget() else {
-            state = .failed(message: "Reconnect this Mac to your account to delete everywhere. Nothing was deleted.")
+            state = .failed(message: "Reconnect this Mac to your account to remove from My skills. Nothing was deleted.")
             return
         }
         let id = UUID()
@@ -190,7 +190,7 @@ final class SkillRemovalController {
             state = Self.partialFailure(outcome, kept: true)
             return
         }
-        state = .working(title: "Deleting \(SkillRemoval.title(outcome.removed))…")
+        state = .working(title: "Removing \(SkillRemoval.title(outcome.removed))…")
         let gone = outcome.copies.filter { outcome.removed.map(SkillRemoval.normalizedName).contains(SkillRemoval.normalizedName($0.name)) }
         var forgotten = true
         do { try await forget(Self.keys(gone, among: installed, records: records), Array(Set(gone.compactMap(\.catalogSkillId))).sorted()) }
@@ -202,8 +202,8 @@ final class SkillRemovalController {
             state = .failed(message: "Moved to the Trash, but couldn't remove \(SkillRemoval.title(outcome.removed)) from My skills. "
                 + "Delete it on the web.")
         } else {
-            state = .done(title: "Deleted \(SkillRemoval.title(outcome.removed))",
-                          message: "Removed from My skills and moved to the Trash. Copies on other Macs stay there.")
+            state = .done(title: "Removed \(SkillRemoval.title(outcome.removed)) from My skills",
+                          message: "Copies here moved to the Trash. Copies on other Macs stay there.")
         }
     }
 
@@ -290,19 +290,19 @@ struct SkillRemovalView: View {
                     }
                     if controller.canDeleteEverywhere {
                         Button(role: .destructive) { controller.chooseEverywhere() } label: {
-                            Text("Delete everywhere…").frame(maxWidth: .infinity)
+                            Text("Remove from My skills…").frame(maxWidth: .infinity)
                         }
                     }
                     Button { controller.close() } label: { Text("Cancel").frame(maxWidth: .infinity) }
                         .keyboardShortcut(.cancelAction)
                 }
             case .confirmEverywhere(let names, _, let sets):
-                Text("Delete \(SkillRemoval.title(names)) everywhere?").font(.headline)
+                Text("Remove \(SkillRemoval.title(names)) from My skills?").font(.headline)
                 Text(SkillRemoval.everywhereWarning(count: names.count, sets: sets))
                     .font(.callout).foregroundStyle(.secondary)
                 VStack(spacing: 6) {
                     Button(role: .destructive) { Task { await controller.confirmEverywhere() } } label: {
-                        Text("Delete everywhere").frame(maxWidth: .infinity)
+                        Text("Remove from My skills").frame(maxWidth: .infinity)
                     }
                     Button { controller.close() } label: { Text("Cancel").frame(maxWidth: .infinity) }
                         .keyboardShortcut(.cancelAction)
