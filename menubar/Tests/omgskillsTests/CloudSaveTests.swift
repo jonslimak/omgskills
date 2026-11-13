@@ -960,6 +960,38 @@ struct CloudSaveControllerTests {
         #expect(controller.pendingEnabled == nil && controller.isEnabled)
     }
 
+    @Test func aPassOvertakenByANewerRequestDoesNotShowItsOldCount() async throws {
+        actor Gate {
+            var scans = 0
+            var waiting: [CheckedContinuation<Void, Never>] = []
+            func enter() async -> Int {
+                scans += 1
+                let n = scans
+                await withCheckedContinuation { waiting.append($0) }
+                return n
+            }
+            func open() { waiting.forEach { $0.resume() }; waiting = [] }
+            func count() -> Int { scans }
+        }
+        let gate = Gate()
+        let controller = CloudSaveController(api: FakeCloudSave(enabled: true), credential: { credential() },
+            scan: {
+                _ = await gate.enter()
+                return InstalledSkillsScanner.ScanResult(skills: [], installations: [], summary: InstalledSkillSummary())
+            },
+            folderKeys: { [] }, treeRecord: nil, pace: {})
+        let task = controller.requestRun()
+        while await gate.count() < 1 { await Task.yield() }
+        // A newer inventory report arrives while the first pass is still scanning.
+        controller.requestRun()
+        await gate.open()
+        while await gate.count() < 2 { await Task.yield() }
+        #expect(controller.summary == nil, "The overtaken pass must not publish its out-of-date summary")
+        await gate.open()
+        await task?.value
+        #expect(controller.summary != nil, "The queued pass publishes")
+    }
+
     @Test func aFailedPassAfterTurningOnKeepsTheSwitchOn() async throws {
         struct Flaky: CloudSaveServing {
             func state(credential: StoredDeviceCredential) async throws -> CloudSaveState { throw CloudSaveAPIError.unavailable }
