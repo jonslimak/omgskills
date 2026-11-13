@@ -11,6 +11,7 @@ struct CatalogInstallView: View {
     var openWebsite: () -> Void = {}
     var quit: () -> Void = {}
     var appUpdater: CatalogCandidateUpdater? = nil
+    var loginItem: LoginItemController? = nil
     var showsOptions = false
     var resizePanel: (CGFloat) -> Void = { _ in }
     var connection: DeviceConnectionModel? = nil
@@ -206,6 +207,7 @@ struct CatalogInstallView: View {
                         }.frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
                     }.buttonStyle(.plain).disabled(!appUpdater.canCheck)
                 }
+                if let loginItem { LoginItemRow(controller: loginItem) }
                 Divider()
                 HStack(alignment: .bottom) {
                     Button(action: quit) {
@@ -224,6 +226,33 @@ struct CatalogInstallView: View {
     }
 }
 
+/// "Open at login": off by default; the switch follows what macOS reports.
+private struct LoginItemRow: View {
+    let controller: LoginItemController
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 8) {
+                Label {
+                    Text("Open at login").lineLimit(1)
+                } icon: {
+                    Image(systemName: "clock").frame(width: CatalogInstallView.iconColumnWidth)
+                }
+                Spacer(minLength: 0)
+                Toggle("Open at login", isOn: Binding(
+                    get: { controller.isOn },
+                    set: { controller.setEnabled($0) }))
+                .toggleStyle(.switch).controlSize(.small).labelsHidden()
+            }
+            if controller.needsApproval {
+                Text(LoginItemController.approvalHint).font(.caption).foregroundStyle(.secondary)
+                Button("Open Login Items") { controller.openSystemSettings() }.controlSize(.small)
+            }
+            if let message = controller.message { Text(message).font(.caption).foregroundStyle(.red) }
+        }
+    }
+}
+
 @MainActor
 final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     let model: CatalogInstallModel
@@ -232,6 +261,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     private let contentController: NSHostingController<CatalogInstallView>
     private let statusItem: NSStatusItem
     private var appUpdater: CatalogCandidateUpdater?
+    private var loginItem: LoginItemController?
     private var connectedRuntime: ConnectedInventoryRuntime?
     private var setInstall: CompanionSetInstallController?
     private var removal: SkillRemovalController?
@@ -295,6 +325,9 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
         let service = CatalogInstallFlowService(records: records, installer: CatalogInstallService(installer: installer))
         self.init(model: CatalogInstallModel(service: service, coordinator: coordinator, client: .product, track: track),
             website: candidate.profile.website)
+        let loginItem = LoginItemController(service: MainAppLoginItemService())
+        self.loginItem = loginItem
+        contentController.rootView.loginItem = loginItem
         if let connected = candidate.connected, AppRuntimeConfiguration.skillGroupsAuthSupported {
             let sets = CompanionSetInstallController(
                 flow: GroupInstallFlowModel(credentialStore: DeviceCredentialStore(service: connected.keychainService),
@@ -413,7 +446,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
             close: { [weak self] in self?.closeRequest() }, hide: { [weak self] in self?.hidePanel() },
             showAppMenu: { [weak self] in self?.showAppMenu() }, showStatus: { [weak self] in self?.showStatus() },
             openWebsite: { [weak self] in self?.openWebsite() }, quit: { [weak self] in self?.quit() },
-            appUpdater: appUpdater, resizePanel: { [weak self] in self?.resizePanel(to: $0) }, connection: connection,
+            appUpdater: appUpdater, loginItem: loginItem, resizePanel: { [weak self] in self?.resizePanel(to: $0) }, connection: connection,
             inventoryRuntime: inventoryRuntime, connectionSetupError: connectionSetupError, setInstall: setInstall,
             removal: removal, versionMatch: versionMatch, restore: restore, savedInstall: savedInstall)
     }
@@ -492,6 +525,8 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
 
     private func presentPanel() {
         guard let button = statusItem.button else { return }
+        // The user can change this in System Settings while the panel is closed.
+        loginItem?.refresh()
         NSApp.activate()
         if !popover.isShown {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
