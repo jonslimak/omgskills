@@ -160,8 +160,9 @@ final class CloudSaveController {
             }
             // A newer report asked for another pass while this one ran: its scan is out of date, so the count
             // here would replace a newer one. The queued pass publishes instead.
-            guard !rerun else { return }
+            // The server answered either way, so the sync section can show.
             if next.status != .unavailable { isAvailable = true }
+            guard !rerun else { return }
             summary = next
             if [.off, .upToDate, .incomplete].contains(next.status) { confirmedEnabled = next.status != .off }
             message = nil
