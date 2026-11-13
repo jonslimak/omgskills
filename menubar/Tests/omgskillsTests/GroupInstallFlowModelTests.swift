@@ -36,7 +36,7 @@ struct GroupInstallFlowModelTests {
 
         #expect(model.phase == .failure(.init(
             kind: .reconnectRequired,
-            message: "Connect this Mac to omgskills before installing a Skill Group."
+            message: "Connect this Mac to omgskills before installing a set."
         )))
         #expect(await api.requestedRoutes().isEmpty)
     }

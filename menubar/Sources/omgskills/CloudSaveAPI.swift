@@ -329,7 +329,7 @@ struct CloudSaveAPI: CloudSaveServing {
         case (429, _): throw CloudSaveAPIError.rateLimited
         // A 500 is one request's problem (say, a skill the server can't store); it is reported per skill.
         case (503, _), (502, _), (504, _): throw CloudSaveAPIError.unavailable
-        default: throw CloudSaveAPIError.rejected(error?.error ?? "Cloud save request failed (\(http.statusCode))")
+        default: throw CloudSaveAPIError.rejected(error?.error ?? "Sync failed (\(http.statusCode))")
         }
     }
 }

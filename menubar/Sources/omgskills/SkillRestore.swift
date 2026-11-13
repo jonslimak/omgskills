@@ -219,7 +219,7 @@ struct SkillRestoreView: View {
                 Button("Cancel") { controller.close() }.keyboardShortcut(.cancelAction)
             case .confirm(let request, let version, let copies):
                 Text("Restore \(request.name)?").font(.headline)
-                Text("Puts the version saved \(Self.date(version.savedAt)) in place of the copies in \(SkillRemoval.agents(copies)). "
+                Text("Puts the version synced \(Self.date(version.savedAt)) in place of the copies in \(SkillRemoval.agents(copies)). "
                     + "Current copies go to the Trash.")
                     .font(.callout).foregroundStyle(.secondary)
                     .help(copies.map(\.installCmd).joined(separator: "\n"))

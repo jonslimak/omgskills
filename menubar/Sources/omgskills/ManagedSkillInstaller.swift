@@ -260,15 +260,15 @@ actor ManagedSkillInstaller {
             case .invalidManagedActivation:
                 return "Managed installation state is incomplete or unsafe"
             case .invalidGroupManifest:
-                return "This group cannot be installed safely"
+                return "This set cannot be installed safely"
             case .invalidTransactionJournal:
-                return "A previous group installation cannot be recovered safely"
+                return "A previous set installation cannot be recovered safely"
             case .subscriptionNotFound:
-                return "This Skill Group subscription is no longer installed"
+                return "This set subscription is no longer installed"
             case .subscriptionChanged:
-                return "The installed Skill Group changed. Refresh it and try again"
+                return "The installed set changed. Refresh it and try again"
             case .subscriptionHasLocalConflicts:
-                return "Resolve the local skill changes before applying this group update"
+                return "Resolve the local skill changes before applying this set update"
             case .operationInProgress:
                 return "Another managed installation is already in progress"
             case .filesystemFailure(let message):

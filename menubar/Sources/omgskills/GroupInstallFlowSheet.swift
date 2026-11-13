@@ -13,7 +13,7 @@ struct GroupInstallFlowSheet: View {
             case .idle, .loading:
                 VStack(spacing: 14) {
                     ProgressView()
-                    Text("Loading Skill Group...")
+                    Text("Loading set...")
                         .foregroundStyle(.secondary)
                 }
                 .frame(width: 360, height: 220)
@@ -31,7 +31,7 @@ struct GroupInstallFlowSheet: View {
                     .id(context.id)
                 } else {
                     failureView(
-                        message: "The Skill Group could not be loaded.",
+                        message: "The set could not be loaded.",
                         canRetry: false
                     )
                 }
@@ -46,7 +46,7 @@ struct GroupInstallFlowSheet: View {
 
     private func failureView(message: String, canRetry: Bool) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Label("Unable to load Skill Group", systemImage: "exclamationmark.triangle.fill")
+            Label("Unable to load set", systemImage: "exclamationmark.triangle.fill")
                 .font(.headline)
             Text(message)
                 .foregroundStyle(.secondary)

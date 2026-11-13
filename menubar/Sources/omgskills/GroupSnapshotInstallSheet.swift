@@ -51,7 +51,7 @@ struct GroupSnapshotInstallSheet: View {
         )
         .interactiveDismissDisabled(model.isOperationActive)
         .confirmationDialog(
-            "Apply this Skill Group update?",
+            "Update this set?",
             isPresented: $showsUpdateConfirmation,
             titleVisibility: .visible
         ) {
@@ -117,7 +117,7 @@ struct GroupSnapshotInstallSheet: View {
         }
         .pickerStyle(.segmented)
         .disabled(model.isOperationActive)
-        .accessibilityHint("Choose where this group will be installed")
+        .accessibilityHint("Choose where this set will be installed")
     }
 
     private var itemList: some View {
@@ -139,7 +139,7 @@ struct GroupSnapshotInstallSheet: View {
                 ContentUnavailableView(
                     "No skills",
                     systemImage: "tray",
-                    description: Text("This group has no skills to install.")
+                    description: Text("This set has no skills to install.")
                 )
             }
         }
@@ -172,7 +172,7 @@ struct GroupSnapshotInstallSheet: View {
                 Label(message, systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.red)
             case .none where model.installableCount == 0:
-                Label("This group has no installable skills.", systemImage: "info.circle")
+                Label("This set has no installable skills.", systemImage: "info.circle")
                     .foregroundStyle(.secondary)
             case .none:
                 EmptyView()
@@ -225,8 +225,8 @@ struct GroupSnapshotInstallSheet: View {
         } else {
             Label(
                 diff.hasLocalChanges
-                    ? "This group is up to date. Local edits remain on this Mac."
-                    : "This installed group is up to date.",
+                    ? "This set is up to date. Local edits remain on this Mac."
+                    : "This installed set is up to date.",
                 systemImage: "checkmark.circle.fill"
             )
                 .foregroundStyle(.green)
@@ -357,7 +357,7 @@ struct GroupSnapshotInstallSheet: View {
         if updateCount > 0 { parts.append("update \(updateCount)") }
         if removeCount > 0 { parts.append("remove \(removeCount)") }
         if parts.isEmpty {
-            return "This updates the saved group version without changing installed files."
+            return "This updates the saved set version without changing installed files."
         }
         return "This will \(parts.joined(separator: ", ")). Existing files stay unchanged if any step fails."
     }

@@ -74,7 +74,7 @@ final class GroupInstallFlowModel {
                 guard let credential = try await credentialStore.load() else {
                     throw GroupInstallFlowFailure(
                         kind: .reconnectRequired,
-                        message: "Connect this Mac to omgskills before installing a Skill Group."
+                        message: "Connect this Mac to omgskills before installing a set."
                     )
                 }
                 try Task.checkCancellation()
@@ -141,7 +141,7 @@ final class GroupInstallFlowModel {
         }
         return .init(
             kind: .temporarilyUnavailable,
-            message: "The Skill Group could not be loaded. Try again shortly."
+            message: "The set could not be loaded. Try again shortly."
         )
     }
 }
