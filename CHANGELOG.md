@@ -4,6 +4,13 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.38] - 2026-11-13
+
+### App
+- Clarify app wording and account connection.
+- Improve the Remove from My skills confirmation.
+- Tell the website when the Mac receives an install request.
+
 ## [0.0.37] - 2026-11-09
 
 ### App
