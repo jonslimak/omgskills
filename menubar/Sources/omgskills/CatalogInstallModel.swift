@@ -35,6 +35,8 @@ final class CatalogInstallModel {
     let client: CatalogInstallRequest.Client
     let appName: String
     @ObservationIgnored var onInstalled: @MainActor () -> Void
+    /// Runs once for each install link that parses, before any install work; must not block.
+    @ObservationIgnored var onRequestReceived: @MainActor (CatalogInstallRequest) -> Void = { _ in }
     @ObservationIgnored private let track: ConnectedAppEvent.Track
     @ObservationIgnored private let service: any CatalogInstallFlowServing
     @ObservationIgnored private let coordinator: UpdateInstallCoordinator
@@ -104,6 +106,7 @@ final class CatalogInstallModel {
             }
             return
         }
+        onRequestReceived(incoming)
         guard !ownsRequest else {
             notice = incoming == request ? "" : "Finish or cancel the current request first."
             return
