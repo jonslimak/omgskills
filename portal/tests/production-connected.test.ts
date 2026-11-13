@@ -51,9 +51,13 @@ test("production consent uses the gated normal API, strips private access and ca
     } };
   await createPairingConsent(hash, productionInventoryConsent(false), options).approve();
   assert.equal(called, 0);
-  await createPairingConsent(hash, productionInventoryConsent(true), options).approve();
+  const consent = createPairingConsent(hash, productionInventoryConsent(true), options);
+  await consent.approve();
   assert.equal(called, 1);
   assert.match(returned, /^omgskills:\/\/pair\?/);
+  // If the browser's "Open omgskills?" prompt is dismissed, the page offers the same link again.
+  assert.equal(consent.getSnapshot().phase, "returning");
+  assert.equal(consent.getSnapshot().returnUrl, returned);
 });
 
 test("production pairing adds cloud save upload only for a companion that asks for it", () => {

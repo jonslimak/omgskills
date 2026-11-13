@@ -112,6 +112,8 @@ export const f1PairingConsent: PairingConsentPolicy = {
 export type PairingConsentSnapshot = {
   phase: "ready" | "invalid" | "approving" | "returning" | "cancelled" | "error";
   status: string;
+  /** While returning: the hand-back link again, for when the browser's "Open omgskills?" prompt was dismissed. */
+  returnUrl?: string;
 };
 
 // One page-local attempt; disposing the page makes late responses inert.
@@ -153,7 +155,7 @@ export function createPairingConsent(hash: string, policy: PairingConsentPolicy,
           throw new Error("This approval has expired or is invalid. Try approving again.");
         }
         const callback = policy.callback(result.callbackUrl, request.state);
-        emit({ phase: "returning", status: "Returning to omgskills..." });
+        emit({ phase: "returning", status: "Approved. Returning to omgskills...", returnUrl: callback });
         if (current(attempt)) options.navigate(callback);
       } catch (error) {
         if (current(attempt)) emit({ phase: "error", status: error instanceof Error ? error.message : "Failed to approve connection" });
