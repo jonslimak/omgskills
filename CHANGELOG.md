@@ -4,6 +4,13 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.39] - 2026-11-13
+
+### App
+- Keep the skill count current after Resync.
+- Connect accounts using the default browser.
+- Offer an optional Open at login setting.
+
 ## [0.0.38] - 2026-11-13
 
 ### App
