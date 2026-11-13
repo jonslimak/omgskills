@@ -416,7 +416,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     /// Lets the website know each install link arrived; only while this Mac is connected.
     private func acknowledgeInstalls(_ ack: CatalogInstallAck, runtime: ConnectedInventoryRuntime) {
         model.onRequestReceived = { [weak runtime] request in
-            ack.fire(request, credential: runtime?.connection.currentCredential)
+            ack.fire(request, credential: { runtime?.connection.currentCredential })
         }
     }
 

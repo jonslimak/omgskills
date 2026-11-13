@@ -32,6 +32,22 @@ struct CatalogInstallAck: Sendable {
         return Task.detached(priority: .utility) { await send(request, credential: credential) }
     }
 
+    /// Like `fire`, but when the Mac is still connecting (a cold launch replays the link before the stored
+    /// connection is restored, and syncing hides the credential) it waits up to `wait` for one, then gives up.
+    @MainActor @discardableResult
+    func fire(_ request: CatalogInstallRequest, credential: @escaping @MainActor () -> StoredDeviceCredential?,
+              wait: Duration = .seconds(60), poll: Duration = .seconds(1)) -> Task<Void, Never>? {
+        guard endpoint != nil else { return nil }
+        if let task = fire(request, credential: credential()) { return task }
+        return Task { @MainActor in
+            let deadline = ContinuousClock.now + wait
+            while ContinuousClock.now < deadline {
+                do { try await Task.sleep(for: poll) } catch { return }
+                if let task = fire(request, credential: credential()) { await task.value; return }
+            }
+        }
+    }
+
     func send(_ request: CatalogInstallRequest, credential: StoredDeviceCredential) async {
         guard let endpoint else { return }
         var urlRequest = URLRequest(url: endpoint)

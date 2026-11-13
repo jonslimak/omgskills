@@ -106,7 +106,8 @@ final class CatalogInstallModel {
             }
             return
         }
-        onRequestReceived(incoming)
+        // Ack only links this Mac takes up (or the one already on screen), not ones turned away.
+        if !ownsRequest || incoming == request { onRequestReceived(incoming) }
         guard !ownsRequest else {
             notice = incoming == request ? "" : "Finish or cancel the current request first."
             return

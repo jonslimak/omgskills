@@ -61,6 +61,33 @@ struct CatalogInstallAckTests {
         #expect(await session.requests.isEmpty)
     }
 
+    @MainActor @Test func waitsForTheConnectionToRestoreOnColdLaunch() async throws {
+        let session = AckHTTPSession()
+        let ack = CatalogInstallAck(uploadEndpoint: upload, session: session)
+        var current: StoredDeviceCredential?
+        var checks = 0
+        let task = try #require(ack.fire(try request(), credential: {
+            checks += 1
+            if checks == 3 { current = credential() }
+            return current
+        }, wait: .seconds(5), poll: .milliseconds(5)))
+        #expect(await session.requests.isEmpty)
+        await task.value
+        #expect(await session.requests.count == 1)
+        #expect(await session.requests.first?.value(forHTTPHeaderField: "Authorization") == "Bearer device_secret")
+    }
+
+    @MainActor @Test func givesUpWhenTheMacNeverConnects() async throws {
+        let session = AckHTTPSession()
+        let ack = CatalogInstallAck(uploadEndpoint: upload, session: session)
+        var checks = 0
+        let task = try #require(ack.fire(try request(), credential: { checks += 1; return nil },
+            wait: .milliseconds(50), poll: .milliseconds(5)))
+        await task.value
+        #expect(checks > 1)
+        #expect(await session.requests.isEmpty)
+    }
+
     @Test func refusesAnInsecureOrigin() async throws {
         let session = AckHTTPSession()
         let ack = CatalogInstallAck(uploadEndpoint: URL(string: "http://omgskills.com/api/portal/sync-upload")!,
