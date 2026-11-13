@@ -1,19 +1,20 @@
 import type { Config, Context } from "@netlify/functions";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { createOmgskillsServer } from "../../mcp/src/server.js";
-import { loadProductionMcpLibrary, type McpLibraryLoader } from "./_shared/mcp-library.js";
+import { fetchWithTimeout, loadProductionMcpLibrary, productionMcpTracks, type McpLibraryLoader } from "./_shared/mcp-library.js";
 import { createCompactMcpLibraryLoader, type CompactMcpLoader } from "./_shared/compact-mcp-library.js";
 import featureConfig from "../../config/production-features.json" with { type: "json" };
 import { validateProductionFeatures } from "../../config/production-features.mjs";
-import { catalogInstallRecord, catalogInstallRecordPath } from "./_shared/catalog-install-record.js";
+import { catalogInstallRecord, catalogInstallRecordPath, createQuickInstallRecordReader,
+  type QuickInstallRecordRead } from "./_shared/catalog-install-record.js";
 import type { CatalogReader } from "../../mcp/src/catalog-reader.js";
 import type { SkillResult } from "../../mcp/src/library.js";
 
 const maximumRequestBytes = 64 * 1024;
 
 // Keep the legacy factory synchronous-reader-only for the separate install-record route.
-export function createMcpHandler(loader: McpLibraryLoader) {
-  return withInstallRecordRoute(createReadMcpHandler(loader), loader);
+export function createMcpHandler(loader: McpLibraryLoader, installRecordQuick?: QuickInstallRecordRead) {
+  return withInstallRecordRoute(createReadMcpHandler(loader), loader, installRecordQuick);
 }
 
 export function createCompactMcpHandler(loader: CompactMcpLoader, options: { paging?: boolean; ranking?: boolean } = {}) {
@@ -113,17 +114,22 @@ function quickLibrary(skill: SkillResult): CatalogReader {
   });
 }
 
-export function createConfiguredMcpHandler(enabled: boolean, loaders?: { legacy: McpLibraryLoader; compact: CompactMcpLoader }) {
+export function createConfiguredMcpHandler(enabled: boolean, loaders?: { legacy: McpLibraryLoader; compact: CompactMcpLoader;
+  installRecordQuick?: QuickInstallRecordRead }) {
   const legacy = loaders?.legacy ?? loadProductionMcpLibrary;
+  // The legacy loader's first track, read from its small published assets until the full load lands.
+  const quick = loaders ? loaders.installRecordQuick
+    : createQuickInstallRecordReader(productionMcpTracks[0].manifestUrl, { fetcher: fetchWithTimeout });
   return enabled ? withInstallRecordRoute(createCompactMcpHandler(
-    loaders?.compact ?? createCompactMcpLibraryLoader({ ranking: true }), { paging: true, ranking: true }), legacy)
-    : createMcpHandler(legacy);
+    loaders?.compact ?? createCompactMcpLibraryLoader({ ranking: true }), { paging: true, ranking: true }), legacy, quick)
+    : createMcpHandler(legacy, quick);
 }
 
-function withInstallRecordRoute(handler: ReturnType<typeof createReadMcpHandler>, loader: McpLibraryLoader) {
+function withInstallRecordRoute(handler: ReturnType<typeof createReadMcpHandler>, loader: McpLibraryLoader,
+  quick?: QuickInstallRecordRead) {
   return (request: Request, context: Pick<Context, "waitUntil">): Promise<Response> =>
     new URL(request.url).pathname === catalogInstallRecordPath
-      ? catalogInstallRecord(request, loader, work => context.waitUntil(work))
+      ? catalogInstallRecord(request, loader, work => context.waitUntil(work), quick)
       : handler(request, context);
 }
 

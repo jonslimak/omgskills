@@ -245,7 +245,8 @@ export class SearchCatalogReader implements CatalogReader {
 export class QuickSkillReader {
   private constructor(private readonly manifestUrl: string, private readonly details: DetailIndex,
     private readonly signalLibrary: OmgskillsLibrary, private readonly options: CatalogReadOptions) {}
-  static async load(manifestUrl: string, options: CatalogReadOptions = {}): Promise<QuickSkillReader | null> {
+  /** withSignals false skips trending and curated reads, for callers that only need getRawSkill. */
+  static async load(manifestUrl: string, options: CatalogReadOptions = {}, withSignals = true): Promise<QuickSkillReader | null> {
     const fetcher = options.fetcher ?? fetch;
     const manifest = await manifestAt(manifestUrl, fetcher);
     if (!manifest.searchCatalog) return null;
@@ -253,20 +254,24 @@ export class QuickSkillReader {
     const desc = descriptor(await json(assetUrl(manifestUrl, ref), fetcher, ref.bytes, ref), manifest.skills);
     const [rawIndex, signalData] = await Promise.all([
       json(assetUrl(manifestUrl, desc.details), fetcher, desc.details.bytes, desc.details),
-      signals(manifestUrl, manifest, options),
+      withSignals ? signals(manifestUrl, manifest, options) : Promise.resolve({ trending: [], goldBasket: [] }),
     ]);
     // Same trending and curated signals the full reader enriches with; no catalog rows needed.
     const signalLibrary = OmgskillsLibrary.fromData({ skills: [], trending: signalData.trending, goldBasket: signalData.goldBasket });
     return new QuickSkillReader(manifestUrl, detailIndex(rawIndex, desc), signalLibrary, options);
   }
-  async getSkill(id: string): Promise<SkillResult | undefined> {
+  /** The published catalog record (the same row the full skills file holds) for an exact ID. */
+  async getRawSkill(id: string): Promise<RawSkill | undefined> {
     const exact = id.trim().replace(/^catalog:/i, "");
     const bucket = detailBucket(exact);
     const ref = this.details.shards[bucket];
     if (!ref) return undefined;
     const rows = await json(assetUrl(this.manifestUrl, ref), this.options.fetcher ?? fetch, ref.bytes, ref);
     if (!Array.isArray(rows)) throw new Error("Detail shard must be an array");
-    const raw = rows.find(row => object(row) && (row as RawSkill).id === exact) as RawSkill | undefined;
+    return rows.find(row => object(row) && (row as RawSkill).id === exact) as RawSkill | undefined;
+  }
+  async getSkill(id: string): Promise<SkillResult | undefined> {
+    const raw = await this.getRawSkill(id);
     if (!raw) return undefined;
     // Matches the full reader: the enriched search row, then the detail record's fields.
     return { ...this.signalLibrary.enrichRecord(projectSearchSkill(raw) as Skill), ...slimSkill(raw as Skill) };
