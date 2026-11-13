@@ -89,6 +89,16 @@ struct LoginItemTests {
         #expect(controller.message == LoginItemController.turnOnFailed)
     }
 
+    @Test func notFoundAsksToMoveTheAppToApplications() {
+        let service = FakeLoginItemService()
+        service.status = .notFound
+        service.failure = .init()
+        let controller = LoginItemController(service: service)
+        controller.setEnabled(true)
+        #expect(!controller.isOn)
+        #expect(controller.message == LoginItemController.moveToApplications)
+    }
+
     @Test func unregisterErrorLeavesTheSwitchOn() {
         let service = FakeLoginItemService()
         service.status = .enabled

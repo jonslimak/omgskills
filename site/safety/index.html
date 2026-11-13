@@ -40,7 +40,7 @@
     <h2>What it never does</h2>
     <ul>
       <li>No admin password, no <code>sudo</code>, no background helpers.</li>
-      <li>Doesn't start at login unless you turn on "Open at login" (off by default). Turn it off in the app or in System Settings &gt; General &gt; Login Items.</li>
+      <li>Doesn't add itself to Login Items unless you turn on "Open at login" (off by default). Turn it off in the app or in System Settings &gt; General &gt; Login Items.</li>
       <li>No changes to your shell, PATH or agent settings.</li>
       <li>Never uploads skill files unless you turn on sync. See the <a href="/privacy/">privacy policy</a>.</li>
     </ul>
@@ -58,7 +58,7 @@ codesign -dv /Applications/omgskills.app 2&gt;&amp;1 | grep TeamIdentifier   # S
 spctl --assess --type execute -v /Applications/omgskills.app        # accepted, Notarized Developer ID</pre>
 
     <h2>Remove it</h2>
-    <p>Quit omgskills from the menu bar and drag <code>omgskills.app</code> to the Trash. Skills it installed are links in your agents' folders to copies in <code>~/Library/Application Support/omgskills</code>; delete both to remove them.</p>
+    <p>If you turned on Open at login, turn it off first (or remove omgskills in System Settings &gt; General &gt; Login Items). Then quit omgskills from the menu bar and drag <code>omgskills.app</code> to the Trash. Skills it installed are links in your agents' folders to copies in <code>~/Library/Application Support/omgskills</code>; delete both to remove them.</p>
 
     <h2>More</h2>
     <ul>

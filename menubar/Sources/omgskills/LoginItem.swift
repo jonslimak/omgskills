@@ -45,6 +45,7 @@ final class LoginItemController {
     static let approvalHint = "Allow it in System Settings > General > Login Items."
     static let turnOnFailed = "Couldn't turn on Open at login."
     static let turnOffFailed = "Couldn't turn off Open at login."
+    static let moveToApplications = "Move omgskills to Applications, then try again."
 
     private(set) var status: LoginItemStatus
     private(set) var message: String?
@@ -73,6 +74,8 @@ final class LoginItemController {
             message = on ? Self.turnOnFailed : Self.turnOffFailed
         }
         refresh()
+        // macOS can't find the app where it is (e.g. run from Downloads or a disk image).
+        if on, status == .notFound { message = Self.moveToApplications }
     }
 
     func openSystemSettings() {
