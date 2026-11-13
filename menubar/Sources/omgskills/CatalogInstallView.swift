@@ -231,7 +231,6 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     private let popover = NSPopover()
     private let contentController: NSHostingController<CatalogInstallView>
     private let statusItem: NSStatusItem
-    private var authenticationAnchor: NSWindow?
     private var appUpdater: CatalogCandidateUpdater?
     private var connectedRuntime: ConnectedInventoryRuntime?
     private var setInstall: CompanionSetInstallController?
@@ -239,6 +238,8 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     private var versionMatch: SkillVersionMatchController?
     private var restore: SkillRestoreController?
     private var savedInstall: SavedSkillInstallController?
+    /// An install, Set or other link arrived; its own flow handles Connect, so the first-launch offer waits.
+    private var receivedLink = false
 
     #if DEBUG
     convenience init(root: URL, website: URL, coordinator: UpdateInstallCoordinator,
@@ -256,8 +257,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
         self.init(model: CatalogInstallModel(service: service, coordinator: coordinator,
             appName: connected == nil ? nil : "OMGSkills Connected Test"), website: website)
         if let connected {
-            let authorizer = WebAuthenticationSession(anchorProvider: { [weak self] in self?.browserPresentationAnchor() },
-                onReturn: { [weak self] in self?.returnFromBrowser() })
+            let authorizer = BrowserPairingSession(onReturn: { [weak self] in self?.returnFromBrowser() })
             let connection = DeviceConnectionModel(
                 credentialStore: DeviceCredentialStore(service: connected.keychainService),
                 api: DeviceSyncAPI(uploadEndpoint: connected.uploadURL,
@@ -285,6 +285,8 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     #endif
 
     convenience init(candidate: CatalogCandidateRuntime.Configuration, coordinator: UpdateInstallCoordinator) {
+        // Read before this launch's telemetry and status item write their own defaults.
+        let launchedBefore = FirstLaunchConnect.launchedBefore(.standard)
         let track = Analytics.connectedTracker(profile: candidate.profile)
         // One managed installer serializes single-skill and Set changes to the same destinations.
         let managed = ManagedSkillInstaller(managedRoot: candidate.managedRoot, pathAnchor: candidate.home)
@@ -307,8 +309,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
             Task { await sets.refreshAvailability() }
         }
         if let connected = candidate.connected {
-            let authorizer = WebAuthenticationSession(anchorProvider: { [weak self] in self?.browserPresentationAnchor() },
-                onReturn: { [weak self] in self?.returnFromBrowser() })
+            let authorizer = BrowserPairingSession(onReturn: { [weak self] in self?.returnFromBrowser() })
             do {
                 let runtime = try connected.makeRuntime(paths: candidate.paths, authorizer: authorizer,
                     coordinator: coordinator, automation: .live(paths: candidate.paths), track: track)
@@ -367,7 +368,11 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
                 savedInstall.onChanged = { [weak runtime] in runtime?.installed() }
                 self.savedInstall = savedInstall
                 setContent(connection: runtime.connection, inventoryRuntime: runtime)
+                runtime.firstLaunchDefaults = .standard
                 runtime.start()
+                runtime.offerFirstLaunchConnect(launchedBefore: launchedBefore,
+                    deferIf: { [weak self] in self?.receivedLink == true },
+                    deviceName: { Host.current().localizedName ?? "Mac" })
             } catch {
                 track(.setupFailed)
                 setContent(connectionSetupError: CatalogInstallView.connectionSetupFailureMessage)
@@ -420,15 +425,8 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
         }
     }
 
-    private func browserPresentationAnchor() -> NSWindow? {
-        // Keep the login's presentation window alive when the transient panel hides.
-        authenticationAnchor = contentController.view.window ?? statusItem.button?.window
-        return authenticationAnchor
-    }
-
     private func returnFromBrowser() {
         showStatus()
-        authenticationAnchor = nil
     }
 
     @objc private func togglePanel() {
@@ -448,6 +446,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     func receive(_ url: URL) {
         if connectedRuntime != nil && url.absoluteString == "omgskills://connect" { showStatus(); return }
         if connectedRuntime?.receivePairingCallback(url) == true { showStatus(); return }
+        receivedLink = true
         // While a restore or version match is replacing files, no other link (install, Set, delete) may touch skill folders.
         if versionMatch?.isWorking == true || restore?.isWorking == true || removal?.isWorking == true
             || savedInstall?.isWorking == true { showStatus(); return }

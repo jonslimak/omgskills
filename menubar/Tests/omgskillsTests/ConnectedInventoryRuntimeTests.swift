@@ -520,7 +520,6 @@ struct ConnectedInventoryRuntimeTests {
             #expect(!branch.contains(forbidden))
         }
         let view = try String(contentsOf: source.appendingPathComponent("CatalogInstallView.swift"), encoding: .utf8)
-        #expect(view.contains("anchorProvider: { [weak self] in self?.browserPresentationAnchor() }"))
         #expect(view.contains("onReturn: { [weak self] in self?.returnFromBrowser() }"))
         #expect(view.contains("connectedRuntime?.receivePairingCallback(url)"))
         #expect(view.contains("Analytics.connectedTracker(profile: candidate.profile)"))
@@ -536,10 +535,241 @@ struct ConnectedInventoryRuntimeTests {
         let stop = try #require(app.range(of: "await catalogInstallController.stopReporting()", range: termination.lowerBound..<app.endIndex))
         let reply = try #require(app.range(of: "sender.reply(toApplicationShouldTerminate: closed)", range: termination.lowerBound..<app.endIndex))
         #expect(stop.lowerBound < reply.lowerBound)
-        let auth = try String(contentsOf: source.appendingPathComponent("WebAuthenticationSession.swift"), encoding: .utf8)
-        #expect(auth.contains("guard activeAttemptID == attemptID else { return }"))
+        let auth = try String(contentsOf: source.appendingPathComponent("BrowserPairingSession.swift"), encoding: .utf8)
+        #expect(auth.contains("guard let self, self.activeAttemptID == attemptID else { return }"))
         #expect(auth.contains("guard self?.activeAttemptID == attemptID else { return }"))
+        #expect(!auth.contains("AuthenticationServices"))
         #expect(auth.contains("BrowserPairing.parseCallback(url, expectedState: expectedState"))
+    }
+
+    // MARK: First-launch Connect
+
+    private func firstLaunchDefaults() -> UserDefaults {
+        let name = "omgskills.tests.first-launch." + UUID().uuidString
+        let defaults = UserDefaults(suiteName: name)!
+        defaults.removePersistentDomain(forName: name)
+        return defaults
+    }
+
+    @Test func firstLaunchConnectDecisionNeedsANeverConnectedDisconnectedMac() {
+        #expect(FirstLaunchConnect.shouldConnect(alreadyOffered: false, state: .disconnected, hasPriorConnection: false))
+        #expect(!FirstLaunchConnect.shouldConnect(alreadyOffered: true, state: .disconnected, hasPriorConnection: false))
+        #expect(!FirstLaunchConnect.shouldConnect(alreadyOffered: false, state: .disconnected, hasPriorConnection: true))
+        #expect(!FirstLaunchConnect.shouldConnect(alreadyOffered: false, state: .connected(inventoryCredential.connection),
+            hasPriorConnection: false))
+        #expect(!FirstLaunchConnect.shouldConnect(alreadyOffered: false, state: .authorizing, hasPriorConnection: false))
+        #expect(!FirstLaunchConnect.shouldConnect(alreadyOffered: false, state: .failed(.reconnectRequired),
+            hasPriorConnection: false))
+        #expect(!FirstLaunchConnect.shouldConnect(alreadyOffered: false, state: .failed(.credentialStorage),
+            hasPriorConnection: false))
+    }
+
+    @Test func firstLaunchConnectStartsOnceEverOnANeverConnectedMac() async {
+        let defaults = firstLaunchDefaults()
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let store = InventoryCredentialFixture(record: nil)
+        let runtime = ConnectedInventoryRuntime(connection: makeConnection(store: store, api: api, authorizer: authorizer),
+            authorizer: authorizer)
+        runtime.firstLaunchDefaults = defaults
+        runtime.start()
+        await runtime.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
+        #expect(authorizer.authorizationURL != nil)
+        #expect(FirstLaunchConnect.wasOffered(defaults))
+        #expect(runtime.connection.state == .connected(inventoryCredential.connection))
+        await runtime.stop()
+
+        // Even after the credential is gone again, the next launch never auto-connects.
+        await store.setRecord(nil)
+        let again = InventoryAuthorizerFixture()
+        let next = ConnectedInventoryRuntime(connection: makeConnection(store: store, api: api, authorizer: again),
+            authorizer: again)
+        next.firstLaunchDefaults = defaults
+        await next.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
+        #expect(again.authorizationURL == nil)
+        #expect(next.connection.state == .disconnected)
+        await next.stop()
+    }
+
+    @Test func firstLaunchConnectSkipsAConnectedOrPreviouslyConnectedMac() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let stored = firstLaunchDefaults()
+        let authorizer = InventoryAuthorizerFixture()
+        let connected = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(), api: api,
+            authorizer: authorizer), authorizer: authorizer)
+        connected.firstLaunchDefaults = stored
+        await connected.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
+        #expect(authorizer.authorizationURL == nil)
+        #expect(FirstLaunchConnect.wasOffered(stored))
+        await connected.stop()
+
+        // A reconnect key left by an earlier connection counts as a previous connect.
+        let keyed = firstLaunchDefaults()
+        let keys = InventoryReconnectFixture()
+        await keys.setExisting(true)
+        let keyAuthorizer = InventoryAuthorizerFixture()
+        let keyedRuntime = ConnectedInventoryRuntime(connection: DeviceConnectionModel(
+            credentialStore: InventoryCredentialFixture(record: nil), reconnectKeyStore: keys, api: api,
+            browserAuthorizer: keyAuthorizer, portalConnectURL: URL(string: "http://127.0.0.1:5201/app/connect")!,
+            callbackScheme: BrowserPairing.connectedTestCallbackScheme), authorizer: keyAuthorizer)
+        keyedRuntime.firstLaunchDefaults = keyed
+        await keyedRuntime.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
+        #expect(keyAuthorizer.authorizationURL == nil)
+        #expect(keyedRuntime.connection.state == .disconnected)
+        await keyedRuntime.stop()
+    }
+
+    @Test func firstLaunchConnectNeverStartsAfterTheUserDisconnectedOrWhenTurnedOff() async {
+        let defaults = firstLaunchDefaults()
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let runtime = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(record: nil),
+            api: api, authorizer: authorizer), authorizer: authorizer)
+        runtime.firstLaunchDefaults = defaults
+        await runtime.disconnect().value
+        #expect(FirstLaunchConnect.wasOffered(defaults))
+        await runtime.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
+        #expect(authorizer.authorizationURL == nil)
+        await runtime.stop()
+
+        let off = InventoryAuthorizerFixture()
+        let unwired = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(record: nil),
+            api: api, authorizer: off), authorizer: off)
+        await unwired.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" }).value
+        #expect(off.authorizationURL == nil)
+        await unwired.stop()
+    }
+
+    @Test func firstLaunchConnectYieldsToAConnectTheUserAlreadyStarted() async {
+        let defaults = firstLaunchDefaults()
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let runtime = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(record: nil),
+            api: api, authorizer: authorizer), authorizer: authorizer)
+        runtime.firstLaunchDefaults = defaults
+        let offer = runtime.offerFirstLaunchConnect(launchedBefore: false, deviceName: { "Test Mac" })
+        await runtime.connect(deviceName: "Test Mac").value
+        await offer.value
+        #expect(authorizer.authorizations == 1)
+        await runtime.stop()
+    }
+
+    @Test func launchedBeforeRecognizesEarlierVersionsDefaults() {
+        let fresh = firstLaunchDefaults()
+        #expect(!FirstLaunchConnect.launchedBefore(fresh))
+        let telemetry = firstLaunchDefaults()
+        telemetry.set(true, forKey: "com.omgskills.telemetry.installTracked.v2")
+        #expect(FirstLaunchConnect.launchedBefore(telemetry))
+        let statusItem = firstLaunchDefaults()
+        statusItem.set(1200.0, forKey: "NSStatusItem Preferred Position Item-0")
+        #expect(FirstLaunchConnect.launchedBefore(statusItem))
+        #expect(Analytics.launchMarkerKeys.contains("com.omgskills.telemetry.installTracked.v2"))
+    }
+
+    @Test func upgradeFromAnEarlierVersionUsesUpTheOfferWithoutConnecting() async {
+        let defaults = firstLaunchDefaults()
+        let authorizer = InventoryAuthorizerFixture()
+        let runtime = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(record: nil),
+            api: InventoryAPIFixture(reportMode: .reconciliation), authorizer: authorizer), authorizer: authorizer)
+        runtime.firstLaunchDefaults = defaults
+        var namesAsked = 0
+        await runtime.offerFirstLaunchConnect(launchedBefore: true, deviceName: { namesAsked += 1; return "Test Mac" }).value
+        #expect(authorizer.authorizationURL == nil)
+        #expect(FirstLaunchConnect.wasOffered(defaults))
+        #expect(namesAsked == 0)
+        await runtime.stop()
+    }
+
+    @Test func firstLaunchFromAnInstallLinkLeavesTheOfferForALaterLaunch() async {
+        let defaults = firstLaunchDefaults()
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let runtime = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(record: nil),
+            api: api, authorizer: authorizer), authorizer: authorizer)
+        runtime.firstLaunchDefaults = defaults
+        var namesAsked = 0
+        await runtime.offerFirstLaunchConnect(launchedBefore: false, deferIf: { true },
+            deviceName: { namesAsked += 1; return "Test Mac" }).value
+        #expect(authorizer.authorizationURL == nil)
+        #expect(!FirstLaunchConnect.wasOffered(defaults))
+        #expect(namesAsked == 0)
+        await runtime.stop()
+
+        let later = InventoryAuthorizerFixture()
+        let next = ConnectedInventoryRuntime(connection: makeConnection(store: InventoryCredentialFixture(record: nil),
+            api: api, authorizer: later), authorizer: later)
+        next.firstLaunchDefaults = defaults
+        await next.offerFirstLaunchConnect(launchedBefore: false, deviceName: { namesAsked += 1; return "Test Mac" }).value
+        #expect(later.authorizationURL != nil)
+        #expect(namesAsked == 1)
+        await next.stop()
+    }
+
+    @Test func installLinksDeferTheOfferButPairAndConnectLinksDoNot() throws {
+        let source = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().appendingPathComponent("Sources/omgskills/CatalogInstallView.swift")
+        let code = try String(contentsOf: source, encoding: .utf8)
+        let pair = try #require(code.range(of: "if connectedRuntime?.receivePairingCallback(url) == true { showStatus(); return }"))
+        let mark = try #require(code.range(of: "receivedLink = true"))
+        #expect(pair.upperBound <= mark.lowerBound)
+        #expect(code.contains("deferIf: { [weak self] in self?.receivedLink == true }"))
+        #expect(code.contains("deviceName: { Host.current().localizedName ?? \"Mac\" }"))
+        let launched = try #require(code.range(of: "let launchedBefore = FirstLaunchConnect.launchedBefore(.standard)"))
+        let tracker = try #require(code.range(of: "Analytics.connectedTracker(profile: candidate.profile)"))
+        #expect(launched.upperBound <= tracker.lowerBound)
+        #expect(BrowserPairingSession.defaultTimeout == .seconds(1_800))
+    }
+
+    // MARK: Connect in the default browser
+
+    @Test func connectOpensTheDefaultBrowserAndCompletesFromThePairLink() async throws {
+        var opened: [URL] = []
+        var returns = 0
+        let session = BrowserPairingSession(openURL: { opened.append($0); return true }, onReturn: { returns += 1 })
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let store = InventoryCredentialFixture(record: nil)
+        let connection = DeviceConnectionModel(credentialStore: store, api: api, browserAuthorizer: session,
+            portalConnectURL: URL(string: "http://127.0.0.1:5201/app/connect")!, callbackScheme: BrowserPairing.callbackScheme)
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: session,
+            callbackScheme: BrowserPairing.callbackScheme)
+        let task = runtime.connect(deviceName: "Test Mac")
+        while opened.isEmpty { await Task.yield() }
+        #expect(connection.state == .authorizing)
+        #expect(ConnectedInventoryView.progressText(connection.state) == "Waiting for approval in your browser...")
+        let page = try #require(opened.first)
+        #expect(page.path == "/app/connect")
+        let items = URLComponents(string: "?" + (page.fragment ?? ""))?.queryItems ?? []
+        let state = try #require(items.first { $0.name == "state" }?.value)
+        #expect(items.contains { $0.name == "code_challenge" })
+        #expect(!runtime.receivePairingCallback(URL(string: "omgskills-f1://pair?state=\(state)&code=\(pairCode)")!))
+        #expect(runtime.receivePairingCallback(URL(string: "omgskills://pair?state=wrong&code=\(pairCode)")!))
+        #expect(session.isPending)
+        let callback = URL(string: "omgskills://pair?state=\(state)&code=\(pairCode)")!
+        #expect(session.handleCallback(callback))
+        await task.value
+        #expect(returns == 1)
+        #expect(connection.state == .connected(inventoryCredential.connection))
+        // Single use: the same link again is inert.
+        #expect(!session.handleCallback(callback))
+        #expect(opened.count == 1)
+        await runtime.stop()
+    }
+
+    @Test func browserConnectCancelReturnsToSignedOut() async {
+        var opened = 0
+        let session = BrowserPairingSession(openURL: { _ in opened += 1; return true }, onReturn: {})
+        let connection = DeviceConnectionModel(credentialStore: InventoryCredentialFixture(record: nil),
+            api: InventoryAPIFixture(reportMode: .reconciliation), browserAuthorizer: session,
+            portalConnectURL: URL(string: "http://127.0.0.1:5201/app/connect")!)
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: session,
+            callbackScheme: BrowserPairing.callbackScheme)
+        let task = runtime.connect(deviceName: "Test Mac")
+        while opened == 0 { await Task.yield() }
+        await runtime.cancel().value
+        await task.value
+        #expect(!session.isPending)
+        #expect(connection.state == .disconnected)
+        await runtime.stop()
     }
 
     private func makeConnection(store: InventoryCredentialFixture, api: InventoryAPIFixture,
@@ -553,6 +783,8 @@ struct ConnectedInventoryRuntimeTests {
     }
 }
 
+private let pairCode = "pair_" + String(repeating: "b", count: 43)
+
 private let inventoryCredential = StoredDeviceCredential(credential: "test-only-secret", connection: .init(
     deviceID: "inventory-test-device", accountLabel: "Test account", expiresAt: .distantFuture))
 
@@ -562,6 +794,9 @@ private actor InventoryReconnectFixture: DeviceReconnectKeyStoring {
         loads += 1
         return String(repeating: "a", count: 64)
     }
+    var existing = false
+    func setExisting(_ value: Bool) { existing = value }
+    func hasKey() async throws -> Bool { existing }
 }
 
 private actor InventoryCredentialFixture: DeviceCredentialStoring {
@@ -573,6 +808,7 @@ private actor InventoryCredentialFixture: DeviceCredentialStoring {
         self.saveGate = saveGate
     }
     func load() async throws -> StoredDeviceCredential? { loads += 1; return record }
+    func setRecord(_ value: StoredDeviceCredential?) { record = value }
     func save(_ record: StoredDeviceCredential, replacingExisting: Bool) async throws {
         self.record = record
         if let saveGate { await saveGate.block() }
@@ -716,7 +952,9 @@ private final class InventoryAuthorizerFixture: BrowserPairingAuthorizing {
     var callbacks: [URL] = []
     var scheme: String?
     var authorizationURL: URL?
+    var authorizations = 0
     func authorize(url: URL, callbackScheme: String) async throws -> URL {
+        authorizations += 1
         if let failure { throw failure }
         scheme = callbackScheme
         authorizationURL = url

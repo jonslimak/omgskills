@@ -11,6 +11,8 @@ final class ConnectedInventoryRuntime {
     private(set) var watchWarning: String?
     /// Saves this Mac's own skills after each inventory report, when the account has cloud save on.
     var cloudSave: CloudSaveController?
+    /// Where the once-ever first-launch Connect is recorded; nil turns the first-launch Connect off.
+    @ObservationIgnored var firstLaunchDefaults: UserDefaults?
     @ObservationIgnored private let authorizer: any BrowserPairingAuthorizing
     @ObservationIgnored private let automation: Automation?
     @ObservationIgnored private let callbackScheme: String
@@ -91,9 +93,34 @@ final class ConnectedInventoryRuntime {
         return true
     }
 
+    /// Starts Connect once ever, on the app's very first launch, when this Mac has never been connected.
+    /// Any connect or disconnect by the user also uses up the offer. A launch the app had before this
+    /// version (`launchedBefore`) uses it up without connecting. While `deferIf` is true (an install
+    /// link arrived and its review handles Connect) the offer is left for a later launch.
+    @discardableResult
+    func offerFirstLaunchConnect(launchedBefore: Bool, deferIf: @escaping @MainActor () -> Bool = { false },
+                                 deviceName: @escaping @MainActor () -> String) -> Task<Void, Never> {
+        guard let defaults = firstLaunchDefaults, !FirstLaunchConnect.wasOffered(defaults) else { return Task {} }
+        if launchedBefore { FirstLaunchConnect.markOffered(defaults); return Task {} }
+        let startup = start()
+        return Task { @MainActor [weak self] in
+            await startup.value
+            guard let self, let defaults = firstLaunchDefaults, !FirstLaunchConnect.wasOffered(defaults),
+                  !deferIf() else { return }
+            let current = session
+            let hasPrior = await connection.hasPriorConnectionRecord()
+            guard !FirstLaunchConnect.wasOffered(defaults), !deferIf() else { return }
+            FirstLaunchConnect.markOffered(defaults)
+            guard current == session, FirstLaunchConnect.shouldConnect(alreadyOffered: false,
+                state: connection.state, hasPriorConnection: hasPrior) else { return }
+            await connect(deviceName: deviceName()).value
+        }
+    }
+
     @discardableResult
     func connect(deviceName: String) -> Task<Void, Never> {
-        beginInitial(action: .connect) { [connection] in
+        if let firstLaunchDefaults { FirstLaunchConnect.markOffered(firstLaunchDefaults) }
+        return beginInitial(action: .connect) { [connection] in
             connection.connectWithBrowser(deviceName: deviceName, installations: [], replacingExisting: true)
         }
     }
@@ -115,7 +142,8 @@ final class ConnectedInventoryRuntime {
 
     @discardableResult
     func disconnect() -> Task<Void, Never> {
-        transition(initial: false, action: .disconnect) { [connection] in connection.disconnect() }
+        if let firstLaunchDefaults { FirstLaunchConnect.markOffered(firstLaunchDefaults) }
+        return transition(initial: false, action: .disconnect) { [connection] in connection.disconnect() }
     }
 
     @discardableResult
@@ -221,6 +249,27 @@ final class ConnectedInventoryRuntime {
         stopWake?(); stopWake = nil
         hourly?.cancel(); hourly = nil
         scheduler.stop()
+    }
+}
+
+/// The connected app opens Connect by itself at most once ever: on a launch where this Mac
+/// has no credential, no reconnect key and no record of an earlier connect or disconnect.
+enum FirstLaunchConnect {
+    static let offeredKey = "OMGSkillsFirstLaunchConnectOffered"
+
+    static func wasOffered(_ defaults: UserDefaults) -> Bool { defaults.bool(forKey: offeredKey) }
+
+    /// Whether an earlier version already ran: production 0.0.38 and earlier record install telemetry on
+    /// every launch, and AppKit saves status item positions. Read this before this launch writes either.
+    static func launchedBefore(_ defaults: UserDefaults) -> Bool {
+        if Analytics.launchMarkerKeys.contains(where: { defaults.object(forKey: $0) != nil }) { return true }
+        return defaults.dictionaryRepresentation().keys.contains { $0.hasPrefix("NSStatusItem ") }
+    }
+    static func markOffered(_ defaults: UserDefaults) { defaults.set(true, forKey: offeredKey) }
+
+    static func shouldConnect(alreadyOffered: Bool, state: DeviceConnectionModel.State,
+                              hasPriorConnection: Bool) -> Bool {
+        !alreadyOffered && !hasPriorConnection && state == .disconnected
     }
 }
 #endif

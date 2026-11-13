@@ -64,8 +64,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private lazy var deviceCredentialStore = DeviceCredentialStore(
         service: DeviceCredentialStore.configuredService()
     )
-    private lazy var browserPairingSession = WebAuthenticationSession(
-        anchorProvider: { [weak self] in self?.panel },
+    private lazy var browserPairingSession = BrowserPairingSession(
         onReturn: { [weak self] in self?.showPanelAfterAuthentication() }
     )
     private lazy var deviceConnectionModel = DeviceConnectionModel(

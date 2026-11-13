@@ -171,10 +171,10 @@ struct CatalogPopoverTests {
 
     @Test func browserReturnAndInstallLinksReopenTheSamePanel() throws {
         let code = try source()
-        #expect(code.components(separatedBy: "self?.browserPresentationAnchor()").count == 3)
-        #expect(code.components(separatedBy: "self?.returnFromBrowser()").count == 3)
-        #expect(code.contains("authenticationAnchor = contentController.view.window ?? statusItem.button?.window"))
-        #expect(code.contains("private var authenticationAnchor: NSWindow?"))
+        // Connect opens the default browser; the website's pair link reopens the panel.
+        #expect(code.components(separatedBy: "BrowserPairingSession(onReturn: { [weak self] in self?.returnFromBrowser() })").count == 3)
+        #expect(!code.contains("WebAuthenticationSession"))
+        #expect(!code.contains("anchorProvider"))
         #expect(code.contains("model.receive(url)\n        showStatus()"))
         #expect(code.contains("if connectedRuntime?.receivePairingCallback(url) == true { showStatus(); return }"))
     }
