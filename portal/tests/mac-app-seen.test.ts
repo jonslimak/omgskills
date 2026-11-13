@@ -10,7 +10,7 @@ test("the install pop-over assumes the app only on a Mac that checked in lately"
   assert.equal(macAppSeen([], now), false);
   assert.equal(macAppSeen([mac({ lastCheckedAt: ago(60 * 60 * 1000) })], now), true);
   assert.equal(macAppSeen([mac({ lastCheckedAt: null, lastReportedAt: ago(5 * 60 * 1000) })], now), true);
-  // Removed app: no check-in for over two days.
+  // Removed app: no check-in for over a week.
   assert.equal(macAppSeen([mac({ lastCheckedAt: ago(MAC_APP_SEEN_WINDOW_MS + 1), lastReportedAt: ago(MAC_APP_SEEN_WINDOW_MS * 3) })], now), false);
   assert.equal(macAppSeen([mac({ lastCheckedAt: null, lastReportedAt: null })], now), false);
   assert.equal(macAppSeen([mac({ status: "revoked", lastCheckedAt: ago(1000) })], now), false);
