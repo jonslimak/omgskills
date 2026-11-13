@@ -672,3 +672,21 @@ export const cloudStorageSweepCursor = pgTable(
   },
   (table) => [check("cloud_storage_sweep_cursor_id_check", sql`${table.id}`)]
 );
+
+/** The Mac app received a website install request; see netlify/functions/_shared/install-ack.ts. */
+export const installAcks = pgTable(
+  "install_acks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    deviceId: uuid("device_id").notNull().references(() => deviceTokens.id, { onDelete: "cascade" }),
+    catalogId: text("catalog_id").notNull(),
+    agent: text("agent").notNull(),
+    receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    index("install_acks_user_received_idx").on(table.userId, table.receivedAt),
+    check("install_acks_catalog_id_check", sql`octet_length(${table.catalogId}) BETWEEN 1 AND 500`),
+    check("install_acks_agent_check", sql`${table.agent} IN ('claude', 'codex')`)
+  ]
+);
