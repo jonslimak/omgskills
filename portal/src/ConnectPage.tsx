@@ -29,6 +29,8 @@ export function ConsentContent({ request, policy, snapshot, approve, cancel }: {
       </details>
       {snapshot.status && <p role={snapshot.phase === "invalid" || snapshot.phase === "error" ? "alert" : "status"}
         className={snapshot.phase === "invalid" ? "connect-error" : "status"}>{snapshot.status}</p>}
+      {snapshot.phase === "returning" && snapshot.returnUrl && <p className="status">
+        Didn't open? <a href={snapshot.returnUrl}>Open omgskills</a></p>}
       <div className="actions">
         <Button type="button" disabled={!request || pending || finished} onClick={approve}>{pending ? "Approving..." : "Approve"}</Button>
         <Button type="button" disabled={!request || finished} onClick={cancel} variant="outline">Cancel</Button>
