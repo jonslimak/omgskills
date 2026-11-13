@@ -159,3 +159,19 @@ export function sourceLabel(url: string | null) {
     return null;
   }
 }
+
+/** How long after a Mac's last check-in the install pop-over still assumes the app is there. */
+export const MAC_APP_SEEN_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Whether a connected Mac has the app, as far as the website can tell. A running app checks in about hourly, so a Mac
+ * that hasn't for a week most likely removed it. Without check-in times (older inventory), any active Mac counts.
+ */
+export function macAppSeen(devices: PortalDevice[], now = Date.now()): boolean {
+  return devices.some(device => {
+    if (device.status !== "active") return false;
+    if (device.lastCheckedAt === undefined) return true;
+    const seen = Math.max(Date.parse(device.lastCheckedAt ?? "") || 0, Date.parse(device.lastReportedAt ?? "") || 0);
+    return seen > 0 && now - seen < MAC_APP_SEEN_WINDOW_MS;
+  });
+}
