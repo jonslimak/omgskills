@@ -33,6 +33,7 @@ import { PublicInstallSetup } from "../../app/unified/PublicInstallSetup";
 import { setupTestDistribution } from "../../app/unified/setup-test-distribution";
 import { CatalogInstallIntentStore } from "../../app/unified/catalog-install-intent";
 import { CatalogInstallSetup } from "../../app/unified/CatalogInstallSetup";
+import { checkInstallAck } from "../../app/unified/install-ack";
 import { needsAnalyticsDocumentReload, startPublicAnalytics } from "../../app/unified/analytics";
 import { isFeatureEnabled } from "../../feature-flags";
 
@@ -146,6 +147,10 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     ? new InstallIntentStore(() => window.sessionStorage, installClient, "normal") : null);
   const [catalogStore] = useState(() => !composition && (catalogInstallEnabled || productionInstall) && base === "/app/"
     ? new CatalogInstallIntentStore(() => window.sessionStorage, productionInstall ? "production" : "f1") : null);
+  // The install pop-over asks, while signed in, whether the Mac app received its request.
+  const ackApi = useRef(api);
+  ackApi.current = api;
+  const [installAck] = useState(() => checkInstallAck((path, init) => ackApi.current(path, init)));
   const clearOtherIntent = (next: Navigation) => {
     composition?.clearInstallIntent(next);
     const pending = installStore?.read().intent;
@@ -262,6 +267,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
       action={normalInstallAction} distribution={setupTestDistribution} />
       : catalogStore ? (skill, detailReady, appKnown) => <CatalogInstallSetup key={skill.key}
         skill={skill} detailReady={detailReady} store={catalogStore} appKnown={appKnown}
+        checkAck={available && !local ? installAck : undefined}
         returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} /> : undefined)}
     onInstallCancel={() => catalogStore?.clear()}
     readOnlyAccount

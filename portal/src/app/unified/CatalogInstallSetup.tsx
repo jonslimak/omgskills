@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Download, RefreshCw, X } from "lucide-react";
 import { agentKind, type SkillDisplay } from "./model";
 import { catalogInstallAction, catalogInstallClients, type CatalogInstallAgent } from "./public-install";
@@ -6,14 +6,17 @@ import { CatalogInstallIntentStore, CatalogInstallSetupSession } from "./catalog
 import { refreshInstallSkill } from "./PublicInstallSetup";
 import { productionDistribution } from "./production-distribution";
 import { AgentSetupPrompt } from "./AgentSetupPrompt";
+import { openingStatus, pollInstallAck, type InstallAckCheck } from "./install-ack";
 import type { CandidateDistribution } from "../../candidate/distribution";
 import "./install-setup.css";
 
-export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, distribution, appKnown = false }: {
+export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, distribution, appKnown = false, checkAck }: {
   skill: SkillDisplay; detailReady: boolean; returnRoute: string; store: CatalogInstallIntentStore;
   distribution?: CandidateDistribution;
   /** The account has a connected Mac, so the app is most likely installed. */
   appKnown?: boolean;
+  /** Signed in: asks whether the Mac app received the request, so the pop-over can say "Approve it". */
+  checkAck?: InstallAckCheck;
 }) {
   const saved = store.read().intent;
   // Start on the agent that doesn't have the skill yet.
@@ -26,7 +29,7 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
   const [confirmed, setConfirmed] = useState(false);
   if (store.client === "production") return <section className="ua-install-setup ua-install-pop" aria-label="Install skill">
     <ProductionInstall key={agent} skill={skill} detailReady={detailReady} returnRoute={returnRoute} store={store} agent={agent}
-      appKnown={appKnown || confirmed} onAppConfirmed={() => setConfirmed(true)}
+      appKnown={appKnown || confirmed} onAppConfirmed={() => setConfirmed(true)} checkAck={checkAck}
       picker={<div className="ua-install-agents" role="group" aria-label="Agent">
       {(["claude", "codex"] as const).map(kind => <button key={kind} type="button" aria-pressed={agent === kind}
         className="ua-install-agent" onClick={() => pick(kind)}>
@@ -61,9 +64,9 @@ function useInstallSession(skill: SkillDisplay, agent: CatalogInstallAgent, retu
 const OPEN_WAIT_MS = 5000;
 
 /** The published app: one Install now when the app is there, else Download or an agent prompt. Few words. */
-function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appKnown, onAppConfirmed, picker }: {
+function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appKnown, onAppConfirmed, picker, checkAck }: {
   skill: SkillDisplay; detailReady: boolean; returnRoute: string; store: CatalogInstallIntentStore; agent: CatalogInstallAgent; appKnown: boolean;
-  onAppConfirmed: () => void; picker: ReactNode;
+  onAppConfirmed: () => void; picker: ReactNode; checkAck?: InstallAckCheck;
 }) {
   const { session, state } = useInstallSession(skill, agent, returnRoute, store);
   useEffect(() => { if (state.phase === "ready") onAppConfirmed(); }, [state.phase, onAppConfirmed]);
@@ -75,6 +78,18 @@ function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appK
     const timer = window.setTimeout(() => setSlow(true), OPEN_WAIT_MS);
     return () => window.clearTimeout(timer);
   }, [state.phase, state.intent]);
+  // A Mac app that got the request says so (older ones never do); then the page asks for approval instead.
+  const [acked, setAcked] = useState(false);
+  const checkAckRef = useRef(checkAck);
+  checkAckRef.current = checkAck;
+  const canCheckAck = !!checkAck;
+  useEffect(() => {
+    setAcked(false);
+    const check = checkAckRef.current;
+    if (state.phase !== "opening" || !check || !state.intent) return;
+    return pollInstallAck({ check: (request, signal) => (checkAckRef.current ?? check)(request, signal),
+      catalogId: state.intent.catalogId, agent: state.intent.agent, onAck: () => setAcked(true) });
+  }, [state.phase, state.intent, canCheckAck]);
   const app = productionDistribution;
   const action = detailReady ? catalogInstallAction(skill, agent, store.client) : { href: null, reason: "Loading..." };
   const busy = state.phase === "checking";
@@ -85,7 +100,7 @@ function ProductionInstall({ skill, detailReady, returnRoute, store, agent, appK
   // Only what needs the person: opening the app, or what went wrong.
   const status = !action.href ? (detailReady ? action.reason : "")
     : state.restartRequired ? "This request is out of date."
-    : state.phase === "opening" ? (slow ? "Didn't open? Open omgskills from Applications, then try again." : "Opening omgskills...")
+    : state.phase === "opening" ? openingStatus(acked, slow)
     : state.phase === "blocked" ? state.message : "";
   const install = ready || state.phase === "opening" || state.phase === "setup"
     ? <button type="button" className="ua-primary ua-install-now" disabled={!action.href || state.restartRequired}
