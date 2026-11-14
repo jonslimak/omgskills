@@ -45,6 +45,9 @@ struct CatalogInstallRecordClient: Sendable {
     private let waitBeforeRetry: @Sendable () async throws -> Void
     private enum AttemptError: Error { case temporaryServerFailure }
     static let maximumResponseBytes = 256 * 1024
+    /// Generous enough for a slow server cold start. A request that times out is not retried, so the
+    /// worst case stays near one timeout plus one fast failure, not two full timeouts.
+    static let requestTimeout: TimeInterval = 45
 
     init(session: URLSession = .shared,
          waitBeforeRetry: @escaping @Sendable () async throws -> Void = {
@@ -83,7 +86,7 @@ struct CatalogInstallRecordClient: Sendable {
         var components = URLComponents(url: origin, resolvingAgainstBaseURL: false)!
         components.path = "/api/catalog/install-record"
         components.queryItems = [URLQueryItem(name: "id", value: id)]
-        var request = URLRequest(url: components.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 20)
+        var request = URLRequest(url: components.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: Self.requestTimeout)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.httpShouldHandleCookies = false
         for attempt in 0..<2 {
@@ -106,9 +109,10 @@ struct CatalogInstallRecordClient: Sendable {
     }
 
     private static func isTemporary(_ error: any Error) -> Bool {
+        // 5xx and quick network failures retry once; a full timeout does not (see `requestTimeout`).
         if error is AttemptError { return true }
         guard let error = error as? URLError else { return false }
-        return [.timedOut, .networkConnectionLost, .cannotConnectToHost,
+        return [.networkConnectionLost, .cannotConnectToHost,
                 .cannotFindHost, .dnsLookupFailed].contains(error.code)
     }
 

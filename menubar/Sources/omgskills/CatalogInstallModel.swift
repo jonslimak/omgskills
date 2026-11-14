@@ -23,6 +23,20 @@ struct CatalogInstallFlowService: CatalogInstallFlowServing {
 
 @MainActor @Observable
 final class CatalogInstallModel {
+    /// Time source for the "still loading" hint and record freshness; tests inject a manual clock.
+    struct Timing: Sendable {
+        var now: @Sendable () -> ContinuousClock.Instant
+        var sleep: @Sendable (Duration) async throws -> Void
+        static let live = Timing(now: { .now }, sleep: { try await Task.sleep(for: $0) })
+    }
+    static let slowLoadingDelay: Duration = .seconds(3)
+    static let loadingMessage = "Loading installation information..."
+    static let slowLoadingMessage = "Still loading…"
+    static let recheckingMessage = "Checking installation information..."
+    static let slowRecheckingMessage = "Still checking…"
+    /// Approve re-reads the record so a takedown or changed pins between review and approval are caught.
+    /// A record read this recently is trusted instead; the gap is no wider than this window.
+    static let recordReuseWindow: Duration = .seconds(30)
     enum Phase: Equatable { case idle, loading, confirm, rechecking, installing, cancelling, result }
     private(set) var phase: Phase = .idle
     private(set) var record: CatalogInstallRecord?
@@ -43,11 +57,16 @@ final class CatalogInstallModel {
     @ObservationIgnored private var activity: UpdateInstallCoordinator.ActivityToken?
     @ObservationIgnored private var operationID: UUID?
     @ObservationIgnored private(set) var operation: Task<Void, Never>?
+    @ObservationIgnored private let timing: Timing
+    /// When the shown record's lookup started; nil when no record is shown.
+    @ObservationIgnored private var recordFetchedAt: ContinuousClock.Instant?
+    @ObservationIgnored private var slowNotice: Task<Void, Never>?
 
     init(service: any CatalogInstallFlowServing, coordinator: UpdateInstallCoordinator, client: CatalogInstallRequest.Client = .f1,
          appName: String? = nil, onInstalled: @escaping @MainActor () -> Void = {},
-         track: @escaping ConnectedAppEvent.Track = { _ in }) {
+         track: @escaping ConnectedAppEvent.Track = { _ in }, timing: Timing = .live) {
         self.service = service
+        self.timing = timing
         self.coordinator = coordinator
         self.client = client
         self.appName = appName ?? (client == .product ? "OMGSkills Candidate" : "OMGSkills F1 Test")
@@ -60,6 +79,7 @@ final class CatalogInstallModel {
     func beginAppUpdate() -> Bool {
         guard canCheckForAppUpdates else { return false }
         record = nil
+        recordFetchedAt = nil
         destination = nil
         request = nil
         result = nil
@@ -100,6 +120,7 @@ final class CatalogInstallModel {
             if ownsRequest { notice = "This install link is invalid." }
             else {
                 record = nil
+                recordFetchedAt = nil
                 request = nil
                 destination = nil
                 finish(.unavailable, message: "This install link is invalid.")
@@ -115,17 +136,20 @@ final class CatalogInstallModel {
         request = incoming
         track(.install(.requested, agent: incoming.target))
         record = nil
+        recordFetchedAt = nil
         destination = nil
         result = nil
         notice = ""
         phase = .loading
-        message = "Loading installation information..."
+        message = Self.loadingMessage
         activity = coordinator.beginActivity(.skillInstall)
         let id = UUID()
         operationID = id
+        showSlowNotice(Self.slowLoadingMessage, in: .loading, for: id)
         operation = Task { [weak self] in
             guard let self else { return }
             do {
+                let started = timing.now()
                 guard let fetched = try await service.fetch(id: incoming.catalogID) else {
                     if isCurrent(id) { finish(.unavailable, message: "This skill is not available in the catalog.") }
                     return
@@ -133,7 +157,9 @@ final class CatalogInstallModel {
                 guard fetched.id == incoming.catalogID else { throw CatalogInstallRecordClient.ClientError.invalidResponse }
                 let target = try await service.destination(for: fetched, target: incoming.target)
                 guard isCurrent(id) else { return }
+                cancelSlowNotice()
                 record = fetched
+                recordFetchedAt = started
                 destination = target
                 phase = .confirm
                 message = "Ready to install in \(incoming.target.rawValue)."
@@ -151,27 +177,34 @@ final class CatalogInstallModel {
             finish(.failed("An app update is waiting. Retry after the app restarts."))
             return
         }
+        // Reuse only the record on screen for this request, and only while it is very fresh.
+        let reuse = recordFetchedAt.map { timing.now() - $0 < Self.recordReuseWindow } ?? false
         phase = .rechecking
-        message = "Checking installation information..."
+        message = Self.recheckingMessage
         notice = ""
         let id = UUID()
         operationID = id
+        if !reuse { showSlowNotice(Self.slowRecheckingMessage, in: .rechecking, for: id) }
         operation = Task { [weak self] in
             guard let self else { return }
             do {
-                guard let current = try await service.fetch(id: incoming.catalogID) else {
+                let started = timing.now()
+                let fetched = reuse ? approved : try await service.fetch(id: incoming.catalogID)
+                guard let current = fetched else {
                     if isCurrent(id) { finish(.unavailable, message: "This skill is no longer available in the catalog.") }
                     return
                 }
                 guard current.id == incoming.catalogID else { throw CatalogInstallRecordClient.ClientError.invalidResponse }
                 let currentDestination = try await service.destination(for: current, target: incoming.target)
                 guard isCurrent(id) else { return }
+                cancelSlowNotice()
                 guard !appReplacementBlocksRequest else {
                     finish(.failed("An app update is waiting. Retry after the app restarts."))
                     return
                 }
                 if !approved.hasSameInstallation(as: current) || destination != currentDestination {
                     record = current
+                    if !reuse { recordFetchedAt = started }
                     destination = currentDestination
                     phase = .confirm
                     message = "Installation information changed. Confirm again."
@@ -200,7 +233,9 @@ final class CatalogInstallModel {
         pending?.cancel()
         await pending?.value
         operation = nil
+        cancelSlowNotice()
         record = nil
+        recordFetchedAt = nil
         request = nil
         destination = nil
         result = nil
@@ -213,8 +248,25 @@ final class CatalogInstallModel {
 
     private func isCurrent(_ id: UUID) -> Bool { operationID == id && !Task.isCancelled }
 
+    /// After `slowLoadingDelay`, swaps in `text` if this operation is still waiting in `phase`.
+    private func showSlowNotice(_ text: String, in phase: Phase, for id: UUID) {
+        slowNotice?.cancel()
+        let sleep = timing.sleep
+        slowNotice = Task { [weak self] in
+            do { try await sleep(Self.slowLoadingDelay) } catch { return }
+            guard let self, !Task.isCancelled, operationID == id, self.phase == phase else { return }
+            message = text
+        }
+    }
+
+    private func cancelSlowNotice() {
+        slowNotice?.cancel()
+        slowNotice = nil
+    }
+
     private func finish(_ result: CatalogInstallService.Result, message: String? = nil) {
         track(.installResult(result, agent: request?.target))
+        cancelSlowNotice()
         self.result = result
         phase = .result
         notice = ""
