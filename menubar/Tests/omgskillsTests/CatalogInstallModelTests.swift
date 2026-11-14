@@ -475,15 +475,70 @@ struct CatalogInstallModelTests {
         #expect(model.phase == .confirm)
         #expect(model.message == "Ready to install in Codex.")
         #expect(await model.close())
+        // A lookup that finishes before the delay cancels the pending timer.
+        await service.holdNextFetch()
         model.receive(link())
         #expect(model.message == "Loading installation information...")
-        await model.operation?.value
-        // A lookup that finished before the delay never shows the slow message.
+        await service.waitForFetch()
         await clock.waitForSleeper()
-        clock.wakeSleepers()
-        for _ in 0..<50 { await Task.yield() }
+        #expect(clock.pendingSleeps.count == 1)
+        let cancelledBefore = clock.cancelledSleeps
+        await service.resumeFetch()
+        await model.operation?.value
+        await clock.waitForCancelled(cancelledBefore + 1)
+        #expect(clock.cancelledSleeps == cancelledBefore + 1)
+        #expect(clock.pendingSleeps.isEmpty)
         #expect(model.message == "Ready to install in Codex.")
         _ = await model.close()
+    }
+
+    @Test(arguments: [false, true])
+    func slowTimerCannotOverwriteAFailedLookup(_ atApprove: Bool) async {
+        let clock = ManualTiming()
+        let service = FlowStub()
+        let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(), timing: clock.timing)
+        if atApprove {
+            model.receive(link())
+            await model.operation?.value
+            clock.advance(.seconds(31))
+        }
+        await service.setFetchFailure()
+        await service.holdNextFetch()
+        if atApprove { model.install() } else { model.receive(link()) }
+        await service.waitForFetch()
+        await clock.waitForSleeper()
+        let cancelledBefore = clock.cancelledSleeps
+        await service.resumeFetch()
+        await model.operation?.value
+        #expect(model.hasFailure)
+        let failure = model.message
+        #expect(failure == "Could not load installation information. Close this request and retry.")
+        await clock.waitForCancelled(cancelledBefore + 1)
+        #expect(clock.cancelledSleeps == cancelledBefore + 1)
+        clock.wakeSleepers()
+        for _ in 0..<100 { await Task.yield() }
+        #expect(model.message == failure)
+        #expect(model.phase == .result)
+    }
+
+    @Test func slowTimerCannotOverwriteAClosedRequest() async {
+        let clock = ManualTiming()
+        let service = FlowStub()
+        await service.holdNextFetch()
+        let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(), timing: clock.timing)
+        model.receive(link())
+        await service.waitForFetch()
+        await clock.waitForSleeper()
+        let close = Task { await model.close() }
+        while model.phase != .cancelling { await Task.yield() }
+        await service.resumeFetch()
+        #expect(await close.value)
+        await clock.waitForCancelled(1)
+        #expect(clock.cancelledSleeps == 1)
+        clock.wakeSleepers()
+        for _ in 0..<100 { await Task.yield() }
+        #expect(model.phase == .idle)
+        #expect(model.message == "Ready")
     }
 
     @Test func approveReusesAFreshRecordWithoutAnotherLookup() async {
@@ -571,12 +626,12 @@ private actor FlowStub: CatalogInstallFlowServing {
     func setFetchFailure() { failFetch = true }
     func fetch(id: String) async throws -> CatalogInstallRecord? {
         fetchCount += 1
-        if failFetch { throw URLError(.timedOut) }
         let captured = current
         if holdFetch {
             holdFetch = false
             await withCheckedContinuation { fetchWait = $0; fetchStarted?.resume(); fetchStarted = nil }
         }
+        if failFetch { throw URLError(.timedOut) }
         return captured
     }
     func destination(for record: CatalogInstallRecord, target: SkillInstaller.Target) async throws -> URL {
@@ -607,6 +662,7 @@ private func record(id: String = "owner/repo:alias", name: String = "old-alias",
 private final class ManualTiming: Sendable {
     private struct State {
         var elapsed: Duration = .zero
+        var cancelled = 0
         var sleepers: [UUID: (Duration, CheckedContinuation<Void, any Error>)] = [:]
     }
     private let state = OSAllocatedUnfairLock(initialState: State())
@@ -616,6 +672,10 @@ private final class ManualTiming: Sendable {
         .init(now: { [self] in start + state.withLock { $0.elapsed } }, sleep: { [self] in try await sleep($0) })
     }
     var pendingSleeps: [Duration] { state.withLock { $0.sleepers.values.map(\.0) } }
+    var cancelledSleeps: Int { state.withLock { $0.cancelled } }
+    func waitForCancelled(_ count: Int) async {
+        for _ in 0..<10_000 where cancelledSleeps < count { await Task.yield() }
+    }
     func advance(_ duration: Duration) { state.withLock { $0.elapsed += duration } }
     func wakeSleepers() {
         let waiting = state.withLock { current in
@@ -632,14 +692,18 @@ private final class ManualTiming: Sendable {
         try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
                 let cancelled = state.withLock { current -> Bool in
-                    if Task.isCancelled { return true }
+                    if Task.isCancelled { current.cancelled += 1; return true }
                     current.sleepers[id] = (duration, continuation)
                     return false
                 }
                 if cancelled { continuation.resume(throwing: CancellationError()) }
             }
         } onCancel: {
-            state.withLock { $0.sleepers.removeValue(forKey: id) }?.1.resume(throwing: CancellationError())
+            state.withLock { current in
+                let removed = current.sleepers.removeValue(forKey: id)
+                if removed != nil { current.cancelled += 1 }
+                return removed
+            }?.1.resume(throwing: CancellationError())
         }
     }
 }

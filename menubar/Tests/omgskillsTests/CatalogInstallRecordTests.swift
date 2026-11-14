@@ -115,6 +115,18 @@ struct CatalogInstallRecordTests {
         #expect(waits.withLock { $0 } == 1)
     }
 
+    @Test(arguments: ["once-disconnect", "once-503"])
+    func aSlowFailureIsNotRetried(_ scenario: String) async throws {
+        #expect(CatalogInstallRecordClient.quickFailureWindow == .seconds(5))
+        let id = "\(scenario):\(UUID().uuidString)"
+        // A zero window makes every failure count as slow.
+        let client = CatalogInstallRecordClient(session: session(), waitBeforeRetry: {
+            Issue.record("A failure after a long wait must not start another long attempt")
+        }, retryWindow: .zero)
+        await #expect(throws: (any Error).self) { try await client.fetch(id: id) }
+        #expect(CatalogRecordURLProtocol.attempts(for: id) == 1)
+    }
+
     @Test(arguments: ["always-disconnect", "always-503"])
     func repeatedFailuresStopAfterTwoRequests(_ scenario: String) async throws {
         let id = "\(scenario):\(UUID().uuidString)"
