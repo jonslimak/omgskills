@@ -8,7 +8,7 @@ import { verifyLiveHelperReleaseAssets } from "./helper-release-assets.mjs";
 import { consumeVerificationBody, fetchForVerification } from "./verification-fetch.mjs";
 
 const defaultOrigin = (process.env.PRODUCTION_ORIGIN || "https://omgskills.com").replace(/\/$/, "");
-export const defaultDownloadURL = "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.40/OMGSkills-Connected-0.0.40-40-arm64.zip";
+export const defaultDownloadURL = "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.41/OMGSkills-Connected-0.0.41-41-arm64.zip";
 const requiredStaticReleaseAssets = [
   "downloads/omgskills-mac.dmg",
   "downloads/omgskills-mac.dmg.sha256",
