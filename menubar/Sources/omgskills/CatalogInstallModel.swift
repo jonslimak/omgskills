@@ -107,6 +107,11 @@ final class CatalogInstallModel {
         default: return true
         }
     }
+    /// Whether the install window shows `message` with a spinner or warning icon.
+    var showsStatusLine: Bool {
+        hasFailure || [.loading, .rechecking, .cancelling].contains(phase)
+            || (phase == .confirm && message != "Ready to install in \(request?.target.rawValue ?? "").")
+    }
     var appReplacementBlocksRequest: Bool { appUpdateActive || coordinator.hasPendingInstall || coordinator.isAppReplacementActive }
 
     func receive(_ url: URL) {

@@ -131,8 +131,7 @@ struct CatalogInstallView: View {
                     Text(destination.path).font(.caption).foregroundStyle(.secondary).textSelection(.enabled)
                 }
             }
-            if model.hasFailure || model.phase == .loading || model.phase == .cancelling
-                || (model.phase == .confirm && model.message != "Ready to install in \(model.request?.target.rawValue ?? "").") {
+            if model.showsStatusLine {
                 HStack(alignment: .top, spacing: 10) {
                     if model.isWorking { ProgressView().controlSize(.small) }
                     else if model.hasFailure {

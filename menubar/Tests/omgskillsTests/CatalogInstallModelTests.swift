@@ -470,6 +470,7 @@ struct CatalogInstallModelTests {
         await waitUntil { model.message == "Still loading…" }
         #expect(model.message == "Still loading…")
         #expect(model.isWorking)
+        #expect(model.showsStatusLine)
         await service.resumeFetch()
         await model.operation?.value
         #expect(model.phase == .confirm)
@@ -490,6 +491,31 @@ struct CatalogInstallModelTests {
         #expect(clock.pendingSleeps.isEmpty)
         #expect(model.message == "Ready to install in Codex.")
         _ = await model.close()
+    }
+
+    @Test func stillCheckingIsShownWhileApproveWaits() async {
+        let clock = ManualTiming()
+        let service = FlowStub()
+        let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(), timing: clock.timing)
+        model.receive(link())
+        await model.operation?.value
+        #expect(!model.showsStatusLine)
+        clock.advance(.seconds(31))
+        await service.holdNextFetch()
+        model.install()
+        await service.waitForFetch()
+        await clock.waitForSleeper()
+        #expect(model.phase == .rechecking)
+        #expect(model.message == "Checking installation information...")
+        #expect(model.showsStatusLine)
+        clock.wakeSleepers()
+        await waitUntil { model.message == "Still checking…" }
+        #expect(model.message == "Still checking…")
+        #expect(model.showsStatusLine)
+        #expect(model.isWorking)
+        await service.resumeFetch()
+        await model.operation?.value
+        #expect(model.result == .installed)
     }
 
     @Test(arguments: [false, true])
