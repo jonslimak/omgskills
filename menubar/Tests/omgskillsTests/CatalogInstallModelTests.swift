@@ -692,6 +692,17 @@ struct CatalogInstallModelTests {
         await other.operation?.value
         #expect(other.message == "Installed in Claude. Already in Codex.")
         #expect(other.installedTargets == [.claude])
+
+        // A result on screen, then a bad link: the old restart hint goes away.
+        let codexDone = CatalogInstallModel(service: FlowStub(), coordinator: UpdateInstallCoordinator(), timing: .staleRecords)
+        codexDone.receive(link(agent: "codex"))
+        await codexDone.operation?.value
+        codexDone.install()
+        await codexDone.operation?.value
+        #expect(codexDone.installedTargets == [.codex])
+        codexDone.receive(link(agent: "nobody"))
+        #expect(codexDone.message == "This install link is invalid.")
+        #expect(codexDone.installedTargets.isEmpty)
     }
 
     @Test func bothCountsAResultForEveryAgent() async {

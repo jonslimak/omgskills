@@ -237,9 +237,9 @@ final class CatalogInstallModel {
                 }
                 guard operationID == id else { return }
                 let anyInstalled = outcomes.contains { $0.1 == .installed }
-                installedTargets = outcomes.filter { $0.1 == .installed }.map(\.0)
+                let installed = outcomes.filter { $0.1 == .installed }.map(\.0)
                 if incoming.targets.count == 1 {
-                    finish(outcomes[0].1)
+                    finish(outcomes[0].1, installed: installed)
                 } else {
                     for (target, outcome) in outcomes { track(.installResult(outcome, agent: target)) }
                     if let (target, failure) = outcomes.first(where: { !Self.succeeded($0.1) }) {
@@ -247,7 +247,7 @@ final class CatalogInstallModel {
                         for skipped in incoming.targets.dropFirst(outcomes.count) { track(.installResult(failure, agent: skipped)) }
                         let done = outcomes.filter { $0.1 == .installed }.map(\.0.rawValue)
                         finish(failure, message: (done.isEmpty ? "" : "Installed in \(done.joined(separator: " and ")). ")
-                            + "\(target.rawValue): " + Self.resultMessage(failure, label: target.rawValue), tracked: true)
+                            + "\(target.rawValue): " + Self.resultMessage(failure, label: target.rawValue), tracked: true, installed: installed)
                     } else {
                         let done = outcomes.filter { $0.1 == .installed }.map(\.0.rawValue)
                         let had = outcomes.filter { $0.1 == .alreadyInstalled }.map(\.0.rawValue)
@@ -255,7 +255,7 @@ final class CatalogInstallModel {
                         finish(anyInstalled ? .installed : .alreadyInstalled,
                                message: anyInstalled && !had.isEmpty
                                    ? "Installed in \(done.joined(separator: " and ")). Already in \(had.joined(separator: " and "))." : nil,
-                               tracked: true)
+                               tracked: true, installed: installed)
                     }
                 }
                 if anyInstalled { onInstalled() }
@@ -311,8 +311,10 @@ final class CatalogInstallModel {
         result == .installed || result == .alreadyInstalled
     }
 
-    /// `tracked`: the caller already counted each agent's result.
-    private func finish(_ result: CatalogInstallService.Result, message: String? = nil, tracked: Bool = false) {
+    /// `tracked`: the caller already counted each agent's result. `installed`: agents newly changed.
+    private func finish(_ result: CatalogInstallService.Result, message: String? = nil, tracked: Bool = false,
+                        installed: [SkillInstaller.Target] = []) {
+        installedTargets = installed
         if !tracked {
             if let request { for target in request.targets { track(.installResult(result, agent: target)) } }
             else { track(.installResult(result, agent: nil)) }
