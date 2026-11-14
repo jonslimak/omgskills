@@ -611,15 +611,17 @@ export function UnifiedApp({
   // The app installs any library skill, from Discover or My skills (Set rows keep the copy command).
   const canInstall = !!(onMac && signedIn && publicInstallAction && detail?.catalogId && !detail.setItemKind && !detail.installed?.isLocalOnly);
   // An install that finishes changes where the skill is; close the card and drop its intent.
-  const installDone = useRef(installedAgents);
+  const installDone = useRef({ agents: installedAgents, key: detail?.key });
   useEffect(() => {
-    if (installDone.current === installedAgents) return;
     const before = installDone.current;
-    installDone.current = installedAgents;
-    // Installed from this card: a new agent has it now, so say so.
-    if (installOpen && detail && installedAgents.split(",").some(agent => agent && !before.split(",").includes(agent))) {
+    if (before.agents === installedAgents && before.key === detail?.key) return;
+    installDone.current = { agents: installedAgents, key: detail?.key };
+    // Installed from this card: the same skill is on a new agent now, so say so.
+    if (installOpen && detail && before.key === detail.key
+      && installedAgents.split(",").some(agent => agent && !before.agents.split(",").includes(agent))) {
       setInstalledNotice(`Installed ${detail.name}`);
     }
+    if (before.agents === installedAgents) return;
     if (installOpen) onInstallCancel?.();
     setInstallOpen(false);
   }, [installedAgents, installOpen, onInstallCancel, detail]);
