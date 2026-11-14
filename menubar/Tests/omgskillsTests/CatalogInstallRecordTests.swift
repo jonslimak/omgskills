@@ -84,7 +84,26 @@ struct CatalogInstallRecordTests {
         await #expect(throws: CancellationError.self) { try await task.value }
     }
 
-    @Test(arguments: ["once-timeout", "once-disconnect", "once-503"])
+    @Test func requestTimeoutAllowsSlowColdStarts() {
+        #expect(CatalogInstallRecordClient.requestTimeout == 45)
+    }
+
+    @Test(arguments: ["once-timeout", "always-timeout"])
+    func aFullTimeoutIsNotRetried(_ scenario: String) async throws {
+        let id = "\(scenario):\(UUID().uuidString)"
+        let client = CatalogInstallRecordClient(session: session(), waitBeforeRetry: {
+            Issue.record("A timed-out lookup must not wait another full timeout")
+        })
+        do {
+            _ = try await client.fetch(id: id)
+            Issue.record("Expected timed-out lookup to fail")
+        } catch {
+            #expect((error as? URLError)?.code == .timedOut)
+        }
+        #expect(CatalogRecordURLProtocol.attempts(for: id) == 1)
+    }
+
+    @Test(arguments: ["once-disconnect", "once-503"])
     func temporaryLookupFailureRetriesOnce(_ scenario: String) async throws {
         let id = "\(scenario):\(UUID().uuidString)"
         let waits = OSAllocatedUnfairLock(initialState: 0)
@@ -96,7 +115,19 @@ struct CatalogInstallRecordTests {
         #expect(waits.withLock { $0 } == 1)
     }
 
-    @Test(arguments: ["always-timeout", "always-503"])
+    @Test(arguments: ["once-disconnect", "once-503"])
+    func aSlowFailureIsNotRetried(_ scenario: String) async throws {
+        #expect(CatalogInstallRecordClient.quickFailureWindow == .seconds(5))
+        let id = "\(scenario):\(UUID().uuidString)"
+        // A zero window makes every failure count as slow.
+        let client = CatalogInstallRecordClient(session: session(), waitBeforeRetry: {
+            Issue.record("A failure after a long wait must not start another long attempt")
+        }, retryWindow: .zero)
+        await #expect(throws: (any Error).self) { try await client.fetch(id: id) }
+        #expect(CatalogRecordURLProtocol.attempts(for: id) == 1)
+    }
+
+    @Test(arguments: ["always-disconnect", "always-503"])
     func repeatedFailuresStopAfterTwoRequests(_ scenario: String) async throws {
         let id = "\(scenario):\(UUID().uuidString)"
         let client = CatalogInstallRecordClient(session: session(), waitBeforeRetry: {})
@@ -104,8 +135,8 @@ struct CatalogInstallRecordTests {
             _ = try await client.fetch(id: id)
             Issue.record("Expected exhausted lookup to fail")
         } catch {
-            if scenario == "always-timeout" {
-                #expect((error as? URLError)?.code == .timedOut)
+            if scenario == "always-disconnect" {
+                #expect((error as? URLError)?.code == .networkConnectionLost)
             } else {
                 #expect(error as? CatalogInstallRecordClient.ClientError == .unavailable)
             }
@@ -131,7 +162,7 @@ struct CatalogInstallRecordTests {
     }
 
     @Test func cancellationDuringRetryDelayStopsWithoutAnotherRequest() async throws {
-        let id = "once-timeout:\(UUID().uuidString)"
+        let id = "once-disconnect:\(UUID().uuidString)"
         let task = Task {
             let client = CatalogInstallRecordClient(session: session(), waitBeforeRetry: {
                 withUnsafeCurrentTask { $0?.cancel() }
@@ -185,14 +216,14 @@ private final class CatalogRecordURLProtocol: URLProtocol, @unchecked Sendable {
         }
         #expect(request.url!.host == "omgskills.com")
         #expect(request.url!.path == "/api/catalog/install-record")
-        #expect(request.timeoutInterval == 20)
+        #expect(request.timeoutInterval == 45)
         #expect(!request.httpShouldHandleCookies)
         var body = "{\"version\":1,\"found\":true,\"skill\":\(recordJSON())}"
         let scenario = String(id.split(separator: ":").first!)
         var status = id == "offline" ? 503 : 200
-        if ["once-timeout", "once-disconnect", "always-timeout"].contains(scenario),
-           attempt == 1 || scenario == "always-timeout" {
-            client?.urlProtocol(self, didFailWithError: URLError(scenario == "once-disconnect" ? .networkConnectionLost : .timedOut))
+        if ["once-timeout", "once-disconnect", "always-timeout", "always-disconnect"].contains(scenario),
+           attempt == 1 || scenario.hasPrefix("always-") {
+            client?.urlProtocol(self, didFailWithError: URLError(scenario.hasSuffix("-disconnect") ? .networkConnectionLost : .timedOut))
             return
         }
         if scenario == "terminal-cancel" || scenario == "terminal-tls" {
