@@ -45,6 +45,8 @@ final class ConnectedInventoryRuntime {
     /// The fallback check runs this often (seconds) besides folder changes, wake and Resync.
     /// It asks the scheduler, so a server backoff still holds it back.
     nonisolated static let fallbackCheckInterval: TimeInterval = 900
+    /// How late the fallback check may wake, so macOS can batch it with other work.
+    nonisolated static let fallbackCheckTolerance: TimeInterval = 60
 
     private static let defaultSleep: InventoryReportScheduler.Sleep = { try await Task.sleep(for: .seconds($0)) }
 
@@ -55,6 +57,8 @@ final class ConnectedInventoryRuntime {
         var now: () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }
         var sleep: InventoryReportScheduler.Sleep = { try await Task.sleep(for: .seconds($0)) }
         var jitter: () -> TimeInterval = { .random(in: 0...1) }
+        /// The fallback check's sleep; nil uses `sleep`. Live, it allows the system some slack.
+        var fallbackSleep: InventoryReportScheduler.Sleep? = nil
 
         static func live(paths: SkillFilesystemPaths) -> Self {
             Self(watch: { changed in
@@ -67,7 +71,7 @@ final class ConnectedInventoryRuntime {
                     Task { @MainActor in woke() }
                 }
                 return { center.removeObserver(token) }
-            })
+            }, fallbackSleep: { try await Task.sleep(for: .seconds($0), tolerance: .seconds(fallbackCheckTolerance)) })
         }
     }
 
@@ -213,15 +217,23 @@ final class ConnectedInventoryRuntime {
         scheduler.start()
         do { stopWatching = try automation.watch { [weak self] in self?.trigger(changed: true, session: current) } }
         catch {
-            watchWarning = "Folder monitoring unavailable. Resync and regular checks remain available."
+            watchWarning = "Folder monitoring is off. Regular checks and Resync in Options still work."
             track(.watcherUnavailable)
         }
         stopWake = automation.wake { [weak self] in self?.trigger(changed: false, session: current) }
-        fallbackCheck = Task { @MainActor [weak self, sleep = automation.sleep] in
+        fallbackCheck = Task { @MainActor [weak self, sleep = automation.fallbackSleep ?? automation.sleep, now = automation.now] in
+            var delay = Self.fallbackCheckInterval
             while !Task.isCancelled {
-                do { try await sleep(Self.fallbackCheckInterval) } catch { return }
-                guard !Task.isCancelled, self?.session == current else { return }
-                self?.trigger(changed: false, session: current)
+                do { try await sleep(delay) } catch { return }
+                guard !Task.isCancelled, let self, session == current else { return }
+                // A report or check that just succeeded (a change, wake or Resync) makes this tick redundant:
+                // wait out the rest of the interval from then instead.
+                if let last = scheduler.lastSuccessAt, now() - last < Self.fallbackCheckInterval - Self.fallbackCheckTolerance {
+                    delay = Self.fallbackCheckInterval - (now() - last)
+                    continue
+                }
+                delay = Self.fallbackCheckInterval
+                trigger(changed: false, session: current)
             }
         }
     }

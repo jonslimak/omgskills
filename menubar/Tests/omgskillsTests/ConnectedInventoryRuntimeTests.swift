@@ -336,7 +336,7 @@ struct ConnectedInventoryRuntimeTests {
         #expect(events.clock.pendingSleeps == 0)
     }
 
-    @Test func fallbackChecksNeverBypassServerBackoff() async {
+    @Test func fallbackChecksNeverBypassServerBackoffAndSkipRedundantTicks() async {
         let api = InventoryAPIFixture(reportMode: .reconciliation)
         let authorizer = InventoryAuthorizerFixture()
         let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
@@ -344,22 +344,62 @@ struct ConnectedInventoryRuntimeTests {
         let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
         await runtime.start().value
         #expect(await api.uploads == 1)
-        // The server asks for an hour's pause, longer than the fallback interval.
-        await api.setCheckError(.retryableServer(statusCode: 503, retryAfter: 3_600))
+        // The server asks for a pause longer than the fallback interval.
+        await api.setCheckError(.retryableServer(statusCode: 503, retryAfter: 3_000))
         await events.clock.advance(900)
         #expect(await api.checks == 1)
         await api.clearCheckError()
-        // Three more fallback ticks inside the pause send nothing.
+        // Fallback ticks at 1,800, 2,700 and 3,600 fall inside the pause and send nothing.
         for _ in 0..<3 {
             await events.clock.advance(900)
             #expect(await api.checks == 1)
             #expect(await api.uploads == 1)
         }
-        // The retry runs once the server's delay has passed (900 + 3,600), as one fresh report.
-        await events.clock.advance(900)
+        await events.clock.advance(299)
+        #expect(await api.uploads == 1)
+        // At 3,900 (900 + 3,000) the retry runs, alone, as one fresh report.
+        await events.clock.advance(1)
+        #expect(await api.uploads == 2)
+        #expect(await api.checks == 1)
+        // The tick at 4,500 comes 600 s after that success, so it waits out the interval instead.
+        await events.clock.advance(600)
         #expect(await api.checks == 1)
         #expect(await api.uploads == 2)
+        await events.clock.advance(299)
+        #expect(await api.checks == 1)
+        await events.clock.advance(1)
+        #expect(await api.checks == 2)
         await runtime.stop()
+    }
+
+    @Test func backgroundCheckKeepsTheLastReportForThePanel() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let events = InventoryAutomationFixture()
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
+        await runtime.start().value
+        guard case .reported = connection.reportStatus else { Issue.record("Expected a report"); return }
+        let gate = InventoryShutdownGate()
+        await api.setCheckGate(gate)
+        await events.clock.advance(ConnectedInventoryRuntime.fallbackCheckInterval)
+        await gate.waitUntilBlocked()
+        #expect(connection.reportStatus == .reporting)
+        let shown = ConnectedInventoryView.shownStatus(connection)
+        #expect(ConnectedInventoryView.reportedCount(shown) != nil)
+        #expect(ConnectedInventoryView.reportAttention(shown) == nil)
+        await gate.open()
+        await events.clock.advance(0)
+        #expect(await api.checks == 1)
+        await runtime.disconnect().value
+        #expect(connection.lastReportedStatus == nil)
+        await runtime.stop()
+    }
+
+    @Test func liveFallbackSleepAllowsSystemSlack() {
+        #expect(ConnectedInventoryRuntime.fallbackCheckTolerance >= 60)
+        let automation = ConnectedInventoryRuntime.Automation.live(paths: .isolated(testRoot: URL(fileURLWithPath: NSTemporaryDirectory())))
+        #expect(automation.fallbackSleep != nil)
     }
 
     @Test func stopDrainsAnUncooperativeCheckAndRestartRejectsOldCallbacks() async {

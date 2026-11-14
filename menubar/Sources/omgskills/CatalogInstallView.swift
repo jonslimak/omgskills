@@ -212,7 +212,7 @@ struct CatalogInstallView: View {
                 if let connection, case .connected = connection.state {
                     Divider()
                     ConnectedSyncOptions(model: connection, runtime: inventoryRuntime, iconWidth: Self.iconColumnWidth,
-                                         didDisconnect: { showStatus?() })
+                                         reconnect: { reconnect(); showStatus?() }, didDisconnect: { showStatus?() })
                 }
                 Divider()
                 HStack(alignment: .bottom) {

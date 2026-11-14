@@ -47,7 +47,19 @@ final class DeviceConnectionModel {
     private(set) var state: State = .disconnected
     private(set) var disconnectWarning: String?
     private(set) var continuityWarning: String?
-    private(set) var reportStatus: ReportStatus = .idle
+    private(set) var reportStatus: ReportStatus = .idle {
+        didSet {
+            switch reportStatus {
+            case .reported: lastReportedStatus = reportStatus
+            // Each new attempt starts from idle; only a failure or another credential drops the last report.
+            case .idle, .pending, .reporting: break
+            case .failed, .uncertain: lastReportedStatus = nil
+            }
+        }
+    }
+    /// The last report for this credential while a newer one is waiting or running, so a background check
+    /// can keep the count on screen.
+    private(set) var lastReportedStatus: ReportStatus?
     /// Skills on this Mac counted the way the web lists them: one per skill, not per agent it's in.
     private(set) var skillCount: Int?
     private(set) var lastReportOutcome: InventoryReportOutcome?
@@ -74,7 +86,9 @@ final class DeviceConnectionModel {
     @ObservationIgnored private var stateAttemptID: UUID?
     @ObservationIgnored private var needsReconnect = false
     @ObservationIgnored private var connectedInfo: DeviceConnectionInfo?
-    @ObservationIgnored private var connectedCredential: StoredDeviceCredential?
+    @ObservationIgnored private var connectedCredential: StoredDeviceCredential? {
+        didSet { if connectedCredential != oldValue { lastReportedStatus = nil } }
+    }
     @ObservationIgnored private let inventoryScanner: InventoryScanner?
     @ObservationIgnored private var reportRequested = false
     @ObservationIgnored private var reconciliationUploadInFlight = false

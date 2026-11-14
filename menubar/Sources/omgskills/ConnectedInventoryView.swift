@@ -33,22 +33,23 @@ struct ConnectedInventoryView: View {
             case .connected:
                 // Sync runs in the background: the panel shows the count, and a message only when something needs a look.
                 // The sync switch, Resync and Disconnect live in Options.
-                if let count = Self.reportedCount(model.reportStatus) {
+                let status = Self.shownStatus(model)
+                if let count = Self.reportedCount(status) {
                     let here = model.skillCount ?? count
                     let cloud = runtime?.cloudSave.flatMap { $0.isAvailable ? $0.shownSummary : nil }
                     Text(Self.headerText(here: here, summary: cloud)).font(.body)
                     Text(Self.lineText(here: here, summary: cloud)).font(.caption).foregroundStyle(.secondary)
                 }
-                if let attention = Self.reportAttention(model.reportStatus) {
+                if let attention = Self.reportAttention(status) {
                     Text(attention).font(.callout).textSelection(.enabled)
-                    if Self.attentionOffersResync(model.reportStatus) {
+                    if Self.attentionOffersResync(status) {
                         Button("Resync") { resync() }.controlSize(.small)
                     }
                 }
                 if let warning = runtime?.watchWarning { Text(warning).font(.caption).foregroundStyle(.secondary) }
                 if let cloudSave = runtime?.cloudSave, cloudSave.isAvailable {
                     // While the header is hidden (reporting, or a failed report), this says how sync is doing.
-                    CloudSaveAttention(controller: cloudSave, showsStatus: Self.reportedCount(model.reportStatus) == nil,
+                    CloudSaveAttention(controller: cloudSave, showsStatus: Self.reportedCount(status) == nil,
                                        reconnect: { runtime?.connect(deviceName: deviceName) })
                 }
             case .authorizing, .exchanging, .storingCredential, .syncing:
@@ -103,9 +104,22 @@ struct ConnectedInventoryView: View {
     /// Whether Resync is the fix for the attention message, so the panel can offer it in place.
     static func attentionOffersResync(_ status: DeviceConnectionModel.ReportStatus) -> Bool {
         switch status {
-        case .failed, .uncertain: return true
+        case .idle, .failed, .uncertain: return true
         case .reported(let result, let issues): return issues > 0 || (result.reportVersion == 3 && result.complete != true)
-        case .idle, .pending, .reporting: return false
+        case .pending, .reporting: return false
+        }
+    }
+
+    /// While a check waits or runs after an earlier report, the panel keeps that report's count instead of "Checking...".
+    static func shownStatus(_ model: DeviceConnectionModel) -> DeviceConnectionModel.ReportStatus {
+        shownStatus(model.reportStatus, lastReported: model.lastReportedStatus)
+    }
+
+    nonisolated static func shownStatus(_ status: DeviceConnectionModel.ReportStatus,
+                                        lastReported: DeviceConnectionModel.ReportStatus?) -> DeviceConnectionModel.ReportStatus {
+        switch status {
+        case .idle, .pending, .reporting: return lastReported ?? status
+        case .failed, .uncertain, .reported: return status
         }
     }
 
@@ -175,6 +189,7 @@ struct ConnectedSyncOptions: View {
     let model: DeviceConnectionModel
     var runtime: ConnectedInventoryRuntime? = nil
     let iconWidth: CGFloat
+    var reconnect: () -> Void = {}
     /// After Disconnect, the status panel shows Connect account.
     var didDisconnect: () -> Void = {}
 
@@ -199,16 +214,26 @@ struct ConnectedSyncOptions: View {
                         Text("Off: My skills lists names only, and files stay on this Mac.")
                             .font(.caption).foregroundStyle(.secondary)
                     }
+                    // A switch change that fails says so here, where it was made.
+                    if let summary = cloudSave.summary,
+                       summary.status == .permissionRequired || summary.status == .reconnectRequired {
+                        Text(CloudSaveController.statusText(summary)).font(.caption).foregroundStyle(.secondary)
+                        Button("Reconnect", action: reconnect).controlSize(.small)
+                    }
+                    if let message = cloudSave.message { Text(message).font(.caption).foregroundStyle(.secondary) }
                 }
             }
             VStack(alignment: .leading, spacing: 4) {
                 Button {
                     if let runtime { runtime.resync() } else { model.requestInventoryReport() }
                 } label: {
-                    Label {
-                        Text("Resync")
-                    } icon: {
-                        Image(systemName: "arrow.clockwise").frame(width: iconWidth)
+                    HStack(spacing: 8) {
+                        Label {
+                            Text("Resync")
+                        } icon: {
+                            Image(systemName: "arrow.clockwise").frame(width: iconWidth)
+                        }
+                        if model.reportStatus == .reporting { ProgressView().controlSize(.mini) }
                     }.frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
                 }.buttonStyle(.plain)
                 .disabled(model.reportStatus == .reporting)
