@@ -45,14 +45,22 @@ struct CatalogInstallRecordClient: Sendable {
     private let waitBeforeRetry: @Sendable () async throws -> Void
     private enum AttemptError: Error { case temporaryServerFailure }
     static let maximumResponseBytes = 256 * 1024
+    /// Generous enough for a slow server cold start. URLSession treats it as an idle timeout, so a
+    /// trickling response can run longer; that is accepted.
+    static let requestTimeout: TimeInterval = 45
+    /// Only a failure this quick is retried, so a retry never follows a long wait: the worst case is
+    /// about this window plus one timeout (~50 s), never two long attempts.
+    static let quickFailureWindow: Duration = .seconds(5)
+    private let retryWindow: Duration
 
     init(session: URLSession = .shared,
          waitBeforeRetry: @escaping @Sendable () async throws -> Void = {
              try await Task.sleep(for: .milliseconds(500))
-         }) {
+         }, retryWindow: Duration = Self.quickFailureWindow) {
         origin = URL(string: "https://omgskills.com")!
         self.session = session
         self.waitBeforeRetry = waitBeforeRetry
+        self.retryWindow = retryWindow
     }
 
     #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
@@ -60,6 +68,7 @@ struct CatalogInstallRecordClient: Sendable {
         origin = catalogCandidate.profile.origin
         self.session = session
         waitBeforeRetry = { try await Task.sleep(for: .milliseconds(500)) }
+        retryWindow = Self.quickFailureWindow
     }
     #endif
 
@@ -74,6 +83,7 @@ struct CatalogInstallRecordClient: Sendable {
         origin = localOrigin
         self.session = session
         waitBeforeRetry = { try await Task.sleep(for: .milliseconds(500)) }
+        retryWindow = Self.quickFailureWindow
     }
     #endif
 
@@ -83,10 +93,11 @@ struct CatalogInstallRecordClient: Sendable {
         var components = URLComponents(url: origin, resolvingAgainstBaseURL: false)!
         components.path = "/api/catalog/install-record"
         components.queryItems = [URLQueryItem(name: "id", value: id)]
-        var request = URLRequest(url: components.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 20)
+        var request = URLRequest(url: components.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: Self.requestTimeout)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.httpShouldHandleCookies = false
         for attempt in 0..<2 {
+            let started = ContinuousClock.now
             do {
                 try Task.checkCancellation()
                 return try await fetchOnce(request, id: id)
@@ -95,7 +106,7 @@ struct CatalogInstallRecordClient: Sendable {
                 if error is CancellationError || (error as? URLError)?.code == .cancelled {
                     throw CancellationError()
                 }
-                guard attempt == 0, Self.isTemporary(error) else {
+                guard attempt == 0, Self.isTemporary(error), ContinuousClock.now - started < retryWindow else {
                     if error is AttemptError { throw ClientError.unavailable }
                     throw error
                 }
@@ -106,9 +117,10 @@ struct CatalogInstallRecordClient: Sendable {
     }
 
     private static func isTemporary(_ error: any Error) -> Bool {
+        // 5xx and network failures retry once if they came quickly; a timeout never does.
         if error is AttemptError { return true }
         guard let error = error as? URLError else { return false }
-        return [.timedOut, .networkConnectionLost, .cannotConnectToHost,
+        return [.networkConnectionLost, .cannotConnectToHost,
                 .cannotFindHost, .dnsLookupFailed].contains(error.code)
     }
 

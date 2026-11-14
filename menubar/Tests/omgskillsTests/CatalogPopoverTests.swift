@@ -68,7 +68,8 @@ struct CatalogPopoverTests {
         #expect(code.contains("Label(model.message, systemImage: \"checkmark\")"))
         #expect(code.contains("model.message != \"Ready\""))
         #expect(code.contains(".buttonStyle(.borderedProminent).disabled(true)"))
-        #expect(code.contains("model.phase == .confirm && model.message !="))
+        // The status line (spinner + message) follows the model, which covers loading and rechecking.
+        #expect(code.contains("if model.showsStatusLine {"))
         #expect(code.contains("NSApp.activate()"))
         #expect(!code.contains("activate(ignoringOtherApps:"))
     }
