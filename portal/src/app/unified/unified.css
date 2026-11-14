@@ -2373,6 +2373,27 @@
   box-shadow: var(--ua-shadow);
   z-index: 100;
 }
+.ua-toast.ua-toast-success {
+  top: 16px;
+  bottom: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #34c759; /* macOS system green, as on the Mac app's confirmation */
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+}
+.ua-theme[data-theme="dark"] .ua-toast.ua-toast-success {
+  background: #30d158;
+}
+.ua-toast.ua-toast-success svg {
+  width: 14px;
+  height: 14px;
+}
 .ua-mobile-header {
   display: none;
 }

@@ -510,6 +510,12 @@ export function UnifiedApp({
   const [notice, setNotice] = useState(initialNotice);
   // The agent picker opens from the Install button and closes when another skill is shown.
   const [installOpen, setInstallOpen] = useState(false);
+  const [installedNotice, setInstalledNotice] = useState("");
+  useEffect(() => {
+    if (!installedNotice) return;
+    const timer = setTimeout(() => setInstalledNotice(""), 3000);
+    return () => clearTimeout(timer);
+  }, [installedNotice]);
   // Long descriptions start as their "Use when" summary.
   const [descriptionOpen, setDescriptionOpen] = useState(false);
   // Per-Mac scan history stays behind "Show history" at the bottom of the panel.
@@ -605,13 +611,22 @@ export function UnifiedApp({
   // The app installs any library skill, from Discover or My skills (Set rows keep the copy command).
   const canInstall = !!(onMac && signedIn && publicInstallAction && detail?.catalogId && !detail.setItemKind && !detail.installed?.isLocalOnly);
   // An install that finishes changes where the skill is; close the card and drop its intent.
-  const installDone = useRef(installedAgents);
+  // Same skill across regrouping: the library id stays put when a new agent's copy becomes the row's representative.
+  const installSkillId = detail ? detail.catalogId ?? detail.key : undefined;
+  const installDone = useRef({ agents: installedAgents, key: installSkillId });
   useEffect(() => {
-    if (installDone.current === installedAgents) return;
-    installDone.current = installedAgents;
+    const before = installDone.current;
+    if (before.agents === installedAgents && before.key === installSkillId) return;
+    installDone.current = { agents: installedAgents, key: installSkillId };
+    // Installed from this card: the same skill is on a new agent now, so say so.
+    if (installOpen && detail && before.key === installSkillId
+      && installedAgents.split(",").some(agent => agent && !before.agents.split(",").includes(agent))) {
+      setInstalledNotice(`Installed ${detail.name}`);
+    }
+    if (before.agents === installedAgents) return;
     if (installOpen) onInstallCancel?.();
     setInstallOpen(false);
-  }, [installedAgents, installOpen, onInstallCancel]);
+  }, [installedAgents, installOpen, onInstallCancel, detail, installSkillId]);
   const panelPending = selected ? detailPending : !!closingDetail.current?.pending;
   // List rows already carry the name and avatar; only the direct-link placeholder (no author) waits.
   const detailHeadingKnown = !!detail && !(panelPending && !detail.author);
@@ -2486,6 +2501,11 @@ export function UnifiedApp({
             Use sample account
           </button>
         </Modal>
+      )}
+      {installedNotice && (
+        <div className="ua-toast ua-toast-success" role="status">
+          <Check aria-hidden="true" /> {installedNotice}
+        </div>
       )}
       {notice && (
         <div className="ua-toast" role="status">
