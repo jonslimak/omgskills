@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "./components/ui/button";
 import { usePortalApi, type PortalApi } from "./portal-api";
-import { createPairingConsent, normalPairingConsent, type BrowserPairingRequest,
+import { createPairingConsent, deviceMarks, macTookApproval, MY_SKILLS_PATH, normalPairingConsent, type BrowserPairingRequest,
   type PairingConsentPolicy, type PairingConsentSnapshot } from "./browser-pairing";
 
 type ConsentSession = ReturnType<typeof createPairingConsent>;
@@ -61,6 +61,40 @@ export function ConnectPage({ policy = normalPairingConsent, adaptApi, pendingHa
     setSnapshot(current.getSnapshot());
     return () => { current.dispose(); if (session.current === current) session.current = null; };
   }, [hash, policy]);
+  // On Approve, note this account's Macs first; once one takes the approval, go to My skills.
+  const before = useRef<Promise<Map<string, string> | null> | null>(null);
+  const starting = useRef(false);
+  const approve = () => {
+    // One Approve at a time: a second click mustn't replace the snapshot taken before the first.
+    if (starting.current) return;
+    starting.current = true;
+    const marks = callbacks.current.api<{ devices: { id: string; expiresAt: string | null }[] }>("/api/portal/devices", { cache: "no-store" })
+      .then(result => Array.isArray(result?.devices) ? deviceMarks(result.devices) : null).catch(() => null);
+    before.current = marks;
+    void marks.then(() => session.current?.approve()).finally(() => { starting.current = false; });
+  };
+  const returning = snapshot.phase === "returning";
+  useEffect(() => {
+    if (!returning || !before.current) return;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const started = Date.now();
+    const check = async () => {
+      const marks = await before.current;
+      if (stopped || !marks) return;
+      try {
+        const result = await callbacks.current.api<{ devices: { id: string; expiresAt: string | null }[] }>("/api/portal/devices", { cache: "no-store" });
+        if (stopped) return;
+        if (Array.isArray(result?.devices) && macTookApproval(marks, result.devices)) {
+          if (callbacks.current.isCurrent?.() !== false) window.location.assign(MY_SKILLS_PATH);
+          return;
+        }
+      } catch { /* keep waiting; the link stays for a manual return */ }
+      if (!stopped && Date.now() - started < 3 * 60_000) timer = setTimeout(check, 2_000);
+    };
+    timer = setTimeout(check, 1_000);
+    return () => { stopped = true; clearTimeout(timer); };
+  }, [returning]);
   return <ConsentContent request={request} policy={policy} snapshot={snapshot}
-    approve={() => { void session.current?.approve(); }} cancel={() => session.current?.cancel()} />;
+    approve={approve} cancel={() => session.current?.cancel()} />;
 }

@@ -171,3 +171,16 @@ export function createPairingConsent(hash: string, policy: PairingConsentPolicy,
     dispose() { active = false; generation++; controller?.abort(); },
   };
 }
+
+/** Where the Connect page goes once the Mac has taken the approval: My skills. */
+export const MY_SKILLS_PATH = "/app/?view=all";
+
+type DeviceMark = { id: string; expiresAt: string | null };
+/** A device fingerprint that only pairing changes: a new device, or a reconnect that set a new expiry. */
+export function deviceMarks(devices: DeviceMark[]) {
+  return new Map(devices.map(device => [device.id, device.expiresAt ?? ""]));
+}
+/** True once a Mac has exchanged the approval: a device that wasn't there before, or one re-paired since. */
+export function macTookApproval(before: Map<string, string>, devices: DeviceMark[]) {
+  return devices.some(device => before.get(device.id) !== (device.expiresAt ?? ""));
+}
