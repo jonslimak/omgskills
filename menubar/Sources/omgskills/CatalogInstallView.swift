@@ -144,7 +144,7 @@ struct CatalogInstallView: View {
                 }
             }
             if !model.notice.isEmpty { Text(model.notice).font(.callout).foregroundStyle(.secondary) }
-            if model.result == .installed, model.request?.targets.contains(.codex) == true {
+            if model.installedTargets.contains(.codex) {
                 Text("Restart Codex if the skill does not appear.").font(.caption).foregroundStyle(.secondary)
             }
             VStack(spacing: 8) {

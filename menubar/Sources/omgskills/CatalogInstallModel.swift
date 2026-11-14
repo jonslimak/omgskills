@@ -45,6 +45,8 @@ final class CatalogInstallModel {
     var destination: URL? { destinations.first }
     private(set) var request: CatalogInstallRequest?
     private(set) var result: CatalogInstallService.Result?
+    /// Agents this request newly installed the skill in.
+    private(set) var installedTargets: [SkillInstaller.Target] = []
     private(set) var message = "Ready"
     private(set) var notice = ""
     private(set) var appUpdateActive = false
@@ -85,6 +87,7 @@ final class CatalogInstallModel {
         destinations = []
         request = nil
         result = nil
+        installedTargets = []
         notice = ""
         phase = .idle
         message = "Checking for app updates..."
@@ -146,6 +149,7 @@ final class CatalogInstallModel {
         recordFetchedAt = nil
         destinations = []
         result = nil
+        installedTargets = []
         notice = ""
         phase = .loading
         message = Self.loadingMessage
@@ -233,11 +237,14 @@ final class CatalogInstallModel {
                 }
                 guard operationID == id else { return }
                 let anyInstalled = outcomes.contains { $0.1 == .installed }
+                installedTargets = outcomes.filter { $0.1 == .installed }.map(\.0)
                 if incoming.targets.count == 1 {
                     finish(outcomes[0].1)
                 } else {
                     for (target, outcome) in outcomes { track(.installResult(outcome, agent: target)) }
                     if let (target, failure) = outcomes.first(where: { !Self.succeeded($0.1) }) {
+                        // Agents skipped after the failure count the same result.
+                        for skipped in incoming.targets.dropFirst(outcomes.count) { track(.installResult(failure, agent: skipped)) }
                         let done = outcomes.filter { $0.1 == .installed }.map(\.0.rawValue)
                         finish(failure, message: (done.isEmpty ? "" : "Installed in \(done.joined(separator: " and ")). ")
                             + "\(target.rawValue): " + Self.resultMessage(failure, label: target.rawValue), tracked: true)
@@ -274,6 +281,7 @@ final class CatalogInstallModel {
         request = nil
         destinations = []
         result = nil
+        installedTargets = []
         notice = ""
         message = "Ready"
         phase = .idle
@@ -305,7 +313,10 @@ final class CatalogInstallModel {
 
     /// `tracked`: the caller already counted each agent's result.
     private func finish(_ result: CatalogInstallService.Result, message: String? = nil, tracked: Bool = false) {
-        if !tracked { track(.installResult(result, agent: request?.target)) }
+        if !tracked {
+            if let request { for target in request.targets { track(.installResult(result, agent: target)) } }
+            else { track(.installResult(result, agent: nil)) }
+        }
         cancelSlowNotice()
         self.result = result
         phase = .result

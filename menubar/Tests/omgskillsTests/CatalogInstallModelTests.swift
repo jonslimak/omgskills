@@ -680,6 +680,41 @@ struct CatalogInstallModelTests {
         await model.operation?.value
         #expect(model.result == .installed)
         #expect(model.message == "Installed in Codex. Already in Claude.")
+        #expect(model.installedTargets == [.codex])
+
+        // Codex unchanged: no Codex restart hint.
+        let codexHad = FlowStub()
+        await codexHad.setResult(.alreadyInstalled, for: .codex)
+        let other = CatalogInstallModel(service: codexHad, coordinator: UpdateInstallCoordinator(), timing: .staleRecords)
+        other.receive(link(agent: "both"))
+        await other.operation?.value
+        other.install()
+        await other.operation?.value
+        #expect(other.message == "Installed in Claude. Already in Codex.")
+        #expect(other.installedTargets == [.claude])
+    }
+
+    @Test func bothCountsAResultForEveryAgent() async {
+        var events: [ConnectedAppEvent] = []
+        let failing = FlowStub()
+        await failing.setFetchFailure()
+        let model = CatalogInstallModel(service: failing, coordinator: UpdateInstallCoordinator(),
+            track: { events.append($0) }, timing: .staleRecords)
+        model.receive(link(agent: "both"))
+        await model.operation?.value
+        #expect(events.suffix(2) == [.installResult(.unavailable, agent: .claude), .installResult(.unavailable, agent: .codex)])
+
+        events = []
+        let first = FlowStub()
+        await first.setResult(.needsGit, for: .claude)
+        let stopped = CatalogInstallModel(service: first, coordinator: UpdateInstallCoordinator(),
+            track: { events.append($0) }, timing: .staleRecords)
+        stopped.receive(link(agent: "both"))
+        await stopped.operation?.value
+        stopped.install()
+        await stopped.operation?.value
+        #expect(events.suffix(2) == [.installResult(.needsGit, agent: .claude), .installResult(.needsGit, agent: .codex)])
+        #expect(stopped.installedTargets.isEmpty)
     }
 
     @Test func bothAlreadyInstalledEverywhereChangesNothing() async {
