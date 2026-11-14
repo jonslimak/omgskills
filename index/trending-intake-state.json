@@ -33,6 +33,18 @@
       "reason": "catalog-identity-or-path"
     },
     {
+      "sourceId": "antibrow/anti-detect-browser-skills:browser-mcp-agent",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "antibrow/anti-detect-browser-skills:multi-account-isolation",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
       "sourceId": "bankai-skills/superpowers:agent-browser",
       "checkedAt": "2026-11-11T13:17:51.486Z",
       "outcome": "blocked",
@@ -285,6 +297,12 @@
       "reason": "confirmed-upstream-copy"
     },
     {
+      "sourceId": "its-a-skill-issue/superpowers:agent-tools",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "duplicate",
+      "reason": "exact-sha-existing"
+    },
+    {
       "sourceId": "its-a-skill-issue/superpowers:ai-avatar-video",
       "checkedAt": "2026-11-10T19:41:25.403Z",
       "outcome": "blocked",
@@ -309,6 +327,18 @@
       "reason": "reviewed-copy-content"
     },
     {
+      "sourceId": "its-a-skill-issue/superpowers:web-search",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
+    },
+    {
+      "sourceId": "juliusbrussee/caveman:caveman-compress",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
       "sourceId": "lemomo-ai/lemo-opuscar:lemo-opuscar",
       "checkedAt": "2026-11-11T19:33:08.232Z",
       "outcome": "added",
@@ -319,6 +349,36 @@
       "checkedAt": "2026-11-11T13:17:51.486Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "liarjsdev/liarjs-skills:browser-fingerprint-audit",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "liarjsdev/liarjs-skills:fingerprint-ci-gate",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "liarjsdev/liarjs-skills:fingerprint-failure-triage",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "liarjsdev/liarjs-skills:playwright-stealth-verify",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "magentosh/superpowers:agent-browser",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
     },
     {
       "sourceId": "magentosh/superpowers:ai-avatar-video",
@@ -531,6 +591,12 @@
       "reason": "confirmed-upstream-copy"
     },
     {
+      "sourceId": "qu-skills/superpowers:agent-tools",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "duplicate",
+      "reason": "exact-sha-existing"
+    },
+    {
       "sourceId": "qu-skills/superpowers:ai-avatar-video",
       "checkedAt": "2026-11-10T19:41:25.403Z",
       "outcome": "blocked",
@@ -549,10 +615,34 @@
       "reason": "reviewed-copy-content"
     },
     {
+      "sourceId": "qu-skills/superpowers:infsh-cli",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "duplicate",
+      "reason": "exact-sha-existing"
+    },
+    {
+      "sourceId": "qu-skills/superpowers:python-executor",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
+    },
+    {
+      "sourceId": "qu-skills/superpowers:remotion-render",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
+    },
+    {
       "sourceId": "qu-skills/superpowers:twitter-automation",
       "checkedAt": "2026-11-10T19:41:25.403Z",
       "outcome": "blocked",
       "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "qu-skills/superpowers:web-search",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
     },
     {
       "sourceId": "remotion-dev/skills:remotion-docs",
@@ -663,6 +753,12 @@
       "reason": "confirmed-upstream-copy"
     },
     {
+      "sourceId": "skills-shell/superpowers:agent-tools",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "duplicate",
+      "reason": "exact-sha-existing"
+    },
+    {
       "sourceId": "skills-shell/superpowers:ai-avatar-video",
       "checkedAt": "2026-11-10T19:41:25.403Z",
       "outcome": "blocked",
@@ -681,10 +777,34 @@
       "reason": "non-original-provenance"
     },
     {
+      "sourceId": "skills-shell/superpowers:infsh-cli",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "duplicate",
+      "reason": "exact-sha-existing"
+    },
+    {
+      "sourceId": "skills-shell/superpowers:python-executor",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
+    },
+    {
+      "sourceId": "skills-shell/superpowers:remotion-render",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
+    },
+    {
       "sourceId": "skills-shell/superpowers:twitter-automation",
       "checkedAt": "2026-11-10T19:41:25.403Z",
       "outcome": "blocked",
       "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "skills-shell/superpowers:web-search",
+      "checkedAt": "2026-11-14T17:58:59.177Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
     },
     {
       "sourceId": "uizze/uizze:uizze-ui",
