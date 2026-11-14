@@ -4,6 +4,12 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.40] - 2026-11-14
+
+### App
+- Make skill installs more reliable when loading takes longer.
+- Keep sync running in the background and simplify sync controls.
+
 ## [0.0.39] - 2026-11-13
 
 ### App
