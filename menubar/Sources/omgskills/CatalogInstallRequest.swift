@@ -2,7 +2,14 @@ import Foundation
 
 struct CatalogInstallRequest: Equatable, Sendable {
     let catalogID: String
-    let target: SkillInstaller.Target
+    /// Where to install, in order: one agent, or both for `agent=both` (one Approve installs in each).
+    let targets: [SkillInstaller.Target]
+    /// The first agent; for a single-agent link, the only one.
+    var target: SkillInstaller.Target { targets[0] }
+    /// The link's `agent` value, echoed back in the install ack.
+    var agentParameter: String { targets.count > 1 ? "both" : target == .claude ? "claude" : "codex" }
+    /// "Claude", "Codex", or "Claude and Codex".
+    var targetLabel: String { targets.map(\.rawValue).joined(separator: " and ") }
 
     enum Client: String, Sendable {
         case f1 = "omgskills-f1"
@@ -24,10 +31,10 @@ struct CatalogInstallRequest: Equatable, Sendable {
               let id = items.first(where: { $0.name == "id" })?.value,
               Self.validID(id),
               let agent = items.first(where: { $0.name == "agent" })?.value,
-              ["claude", "codex"].contains(agent)
+              ["claude", "codex", "both"].contains(agent)
         else { throw RequestError.invalid }
         catalogID = id
-        target = agent == "claude" ? .claude : .codex
+        targets = agent == "both" ? [.claude, .codex] : agent == "claude" ? [.claude] : [.codex]
     }
 
     static func validID(_ id: String) -> Bool {

@@ -618,6 +618,138 @@ struct CatalogInstallModelTests {
         #expect(await service.installCount == 0)
     }
 
+    @Test func bothInstallsInClaudeThenCodexWithOneApproval() async {
+        let service = FlowStub()
+        var events: [ConnectedAppEvent] = []
+        var reports = 0
+        let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(),
+            onInstalled: { reports += 1 }, track: { events.append($0) }, timing: .staleRecords)
+        model.receive(link(agent: "both"))
+        await model.operation?.value
+        #expect(model.phase == .confirm)
+        #expect(model.request?.targets == [.claude, .codex])
+        #expect(model.request?.agentParameter == "both")
+        #expect(model.destinations.map { $0.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent } == [".claude", ".codex"])
+        #expect(model.message == "Ready to install in Claude and Codex.")
+        #expect(!model.showsStatusLine)
+        model.install()
+        await model.operation?.value
+        #expect(await service.installedTargets == [.claude, .codex])
+        #expect(model.result == .installed)
+        #expect(model.message == "Installed in Claude and Codex.")
+        #expect(reports == 1)
+        #expect(events == [.install(.requested, agent: .claude), .install(.requested, agent: .codex),
+                           .install(.approved, agent: .claude), .install(.approved, agent: .codex),
+                           .installResult(.installed, agent: .claude), .installResult(.installed, agent: .codex)])
+    }
+
+    @Test func bothStopsAtTheFirstFailureAndSaysWhichAgent() async {
+        let service = FlowStub()
+        await service.setResult(.conflict, for: .codex)
+        var reports = 0
+        let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(),
+            onInstalled: { reports += 1 }, timing: .staleRecords)
+        model.receive(link(agent: "both"))
+        await model.operation?.value
+        model.install()
+        await model.operation?.value
+        #expect(model.result == .conflict)
+        #expect(model.hasFailure)
+        #expect(model.message == "Installed in Claude. Codex: Another skill or record uses this destination. Nothing was replaced.")
+        // Claude did change, so the Mac still reports its skills.
+        #expect(reports == 1)
+
+        let first = FlowStub()
+        await first.setResult(.needsGit, for: .claude)
+        let stopped = CatalogInstallModel(service: first, coordinator: UpdateInstallCoordinator(), timing: .staleRecords)
+        stopped.receive(link(agent: "both"))
+        await stopped.operation?.value
+        stopped.install()
+        await stopped.operation?.value
+        #expect(await first.installedTargets == [.claude])
+        #expect(stopped.message == "Claude: Git is required. Set up Git, then retry from the website.")
+    }
+
+    @Test func bothNamesTheAgentThatAlreadyHadIt() async {
+        let service = FlowStub()
+        await service.setResult(.alreadyInstalled, for: .claude)
+        let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(), timing: .staleRecords)
+        model.receive(link(agent: "both"))
+        await model.operation?.value
+        model.install()
+        await model.operation?.value
+        #expect(model.result == .installed)
+        #expect(model.message == "Installed in Codex. Already in Claude.")
+        #expect(model.installedTargets == [.codex])
+
+        // Codex unchanged: no Codex restart hint.
+        let codexHad = FlowStub()
+        await codexHad.setResult(.alreadyInstalled, for: .codex)
+        let other = CatalogInstallModel(service: codexHad, coordinator: UpdateInstallCoordinator(), timing: .staleRecords)
+        other.receive(link(agent: "both"))
+        await other.operation?.value
+        other.install()
+        await other.operation?.value
+        #expect(other.message == "Installed in Claude. Already in Codex.")
+        #expect(other.installedTargets == [.claude])
+
+        // A result on screen, then a bad link: the old restart hint goes away.
+        let codexDone = CatalogInstallModel(service: FlowStub(), coordinator: UpdateInstallCoordinator(), timing: .staleRecords)
+        codexDone.receive(link(agent: "codex"))
+        await codexDone.operation?.value
+        codexDone.install()
+        await codexDone.operation?.value
+        #expect(codexDone.installedTargets == [.codex])
+        codexDone.receive(link(agent: "nobody"))
+        #expect(codexDone.message == "This install link is invalid.")
+        #expect(codexDone.installedTargets.isEmpty)
+    }
+
+    @Test func bothCountsAResultForEveryAgent() async {
+        var events: [ConnectedAppEvent] = []
+        let failing = FlowStub()
+        await failing.setFetchFailure()
+        let model = CatalogInstallModel(service: failing, coordinator: UpdateInstallCoordinator(),
+            track: { events.append($0) }, timing: .staleRecords)
+        model.receive(link(agent: "both"))
+        await model.operation?.value
+        #expect(events.suffix(2) == [.installResult(.unavailable, agent: .claude), .installResult(.unavailable, agent: .codex)])
+
+        events = []
+        let first = FlowStub()
+        await first.setResult(.needsGit, for: .claude)
+        let stopped = CatalogInstallModel(service: first, coordinator: UpdateInstallCoordinator(),
+            track: { events.append($0) }, timing: .staleRecords)
+        stopped.receive(link(agent: "both"))
+        await stopped.operation?.value
+        stopped.install()
+        await stopped.operation?.value
+        #expect(events.suffix(2) == [.installResult(.needsGit, agent: .claude), .installResult(.needsGit, agent: .codex)])
+        #expect(stopped.installedTargets.isEmpty)
+    }
+
+    @Test func bothAlreadyInstalledEverywhereChangesNothing() async {
+        let service = FlowStub(installResult: .alreadyInstalled)
+        var reports = 0
+        let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(),
+            onInstalled: { reports += 1 }, timing: .staleRecords)
+        model.receive(link(agent: "both"))
+        await model.operation?.value
+        model.install()
+        await model.operation?.value
+        #expect(model.result == .alreadyInstalled)
+        #expect(reports == 0)
+    }
+
+    @Test func installLinksAcceptOneAgentOrBothAndNothingElse() throws {
+        for (agent, targets) in [("claude", [SkillInstaller.Target.claude]), ("codex", [.codex]), ("both", [.claude, .codex])] {
+            #expect(try CatalogInstallRequest(url: link(agent: agent), client: .f1).targets == targets)
+        }
+        for agent in ["all", "Both", "claude,codex", ""] {
+            #expect(throws: CatalogInstallRequest.RequestError.self) { try CatalogInstallRequest(url: link(agent: agent), client: .f1) }
+        }
+    }
+
     private func waitUntil(_ condition: () -> Bool) async {
         for _ in 0..<10_000 where !condition() { await Task.yield() }
     }
@@ -638,6 +770,9 @@ private actor FlowStub: CatalogInstallFlowServing {
     var installCount = 0
     private var current: CatalogInstallRecord? = try! record()
     private let installResult: CatalogInstallService.Result
+    private var resultFor: [SkillInstaller.Target: CatalogInstallService.Result] = [:]
+    private(set) var installedTargets: [SkillInstaller.Target] = []
+    func setResult(_ result: CatalogInstallService.Result, for target: SkillInstaller.Target) { resultFor[target] = result }
     private var holdFetch = false
     private var holdApplying = false
     private var failFetch = false
@@ -667,10 +802,11 @@ private actor FlowStub: CatalogInstallFlowServing {
     }
     func install(_ record: CatalogInstallRecord, target: SkillInstaller.Target) async -> CatalogInstallService.Result {
         installCount += 1
+        installedTargets.append(target)
         if holdApplying {
             await withCheckedContinuation { applyWait = $0; applyStarted?.resume(); applyStarted = nil }
         }
-        return installResult
+        return resultFor[target] ?? installResult
     }
     func waitForFetch() async { if fetchWait == nil { await withCheckedContinuation { fetchStarted = $0 } } }
     func waitForInstall() async { if applyWait == nil { await withCheckedContinuation { applyStarted = $0 } } }

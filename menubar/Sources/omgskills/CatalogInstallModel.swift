@@ -40,9 +40,13 @@ final class CatalogInstallModel {
     enum Phase: Equatable { case idle, loading, confirm, rechecking, installing, cancelling, result }
     private(set) var phase: Phase = .idle
     private(set) var record: CatalogInstallRecord?
-    private(set) var destination: URL?
+    /// Where the skill goes, one per agent in the request.
+    private(set) var destinations: [URL] = []
+    var destination: URL? { destinations.first }
     private(set) var request: CatalogInstallRequest?
     private(set) var result: CatalogInstallService.Result?
+    /// Agents this request newly installed the skill in.
+    private(set) var installedTargets: [SkillInstaller.Target] = []
     private(set) var message = "Ready"
     private(set) var notice = ""
     private(set) var appUpdateActive = false
@@ -80,9 +84,10 @@ final class CatalogInstallModel {
         guard canCheckForAppUpdates else { return false }
         record = nil
         recordFetchedAt = nil
-        destination = nil
+        destinations = []
         request = nil
         result = nil
+        installedTargets = []
         notice = ""
         phase = .idle
         message = "Checking for app updates..."
@@ -110,7 +115,7 @@ final class CatalogInstallModel {
     /// Whether the install window shows `message` with a spinner or warning icon.
     var showsStatusLine: Bool {
         hasFailure || [.loading, .rechecking, .cancelling].contains(phase)
-            || (phase == .confirm && message != "Ready to install in \(request?.target.rawValue ?? "").")
+            || (phase == .confirm && message != "Ready to install in \(request?.targetLabel ?? "").")
     }
     var appReplacementBlocksRequest: Bool { appUpdateActive || coordinator.hasPendingInstall || coordinator.isAppReplacementActive }
 
@@ -127,7 +132,7 @@ final class CatalogInstallModel {
                 record = nil
                 recordFetchedAt = nil
                 request = nil
-                destination = nil
+                destinations = []
                 finish(.unavailable, message: "This install link is invalid.")
             }
             return
@@ -139,11 +144,12 @@ final class CatalogInstallModel {
             return
         }
         request = incoming
-        track(.install(.requested, agent: incoming.target))
+        for target in incoming.targets { track(.install(.requested, agent: target)) }
         record = nil
         recordFetchedAt = nil
-        destination = nil
+        destinations = []
         result = nil
+        installedTargets = []
         notice = ""
         phase = .loading
         message = Self.loadingMessage
@@ -160,14 +166,15 @@ final class CatalogInstallModel {
                     return
                 }
                 guard fetched.id == incoming.catalogID else { throw CatalogInstallRecordClient.ClientError.invalidResponse }
-                let target = try await service.destination(for: fetched, target: incoming.target)
+                var found: [URL] = []
+                for target in incoming.targets { found.append(try await service.destination(for: fetched, target: target)) }
                 guard isCurrent(id) else { return }
                 cancelSlowNotice()
                 record = fetched
                 recordFetchedAt = started
-                destination = target
+                destinations = found
                 phase = .confirm
-                message = "Ready to install in \(incoming.target.rawValue)."
+                message = "Ready to install in \(incoming.targetLabel)."
             } catch {
                 guard isCurrent(id) else { return }
                 finish(.unavailable, message: Self.fetchFailureMessage(error))
@@ -177,7 +184,7 @@ final class CatalogInstallModel {
 
     func install() {
         guard phase == .confirm, let approved = record, let incoming = request else { return }
-        track(.install(.approved, agent: incoming.target))
+        for target in incoming.targets { track(.install(.approved, agent: target)) }
         guard !appReplacementBlocksRequest else {
             finish(.failed("An app update is waiting. Retry after the app restarts."))
             return
@@ -200,28 +207,58 @@ final class CatalogInstallModel {
                     return
                 }
                 guard current.id == incoming.catalogID else { throw CatalogInstallRecordClient.ClientError.invalidResponse }
-                let currentDestination = try await service.destination(for: current, target: incoming.target)
+                var currentDestinations: [URL] = []
+                for target in incoming.targets {
+                    currentDestinations.append(try await service.destination(for: current, target: target))
+                }
                 guard isCurrent(id) else { return }
                 cancelSlowNotice()
                 guard !appReplacementBlocksRequest else {
                     finish(.failed("An app update is waiting. Retry after the app restarts."))
                     return
                 }
-                if !approved.hasSameInstallation(as: current) || destination != currentDestination {
+                if !approved.hasSameInstallation(as: current) || destinations != currentDestinations {
                     record = current
                     if !reuse { recordFetchedAt = started }
-                    destination = currentDestination
+                    destinations = currentDestinations
                     phase = .confirm
                     message = "Installation information changed. Confirm again."
                     return
                 }
                 phase = .installing
-                message = "Installing in \(incoming.target.rawValue)..."
+                message = "Installing in \(incoming.targetLabel)..."
                 // No cancellation or close during the backend's final filesystem writes.
-                let installed = await service.install(current, target: incoming.target)
+                // Each agent in turn; the first that fails stops the rest and is what the window shows.
+                var outcomes: [(SkillInstaller.Target, CatalogInstallService.Result)] = []
+                for target in incoming.targets {
+                    let outcome = await service.install(current, target: target)
+                    outcomes.append((target, outcome))
+                    if !Self.succeeded(outcome) { break }
+                }
                 guard operationID == id else { return }
-                finish(installed)
-                if installed == .installed { onInstalled() }
+                let anyInstalled = outcomes.contains { $0.1 == .installed }
+                let installed = outcomes.filter { $0.1 == .installed }.map(\.0)
+                if incoming.targets.count == 1 {
+                    finish(outcomes[0].1, installed: installed)
+                } else {
+                    for (target, outcome) in outcomes { track(.installResult(outcome, agent: target)) }
+                    if let (target, failure) = outcomes.first(where: { !Self.succeeded($0.1) }) {
+                        // Agents skipped after the failure count the same result.
+                        for skipped in incoming.targets.dropFirst(outcomes.count) { track(.installResult(failure, agent: skipped)) }
+                        let done = outcomes.filter { $0.1 == .installed }.map(\.0.rawValue)
+                        finish(failure, message: (done.isEmpty ? "" : "Installed in \(done.joined(separator: " and ")). ")
+                            + "\(target.rawValue): " + Self.resultMessage(failure, label: target.rawValue), tracked: true, installed: installed)
+                    } else {
+                        let done = outcomes.filter { $0.1 == .installed }.map(\.0.rawValue)
+                        let had = outcomes.filter { $0.1 == .alreadyInstalled }.map(\.0.rawValue)
+                        // Name only the agents that changed; one that already had it is said separately.
+                        finish(anyInstalled ? .installed : .alreadyInstalled,
+                               message: anyInstalled && !had.isEmpty
+                                   ? "Installed in \(done.joined(separator: " and ")). Already in \(had.joined(separator: " and "))." : nil,
+                               tracked: true, installed: installed)
+                    }
+                }
+                if anyInstalled { onInstalled() }
             } catch {
                 guard isCurrent(id) else { return }
                 finish(.unavailable, message: Self.fetchFailureMessage(error))
@@ -231,7 +268,7 @@ final class CatalogInstallModel {
 
     func close() async -> Bool {
         guard canClose else { return false }
-        if ownsRequest { track(.install(.cancelled, agent: request?.target)) }
+        if ownsRequest, let request { for target in request.targets { track(.install(.cancelled, agent: target)) } }
         phase = .cancelling
         operationID = nil
         let pending = operation
@@ -242,8 +279,9 @@ final class CatalogInstallModel {
         record = nil
         recordFetchedAt = nil
         request = nil
-        destination = nil
+        destinations = []
         result = nil
+        installedTargets = []
         notice = ""
         message = "Ready"
         phase = .idle
@@ -269,14 +307,24 @@ final class CatalogInstallModel {
         slowNotice = nil
     }
 
-    private func finish(_ result: CatalogInstallService.Result, message: String? = nil) {
-        track(.installResult(result, agent: request?.target))
+    private static func succeeded(_ result: CatalogInstallService.Result) -> Bool {
+        result == .installed || result == .alreadyInstalled
+    }
+
+    /// `tracked`: the caller already counted each agent's result. `installed`: agents newly changed.
+    private func finish(_ result: CatalogInstallService.Result, message: String? = nil, tracked: Bool = false,
+                        installed: [SkillInstaller.Target] = []) {
+        installedTargets = installed
+        if !tracked {
+            if let request { for target in request.targets { track(.installResult(result, agent: target)) } }
+            else { track(.installResult(result, agent: nil)) }
+        }
         cancelSlowNotice()
         self.result = result
         phase = .result
         notice = ""
         operationID = nil
-        self.message = message ?? Self.resultMessage(result, target: request?.target)
+        self.message = message ?? Self.resultMessage(result, label: request?.targetLabel)
         releaseActivity()
     }
 
@@ -292,9 +340,9 @@ final class CatalogInstallModel {
         return "Could not load installation information. Close this request and retry."
     }
 
-    private static func resultMessage(_ result: CatalogInstallService.Result, target: SkillInstaller.Target?) -> String {
+    private static func resultMessage(_ result: CatalogInstallService.Result, label: String?) -> String {
         switch result {
-        case .installed: return "Installed in \(target?.rawValue ?? "the selected agent")."
+        case .installed: return "Installed in \(label ?? "the selected agent")."
         case .alreadyInstalled: return "Already installed. No changes made."
         case .conflict: return "Another skill or record uses this destination. Nothing was replaced."
         case .needsGit: return "Git is required. Set up Git, then retry from the website."

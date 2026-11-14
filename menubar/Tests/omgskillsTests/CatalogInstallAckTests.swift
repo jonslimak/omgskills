@@ -27,7 +27,7 @@ struct CatalogInstallAckTests {
             client: .product)
     }
 
-    @Test(arguments: ["claude", "codex"])
+    @Test(arguments: ["claude", "codex", "both"])
     func postsTheReceivedLinkToTheSameOrigin(_ agent: String) async throws {
         let session = AckHTTPSession()
         let ack = CatalogInstallAck(uploadEndpoint: upload, session: session)

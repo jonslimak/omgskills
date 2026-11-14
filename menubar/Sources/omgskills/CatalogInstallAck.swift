@@ -55,9 +55,8 @@ struct CatalogInstallAck: Sendable {
         urlRequest.timeoutInterval = Self.timeout
         urlRequest.setValue("Bearer \(credential.credential)", forHTTPHeaderField: "Authorization")
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let agent = request.target == .claude ? "claude" : "codex"
         urlRequest.httpBody = try? JSONSerialization.data(
-            withJSONObject: ["catalogId": request.catalogID, "agent": agent], options: [.sortedKeys])
+            withJSONObject: ["catalogId": request.catalogID, "agent": request.agentParameter], options: [.sortedKeys])
         _ = try? await session.data(for: urlRequest)
     }
 

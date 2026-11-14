@@ -323,6 +323,10 @@ struct DeviceSyncAPI: DeviceSyncServing, Sendable {
         if let credential {
             request.setValue("Bearer \(credential)", forHTTPHeaderField: "Authorization")
         }
+        // Lets the website offer only what this Mac can do (e.g. installing in both agents from build 41).
+        if let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
+            request.setValue(build, forHTTPHeaderField: "X-OMGSkills-App-Build")
+        }
         request.timeoutInterval = 20
         request.httpBody = body
 
