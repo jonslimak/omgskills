@@ -61,13 +61,14 @@ export function ConnectPage({ policy = normalPairingConsent, adaptApi, pendingHa
     setSnapshot(current.getSnapshot());
     return () => { current.dispose(); if (session.current === current) session.current = null; };
   }, [hash, policy]);
-  // Before approving, note this account's Macs; once one takes the approval, go to My skills.
+  // On Approve, note this account's Macs first; once one takes the approval, go to My skills.
   const before = useRef<Promise<Map<string, string> | null> | null>(null);
-  useEffect(() => {
-    if (!request || before.current) return;
-    before.current = callbacks.current.api<{ devices: { id: string; expiresAt: string | null }[] }>("/api/portal/devices", { cache: "no-store" })
+  const approve = () => {
+    const marks = callbacks.current.api<{ devices: { id: string; expiresAt: string | null }[] }>("/api/portal/devices", { cache: "no-store" })
       .then(result => Array.isArray(result?.devices) ? deviceMarks(result.devices) : null).catch(() => null);
-  }, [request]);
+    before.current = marks;
+    void marks.then(() => session.current?.approve());
+  };
   const returning = snapshot.phase === "returning";
   useEffect(() => {
     if (!returning || !before.current) return;
@@ -91,5 +92,5 @@ export function ConnectPage({ policy = normalPairingConsent, adaptApi, pendingHa
     return () => { stopped = true; clearTimeout(timer); };
   }, [returning]);
   return <ConsentContent request={request} policy={policy} snapshot={snapshot}
-    approve={() => { void session.current?.approve(); }} cancel={() => session.current?.cancel()} />;
+    approve={approve} cancel={() => session.current?.cancel()} />;
 }
