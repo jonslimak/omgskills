@@ -2373,6 +2373,24 @@
   box-shadow: var(--ua-shadow);
   z-index: 100;
 }
+.ua-toast.ua-toast-success {
+  top: 16px;
+  bottom: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-color: #15803d;
+  border-radius: 999px;
+  background: #16a34a;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+}
+.ua-toast.ua-toast-success svg {
+  width: 16px;
+  height: 16px;
+}
 .ua-mobile-header {
   display: none;
 }

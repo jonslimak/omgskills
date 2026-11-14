@@ -510,6 +510,12 @@ export function UnifiedApp({
   const [notice, setNotice] = useState(initialNotice);
   // The agent picker opens from the Install button and closes when another skill is shown.
   const [installOpen, setInstallOpen] = useState(false);
+  const [installedNotice, setInstalledNotice] = useState("");
+  useEffect(() => {
+    if (!installedNotice) return;
+    const timer = setTimeout(() => setInstalledNotice(""), 3000);
+    return () => clearTimeout(timer);
+  }, [installedNotice]);
   // Long descriptions start as their "Use when" summary.
   const [descriptionOpen, setDescriptionOpen] = useState(false);
   // Per-Mac scan history stays behind "Show history" at the bottom of the panel.
@@ -608,10 +614,15 @@ export function UnifiedApp({
   const installDone = useRef(installedAgents);
   useEffect(() => {
     if (installDone.current === installedAgents) return;
+    const before = installDone.current;
     installDone.current = installedAgents;
+    // Installed from this card: a new agent has it now, so say so.
+    if (installOpen && detail && installedAgents.split(",").some(agent => agent && !before.split(",").includes(agent))) {
+      setInstalledNotice(`Installed ${detail.name}`);
+    }
     if (installOpen) onInstallCancel?.();
     setInstallOpen(false);
-  }, [installedAgents, installOpen, onInstallCancel]);
+  }, [installedAgents, installOpen, onInstallCancel, detail]);
   const panelPending = selected ? detailPending : !!closingDetail.current?.pending;
   // List rows already carry the name and avatar; only the direct-link placeholder (no author) waits.
   const detailHeadingKnown = !!detail && !(panelPending && !detail.author);
@@ -2486,6 +2497,11 @@ export function UnifiedApp({
             Use sample account
           </button>
         </Modal>
+      )}
+      {installedNotice && (
+        <div className="ua-toast ua-toast-success" role="status">
+          <Check aria-hidden="true" /> {installedNotice}
+        </div>
       )}
       {notice && (
         <div className="ua-toast" role="status">
