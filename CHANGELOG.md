@@ -4,6 +4,11 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.41] - 2026-11-14
+
+### App
+- Install a skill in Claude and Codex with one approval.
+
 ## [0.0.40] - 2026-11-14
 
 ### App
