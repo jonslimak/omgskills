@@ -235,7 +235,7 @@ struct ConnectedInventoryRuntimeTests {
         runtime.resync()
         await events.clock.advance(0)
         #expect(await api.uploads == 2)
-        await events.clock.advance(3_600)
+        await events.clock.advance(ConnectedInventoryRuntime.fallbackCheckInterval)
         #expect(await api.checks == 3)
         await events.clock.advance(36_000)
         #expect(await api.checks == 4)
@@ -294,7 +294,7 @@ struct ConnectedInventoryRuntimeTests {
         await runtime.stop()
     }
 
-    @Test func failedWatcherRemainsVisibleAndHourlyFallbackStillWorks() async {
+    @Test func failedWatcherRemainsVisibleAndPeriodicFallbackStillWorks() async {
         let api = InventoryAPIFixture(reportMode: .reconciliation)
         let authorizer = InventoryAuthorizerFixture()
         let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
@@ -303,7 +303,7 @@ struct ConnectedInventoryRuntimeTests {
         let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
         await runtime.start().value
         #expect(runtime.watchWarning != nil)
-        await events.clock.advance(3_600)
+        await events.clock.advance(ConnectedInventoryRuntime.fallbackCheckInterval)
         #expect(await api.checks == 1)
         #expect(runtime.watchWarning != nil)
         runtime.resync()
@@ -312,6 +312,54 @@ struct ConnectedInventoryRuntimeTests {
         #expect(runtime.watchWarning != nil)
         await runtime.stop()
         #expect(events.watchStops == 0 && events.wakeStops == 1)
+    }
+
+    @Test func fallbackChecksRunEveryFifteenMinutes() async {
+        #expect(ConnectedInventoryRuntime.fallbackCheckInterval == 15 * 60)
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let events = InventoryAutomationFixture()
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
+        await runtime.start().value
+        #expect(await api.uploads == 1)
+        await events.clock.advance(899)
+        #expect(await api.checks == 0)
+        await events.clock.advance(1)
+        #expect(await api.checks == 1)
+        await events.clock.advance(899)
+        #expect(await api.checks == 1)
+        await events.clock.advance(1)
+        #expect(await api.checks == 2)
+        #expect(await api.uploads == 1)
+        await runtime.stop()
+        #expect(events.clock.pendingSleeps == 0)
+    }
+
+    @Test func fallbackChecksNeverBypassServerBackoff() async {
+        let api = InventoryAPIFixture(reportMode: .reconciliation)
+        let authorizer = InventoryAuthorizerFixture()
+        let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
+        let events = InventoryAutomationFixture()
+        let runtime = ConnectedInventoryRuntime(connection: connection, authorizer: authorizer, automation: events.configuration)
+        await runtime.start().value
+        #expect(await api.uploads == 1)
+        // The server asks for an hour's pause, longer than the fallback interval.
+        await api.setCheckError(.retryableServer(statusCode: 503, retryAfter: 3_600))
+        await events.clock.advance(900)
+        #expect(await api.checks == 1)
+        await api.clearCheckError()
+        // Three more fallback ticks inside the pause send nothing.
+        for _ in 0..<3 {
+            await events.clock.advance(900)
+            #expect(await api.checks == 1)
+            #expect(await api.uploads == 1)
+        }
+        // The retry runs once the server's delay has passed (900 + 3,600), as one fresh report.
+        await events.clock.advance(900)
+        #expect(await api.checks == 1)
+        #expect(await api.uploads == 2)
+        await runtime.stop()
     }
 
     @Test func stopDrainsAnUncooperativeCheckAndRestartRejectsOldCallbacks() async {
@@ -372,7 +420,7 @@ struct ConnectedInventoryRuntimeTests {
         await runtime.stop()
     }
 
-    @Test func reconnectRequiredRemovesWatchWakeAndHourlyWork() async {
+    @Test func reconnectRequiredRemovesWatchWakeAndPeriodicWork() async {
         let api = InventoryAPIFixture(reportMode: .reconciliation)
         let authorizer = InventoryAuthorizerFixture()
         let connection = makeConnection(store: InventoryCredentialFixture(), api: api, authorizer: authorizer, automation: true)
@@ -837,6 +885,7 @@ private actor InventoryAPIFixture: DeviceSyncServing {
     func setReportGate(_ gate: InventoryShutdownGate) { reportGate = gate }
     func setCheckGate(_ gate: InventoryShutdownGate) { checkGate = gate }
     func setCheckError(_ error: DeviceSyncAPIError) { checkError = error }
+    func clearCheckError() { checkError = nil }
     private var failure = false
     func setFailure(_ value: Bool) { failure = value }
     func exchange(pairingCode: String, deviceName: String, codeVerifier: String?) async throws -> StoredDeviceCredential {

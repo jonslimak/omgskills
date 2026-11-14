@@ -85,7 +85,7 @@ final class InventoryReportScheduler {
         schedule(at: changeDeadline!)
     }
 
-    // Manual/hourly intent may restart an exhausted cycle, but never bypasses server backoff.
+    // Manual/periodic intent may restart an exhausted cycle, but never bypasses server backoff.
     func request() {
         guard phase != .stopped else { return }
         changeDeadline = now()

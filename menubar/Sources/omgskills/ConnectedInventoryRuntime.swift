@@ -19,7 +19,7 @@ final class ConnectedInventoryRuntime {
     @ObservationIgnored private let track: ConnectedAppEvent.Track
     @ObservationIgnored private var startup: Task<Void, Never>?
     @ObservationIgnored private var operation: Task<Void, Never>?
-    @ObservationIgnored private var hourly: Task<Void, Never>?
+    @ObservationIgnored private var fallbackCheck: Task<Void, Never>?
     @ObservationIgnored private var stopWatching: (@MainActor () -> Void)?
     @ObservationIgnored private var stopWake: (@MainActor () -> Void)?
     @ObservationIgnored private var session = UUID()
@@ -41,6 +41,10 @@ final class ConnectedInventoryRuntime {
             }
             return outcome
         }
+
+    /// The fallback check runs this often (seconds) besides folder changes, wake and Resync.
+    /// It asks the scheduler, so a server backoff still holds it back.
+    nonisolated static let fallbackCheckInterval: TimeInterval = 900
 
     private static let defaultSleep: InventoryReportScheduler.Sleep = { try await Task.sleep(for: .seconds($0)) }
 
@@ -209,13 +213,13 @@ final class ConnectedInventoryRuntime {
         scheduler.start()
         do { stopWatching = try automation.watch { [weak self] in self?.trigger(changed: true, session: current) } }
         catch {
-            watchWarning = "Folder monitoring unavailable. Resync and hourly checks remain available."
+            watchWarning = "Folder monitoring unavailable. Resync and regular checks remain available."
             track(.watcherUnavailable)
         }
         stopWake = automation.wake { [weak self] in self?.trigger(changed: false, session: current) }
-        hourly = Task { @MainActor [weak self, sleep = automation.sleep] in
+        fallbackCheck = Task { @MainActor [weak self, sleep = automation.sleep] in
             while !Task.isCancelled {
-                do { try await sleep(3_600) } catch { return }
+                do { try await sleep(Self.fallbackCheckInterval) } catch { return }
                 guard !Task.isCancelled, self?.session == current else { return }
                 self?.trigger(changed: false, session: current)
             }
@@ -247,7 +251,7 @@ final class ConnectedInventoryRuntime {
         cloudSave?.cancel()
         stopWatching?(); stopWatching = nil
         stopWake?(); stopWake = nil
-        hourly?.cancel(); hourly = nil
+        fallbackCheck?.cancel(); fallbackCheck = nil
         scheduler.stop()
     }
 }
