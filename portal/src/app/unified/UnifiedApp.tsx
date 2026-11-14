@@ -611,20 +611,22 @@ export function UnifiedApp({
   // The app installs any library skill, from Discover or My skills (Set rows keep the copy command).
   const canInstall = !!(onMac && signedIn && publicInstallAction && detail?.catalogId && !detail.setItemKind && !detail.installed?.isLocalOnly);
   // An install that finishes changes where the skill is; close the card and drop its intent.
-  const installDone = useRef({ agents: installedAgents, key: detail?.key });
+  // Same skill across regrouping: the library id stays put when a new agent's copy becomes the row's representative.
+  const installSkillId = detail ? detail.catalogId ?? detail.key : undefined;
+  const installDone = useRef({ agents: installedAgents, key: installSkillId });
   useEffect(() => {
     const before = installDone.current;
-    if (before.agents === installedAgents && before.key === detail?.key) return;
-    installDone.current = { agents: installedAgents, key: detail?.key };
+    if (before.agents === installedAgents && before.key === installSkillId) return;
+    installDone.current = { agents: installedAgents, key: installSkillId };
     // Installed from this card: the same skill is on a new agent now, so say so.
-    if (installOpen && detail && before.key === detail.key
+    if (installOpen && detail && before.key === installSkillId
       && installedAgents.split(",").some(agent => agent && !before.agents.split(",").includes(agent))) {
       setInstalledNotice(`Installed ${detail.name}`);
     }
     if (before.agents === installedAgents) return;
     if (installOpen) onInstallCancel?.();
     setInstallOpen(false);
-  }, [installedAgents, installOpen, onInstallCancel, detail]);
+  }, [installedAgents, installOpen, onInstallCancel, detail, installSkillId]);
   const panelPending = selected ? detailPending : !!closingDetail.current?.pending;
   // List rows already carry the name and avatar; only the direct-link placeholder (no author) waits.
   const detailHeadingKnown = !!detail && !(panelPending && !detail.author);
