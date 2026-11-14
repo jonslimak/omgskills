@@ -20,6 +20,10 @@ final class InventoryReportScheduler {
     private var burstStart: TimeInterval?
     private var changeDeadline: TimeInterval?
     private var retryDeadline: TimeInterval?
+    /// The server's last Retry-After as a time; it outlives an exhausted cycle, so no request goes out earlier.
+    private(set) var notBefore: TimeInterval?
+    /// When a report or check last succeeded.
+    private(set) var lastSuccessAt: TimeInterval?
     private var retries = 0
     private var conflicts = 0
 
@@ -82,17 +86,17 @@ final class InventoryReportScheduler {
         if burstStart == nil { burstStart = time }
         changeDeadline = min(time + 3, (burstStart ?? time) + 30)
         guard phase != .reporting, retryDeadline == nil else { return }
-        schedule(at: changeDeadline!)
+        schedule(at: max(changeDeadline!, notBefore ?? 0))
     }
 
-    // Manual/hourly intent may restart an exhausted cycle, but never bypasses server backoff.
+    // Manual/periodic intent may restart an exhausted cycle, but never bypasses server backoff.
     func request() {
         guard phase != .stopped else { return }
         changeDeadline = now()
         if phase == .reporting || retryDeadline != nil { return }
         retries = 0
         conflicts = 0
-        schedule(at: now())
+        schedule(at: max(now(), notBefore ?? 0))
     }
 
     private func schedule(at time: TimeInterval) {
@@ -134,6 +138,8 @@ final class InventoryReportScheduler {
         case .reported, .checked:
             retries = 0
             conflicts = 0
+            notBefore = nil
+            lastSuccessAt = now()
             if let changeDeadline { schedule(at: max(now(), changeDeadline)) }
             else { phase = .idle }
         case .retryable(let requested):
@@ -155,6 +161,9 @@ final class InventoryReportScheduler {
 
     private func retry(after requested: TimeInterval?) {
         let delays: [TimeInterval] = [5, 30, 120]
+        if let requested, requested.isFinite, requested > 0, requested <= 86_400 * 365 {
+            notBefore = max(notBefore ?? 0, now() + requested)
+        }
         guard retries < delays.count else { exhaust(); return }
         let extra = jitter()
         let delay = delays[retries] + (extra.isFinite ? min(1, max(0, extra)) : 0)

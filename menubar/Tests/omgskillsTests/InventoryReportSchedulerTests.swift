@@ -31,6 +31,39 @@ struct InventoryReportSchedulerTests {
         await scheduler.stopAndWait()
     }
 
+    @Test func exhaustedRetriesKeepTheServerDelayForLaterRequests() async {
+        let clock = ReportTestClock()
+        var calls = 0
+        var outcome = InventoryReportOutcome.retryable(retryAfter: 600)
+        let scheduler = InventoryReportScheduler(now: { clock.now }, sleep: clock.sleep, jitter: { 0 }) {
+            calls += 1
+            return outcome
+        }
+        scheduler.start()
+        scheduler.request()
+        await clock.advance(0)
+        for _ in 0..<3 { await clock.advance(600) }
+        #expect(calls == 4)
+        #expect(scheduler.phase == .needsAttention)
+        #expect(scheduler.notBefore == 2_400)
+        // Manual or periodic intent restarts the cycle, but not before the server's last delay.
+        outcome = .checked
+        scheduler.request()
+        #expect(scheduler.deadline == 2_400)
+        scheduler.changed()
+        await clock.advance(599)
+        #expect(calls == 4)
+        await clock.advance(1)
+        #expect(calls == 5)
+        #expect(scheduler.notBefore == nil)
+        #expect(scheduler.lastSuccessAt == 2_400)
+        scheduler.request()
+        #expect(scheduler.deadline == 2_400)
+        await clock.advance(0)
+        #expect(calls == 6)
+        scheduler.stop()
+    }
+
     @Test func debounceUsesLatestEventAndCapsContinuousBursts() async {
         let clock = ReportTestClock()
         var calls = 0

@@ -207,6 +207,12 @@ struct CatalogInstallView: View {
                     }.buttonStyle(.plain).disabled(!appUpdater.canCheck)
                 }
                 if let loginItem { LoginItemRow(controller: loginItem) }
+                // Sync is a background job: its switch, Resync and Disconnect sit here, not on the status panel.
+                if let connection, case .connected = connection.state {
+                    Divider()
+                    ConnectedSyncOptions(model: connection, runtime: inventoryRuntime, iconWidth: Self.iconColumnWidth,
+                                         reconnect: { reconnect(); showStatus?() }, didDisconnect: { showStatus?() })
+                }
                 Divider()
                 HStack(alignment: .bottom) {
                     Button(action: quit) {

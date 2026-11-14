@@ -9,14 +9,76 @@ struct CatalogPopoverTests {
         return try String(contentsOf: file, encoding: .utf8)
     }
 
-    @Test func inventoryButtonsShareTheAvailableWidth() throws {
-        let code = try source("ConnectedInventoryView.swift")
-        #expect(code.contains("HStack(spacing: 8) { inventoryActions }.buttonStyle(.bordered)"))
-        #expect(code.contains("Text(\"Resync\").frame(maxWidth: .infinity)"))
-        #expect(code.contains("Text(\"Disconnect\").frame(maxWidth: .infinity)"))
-        #expect(!code.contains("HStack { inventoryActions }.fixedSize()"))
-        #expect(code.contains(".disabled(model.reportStatus == .reporting)"))
+    @Test func syncControlsLiveInOptionsAndTheStatusPanelOnlyFlagsAttention() throws {
+        let inventory = try source("ConnectedInventoryView.swift")
+        let main = try #require(inventory.range(of: "case .connected:"))
+        let mainEnd = try #require(inventory.range(of: "case .authorizing, .exchanging", range: main.upperBound..<inventory.endIndex))
+        let panel = inventory[main.upperBound..<mainEnd.lowerBound]
+        #expect(!panel.contains("Toggle("))
+        #expect(!panel.contains("Text(\"Disconnect\")") && !panel.contains("disconnect()"))
+        #expect(!panel.contains("lastInventoryCheckedAt"))
+        // Resync on the panel only beside a message it fixes.
+        #expect(panel.contains("if Self.attentionOffersResync(status) {"))
+        #expect(panel.contains("let status = Self.shownStatus(model)"))
+        #expect(panel.contains("Button(\"Resync\") { resync() }.controlSize(.small)"))
+        #expect(!inventory.contains("inventoryActions"))
+        #expect(!inventory.contains("CloudSaveSection"))
+        let attention = try #require(inventory.range(of: "private struct CloudSaveAttention"))
+        let attentionEnd = try #require(inventory.range(of: "static func attentionOffersResync", range: attention.upperBound..<inventory.endIndex))
+        let attentionBody = inventory[attention.upperBound..<attentionEnd.lowerBound]
+        #expect(!attentionBody.contains("Toggle("))
+        #expect(!attentionBody.contains("lists names only"))
+        #expect(attentionBody.contains("Button(\"Reconnect\", action: reconnect)"))
+
+        let options = try #require(inventory.range(of: "struct ConnectedSyncOptions: View"))
+        let settings = inventory[options.upperBound..<inventory.endIndex]
+        #expect(settings.contains("Toggle(\"Sync My skills\""))
+        #expect(settings.contains("Text(\"Off: My skills lists names only, and files stay on this Mac.\")"))
+        #expect(settings.contains("Text(\"Resync\")"))
+        #expect(settings.contains(".disabled(model.reportStatus == .reporting)"))
+        #expect(settings.contains("Text(\"Disconnect\")"))
+        #expect(settings.contains("didDisconnect()"))
+        #expect(settings.contains("Text(\"Last \" + checked.formatted(date: .abbreviated, time: .shortened))"))
+        #expect(settings.contains("Button(\"Reconnect\", action: reconnect)"))
+        #expect(settings.contains("if let message = cloudSave.message {"))
+        #expect(settings.contains("if model.reportStatus == .reporting { ProgressView().controlSize(.mini) }"))
+
+        let code = try source()
+        let menu = try #require(code.range(of: "private var optionsContent"))
+        let quit = try #require(code.range(of: "Text(\"Quit\")", range: menu.upperBound..<code.endIndex))
+        let menuBody = code[menu.upperBound..<quit.lowerBound]
+        #expect(menuBody.contains("if let connection, case .connected = connection.state {"))
+        #expect(menuBody.contains("ConnectedSyncOptions(model: connection, runtime: inventoryRuntime"))
+        #expect(menuBody.contains("didDisconnect: { showStatus?() }"))
+        #expect(menuBody.contains("reconnect: { reconnect(); showStatus?() }"))
+        let account = try #require(code.range(of: "private var accountContent"))
+        let accountEnd = try #require(code.range(of: "private var installContent"))
+        #expect(!code[account.upperBound..<accountEnd.lowerBound].contains("ConnectedSyncOptions"))
     }
+
+    #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
+    @MainActor @Test func inlineResyncOnlyWhenResyncIsTheFix() {
+        let complete = SkillSyncResult(syncRunId: "run", syncedSkillCount: 3, reportVersion: 3,
+            mode: "reconciled", deviceId: "device", completedAt: "2026-10-26T12:00:00Z",
+            missingSkillCount: 0, complete: true)
+        let partial = SkillSyncResult(syncRunId: "partial", syncedSkillCount: 2, reportVersion: 3,
+            mode: "reconciled", deviceId: "device", completedAt: "2026-10-26T12:00:00Z",
+            missingSkillCount: 0, complete: false)
+        #expect(ConnectedInventoryView.attentionOffersResync(.failed("Offline")))
+        #expect(ConnectedInventoryView.attentionOffersResync(.uncertain("Offline")))
+        #expect(ConnectedInventoryView.attentionOffersResync(.reported(complete, scanIssueCount: 1)))
+        #expect(ConnectedInventoryView.attentionOffersResync(.reported(partial, scanIssueCount: 0)))
+        #expect(!ConnectedInventoryView.attentionOffersResync(.reported(complete, scanIssueCount: 0)))
+        #expect(ConnectedInventoryView.attentionOffersResync(.idle))
+        #expect(!ConnectedInventoryView.attentionOffersResync(.pending))
+        #expect(!ConnectedInventoryView.attentionOffersResync(.reporting))
+        // Every status that offers Resync shows a message to go with it.
+        for status: DeviceConnectionModel.ReportStatus in [.idle, .failed("x"), .uncertain("x"),
+            .reported(complete, scanIssueCount: 1), .reported(partial, scanIssueCount: 0)] {
+            #expect(ConnectedInventoryView.reportAttention(status) != nil)
+        }
+    }
+    #endif
 
     @Test func panelKeepsWidthAndFitsContentHeight() throws {
         let code = try source()
@@ -98,6 +160,21 @@ struct CatalogPopoverTests {
     }
     #endif
 
+    #if DEBUG || OMGSKILLS_CATALOG_CANDIDATE
+    @MainActor @Test func backgroundCheckKeepsTheShownCount() {
+        let complete = SkillSyncResult(syncRunId: "run", syncedSkillCount: 3, reportVersion: 3,
+            mode: "reconciled", deviceId: "device", completedAt: "2026-10-26T12:00:00Z",
+            missingSkillCount: 0, complete: true)
+        let reported = DeviceConnectionModel.ReportStatus.reported(complete, scanIssueCount: 0)
+        #expect(ConnectedInventoryView.shownStatus(.reporting, lastReported: reported) == reported)
+        #expect(ConnectedInventoryView.shownStatus(.pending, lastReported: reported) == reported)
+        #expect(ConnectedInventoryView.shownStatus(.idle, lastReported: reported) == reported)
+        #expect(ConnectedInventoryView.shownStatus(.reporting, lastReported: nil) == .reporting)
+        #expect(ConnectedInventoryView.shownStatus(.idle, lastReported: nil) == .idle)
+        #expect(ConnectedInventoryView.shownStatus(.failed("x"), lastReported: reported) == .failed("x"))
+    }
+    #endif
+
     @Test func versionSitsBesideQuitInTheOptionsFooter() throws {
         let code = try source()
         let footer = try #require(code.range(of: "HStack(alignment: .bottom)"))
@@ -128,7 +205,10 @@ struct CatalogPopoverTests {
         #expect(title.contains(".frame(width: Self.iconColumnWidth)"))
         #expect(title.contains(".hidden().accessibilityHidden(true)"))
         let inventory = try source("ConnectedInventoryView.swift")
-        #expect(inventory.contains(".font(.caption).foregroundStyle(.tertiary).padding(.top, 8)"))
+        // "Last ..." is the one lighter line, set straight under Resync.
+        #expect(inventory.contains("Text(\"Last \" + checked.formatted(date: .abbreviated, time: .shortened))\n"
+            + String(repeating: " ", count: 24) + ".font(.caption).foregroundStyle(.tertiary)\n"))
+        #expect(inventory.components(separatedBy: ".foregroundStyle(.tertiary)").count == 2)
     }
 
     @Test func panelsShareInsetsWithoutOversizingVisibleIconsOrCount() throws {
