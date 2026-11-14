@@ -63,11 +63,15 @@ export function ConnectPage({ policy = normalPairingConsent, adaptApi, pendingHa
   }, [hash, policy]);
   // On Approve, note this account's Macs first; once one takes the approval, go to My skills.
   const before = useRef<Promise<Map<string, string> | null> | null>(null);
+  const starting = useRef(false);
   const approve = () => {
+    // One Approve at a time: a second click mustn't replace the snapshot taken before the first.
+    if (starting.current) return;
+    starting.current = true;
     const marks = callbacks.current.api<{ devices: { id: string; expiresAt: string | null }[] }>("/api/portal/devices", { cache: "no-store" })
       .then(result => Array.isArray(result?.devices) ? deviceMarks(result.devices) : null).catch(() => null);
     before.current = marks;
-    void marks.then(() => session.current?.approve());
+    void marks.then(() => session.current?.approve()).finally(() => { starting.current = false; });
   };
   const returning = snapshot.phase === "returning";
   useEffect(() => {
