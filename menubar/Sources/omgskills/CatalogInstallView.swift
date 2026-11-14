@@ -125,10 +125,12 @@ struct CatalogInstallView: View {
                     Text(record.githubURL).font(.caption).foregroundStyle(.secondary).textSelection(.enabled)
                 }
             }
-            if let destination = model.destination {
+            if !model.destinations.isEmpty {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Install in")
-                    Text(destination.path).font(.caption).foregroundStyle(.secondary).textSelection(.enabled)
+                    ForEach(model.destinations, id: \.self) { destination in
+                        Text(destination.path).font(.caption).foregroundStyle(.secondary).textSelection(.enabled)
+                    }
                 }
             }
             if model.showsStatusLine {
@@ -142,7 +144,7 @@ struct CatalogInstallView: View {
                 }
             }
             if !model.notice.isEmpty { Text(model.notice).font(.callout).foregroundStyle(.secondary) }
-            if model.result == .installed, model.request?.target == .codex {
+            if model.result == .installed, model.request?.targets.contains(.codex) == true {
                 Text("Restart Codex if the skill does not appear.").font(.caption).foregroundStyle(.secondary)
             }
             VStack(spacing: 8) {
@@ -152,9 +154,9 @@ struct CatalogInstallView: View {
                 } else if model.phase == .result {
                     Button(action: close) { Text("Done").frame(maxWidth: .infinity) }
                 }
-                if let target = model.request?.target {
+                if let request = model.request {
                     if model.phase == .confirm {
-                        Button(action: model.install) { Text("Install in " + target.rawValue).frame(maxWidth: .infinity) }
+                        Button(action: model.install) { Text("Install in " + request.targetLabel).frame(maxWidth: .infinity) }
                             .buttonStyle(.borderedProminent).keyboardShortcut(.defaultAction)
                     } else if model.phase == .rechecking || model.phase == .installing {
                         Button {} label: { Text("Installing...").frame(maxWidth: .infinity) }
