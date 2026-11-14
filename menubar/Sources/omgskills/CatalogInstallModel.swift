@@ -242,7 +242,13 @@ final class CatalogInstallModel {
                         finish(failure, message: (done.isEmpty ? "" : "Installed in \(done.joined(separator: " and ")). ")
                             + "\(target.rawValue): " + Self.resultMessage(failure, label: target.rawValue), tracked: true)
                     } else {
-                        finish(anyInstalled ? .installed : .alreadyInstalled, tracked: true)
+                        let done = outcomes.filter { $0.1 == .installed }.map(\.0.rawValue)
+                        let had = outcomes.filter { $0.1 == .alreadyInstalled }.map(\.0.rawValue)
+                        // Name only the agents that changed; one that already had it is said separately.
+                        finish(anyInstalled ? .installed : .alreadyInstalled,
+                               message: anyInstalled && !had.isEmpty
+                                   ? "Installed in \(done.joined(separator: " and ")). Already in \(had.joined(separator: " and "))." : nil,
+                               tracked: true)
                     }
                 }
                 if anyInstalled { onInstalled() }

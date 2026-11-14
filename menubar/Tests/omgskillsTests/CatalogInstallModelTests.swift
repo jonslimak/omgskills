@@ -670,6 +670,18 @@ struct CatalogInstallModelTests {
         #expect(stopped.message == "Claude: Git is required. Set up Git, then retry from the website.")
     }
 
+    @Test func bothNamesTheAgentThatAlreadyHadIt() async {
+        let service = FlowStub()
+        await service.setResult(.alreadyInstalled, for: .claude)
+        let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(), timing: .staleRecords)
+        model.receive(link(agent: "both"))
+        await model.operation?.value
+        model.install()
+        await model.operation?.value
+        #expect(model.result == .installed)
+        #expect(model.message == "Installed in Codex. Already in Claude.")
+    }
+
     @Test func bothAlreadyInstalledEverywhereChangesNothing() async {
         let service = FlowStub(installResult: .alreadyInstalled)
         var reports = 0
