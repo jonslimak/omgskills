@@ -4,6 +4,14 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
   <channel>
     <title>OMGSkills Connected Updates</title>
     <item>
+      <title>OMGSkills 0.0.40</title>
+      <sparkle:version>40</sparkle:version>
+      <sparkle:shortVersionString>0.0.40</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+      <enclosure url="https://omgskills.com/updates/connected/OMGSkills-Connected-0.0.40-40-arm64.zip" sparkle:installationType="application" sparkle:edSignature="LLHg0Chsm68lOu0iNQXnSyFH7xvEn+4/aWclL6QW8yjDfKlJLgktKiBa+ApWuHLOjrC0+hUBW98bIHI7y0nkDA==" length="6344845" type="application/octet-stream"></enclosure>
+    </item>
+    <item>
       <title>OMGSkills 0.0.39</title>
       <sparkle:version>39</sparkle:version>
       <sparkle:shortVersionString>0.0.39</sparkle:shortVersionString>
@@ -78,6 +86,6 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
   </channel>
 </rss>
 <!-- sparkle-signatures:
-edSignature: Ex/uLMDdpyK9P8FaapNWgHi4ftl3P2wyrGLVWrZ1CyeooUGiYV1UKj8MemFj7I4Au77gMrlHGoFue5QH51h/AQ==
-length: 6173
+edSignature: aXbXu8OPS/N3oBtCdG50+V72aWUUx9jJ+N2X5pefzgQ6NJUw9ahpBgeeG8gqunhFOmWln3kWDMo+eL8W8X4PCg==
+length: 6808
 -->
