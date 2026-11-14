@@ -6,7 +6,8 @@ import { codeChallengeForVerifier, hashToken } from "./crypto.js";
 import {
   BASE_DEVICE_SCOPES,
   DeviceAuthError,
-  requireDeviceToken
+  requireDeviceToken,
+  type DeviceScope
 } from "./device-auth.js";
 import {
   exchangePairingCode,
@@ -85,6 +86,79 @@ test("approved content scope is copied from pairing to the device credential", a
 
     assert.deepEqual(exchanged.grantedScopes, ["sync:write", "self:revoke", "content:read"]);
     assert.deepEqual(stored.rows[0].granted_scopes, exchanged.grantedScopes);
+  } finally {
+    await removeUser(userId);
+  }
+});
+
+async function cloudSaveRow(userId: string) {
+  const result = await pool.query<{ enabled: boolean; excluded_skill_keys: string[] }>(
+    "SELECT enabled, excluded_skill_keys FROM cloud_save_settings WHERE user_id = $1",
+    [userId]
+  );
+  return result.rows[0];
+}
+
+async function connectMac(userId: string, grantedScopes: DeviceScope[]) {
+  const pairing = await issuePairingCode(pool, userId, {
+    codeChallenge: codeChallengeForVerifier(verifier),
+    grantedScopes
+  });
+  return exchangePairingCode(pool, { pairingCode: pairing.code, deviceName: "Sync Mac", codeVerifier: verifier });
+}
+
+test("connecting a Mac with content:write turns Sync My skills on for a new account", async () => {
+  const userId = await createUser("Sync Mac");
+  try {
+    await connectMac(userId, [...BASE_DEVICE_SCOPES, "content:read", "content:write"]);
+    assert.deepEqual(await cloudSaveRow(userId), { enabled: true, excluded_skill_keys: [] });
+  } finally {
+    await removeUser(userId);
+  }
+});
+
+test("connecting a Mac without content:write leaves Sync My skills unset", async () => {
+  const userId = await createUser("Older Mac");
+  try {
+    await connectMac(userId, [...BASE_DEVICE_SCOPES, "content:read"]);
+    assert.equal(await cloudSaveRow(userId), undefined);
+  } finally {
+    await removeUser(userId);
+  }
+});
+
+test("connecting a Mac never changes an existing Sync My skills choice", async () => {
+  const offUser = await createUser("Off Mac");
+  const excludedUser = await createUser("Excluded Mac");
+  try {
+    await pool.query("INSERT INTO cloud_save_settings (user_id, enabled) VALUES ($1, false)", [offUser]);
+    await pool.query(
+      "INSERT INTO cloud_save_settings (user_id, enabled, excluded_skill_keys) VALUES ($1, false, $2)",
+      [excludedUser, ["local:alpha"]]
+    );
+    for (const userId of [offUser, excludedUser]) {
+      await connectMac(userId, [...BASE_DEVICE_SCOPES, "content:read", "content:write"]);
+    }
+    assert.deepEqual(await cloudSaveRow(offUser), { enabled: false, excluded_skill_keys: [] });
+    assert.deepEqual(await cloudSaveRow(excludedUser), { enabled: false, excluded_skill_keys: ["local:alpha"] });
+  } finally {
+    await removeUser(offUser);
+    await removeUser(excludedUser);
+  }
+});
+
+test("a failed exchange does not turn Sync My skills on", async () => {
+  const userId = await createUser("Wrong Mac");
+  try {
+    const pairing = await issuePairingCode(pool, userId, {
+      codeChallenge: codeChallengeForVerifier(verifier),
+      grantedScopes: [...BASE_DEVICE_SCOPES, "content:read", "content:write"]
+    });
+    await assert.rejects(
+      exchangePairingCode(pool, { pairingCode: pairing.code, deviceName: "Wrong Mac", codeVerifier: `${verifier.slice(1)}x` }),
+      (error) => error instanceof PairingError && error.status === 401
+    );
+    assert.equal(await cloudSaveRow(userId), undefined);
   } finally {
     await removeUser(userId);
   }
