@@ -1934,6 +1934,9 @@
   }
 }
 .ua-detail-actions {
+  /* Above the description, so the kind icon's hover text isn't drawn under it. */
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -3040,15 +3043,24 @@ main:has(> .ua-az-anchor) .ua-content {
 }
 .ua-kind-tip svg { width: 16px; height: 16px; }
 .ua-kind-tip-text {
-  /* Starts at the icon's left edge: the panel clips overflow, and the icon can be first in its row. */
-  position: absolute; top: calc(100% + 4px); left: 0; z-index: 5;
+  /* Ends at the icon's right edge: the icon is last in its row and the panel clips overflow. */
+  position: absolute; top: calc(100% + 4px); right: 0; z-index: 5;
   padding: 4px 8px; border-radius: 6px; background: var(--ua-ink); color: var(--ua-bg);
   font-size: 12px; font-weight: 500; white-space: nowrap; pointer-events: none;
   visibility: hidden;
 }
+/* Alone in its group, the icon can start a row: then the words start at its left edge instead. */
+.ua-detail-icons > .ua-kind-tip:first-child .ua-kind-tip-text { right: auto; left: 0; }
 .ua-kind-tip[data-open="true"] .ua-kind-tip-text,
 .ua-kind-tip:focus-visible .ua-kind-tip-text { visibility: visible; }
 @media (hover: hover) and (pointer: fine) {
   .ua-kind-tip:hover .ua-kind-tip-text { visibility: visible; }
 }
 .ua-modal .ua-modal-action { align-self: flex-start; min-height: 36px; padding: 0 16px; }
+/* A narrow list column (the skill panel open): the heading's buttons go under the title instead of squeezing it. */
+@media (min-width: 760px) {
+  @container (max-width: 600px) {
+    .ua-page-heading.ua-heading-filter:not(.ua-set-heading) { grid-template-columns: minmax(0, 1fr); row-gap: 14px; }
+    .ua-page-heading.ua-heading-filter:not(.ua-set-heading) > .ua-heading-actions { grid-column: 1; grid-row: 2; }
+  }
+}
