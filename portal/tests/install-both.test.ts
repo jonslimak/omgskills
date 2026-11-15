@@ -32,6 +32,21 @@ test("+ on a personal skill waits for every connected Mac to be build 42 or late
   assert.equal(macAddsAgent([mac({ appBuild: 42 }), mac({ id: "old", status: "revoked" })]), true);
 });
 
+test("A Mac connection that never checked in, or not for a week, doesn't hold back the others", () => {
+  const now = Date.parse("2026-11-15T12:00:00Z");
+  const today = mac({ appBuild: 42, lastCheckedAt: "2026-11-15T11:00:00Z", lastReportedAt: "2026-11-15T11:00:00Z" });
+  const never = mac({ id: "never", lastCheckedAt: null, lastReportedAt: null, appBuild: null });
+  const stale = mac({ id: "stale", lastCheckedAt: "2026-11-01T11:00:00Z", lastReportedAt: null, appBuild: null });
+  assert.equal(macInstallsBoth([today, never, stale], now), true);
+  assert.equal(macAddsAgent([today, never, stale], now), true);
+  // A Mac on an old app that checked in this week still holds it back.
+  const old = mac({ id: "old", lastCheckedAt: "2026-11-15T10:00:00Z", lastReportedAt: null, appBuild: null });
+  assert.equal(macInstallsBoth([today, old], now), false);
+  assert.equal(macAddsAgent([today, old], now), false);
+  // No Mac with the app: nothing to offer.
+  assert.equal(macInstallsBoth([never], now), false);
+});
+
 const skill = { key: "catalog:anthropics/skills/pdf", catalogId: "anthropics/skills/pdf", name: "pdf" } as SkillDisplay;
 
 test("install links and the ack poll carry agent=both", () => {
