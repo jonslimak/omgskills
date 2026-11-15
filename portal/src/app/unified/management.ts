@@ -7,7 +7,8 @@ export type UnifiedManagement = {
   blocked: boolean;
   notice: string;
   create: (skills?: SkillDisplay[]) => void;
-  add: (skills: SkillDisplay[], set?: PortalSet) => void;
+  /** `choices`: what the Set's skill picker offers (all of My skills, saved ones too); defaults to installed skills. */
+  add: (skills: SkillDisplay[], set?: PortalSet, choices?: SkillDisplay[]) => void;
   favorite: (skill: SkillDisplay) => void;
   rename: (set: PortalSet) => void;
   access: (set: PortalSet) => void;

@@ -20,6 +20,7 @@ import {
 } from "./cloud-save.js";
 import { CloudStoreError, type CloudObjectStore } from "./cloud-store.js";
 import { requirePrivateReleaseAccess } from "./private-release-access.js";
+import { savedSkillInSetFromMac } from "../portal-group-items.mjs";
 import { addGroupItemWithClient, updateCloudGroupItemWithClient, type GroupItemPublication } from "./group-items.js";
 import { gitObjectSha, validateSkillPackage, type SkillManifestEntry } from "./skill-package.js";
 import { skillMdBody } from "./skill-readme.js";
@@ -1461,6 +1462,39 @@ test("adding your own skill to a Set shares its saved version; Update Set moves 
     // Not saved: the Set gets the name only, as before.
     const unsaved = await inTransaction((client) => addGroupItemWithClient(client, group, { kind: "synced", name: "other" }, cloud("other")));
     assert.deepEqual(await item(unsaved.itemId), { source_id: null, release_id: null, reason: "synced_local_only" });
+    // Added from My skills by its saved copy alone: it needs a saved copy, and is in the Set once.
+    const required = (skillKey: string): GroupItemPublication =>
+      ({ kind: "cloud", ownerUserId: owner.userId, skillKey, fallback: "synced_local_only", required: true });
+    await assert.rejects(inTransaction((client) => addGroupItemWithClient(client, group, { kind: "synced", name: "other" }, required("other"))),
+      (error: unknown) => error instanceof Response && error.status === 409);
+    await assert.rejects(inTransaction((client) => addGroupItemWithClient(client, group, { kind: "synced", name: "notes" }, required("notes"))),
+      (error: unknown) => error instanceof Response && error.status === 409);
+    const otherGroup = (await pool.query<{ id: string }>(
+      "INSERT INTO skill_groups (owner_user_id, name, slug, visibility) VALUES ($1, 'Solo', 'solo', 'private') RETURNING id",
+      [owner.userId])).rows[0].id;
+    const bySaved = await inTransaction((client) => addGroupItemWithClient(client, otherGroup, { kind: "synced", name: "notes" }, required("notes")));
+    assert.equal((await item(bySaved.itemId)).release_id, first.skill.currentVersion.id);
+    // Either way round: a Mac's copy of the same skill isn't added again once its saved copy is in.
+    await assert.rejects(inTransaction((client) => addGroupItemWithClient(client, otherGroup, { kind: "synced", name: "notes" }, cloud("notes"))),
+      (error: unknown) => error instanceof Response && error.status === 409);
+    await pool.query("DELETE FROM skill_group_items WHERE id = $1", [bySaved.itemId]);
+    // A name-only item from a Mac's copy is the same skill too.
+    const run = randomUUID();
+    await pool.query("INSERT INTO sync_runs(id,user_id,device_id,status,completed_at) VALUES($1,$2,$3,'completed',now())", [run, owner.userId, owner.deviceId]);
+    const synced = (await pool.query<{ id: string }>(`INSERT INTO synced_skills(user_id,sync_run_id,device_id,stable_key,name,source,identity_status,is_local_only)
+      VALUES($1,$2,$3,'location:v1:claude:notes','Note taker','claude','localOnly',true) RETURNING id`, [owner.userId, run, owner.deviceId])).rows[0].id;
+    await inTransaction((client) => addGroupItemWithClient(client, otherGroup, { kind: "synced", syncedSkillId: synced },
+      { kind: "metadata_only", reason: "synced_local_only" }));
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "notes"), true);
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "other"), false, "matched by key, not name");
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, group, "notes"), false);
+    // Still found once no Mac has it.
+    await pool.query("UPDATE synced_skills SET is_current = false WHERE id = $1", [synced]);
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "notes"), true);
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "other"), false);
+    // A different skill kept in a same-name folder (its own key, its own name) isn't the same skill.
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "notes@codex", "Meeting notes"), false);
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "notes", "note taker"), true);
 
     // A newer save doesn't change the Set until the owner updates it.
     await uploadAll(pool, store, owner.userId, v2);

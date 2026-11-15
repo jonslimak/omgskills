@@ -28,8 +28,11 @@ export type GroupItemPublication =
       createdBy: string;
     }
   | { kind: "metadata_only"; reason: string }
-  /** The owner's own skill: its saved cloud version when there is one, otherwise `fallback`. */
-  | { kind: "cloud"; ownerUserId: string; skillKey: string; fallback: string };
+  /**
+   * The owner's own skill: its saved cloud version when there is one, otherwise `fallback`.
+   * `required`: a skill added from My skills by its saved copy alone; without one it isn't added.
+   */
+  | { kind: "cloud"; ownerUserId: string; skillKey: string; fallback: string; required?: boolean };
 
 type CloudVersion = { sourceId: string; releaseId: string; confirmedSecret: boolean };
 
@@ -66,6 +69,13 @@ export async function addGroupItemWithClient(
   const cloud = publication?.kind === "cloud"
     ? await lockCurrentCloudVersion(client, publication)
     : null;
+  if (publication?.kind === "cloud" && publication.required && !cloud) {
+    throw new Response("Saved skill is unavailable", { status: 409 });
+  }
+  // Without a shareable copy there's nothing to add it by; the owner confirmed it holds a key or password.
+  if (publication?.kind === "cloud" && publication.required && cloud?.confirmedSecret) {
+    throw new Response("This skill has a key or password, so it can't be shared in a Set", { status: 409 });
+  }
   await lockGroupForMutation(client, groupId);
   let snapshotName = item.name ?? null;
   let snapshotDescription = item.description ?? null;
@@ -81,6 +91,16 @@ export async function addGroupItemWithClient(
     }
   }
 
+  // A skill shared from its saved copy is in the Set once, whether added from a Mac's copy or the saved one.
+  if (cloud && !cloud.confirmedSecret) {
+    const existing = await client.query<{ id: string }>(
+      "SELECT id FROM skill_group_items WHERE group_id = $1 AND source_id = $2 LIMIT 1",
+      [groupId, cloud.sourceId]
+    );
+    if (existing.rowCount) {
+      throw new Response("Skill is already in this group", { status: 409 });
+    }
+  }
   if (item.syncedSkillId) {
     const existing = await client.query<{ id: string }>(
       "SELECT id FROM skill_group_items WHERE group_id = $1 AND synced_skill_id = $2 LIMIT 1",

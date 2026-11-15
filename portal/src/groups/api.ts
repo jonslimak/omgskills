@@ -113,6 +113,14 @@ export async function removeGroupAllowedEmail(api: PortalApi, groupId: string, e
   });
 }
 
+/** A skill in My skills that no Mac has now: the Set gets its saved copy. */
+export async function addSavedSkillToGroup(api: PortalApi, groupId: string, cloudKey: string) {
+  return api(`/api/portal/groups/${groupId}/items`, {
+    method: "POST",
+    body: JSON.stringify({ kind: "synced", cloudKey }),
+  });
+}
+
 export async function addSyncedSkillToGroup(
   api: PortalApi,
   groupId: string,

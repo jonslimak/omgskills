@@ -77,6 +77,39 @@ async function cloudKeyOf(client: QueryClient, userId: string, skill: SyncedSkil
 
 type QueryClient = Pick<ReturnType<typeof getPgPool>, "query">;
 
+/**
+ * Whether the Set already holds this saved skill as a name-only item from a Mac's copy (added when nothing
+ * was shareable). Matched by the same saved-skill key the Mac's copy saves under, not by name.
+ */
+export async function savedSkillInSetFromMac(client: QueryClient, userId: string, groupId: string, skillKey: string,
+  savedName: string | null = null) {
+  const items = await client.query<{ syncedSkillId: string }>(
+    `SELECT synced_skill_id AS "syncedSkillId" FROM skill_group_items
+     WHERE group_id = $1 AND kind = 'synced' AND source_id IS NULL AND synced_skill_id IS NOT NULL`,
+    [groupId]
+  );
+  for (const { syncedSkillId } of items.rows) {
+    const skill = await getSyncedSkill(client, userId, syncedSkillId);
+    if (skill) {
+      if (await cloudKeyOf(client, userId, skill) === skillKey) return true;
+      continue;
+    }
+    // No Mac has it now: its folder name is the key it saved under ("notes", or "notes@codex" when taken).
+    // Same-folder skills get different keys only when their SKILL.md names differ, so the name must match too.
+    const old = await client.query<{ stableKey: string; source: string; name: string }>(
+      `SELECT stable_key AS "stableKey", source, name FROM synced_skills WHERE id = $1 AND user_id = $2 LIMIT 1`,
+      [syncedSkillId, userId]
+    );
+    const row = old.rows[0];
+    const folder = row ? installationFolderFromKey(row.stableKey, row.source) : null;
+    let key: string | null = null;
+    try { key = folder ? normalizeSkillKey(folder) : null; } catch { key = null; }
+    const sameName = !savedName || row!.name.normalize("NFC").toLowerCase() === savedName.normalize("NFC").toLowerCase();
+    if (key && sameName && (skillKey === key || skillKey.startsWith(`${key}@`))) return true;
+  }
+  return false;
+}
+
 async function getSyncedSkill(
   client: QueryClient,
   userId: string,
@@ -167,7 +200,8 @@ export async function listGroupItems(req: Request, groupId: string, dependencies
         i.release_id AS "releaseId",
         -- A duplicated Set holds someone else's version, which only that person's Sets can share.
         (src.owner_user_id = (SELECT owner_user_id FROM skill_groups WHERE id = $1)) AS "sharedByOwner",
-        CASE WHEN $2 = 'owner' THEN saved.current_release_id ELSE NULL END AS "savedReleaseId"
+        CASE WHEN $2 = 'owner' THEN saved.current_release_id ELSE NULL END AS "savedReleaseId",
+        CASE WHEN $2 = 'owner' THEN saved.skill_key ELSE NULL END AS "savedKey"
       FROM skill_group_items i
       LEFT JOIN synced_skills s ON s.id = i.synced_skill_id
       LEFT JOIN skill_sources src ON src.id = i.source_id
@@ -242,6 +276,34 @@ export default async (req: Request, _context: Context) => {
 
     const body = await requireJsonObject(req);
     const kind = body?.kind;
+    // A skill in My skills that no Mac has now: added by its saved copy (cloud save key).
+    if (kind === "synced" && body?.syncedSkillId === undefined && body?.cloudKey !== undefined) {
+      let skillKey: string;
+      try {
+        skillKey = normalizeSkillKey(requireString(body.cloudKey, "cloudKey", 200));
+      } catch {
+        throw new Response("cloudKey is invalid", { status: 400 });
+      }
+      const saved = await getPgPool().query<{ name: string | null; description: string | null }>(
+        `SELECT skill_name AS name, skill_description AS description FROM cloud_saved_skills
+         WHERE user_id = $1 AND skill_key = $2 LIMIT 1`,
+        [user.id, skillKey]
+      );
+      if (!saved.rows[0]) {
+        throw new Response("Saved skill is unavailable", { status: 400 });
+      }
+      if (await savedSkillInSetFromMac(getPgPool(), user.id, groupId, skillKey, saved.rows[0].name)) {
+        throw new Response("Skill is already in this group", { status: 409 });
+      }
+      const item = await persistGroupItem(
+        user,
+        groupId,
+        { kind: "synced", name: saved.rows[0].name ?? skillKey, description: saved.rows[0].description,
+          note: optionalString(body?.note, 1000) },
+        { kind: "cloud", ownerUserId: user.id, skillKey, fallback: "synced_local_only", required: true },
+      );
+      return jsonResponse(req, item, { status: 201 });
+    }
     if (kind === "synced") {
       const syncedSkillId = requireString(body?.syncedSkillId, "syncedSkillId", 80);
       const available = await getSyncedSkill(getPgPool(), user.id, syncedSkillId);

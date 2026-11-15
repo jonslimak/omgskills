@@ -1,6 +1,6 @@
 import type { PortalApi } from "../portal-api";
 import { PortalApiError, isAccessError } from "../api-error";
-import { addSyncedSkillToGroup, createCatalogFavoritesGroup, createFavoritesGroup, createGroup, listOwnedGroups, removeGroupItem, reorderGroupItems, updateGroupItem } from "../groups/api";
+import { addSavedSkillToGroup, addSyncedSkillToGroup, createCatalogFavoritesGroup, createFavoritesGroup, createGroup, listOwnedGroups, removeGroupItem, reorderGroupItems, updateGroupItem } from "../groups/api";
 import { groupSyncedSkills, hasCatalogId, type GroupedSyncedSkill } from "../synced-skill-grouping";
 import { isMember, type MembershipResult, type PortalData, type PortalSet } from "../app/model";
 import { loadSetData } from "./data";
@@ -12,9 +12,14 @@ export type MembershipCommand =
   | { kind: "favorites"; skills: GroupedSyncedSkill[]; add: boolean }
   | { kind: "remove-favorite"; catalogId?: string; skillId?: string }
   | { kind: "create-selected"; name: string; skills: GroupedSyncedSkill[] }
+  /** Any mix of installed, saved library and saved personal skills, into a Set (`id`) or a new one (`name`). */
+  | { kind: "add-many"; id?: string; name?: string; skills: GroupedSyncedSkill[]; catalogIds: string[];
+      saved: { key: string; name: string }[] }
   | { kind: "remove-item"; id: string; itemId: string }
   | { kind: "reorder"; id: string; itemIds: string[] }
   | { kind: "update-item"; id: string; itemId: string };
+/** The server's answer when a skill is already in the Set, however it got there. */
+const alreadyInSet = "Skill is already in this group";
 const message = (error: unknown) => error instanceof Error ? error.message : "Could not update this skill.";
 const uncertain = (error: unknown) => !(error instanceof PortalApiError) || error.status >= 500;
 function checkSignal(signal: AbortSignal) { if (signal.aborted) throw new DOMException("Account changed", "AbortError"); }
@@ -87,10 +92,12 @@ export async function changeMembership(api: PortalApi, id: string, skills: Group
     }
     try {
       const matches = set.items.filter((item) => item.syncedSkillId && skill.allSkillIds.includes(item.syncedSkillId));
-      if ((add && matches.length) || (!add && !matches.length && !set.items.some((item) => item.kind === "synced" && !item.syncedSkillId))) {
+      // Items added by their saved copy carry its key instead of a synced skill.
+      const unknown = set.items.some((item) => item.kind === "synced" && !item.syncedSkillId && !item.cloudKey);
+      if ((add && matches.length) || (!add && !matches.length && !unknown)) {
         result.unchanged++;
       } else {
-        if (set.items.some((item) => item.kind === "synced" && !item.syncedSkillId)) {
+        if (unknown) {
           throw new PortalApiError("Membership information is incomplete. Refresh this set.", 409);
         }
         if (add) {
@@ -103,9 +110,13 @@ export async function changeMembership(api: PortalApi, id: string, skills: Group
             result.added++;
           } catch (error) {
             if (!(error instanceof PortalApiError) || error.status !== 409) throw error;
-            set = await ownedSet(api, id, signal);
-            if (!isMember(set, skill)) throw error;
-            result.unchanged++;
+            // Its saved copy may already be in the Set (an item the list can't match to this Mac's copy).
+            if (error.message === alreadyInSet) { result.unchanged++; }
+            else {
+              set = await ownedSet(api, id, signal);
+              if (!isMember(set, skill)) throw error;
+              result.unchanged++;
+            }
           }
         } else {
           for (const item of matches) {
@@ -163,6 +174,78 @@ export async function createSelectedSet(api: PortalApi, name: string, skills: Gr
   return { ...emptyMembershipResult(), groupId: id, added: skills.length, completedIds: skills.map((skill) => skill.id) };
 }
 
+/** Adds saved skills no Mac has now, by their saved copy. Already in the Set counts as done. */
+export async function addSavedMembership(api: PortalApi, id: string, saved: { key: string; name: string }[], signal: AbortSignal): Promise<MembershipResult> {
+  let set = await ownedSet(api, id, signal);
+  if (set.hidden || set.isFavorites) throw new PortalApiError("This set is not available for this action.", 409);
+  const result = { ...emptyMembershipResult(), groupId: id };
+  for (const skill of saved) {
+    checkSignal(signal);
+    if (result.uncertain) {
+      result.failed.push({ id: skill.key, name: skill.name, message: "Not attempted. Refresh before continuing." });
+      continue;
+    }
+    try {
+      if (set.items.some((item) => item.cloudKey === skill.key)) result.unchanged++;
+      else {
+        try {
+          const value = await addSavedSkillToGroup(api, id, skill.key) as { itemId?: unknown };
+          checkSignal(signal);
+          if (typeof value?.itemId !== "string" || !value.itemId) throw new Error("Unexpected add response. Refresh before trying again.");
+          result.added++;
+        } catch (error) {
+          if (!(error instanceof PortalApiError) || error.status !== 409) throw error;
+          if (error.message !== alreadyInSet) {
+            set = await ownedSet(api, id, signal);
+            if (!set.items.some((item) => item.cloudKey === skill.key)) throw error;
+          }
+          result.unchanged++;
+        }
+      }
+      result.completedIds.push(skill.key);
+    } catch (error) {
+      checkSignal(signal);
+      if (isAccessError(error)) throw error;
+      result.failed.push({ id: skill.key, name: skill.name, message: message(error) });
+      result.uncertain = uncertain(error);
+    }
+  }
+  return result;
+}
+
+/** One add for any mix of skills: installed ones, then saved library skills, then saved personal skills. */
+export async function addManyMembership(api: PortalApi, sets: PortalSet[], command: Extract<MembershipCommand, { kind: "add-many" }>,
+  skills: GroupedSyncedSkill[], signal: AbortSignal): Promise<MembershipResult> {
+  let total: MembershipResult;
+  let id = command.id;
+  if (command.name !== undefined) {
+    total = await createSelectedSet(api, command.name, skills, signal);
+    id = total.groupId;
+  } else {
+    if (!id) throw new PortalApiError("Choose a set you own.", 400);
+    total = skills.length ? await changeMembership(api, id, skills, true, signal) : { ...emptyMembershipResult(), groupId: id };
+  }
+  const merge = (next: MembershipResult) => {
+    total = { ...total, completedIds: [...total.completedIds, ...next.completedIds], failed: [...total.failed, ...next.failed],
+      added: total.added + next.added, unchanged: total.unchanged + next.unchanged, uncertain: total.uncertain || next.uncertain };
+  };
+  for (const catalogId of command.catalogIds) {
+    if (total.uncertain) { total.failed.push({ id: catalogId, name: catalogId, message: "Not attempted. Refresh before continuing." }); continue; }
+    try { merge(await addCatalogMembership(api, sets, { kind: "catalog", catalogId, favorite: false, id }, signal)); }
+    catch (error) {
+      checkSignal(signal);
+      if (isAccessError(error)) throw error;
+      total.failed.push({ id: catalogId, name: catalogId, message: message(error) });
+      total.uncertain = total.uncertain || uncertain(error);
+    }
+  }
+  if (command.saved.length) {
+    if (total.uncertain) total.failed.push(...command.saved.map((skill) => ({ id: skill.key, name: skill.name, message: "Not attempted. Refresh before continuing." })));
+    else merge(await addSavedMembership(api, id!, command.saved, signal));
+  }
+  return total;
+}
+
 export async function changeFavorites(api: PortalApi, sets: PortalSet[], skills: GroupedSyncedSkill[], add: boolean, signal: AbortSignal): Promise<MembershipResult> {
   let id = sets.find((set) => set.role === "owner" && set.isFavorites)?.id;
   if (!id && !add) return { ...emptyMembershipResult(), unchanged: skills.length, completedIds: skills.map((skill) => skill.id) };
@@ -203,7 +286,7 @@ export async function removeFavoriteMembership(api: PortalApi, sets: PortalSet[]
   const set = await ownedSet(api, id, signal);
   if (!set.isFavorites || set.hidden) throw new PortalApiError("Favorites is not available for this action.", 409);
   if (set.items.some(item => (catalogId && item.kind === "catalog" && !item.catalogSkillId) ||
-    (skill && item.kind === "synced" && !item.syncedSkillId))) {
+    (skill && item.kind === "synced" && !item.syncedSkillId && !item.cloudKey))) {
     throw new PortalApiError("Membership information is incomplete. Refresh Favorites.", 409);
   }
   const matches = set.items.filter(item =>
