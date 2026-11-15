@@ -3049,6 +3049,8 @@ main:has(> .ua-az-anchor) .ua-content {
   font-size: 12px; font-weight: 500; white-space: nowrap; pointer-events: none;
   visibility: hidden;
 }
+/* Alone in its group, the icon can start a row: then the words start at its left edge instead. */
+.ua-detail-icons > .ua-kind-tip:first-child .ua-kind-tip-text { right: auto; left: 0; }
 .ua-kind-tip[data-open="true"] .ua-kind-tip-text,
 .ua-kind-tip:focus-visible .ua-kind-tip-text { visibility: visible; }
 @media (hover: hover) and (pointer: fine) {
