@@ -3,6 +3,12 @@
   "policyDigest": "sha256:6f73171923895a3c5c400fdd10204f66864a1523dd6ad6fd7a5ab7a001644a94",
   "reviews": [
     {
+      "sourceId": "101-skills/superpowers:agent-browser",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
+    },
+    {
       "sourceId": "101-skills/superpowers:ai-avatar-video",
       "checkedAt": "2026-11-11T13:17:51.486Z",
       "outcome": "blocked",
@@ -27,8 +33,20 @@
       "reason": "non-original-provenance"
     },
     {
+      "sourceId": "2dmurali/review-loop-skill:review-loop",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
       "sourceId": "anthropics/skills:frontend-design",
       "checkedAt": "2026-11-11T13:17:51.486Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "anthropics/skills:skill-creator",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
     },
@@ -159,6 +177,12 @@
       "reason": "verified-trending"
     },
     {
+      "sourceId": "coreyhaines31/marketingskills:copywriting",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
       "sourceId": "coreyhaines31/marketingskills:link-building",
       "checkedAt": "2026-11-12T19:52:55.556Z",
       "outcome": "added",
@@ -171,6 +195,18 @@
       "reason": "verified-trending"
     },
     {
+      "sourceId": "coreyhaines31/marketingskills:seo-audit",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "coreyhaines31/marketingskills:social",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
       "sourceId": "designed-by-ai/skills:design-mobile-apps",
       "checkedAt": "2026-11-10T11:17:49.752Z",
       "outcome": "blocked",
@@ -179,6 +215,12 @@
     {
       "sourceId": "emilkowalski/skills:animation-performance",
       "checkedAt": "2026-11-12T19:52:55.556Z",
+      "outcome": "added",
+      "reason": "verified-trending"
+    },
+    {
+      "sourceId": "emilkowalski/skills:ask-emil",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
       "outcome": "added",
       "reason": "verified-trending"
     },
@@ -319,6 +361,24 @@
       "checkedAt": "2026-11-10T19:41:25.403Z",
       "outcome": "blocked",
       "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "its-a-skill-issue/superpowers:infsh-cli",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "duplicate",
+      "reason": "exact-sha-existing"
+    },
+    {
+      "sourceId": "its-a-skill-issue/superpowers:python-executor",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
+    },
+    {
+      "sourceId": "its-a-skill-issue/superpowers:remotion-render",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "blocked",
+      "reason": "confirmed-upstream-copy"
     },
     {
       "sourceId": "its-a-skill-issue/superpowers:twitter-automation",
@@ -573,6 +633,12 @@
       "reason": "catalog-identity-or-path"
     },
     {
+      "sourceId": "neondatabase/agent-skills:neon",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
       "sourceId": "nextlevelbuilder/ui-ux-pro-max-skill:ui-ux-pro-max",
       "checkedAt": "2026-11-12T19:52:55.556Z",
       "outcome": "existing",
@@ -819,8 +885,20 @@
       "reason": "verified-trending"
     },
     {
+      "sourceId": "vercel-labs/agent-skills:deploy-to-vercel",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
       "sourceId": "vercel-labs/agent-skills:vercel-composition-patterns",
       "checkedAt": "2026-11-12T19:52:55.556Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "vercel-labs/agent-skills:vercel-optimize",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
     },
@@ -831,8 +909,26 @@
       "reason": "catalog-identity-or-path"
     },
     {
+      "sourceId": "vercel-labs/agent-skills:vercel-react-native-skills",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "vercel-labs/agent-skills:vercel-react-view-transitions",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
       "sourceId": "vercel-labs/agent-skills:web-design-guidelines",
       "checkedAt": "2026-11-11T19:33:08.232Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "vercel-labs/agent-skills:writing-guidelines",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
     },
@@ -841,6 +937,30 @@
       "checkedAt": "2026-11-13T19:37:36.375Z",
       "outcome": "added",
       "reason": "verified-trending"
+    },
+    {
+      "sourceId": "whytryharder/superpowers:ai-avatar-video",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "whytryharder/superpowers:ai-image-generation",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "whytryharder/superpowers:ai-video-generation",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
+    },
+    {
+      "sourceId": "whytryharder/superpowers:twitter-automation",
+      "checkedAt": "2026-11-15T18:47:37.580Z",
+      "outcome": "blocked",
+      "reason": "reviewed-copy-content"
     }
   ]
 }
