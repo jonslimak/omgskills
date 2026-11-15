@@ -93,6 +93,7 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean, cloudChanged: () 
   const [skills, setSkills] = useState<MySkillAddition[] | null>(saved);
   const [loaded, setLoaded] = useState(false);
   const [ok, setOk] = useState(false);
+  const okRef = useRef(false);
   // A change made on the saved list waits for the live load, so the load can't undo it.
   const firstLoad = useRef<Promise<void>>(Promise.resolve());
   const current = useRef(skills);
@@ -101,11 +102,12 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean, cloudChanged: () 
   const [pending, setPending] = useState<string[]>([]);
   const inFlight = useRef(new Set<string>());
   useEffect(() => {
-    if (!enabled) { setSkills(null); setLoaded(false); setOk(false); return; }
+    if (!enabled) { setSkills(null); setLoaded(false); setOk(false); okRef.current = false; return; }
     const controller = new AbortController();
     firstLoad.current = loadMySkillAdditions(apiRef.current, controller.signal)
-      .then(value => { if (!controller.signal.aborted) { setSkills(value); current.current = value; setOk(true); } })
-      .catch(() => { if (!controller.signal.aborted) { setSkills(null); current.current = null; setOk(false); } })
+      .then(value => { if (!controller.signal.aborted) { setSkills(value); current.current = value; okRef.current = true; setOk(true); } })
+      // A failed load keeps the saved list on screen, like the account, but changes are refused until a live load.
+      .catch(() => { if (!controller.signal.aborted) { okRef.current = false; setOk(false); } })
       .finally(() => { if (!controller.signal.aborted) setLoaded(true); });
     return () => controller.abort();
   }, [enabled]);
@@ -113,10 +115,18 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean, cloudChanged: () 
     if (inFlight.current.has(catalogId)) return;
     inFlight.current.add(catalogId);
     setPending([...inFlight.current]);
-    await firstLoad.current;
-    const previous = current.current?.find(skill => skill.catalogId === catalogId);
-    setSkills(old => old && (add ? [previous ?? { ...details, catalogId }, ...old.filter(skill => skill.catalogId !== catalogId)]
-      : old.filter(skill => skill.catalogId !== catalogId)));
+    let previous: MySkillAddition | undefined;
+    try {
+      await firstLoad.current;
+      if (!okRef.current) throw new Error("My skills isn't loaded yet.");
+      previous = current.current?.find(skill => skill.catalogId === catalogId);
+      setSkills(old => old && (add ? [previous ?? { ...details, catalogId }, ...old.filter(skill => skill.catalogId !== catalogId)]
+        : old.filter(skill => skill.catalogId !== catalogId)));
+    } catch (failure) {
+      inFlight.current.delete(catalogId);
+      setPending([...inFlight.current]);
+      throw failure;
+    }
     try { await (add ? addMySkill : removeMySkill)(apiRef.current, catalogId); }
     catch (failure) {
       // Put back only this skill, keeping any other change made meanwhile.
