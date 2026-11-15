@@ -101,23 +101,32 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean, cloudChanged: () 
   // One save per skill at a time, so a quick undo can't reach the server before the add it undoes.
   const [pending, setPending] = useState<string[]>([]);
   const inFlight = useRef(new Set<string>());
+  const loadSignal = useRef<AbortSignal | null>(null);
+  // A failed load keeps the saved list on screen, like the account; the next change tries the load again first.
+  const loadLive = useCallback((signal: AbortSignal) => loadMySkillAdditions(apiRef.current, signal)
+    .then(value => { if (!signal.aborted) { setSkills(value); current.current = value; okRef.current = true; setOk(true); } })
+    .catch(() => { if (!signal.aborted) { okRef.current = false; setOk(false); } })
+    .finally(() => { if (!signal.aborted) setLoaded(true); }), []);
   useEffect(() => {
     if (!enabled) { setSkills(null); setLoaded(false); setOk(false); okRef.current = false; return; }
     const controller = new AbortController();
-    firstLoad.current = loadMySkillAdditions(apiRef.current, controller.signal)
-      .then(value => { if (!controller.signal.aborted) { setSkills(value); current.current = value; okRef.current = true; setOk(true); } })
-      // A failed load keeps the saved list on screen, like the account, but changes are refused until a live load.
-      .catch(() => { if (!controller.signal.aborted) { okRef.current = false; setOk(false); } })
-      .finally(() => { if (!controller.signal.aborted) setLoaded(true); });
+    loadSignal.current = controller.signal;
+    firstLoad.current = loadLive(controller.signal);
     return () => controller.abort();
-  }, [enabled]);
+  }, [enabled, loadLive]);
   const change = useCallback(async (catalogId: string, add: boolean, details?: Omit<MySkillAddition, "catalogId">) => {
     if (inFlight.current.has(catalogId)) return;
     inFlight.current.add(catalogId);
     setPending([...inFlight.current]);
     let previous: MySkillAddition | undefined;
     try {
-      await firstLoad.current;
+      const awaited = firstLoad.current;
+      await awaited;
+      // One retry at a time: a second change waits for the same retry, so no later load lands after its edit.
+      if (!okRef.current && loadSignal.current && !loadSignal.current.aborted) {
+        if (firstLoad.current === awaited) firstLoad.current = loadLive(loadSignal.current);
+        await firstLoad.current;
+      }
       if (!okRef.current) throw new Error("My skills isn't loaded yet.");
       previous = current.current?.find(skill => skill.catalogId === catalogId);
       setSkills(old => old && (add ? [previous ?? { ...details, catalogId }, ...old.filter(skill => skill.catalogId !== catalogId)]
@@ -137,7 +146,7 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean, cloudChanged: () 
       inFlight.current.delete(catalogId);
       setPending([...inFlight.current]);
     }
-  }, []);
+  }, [loadLive]);
   const additions = useMemo(() => skills ? { skills, pending,
     add: (id: string, details?: Omit<MySkillAddition, "catalogId">) => change(id, true, details), remove: (id: string) => change(id, false),
     findByGithubLink: (link: string, signal?: AbortSignal) => findSkillsAtGithubLink(apiRef.current, link, signal),
