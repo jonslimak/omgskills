@@ -3032,4 +3032,22 @@ main:has(> .ua-az-anchor) .ua-content {
 .ua-on-agents { display: inline-flex; align-items: center; gap: 2px; }
 .ua-on-agents-label { gap: 6px; cursor: default; }
 .ua-on-agents-label .ua-agent-logo { width: 14px; height: 14px; }
+.ua-on-agent { display: inline-flex; align-items: center; gap: 1px; }
+.ua-kind-tip {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; padding: 0; border: 0; background: none !important;
+  color: var(--ua-muted); cursor: default;
+}
+.ua-kind-tip svg { width: 16px; height: 16px; }
+.ua-kind-tip-text {
+  position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); z-index: 5;
+  padding: 4px 8px; border-radius: 6px; background: var(--ua-ink); color: var(--ua-bg);
+  font-size: 12px; font-weight: 500; white-space: nowrap; pointer-events: none;
+  visibility: hidden;
+}
+.ua-kind-tip[data-open="true"] .ua-kind-tip-text,
+.ua-kind-tip:focus-visible .ua-kind-tip-text { visibility: visible; }
+@media (hover: hover) and (pointer: fine) {
+  .ua-kind-tip:hover .ua-kind-tip-text { visibility: visible; }
+}
 .ua-modal .ua-modal-action { align-self: flex-start; min-height: 36px; padding: 0 16px; }
