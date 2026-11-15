@@ -96,7 +96,7 @@ test("migration preserves old rows and enforces account-scoped hash uniqueness/f
   let before: Awaited<ReturnType<typeof rows>>;
   await withSchema(async pool => {
     const devices = await rows(pool, "device_tokens");
-    assert.deepEqual(devices.map(({ reconnect_key_hash, ...old }) => old), before);
+    assert.deepEqual(devices.map(({ reconnect_key_hash, app_build, ...old }) => old), before);
     assert.ok(devices.every(device => device.reconnect_key_hash === null));
     const owner = devices[0].user_id;
     await pool.query("UPDATE device_tokens SET reconnect_key_hash=$2 WHERE id=$1", [devices[0].id, hashReconnectKey(key)]);

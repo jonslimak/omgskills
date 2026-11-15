@@ -170,7 +170,7 @@ test("additive reconciliation migration preserves old device/legacy rows and Set
   await withSchema(async pool => {
     const after = await snapshot(pool);
     const oldShape = { ...after,
-      device_tokens: after.device_tokens.map(({ inventory_revision, inventory_protocol, inventory_checked_at, reconnect_key_hash, ...old }) => old),
+      device_tokens: after.device_tokens.map(({ inventory_revision, inventory_protocol, inventory_checked_at, reconnect_key_hash, app_build, ...old }) => old),
       sync_runs: after.sync_runs.map(({ scan_coverage, ...old }) => old) };
     assert.deepEqual(oldShape, before);
     assert.ok(after.device_tokens.every(row => row.inventory_revision === null && row.inventory_protocol === 1));
@@ -351,7 +351,7 @@ test("v3 inventory distinguishes an empty account and a connected device without
     const read = await readSyncInventory(pool, owner, 3, now);
     assert.deepEqual(read.skills, []);
     assert.deepEqual(read.devices, [{ id: reporter.id, deviceName: "Reconciliation test Mac", status: "active",
-      lastReportedAt: null, scanCoverage: null, lastCheckedAt: null }]);
+      lastReportedAt: null, scanCoverage: null, lastCheckedAt: null, appBuild: null }]);
   });
 });
 
@@ -518,7 +518,7 @@ test("check-time migration is additive, preserves prior inventory/Sets and does 
   let before: Awaited<ReturnType<typeof snapshot>>;
   await withSchema(async pool => {
     const after = await snapshot(pool);
-    assert.deepEqual({ ...after, device_tokens: after.device_tokens.map(({ inventory_checked_at, reconnect_key_hash, ...old }) => old) }, before);
+    assert.deepEqual({ ...after, device_tokens: after.device_tokens.map(({ inventory_checked_at, reconnect_key_hash, app_build, ...old }) => old) }, before);
     assert.ok(after.device_tokens.every(row => row.inventory_checked_at === null));
     assert.ok(after.device_tokens.every(row => row.reconnect_key_hash === null));
     assertSetPreserved(after, before);

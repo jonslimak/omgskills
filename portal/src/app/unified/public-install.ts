@@ -16,7 +16,9 @@ export function normalInstallClient(development: boolean, enabled: unknown, host
   return isF1Preview(development, enabled, hostname) ? "setup-test" : null;
 }
 
-export type CatalogInstallAgent = "claude" | "codex";
+/** "both" needs Mac build 41 or later (MAC_INSTALLS_BOTH_BUILD). */
+export type CatalogInstallAgent = "claude" | "codex" | "both";
+export const MAC_INSTALLS_BOTH_BUILD = 41;
 export const catalogInstallClients = {
   f1: { scheme: "omgskills-f1", name: "OMGSkills F1 Test" },
   candidate: { scheme: "omgskills", name: "OMGSkills Candidate" },
@@ -30,7 +32,7 @@ export function catalogInstallTestEnabled(development: boolean, enabled: unknown
 export function catalogInstallAction(skill: SkillDisplay, agent: CatalogInstallAgent, client: CatalogInstallClient = "f1"): InstallAction {
   const id = skill.catalogId;
   if (!id?.trim() || skill.key !== `catalog:${id}` || skill.setItemKind || skill.installed?.isLocalOnly
-    || bytes(id) > 500 || controls.test(id) || !["claude", "codex"].includes(agent)) {
+    || bytes(id) > 500 || controls.test(id) || !["claude", "codex", "both"].includes(agent)) {
     return { href: null, reason: "Select a public catalog skill and an install target." };
   }
   const link = new URL(`${catalogInstallClients[client].scheme}://catalog-install`);

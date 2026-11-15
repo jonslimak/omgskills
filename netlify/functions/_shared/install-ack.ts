@@ -2,7 +2,9 @@ import type { Pool } from "pg";
 import { requireDeviceToken, rollback, touchDeviceAfterSuccessfulUse } from "./device-auth.js";
 
 /** A Mac app tells the server it received a website install request, so the pop-over can say "Approve it". */
-export type InstallAckTarget = { catalogId: string; agent: "claude" | "codex" };
+export type InstallAckTarget = { catalogId: string; agent: "claude" | "codex" | "both" };
+/** "both" (Mac build 41 on) is stored as one row per agent. */
+const ackAgents = (agent: InstallAckTarget["agent"]) => agent === "both" ? ["claude", "codex"] : [agent];
 
 /** Rows kept per person; older ones only mattered while a pop-over was polling. */
 export const INSTALL_ACK_KEEP_ROWS = 20;
@@ -16,8 +18,8 @@ export function parseInstallAckTarget(catalogId: unknown, agent: unknown): Insta
     || /[\p{Cc}\p{Cf}]/u.test(catalogId)) {
     throw new Response("catalogId is invalid", { status: 400 });
   }
-  if (agent !== "claude" && agent !== "codex") {
-    throw new Response("agent must be claude or codex", { status: 400 });
+  if (agent !== "claude" && agent !== "codex" && agent !== "both") {
+    throw new Response("agent must be claude, codex, or both", { status: 400 });
   }
   return { catalogId, agent };
 }
@@ -52,8 +54,9 @@ export async function recordInstallAck(pool: Pool, req: Request, target: Install
     await client.query("BEGIN");
     const device = await requireDeviceToken(req, client, "sync:write", now);
     await client.query(
-      `INSERT INTO install_acks (user_id, device_id, catalog_id, agent, received_at) VALUES ($1, $2, $3, $4, $5)`,
-      [device.userId, device.deviceId, target.catalogId, target.agent, now]
+      `INSERT INTO install_acks (user_id, device_id, catalog_id, agent, received_at)
+       SELECT $1, $2, $3, agent, $5 FROM unnest($4::text[]) AS agent`,
+      [device.userId, device.deviceId, target.catalogId, ackAgents(target.agent), now]
     );
     await client.query(
       `
@@ -79,24 +82,23 @@ export async function recordInstallAck(pool: Pool, req: Request, target: Install
 }
 
 /**
- * Whether any of the person's non-revoked devices acked this request at or after since.
+ * Whether one of the person's non-revoked devices acked this request at or after since ("both": for each agent).
  * Keyed by the Clerk user so a poll costs one query, not a Clerk profile load; no portal user means no devices.
  */
 export async function readInstallAck(pool: Pool, clerkUserId: string, query: InstallAckTarget & { since: Date }) {
   const result = await pool.query<{ acked: boolean }>(
     `
-      SELECT EXISTS (
-        SELECT 1 FROM users
-        JOIN install_acks ack ON ack.user_id = users.id
-        JOIN device_tokens device ON device.id = ack.device_id AND device.user_id = users.id
-        WHERE users.clerk_user_id = $1
-          AND device.revoked_at IS NULL
-          AND ack.catalog_id = $2
-          AND ack.agent = $3
-          AND ack.received_at >= $4
-      ) AS acked
+      SELECT count(DISTINCT ack.agent) = cardinality($3::text[]) AS acked
+      FROM users
+      JOIN install_acks ack ON ack.user_id = users.id
+      JOIN device_tokens device ON device.id = ack.device_id AND device.user_id = users.id
+      WHERE users.clerk_user_id = $1
+        AND device.revoked_at IS NULL
+        AND ack.catalog_id = $2
+        AND ack.agent = ANY($3::text[])
+        AND ack.received_at >= $4
     `,
-    [clerkUserId, query.catalogId, query.agent, query.since]
+    [clerkUserId, query.catalogId, ackAgents(query.agent), query.since]
   );
   return result.rows[0]?.acked === true;
 }
