@@ -77,6 +77,23 @@ async function cloudKeyOf(client: QueryClient, userId: string, skill: SyncedSkil
 
 type QueryClient = Pick<ReturnType<typeof getPgPool>, "query">;
 
+/**
+ * Whether the Set already holds this saved skill as a name-only item from a Mac's copy (added when nothing
+ * was shareable). Matched by the same saved-skill key the Mac's copy saves under, not by name.
+ */
+export async function savedSkillInSetFromMac(client: QueryClient, userId: string, groupId: string, skillKey: string) {
+  const items = await client.query<{ syncedSkillId: string }>(
+    `SELECT synced_skill_id AS "syncedSkillId" FROM skill_group_items
+     WHERE group_id = $1 AND kind = 'synced' AND source_id IS NULL AND synced_skill_id IS NOT NULL`,
+    [groupId]
+  );
+  for (const { syncedSkillId } of items.rows) {
+    const skill = await getSyncedSkill(client, userId, syncedSkillId);
+    if (skill && await cloudKeyOf(client, userId, skill) === skillKey) return true;
+  }
+  return false;
+}
+
 async function getSyncedSkill(
   client: QueryClient,
   userId: string,
@@ -258,6 +275,9 @@ export default async (req: Request, _context: Context) => {
       );
       if (!saved.rows[0]) {
         throw new Response("Saved skill is unavailable", { status: 400 });
+      }
+      if (await savedSkillInSetFromMac(getPgPool(), user.id, groupId, skillKey)) {
+        throw new Response("Skill is already in this group", { status: 409 });
       }
       const item = await persistGroupItem(
         user,

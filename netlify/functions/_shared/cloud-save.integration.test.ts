@@ -20,6 +20,7 @@ import {
 } from "./cloud-save.js";
 import { CloudStoreError, type CloudObjectStore } from "./cloud-store.js";
 import { requirePrivateReleaseAccess } from "./private-release-access.js";
+import { savedSkillInSetFromMac } from "../portal-group-items.mjs";
 import { addGroupItemWithClient, updateCloudGroupItemWithClient, type GroupItemPublication } from "./group-items.js";
 import { gitObjectSha, validateSkillPackage, type SkillManifestEntry } from "./skill-package.js";
 import { skillMdBody } from "./skill-readme.js";
@@ -1481,11 +1482,12 @@ test("adding your own skill to a Set shares its saved version; Update Set moves 
     const run = randomUUID();
     await pool.query("INSERT INTO sync_runs(id,user_id,device_id,status,completed_at) VALUES($1,$2,$3,'completed',now())", [run, owner.userId, owner.deviceId]);
     const synced = (await pool.query<{ id: string }>(`INSERT INTO synced_skills(user_id,sync_run_id,device_id,stable_key,name,source,identity_status,is_local_only)
-      VALUES($1,$2,$3,'location:v1:claude:notes','Notes','claude','localOnly',true) RETURNING id`, [owner.userId, run, owner.deviceId])).rows[0].id;
+      VALUES($1,$2,$3,'location:v1:claude:notes','Note taker','claude','localOnly',true) RETURNING id`, [owner.userId, run, owner.deviceId])).rows[0].id;
     await inTransaction((client) => addGroupItemWithClient(client, otherGroup, { kind: "synced", syncedSkillId: synced },
       { kind: "metadata_only", reason: "synced_local_only" }));
-    await assert.rejects(inTransaction((client) => addGroupItemWithClient(client, otherGroup, { kind: "synced", name: "notes" }, required("notes"))),
-      (error: unknown) => error instanceof Response && error.status === 409);
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "notes"), true);
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "other"), false, "matched by key, not name");
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, group, "notes"), false);
 
     // A newer save doesn't change the Set until the owner updates it.
     await uploadAll(pool, store, owner.userId, v2);
