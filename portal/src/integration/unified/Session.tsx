@@ -8,6 +8,7 @@ import { usePublicCatalog, usePublicCatalogPreload } from "../../app/unified/use
 import { usePortalApi, type PortalApi } from "../../portal-api";
 import { emptyAccount, type AccountIdentity } from "../data";
 import { useAccount } from "./useAccount";
+import { clearMySkillsCache, readMySkillsCache, writeMySkillsCache, type MySkillsCache } from "./my-skills-cache";
 import { accountNavigation, publicNavigation, unifiedBase } from "./policy";
 import { useSetDetail } from "./useSetDetail";
 import { useAddedCatalog, useSetCatalog } from "../../app/unified/use-set-catalog";
@@ -56,19 +57,23 @@ export type UnifiedSessionComposition = {
 };
 
 /** The account's cloud save state for the skill list; reloaded with the account and after a confirm. */
-function useCloudStatus(api: PortalApi, enabled: boolean, revision: unknown): { info: CloudInfo | undefined; loaded: boolean; reload: () => void } {
+function useCloudStatus(api: PortalApi, enabled: boolean, revision: unknown, saved: CloudSaveState | null = null): { info: CloudInfo | undefined; state: CloudSaveState | null; loaded: boolean; ok: boolean; reload: () => void } {
   const apiRef = useRef(api);
   apiRef.current = api;
-  const [state, setState] = useState<CloudSaveState | null>(null);
+  // Starts from the last saved state, if any, so a return visit shows its sync icons at once.
+  const [state, setState] = useState<CloudSaveState | null>(saved);
   // Whether the first answer is in (or failed), so My skills shows its count once, not 75 then 85.
   const [loaded, setLoaded] = useState(false);
+  // Whether the last answer was real, so a failed load is never saved for the next visit.
+  const [ok, setOk] = useState(false);
   const [reload, setReload] = useState(0);
   useEffect(() => {
-    if (!enabled) { setState(null); setLoaded(false); return; }
+    if (!enabled) { setState(null); setLoaded(false); setOk(false); return; }
     const controller = new AbortController();
     void loadCloudSave(apiRef.current, controller.signal)
-      .then(view => { if (!controller.signal.aborted) setState(view.status === "ready" ? view.state : null); })
-      .catch(() => { /* The list shows no cloud status; the Cloud save page reports the error. */ })
+      .then(view => { if (!controller.signal.aborted) { setState(view.status === "ready" ? view.state : null); setOk(view.status !== "error"); } })
+      // The list shows no cloud status (not the saved one); the Cloud save page reports the error.
+      .catch(() => { if (!controller.signal.aborted) { setState(null); setOk(false); } })
       .finally(() => { if (!controller.signal.aborted) setLoaded(true); });
     return () => controller.abort();
   }, [enabled, revision, reload]);
@@ -78,36 +83,59 @@ function useCloudStatus(api: PortalApi, enabled: boolean, revision: unknown): { 
     remove: async (key: string) => { await deleteCloudSaved(apiRef.current, key); setReload(value => value + 1); },
   } : undefined, [state]);
   const reloadCloud = useCallback(() => setReload(value => value + 1), []);
-  return { info, loaded, reload: reloadCloud };
+  return { info, state, loaded, ok, reload: reloadCloud };
 }
 
 /** Library skills added to My skills; each change shows at once and goes back if the save fails. */
-function useMySkillAdditions(api: PortalApi, enabled: boolean, cloudChanged: () => void): { additions: MySkillAdditions | undefined; loaded: boolean } {
+function useMySkillAdditions(api: PortalApi, enabled: boolean, cloudChanged: () => void, saved: MySkillAddition[] | null = null): { additions: MySkillAdditions | undefined; loaded: boolean; ok: boolean } {
   const apiRef = useRef(api);
   apiRef.current = api;
-  const [skills, setSkills] = useState<MySkillAddition[] | null>(null);
+  const [skills, setSkills] = useState<MySkillAddition[] | null>(saved);
   const [loaded, setLoaded] = useState(false);
+  const [ok, setOk] = useState(false);
+  const okRef = useRef(false);
+  // A change made on the saved list waits for the live load, so the load can't undo it.
+  const firstLoad = useRef<Promise<void>>(Promise.resolve());
   const current = useRef(skills);
   current.current = skills;
   // One save per skill at a time, so a quick undo can't reach the server before the add it undoes.
   const [pending, setPending] = useState<string[]>([]);
   const inFlight = useRef(new Set<string>());
+  const loadSignal = useRef<AbortSignal | null>(null);
+  // A failed load keeps the saved list on screen, like the account; the next change tries the load again first.
+  const loadLive = useCallback((signal: AbortSignal) => loadMySkillAdditions(apiRef.current, signal)
+    .then(value => { if (!signal.aborted) { setSkills(value); current.current = value; okRef.current = true; setOk(true); } })
+    .catch(() => { if (!signal.aborted) { okRef.current = false; setOk(false); } })
+    .finally(() => { if (!signal.aborted) setLoaded(true); }), []);
   useEffect(() => {
-    if (!enabled) { setSkills(null); setLoaded(false); return; }
+    if (!enabled) { setSkills(null); setLoaded(false); setOk(false); okRef.current = false; return; }
     const controller = new AbortController();
-    void loadMySkillAdditions(apiRef.current, controller.signal)
-      .then(value => { if (!controller.signal.aborted) setSkills(value); })
-      .catch(() => { if (!controller.signal.aborted) setSkills(null); })
-      .finally(() => { if (!controller.signal.aborted) setLoaded(true); });
+    loadSignal.current = controller.signal;
+    firstLoad.current = loadLive(controller.signal);
     return () => controller.abort();
-  }, [enabled]);
+  }, [enabled, loadLive]);
   const change = useCallback(async (catalogId: string, add: boolean, details?: Omit<MySkillAddition, "catalogId">) => {
     if (inFlight.current.has(catalogId)) return;
     inFlight.current.add(catalogId);
     setPending([...inFlight.current]);
-    const previous = current.current?.find(skill => skill.catalogId === catalogId);
-    setSkills(old => old && (add ? [previous ?? { ...details, catalogId }, ...old.filter(skill => skill.catalogId !== catalogId)]
-      : old.filter(skill => skill.catalogId !== catalogId)));
+    let previous: MySkillAddition | undefined;
+    try {
+      const awaited = firstLoad.current;
+      await awaited;
+      // One retry at a time: a second change waits for the same retry, so no later load lands after its edit.
+      if (!okRef.current && loadSignal.current && !loadSignal.current.aborted) {
+        if (firstLoad.current === awaited) firstLoad.current = loadLive(loadSignal.current);
+        await firstLoad.current;
+      }
+      if (!okRef.current) throw new Error("My skills isn't loaded yet.");
+      previous = current.current?.find(skill => skill.catalogId === catalogId);
+      setSkills(old => old && (add ? [previous ?? { ...details, catalogId }, ...old.filter(skill => skill.catalogId !== catalogId)]
+        : old.filter(skill => skill.catalogId !== catalogId)));
+    } catch (failure) {
+      inFlight.current.delete(catalogId);
+      setPending([...inFlight.current]);
+      throw failure;
+    }
     try { await (add ? addMySkill : removeMySkill)(apiRef.current, catalogId); }
     catch (failure) {
       // Put back only this skill, keeping any other change made meanwhile.
@@ -118,7 +146,7 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean, cloudChanged: () 
       inFlight.current.delete(catalogId);
       setPending([...inFlight.current]);
     }
-  }, []);
+  }, [loadLive]);
   const additions = useMemo(() => skills ? { skills, pending,
     add: (id: string, details?: Omit<MySkillAddition, "catalogId">) => change(id, true, details), remove: (id: string) => change(id, false),
     findByGithubLink: (link: string, signal?: AbortSignal) => findSkillsAtGithubLink(apiRef.current, link, signal),
@@ -128,7 +156,7 @@ function useMySkillAdditions(api: PortalApi, enabled: boolean, cloudChanged: () 
     previewUpload: (folder: PickedFolder, signal?: AbortSignal) => previewUpload(apiRef.current, folder, signal),
     addUpload: async (folder: PickedFolder) => { const saved = await addUpload(apiRef.current, folder); cloudChanged(); return saved; },
   } : undefined, [skills, pending, change, cloudChanged]);
-  return { additions, loaded };
+  return { additions, loaded, ok };
 }
 
 function AccountView({ identity, signedIn, accountKey, base, local, connectedInventory, inventoryReconciliation, productionInstall, composition, cleanPaths , takeover }: { identity: AccountIdentity; signedIn: boolean; accountKey: string; base: string; local: boolean; connectedInventory: boolean; inventoryReconciliation: boolean; productionInstall: boolean; composition?: UnifiedSessionComposition; cleanPaths: boolean ; takeover: boolean }) {
@@ -217,6 +245,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     setLeaving(true);
     setSessionError("");
     account.clear();
+    clearMySkillsCache();
     const next = navigation(nav, false);
     // Clerk's redirect below crosses the privacy boundary after sign-out succeeds.
     if (!needsAnalyticsDocumentReload(address(next))) history.replaceState({ nav: next }, "", address(next));
@@ -226,23 +255,36 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     catch { setLeaving(false); setSessionError("Could not sign out. Try again."); account.recover(); }
   }
   const { snapshot } = account;
-  const data = available && snapshot.data ? snapshot.data : emptyAccount(available ? identity : { name: "Visitor", email: "" });
+  // The last My skills this browser showed paints at once; the live load replaces it. Set and profile edits
+  // stay blocked until the account is live; added-skill changes wait for their own live load.
+  const userId = accountKey.split(":")[0];
+  const cacheable = signedIn && !composition && !local;
+  const [saved] = useState<MySkillsCache | null>(() => cacheable ? readMySkillsCache(userId) : null);
+  const shown = available && !snapshot.accessDenied ? snapshot.data ?? saved?.data ?? null : null;
+  const data = shown ? { ...shown, profile: { ...shown.profile, ...identity } } : emptyAccount(available ? identity : { name: "Visitor", email: "" });
   const setId = nav.view === "set" ? nav.id : nav.view === "favorites" ? data.sets.find(set => set.isFavorites && set.role === "owner")?.id ?? "" : "";
   const detail = useSetDetail(api, setId, snapshot.revision, available && !!snapshot.data && !snapshot.accessDenied);
   const setCatalog = useSetCatalog(publicClient, detail.set);
   // Both start with the account load instead of after it. The account's first load is revision 1: no second fetch.
   const extras = available && !snapshot.accessDenied && !composition?.readOnly && !local;
-  const { info: cloud, loaded: cloudLoaded, reload: reloadCloud } = useCloudStatus(api, extras, Math.max(1, snapshot.revision));
-  const { additions: mySkills, loaded: mySkillsLoaded } = useMySkillAdditions(api, extras, reloadCloud);
+  const { info: cloud, state: cloudState, loaded: cloudLoaded, ok: cloudOk, reload: reloadCloud } = useCloudStatus(api, extras, Math.max(1, snapshot.revision), saved?.cloud ?? null);
+  const { additions: mySkills, loaded: mySkillsLoaded, ok: mySkillsOk } = useMySkillAdditions(api, extras, reloadCloud, saved?.additions ?? null);
   const addedCatalog = useAddedCatalog(publicClient, useMemo(() => mySkills?.skills.map(skill => skill.catalogId) ?? [], [mySkills?.skills]));
-  // My skills waits for the account, cloud save and its added skills (or 4 seconds), so its count shows once and is right.
+  // Save what this visit loaded, once all three parts loaded for real, for the next visit.
+  useEffect(() => {
+    if (!cacheable || !snapshot.data || snapshot.accessDenied || !cloudLoaded || !cloudOk || !mySkillsLoaded || !mySkillsOk) return;
+    writeMySkillsCache(userId, { data: snapshot.data, cloud: cloudState, additions: mySkills?.skills ?? null });
+  }, [cacheable, userId, snapshot.data, snapshot.accessDenied, cloudLoaded, cloudOk, mySkillsLoaded, mySkillsOk, cloudState, mySkills?.skills]);
+  useEffect(() => { if (snapshot.accessDenied) clearMySkillsCache(); }, [snapshot.accessDenied]);
+  // With a saved list, My skills shows at once. Without one (a first visit), it waits for the account,
+  // cloud save and added skills (or 4 seconds), so its count shows once and is right.
   const [extrasWaited, setExtrasWaited] = useState(false);
   useEffect(() => {
     if (!extras) { setExtrasWaited(false); return; }
     const timer = setTimeout(() => setExtrasWaited(true), 4000);
     return () => clearTimeout(timer);
   }, [extras]);
-  const myListLoading = extras && !extrasWaited && !(cloudLoaded && mySkillsLoaded);
+  const myListLoading = extras && !extrasWaited && !saved && !(cloudLoaded && mySkillsLoaded);
   // One entry per library skill: Set and added details only fill in what the loaded page lacks.
   const catalogIds = new Set(publicData.catalog.skills.map(skill => skill.id));
   const catalog = { ...publicData.catalog, skills: [...publicData.catalog.skills, ...[...setCatalog.skills, ...addedCatalog]
@@ -281,7 +323,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     }}
     onSession={next => { if (!next) void signOut(); }}
     onFavorite={rejectEdit} onCreateSet={rejectEdit} onMembership={rejectEdit} onVisibility={rejectEdit}
-    state={!available || snapshot.data ? "ready" : snapshot.error ? "error" : "loading"}
+    state={!available || shown ? "ready" : snapshot.error ? "error" : "loading"}
     mySkillsLoading={myListLoading}
     retry={account.refresh}
     savedSkillMd={available && !snapshot.accessDenied && !composition?.readOnly && !local
