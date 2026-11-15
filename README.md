@@ -13,7 +13,7 @@ Keep your skills in one place. Use them in Claude, ChatGPT, Cursor, Grok, Muse a
 ## Keep your skills in My skills
 
 - My skills holds the skills you write and the ones you add from the library.
-- Turn on Sync My skills, and your connected Macs keep a private copy of each skill's files in My skills. You can leave out any skill.
+- Connect your Mac, and it keeps a private copy of each skill's files in My skills. You can leave out any skill.
 - With sync on, you can also add a skill from a GitHub link or a folder on your computer.
 - A file that looks like it contains a key or password is not synced unless you confirm it's safe, and a skill with one can't be added.
 
