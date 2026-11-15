@@ -31,6 +31,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     private var catalogCandidateUpdaterStarted = false
     private var automaticUpdateTimer: Timer?
     private var automaticUpdateWakeObserver: NSObjectProtocol?
+    /// Sparkle already asked to run this background check. A second ask in the same cycle means it wants to show its
+    /// window (an update that needs attention, or one it can't install quietly), which a quiet check never does.
+    private var backgroundCheckAsked = false
+    /// Set by that case: no more quiet checks this session; "Check for app updates" still shows it.
+    private var automaticUpdateNeedsAttention = false
     #endif
     #if DEBUG || OMGSKILLS_SETUP_TEST
     private var f1Controller: PublicSkillInstallWindowController?
@@ -468,17 +473,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             catalogCandidateUpdaterStarted = true
         }
         // A background check downloads a signed update quietly; willInstallUpdateOnQuit then installs it once idle.
-        updaterController.updater.automaticallyDownloadsUpdates = automatic
+        // A manual check shows Sparkle's "install automatically" box ticked the same as the Options switch.
+        updaterController.updater.automaticallyDownloadsUpdates = configuration.profile == .production
+            && (automatic || AutomaticAppUpdates.enabled)
+        if automatic { backgroundCheckAsked = false }
+        else { automaticUpdateNeedsAttention = false }
         guard updaterController.updater.canCheckForUpdates else { throw Self.catalogCandidateUpdateUnavailable() }
         if automatic { updaterController.updater.checkForUpdatesInBackground() }
         else { updaterController.checkForUpdates(nil) }
     }
 
+    /// A downloaded automatic update restarts the app only once no review, question or skill change is open.
+    private func installAutomaticUpdateWhenIdle(_ install: @escaping @MainActor () -> Void) {
+        guard catalogInstallController?.hasOpenSkillWork == true else { install(); return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30) { [weak self] in
+            MainActor.assumeIsolated { self?.installAutomaticUpdateWhenIdle(install) }
+        }
+    }
+
     /// Production checks for an app update when it opens, every hour, and after the Mac wakes, unless the
     /// "Update automatically" option is off. A check is skipped while anything else is in progress.
     private func startAutomaticAppUpdates(_ updater: CatalogCandidateUpdater) {
-        let check: @MainActor () -> Void = { [weak updater] in
-            guard AutomaticAppUpdates.enabled else { return }
+        let check: @MainActor () -> Void = { [weak self, weak updater] in
+            guard let self, AutomaticAppUpdates.enabled, !automaticUpdateNeedsAttention,
+                  catalogInstallController?.hasOpenSkillWork != true else { return }
             updater?.checkInBackground()
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + AutomaticAppUpdates.launchDelay) {
@@ -783,9 +801,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     func updater(_ updater: SPUUpdater, mayPerform updateCheck: SPUUpdateCheck) throws {
         #if OMGSKILLS_CATALOG_CANDIDATE
         if catalogCandidateMode != .disabled {
-            guard updateCheck == (catalogCandidateUpdater?.background == true ? .updatesInBackground : .updates),
+            let background = catalogCandidateUpdater?.background == true
+            guard updateCheck == (background ? .updatesInBackground : .updates),
                   catalogCandidateUpdater?.phase == .checking,
                   catalogCandidateUpdater?.permitsUpdate == true else { throw Self.catalogCandidateUpdateUnavailable() }
+            if background {
+                guard !backgroundCheckAsked else {
+                    automaticUpdateNeedsAttention = true
+                    throw Self.catalogCandidateUpdateUnavailable()
+                }
+                backgroundCheckAsked = true
+            }
         }
         #endif
         #if OMGSKILLS_SETUP_TEST
@@ -840,6 +866,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         #if OMGSKILLS_CATALOG_CANDIDATE
         if catalogCandidateMode != .disabled {
             guard updateCheck == .updates || updateCheck == .updatesInBackground else { return }
+            // Sparkle's "install automatically" box in a manual check sets the Options switch too.
+            if updateCheck == .updates, catalogCandidateUpdater?.background == false,
+               case .enabled(let configuration) = catalogCandidateMode, configuration.profile == .production {
+                AutomaticAppUpdates.enabled = updater.automaticallyDownloadsUpdates
+            }
             let error = error as NSError?
             let failed = error != nil && !(error?.domain == SUSparkleErrorDomain && error?.code == Int(SUError.noUpdateError.rawValue))
             catalogCandidateUpdater?.finish(failed: failed)
@@ -862,11 +893,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         #if OMGSKILLS_CATALOG_CANDIDATE
         if catalogCandidateMode != .disabled {
             guard catalogCandidateUpdater?.permitsUpdate == true else { return true }
+            let background = catalogCandidateUpdater?.background == true
             catalogCandidateUpdater?.installationStarted()
-            return updateInstallCoordinator.requestInstall(targetVersion: item.displayVersionString,
-                targetBuild: item.versionString) {
-                immediateInstallHandler()
+            let install: @MainActor () -> Void = { [weak self] in
+                guard let self else { return }
+                updateInstallCoordinator.requestInstall(targetVersion: item.displayVersionString,
+                    targetBuild: item.versionString) { immediateInstallHandler() }
             }
+            if background { installAutomaticUpdateWhenIdle(install) } else { install() }
+            return true
         }
         #endif
         #if OMGSKILLS_SETUP_TEST

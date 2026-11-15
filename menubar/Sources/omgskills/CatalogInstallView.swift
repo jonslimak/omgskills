@@ -236,7 +236,7 @@ struct CatalogInstallView: View {
     }
 }
 
-/// "Open at login": off by default; the switch follows what macOS reports.
+/// "Update automatically": on by default (AutomaticAppUpdates).
 private struct AutomaticUpdatesRow: View {
     @AppStorage(AutomaticAppUpdates.defaultsKey) private var isOn = true
 
@@ -253,6 +253,7 @@ private struct AutomaticUpdatesRow: View {
     }
 }
 
+/// "Open at login": off by default; the switch follows what macOS reports.
 private struct LoginItemRow: View {
     let controller: LoginItemController
 
@@ -295,6 +296,12 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     private var restore: SkillRestoreController?
     private var savedInstall: SavedSkillInstallController?
     private var addAgent: SkillAddAgentController?
+    /// A review, question or skill change is open: an automatic app update waits, since restarting would drop it
+    /// (or interrupt a restore, removal or Set install halfway).
+    var hasOpenSkillWork: Bool {
+        model.ownsRequest || setInstall?.isActive == true || removal?.isActive == true || versionMatch?.isActive == true
+            || restore?.isActive == true || savedInstall?.isActive == true || addAgent?.isActive == true
+    }
     /// An install, Set or other link arrived; its own flow handles Connect, so the first-launch offer waits.
     private var receivedLink = false
 
