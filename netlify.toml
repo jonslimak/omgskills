@@ -53,6 +53,12 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
 
 [[headers]]
+  for = "/app/oauth-consent/"
+  [headers.values]
+    Cache-Control = "private, no-store"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
   for = "/app/connect"
   [headers.values]
     Cache-Control = "private, no-store"

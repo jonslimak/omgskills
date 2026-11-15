@@ -12,6 +12,20 @@ export function consentRequest(search: string) {
   return { clientId, redirectUri, scope: params.get("scope") ?? undefined, forward };
 }
 
+/** Where Allow sends you: Clerk's checked domain, else the redirect's host or scheme; never throws. */
+export function consentDestination(redirectDomain: string | null | undefined, redirectUri: string) {
+  if (redirectDomain) return redirectDomain;
+  try {
+    const url = new URL(redirectUri);
+    return url.hostname || url.protocol.replace(/:$/, "");
+  } catch { return ""; }
+}
+
+/** A loopback address (a local agent's callback); everything else is said up front. */
+export function isLocalDestination(destination: string) {
+  return ["localhost", "127.0.0.1", "[::1]", "::1"].includes(destination);
+}
+
 /** An agent's name without a stray empty or overlong value. */
 export function agentName(name: string | null | undefined) {
   const trimmed = name?.trim();
@@ -40,13 +54,15 @@ export function OAuthConsentContent({ request, view }: { request: ReturnType<typ
   }
   const { data, action } = view;
   const name = agentName(data.oauthApplicationName);
-  const destination = data.redirectDomain || new URL(request.redirectUri).hostname;
+  const destination = consentDestination(data.redirectDomain, request.redirectUri);
   return <Shell>
     <h1>Connect {name}</h1>
     <p className="connect-lead">{name} can read your My skills.</p>
+    {/* Agents name themselves, so where Allow goes is shown up front unless it's this computer. */}
+    {destination && !isLocalDestination(destination) && <p className="status">Allow returns you to <strong>{destination}</strong>.</p>}
     <details className="connect-details">
       <summary>Show details</summary>
-      <p>Read only. Nothing on your Mac changes. You'll go back to {destination}.</p>
+      <p>Read only. Nothing on your Mac changes.{destination ? ` You'll go back to ${destination}.` : ""}</p>
       <ul className="connect-permission" aria-label="Access">
         {data.scopes.map(scope => <li key={scope.scope}>{scope.description || scope.scope}</li>)}
       </ul>

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { agentName, consentRequest, OAuthConsentContent } from "../src/oauth-consent/OAuthConsentPage";
+import { agentName, consentDestination, consentRequest, OAuthConsentContent } from "../src/oauth-consent/OAuthConsentPage";
 
 const search = "?client_id=abc&redirect_uri=http%3A%2F%2F127.0.0.1%3A1455%2Fcallback&scope=profile+email+private_metadata&state=s1&consented=true&organization_id=o";
 
@@ -42,4 +42,17 @@ test("a broken request says to start again; no form", () => {
     assert.match(html, /Start again from your agent\./);
     assert.doesNotMatch(html, /<form/);
   }
+});
+
+test("the destination never throws, and a non-local one is shown up front", () => {
+  assert.equal(consentDestination("claude.ai", "https://claude.ai/cb"), "claude.ai");
+  assert.equal(consentDestination(null, "http://127.0.0.1:1455/cb"), "127.0.0.1");
+  assert.equal(consentDestination(null, "com.foo.app:/cb"), "com.foo.app");
+  assert.equal(consentDestination(null, "not a url"), "");
+  const render = (redirectDomain: string | null, uri: string) => renderToStaticMarkup(createElement(OAuthConsentContent, {
+    request: consentRequest(`?client_id=a&redirect_uri=${encodeURIComponent(uri)}`),
+    view: { state: "ready", action: "#", data: { oauthApplicationName: "Codex", redirectDomain, scopes: [] } } }));
+  assert.match(render("claude.ai", "https://claude.ai/cb"), /Allow returns you to <strong>claude\.ai<\/strong>/);
+  assert.doesNotMatch(render(null, "http://127.0.0.1:1455/cb"), /Allow returns you/);
+  assert.doesNotMatch(render(null, "not a url"), /Allow returns you|go back to/);
 });

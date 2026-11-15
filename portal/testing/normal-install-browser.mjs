@@ -50,7 +50,7 @@ try {
       return route.abort();
     }
     if (url.pathname.startsWith("/api/")) { forbidden.push(url.pathname); return route.abort(); }
-    if (url.pathname.includes("@clerk_clerk-react.js")) {
+    if (url.pathname.includes("@clerk_react.js")) {
       return route.fulfill({ contentType: "text/javascript", body: `
         const token = async () => { throw new Error("No account requests in F4 browser test"); };
         export const ClerkProvider = ({children}) => children;
