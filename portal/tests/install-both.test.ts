@@ -60,4 +60,14 @@ test("the picker starts on Both where the Mac can, and on the missing agent othe
   assert.equal(pressed(render(true)), "Both");
   assert.equal(pressed(render(true, ["Claude Code"])), "Codex");
   assert.equal(pressed(render(true, ["Codex"])), "Claude");
+
+  // A saved Both, then the Mac can't: dropped, and the pop-over isn't stuck on "out of date".
+  const store = new CatalogInstallIntentStore(storage, "production");
+  store.save({ version: 1, catalogId: skill.catalogId!, agent: "both", createdAt: Date.now(), returnRoute: "/app/?view=discover&skill=catalog%3Aanthropics%2Fskills%2Fpdf" });
+  assert.equal(store.read().intent?.agent, "both");
+  const html = renderToStaticMarkup(createElement(CatalogInstallSetup, { skill, detailReady: true, returnRoute: "/app/?view=discover",
+    store, appKnown: true, installsBoth: false }));
+  assert.equal(store.read().intent, null);
+  assert.equal(pressed(html), "Claude");
+  assert.doesNotMatch(html, /out of date/);
 });

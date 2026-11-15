@@ -24,7 +24,11 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
   const bothOffered = installsBoth && store.client === "production";
   // Start on the agent that doesn't have the skill yet; with neither, Both where the Mac can do it.
   const [agent, setAgent] = useState<CatalogInstallAgent>(() => {
-    if (saved && saved.catalogId === skill.catalogId && (saved.agent !== "both" || bothOffered)) return saved.agent;
+    if (saved && saved.catalogId === skill.catalogId) {
+      if (saved.agent !== "both" || bothOffered) return saved.agent;
+      // A saved Both this Mac can no longer do: drop it, or the session would call the request out of date.
+      store.clear();
+    }
     const has = (kind: "claude" | "codex") => !!skill.installed?.sources.some(source => agentKind(source) === kind);
     return has("claude") && !has("codex") ? "codex" : has("codex") && !has("claude") ? "claude" : bothOffered && !has("claude") ? "both" : "claude";
   });
