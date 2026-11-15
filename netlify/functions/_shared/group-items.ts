@@ -101,6 +101,17 @@ export async function addGroupItemWithClient(
       throw new Response("Skill is already in this group", { status: 409 });
     }
   }
+  // Added by its saved copy: a name-only item from a Mac's copy (nothing shareable then) is the same skill.
+  if (publication?.kind === "cloud" && publication.required && item.name) {
+    const existing = await client.query<{ id: string }>(
+      `SELECT id FROM skill_group_items WHERE group_id = $1 AND kind = 'synced' AND source_id IS NULL
+         AND synced_skill_id IS NOT NULL AND lower(name) = lower($2) LIMIT 1`,
+      [groupId, item.name]
+    );
+    if (existing.rowCount) {
+      throw new Response("Skill is already in this group", { status: 409 });
+    }
+  }
 
   if (item.syncedSkillId) {
     const existing = await client.query<{ id: string }>(

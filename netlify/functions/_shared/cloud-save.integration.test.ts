@@ -1477,6 +1477,15 @@ test("adding your own skill to a Set shares its saved version; Update Set moves 
     await assert.rejects(inTransaction((client) => addGroupItemWithClient(client, otherGroup, { kind: "synced", name: "notes" }, cloud("notes"))),
       (error: unknown) => error instanceof Response && error.status === 409);
     await pool.query("DELETE FROM skill_group_items WHERE id = $1", [bySaved.itemId]);
+    // A name-only item from a Mac's copy is the same skill too.
+    const run = randomUUID();
+    await pool.query("INSERT INTO sync_runs(id,user_id,device_id,status,completed_at) VALUES($1,$2,$3,'completed',now())", [run, owner.userId, owner.deviceId]);
+    const synced = (await pool.query<{ id: string }>(`INSERT INTO synced_skills(user_id,sync_run_id,device_id,stable_key,name,source,identity_status,is_local_only)
+      VALUES($1,$2,$3,'location:v1:claude:notes','Notes','claude','localOnly',true) RETURNING id`, [owner.userId, run, owner.deviceId])).rows[0].id;
+    await inTransaction((client) => addGroupItemWithClient(client, otherGroup, { kind: "synced", syncedSkillId: synced },
+      { kind: "metadata_only", reason: "synced_local_only" }));
+    await assert.rejects(inTransaction((client) => addGroupItemWithClient(client, otherGroup, { kind: "synced", name: "notes" }, required("notes"))),
+      (error: unknown) => error instanceof Response && error.status === 409);
 
     // A newer save doesn't change the Set until the owner updates it.
     await uploadAll(pool, store, owner.userId, v2);

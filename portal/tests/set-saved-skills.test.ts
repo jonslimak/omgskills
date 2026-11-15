@@ -80,3 +80,15 @@ test("saved skills get Add to set in the panel, row menu and edit bar; Favorites
   assert.match(source, /onClick=\{\(\) => addToSet\(forSets\)\}/);
   assert.match(source, /\(detail\.installed \|\| detail\.catalogId \|\| settable\(detail\)\)/);
 });
+
+test("adding a Mac's copy whose saved copy is already in the Set counts as done", async () => {
+  const s = server([{ id: "saved", kind: "synced", syncedSkillId: null, cloudKey: "local" }]);
+  const { PortalApiError } = await import("../src/api-error");
+  const api: PortalApi = async <T>(path: string, init?: RequestInit) => {
+    if (init?.method === "POST") throw new PortalApiError("Skill is already in this group", 409);
+    return s.api<T>(path, init);
+  };
+  const result = await changeMembership(api, "set", [installed], true, signal());
+  assert.equal(result.unchanged, 1);
+  assert.equal(result.failed.length, 0);
+});

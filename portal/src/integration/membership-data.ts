@@ -18,6 +18,8 @@ export type MembershipCommand =
   | { kind: "remove-item"; id: string; itemId: string }
   | { kind: "reorder"; id: string; itemIds: string[] }
   | { kind: "update-item"; id: string; itemId: string };
+/** The server's answer when a skill is already in the Set, however it got there. */
+const alreadyInSet = "Skill is already in this group";
 const message = (error: unknown) => error instanceof Error ? error.message : "Could not update this skill.";
 const uncertain = (error: unknown) => !(error instanceof PortalApiError) || error.status >= 500;
 function checkSignal(signal: AbortSignal) { if (signal.aborted) throw new DOMException("Account changed", "AbortError"); }
@@ -108,9 +110,13 @@ export async function changeMembership(api: PortalApi, id: string, skills: Group
             result.added++;
           } catch (error) {
             if (!(error instanceof PortalApiError) || error.status !== 409) throw error;
-            set = await ownedSet(api, id, signal);
-            if (!isMember(set, skill)) throw error;
-            result.unchanged++;
+            // Its saved copy may already be in the Set (an item the list can't match to this Mac's copy).
+            if (error.message === alreadyInSet) { result.unchanged++; }
+            else {
+              set = await ownedSet(api, id, signal);
+              if (!isMember(set, skill)) throw error;
+              result.unchanged++;
+            }
           }
         } else {
           for (const item of matches) {
@@ -189,8 +195,10 @@ export async function addSavedMembership(api: PortalApi, id: string, saved: { ke
           result.added++;
         } catch (error) {
           if (!(error instanceof PortalApiError) || error.status !== 409) throw error;
-          set = await ownedSet(api, id, signal);
-          if (!set.items.some((item) => item.cloudKey === skill.key)) throw error;
+          if (error.message !== alreadyInSet) {
+            set = await ownedSet(api, id, signal);
+            if (!set.items.some((item) => item.cloudKey === skill.key)) throw error;
+          }
           result.unchanged++;
         }
       }
