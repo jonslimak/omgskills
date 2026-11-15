@@ -318,8 +318,8 @@ function MenuItem({
   );
 }
 
-function ManagedSetHeader({ set, skills, management, theme, headingActions }: {
-  set: PortalSet; skills: SkillDisplay[]; management: UnifiedManagement; theme: string; headingActions: ReactNode;
+function ManagedSetHeader({ set, skills, choices, management, theme, headingActions }: {
+  set: PortalSet; skills: SkillDisplay[]; choices: SkillDisplay[]; management: UnifiedManagement; theme: string; headingActions: ReactNode;
 }) {
   const editable = set.role === "owner" && !set.hidden && !set.isFavorites;
   const disabled = management.busy || management.blocked;
@@ -367,7 +367,7 @@ function ManagedSetHeader({ set, skills, management, theme, headingActions }: {
     </div>}
     <div className="ua-set-actions">
       {editable && <>
-        <button className="ua-pill ua-set-action" type="button" aria-label="Add skill" title="Add skill" disabled={disabled} onClick={() => management.add([], set)}><Plus /><span>Add skill</span></button>
+        <button className="ua-pill ua-set-action" type="button" aria-label="Add skill" title="Add skill" disabled={disabled} onClick={() => management.add([], set, choices)}><Plus /><span>Add skill</span></button>
       </>}
       {installLink && !disabled && <a className="ua-pill ua-set-action" href={installLink} title="Install this Set with the omgskills Mac app">
         <Download /><span>Install on Mac</span></a>}
@@ -815,6 +815,10 @@ export function UnifiedApp({
   function closeDetail() {
     navigate({ ...nav, selected: "" });
   }
+  // Installed skills go in Sets everywhere; the account's Sets also take saved ones (by library id or saved copy).
+  function settable(skill: SkillDisplay) {
+    return !!skill.installed || (!!management && !skill.setItemKind && !!(skill.catalogId || skill.cloudKey));
+  }
   function addToSet(skills: SkillDisplay[]) {
     if (management) { management.add(skills); return; }
     if (readOnlyAccount) return;
@@ -1101,10 +1105,10 @@ export function UnifiedApp({
               <MenuItem icon={BookOpen} onSelect={() => open(skill)}>
                 View details
               </MenuItem>
-              {(!readOnlyAccount || management) && skill.installed && <><MenuItem icon={ListPlus} disabled={!!management && !canManage} onSelect={() => addToSet([skill])}>
+              {(!readOnlyAccount || management) && settable(skill) && <MenuItem icon={ListPlus} disabled={!!management && !canManage} onSelect={() => addToSet([skill])}>
                 Add to set
-              </MenuItem>
-              <MenuItem icon={Heart} disabled={!!management && !canManage} onSelect={() => management ? management.favorite(skill) : onFavorite(skill)}>
+              </MenuItem>}
+              {(!readOnlyAccount || management) && skill.installed && <><MenuItem icon={Heart} disabled={!!management && !canManage} onSelect={() => management ? management.favorite(skill) : onFavorite(skill)}>
                 {isFavorite(data, skill)
                   ? "Remove from favorites"
                   : "Add to favorites"}
@@ -1653,7 +1657,7 @@ export function UnifiedApp({
                   <CreatorProfileDetails handle={nav.id} />
                 </header>
               ) : management && nav.view === "set" && activeSet && management.detail.state === "ready" ?
-                <ManagedSetHeader set={activeSet} skills={setRows} management={management} theme={theme} headingActions={headingActions} /> : dataPage ? null : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}${trendingHeader ? " ua-heading-trending" : ""}${nav.query ? " ua-heading-search" : ""}`}>
+                <ManagedSetHeader set={activeSet} skills={setRows} choices={allMine} management={management} theme={theme} headingActions={headingActions} /> : dataPage ? null : <div className={`ua-page-heading${headingActions ? " ua-heading-filter" : ""}${showCollectionPager ? " ua-heading-collections" : ""}${trendingHeader ? " ua-heading-trending" : ""}${nav.query ? " ua-heading-search" : ""}`}>
                 <div>
                   <h1>{showCollectionPager ? "Today" : title}</h1>
                   {meta && (nav.query ? <p className="ua-search-meta"><span>{meta}</span>{catalogCount}{catalogNote && <span role="status">{catalogNote}</span>}</p> : trendingHeader ? <p className="ua-search-meta"><span>{meta}</span>{catalogCount}</p> : <p>{meta}</p>)}
@@ -1980,19 +1984,19 @@ export function UnifiedApp({
                       </button>
                       <span>{picked.length} selected</span>
                       {(() => {
-                        // Sets hold installed skills; saved-only skills can be removed from My skills here.
+                        // Sets take installed and saved skills; saved-only skills can be removed from My skills here.
                         const chosen = visible.filter(skill => picked.includes(skill.key));
                         const installed = chosen.filter(skill => skill.installed);
+                        const forSets = chosen.filter(settable);
                         const savedOnly = chosen.filter(skill => !skill.installed && (skill.cloudKey || (skill.added && skill.catalogId)));
-                        const setHint = chosen.length && !installed.length ? "Sets hold installed skills" : undefined;
                         const names = [...new Map(installed.flatMap(skill => liveCopiesOf(skill)?.name ?? [])
                           .map(name => [name.trim().toLowerCase(), name] as const)).values()];
                         const tooMany = names.length > maxRemoveFromMac;
                         return <>
-                          <button type="button" className="ua-pill" title={setHint} disabled={!installed.length || (!!management && !canManage)}
-                            onClick={() => newSet(installed)}><Plus />New set</button>
-                          <button type="button" className="ua-pill" title={setHint} disabled={!installed.length || (!!management && !canManage)}
-                            onClick={() => addToSet(installed)}><ListPlus />Add to set</button>
+                          <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
+                            onClick={() => newSet(forSets)}><Plus />New set</button>
+                          <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
+                            onClick={() => addToSet(forSets)}><ListPlus />Add to set</button>
                           {(!readOnlyAccount || management) && <button type="button" className="ua-pill ua-pill-danger" disabled={!names.length || tooMany}
                             title={tooMany ? `Select up to ${maxRemoveFromMac} skills` : "The Mac app asks first"}
                             onClick={() => window.location.assign(removeFromMacLink(names))}>
@@ -2202,7 +2206,6 @@ export function UnifiedApp({
                   ) : statusLabel && statusLabel !== kindLabel && <span className="ua-pill">{statusLabel}</span>}
                   <span className="ua-detail-icons">
                   {(!readOnlyAccount || management) && signedIn && (detail.installed || detail.catalogId) && (
-                    <>
                       <IconButton
                         label={
                           isFavorite(data, detail)
@@ -2215,6 +2218,8 @@ export function UnifiedApp({
                       >
                         <Heart />
                       </IconButton>
+                  )}
+                  {(!readOnlyAccount || management) && signedIn && (detail.installed || detail.catalogId || settable(detail)) && (
                       <IconButton
                         label="Add to set"
                         disabled={!!management && !canManage}
@@ -2222,7 +2227,6 @@ export function UnifiedApp({
                       >
                         <ListPlus />
                       </IconButton>
-                    </>
                   )}
                   {detail.catalogId && !detail.installed?.isLocalOnly && (
                     <IconButton label="Share skill" onClick={() => void share(detail)}>

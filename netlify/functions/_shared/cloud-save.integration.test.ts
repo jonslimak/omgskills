@@ -1461,6 +1461,19 @@ test("adding your own skill to a Set shares its saved version; Update Set moves 
     // Not saved: the Set gets the name only, as before.
     const unsaved = await inTransaction((client) => addGroupItemWithClient(client, group, { kind: "synced", name: "other" }, cloud("other")));
     assert.deepEqual(await item(unsaved.itemId), { source_id: null, release_id: null, reason: "synced_local_only" });
+    // Added from My skills by its saved copy alone: it needs a saved copy, and is in the Set once.
+    const required = (skillKey: string): GroupItemPublication =>
+      ({ kind: "cloud", ownerUserId: owner.userId, skillKey, fallback: "synced_local_only", required: true });
+    await assert.rejects(inTransaction((client) => addGroupItemWithClient(client, group, { kind: "synced", name: "other" }, required("other"))),
+      (error: unknown) => error instanceof Response && error.status === 409);
+    await assert.rejects(inTransaction((client) => addGroupItemWithClient(client, group, { kind: "synced", name: "notes" }, required("notes"))),
+      (error: unknown) => error instanceof Response && error.status === 409);
+    const otherGroup = (await pool.query<{ id: string }>(
+      "INSERT INTO skill_groups (owner_user_id, name, slug, visibility) VALUES ($1, 'Solo', 'solo', 'private') RETURNING id",
+      [owner.userId])).rows[0].id;
+    const bySaved = await inTransaction((client) => addGroupItemWithClient(client, otherGroup, { kind: "synced", name: "notes" }, required("notes")));
+    assert.equal((await item(bySaved.itemId)).release_id, first.skill.currentVersion.id);
+    await pool.query("DELETE FROM skill_group_items WHERE id = $1", [bySaved.itemId]);
 
     // A newer save doesn't change the Set until the owner updates it.
     await uploadAll(pool, store, owner.userId, v2);

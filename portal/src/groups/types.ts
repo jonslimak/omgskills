@@ -27,6 +27,8 @@ export type SkillGroupItem = {
   source: string;
   position: number;
   cloudShared?: boolean;
+  /** Owner only: the saved skill (cloud save key) a cloud-shared item comes from. */
+  cloudKey?: string;
   /** Private items: the version invitees install; its instructions can be read on the web. */
   sharedReleaseId?: string;
   updateAvailable?: boolean;

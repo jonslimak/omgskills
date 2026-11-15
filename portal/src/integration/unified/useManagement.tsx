@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { PortalData, PortalSet, MembershipResult, Visibility } from "../../app/model";
-import { membershipStatus } from "../../app/model";
+import { addable, setStatus } from "./set-adds";
 import { isFavorite, type SkillDisplay } from "../../app/unified/model";
 import { Modal } from "../../app/unified/UnifiedApp";
 import type { UnifiedManagement } from "../../app/unified/management";
@@ -17,7 +17,7 @@ type Request =
   | { kind: "create"; skills: SkillDisplay[] }
   | { kind: "moderate"; set: PortalSet }
   | { kind: "rename"; set: PortalSet }
-  | { kind: "add"; skills: SkillDisplay[]; set?: PortalSet }
+  | { kind: "add"; skills: SkillDisplay[]; set?: PortalSet; choices?: SkillDisplay[] }
   | { kind: "favorite"; skill: SkillDisplay; add: boolean }
   | { kind: "remove"; set: PortalSet; skill: SkillDisplay };
 
@@ -49,7 +49,8 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
     setSkillKey("");
   }
   const targetSet = request?.kind === "add" ? request.set ?? data.sets.find(set => set.id === setId) : undefined;
-  const targetSkills = request?.kind === "add" ? request.skills.length ? request.skills : mine.filter(skill => skill.key === skillKey) : [];
+  const choices = request?.kind === "add" ? request.choices ?? mine : mine;
+  const targetSkills = request?.kind === "add" ? request.skills.length ? request.skills : choices.filter(skill => skill.key === skillKey) : [];
   const disabled = busy || blocked;
   const close = () => { if (!busy && !pending.current) setRequest(null); };
   async function changeVisibility(set: PortalSet, visibility: Visibility) {
@@ -84,8 +85,9 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         message = saved.refreshed ? "Set renamed." : "Set renamed. Refresh to see the latest data.";
       } else if (request.kind === "create") {
         if (request.skills.length) {
-          if (request.skills.some(skill => !skill.installed)) throw new Error("Create an empty set first, then add the catalog skill.");
-          result = await saveMembership({ kind: "create-selected", name: name.trim(), skills: request.skills.map(skill => skill.installed!) });
+          result = request.skills.every(skill => skill.installed)
+            ? await saveMembership({ kind: "create-selected", name: name.trim(), skills: request.skills.map(skill => skill.installed!) })
+            : await saveMembership({ kind: "add-many", name: name.trim(), ...addable(request.skills) });
         } else {
           const saved = await saveSet({ kind: "create", name: name.trim() });
           if (!saved.refreshed) message = "Set created. Refresh to see the latest data.";
@@ -106,17 +108,16 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         if (!targetSet || targetSet.role !== "owner" || targetSet.hidden || targetSet.isFavorites || !targetSkills.length) {
           throw new Error("Choose a set you own and a skill.");
         }
-        if (targetSkills.every(skill => skill.installed)) {
-          result = await saveMembership({ kind: "change", id: targetSet.id, skills: targetSkills.map(skill => skill.installed!), add: true });
-        } else if (targetSkills.length === 1 && targetSkills[0].catalogId) {
-          result = await saveMembership({ kind: "catalog", id: targetSet.id, catalogId: targetSkills[0].catalogId, favorite: false });
-        } else throw new Error("Select installed skills together, or add one catalog skill at a time.");
+        result = targetSkills.every(skill => skill.installed)
+          ? await saveMembership({ kind: "change", id: targetSet.id, skills: targetSkills.map(skill => skill.installed!), add: true })
+          : await saveMembership({ kind: "add-many", id: targetSet.id, ...addable(targetSkills) });
         message = result.unchanged ? "This skill is already in the set." : "Added to set.";
       }
       if (result?.failed.length || result?.uncertain) {
         if (request.kind === "add" && result.failed.length && !result.uncertain && generation.current === version) {
           const failed = new Set(result.failed.map(item => item.id));
-          setRequest({ ...request, skills: targetSkills.filter(skill => skill.installed && failed.has(skill.installed.id)) });
+          setRequest({ ...request, skills: targetSkills.filter(skill => skill.installed ? failed.has(skill.installed.id)
+            : failed.has(skill.catalogId ?? skill.cloudKey ?? "")) });
         }
         throw new Error(result.failed.map(item => item.message).join(" ") || "Could not confirm the save. Refresh before continuing.");
       }
@@ -140,7 +141,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
   return {
     busy, blocked, notice, detail,
     create: (skills = []) => show({ kind: "create", skills }),
-    add: (skills, set) => show({ kind: "add", skills, set }),
+    add: (skills, set, choices) => show({ kind: "add", skills, set, choices }),
     favorite: skill => {
       const next: Request = { kind: "favorite", skill, add: !isFavorite(data, skill) };
       void submit(next, true);
@@ -206,9 +207,9 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
           </label>}
           {request.skills.length ? <p>{request.skills.length === 1 ? request.skills[0].name : `${request.skills.length} skills`}</p> : <label>Skill
             <select required value={skillKey} disabled={disabled} onChange={event => setSkillKey(event.target.value)}>
-              <option value="">Choose an installed skill</option>
-              {mine.map(skill => <option key={skill.key} value={skill.key} disabled={!targetSet || !skill.installed || membershipStatus(targetSet, skill.installed) !== false}>
-                {skill.name}{targetSet && skill.installed && membershipStatus(targetSet, skill.installed) === true ? " (included)" : ""}
+              <option value="">Choose a skill</option>
+              {choices.map(skill => <option key={skill.key} value={skill.key} disabled={!targetSet || setStatus(targetSet, skill) !== false}>
+                {skill.name}{targetSet && setStatus(targetSet, skill) === true ? " (included)" : ""}
               </option>)}
             </select>
           </label>}

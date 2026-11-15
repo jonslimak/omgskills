@@ -6,7 +6,7 @@ import { saveSetData, type SetCommand } from "./set-data";
 import { changeMembership, changeFavorites, createSelectedSet, removeMembershipItem, reorderMembership, updateMembershipItem, emptyMembershipResult, type MembershipCommand } from "./membership-data";
 import { groupSyncedSkills, type GroupedSyncedSkill, type SyncedSkill } from "../synced-skill-grouping";
 import type { MembershipResult } from "../app/model";
-import { addCatalogMembership, removeFavoriteMembership, withFavoriteChange } from "./membership-data";
+import { addCatalogMembership, addManyMembership, removeFavoriteMembership, withFavoriteChange } from "./membership-data";
 
 function membershipRows(skills: SyncedSkill[], selected?: GroupedSyncedSkill[]) {
   const displayGroups = groupSyncedSkills(skills, { groupInstallations: true });
@@ -242,7 +242,8 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
             if (!skill) throw new PortalApiError("Your selected skills changed. Refresh and select them again.", 409);
             return skill;
           });
-          result = command.kind === "change" ? await changeMembership(scoped, command.id, skills, command.add, signal)
+          result = command.kind === "add-many" ? await addManyMembership(scoped, current.sets, command, skills, signal)
+            : command.kind === "change" ? await changeMembership(scoped, command.id, skills, command.add, signal)
             : command.kind === "favorites" ? await changeFavorites(scoped, current.sets, skills, command.add, signal)
             : await createSelectedSet(scoped, command.name, skills, signal);
         }

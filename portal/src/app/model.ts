@@ -17,6 +17,8 @@ export type SetItem = {
   kind: "synced" | "catalog" | "github" | "private-release";
   /** Shared from the owner's cloud save: members install the saved version with the Set. */
   cloudShared?: boolean;
+  /** Owner only: the saved skill (cloud save key) a cloud-shared item comes from. */
+  cloudKey?: string;
   /** Owner only: a newer version is saved than the one in the Set. */
   updateAvailable?: boolean;
   /** Private items: the version people with access install; its instructions can be read on the web. */

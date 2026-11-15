@@ -19,6 +19,8 @@ export type PortalGroupItemRow = {
   releaseId?: string | null;
   /** The owner's newest saved version, for owners only. */
   savedReleaseId?: string | null;
+  /** Owner only: the cloud save key of the item's saved skill, so My skills can tell it's in the Set. */
+  savedKey?: string | null;
   /** The Set's owner owns the item's source (false in a duplicated Set). */
   sharedByOwner?: boolean | null;
 };
@@ -40,6 +42,7 @@ export function portalGroupItem(row: PortalGroupItemRow, role: GroupAccessRole) 
     position: row.position,
     // Shared from the owner's cloud save; the owner also learns when a newer version is saved.
     ...(row.sourceKind === "cloud" && role !== "public" ? { cloudShared: true } : {}),
+    ...(role === "owner" && row.sourceKind === "cloud" && row.savedKey ? { cloudKey: row.savedKey } : {}),
     // Invitees and the owner can read a private item's instructions on the web (same check as the download).
     ...(role !== "public" && (row.sourceKind === "cloud" || row.sourceKind === "private_github") && row.releaseId
       && !row.metadataOnlyReason && row.sharedByOwner === true ? { sharedReleaseId: row.releaseId } : {}),
