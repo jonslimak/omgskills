@@ -1439,7 +1439,7 @@ It is like asking an AI for good dinner ideas versus asking while sharing a reci
 
 Find a skill in the [omgskills web library](${origin}/app/), open its install panel, choose Claude or Codex, and open OMGSkills. Approve the installation on your Mac. If you need the Mac app, follow the setup link in the install panel and return to the skill.
 
-Keep and share your skills: connect the Mac app to your account, turn on Sync My skills to keep them in My skills, share them in a set, or use them in any MCP agent through the My skills MCP (${origin}/my/mcp). Browsing and individual public skill installs do not require an account.
+Keep and share your skills: connect the Mac app to your account and your skills sync to My skills, share them in a set, or use them in any MCP agent through the My skills MCP (${origin}/my/mcp). Browsing and individual public skill installs do not require an account.
 
 Use the skill in a new agent session. Your agent can load it when relevant, or you can use \`/skill-name\` where supported. You can also share a GitHub source link with your agent to install it yourself.
 

@@ -30,7 +30,7 @@ test("guide, structured answers and generated Markdown describe the same availab
   assert.match(answer("Are skills safe?"), /not a security audit/);
   assert.equal(structured.find(item => item["@type"] === "TechArticle").dateModified, "2026-11-09");
   for (const text of [html, generator]) {
-    assert.match(text, /turn on Sync My skills to keep them in My skills/);
+    assert.match(text, /connect the Mac app to your account and your skills sync to My skills/);
     assert.match(text, /Automatic team updates: Coming soon\./);
     assert.match(text, /Original Mac app/);
   }
