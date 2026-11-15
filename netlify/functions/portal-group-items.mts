@@ -81,7 +81,8 @@ type QueryClient = Pick<ReturnType<typeof getPgPool>, "query">;
  * Whether the Set already holds this saved skill as a name-only item from a Mac's copy (added when nothing
  * was shareable). Matched by the same saved-skill key the Mac's copy saves under, not by name.
  */
-export async function savedSkillInSetFromMac(client: QueryClient, userId: string, groupId: string, skillKey: string) {
+export async function savedSkillInSetFromMac(client: QueryClient, userId: string, groupId: string, skillKey: string,
+  savedName: string | null = null) {
   const items = await client.query<{ syncedSkillId: string }>(
     `SELECT synced_skill_id AS "syncedSkillId" FROM skill_group_items
      WHERE group_id = $1 AND kind = 'synced' AND source_id IS NULL AND synced_skill_id IS NOT NULL`,
@@ -94,15 +95,17 @@ export async function savedSkillInSetFromMac(client: QueryClient, userId: string
       continue;
     }
     // No Mac has it now: its folder name is the key it saved under ("notes", or "notes@codex" when taken).
-    const old = await client.query<{ stableKey: string; source: string }>(
-      `SELECT stable_key AS "stableKey", source FROM synced_skills WHERE id = $1 AND user_id = $2 LIMIT 1`,
+    // Same-folder skills get different keys only when their SKILL.md names differ, so the name must match too.
+    const old = await client.query<{ stableKey: string; source: string; name: string }>(
+      `SELECT stable_key AS "stableKey", source, name FROM synced_skills WHERE id = $1 AND user_id = $2 LIMIT 1`,
       [syncedSkillId, userId]
     );
     const row = old.rows[0];
     const folder = row ? installationFolderFromKey(row.stableKey, row.source) : null;
     let key: string | null = null;
     try { key = folder ? normalizeSkillKey(folder) : null; } catch { key = null; }
-    if (key && (skillKey === key || skillKey.startsWith(`${key}@`))) return true;
+    const sameName = !savedName || row!.name.normalize("NFC").toLowerCase() === savedName.normalize("NFC").toLowerCase();
+    if (key && sameName && (skillKey === key || skillKey.startsWith(`${key}@`))) return true;
   }
   return false;
 }
@@ -289,7 +292,7 @@ export default async (req: Request, _context: Context) => {
       if (!saved.rows[0]) {
         throw new Response("Saved skill is unavailable", { status: 400 });
       }
-      if (await savedSkillInSetFromMac(getPgPool(), user.id, groupId, skillKey)) {
+      if (await savedSkillInSetFromMac(getPgPool(), user.id, groupId, skillKey, saved.rows[0].name)) {
         throw new Response("Skill is already in this group", { status: 409 });
       }
       const item = await persistGroupItem(

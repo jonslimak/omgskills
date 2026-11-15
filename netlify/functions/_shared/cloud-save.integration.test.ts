@@ -1492,6 +1492,9 @@ test("adding your own skill to a Set shares its saved version; Update Set moves 
     await pool.query("UPDATE synced_skills SET is_current = false WHERE id = $1", [synced]);
     assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "notes"), true);
     assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "other"), false);
+    // A different skill kept in a same-name folder (its own key, its own name) isn't the same skill.
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "notes@codex", "Meeting notes"), false);
+    assert.equal(await savedSkillInSetFromMac(pool, owner.userId, otherGroup, "notes", "note taker"), true);
 
     // A newer save doesn't change the Set until the owner updates it.
     await uploadAll(pool, store, owner.userId, v2);
