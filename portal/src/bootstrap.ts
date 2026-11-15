@@ -38,6 +38,9 @@ if (
   }
 } else if (/^\/app\/oauth-consent\/?$/.test(location.pathname)) {
   // Clerk sends agents' sign-in consent here (Clerk dashboard: Paths > OAuth consent).
+  // The app shell's no-referrer meta makes Chrome post Origin: null, which Clerk rejects.
+  // Clerk requires strict-origin-when-cross-origin on this page; the meta wins over the header.
+  document.querySelector('meta[name="referrer"]')?.setAttribute("content", "strict-origin-when-cross-origin");
   void import("./oauth-consent/main");
 } else if (isReviewRoute(location.pathname)) {
   void import("./review/main");
