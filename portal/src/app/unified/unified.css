@@ -3034,12 +3034,12 @@ main:has(> .ua-az-anchor) .ua-content {
 /* "On Claude, Codex" + add to another agent: where a skill is installed, in one place. */
 .ua-on-agents { display: inline-flex; align-items: center; gap: 2px; }
 .ua-on-agents-label { gap: 6px; cursor: default; }
-.ua-on-agents-label .ua-agent-logo { width: 14px; height: 14px; }
+.ua-on-agents-label .ua-agent-logo { width: 14px; height: 14px; background: var(--ua-muted); }
 .ua-on-agent { display: inline-flex; align-items: center; gap: 1px; }
 .ua-kind-tip {
   position: relative; display: inline-flex; align-items: center; justify-content: center;
   width: 30px; height: 30px; padding: 0; border: 0; background: none !important;
-  color: var(--ua-muted); cursor: default;
+  color: var(--ua-muted) !important; cursor: default;
 }
 .ua-kind-tip svg { width: 16px; height: 16px; }
 .ua-kind-tip-text {
