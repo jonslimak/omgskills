@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import test from "node:test";
 import pg from "pg";
 import { createDeviceCredential, hashToken } from "./crypto.js";
-import { DeviceAuthError } from "./device-auth.js";
+import { DeviceAuthError, requireDeviceToken } from "./device-auth.js";
 import { INSTALL_ACK_KEEP_ROWS, readInstallAck, recordInstallAck } from "./install-ack.js";
 
 const connectionString = process.env.AUTH_TEST_DATABASE_URL;
@@ -91,6 +91,49 @@ test("an expired device cannot ack", async () => {
       [device.id]);
     await assert.rejects(recordInstallAck(pool, ack(device.credential), { catalogId: "x", agent: "claude" }),
       (error) => error instanceof DeviceAuthError);
+  } finally {
+    await pool.query("DELETE FROM users WHERE id = $1", [user.id]);
+  }
+});
+
+test("a both-agent ack answers for each agent and for both", async () => {
+  const user = await createUser("both");
+  try {
+    const device = await createDevice(user.id);
+    const since = new Date(Date.now() - 1000);
+    const query = { catalogId: "anthropics/skills/pdf", since };
+    await recordInstallAck(pool, ack(device.credential), { catalogId: query.catalogId, agent: "claude" });
+    assert.equal(await readInstallAck(pool, user.clerkUserId, { ...query, agent: "both" }), false);
+    await recordInstallAck(pool, ack(device.credential), { catalogId: query.catalogId, agent: "both" });
+    for (const agent of ["claude", "codex", "both"] as const) {
+      assert.equal(await readInstallAck(pool, user.clerkUserId, { ...query, agent }), true);
+    }
+  } finally {
+    await pool.query("DELETE FROM users WHERE id = $1", [user.id]);
+  }
+});
+
+test("a device request records the Mac app's build, ignoring a missing or odd header", async () => {
+  const user = await createUser("build");
+  try {
+    const device = await createDevice(user.id);
+    const build = async () => (await pool.query("SELECT app_build FROM device_tokens WHERE id = $1", [device.id])).rows[0].app_build;
+    const use = async (header?: string) => {
+      const client = await pool.connect();
+      try {
+        await requireDeviceToken(new Request("https://example.test/", { headers: {
+          Authorization: `Bearer ${device.credential}`, ...(header === undefined ? {} : { "X-OMGSkills-App-Build": header }) } }),
+          client, "sync:write");
+      } finally { client.release(); }
+    };
+    await use();
+    assert.equal(await build(), null);
+    await use("41");
+    assert.equal(await build(), 41);
+    for (const odd of ["", "0", "41.1", "-4", "1e3", "9999999999"]) await use(odd);
+    assert.equal(await build(), 41);
+    await use("40");
+    assert.equal(await build(), 40);
   } finally {
     await pool.query("DELETE FROM users WHERE id = $1", [user.id]);
   }

@@ -85,6 +85,7 @@ import {
 import {
   isMember,
   macAppSeen,
+  macInstallsBoth,
   visibilityLabels,
   type PortalData,
   type PortalSet,
@@ -187,8 +188,8 @@ type Props = {
   additions?: MySkillAdditions;
   /** My skills is still waiting on its cloud and added skills, so its count would jump. */
   mySkillsLoading?: boolean;
-  /** appKnown: the account has a connected Mac, so the app is most likely installed. */
-  publicInstallAction?: (skill: SkillDisplay, detailReady: boolean, appKnown: boolean) => ReactNode;
+  /** appKnown: the account has a connected Mac, so the app is most likely installed. installsBoth: every connected Mac can install in both agents. */
+  publicInstallAction?: (skill: SkillDisplay, detailReady: boolean, appKnown: boolean, installsBoth: boolean) => ReactNode;
   /** Clears a saved install request when the user cancels from the Install button. */
   onInstallCancel?: () => void;
   /** Shown once on arrival, e.g. after a broken address fell back to Discover. */
@@ -2225,7 +2226,7 @@ export function UnifiedApp({
                       </div>
                     </div>
                     {/* Installed as the library skill it is, whichever row it was opened from. */}
-                    {publicInstallAction({ ...selected, key: `catalog:${selected.catalogId}` }, !detailPending, macAppSeen(data.devices))}
+                    {publicInstallAction({ ...selected, key: `catalog:${selected.catalogId}` }, !detailPending, macAppSeen(data.devices), macInstallsBoth(data.devices))}
                   </Modal>
                 )}
                 {management?.notice && <p className="ua-muted" role="status">{management.notice}</p>}

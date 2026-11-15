@@ -57,6 +57,12 @@ export function deviceCredentialFromRequest(req: Request): string {
   return match[1];
 }
 
+/** The Mac app's build from X-OMGSkills-App-Build (build 41 on), or null when missing or not a plain number. */
+export function appBuildFromRequest(req: Request): number | null {
+  const value = req.headers.get("x-omgskills-app-build");
+  return value && /^[1-9][0-9]{0,8}$/.test(value) ? Number(value) : null;
+}
+
 export async function requireDeviceToken(
   req: Request,
   client: PoolClient,
@@ -89,6 +95,13 @@ export async function requireDeviceToken(
   const device = result.rows[0];
   if (!device) {
     throw new DeviceAuthError();
+  }
+  const appBuild = appBuildFromRequest(req);
+  if (appBuild !== null) {
+    await client.query(
+      "UPDATE device_tokens SET app_build = $2 WHERE id = $1 AND app_build IS DISTINCT FROM $2",
+      [device.id, appBuild]
+    );
   }
   return {
     deviceId: device.id,

@@ -23,7 +23,8 @@ test("catalog IDs follow the Mac's check: non-empty, at most 500 bytes, no contr
   for (const id of ["", "   ", "é".repeat(251), "a".repeat(501), "a\nb", "a\u0000b", "a​b", "a‮b", 7, null, undefined]) {
     rejects400(() => parseInstallAckTarget(id, "claude"));
   }
-  for (const agent of ["Claude", "cursor", "", null, undefined, 1]) {
+  assert.deepEqual(parseInstallAckTarget("x", "both"), { catalogId: "x", agent: "both" });
+  for (const agent of ["Claude", "cursor", "Both", "claude,codex", "", null, undefined, 1]) {
     rejects400(() => parseInstallAckTarget("anthropics/skills/pdf", agent));
   }
   assert.deepEqual(parseInstallAckBody({ catalogId: "x", agent: "codex", later: true }), { catalogId: "x", agent: "codex" });

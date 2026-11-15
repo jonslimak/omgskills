@@ -10,19 +10,24 @@ import { openingStatus, pollInstallAck, type InstallAckCheck } from "./install-a
 import type { CandidateDistribution } from "../../candidate/distribution";
 import "./install-setup.css";
 
-export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, distribution, appKnown = false, checkAck }: {
+export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, distribution, appKnown = false, installsBoth = false, checkAck }: {
   skill: SkillDisplay; detailReady: boolean; returnRoute: string; store: CatalogInstallIntentStore;
   distribution?: CandidateDistribution;
   /** The account has a connected Mac, so the app is most likely installed. */
   appKnown?: boolean;
+  /** Every connected Mac can install in Claude and Codex at once, so "Both" is offered. */
+  installsBoth?: boolean;
   /** Signed in: asks whether the Mac app received the request, so the pop-over can say "Approve it". */
   checkAck?: InstallAckCheck;
 }) {
   const saved = store.read().intent;
-  // Start on the agent that doesn't have the skill yet.
-  const [agent, setAgent] = useState<CatalogInstallAgent>(() => saved && saved.catalogId === skill.catalogId ? saved.agent
-    : skill.installed?.sources.some(source => agentKind(source) === "claude")
-      && !skill.installed.sources.some(source => agentKind(source) === "codex") ? "codex" : "claude");
+  const bothOffered = installsBoth && store.client === "production";
+  // Start on the agent that doesn't have the skill yet; with neither, Both where the Mac can do it.
+  const [agent, setAgent] = useState<CatalogInstallAgent>(() => {
+    if (saved && saved.catalogId === skill.catalogId && (saved.agent !== "both" || bothOffered)) return saved.agent;
+    const has = (kind: "claude" | "codex") => !!skill.installed?.sources.some(source => agentKind(source) === kind);
+    return has("claude") && !has("codex") ? "codex" : has("codex") && !has("claude") ? "claude" : bothOffered && !has("claude") ? "both" : "claude";
+  });
   const selectId = useId();
   const pick = (next: CatalogInstallAgent) => { store.clear(); setAgent(next); };
   // Once a check succeeds, switching agents stays on Install now.
@@ -31,9 +36,9 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
     <ProductionInstall key={agent} skill={skill} detailReady={detailReady} returnRoute={returnRoute} store={store} agent={agent}
       appKnown={appKnown || confirmed} onAppConfirmed={() => setConfirmed(true)} checkAck={checkAck}
       picker={<div className="ua-install-agents" role="group" aria-label="Agent">
-      {(["claude", "codex"] as const).map(kind => <button key={kind} type="button" aria-pressed={agent === kind}
-        className="ua-install-agent" onClick={() => pick(kind)}>
-        <span className="ua-agent-logo" data-agent={kind} aria-hidden="true" />{kind === "claude" ? "Claude" : "Codex"}
+      {(bothOffered ? ["claude", "codex", "both"] as const : ["claude", "codex"] as const).map(kind => <button key={kind} type="button"
+        aria-pressed={agent === kind} className="ua-install-agent" onClick={() => pick(kind)}>
+        {kind === "both" ? "Both" : <><span className="ua-agent-logo" data-agent={kind} aria-hidden="true" />{kind === "claude" ? "Claude" : "Codex"}</>}
       </button>)}
     </div>} />
   </section>;

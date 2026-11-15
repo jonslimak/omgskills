@@ -186,7 +186,8 @@ function Preview() {
       publicInstallAction={installClient ? (skill, detailReady) => <PublicInstallSetup
         key={`${skill.catalogId}:${f2CaseKey}`} skill={skill} detailReady={detailReady && liveCatalog}
         caseKey={f2CaseKey} returnRoute={`${base}${previewSearch(nav)}`} store={installStore!} client={installClient} />
-        : (skill, detailReady, appKnown) => <CatalogInstallSetup key={skill.key} skill={skill} detailReady={detailReady && liveCatalog} appKnown={appKnown}
+        : (skill, detailReady, appKnown, installsBoth) => <CatalogInstallSetup key={skill.key} skill={skill} detailReady={detailReady && liveCatalog}
+          appKnown={appKnown} installsBoth={installsBoth}
           store={catalogStore} returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} />}
       onInstallCancel={() => catalogStore.clear()}
       onSession={session}

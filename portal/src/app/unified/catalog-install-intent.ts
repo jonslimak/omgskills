@@ -13,7 +13,7 @@ function parse(raw: string): CatalogInstallIntent | null {
   try {
     if (raw.length > 8192) return null;
     const value = JSON.parse(raw) as CatalogInstallIntent;
-    if (!value || Array.isArray(value) || value.version !== 1 || !["claude", "codex"].includes(value.agent)
+    if (!value || Array.isArray(value) || value.version !== 1 || !["claude", "codex", "both"].includes(value.agent)
       || typeof value.catalogId !== "string" || typeof value.returnRoute !== "string"
       || !Number.isSafeInteger(value.createdAt) || value.createdAt < 0
       || Object.keys(value).some(key => !["version", "catalogId", "agent", "returnRoute", "createdAt"].includes(key))

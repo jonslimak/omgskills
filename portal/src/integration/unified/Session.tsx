@@ -265,8 +265,8 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
       key={skill.key} skill={skill} detailReady={detailReady} client={installClient} store={installStore}
       returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`}
       action={normalInstallAction} distribution={setupTestDistribution} />
-      : catalogStore ? (skill, detailReady, appKnown) => <CatalogInstallSetup key={skill.key}
-        skill={skill} detailReady={detailReady} store={catalogStore} appKnown={appKnown}
+      : catalogStore ? (skill, detailReady, appKnown, installsBoth) => <CatalogInstallSetup key={skill.key}
+        skill={skill} detailReady={detailReady} store={catalogStore} appKnown={appKnown} installsBoth={installsBoth}
         checkAck={available && !local ? installAck : undefined}
         returnRoute={`/app/?view=discover&skill=${encodeURIComponent(skill.key)}`} /> : undefined)}
     onInstallCancel={() => catalogStore?.clear()}

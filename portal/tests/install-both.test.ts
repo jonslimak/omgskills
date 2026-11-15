@@ -1,0 +1,63 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { macInstallsBoth, type PortalDevice } from "../src/app/model";
+import { catalogInstallAction } from "../src/app/unified/public-install";
+import { CatalogInstallIntentStore } from "../src/app/unified/catalog-install-intent";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+import { build } from "esbuild";
+import type { CatalogInstallSetup as Setup } from "../src/app/unified/CatalogInstallSetup";
+import { installAckPath } from "../src/app/unified/install-ack";
+import type { SkillDisplay } from "../src/app/unified/model";
+
+const mac = (extra: Partial<PortalDevice>): PortalDevice => ({ id: "m", name: "Mac", lastActive: "", status: "active", ...extra });
+
+test("Both is offered only when every connected Mac is build 41 or later", () => {
+  assert.equal(macInstallsBoth([]), false);
+  assert.equal(macInstallsBoth([mac({ appBuild: 41 })]), true);
+  assert.equal(macInstallsBoth([mac({ appBuild: 40 })]), false);
+  assert.equal(macInstallsBoth([mac({})]), false);
+  assert.equal(macInstallsBoth([mac({ appBuild: 41 }), mac({ id: "old", appBuild: null })]), false);
+  // A disconnected old Mac doesn't count.
+  assert.equal(macInstallsBoth([mac({ appBuild: 42 }), mac({ id: "old", status: "revoked" })]), true);
+});
+
+const skill = { key: "catalog:anthropics/skills/pdf", catalogId: "anthropics/skills/pdf", name: "pdf" } as SkillDisplay;
+
+test("install links and the ack poll carry agent=both", () => {
+  const href = catalogInstallAction(skill, "both", "production").href ?? "";
+  assert.equal(new URL(href).searchParams.get("agent"), "both");
+  assert.match(installAckPath({ catalogId: "x", agent: "both" }), /agent=both/);
+});
+
+function storage() {
+  const items = new Map<string, string>();
+  return { getItem: (k: string) => items.get(k) ?? null, setItem: (k: string, v: string) => void items.set(k, v), removeItem: (k: string) => void items.delete(k) };
+}
+
+async function loadSetup() {
+  const output = await build({ entryPoints: [fileURLToPath(new URL("../src/app/unified/CatalogInstallSetup.tsx", import.meta.url))],
+    bundle: true, write: false, platform: "node", format: "cjs", packages: "external", jsx: "automatic", loader: { ".css": "empty" } });
+  const module = { exports: {} as { CatalogInstallSetup: typeof Setup } };
+  new Function("require", "module", "exports", output.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
+  return module.exports.CatalogInstallSetup;
+}
+let CatalogInstallSetup: typeof Setup;
+
+const render = (installsBoth: boolean, installed?: string[]) => renderToStaticMarkup(createElement(CatalogInstallSetup, {
+  skill: { ...skill, installed: installed ? { sources: installed } : undefined } as SkillDisplay,
+  detailReady: true, returnRoute: "/app/?view=discover", store: new CatalogInstallIntentStore(storage, "production"),
+  appKnown: true, installsBoth }));
+const pressed = (html: string) => /aria-pressed="true"[^>]*>(?:<span[^>]*><\/span>)?([A-Za-z]+)/.exec(html)?.[1];
+
+test("the picker starts on Both where the Mac can, and on the missing agent otherwise", async () => {
+  CatalogInstallSetup = await loadSetup();
+  assert.doesNotMatch(render(false), />Both</);
+  assert.equal(pressed(render(false)), "Claude");
+  assert.match(render(true), />Both</);
+  assert.equal(pressed(render(true)), "Both");
+  assert.equal(pressed(render(true, ["Claude Code"])), "Codex");
+  assert.equal(pressed(render(true, ["Codex"])), "Claude");
+});

@@ -1,4 +1,5 @@
 import type { GroupedSyncedSkill, SyncedSkill, ScanCoverage } from "../synced-skill-grouping";
+import { MAC_INSTALLS_BOTH_BUILD } from "./unified/public-install";
 
 export type Visibility = "public" | "restricted" | "private";
 export const visibilityLabels: Record<Visibility, string> = {
@@ -46,6 +47,8 @@ export type PortalDevice = {
   lastReportedAt?: string | null;
   lastCheckedAt?: string | null;
   scanCoverage?: ScanCoverage[] | null;
+  /** The Mac app's build, once a build 41 or later app has synced. */
+  appBuild?: number | null;
 };
 export type PortalData = {
   inventoryVersion?: 2 | 3;
@@ -167,6 +170,12 @@ export const MAC_APP_SEEN_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
  * Whether a connected Mac has the app, as far as the website can tell. A running app checks in about hourly, so a Mac
  * that hasn't for a week most likely removed it. Without check-in times (older inventory), any active Mac counts.
  */
+/** Every connected Mac can install in Claude and Codex at once (build 41 or later). */
+export function macInstallsBoth(devices: PortalDevice[]): boolean {
+  const active = devices.filter(device => device.status === "active");
+  return active.length > 0 && active.every(device => (device.appBuild ?? 0) >= MAC_INSTALLS_BOTH_BUILD);
+}
+
 export function macAppSeen(devices: PortalDevice[], now = Date.now()): boolean {
   return devices.some(device => {
     if (device.status !== "active") return false;
