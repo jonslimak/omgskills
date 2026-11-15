@@ -42,7 +42,8 @@ export function portalGroupItem(row: PortalGroupItemRow, role: GroupAccessRole) 
     position: row.position,
     // Shared from the owner's cloud save; the owner also learns when a newer version is saved.
     ...(row.sourceKind === "cloud" && role !== "public" ? { cloudShared: true } : {}),
-    ...(role === "owner" && row.sourceKind === "cloud" && row.savedKey ? { cloudKey: row.savedKey } : {}),
+    // Only for the owner's own saved skill: a duplicated Set's item is someone else's.
+    ...(role === "owner" && row.sourceKind === "cloud" && row.savedKey && row.sharedByOwner === true ? { cloudKey: row.savedKey } : {}),
     // Invitees and the owner can read a private item's instructions on the web (same check as the download).
     ...(role !== "public" && (row.sourceKind === "cloud" || row.sourceKind === "private_github") && row.releaseId
       && !row.metadataOnlyReason && row.sharedByOwner === true ? { sharedReleaseId: row.releaseId } : {}),

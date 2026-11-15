@@ -119,6 +119,13 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
           setRequest({ ...request, skills: targetSkills.filter(skill => skill.installed ? failed.has(skill.installed.id)
             : failed.has(skill.catalogId ?? skill.cloudKey ?? "")) });
         }
+        // The Set was made; trying again adds what didn't go in, instead of making a second Set.
+        if (request.kind === "create" && result.groupId && result.failed.length && !result.uncertain && generation.current === version) {
+          const failed = new Set(result.failed.map(item => item.id));
+          setSetId(result.groupId);
+          setRequest({ kind: "add", skills: request.skills.filter(skill => skill.installed ? failed.has(skill.installed.id)
+            : failed.has(skill.catalogId ?? skill.cloudKey ?? "")) });
+        }
         throw new Error(result.failed.map(item => item.message).join(" ") || "Could not confirm the save. Refresh before continuing.");
       }
       if (generation.current === version) { setRequest(null); setNotice(message); }

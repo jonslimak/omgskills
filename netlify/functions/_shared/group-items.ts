@@ -72,6 +72,10 @@ export async function addGroupItemWithClient(
   if (publication?.kind === "cloud" && publication.required && !cloud) {
     throw new Response("Saved skill is unavailable", { status: 409 });
   }
+  // Without a shareable copy there's nothing to add it by; the owner confirmed it holds a key or password.
+  if (publication?.kind === "cloud" && publication.required && cloud?.confirmedSecret) {
+    throw new Response("This skill has a key or password, so it can't be shared in a Set", { status: 409 });
+  }
   await lockGroupForMutation(client, groupId);
   let snapshotName = item.name ?? null;
   let snapshotDescription = item.description ?? null;
@@ -87,8 +91,8 @@ export async function addGroupItemWithClient(
     }
   }
 
-  // A skill added by its saved copy alone is in the Set once, however it was added.
-  if (cloud && !item.syncedSkillId) {
+  // A skill shared from its saved copy is in the Set once, whether added from a Mac's copy or the saved one.
+  if (cloud && !cloud.confirmedSecret) {
     const existing = await client.query<{ id: string }>(
       "SELECT id FROM skill_group_items WHERE group_id = $1 AND source_id = $2 LIMIT 1",
       [groupId, cloud.sourceId]

@@ -1473,6 +1473,9 @@ test("adding your own skill to a Set shares its saved version; Update Set moves 
       [owner.userId])).rows[0].id;
     const bySaved = await inTransaction((client) => addGroupItemWithClient(client, otherGroup, { kind: "synced", name: "notes" }, required("notes")));
     assert.equal((await item(bySaved.itemId)).release_id, first.skill.currentVersion.id);
+    // Either way round: a Mac's copy of the same skill isn't added again once its saved copy is in.
+    await assert.rejects(inTransaction((client) => addGroupItemWithClient(client, otherGroup, { kind: "synced", name: "notes" }, cloud("notes"))),
+      (error: unknown) => error instanceof Response && error.status === 409);
     await pool.query("DELETE FROM skill_group_items WHERE id = $1", [bySaved.itemId]);
 
     // A newer save doesn't change the Set until the owner updates it.

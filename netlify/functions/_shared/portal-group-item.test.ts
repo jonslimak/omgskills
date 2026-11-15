@@ -47,9 +47,10 @@ test("people who can install a private item can find its instructions; public vi
 });
 
 test("only the owner learns which saved skill a cloud item is, so My skills can mark it as in the Set", () => {
-  const shared = row({ syncedSkillId: null, sourceKind: "cloud", releaseId: "r1", savedKey: "notes" });
+  const shared = row({ syncedSkillId: null, sourceKind: "cloud", releaseId: "r1", savedKey: "notes", sharedByOwner: true });
   assert.equal(portalGroupItem(shared, "owner").cloudKey, "notes");
   assert.equal(portalGroupItem(shared, "invited").cloudKey, undefined);
   assert.equal(portalGroupItem(shared, "public").cloudKey, undefined);
   assert.equal(portalGroupItem(row({ savedKey: "notes" }), "owner").cloudKey, undefined, "only cloud-shared items");
+  assert.equal(portalGroupItem({ ...shared, sharedByOwner: false }, "owner").cloudKey, undefined, "not someone else's, in a duplicated Set");
 });

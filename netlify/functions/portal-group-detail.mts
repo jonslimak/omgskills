@@ -87,7 +87,8 @@ export async function portalGroupDetail(req: Request, _context: Context, depende
             i.release_id AS "releaseId",
         -- A duplicated Set holds someone else's version, which only that person's Sets can share.
         (src.owner_user_id = (SELECT owner_user_id FROM skill_groups WHERE id = $1)) AS "sharedByOwner",
-            CASE WHEN $2 = 'owner' THEN saved.current_release_id ELSE NULL END AS "savedReleaseId"
+            CASE WHEN $2 = 'owner' THEN saved.current_release_id ELSE NULL END AS "savedReleaseId",
+            CASE WHEN $2 = 'owner' THEN saved.skill_key ELSE NULL END AS "savedKey"
           FROM skill_group_items i
           LEFT JOIN synced_skills s ON s.id = i.synced_skill_id
           LEFT JOIN skill_sources src ON src.id = i.source_id
