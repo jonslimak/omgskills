@@ -59,6 +59,7 @@ import {
   Presentation,
   RefreshCw,
   LoaderCircle,
+  Library,
   Search,
   SearchCheck,
   SearchX,
@@ -224,6 +225,17 @@ function IconButton({
       {...props}
     >
       {children}
+    </button>
+  );
+}
+// A plain icon (not a button look) whose words show on hover, or on tap for touch screens.
+function KindTip({ label, icon: Icon }: { label: string; icon: LucideIcon }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button type="button" className="ua-kind-tip" aria-label={label} data-open={open}
+      onClick={() => setOpen(value => !value)} onBlur={() => setOpen(false)}>
+      <Icon aria-hidden="true" />
+      <span className="ua-kind-tip-text" aria-hidden="true">{label}</span>
     </button>
   );
 }
@@ -2122,10 +2134,18 @@ export function UnifiedApp({
                 <div className="ua-detail-actions">
                   {/* Where it's installed, in one place; + adds it to the agent that doesn't have it. */}
                   {detailLive && <span className="ua-on-agents">
-                    <span className="ua-pill ua-on-agents-label" title={`Installed on ${displaySourceNames(detailLive.sources).join(", ")}`}>
-                      {[...new Set(detailLive.sources.map(agentKind))].filter(kind => kind !== "other").map(kind =>
-                        <span key={kind} className="ua-agent-logo" data-agent={kind} aria-hidden="true" />)}
-                      On {displaySourceNames(detailLive.sources).join(", ")}
+                    {/* "Installed" plus each agent's logo; agents without a logo keep their name. */}
+                    <span className="ua-pill ua-on-agents-label" role="img"
+                      aria-label={`Installed on ${displaySourceNames(detailLive.sources).join(", ")}`}
+                      title={`Installed on ${displaySourceNames(detailLive.sources).join(", ")}`}>
+                      Installed
+                      {displaySourceNames(detailLive.sources).map((name, index) => {
+                        const kind = agentKind(name);
+                        return <span key={name} className="ua-on-agent">
+                          {kind === "other" ? name : <span className="ua-agent-logo" data-agent={kind} aria-hidden="true" />}
+                          {index < displaySourceNames(detailLive.sources).length - 1 && <span aria-hidden="true">,</span>}
+                        </span>;
+                      })}
                     </span>
                     {canInstall && missingAgent && <IconButton label="Add to another agent" aria-haspopup="dialog" onClick={() => setInstallOpen(true)}>
                       <Plus />
@@ -2161,13 +2181,13 @@ export function UnifiedApp({
                     <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
                       Copy <Copy />
                     </button>
-                  ) : !canInstall && !savedInstall && (
-                    <span className="ua-pill">
-                      {detail.installed?.isLocalOnly && <User aria-hidden="true" />}
-                      {detail.setItemCloudShared ? cloudSharedLabel(detail, activeSet?.role)
-                        : detail.cloudKey || detail.added ? "Not installed" : detail.catalogId || detail.setItemKind === "catalog" ? "Catalog skill" : detail.installed?.isLocalOnly ? "Personal skill" : "Source unavailable"}
-                    </span>
-                  )}
+                  ) : !canInstall && !savedInstall && (() => {
+                    const label = detail.setItemCloudShared ? cloudSharedLabel(detail, activeSet?.role)
+                      : detail.cloudKey || detail.added ? "Not installed" : detail.catalogId || detail.setItemKind === "catalog" ? "Library skill" : detail.installed?.isLocalOnly ? "Personal skill" : "Source unavailable";
+                    // Personal vs library is a quiet icon: hover or tap shows the words.
+                    const KindIcon = label === "Personal skill" ? User : label === "Library skill" ? Library : null;
+                    return KindIcon ? <KindTip label={label} icon={KindIcon} /> : <span className="ua-pill">{label}</span>;
+                  })()}
                   <span className="ua-detail-icons">
                   {(!readOnlyAccount || management) && signedIn && (detail.installed || detail.catalogId) && (
                     <>
