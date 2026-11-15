@@ -168,16 +168,21 @@ export function sourceLabel(url: string | null) {
 /** How long after a Mac's last check-in the install pop-over still assumes the app is there. */
 export const MAC_APP_SEEN_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
+/** Every connected Mac with the app is at least `build`. A connection that never checked in, or hasn't for a week, has
+ * no app to ask, so it doesn't hold the others back. */
+function macsAtLeast(devices: PortalDevice[], build: number, now: number): boolean {
+  const withApp = devices.filter(device => macAppSeen([device], now));
+  return withApp.length > 0 && withApp.every(device => (device.appBuild ?? 0) >= build);
+}
+
 /** Every connected Mac can install in Claude and Codex at once (build 41 or later). */
-export function macInstallsBoth(devices: PortalDevice[]): boolean {
-  const active = devices.filter(device => device.status === "active");
-  return active.length > 0 && active.every(device => (device.appBuild ?? 0) >= MAC_INSTALLS_BOTH_BUILD);
+export function macInstallsBoth(devices: PortalDevice[], now = Date.now()): boolean {
+  return macsAtLeast(devices, MAC_INSTALLS_BOTH_BUILD, now);
 }
 
 /** Every connected Mac can add a skill it has in one agent to the other (build 42 or later). */
-export function macAddsAgent(devices: PortalDevice[]): boolean {
-  const active = devices.filter(device => device.status === "active");
-  return active.length > 0 && active.every(device => (device.appBuild ?? 0) >= MAC_ADDS_AGENT_BUILD);
+export function macAddsAgent(devices: PortalDevice[], now = Date.now()): boolean {
+  return macsAtLeast(devices, MAC_ADDS_AGENT_BUILD, now);
 }
 
 /**
