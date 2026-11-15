@@ -1333,7 +1333,7 @@ export function UnifiedApp({
     discover: "Discover",
     data: "Data",
     developers: "Developers & Agents",
-    top: publicStatus ? "Trending skills" : "Top this week",
+    top: publicStatus ? "Trending" : "Top this week",
     creators: nav.id === "companies" ? "Companies" : "Creators",
     collections: "Collections",
     set: activeSet?.name || "Set not found",
@@ -1474,7 +1474,7 @@ export function UnifiedApp({
             {sidebarDiscovery ? (
               <>
                 {navItem("discover", "Discover", Compass)}
-                {navItem("top", publicStatus ? "Trending skills" : "Top this week", TrendingUp)}
+                {navItem("top", publicStatus ? "Trending" : "Top this week", TrendingUp)}
                 {navItem("creators", "Companies", Building2, undefined, "companies")}
                 {navItem("creators", "Creators", Users)}
                 {navItem("collections", "Collections", PlayingCardsFan)}
@@ -1818,7 +1818,7 @@ export function UnifiedApp({
                   </div>
                   <section>
                     <SectionHeading
-                      title={publicStatus ? "Trending skills" : "Top this week"}
+                      title={publicStatus ? "Trending" : "Top this week"}
                       action={() => go("top")}
                     />
                     {publicStatus ? <SourceTrending limit={9} grid onOpen={openTrending} /> : publicSection("list", "trending skills", <div className="ua-trending">
