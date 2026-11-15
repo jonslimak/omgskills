@@ -166,16 +166,16 @@ export function sourceLabel(url: string | null) {
 /** How long after a Mac's last check-in the install pop-over still assumes the app is there. */
 export const MAC_APP_SEEN_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
-/**
- * Whether a connected Mac has the app, as far as the website can tell. A running app checks in about hourly, so a Mac
- * that hasn't for a week most likely removed it. Without check-in times (older inventory), any active Mac counts.
- */
 /** Every connected Mac can install in Claude and Codex at once (build 41 or later). */
 export function macInstallsBoth(devices: PortalDevice[]): boolean {
   const active = devices.filter(device => device.status === "active");
   return active.length > 0 && active.every(device => (device.appBuild ?? 0) >= MAC_INSTALLS_BOTH_BUILD);
 }
 
+/**
+ * Whether a connected Mac has the app, as far as the website can tell. A running app checks in about hourly, so a Mac
+ * that hasn't for a week most likely removed it. Without check-in times (older inventory), any active Mac counts.
+ */
 export function macAppSeen(devices: PortalDevice[], now = Date.now()): boolean {
   return devices.some(device => {
     if (device.status !== "active") return false;
