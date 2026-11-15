@@ -89,7 +89,20 @@ export async function savedSkillInSetFromMac(client: QueryClient, userId: string
   );
   for (const { syncedSkillId } of items.rows) {
     const skill = await getSyncedSkill(client, userId, syncedSkillId);
-    if (skill && await cloudKeyOf(client, userId, skill) === skillKey) return true;
+    if (skill) {
+      if (await cloudKeyOf(client, userId, skill) === skillKey) return true;
+      continue;
+    }
+    // No Mac has it now: its folder name is the key it saved under ("notes", or "notes@codex" when taken).
+    const old = await client.query<{ stableKey: string; source: string }>(
+      `SELECT stable_key AS "stableKey", source FROM synced_skills WHERE id = $1 AND user_id = $2 LIMIT 1`,
+      [syncedSkillId, userId]
+    );
+    const row = old.rows[0];
+    const folder = row ? installationFolderFromKey(row.stableKey, row.source) : null;
+    let key: string | null = null;
+    try { key = folder ? normalizeSkillKey(folder) : null; } catch { key = null; }
+    if (key && (skillKey === key || skillKey.startsWith(`${key}@`))) return true;
   }
   return false;
 }
