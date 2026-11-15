@@ -48,7 +48,7 @@ try {
       forbidden.push(url.origin + url.pathname); return route.abort();
     }
     if (url.pathname.startsWith("/api/")) { forbidden.push(url.pathname); return route.abort(); }
-    if (url.pathname.includes("@clerk_clerk-react.js")) return route.fulfill({ contentType: "text/javascript", body: `
+    if (url.pathname.includes("@clerk_react.js")) return route.fulfill({ contentType: "text/javascript", body: `
       const token = async () => { throw new Error("Unexpected account request"); };
       export const ClerkProvider = ({children}) => children;
       export const useAuth = () => ({isLoaded:true,isSignedIn:false,userId:null,sessionId:null,getToken:token});

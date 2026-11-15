@@ -15,7 +15,9 @@ if (
     pathname: location.pathname,
   })
 ) {
-  if (/^\/app\/preview\/unified(?:\/|$)/.test(location.pathname)) {
+  if (/^\/app\/preview\/oauth-consent\/?$/.test(location.pathname)) {
+    void import("./preview/oauth-consent");
+  } else if (/^\/app\/preview\/unified(?:\/|$)/.test(location.pathname)) {
     void import("./preview/unified/main");
   } else {
     void import("./preview/main");
@@ -34,6 +36,9 @@ if (
   } else {
     void import("./integration/main");
   }
+} else if (/^\/app\/oauth-consent\/?$/.test(location.pathname)) {
+  // Clerk sends agents' sign-in consent here (Clerk dashboard: Paths > OAuth consent).
+  void import("./oauth-consent/main");
 } else if (isReviewRoute(location.pathname)) {
   void import("./review/main");
 } else if (import.meta.env.DEV && connectedInventoryTest && /^\/app\/?$/.test(location.pathname)) {

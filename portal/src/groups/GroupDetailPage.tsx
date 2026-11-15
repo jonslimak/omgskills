@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { UserButton, useUser } from "@clerk/clerk-react";
+import { UserButton, useUser } from "@clerk/react";
 import { ArrowDown, ArrowUp, Download, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

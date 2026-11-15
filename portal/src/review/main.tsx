@@ -1,6 +1,6 @@
 import { StrictMode, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { ClerkProvider, SignInButton, useAuth, useClerk, useUser } from "@clerk/clerk-react";
+import { ClerkProvider, SignInButton, useAuth, useClerk, useUser } from "@clerk/react";
 import { PortalAccount, PortalEntry } from "../account/PortalSession";
 import { accountCacheKey } from "../integration/account-session";
 import { usePortalApi } from "../portal-api";

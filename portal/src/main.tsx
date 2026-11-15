@@ -2,14 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ClerkProvider,
-  SignedIn,
-  SignedOut,
+  Show,
   SignInButton,
   SignUpButton,
   UserButton,
   useClerk,
   useUser
-} from "@clerk/clerk-react";
+} from "@clerk/react";
 import {
   Check,
   Copy,
@@ -828,10 +827,10 @@ function App() {
 
   return (
     <>
-      <SignedOut>
+      <Show when="signed-out">
         <SignedOutPage isConnectRoute={isConnectRoute} />
-      </SignedOut>
-      <SignedIn>
+      </Show>
+      <Show when="signed-in">
         {isConnectRoute
           ? <ConnectPage policy={inventoryConnection !== "none" ? productionConsent
             : connectedInventoryTest ? f1PairingConsent : normalPairingConsent} />
@@ -841,7 +840,7 @@ function App() {
                 installEnabled={skillGroupsMacEnabled}
               />
             : <Dashboard />}
-      </SignedIn>
+      </Show>
     </>
   );
 }

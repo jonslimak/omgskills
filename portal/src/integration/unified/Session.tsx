@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
-import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
+import { useAuth, useClerk, useUser } from "@clerk/react";
 import { RefreshCw } from "lucide-react";
 import { UnifiedApp } from "../../app/unified/UnifiedApp";
 import { initialNavigation, isDiscovery, navigationLocation, navigationSearch, skillDisplays, liveMine, type Navigation } from "../../app/unified/model";

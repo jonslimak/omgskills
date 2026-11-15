@@ -5,7 +5,7 @@ import {
   useAuth,
   useUser,
   useClerk,
-} from "@clerk/clerk-react";
+} from "@clerk/react";
 import { RefreshCw } from "lucide-react";
 import { PortalApp } from "../app/PortalApp";
 import { Action, IconAction } from "../app/ui";

@@ -411,7 +411,7 @@ async function compositionFixture(data: PortalData | null = null, href = origin 
     error: "", profileError: "", profileSaving: false, setSaving: false };
   const catalog = { skills: [], collections: [], creators: [], categories: [], trendingIds: [] };
   const overrides: Record<string, unknown> = {
-    "@clerk/clerk-react": {
+    "@clerk/react": {
       ClerkProvider: ({ children }: { children: React.ReactNode }) => { providerMounts++; options.initializeClerk?.(); return children; },
       useAuth: () => ({ isLoaded: true, isSignedIn: signedIn, userId: "user", sessionId: "session", getToken: async () => { tokenCalls++; return "fake"; } }),
       useUser: () => ({ isLoaded: true, user: { fullName: identity.name, primaryEmailAddress: { emailAddress: identity.email } } }),
