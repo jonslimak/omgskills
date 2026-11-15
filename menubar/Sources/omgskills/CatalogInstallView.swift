@@ -22,6 +22,7 @@ struct CatalogInstallView: View {
     var versionMatch: SkillVersionMatchController? = nil
     var restore: SkillRestoreController? = nil
     var savedInstall: SavedSkillInstallController? = nil
+    var addAgent: SkillAddAgentController? = nil
 
     static let connectionSetupFailureMessage = "Account connection is unavailable. Skill installation is still available."
     static let panelWidth: CGFloat = 210
@@ -68,6 +69,7 @@ struct CatalogInstallView: View {
             else if let versionMatch, versionMatch.isActive { SkillVersionMatchView(controller: versionMatch) }
             else if let restore, restore.isActive { SkillRestoreView(controller: restore) }
             else if let savedInstall, savedInstall.isActive { SavedSkillInstallView(controller: savedInstall) }
+            else if let addAgent, addAgent.isActive { SkillAddAgentView(controller: addAgent) }
             else if let setInstall, setInstall.isActive {
                 CompanionSetInstallView(controller: setInstall, reconnect: reconnect)
             } else { accountContent }
@@ -275,6 +277,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
     private var versionMatch: SkillVersionMatchController?
     private var restore: SkillRestoreController?
     private var savedInstall: SavedSkillInstallController?
+    private var addAgent: SkillAddAgentController?
     /// An install, Set or other link arrived; its own flow handles Connect, so the first-launch offer waits.
     private var receivedLink = false
 
@@ -407,6 +410,11 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
                     root: { paths.skillsRoot(for: $0) })
                 savedInstall.onChanged = { [weak runtime] in runtime?.installed() }
                 self.savedInstall = savedInstall
+                let addAgent = SkillAddAgentController(
+                    installations: { InstalledSkillsScanner.scanWithSummary(filesystemPaths: paths).installations },
+                    install: { try LocalSkillCrossInstaller.install($0, target: $1, filesystemPaths: paths) })
+                addAgent.onChanged = { [weak runtime] in runtime?.installed() }
+                self.addAgent = addAgent
                 setContent(connection: runtime.connection, inventoryRuntime: runtime)
                 runtime.firstLaunchDefaults = .standard
                 runtime.start()
@@ -455,7 +463,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
             openWebsite: { [weak self] in self?.openWebsite() }, quit: { [weak self] in self?.quit() },
             appUpdater: appUpdater, loginItem: loginItem, resizePanel: { [weak self] in self?.resizePanel(to: $0) }, connection: connection,
             inventoryRuntime: inventoryRuntime, connectionSetupError: connectionSetupError, setInstall: setInstall,
-            removal: removal, versionMatch: versionMatch, restore: restore, savedInstall: savedInstall)
+            removal: removal, versionMatch: versionMatch, restore: restore, savedInstall: savedInstall, addAgent: addAgent)
     }
 
     /// Lets the website know each install link arrived; only while this Mac is connected.
@@ -489,7 +497,7 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
         receivedLink = true
         // While a restore or version match is replacing files, no other link (install, Set, delete) may touch skill folders.
         if versionMatch?.isWorking == true || restore?.isWorking == true || removal?.isWorking == true
-            || savedInstall?.isWorking == true { showStatus(); return }
+            || savedInstall?.isWorking == true || addAgent?.isWorking == true { showStatus(); return }
         if GroupInstallDeepLink.route(from: url) != nil {
             if model.appReplacementBlocksRequest {
                 model.receive(url)
@@ -502,20 +510,26 @@ final class CatalogInstallWindowController: NSObject, NSPopoverDelegate {
         }
         // Delete links never reach the installer; without a connected account they are dropped.
         if url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "remove" {
-            if !model.appReplacementBlocksRequest, removal?.receive(url) == true { versionMatch?.close(); restore?.close(); savedInstall?.close(); showStatus() }
+            if !model.appReplacementBlocksRequest, removal?.receive(url) == true { versionMatch?.close(); restore?.close(); savedInstall?.close(); addAgent?.close(); showStatus() }
             return
         }
         if url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "match" {
-            if !model.appReplacementBlocksRequest, versionMatch?.receive(url) == true { removal?.close(); restore?.close(); savedInstall?.close(); showStatus() }
+            if !model.appReplacementBlocksRequest, versionMatch?.receive(url) == true { removal?.close(); restore?.close(); savedInstall?.close(); addAgent?.close(); showStatus() }
             return
         }
         if url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "restore" {
-            if !model.appReplacementBlocksRequest, restore?.receive(url) == true { removal?.close(); versionMatch?.close(); savedInstall?.close(); showStatus() }
+            if !model.appReplacementBlocksRequest, restore?.receive(url) == true { removal?.close(); versionMatch?.close(); savedInstall?.close(); addAgent?.close(); showStatus() }
             return
         }
         if url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "install-saved" {
             if !model.appReplacementBlocksRequest, savedInstall?.receive(url) == true {
-                removal?.close(); versionMatch?.close(); restore?.close(); showStatus()
+                removal?.close(); versionMatch?.close(); restore?.close(); addAgent?.close(); showStatus()
+            }
+            return
+        }
+        if url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "add-agent" {
+            if !model.appReplacementBlocksRequest, addAgent?.receive(url) == true {
+                removal?.close(); versionMatch?.close(); restore?.close(); savedInstall?.close(); showStatus()
             }
             return
         }

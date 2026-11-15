@@ -546,6 +546,11 @@ export function installSavedLink(name: string, key: string) {
   return `omgskills://install-saved?name=${encodeURIComponent(name.trim())}&key=${encodeURIComponent(key)}`;
 }
 
+/** Opens the Mac app, which asks which missing agent gets this skill and links it to the copy already there. */
+export function addAgentLink(name: string) {
+  return `omgskills://add-agent?name=${encodeURIComponent(name.trim())}`;
+}
+
 /** Opens the Mac app, which shows this skill's versions (newest picked) and makes every copy match the chosen one. */
 export function matchVersionsLink(name: string) {
   return `omgskills://match?name=${encodeURIComponent(name.trim())}`;
