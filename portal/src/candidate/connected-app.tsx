@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ClerkProvider, useAuth, useClerk } from "@clerk/clerk-react";
+import { ClerkProvider, useAuth, useClerk } from "@clerk/react";
 import { ConnectPage } from "../ConnectPage";
 import { LoadingScreen } from "../app/LoadingScreen";
 import { CatalogInstallIntentStore } from "../app/unified/catalog-install-intent";

@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { ClerkProvider } from "@clerk/clerk-react";
+import { ClerkProvider } from "@clerk/react";
 import { PortalEntry, PortalSession } from "./account/PortalSession";
 import { isFeatureEnabled } from "./feature-flags";
 import { normalPortalBase } from "./app/routes";

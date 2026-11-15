@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { ClerkProvider } from "@clerk/clerk-react";
+import { ClerkProvider } from "@clerk/react";
 import { UnifiedSession } from "./integration/unified/Session";
 import { normalPortalBase } from "./app/routes";
 import { connectedInventoryTest, inventoryReconciliationTest } from "./connected-inventory-runtime";
