@@ -801,11 +801,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     func updater(_ updater: SPUUpdater, mayPerform updateCheck: SPUUpdateCheck) throws {
         #if OMGSKILLS_CATALOG_CANDIDATE
         if catalogCandidateMode != .disabled {
-            let background = catalogCandidateUpdater?.background == true
-            guard updateCheck == (background ? .updatesInBackground : .updates),
-                  catalogCandidateUpdater?.phase == .checking,
-                  catalogCandidateUpdater?.permitsUpdate == true else { throw Self.catalogCandidateUpdateUnavailable() }
-            if background {
+            try catalogCandidateMayCheck(updateCheck)
+            // Only Sparkle starting a check counts here, never shouldProceedWithUpdate re-checking the same one.
+            if catalogCandidateUpdater?.background == true {
                 guard !backgroundCheckAsked else {
                     automaticUpdateNeedsAttention = true
                     throw Self.catalogCandidateUpdateUnavailable()
@@ -822,11 +820,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         #endif
     }
 
+    #if OMGSKILLS_CATALOG_CANDIDATE
+    /// The current check is the one the app started, of the kind it asked for, and still holds the lock.
+    private func catalogCandidateMayCheck(_ updateCheck: SPUUpdateCheck) throws {
+        let background = catalogCandidateUpdater?.background == true
+        guard updateCheck == (background ? .updatesInBackground : .updates),
+              catalogCandidateUpdater?.phase == .checking,
+              catalogCandidateUpdater?.permitsUpdate == true else { throw Self.catalogCandidateUpdateUnavailable() }
+    }
+    #endif
+
     func updater(_ updater: SPUUpdater, shouldProceedWithUpdate item: SUAppcastItem,
                  updateCheck: SPUUpdateCheck) throws {
         #if OMGSKILLS_CATALOG_CANDIDATE
         if catalogCandidateMode != .disabled {
-            try self.updater(updater, mayPerform: updateCheck)
+            try catalogCandidateMayCheck(updateCheck)
             guard CatalogCandidateRuntime.acceptsArchive(url: item.fileURL, build: item.versionString,
                 version: item.displayVersionString, installationType: item.installationType, isDelta: item.isDeltaUpdate)
             else { throw Self.catalogCandidateUpdateUnavailable() }
