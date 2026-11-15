@@ -87,6 +87,7 @@ import {
   isMember,
   macAppSeen,
   macInstallsBoth,
+  macAddsAgent,
   visibilityLabels,
   type PortalData,
   type PortalSet,
@@ -101,6 +102,7 @@ import {
   skillDisplays,
   liveSkill,
   installSavedLink,
+  addAgentLink,
   matchVersionsLink,
   maxRemoveFromMac,
   removeFromMacLink,
@@ -623,6 +625,9 @@ export function UnifiedApp({
   const missingAgent = installedHere && !(installedAgents.includes("claude") && installedAgents.includes("codex"));
   // The app installs any library skill, from Discover or My skills (Set rows keep the copy command).
   const canInstall = !!(onMac && signedIn && publicInstallAction && detail?.catalogId && !detail.setItemKind && !detail.installed?.isLocalOnly);
+  // Skills the app can't install from the library (personal ones): the Mac app copies them across agents itself.
+  const localAddAgent = !!(onMac && signedIn && (!readOnlyAccount || management) && missingAgent && !canInstall
+    && macAddsAgent(data.devices));
   // An install that finishes changes where the skill is; close the card and drop its intent.
   // Same skill across regrouping: the library id stays put when a new agent's copy becomes the row's representative.
   const installSkillId = detail ? detail.catalogId ?? detail.key : undefined;
@@ -2154,6 +2159,11 @@ export function UnifiedApp({
                       })}
                     </span>
                     {canInstall && missingAgent && <IconButton label="Add to another agent" aria-haspopup="dialog" onClick={() => setInstallOpen(true)}>
+                      <Plus />
+                    </IconButton>}
+                    {/* A personal skill: the Mac app adds the copy it has to the agent that doesn't. */}
+                    {localAddAgent && <IconButton label="Add to another agent" title="Add to another agent with the omgskills Mac app"
+                      onClick={() => window.location.assign(addAgentLink(detailLive.name))}>
                       <Plus />
                     </IconButton>}
                   </span>}

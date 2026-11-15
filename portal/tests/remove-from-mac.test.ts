@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { installSavedLink, matchVersionsLink, removeFromMacLink } from "../src/app/unified/model";
+import { addAgentLink, installSavedLink, matchVersionsLink, removeFromMacLink } from "../src/app/unified/model";
 
 test("Delete from my Mac opens the app with only the skill's name", () => {
   assert.equal(removeFromMacLink(["humanizer"]), "omgskills://remove?name=humanizer");
@@ -35,4 +35,11 @@ test("Install opens the app for a synced personal skill no Mac has, with its nam
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /const savedInstall = !!\(onMac && signedIn && \(!readOnlyAccount \|\| management\) && detail\?\.cloudKey && !detail\.catalogId\);/);
   assert.match(source, /onClick=\{\(\) => window\.location\.assign\(installSavedLink\(detail\.name, detail\.cloudKey!\)\)\}/);
+});
+
+test("+ on a personal skill opens the Mac app with only the skill's name", () => {
+  assert.equal(addAgentLink(" my notes "), "omgskills://add-agent?name=my%20notes");
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(source, /onClick=\{\(\) => window\.location\.assign\(addAgentLink\(detailLive\.name\)\)\}/);
+  assert.match(source, /const localAddAgent = [^;]*missingAgent && !canInstall[^;]*macAddsAgent\(data\.devices\)/);
 });

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { macInstallsBoth, type PortalDevice } from "../src/app/model";
+import { macAddsAgent, macInstallsBoth, type PortalDevice } from "../src/app/model";
 import { catalogInstallAction } from "../src/app/unified/public-install";
 import { CatalogInstallIntentStore } from "../src/app/unified/catalog-install-intent";
 import { createRequire } from "node:module";
@@ -22,6 +22,14 @@ test("Both is offered only when every connected Mac is build 41 or later", () =>
   assert.equal(macInstallsBoth([mac({ appBuild: 41 }), mac({ id: "old", appBuild: null })]), false);
   // A disconnected old Mac doesn't count.
   assert.equal(macInstallsBoth([mac({ appBuild: 42 }), mac({ id: "old", status: "revoked" })]), true);
+});
+
+test("+ on a personal skill waits for every connected Mac to be build 42 or later", () => {
+  assert.equal(macAddsAgent([]), false);
+  assert.equal(macAddsAgent([mac({ appBuild: 41 })]), false);
+  assert.equal(macAddsAgent([mac({ appBuild: 42 })]), true);
+  assert.equal(macAddsAgent([mac({ appBuild: 42 }), mac({ id: "old", appBuild: 41 })]), false);
+  assert.equal(macAddsAgent([mac({ appBuild: 42 }), mac({ id: "old", status: "revoked" })]), true);
 });
 
 const skill = { key: "catalog:anthropics/skills/pdf", catalogId: "anthropics/skills/pdf", name: "pdf" } as SkillDisplay;

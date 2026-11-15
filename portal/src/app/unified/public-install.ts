@@ -19,6 +19,8 @@ export function normalInstallClient(development: boolean, enabled: unknown, host
 /** "both" needs Mac build 41 or later (MAC_INSTALLS_BOTH_BUILD). */
 export type CatalogInstallAgent = "claude" | "codex" | "both";
 export const MAC_INSTALLS_BOTH_BUILD = 41;
+/** The Mac app adds a skill it has in one agent to the other (omgskills://add-agent) from build 42. */
+export const MAC_ADDS_AGENT_BUILD = 42;
 export const catalogInstallClients = {
   f1: { scheme: "omgskills-f1", name: "OMGSkills F1 Test" },
   candidate: { scheme: "omgskills", name: "OMGSkills Candidate" },

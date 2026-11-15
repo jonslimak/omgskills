@@ -1,5 +1,5 @@
 import type { GroupedSyncedSkill, SyncedSkill, ScanCoverage } from "../synced-skill-grouping";
-import { MAC_INSTALLS_BOTH_BUILD } from "./unified/public-install";
+import { MAC_ADDS_AGENT_BUILD, MAC_INSTALLS_BOTH_BUILD } from "./unified/public-install";
 
 export type Visibility = "public" | "restricted" | "private";
 export const visibilityLabels: Record<Visibility, string> = {
@@ -170,6 +170,12 @@ export const MAC_APP_SEEN_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 export function macInstallsBoth(devices: PortalDevice[]): boolean {
   const active = devices.filter(device => device.status === "active");
   return active.length > 0 && active.every(device => (device.appBuild ?? 0) >= MAC_INSTALLS_BOTH_BUILD);
+}
+
+/** Every connected Mac can add a skill it has in one agent to the other (build 42 or later). */
+export function macAddsAgent(devices: PortalDevice[]): boolean {
+  const active = devices.filter(device => device.status === "active");
+  return active.length > 0 && active.every(device => (device.appBuild ?? 0) >= MAC_ADDS_AGENT_BUILD);
 }
 
 /**
