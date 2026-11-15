@@ -4,7 +4,7 @@ import type { CloudSaveState } from "../../cloud-save/cloud-save";
 
 /**
  * The last My skills this browser showed, so a return visit paints at once and then refreshes.
- * Display only: edits wait for the live load. One entry per account; signing out removes them all.
+ * Shown until the live load replaces it. One entry per account; signing out removes them all.
  * Bump the version when the saved shape changes, so an older page's entry is ignored.
  */
 export type MySkillsCache = { data: PortalData; cloud: CloudSaveState | null; additions: MySkillAddition[] | null };
