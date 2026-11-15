@@ -19,13 +19,20 @@ enum SkillAddAgent {
         return name
     }
 
-    /// Claude and Codex, without the agents that already have the skill.
+    /// Claude and Codex, without the agents that already have the skill. Pass every copy, not the deduplicated
+    /// list: an agent's skills folder can be a link to another's, and its copy still counts as that agent's.
     static func missing(_ copies: [Skill]) -> [SkillInstaller.Target] {
         let have = Set(copies.compactMap(\.origin))
         return [SkillInstaller.Target.claude, .codex].filter { !have.contains($0.rawValue) }
     }
 
     /// The copy to link to: one with a readable SKILL.md, the newest if there are several.
+    /// Every scanned copy with this name, in any agent, including ones at the same real location.
+    static func allCopies(named name: String, in installations: [Skill]) -> [Skill] {
+        let target = SkillRemoval.normalizedName(name)
+        return installations.filter { SkillRemoval.normalizedName($0.name) == target }
+    }
+
     static func source(_ copies: [Skill], modified: (Skill) -> Date? = SkillVersionMatch.modified) -> Skill? {
         copies.filter { $0.skillMdSha?.isEmpty == false }
             .max { (modified($0) ?? .distantPast) < (modified($1) ?? .distantPast) }
@@ -68,9 +75,10 @@ final class SkillAddAgentController {
             state = .failed(message: "This link is invalid.")
             return true
         }
-        let copies = SkillRemoval.copies(named: [name], in: installations())
+        let installed = installations()
+        let copies = SkillRemoval.copies(named: [name], in: installed)
         guard !copies.isEmpty, SkillAddAgent.source(copies) != nil else { state = .notFound(name: name); return true }
-        let targets = SkillAddAgent.missing(copies)
+        let targets = SkillAddAgent.missing(SkillAddAgent.allCopies(named: name, in: installed))
         state = targets.isEmpty ? .everywhere(name: name)
             : .choose(name: copies[0].name, have: SkillRemoval.agents(copies), targets: targets)
         return true
@@ -79,12 +87,12 @@ final class SkillAddAgentController {
     /// File work runs off the main thread. Reads the skill again first: only adds where it is still missing.
     func add(to target: SkillInstaller.Target) async {
         guard case .choose(let name, _, let targets) = state, targets.contains(target) else { return }
-        let copies = SkillRemoval.copies(named: [name], in: installations())
-        guard let source = SkillAddAgent.source(copies) else {
+        let installed = installations()
+        guard let source = SkillAddAgent.source(SkillRemoval.copies(named: [name], in: installed)) else {
             state = .failed(message: "\(name) is no longer on this Mac. Nothing was changed.")
             return
         }
-        guard SkillAddAgent.missing(copies).contains(target) else {
+        guard SkillAddAgent.missing(SkillAddAgent.allCopies(named: name, in: installed)).contains(target) else {
             state = .done(name: name, message: "It's already in \(target.rawValue).")
             return
         }
@@ -94,11 +102,12 @@ final class SkillAddAgentController {
             Result { try install(source, target) }
         }.value
         switch result {
-        case .success:
+        case .success(.alreadyInstalled), .failure(LocalSkillCrossInstaller.InstallError.targetExists):
+            // Another skill already uses that folder name there; nothing was written.
+            state = .failed(message: "\(target.rawValue) already has a folder named \(name). Nothing was changed.")
+        case .success(.installed):
             onChanged()
             state = .done(name: name, message: "Added to \(target.rawValue).")
-        case .failure(LocalSkillCrossInstaller.InstallError.targetExists):
-            state = .failed(message: "\(target.rawValue) already has a folder named \(name). Nothing was changed.")
         case .failure:
             state = .failed(message: "Couldn't add \(name) to \(target.rawValue). Nothing was changed.")
         }

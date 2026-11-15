@@ -2163,7 +2163,7 @@ export function UnifiedApp({
                     </IconButton>}
                     {/* A personal skill: the Mac app adds the copy it has to the agent that doesn't. */}
                     {localAddAgent && <IconButton label="Add to another agent" title="Add to another agent with the omgskills Mac app"
-                      onClick={() => window.location.assign(addAgentLink(detail.name))}>
+                      onClick={() => window.location.assign(addAgentLink(detailLive.name))}>
                       <Plus />
                     </IconButton>}
                   </span>}

@@ -40,6 +40,6 @@ test("Install opens the app for a synced personal skill no Mac has, with its nam
 test("+ on a personal skill opens the Mac app with only the skill's name", () => {
   assert.equal(addAgentLink(" my notes "), "omgskills://add-agent?name=my%20notes");
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
-  assert.match(source, /onClick=\{\(\) => window\.location\.assign\(addAgentLink\(detail\.name\)\)\}/);
+  assert.match(source, /onClick=\{\(\) => window\.location\.assign\(addAgentLink\(detailLive\.name\)\)\}/);
   assert.match(source, /const localAddAgent = [^;]*missingAgent && !canInstall[^;]*macAddsAgent\(data\.devices\)/);
 });

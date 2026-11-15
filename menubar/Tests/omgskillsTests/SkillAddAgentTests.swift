@@ -61,6 +61,15 @@ struct SkillAddAgentTests {
             install: { _, _ in .installed })
         _ = both.receive(URL(string: "omgskills://add-agent?name=pdf")!)
         #expect(both.state == .everywhere(name: "pdf"))
+        // A Codex folder linked to ~/.agents: its copy dedupes away by location but Codex still has the skill.
+        let linked = SkillAddAgentController(installations: { [self.copy("pdf", "Agents", path: "/x/pdf"),
+            self.copy("pdf", "Codex", path: "/x/pdf"), self.copy("pdf", "Claude")] }, install: { _, _ in .installed })
+        _ = linked.receive(URL(string: "omgskills://add-agent?name=pdf")!)
+        #expect(linked.state == .everywhere(name: "pdf"))
+        let occupied = SkillAddAgentController(installations: { [self.copy("pdf", "Claude")] }, install: { _, _ in .alreadyInstalled })
+        _ = occupied.receive(URL(string: "omgskills://add-agent?name=pdf")!)
+        await occupied.add(to: .codex)
+        #expect(occupied.state == .failed(message: "Codex already has a folder named pdf. Nothing was changed."))
         let taken = SkillAddAgentController(installations: { [self.copy("pdf", "Claude")] },
             install: { _, _ in throw LocalSkillCrossInstaller.InstallError.targetExists })
         _ = taken.receive(URL(string: "omgskills://add-agent?name=pdf")!)
