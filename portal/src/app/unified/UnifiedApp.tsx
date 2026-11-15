@@ -653,6 +653,12 @@ export function UnifiedApp({
   const activeSet = signedIn
     ? management?.detail.set ?? data.sets.find((set) => set.id === nav.id)
     : undefined;
+  // Shown when nothing installs it from here: what kind of skill it is, or why it can't be installed.
+  const statusLabel = !detail || canInstall || savedInstall || (detail.installCommand && !canInstall) ? undefined
+    : detail.setItemCloudShared ? cloudSharedLabel(detail, activeSet?.role)
+    : detail.cloudKey || detail.added ? "Not installed" : detail.catalogId || detail.setItemKind === "catalog" ? "Library skill"
+    : detail.installed?.isLocalOnly ? "Personal skill" : "Source unavailable";
+  const KindIcon = statusLabel === "Personal skill" ? User : statusLabel === "Library skill" ? Library : null;
   const collection = catalog.collections.find((item) => item.id === nav.id);
   const detailCollections = detail?.catalogId
     ? catalog.collections.filter((item) => item.skillIds.includes(detail.catalogId!))
@@ -2181,13 +2187,7 @@ export function UnifiedApp({
                     <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
                       Copy <Copy />
                     </button>
-                  ) : !canInstall && !savedInstall && (() => {
-                    const label = detail.setItemCloudShared ? cloudSharedLabel(detail, activeSet?.role)
-                      : detail.cloudKey || detail.added ? "Not installed" : detail.catalogId || detail.setItemKind === "catalog" ? "Library skill" : detail.installed?.isLocalOnly ? "Personal skill" : "Source unavailable";
-                    // Personal vs library is a quiet icon: hover or tap shows the words.
-                    const KindIcon = label === "Personal skill" ? User : label === "Library skill" ? Library : null;
-                    return KindIcon ? <KindTip label={label} icon={KindIcon} /> : <span className="ua-pill">{label}</span>;
-                  })()}
+                  ) : statusLabel && !KindIcon && <span className="ua-pill">{statusLabel}</span>}
                   <span className="ua-detail-icons">
                   {(!readOnlyAccount || management) && signedIn && (detail.installed || detail.catalogId) && (
                     <>
@@ -2217,6 +2217,8 @@ export function UnifiedApp({
                       <Share />
                     </IconButton>
                   )}
+                  {/* Personal vs library is a quiet icon at the end: hover or tap shows the words. */}
+                  {statusLabel && KindIcon && <KindTip label={statusLabel} icon={KindIcon} />}
                   </span>
                   {/* Sync runs in the background; it only shows here when something needs you. */}
                   {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && needsAttention(cloudRow(detail)?.status ?? "saved")
