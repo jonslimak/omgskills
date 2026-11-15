@@ -39,11 +39,19 @@ enum CatalogCandidateRuntime {
     static let website = origin.appendingPathComponent("app", isDirectory: true)
     static let updateBase = CatalogRuntimeProfile.compiled.updateBase
     static let feedURL = updateBase + "appcast.xml"
-    static let updatePolicy: [String: Bool] = [
-        "SUEnableAutomaticChecks": false, "SUAutomaticallyUpdate": false,
-        "SUAllowsAutomaticUpdates": false, "SUEnableSystemProfiling": false,
-        "SUVerifyUpdateBeforeExtraction": true, "SURequireSignedFeed": true,
-    ]
+    static let updatePolicy: [String: Bool] = updatePolicy(for: .compiled)
+
+    /// The candidate never updates by itself. Production downloads signed updates in the background and installs them
+    /// once nothing is in progress; the app schedules those checks itself (never Sparkle's own timer), so each one
+    /// goes through the same lock as "Check for app updates".
+    static func updatePolicy(for profile: CatalogRuntimeProfile) -> [String: Bool] {
+        let automatic = profile == .production
+        return [
+            "SUEnableAutomaticChecks": false, "SUAutomaticallyUpdate": automatic,
+            "SUAllowsAutomaticUpdates": automatic, "SUEnableSystemProfiling": false,
+            "SUVerifyUpdateBeforeExtraction": true, "SURequireSignedFeed": true,
+        ]
+    }
 
     static var buildRequested: Bool {
         #if OMGSKILLS_CATALOG_CANDIDATE || OMGSKILLS_CONNECTED_PRODUCTION
@@ -102,7 +110,7 @@ enum CatalogCandidateRuntime {
         guard allowed || buildRequested || connected != nil || info[enabledKey] != nil || info[websiteKey] != nil || info[updateKey] != nil
         else { return .disabled }
         let updateKeys = Set(info.keys.filter { $0.hasPrefix("SU") })
-        let expectedKeys = Set(updatePolicy.keys).union(["SUFeedURL", "SUPublicEDKey", "SUSignedFeedFailureExpirationInterval"])
+        let expectedKeys = Set(updatePolicy(for: profile).keys).union(["SUFeedURL", "SUPublicEDKey", "SUSignedFeedFailureExpirationInterval"])
         guard allowed, profile != .production || connected != nil, boolean(info[enabledKey]) == true,
               info["CFBundleIdentifier"] as? String == bundleID,
               let types = info["CFBundleURLTypes"] as? [[String: Any]], types.count == 1,
@@ -122,7 +130,7 @@ enum CatalogCandidateRuntime {
               bytes.contains(where: { $0 != 0 }), bytes.base64EncodedString() == key,
               let expiration = info["SUSignedFeedFailureExpirationInterval"] as? NSNumber,
               CFGetTypeID(expiration) != CFBooleanGetTypeID(), expiration == 0,
-              updatePolicy.allSatisfy({ boolean(info[$0.key]) == $0.value })
+              updatePolicy(for: profile).allSatisfy({ boolean(info[$0.key]) == $0.value })
         else { return .invalid("Invalid catalog candidate build, identity or update configuration.") }
         guard home.isFileURL, home.path != "/", home.standardizedFileURL == home,
               home.resolvingSymlinksInPath().path == home.path,

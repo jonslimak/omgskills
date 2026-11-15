@@ -20,6 +20,18 @@ struct CatalogCandidateRuntimeTests {
         return value
     }
 
+    @Test func onlyProductionUpdatesByItselfAndNeverOnSparklesTimer() {
+        let candidate = CatalogCandidateRuntime.updatePolicy(for: .candidate)
+        let production = CatalogCandidateRuntime.updatePolicy(for: .production)
+        #expect(candidate["SUAutomaticallyUpdate"] == false && candidate["SUAllowsAutomaticUpdates"] == false)
+        #expect(production["SUAutomaticallyUpdate"] == true && production["SUAllowsAutomaticUpdates"] == true)
+        for policy in [candidate, production] {
+            #expect(policy["SUEnableAutomaticChecks"] == false)
+            #expect(policy["SURequireSignedFeed"] == true && policy["SUVerifyUpdateBeforeExtraction"] == true)
+            #expect(policy["SUEnableSystemProfiling"] == false)
+        }
+    }
+
     @Test func candidateRequiresBothBuildFlagAndCompleteMetadata() throws {
         let home = try Self.home()
         defer { try? FileManager.default.removeItem(at: home) }

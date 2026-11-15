@@ -334,7 +334,7 @@ struct CatalogInstallModelTests {
     @Test(arguments: [false, true])
     func updateCompletionNotifiesObserversWhileOptionsAreOpen(_ failed: Bool) async {
         let model = CatalogInstallModel(service: FlowStub(), coordinator: UpdateInstallCoordinator(), client: .product, timing: .staleRecords)
-        let updater = CatalogCandidateUpdater(model: model) {}
+        let updater = CatalogCandidateUpdater(model: model) { _ in }
         updater.check()
         #expect(!updater.canCheck)
         await confirmation("Options observes update-check completion") { changed in
@@ -349,13 +349,74 @@ struct CatalogInstallModelTests {
         #expect(!model.appUpdateActive)
     }
 
+    @Test func backgroundUpdateCheckHoldsTheLockQuietly() async {
+        let service = FlowStub()
+        let coordinator = UpdateInstallCoordinator()
+        let model = CatalogInstallModel(service: service, coordinator: coordinator, client: .product, timing: .staleRecords)
+        var calls: [Bool] = []
+        let updater = CatalogCandidateUpdater(model: model) { calls.append($0) }
+        let before = model.message
+        updater.checkInBackground()
+        #expect(calls == [true])
+        #expect(updater.background)
+        #expect(model.appUpdateActive)
+        #expect(model.message == before)
+        // A skill link waits: it can't start while the update check holds the lock.
+        model.receive(productLink())
+        #expect(await service.fetchCount == 0)
+        // No update (or a network error): unlocked, and nothing shown.
+        updater.finish(failed: true)
+        #expect(!model.appUpdateActive)
+        #expect(!updater.background)
+        #expect(model.message == before)
+        // An update is ready: same lock as a manual check until the app restarts on it.
+        updater.checkInBackground()
+        updater.installationStarted()
+        #expect(updater.phase == .restartRequired)
+        #expect(model.appUpdateActive)
+        updater.checkInBackground()
+        #expect(calls == [true, true])
+        // A manual check still shows Sparkle's window.
+        let manual = CatalogCandidateUpdater(model: CatalogInstallModel(service: FlowStub(), coordinator: UpdateInstallCoordinator(),
+            client: .product, timing: .staleRecords)) { calls.append($0) }
+        manual.check()
+        #expect(calls == [true, true, false])
+        #expect(!manual.background)
+    }
+
+    @Test func backgroundUpdateCheckWaitsForSkillWork() async {
+        let service = FlowStub()
+        let coordinator = UpdateInstallCoordinator()
+        let model = CatalogInstallModel(service: service, coordinator: coordinator, client: .product, timing: .staleRecords)
+        var calls = 0
+        let updater = CatalogCandidateUpdater(model: model) { _ in calls += 1 }
+        let token = coordinator.beginActivity(.skillInstall)
+        updater.checkInBackground()
+        #expect(calls == 0)
+        model.receive(productLink())
+        await model.operation?.value
+        token.finish()
+        updater.checkInBackground()
+        #expect(calls == 0)
+        _ = await model.close()
+        updater.checkInBackground()
+        #expect(calls == 1)
+    }
+
+    @Test func automaticUpdatesOptionDefaultsOn() throws {
+        let defaults = try #require(UserDefaults(suiteName: "omgskills.automatic-updates.\(UUID().uuidString)"))
+        #expect(AutomaticAppUpdates.enabled(in: defaults))
+        defaults.set(false, forKey: AutomaticAppUpdates.defaultsKey)
+        #expect(!AutomaticAppUpdates.enabled(in: defaults))
+    }
+
     @Test func candidateUpdaterBlocksRequestsAndCannotInterruptAnySkillPhase() async {
         let service = FlowStub()
         await service.holdNextFetch()
         await service.holdInstall()
         let model = CatalogInstallModel(service: service, coordinator: UpdateInstallCoordinator(), client: .product, timing: .staleRecords)
         var checks = 0
-        let updater = CatalogCandidateUpdater(model: model) { checks += 1 }
+        let updater = CatalogCandidateUpdater(model: model) { _ in checks += 1 }
         #expect(checks == 0)
         model.receive(productLink())
         await service.waitForFetch()
@@ -397,11 +458,11 @@ struct CatalogInstallModelTests {
         let model = CatalogInstallModel(service: service, coordinator: coordinator, client: .product, timing: .staleRecords)
         let token = coordinator.beginActivity(.portalConnection)
         var checks = 0
-        let updater = CatalogCandidateUpdater(model: model) { checks += 1 }
+        let updater = CatalogCandidateUpdater(model: model) { _ in checks += 1 }
         updater.check()
         #expect(checks == 0)
         token.finish()
-        let failure = CatalogCandidateUpdater(model: model) { throw URLError(.notConnectedToInternet) }
+        let failure = CatalogCandidateUpdater(model: model) { _ in throw URLError(.notConnectedToInternet) }
         failure.check()
         #expect(failure.canCheck)
         #expect(!model.appUpdateActive)

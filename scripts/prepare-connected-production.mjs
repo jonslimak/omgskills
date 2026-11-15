@@ -34,6 +34,9 @@ export function metadata(publicKey) {
     // Sets also need the server's skillGroupsAuthEnabled switch.
     OMGSkillsSkillGroupsAuthEnabled: true,
     SUFeedURL: updateFeed, SUPublicEDKey: publicKey,
+    // Downloads signed updates quietly and installs them once idle. Sparkle's own timer stays off: the app schedules
+    // checks itself (on open, hourly, after wake) through its install lock. Matches CatalogCandidateRuntime.
+    SUEnableAutomaticChecks: false, SUAutomaticallyUpdate: true, SUAllowsAutomaticUpdates: true,
   };
 }
 

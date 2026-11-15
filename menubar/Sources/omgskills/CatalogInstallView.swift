@@ -209,6 +209,7 @@ struct CatalogInstallView: View {
                             Image(systemName: "arrow.down.circle").frame(width: Self.iconColumnWidth)
                         }.frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
                     }.buttonStyle(.plain).disabled(!appUpdater.canCheck)
+                    if CatalogRuntimeProfile.compiled == .production { AutomaticUpdatesRow() }
                 }
                 if let loginItem { LoginItemRow(controller: loginItem) }
                 // Sync is a background job: its switch, Resync and Disconnect sit here, not on the status panel.
@@ -236,6 +237,22 @@ struct CatalogInstallView: View {
 }
 
 /// "Open at login": off by default; the switch follows what macOS reports.
+private struct AutomaticUpdatesRow: View {
+    @AppStorage(AutomaticAppUpdates.defaultsKey) private var isOn = true
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Label {
+                Text("Update automatically").lineLimit(1)
+            } icon: {
+                Image(systemName: "arrow.triangle.2.circlepath").frame(width: CatalogInstallView.iconColumnWidth)
+            }
+            Spacer(minLength: 0)
+            Toggle("Update automatically", isOn: $isOn).toggleStyle(.switch).controlSize(.small).labelsHidden()
+        }
+    }
+}
+
 private struct LoginItemRow: View {
     let controller: LoginItemController
 
