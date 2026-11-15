@@ -3040,7 +3040,8 @@ main:has(> .ua-az-anchor) .ua-content {
 }
 .ua-kind-tip svg { width: 16px; height: 16px; }
 .ua-kind-tip-text {
-  position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); z-index: 5;
+  /* Starts at the icon's left edge: the panel clips overflow, and the icon can be first in its row. */
+  position: absolute; top: calc(100% + 4px); left: 0; z-index: 5;
   padding: 4px 8px; border-radius: 6px; background: var(--ua-ink); color: var(--ua-bg);
   font-size: 12px; font-weight: 500; white-space: nowrap; pointer-events: none;
   visibility: hidden;
