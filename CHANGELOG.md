@@ -4,6 +4,11 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.43] - 2026-11-15
+
+### App
+- The app now updates itself: it checks when it opens, every hour and after waking, and installs once nothing is in progress. Turn it off in Options.
+
 ## [0.0.42] - 2026-11-15
 
 ### App
