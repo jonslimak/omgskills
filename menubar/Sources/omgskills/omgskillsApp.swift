@@ -29,6 +29,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     #if OMGSKILLS_CATALOG_CANDIDATE
     private var catalogCandidateUpdater: CatalogCandidateUpdater?
     private var catalogCandidateUpdaterStarted = false
+    private var automaticUpdateTimer: Timer?
+    private var automaticUpdateWakeObserver: NSObjectProtocol?
+    /// Sparkle already asked to run this background check. A second ask in the same cycle means it wants to show its
+    /// window (an update that needs attention, or one it can't install quietly), which a quiet check never does.
+    private var backgroundCheckAsked = false
+    /// Set by that case: no more quiet checks this session; "Check for app updates" still shows it.
+    private var automaticUpdateNeedsAttention = false
     #endif
     #if DEBUG || OMGSKILLS_SETUP_TEST
     private var f1Controller: PublicSkillInstallWindowController?
@@ -129,12 +136,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             #if OMGSKILLS_CATALOG_CANDIDATE
             let controller = CatalogInstallWindowController(candidate: configuration, coordinator: updateInstallCoordinator)
             catalogInstallController = controller
-            let updater = CatalogCandidateUpdater(model: controller.model) { [weak self] in
+            let updater = CatalogCandidateUpdater(model: controller.model) { [weak self] background in
                 guard let self else { throw Self.catalogCandidateUpdateUnavailable() }
-                try checkCatalogCandidateUpdates()
+                try checkCatalogCandidateUpdates(background: background)
             }
             catalogCandidateUpdater = updater
             controller.configureUpdates(updater)
+            if configuration.profile == .production { startAutomaticAppUpdates(updater) }
             pendingConnectedURLs.forEach(controller.receive)
             pendingConnectedURLs.removeAll()
             #endif
@@ -283,6 +291,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         if let workspaceDidWakeObserver {
             NSWorkspace.shared.notificationCenter.removeObserver(workspaceDidWakeObserver)
         }
+        #if OMGSKILLS_CATALOG_CANDIDATE
+        automaticUpdateTimer?.invalidate()
+        if let automaticUpdateWakeObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(automaticUpdateWakeObserver)
+        }
+        #endif
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -444,20 +458,63 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             userInfo: [NSLocalizedDescriptionKey: "Finish pending work before checking for candidate app updates."])
     }
 
-    private func checkCatalogCandidateUpdates() throws {
-        guard case .enabled = catalogCandidateMode, catalogCandidateUpdater?.phase == .checking,
+    private func checkCatalogCandidateUpdates(background: Bool) throws {
+        guard case .enabled(let configuration) = catalogCandidateMode, catalogCandidateUpdater?.phase == .checking,
               catalogCandidateUpdater?.permitsUpdate == true else { throw Self.catalogCandidateUpdateUnavailable() }
+        // Only production updates by itself; the candidate is VM-only and always asks.
+        let automatic = background && configuration.profile == .production
+        guard automatic || !background else { throw Self.catalogCandidateUpdateUnavailable() }
         if updaterController == nil { setupUpdater(startingUpdater: false) }
         if !catalogCandidateUpdaterStarted {
-            // Candidate runs are VM-only; never inherit automatic checks from the product defaults.
+            // Never Sparkle's own timer: the app schedules checks so each one goes through the install lock.
             updaterController.updater.automaticallyChecksForUpdates = false
-            updaterController.updater.automaticallyDownloadsUpdates = false
             updaterController.updater.sendsSystemProfile = false
             try updaterController.updater.start()
             catalogCandidateUpdaterStarted = true
         }
+        // A background check downloads a signed update quietly; willInstallUpdateOnQuit then installs it once idle.
+        // A manual check shows Sparkle's "install automatically" box ticked the same as the Options switch.
+        updaterController.updater.automaticallyDownloadsUpdates = configuration.profile == .production
+            && (automatic || AutomaticAppUpdates.enabled)
+        if automatic { backgroundCheckAsked = false }
+        else { automaticUpdateNeedsAttention = false }
         guard updaterController.updater.canCheckForUpdates else { throw Self.catalogCandidateUpdateUnavailable() }
-        updaterController.checkForUpdates(nil)
+        if automatic { updaterController.updater.checkForUpdatesInBackground() }
+        else { updaterController.checkForUpdates(nil) }
+    }
+
+    /// A downloaded automatic update restarts the app only once no review, question or skill change is open.
+    private func installAutomaticUpdateWhenIdle(_ install: @escaping @MainActor () -> Void) {
+        guard catalogInstallController?.hasOpenSkillWork == true else { install(); return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30) { [weak self] in
+            MainActor.assumeIsolated { self?.installAutomaticUpdateWhenIdle(install) }
+        }
+    }
+
+    /// Production checks for an app update when it opens, every hour, and after the Mac wakes, unless the
+    /// "Update automatically" option is off. A check is skipped while anything else is in progress.
+    private func startAutomaticAppUpdates(_ updater: CatalogCandidateUpdater) {
+        let check: @MainActor () -> Void = { [weak self, weak updater] in
+            guard let self, AutomaticAppUpdates.enabled, !automaticUpdateNeedsAttention,
+                  catalogInstallController?.hasOpenSkillWork != true else { return }
+            updater?.checkInBackground()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + AutomaticAppUpdates.launchDelay) {
+            MainActor.assumeIsolated { check() }
+        }
+        let timer = Timer(timeInterval: AutomaticAppUpdates.interval, repeats: true) { _ in
+            MainActor.assumeIsolated { check() }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        automaticUpdateTimer = timer
+        automaticUpdateWakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
+        ) { _ in
+            // Give the network a moment after waking.
+            DispatchQueue.main.asyncAfter(deadline: .now() + AutomaticAppUpdates.launchDelay) {
+                MainActor.assumeIsolated { check() }
+            }
+        }
     }
     #endif
 
@@ -744,8 +801,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     func updater(_ updater: SPUUpdater, mayPerform updateCheck: SPUUpdateCheck) throws {
         #if OMGSKILLS_CATALOG_CANDIDATE
         if catalogCandidateMode != .disabled {
-            guard updateCheck == .updates, catalogCandidateUpdater?.phase == .checking,
-                  catalogCandidateUpdater?.permitsUpdate == true else { throw Self.catalogCandidateUpdateUnavailable() }
+            try catalogCandidateMayCheck(updateCheck)
+            // Only Sparkle starting a check counts here, never shouldProceedWithUpdate re-checking the same one.
+            if catalogCandidateUpdater?.background == true {
+                guard !backgroundCheckAsked else {
+                    automaticUpdateNeedsAttention = true
+                    throw Self.catalogCandidateUpdateUnavailable()
+                }
+                backgroundCheckAsked = true
+            }
         }
         #endif
         #if OMGSKILLS_SETUP_TEST
@@ -756,11 +820,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         #endif
     }
 
+    #if OMGSKILLS_CATALOG_CANDIDATE
+    /// The current check is the one the app started, of the kind it asked for, and still holds the lock.
+    private func catalogCandidateMayCheck(_ updateCheck: SPUUpdateCheck) throws {
+        let background = catalogCandidateUpdater?.background == true
+        guard updateCheck == (background ? .updatesInBackground : .updates),
+              catalogCandidateUpdater?.phase == .checking,
+              catalogCandidateUpdater?.permitsUpdate == true else { throw Self.catalogCandidateUpdateUnavailable() }
+    }
+    #endif
+
     func updater(_ updater: SPUUpdater, shouldProceedWithUpdate item: SUAppcastItem,
                  updateCheck: SPUUpdateCheck) throws {
         #if OMGSKILLS_CATALOG_CANDIDATE
         if catalogCandidateMode != .disabled {
-            try self.updater(updater, mayPerform: updateCheck)
+            try catalogCandidateMayCheck(updateCheck)
             guard CatalogCandidateRuntime.acceptsArchive(url: item.fileURL, build: item.versionString,
                 version: item.displayVersionString, installationType: item.installationType, isDelta: item.isDeltaUpdate)
             else { throw Self.catalogCandidateUpdateUnavailable() }
@@ -799,7 +873,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
         #if OMGSKILLS_CATALOG_CANDIDATE
         if catalogCandidateMode != .disabled {
-            guard updateCheck == .updates else { return }
+            guard updateCheck == .updates || updateCheck == .updatesInBackground else { return }
+            // Sparkle's "install automatically" box in a manual check sets the Options switch too.
+            if updateCheck == .updates, catalogCandidateUpdater?.background == false,
+               case .enabled(let configuration) = catalogCandidateMode, configuration.profile == .production {
+                AutomaticAppUpdates.enabled = updater.automaticallyDownloadsUpdates
+            }
             let error = error as NSError?
             let failed = error != nil && !(error?.domain == SUSparkleErrorDomain && error?.code == Int(SUError.noUpdateError.rawValue))
             catalogCandidateUpdater?.finish(failed: failed)
@@ -822,11 +901,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
         #if OMGSKILLS_CATALOG_CANDIDATE
         if catalogCandidateMode != .disabled {
             guard catalogCandidateUpdater?.permitsUpdate == true else { return true }
+            let background = catalogCandidateUpdater?.background == true
             catalogCandidateUpdater?.installationStarted()
-            return updateInstallCoordinator.requestInstall(targetVersion: item.displayVersionString,
-                targetBuild: item.versionString) {
-                immediateInstallHandler()
+            let install: @MainActor () -> Void = { [weak self] in
+                guard let self else { return }
+                updateInstallCoordinator.requestInstall(targetVersion: item.displayVersionString,
+                    targetBuild: item.versionString) { immediateInstallHandler() }
             }
+            if background { installAutomaticUpdateWhenIdle(install) } else { install() }
+            return true
         }
         #endif
         #if OMGSKILLS_SETUP_TEST

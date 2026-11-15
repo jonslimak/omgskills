@@ -39,6 +39,7 @@ struct ProductionConnectedConfigurationTests {
         value[profile.connectedKeys[1]] = profile.connectURL.absoluteString
         value[profile.connectedKeys[2]] = profile.uploadURL.absoluteString
         value[profile.connectedKeys[3]] = profile.credentialService
+        for (key, flag) in CatalogCandidateRuntime.updatePolicy(for: profile) { value[key] = flag }
         return value
     }
 
@@ -68,7 +69,8 @@ struct ProductionConnectedConfigurationTests {
             [CatalogRuntimeProfile.production.connectedKeys[1]: "https://other.invalid/connect"],
             [CatalogRuntimeProfile.production.connectedKeys[0]: false],
             ["SUFeedURL": "https://omgskills.com/appcast.xml"],
-            ["SUEnableAutomaticChecks": true], ["SUAutomaticallyUpdate": true],
+            // Sparkle's own timer stays off; the app schedules checks through its lock.
+            ["SUEnableAutomaticChecks": true], ["SUAutomaticallyUpdate": false], ["SUAllowsAutomaticUpdates": false],
             [CatalogRuntimeProfile.candidate.catalogKeys[0]: true],
         ] {
             guard case .invalid = CatalogCandidateRuntime.mode(info: value.merging(change) { _, new in new },

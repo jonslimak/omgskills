@@ -80,8 +80,10 @@ final class CatalogInstallModel {
 
     var canCheckForAppUpdates: Bool { !ownsRequest && !appUpdateActive && !coordinator.isBusy && !appReplacementBlocksRequest }
 
-    func beginAppUpdate() -> Bool {
+    /// `quiet` is the background check: it holds the same lock but leaves what the window shows alone.
+    func beginAppUpdate(quiet: Bool = false) -> Bool {
         guard canCheckForAppUpdates else { return false }
+        if quiet { appUpdateActive = true; return true }
         record = nil
         recordFetchedAt = nil
         destinations = []
@@ -95,8 +97,9 @@ final class CatalogInstallModel {
         return true
     }
 
-    func finishAppUpdate(failed: Bool, requiresRestart: Bool = false) {
+    func finishAppUpdate(failed: Bool, requiresRestart: Bool = false, quiet: Bool = false) {
         appUpdateActive = requiresRestart
+        if quiet && !requiresRestart { return }
         message = requiresRestart ? "Finish the app update or restart before installing skills."
             : failed ? "The app update did not complete. You can check again."
             : "Update check finished. No skill changes made."

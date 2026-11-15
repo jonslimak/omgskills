@@ -21,8 +21,8 @@ test('production packaging preserves identity with production-only account and m
   assert.notEqual(info.SUFeedURL, 'https://omgskills.com/appcast.xml');
   assert.equal(info.SUPublicEDKey, key);
   assert.equal(info.OMGSkillsCatalogProductionUpdatePublicKey, key);
-  for (const field of ['SUEnableAutomaticChecks', 'SUAutomaticallyUpdate', 'SUAllowsAutomaticUpdates',
-    'SUEnableSystemProfiling']) assert.equal(info[field], false);
+  for (const field of ['SUEnableAutomaticChecks', 'SUEnableSystemProfiling']) assert.equal(info[field], false);
+  for (const field of ['SUAutomaticallyUpdate', 'SUAllowsAutomaticUpdates']) assert.equal(info[field], true);
   assert.equal(info.OMGSkillsSkillGroupsAuthEnabled, true);
   assert.equal(info.SURequireSignedFeed, true);
   assert.equal(info.SUVerifyUpdateBeforeExtraction, true);
@@ -30,7 +30,7 @@ test('production packaging preserves identity with production-only account and m
   assert.doesNotMatch(JSON.stringify(info), /netlify\.app|Candidate|Inspection|SetupTest|F1Root/);
 });
 
-test('production recipe isolates outputs and rejects mixed endpoints, automatic updates and metadata drift', () => {
+test('production recipe isolates outputs and rejects mixed endpoints, Sparkle timer and metadata drift', () => {
   const value = recipe(key);
   value.validateMetadata(value.plist);
   assert.equal(value.outputDirectory, 'connected-production-packages');
@@ -39,7 +39,8 @@ test('production recipe isolates outputs and rejects mixed endpoints, automatic 
   assert.ok(!value.buildArgs.includes('-DOMGSKILLS_CONNECTED_CANDIDATE'));
   assert.ok(value.requiredSymbols.includes('ConnectedInventoryRuntime'));
   for (const change of [{ SUFeedURL: 'https://omgskills.com/appcast.xml' },
-    { SUEnableAutomaticChecks: true }, { OMGSkillsConnectedCandidate: true }, { OMGSkillsSkillGroupsAuthEnabled: false },
+    { SUEnableAutomaticChecks: true }, { SUAutomaticallyUpdate: false }, { SUAllowsAutomaticUpdates: false },
+    { OMGSkillsConnectedCandidate: true }, { OMGSkillsSkillGroupsAuthEnabled: false },
     { OMGSkillsConnectedProductionConnectURL: 'https://other.invalid/' },
     { OMGSkillsConnectedProductionCredentialService: 'com.jonslimak.omgskills.catalog-candidate.inventory' }]) {
     assert.throws(() => value.validateMetadata({ ...value.plist, ...change }));
