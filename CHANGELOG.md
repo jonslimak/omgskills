@@ -4,6 +4,11 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.42] - 2026-11-15
+
+### App
+- Personal skills: + on the website adds a skill to your other agent (Claude or Codex).
+
 ## [0.0.41] - 2026-11-14
 
 ### App
