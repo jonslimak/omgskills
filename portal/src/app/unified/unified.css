@@ -55,6 +55,14 @@
   --ua-shadow: 0 1px 2px #0006, 0 12px 40px #0009;
   color-scheme: dark;
 }
+/* Page cards (creator/company header, developer cards, the open row) use the sidebar grey, which is too close
+   to the page in dark mode; use the button grey there instead. */
+.ua-theme[data-theme="dark"] :is(.ua-creator-banner, .ua-dev-card) {
+  background: var(--ua-chip) !important;
+}
+.ua-theme[data-theme="dark"] .ua-row[data-selected="true"] {
+  background: var(--ua-chip);
+}
 .ua-theme[data-theme="dark"]:is(.ua-drawer, .ua-detail) {
   /* The panel is lighter than the page, so its buttons and cards go lighter again. */
   --ua-chip: #34343a;
