@@ -2233,7 +2233,7 @@ export function UnifiedApp({
                   {addable && (
                     <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} disabled={additions!.pending.includes(detail.catalogId!)}
                       onClick={() => changeMySkills(detail.catalogId!, true)}>
-                      Add to My skills <Plus aria-hidden="true" />
+                      Add to My skills
                     </button>
                   )}
                   {/* On a Mac the app installs it, so the terminal command isn't a second button. */}
