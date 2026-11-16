@@ -152,6 +152,16 @@ import { AddSkillForm } from "./AddSkillDialog";
 import { PortalApiError } from "../../api-error";
 import { cloudSkillRows, needsAttention, setsNote, skillCloudRow, statusText } from "../../cloud-save/cloud-save";
 
+// Official Lucide artwork (ISC): https://lucide.dev/icons/package-question-mark (not in our installed version yet).
+const PackageQuestionMark = createLucideIcon("PackageQuestionMark", [
+  ["path", { d: "M12 22V12l8.71-5", key: "a" }],
+  ["path", { d: "M21 10.342V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2.33-1.332", key: "b" }],
+  ["path", { d: "M3.29 7 12 12", key: "c" }],
+  ["path", { d: "m7.5 4.27 9 5.15", key: "d" }],
+  ["path", { d: "M19 18.5c.5-1 2-1 2-2.5a2 2 0 00-2-2 2.5 2.5 0 00-2 1", key: "e" }],
+  ["path", { d: "M19 22h.01", key: "f" }],
+]);
+
 // Official Lucide artwork (ISC): https://lucide.dev/icons/playing-cards-fan
 // This icon is not yet included in our installed Lucide version.
 const PlayingCardsFan = createLucideIcon("PlayingCardsFan", [
@@ -730,9 +740,11 @@ export function UnifiedApp({
     : detail.cloudKey || detail.added ? "Not installed" : detail.catalogId || detail.setItemKind === "catalog" ? "Library skill"
     : detail.installed?.isLocalOnly ? "Personal skill" : "Source unavailable";
   // Every skill says what kind it is, as a quiet icon at the end: from the public library (globe) or personal.
+  // A skill that's neither (its source can't be found) gets a package-with-question-mark icon instead of a label.
   const kindLabel = !detail ? undefined : detail.catalogId || detail.setItemKind === "catalog" ? "Library skill"
-    : detail.installed?.isLocalOnly ? "Personal skill" : undefined;
-  const KindIcon = kindLabel === "Library skill" ? Globe : kindLabel === "Personal skill" ? User : null;
+    : detail.installed?.isLocalOnly ? "Personal skill" : statusLabel === "Source unavailable" ? "Source unavailable" : undefined;
+  const KindIcon = kindLabel === "Library skill" ? Globe : kindLabel === "Personal skill" ? User
+    : kindLabel === "Source unavailable" ? PackageQuestionMark : null;
   const collection = catalog.collections.find((item) => item.id === nav.id);
   const detailCollections = detail?.catalogId
     ? catalog.collections.filter((item) => item.skillIds.includes(detail.catalogId!))

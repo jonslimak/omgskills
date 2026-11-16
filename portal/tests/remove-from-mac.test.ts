@@ -94,3 +94,10 @@ test("removing a skill no Mac has uses the same centered pop-up, one red button,
   assert.match(source, /\{removing\.length === 1 && <PopupSkill name=\{removing\[0\]\.name\} skill=\{removing\[0\]\} \/>\}/);
   assert.match(source, /onClick=\{\(\) => void removeSaved\(removing\)\}>\s+Remove from My skills<\/button>/);
 });
+
+test("a skill whose source can't be found shows a package-question icon at the end, not a Source unavailable pill", () => {
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(source, /statusLabel === "Source unavailable" \? "Source unavailable" : undefined;/);
+  assert.match(source, /kindLabel === "Source unavailable" \? PackageQuestionMark : null;/);
+  assert.match(source, /statusLabel && statusLabel !== kindLabel && <span className="ua-pill">/, "the pill hides when the icon says it");
+});
