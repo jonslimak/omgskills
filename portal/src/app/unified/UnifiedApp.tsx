@@ -1085,12 +1085,13 @@ export function UnifiedApp({
               {versionCount > 1 && <span className="ua-row-versions" title="Your agents have different versions of this skill">
                 {versionCount} versions
               </span>}
+              {/* Before the phone-only stars, so it stays by the name. */}
+              {discovery && signedIn && inMine(skill) && <span className="ua-mine-tag">My skills</span>}
               {skill.stars !== undefined && (
                 <span className="ua-row-stars ua-row-stars-mobile" aria-label={`${starCount(skill.stars)} stars`}>
                   <Star aria-hidden="true" />{starCount(skill.stars)}
                 </span>
               )}
-              {discovery && signedIn && inMine(skill) && <span className="ua-mine-tag">My skills</span>}
             </span>
             <span className="ua-row-description">
               {compact
