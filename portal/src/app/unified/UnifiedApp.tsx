@@ -2353,7 +2353,7 @@ export function UnifiedApp({
                     </button>
                   )}
                 </div>
-                {detail.installed && (
+                {detailVersions.length > 1 && (
                   <section className="ua-detail-account">
                     {detailVersions.length > 1 && <div className="ua-detail-versions">
                       <span>{detailVersions.length} versions</span>
@@ -2363,23 +2363,6 @@ export function UnifiedApp({
                       className="ua-pill ua-detail-match" onClick={() => window.location.assign(matchVersionsLink(detailLive.name))}>
                       <RefreshCw />Make versions match
                     </button>}
-                    {(!readOnlyAccount || management) && <div className="ua-set-chips">
-                      {data.sets
-                        .filter((set) => isMember(set, detail.installed!))
-                        .map((set) => (
-                          <button
-                            type="button"
-                            className="ua-pill"
-                            key={set.id}
-                            onClick={() =>
-                              go(set.isFavorites ? "favorites" : "set", set.id)
-                            }
-                          >
-                            {set.isFavorites ? <Heart /> : <Folder />}
-                            {set.name}
-                          </button>
-                        ))}
-                    </div>}
                   </section>
                 )}
                 <SkillReadme skill={detail} />
@@ -2448,6 +2431,22 @@ export function UnifiedApp({
                       ))}
                   </section>
                 )}
+                {/* The Sets it's in, at the bottom of the panel. */}
+                {detail.installed && (!readOnlyAccount || management) && (() => {
+                  const sets = data.sets.filter(set => isMember(set, detail.installed!));
+                  return sets.length > 0 && <section className="ua-detail-sets">
+                    <h3>In sets</h3>
+                    <div className="ua-set-chips">
+                      {sets.map(set => (
+                        <button type="button" className="ua-pill" key={set.id}
+                          onClick={() => go(set.isFavorites ? "favorites" : "set", set.id)}>
+                          {set.isFavorites ? <Heart /> : <Folder />}
+                          {set.name}
+                        </button>
+                      ))}
+                    </div>
+                  </section>;
+                })()}
                 {selectedInstallations.some(installation => inventorySummary(installation)) && (
                   <section className="ua-detail-history">
                     <button

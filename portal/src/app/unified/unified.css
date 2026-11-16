@@ -2126,6 +2126,7 @@
   align-self: flex-start;
 }
 .ua-detail-account h3,
+.ua-detail-sets h3,
 .ua-saved-versions h3,
 .ua-more h3 {
   font-family: var(--ua-sans);
@@ -2265,6 +2266,18 @@
 .ua-detail .ua-more {
   gap: 4px;
   margin-top: auto;
+}
+.ua-detail-sets {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/* Bottom of the panel, under "More from" when it's there. */
+.ua-detail .ua-detail-sets {
+  margin-top: auto;
+}
+.ua-detail .ua-more ~ .ua-detail-sets {
+  margin-top: 0;
 }
 .ua-more > button {
   display: grid;
