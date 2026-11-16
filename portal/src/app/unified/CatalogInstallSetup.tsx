@@ -23,26 +23,28 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
   const saved = store.read().intent;
   const bothOffered = installsBoth && store.client === "production";
   // Start on the agent that doesn't have the skill yet; with neither, Both where the Mac can do it.
+  // An agent that already has the skill can't be picked again.
+  const already = (kind: "claude" | "codex") => !!skill.installed?.sources.some(source => agentKind(source) === kind);
   const [agent, setAgent] = useState<CatalogInstallAgent>(() => {
     if (saved && saved.catalogId === skill.catalogId) {
-      if (saved.agent !== "both" || bothOffered) return saved.agent;
-      // A saved Both this Mac can no longer do: drop it, or the session would call the request out of date.
+      const usable = saved.agent === "both" ? bothOffered && !already("claude") && !already("codex") : !already(saved.agent);
+      if (usable) return saved.agent;
+      // A saved request this Mac can no longer do, or for an agent that has it now: drop it,
+      // or the session would call the request out of date.
       store.clear();
     }
-    const has = (kind: "claude" | "codex") => !!skill.installed?.sources.some(source => agentKind(source) === kind);
+    const has = already;
     return has("claude") && !has("codex") ? "codex" : has("codex") && !has("claude") ? "claude" : bothOffered && !has("claude") ? "both" : "claude";
   });
   const selectId = useId();
   const pick = (next: CatalogInstallAgent) => { store.clear(); setAgent(next); };
   // Claude and Codex are toggles; both on installs in both (where the Mac can), and one always stays on.
   const on = (kind: "claude" | "codex") => agent === kind || agent === "both";
-  // An agent that already has the skill can't be picked again.
-  const already = (kind: "claude" | "codex") => !!skill.installed?.sources.some(source => agentKind(source) === kind);
   const toggle = (kind: "claude" | "codex") => {
     const other = kind === "claude" ? "codex" : "claude";
     if (already(kind)) return;
     if (!bothOffered) return pick(kind);
-    if (on(kind)) { if (on(other)) pick(other); }
+    if (on(kind)) { if (on(other) && !already(other)) pick(other); }
     else pick(on(other) ? "both" : kind);
   };
   // Once a check succeeds, switching agents stays on Install now.

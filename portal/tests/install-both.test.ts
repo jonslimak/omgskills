@@ -96,4 +96,12 @@ test("Claude and Codex start both selected where the Mac can, and on the missing
   assert.equal(store.read().intent, null);
   assert.equal(pressed(html), "Claude");
   assert.doesNotMatch(html, /out of date/);
+
+  // A saved Both for a skill now in Claude: dropped, and the picker starts on Codex alone.
+  const later = new CatalogInstallIntentStore(storage, "production");
+  later.save({ version: 1, catalogId: skill.catalogId!, agent: "both", createdAt: Date.now(), returnRoute: "/app/?view=discover&skill=catalog%3Aanthropics%2Fskills%2Fpdf" });
+  const inClaude = renderToStaticMarkup(createElement(CatalogInstallSetup, { skill: { ...skill, installed: { sources: ["Claude Code"] } } as SkillDisplay,
+    detailReady: true, returnRoute: "/app/?view=discover", store: later, appKnown: true, installsBoth: true }));
+  assert.equal(later.read().intent, null);
+  assert.equal(pressed(inClaude), "Codex");
 });

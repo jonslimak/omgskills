@@ -1994,8 +1994,14 @@
   white-space: nowrap;
   overflow: hidden;
 }
-.ua-detail-actions > :not(.ua-pill) {
+.ua-detail-actions > :not(.ua-pill, .ua-detail-icons) {
   flex-shrink: 0;
+}
+/* Last resort on a very narrow panel: the icons wrap inside their group, so none is cut off. */
+.ua-detail-actions > .ua-detail-icons {
+  flex: 0 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 .ua-detail-actions .ua-pill {
   min-height: 32px;
