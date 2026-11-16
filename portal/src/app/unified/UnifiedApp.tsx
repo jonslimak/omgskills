@@ -2553,6 +2553,13 @@ export function UnifiedApp({
           label={`Remove ${removingFromMac.names.join(", ")}`}
           theme={theme} close={() => setRemovingFromMac(null)} className="ua-modal-compact">
           {removingFromMac.names.length === 1 && <PopupSkill name={removingFromMac.names[0]} skill={removingFromMac.skill} />}
+          {/* Away from a Mac (a phone, another computer) there's no app to open: say why, and where to do it. */}
+          {!onMac ? <>
+            <p className="ua-muted">For your safety, skills can't be removed from your Mac remotely. Open omgskills on your Mac to remove {removingFromMac.names.length === 1 ? "it" : "them"}.</p>
+            <div className="ua-modal-choices">
+              <button type="button" className="ua-pill ua-modal-action" onClick={() => setRemovingFromMac(null)}>OK</button>
+            </div>
+          </> : <>
           <p className="ua-muted">Remove from:</p>
           <div className="ua-modal-choices">
             <button type="button" className="ua-pill ua-modal-action" onClick={() => removeFromMac(removingFromMac.names, "mac")}>
@@ -2561,6 +2568,7 @@ export function UnifiedApp({
               This device and My skills</button>
           </div>
           <p className="ua-muted ua-modal-note">Please confirm on your Mac app</p>
+          </>}
         </Modal>
       )}
       {/* Not on any Mac: the website removes it itself, so it works from a phone too. Same look as the other pop-ups. */}

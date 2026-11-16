@@ -101,3 +101,9 @@ test("a skill whose source can't be found shows a package-question icon at the e
   assert.match(source, /kindLabel === "Source unavailable" \? PackageQuestionMark : null;/);
   assert.match(source, /statusLabel && statusLabel !== kindLabel && <span className="ua-pill">/, "the pill hides when the icon says it");
 });
+
+test("away from a Mac, removing a skill a Mac has explains it can't be done remotely, with just OK", () => {
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(source, /\{!onMac \? <>\s+<p className="ua-muted">For your safety, skills can't be removed from your Mac remotely\. Open omgskills on your Mac to remove/);
+  assert.match(source, /onClick=\{\(\) => setRemovingFromMac\(null\)\}>OK<\/button>/);
+});
