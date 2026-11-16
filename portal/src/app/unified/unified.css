@@ -1906,6 +1906,23 @@
   grid-row: 1;
   min-width: 0;
 }
+/* The creator line (name, stars, GitHub, My skills tag) runs under the close button, on one line;
+   only the title keeps clear of the buttons. */
+.ua-detail-top > .ua-detail-heading {
+  grid-column: 1 / -1;
+}
+.ua-detail-window {
+  position: relative;
+  z-index: 1;
+}
+.ua-detail-heading .ua-detail-heading-copy > h2 {
+  padding-right: 72px;
+}
+.ua-detail-heading .ua-detail-meta {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  min-width: 0;
+}
 .ua-detail h2 {
   font-family: var(--ua-display);
   font-size: 23px;
