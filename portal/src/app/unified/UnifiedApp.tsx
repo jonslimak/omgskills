@@ -87,6 +87,7 @@ import {
   macAppSeen,
   macInstallsBoth,
   macAddsAgent,
+  macTakesRemoveChoice,
   visibilityLabels,
   type PortalData,
   type PortalSet,
@@ -386,12 +387,14 @@ export function Modal({
   close,
   theme,
   children,
+  className = "",
 }: {
   title: string;
   label?: string;
   close: () => void;
   theme: string;
   children: ReactNode;
+  className?: string;
 }) {
   const trigger = useRef(document.activeElement as HTMLElement | null);
   return (
@@ -399,7 +402,7 @@ export function Modal({
       <Dialog.Portal>
         <Dialog.Overlay className="ua-overlay" />
         <Dialog.Content
-          className="ua-modal ua-theme"
+          className={`ua-modal ua-theme ${className}`}
           data-theme={theme}
           aria-describedby={undefined}
           aria-label={label}
@@ -513,6 +516,8 @@ export function UnifiedApp({
   const [picked, setPicked] = useState<string[]>([]);
   // Saved-only skills waiting on "Remove from My skills?"; hidden ones stay hidden while the change saves.
   const [removing, setRemoving] = useState<SkillDisplay[] | null>(null);
+  // Skills on a Mac waiting on "Remove from: This device / This device and My skills".
+  const [removingFromMac, setRemovingFromMac] = useState<{ names: string[]; skill?: SkillDisplay } | null>(null);
   const [removed, setRemoved] = useState<string[]>([]);
   const [dialog, setDialog] = useState<
     "new-set" | "membership" | "signin" | "add-skill" | null
@@ -624,12 +629,21 @@ export function UnifiedApp({
   // A Set or Favorites row holds the saved copy; versions come from all of that skill's copies Macs have now.
   // Names sent to the Mac app to delete; the toast shows when the Mac's next check-in no longer has them.
   // The app asks first, so a canceled delete just expires.
-  const macDeletes = useRef<{ names: string[]; until: number } | null>(null);
-  function deleteFromMac(names: string[]) {
+  const macDeletes = useRef<{ names: string[]; everywhere: string[]; until: number } | null>(null);
+  function deleteFromMac(names: string[], from?: "mac" | "everywhere") {
     // Adds to deletes still waiting, so an earlier one keeps its toast.
-    const waiting = macDeletes.current && Date.now() <= macDeletes.current.until ? macDeletes.current.names : [];
-    macDeletes.current = { names: [...new Set([...waiting, ...names])], until: Date.now() + 10 * 60_000 };
-    window.location.assign(removeFromMacLink(names));
+    const waiting = macDeletes.current && Date.now() <= macDeletes.current.until ? macDeletes.current : null;
+    const everywhere = new Set(waiting?.everywhere ?? []);
+    for (const name of names) from === "everywhere" ? everywhere.add(name) : everywhere.delete(name);
+    macDeletes.current = { names: [...new Set([...(waiting?.names ?? []), ...names])], everywhere: [...everywhere], until: Date.now() + 10 * 60_000 };
+    window.location.assign(removeFromMacLink(names, from));
+  }
+  // The website asks where to remove from; Macs that take that choice (build 44+) then just confirm.
+  // Older Macs get the plain link and ask again themselves.
+  const macTakesChoice = macTakesRemoveChoice(data.devices);
+  function removeFromMac(names: string[], from: "mac" | "everywhere") {
+    setRemovingFromMac(null);
+    deleteFromMac(names, macTakesChoice ? from : undefined);
   }
   const onMacKey = [...new Set(mine.flatMap(skill => skill.installed ? [skill.installed.name.trim().toLowerCase()] : []))].sort().join("\n");
   const macSeen = macAppSeen(data.devices);
@@ -643,8 +657,11 @@ export function UnifiedApp({
     const gone = pending.names.filter(name => !still.has(name.trim().toLowerCase()));
     if (!gone.length) return;
     pending.names = pending.names.filter(name => still.has(name.trim().toLowerCase()));
+    const everywhere = gone.every(name => pending.everywhere.includes(name));
+    pending.everywhere = pending.everywhere.filter(name => !gone.includes(name));
     if (!pending.names.length) macDeletes.current = null;
-    setDeletedNotice(gone.length === 1 ? `Deleted ${gone[0]} from your Mac` : `Deleted ${gone.length} skills from your Mac`);
+    const what = gone.length === 1 ? gone[0] : `${gone.length} skills`;
+    setDeletedNotice(everywhere ? `Removed ${what} from My skills and your Mac` : `Deleted ${what} from your Mac`);
   }, [onMacKey, macSeen]);
   const liveCopiesOf = (skill: SkillDisplay) => skill.installed && (mine.find(mineSkill =>
     mineSkill.installed?.allSkillIds.includes(skill.installed!.id))?.installed ?? liveSkill(skill).installed);
@@ -719,6 +736,31 @@ export function UnifiedApp({
   const creatorGroups = useMemo(() => discoveryCreatorGroups(catalog.creators), [catalog.creators]);
   const creatorHeader = nav.view === "creator" && !nav.query;
   const discovery = !signedIn || isDiscovery(nav.view);
+  // In Discover, Add to set leaves the panel's action row when the row can't fit on one line.
+  // The width it was dropped at is kept, so it comes back once there's room for it again.
+  // The row node itself, so a remounted panel (closed and reopened, side panel or full width) is measured again.
+  const [actionsRow, actionsRef] = useState<HTMLDivElement | null>(null);
+  const [setDroppedAt, setSetDroppedAt] = useState<number | null>(null);
+  const setFits = !discovery || setDroppedAt === null;
+  const detailKey = detail?.key;
+  useEffect(() => { setSetDroppedAt(null); }, [actionsRow, detailKey, discovery]);
+  useEffect(() => {
+    const row = actionsRow;
+    if (!row || !discovery || typeof ResizeObserver === "undefined") return;
+    const check = () => {
+      const width = row.clientWidth;
+      setSetDroppedAt(at => {
+        if (at !== null) return width > at + 38 ? null : at;
+        const icons = row.querySelector<HTMLElement>(".ua-detail-icons");
+        const squeezed = [...row.querySelectorAll<HTMLElement>(":scope > .ua-pill")].some(pill => pill.scrollWidth > pill.clientWidth + 1);
+        return (icons && icons.offsetHeight > 40) || squeezed ? width : null;
+      });
+    };
+    check();
+    const observer = new ResizeObserver(check);
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, [actionsRow, detailKey, discovery, setDroppedAt === null]);
   // Developers is in both sidebars: opened from My skills, the sidebar stays on My skills.
   const sidebarMine = useRef(false);
   if (nav.view !== "developers") sidebarMine.current = !discovery;
@@ -1181,8 +1223,8 @@ export function UnifiedApp({
                 Make versions match…
               </MenuItem>}
               {(!readOnlyAccount || management) && liveCopies && <MenuItem icon={Trash2} danger
-                onSelect={() => deleteFromMac([liveCopies.name])}>
-                Delete from my Mac…
+                onSelect={() => setRemovingFromMac({ names: [liveCopies.name], skill })}>
+                Remove…
               </MenuItem>}
             </Menu>
           ))}
@@ -2041,7 +2083,7 @@ export function UnifiedApp({
                             onClick={() => addToSet(forSets)}><ListPlus />Add to set</button>
                           {(!readOnlyAccount || management) && <button type="button" className="ua-pill ua-pill-danger" disabled={!names.length || tooMany}
                             title={tooMany ? `Select up to ${maxRemoveFromMac} skills` : "The Mac app asks first"}
-                            onClick={() => deleteFromMac(names)}>
+                            onClick={() => setRemovingFromMac({ names })}>
                             <Trash2 />Delete from Mac
                           </button>}
                           {(cloud?.remove || additions) && <button type="button" className="ua-pill ua-pill-danger" disabled={!savedOnly.length}
@@ -2191,7 +2233,7 @@ export function UnifiedApp({
                   )}
                 </div>
                 {!panelPending && <>
-                <div className="ua-detail-actions">
+                <div className="ua-detail-actions" ref={actionsRef}>
                   {/* Where it's installed, in one place; + adds it to the agent that doesn't have it. */}
                   {detailLive && <span className="ua-on-agents">
                     {/* "Installed" plus each agent's logo; agents without a logo keep their name. */}
@@ -2257,7 +2299,7 @@ export function UnifiedApp({
                         <Heart />
                       </IconButton>
                   )}
-                  {(!readOnlyAccount || management) && signedIn && (detail.installed || detail.catalogId || settable(detail)) && (
+                  {(!readOnlyAccount || management) && signedIn && (detail.installed || detail.catalogId || settable(detail)) && setFits && (
                       <IconButton
                         label="Add to set"
                         disabled={!!management && !canManage}
@@ -2274,8 +2316,8 @@ export function UnifiedApp({
                   {/* Trash, before the kind icon: one action, named for what it does. On a Mac it deletes there (the Mac app asks first);
                       otherwise it takes the skill out of My skills (after a confirm). A Set's own entry has none. */}
                   {signedIn && (!readOnlyAccount || management) && !detail.setItemKind && (detailLive ? (
-                    <IconButton label="Delete from Mac" title="Delete from Mac (the Mac app asks first)"
-                      onClick={() => deleteFromMac([detailLive.name])}>
+                    // On a Mac: choose where in the pop-up; the Mac app then confirms.
+                    <IconButton label={`Remove ${detail.name}`} onClick={() => setRemovingFromMac({ names: [detailLive.name], skill: detail })}>
                       <Trash2 />
                     </IconButton>
                   ) : (() => {
@@ -2289,7 +2331,8 @@ export function UnifiedApp({
                     );
                   })())}
                   {/* Personal vs library is a quiet icon at the end: hover or tap shows the words. */}
-                  {kindLabel && KindIcon && <KindTip label={kindLabel} icon={KindIcon} />}
+                  {/* Discover is all library skills, so the library/personal icon says nothing there. */}
+                  {!discovery && kindLabel && KindIcon && <KindTip label={kindLabel} icon={KindIcon} />}
                   </span>
                   {/* Sync runs in the background; it only shows here when something needs you. */}
                   {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && needsAttention(cloudRow(detail)?.status ?? "saved")
@@ -2307,7 +2350,7 @@ export function UnifiedApp({
                 )}
                 {installOpen && selected && signedIn && publicInstallAction && (
                   <Modal title={installedHere ? "Add to another agent" : "Install"} label={`${installedHere ? "Add to another agent" : "Install"}: ${selected.name}`} theme={theme}
-                    close={() => { setInstallOpen(false); onInstallCancel?.(); }}>
+                    close={() => { setInstallOpen(false); onInstallCancel?.(); }} className="ua-modal-compact">
                     <div className="ua-install-skill">
                       <Avatar src={selected.avatar} name={selected.author || selected.name} size="large" />
                       <div>
@@ -2479,6 +2522,31 @@ export function UnifiedApp({
         )}
       </div>
       {management?.dialog(theme)}
+      {removingFromMac && (
+        <Modal title={removingFromMac.names.length === 1 ? "Remove skill" : `Remove ${removingFromMac.names.length} skills`}
+          label={`Remove ${removingFromMac.names.join(", ")}`}
+          theme={theme} close={() => setRemovingFromMac(null)} className="ua-modal-compact">
+          {/* The same skill header as Install. */}
+          {removingFromMac.names.length === 1 && <div className="ua-install-skill">
+            <Avatar src={removingFromMac.skill?.avatar} name={removingFromMac.skill?.author || removingFromMac.names[0]} size="large" />
+            <div>
+              <strong>{removingFromMac.names[0]}</strong>
+              {removingFromMac.skill && <div className="ua-detail-meta">
+                {removingFromMac.skill.author && <span>@{removingFromMac.skill.author}</span>}
+                {removingFromMac.skill.stars !== undefined && <span><Star />{starCount(removingFromMac.skill.stars)}</span>}
+              </div>}
+            </div>
+          </div>}
+          <p className="ua-muted">Remove from:</p>
+          <div className="ua-modal-choices">
+            <button type="button" className="ua-pill ua-modal-action" onClick={() => removeFromMac(removingFromMac.names, "mac")}>
+              This device</button>
+            <button type="button" className="ua-pill ua-pill-danger ua-modal-action" onClick={() => removeFromMac(removingFromMac.names, "everywhere")}>
+              This device and My skills</button>
+          </div>
+          <p className="ua-muted ua-modal-note">Please confirm on your Mac app</p>
+        </Modal>
+      )}
       {removing && (
         <Modal title={removing.length === 1 ? `Remove ${removing[0].name}?` : `Remove ${removing.length} skills?`} theme={theme} close={() => setRemoving(null)}>
           <p className="ua-muted">{removeWarning(removing)}</p>

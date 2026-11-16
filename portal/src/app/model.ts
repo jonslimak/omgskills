@@ -1,5 +1,5 @@
 import type { GroupedSyncedSkill, SyncedSkill, ScanCoverage } from "../synced-skill-grouping";
-import { MAC_ADDS_AGENT_BUILD, MAC_INSTALLS_BOTH_BUILD } from "./unified/public-install";
+import { MAC_ADDS_AGENT_BUILD, MAC_INSTALLS_BOTH_BUILD, MAC_REMOVE_CHOICE_BUILD } from "./unified/public-install";
 
 export type Visibility = "public" | "restricted" | "private";
 export const visibilityLabels: Record<Visibility, string> = {
@@ -183,6 +183,11 @@ export function macInstallsBoth(devices: PortalDevice[], now = Date.now()): bool
 /** Every connected Mac can add a skill it has in one agent to the other (build 42 or later). */
 export function macAddsAgent(devices: PortalDevice[], now = Date.now()): boolean {
   return macsAtLeast(devices, MAC_ADDS_AGENT_BUILD, now);
+}
+
+/** Every Mac with the app takes the website's choice of where to remove a skill from. */
+export function macTakesRemoveChoice(devices: PortalDevice[], now = Date.now()): boolean {
+  return macsAtLeast(devices, MAC_REMOVE_CHOICE_BUILD, now);
 }
 
 /**

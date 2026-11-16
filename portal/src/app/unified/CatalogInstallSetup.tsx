@@ -15,7 +15,7 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
   distribution?: CandidateDistribution;
   /** The account has a connected Mac, so the app is most likely installed. */
   appKnown?: boolean;
-  /** Every connected Mac can install in Claude and Codex at once, so "Both" is offered. */
+  /** Every connected Mac can install in Claude and Codex at once, so both can be selected together. */
   installsBoth?: boolean;
   /** Signed in: asks whether the Mac app received the request, so the pop-over can say "Approve it". */
   checkAck?: InstallAckCheck;
@@ -23,26 +23,40 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
   const saved = store.read().intent;
   const bothOffered = installsBoth && store.client === "production";
   // Start on the agent that doesn't have the skill yet; with neither, Both where the Mac can do it.
+  // An agent that already has the skill can't be picked again.
+  const already = (kind: "claude" | "codex") => !!skill.installed?.sources.some(source => agentKind(source) === kind);
   const [agent, setAgent] = useState<CatalogInstallAgent>(() => {
     if (saved && saved.catalogId === skill.catalogId) {
-      if (saved.agent !== "both" || bothOffered) return saved.agent;
-      // A saved Both this Mac can no longer do: drop it, or the session would call the request out of date.
+      const usable = saved.agent === "both" ? bothOffered && !already("claude") && !already("codex") : !already(saved.agent);
+      if (usable) return saved.agent;
+      // A saved request this Mac can no longer do, or for an agent that has it now: drop it,
+      // or the session would call the request out of date.
       store.clear();
     }
-    const has = (kind: "claude" | "codex") => !!skill.installed?.sources.some(source => agentKind(source) === kind);
+    const has = already;
     return has("claude") && !has("codex") ? "codex" : has("codex") && !has("claude") ? "claude" : bothOffered && !has("claude") ? "both" : "claude";
   });
   const selectId = useId();
   const pick = (next: CatalogInstallAgent) => { store.clear(); setAgent(next); };
+  // Claude and Codex are toggles; both on installs in both (where the Mac can), and one always stays on.
+  const on = (kind: "claude" | "codex") => agent === kind || agent === "both";
+  const toggle = (kind: "claude" | "codex") => {
+    const other = kind === "claude" ? "codex" : "claude";
+    if (already(kind)) return;
+    if (!bothOffered) return pick(kind);
+    if (on(kind)) { if (on(other) && !already(other)) pick(other); }
+    else pick(on(other) ? "both" : kind);
+  };
   // Once a check succeeds, switching agents stays on Install now.
   const [confirmed, setConfirmed] = useState(false);
   if (store.client === "production") return <section className="ua-install-setup ua-install-pop" aria-label="Install skill">
     <ProductionInstall key={agent} skill={skill} detailReady={detailReady} returnRoute={returnRoute} store={store} agent={agent}
       appKnown={appKnown || confirmed} onAppConfirmed={() => setConfirmed(true)} checkAck={checkAck}
       picker={<div className="ua-install-agents" role="group" aria-label="Agent">
-      {(bothOffered ? ["claude", "codex", "both"] as const : ["claude", "codex"] as const).map(kind => <button key={kind} type="button"
-        aria-pressed={agent === kind} className="ua-install-agent" onClick={() => pick(kind)}>
-        {kind === "both" ? "Both" : <><span className="ua-agent-logo" data-agent={kind} aria-hidden="true" />{kind === "claude" ? "Claude" : "Codex"}</>}
+      {(["claude", "codex"] as const).map(kind => <button key={kind} type="button"
+        aria-pressed={on(kind)} className="ua-install-agent" onClick={() => toggle(kind)}
+        disabled={already(kind)} title={already(kind) ? `Already in ${kind === "claude" ? "Claude" : "Codex"}` : undefined}>
+        <span className="ua-agent-logo" data-agent={kind} aria-hidden="true" />{kind === "claude" ? "Claude" : "Codex"}
       </button>)}
     </div>} />
   </section>;

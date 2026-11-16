@@ -534,11 +534,12 @@ export function discoverCollectionPage(collections: CatalogDisplay["collections"
 /** The most skills one delete link carries; the Mac app rejects longer links. */
 export const maxRemoveFromMac = 200;
 
-/** Opens the Mac app, which asks once and then moves every copy of these skills on that Mac to the Trash. */
-export function removeFromMacLink(names: string[]) {
+/** Opens the Mac app, which asks once and then moves every copy of these skills on that Mac to the Trash.
+ *  With `from`, the website already chose: only this Mac, or My skills and this Mac (build 44+). */
+export function removeFromMacLink(names: string[], from?: "mac" | "everywhere") {
   const seen = new Set<string>();
   const unique = names.map(name => name.trim()).filter(name => name && !seen.has(name.toLowerCase()) && seen.add(name.toLowerCase()));
-  return `omgskills://remove?${unique.map(name => `name=${encodeURIComponent(name)}`).join("&")}`;
+  return `omgskills://remove?${unique.map(name => `name=${encodeURIComponent(name)}`).join("&")}${from ? `&from=${from}` : ""}`;
 }
 
 /** Opens the Mac app, which asks which agent gets this synced skill and installs its newest saved version. */

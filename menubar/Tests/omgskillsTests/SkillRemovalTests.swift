@@ -24,6 +24,45 @@ struct SkillRemovalTests {
         }
     }
 
+    @Test func theWebsiteCanChooseWhereToRemoveFrom() {
+        #expect(SkillRemoval.request(from: URL(string: "omgskills://remove?name=a")!)?.scope == nil)
+        #expect(SkillRemoval.request(from: URL(string: "omgskills://remove?name=a&from=mac")!)?.scope == .mac)
+        #expect(SkillRemoval.request(from: URL(string: "omgskills://remove?from=everywhere&name=a&name=b")!)?.names == ["a", "b"])
+        #expect(SkillRemoval.request(from: URL(string: "omgskills://remove?from=everywhere&name=a")!)?.scope == .everywhere)
+        let full = (1...SkillRemoval.maximumSkills).map { "name=s\($0)" }.joined(separator: "&")
+        #expect(SkillRemoval.request(from: URL(string: "omgskills://remove?\(full)&from=mac")!)?.names.count == SkillRemoval.maximumSkills,
+                "from doesn't count toward the skill limit")
+        for bad in ["omgskills://remove?from=mac", "omgskills://remove?name=a&from=account", "omgskills://remove?name=a&from=",
+                    "omgskills://remove?name=a&from=mac&from=everywhere", "omgskills://remove?name=a&from"] {
+            #expect(SkillRemoval.request(from: URL(string: bad)!) == nil, "\(bad)")
+        }
+    }
+
+    @Test func aChosenScopeShowsOneButton() async {
+        var trashed: [String] = [], forgotten: [[String]] = []
+        let removal = SkillRemovalController(installations: { [self] in [copy("pdf", "Claude")] },
+            trash: { trashed.append($0.origin!); return .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
+        removal.forget = { keys, ids in forgotten.append(keys + ids) }
+        // This Mac: the one question has no My skills choice, and confirming only trashes.
+        _ = removal.receive(URL(string: "omgskills://remove?name=pdf&from=mac")!)
+        guard case .confirm(_, _, _, let onlyHere) = removal.state else { Issue.record("expected confirmation"); return }
+        #expect(onlyHere && trashed.isEmpty)
+        removal.chooseEverywhere()
+        guard case .confirm = removal.state else { Issue.record("this Mac only never turns into My skills"); return }
+        removal.close()
+        // My skills and this Mac: straight to that confirmation; nothing happens before the yes.
+        _ = removal.receive(URL(string: "omgskills://remove?name=pdf&from=everywhere")!)
+        guard case .confirmEverywhere(let names, _, _) = removal.state else { Issue.record("expected My skills confirmation: \(removal.state)"); return }
+        #expect(names == ["pdf"] && trashed.isEmpty && forgotten.isEmpty)
+        await removal.confirmEverywhere()
+        #expect(trashed == ["Claude"] && forgotten == [["pdf"]])
+        // Without permission to change the account, it says so and deletes nothing.
+        let offline = SkillRemovalController(installations: { [self] in [copy("pdf", "Claude")] },
+            trash: { _ in Issue.record("must not trash"); return .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
+        _ = offline.receive(URL(string: "omgskills://remove?name=pdf&from=everywhere")!)
+        #expect(offline.state == .failed(message: "Reconnect this Mac to your account to remove from My skills. Nothing was deleted."))
+    }
+
     @Test func findsEveryCopyByNameLinksFirst() {
         let all = [copy("Humanizer", "Agents"), copy("humanizer", "Claude", link: true),
                    copy("humanizer", "Codex"), copy("other", "Claude")]
@@ -50,7 +89,7 @@ struct SkillRemovalTests {
             trash: { trashed.append($0.origin!); return .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
         removal.onRemoved = { reported += 1 }
         #expect(removal.receive(URL(string: "omgskills://remove?name=humanizer")!))
-        guard case .confirm(_, let copies, _) = removal.state else { Issue.record("expected confirmation"); return }
+        guard case .confirm(_, let copies, _, _) = removal.state else { Issue.record("expected confirmation"); return }
         #expect(copies.count == 2 && trashed.isEmpty, "A link alone never deletes")
         removal.confirm()
         #expect(trashed.sorted() == ["Claude", "Codex"])
@@ -89,7 +128,7 @@ struct SkillRemovalTests {
             trash: { _ in .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
         _ = removal.receive(URL(string: "omgskills://remove?name=a")!)
         _ = removal.receive(URL(string: "omgskills://remove?name=b")!)
-        guard case .confirm(let names, _, _) = removal.state else { Issue.record("expected confirmation"); return }
+        guard case .confirm(let names, _, _, _) = removal.state else { Issue.record("expected confirmation"); return }
         #expect(names == ["b"])
     }
 
@@ -128,7 +167,7 @@ struct SkillRemovalTests {
             trash: { trashed.append("\($0.name)/\($0.origin!)"); return .init(provenanceRemoved: false, provenanceCleanupWarning: nil) })
         removal.onRemoved = { reported += 1 }
         _ = removal.receive(URL(string: "omgskills://remove?name=a&name=b&name=gone")!)
-        guard case .confirm(let names, let copies, let missing) = removal.state else { Issue.record("expected confirmation"); return }
+        guard case .confirm(let names, let copies, let missing, _) = removal.state else { Issue.record("expected confirmation"); return }
         #expect(names == ["a", "b"] && copies.count == 3 && missing == ["gone"])
         let grouped = SkillRemoval.grouped(names: names, copies: copies)
         #expect(grouped.map(\.name) == ["a", "b"])
