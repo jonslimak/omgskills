@@ -573,6 +573,9 @@ export function UnifiedApp({
   const notInstalledAll = useMemo(() => [...notInstalled, ...added.filter(skill =>
     !notInstalled.some(other => other.catalogId === skill.catalogId))], [notInstalled, added]);
   const allMine = useMemo(() => [...mine, ...notInstalledAll], [mine, notInstalledAll]);
+  // Discover's quiet "In My skills" tag: library skills My skills has (on a Mac, saved or added).
+  const mineCatalogIds = useMemo(() => new Set(allMine.flatMap(skill => skill.catalogId ?? [])), [allMine]);
+  const inMine = (skill: SkillDisplay) => !!skill.installed || (!!skill.catalogId && mineCatalogIds.has(skill.catalogId));
   // Forget removed keys once the list no longer has them, so a skill added again shows.
   useEffect(() => { setRemoved(old => old.length && old.some(key => !allMine.some(skill => skill.key === key))
     ? old.filter(key => allMine.some(skill => skill.key === key)) : old); }, [allMine]);
@@ -1077,6 +1080,7 @@ export function UnifiedApp({
               {!compact && !creatorHeader && (discovery || nav.query) && skill.author && (
                 <span className="ua-row-author">@{skill.author}</span>
               )}
+              {discovery && signedIn && inMine(skill) && <span className="ua-mine-tag">In My skills</span>}
               {!discovery && <CloudAttention status={cloudRow(skill)?.status} />}
               {(skill.cloudKey || skill.added) && <span className="ua-row-versions" title="In My skills, not on any of your Macs">Not installed</span>}
               {versionCount > 1 && <span className="ua-row-versions" title="Your agents have different versions of this skill">
@@ -2159,6 +2163,7 @@ export function UnifiedApp({
                               @{detail.author}
                             </button>
                           )}
+                          {discovery && signedIn && inMine(detail) && <span className="ua-mine-tag">In My skills</span>}
                           {detail.stars !== undefined && (
                             <span>
                               <Star />
