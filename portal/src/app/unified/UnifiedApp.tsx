@@ -1090,7 +1090,7 @@ export function UnifiedApp({
                   <Star aria-hidden="true" />{starCount(skill.stars)}
                 </span>
               )}
-              {discovery && signedIn && inMine(skill) && <span className="ua-mine-tag">In My skills</span>}
+              {discovery && signedIn && inMine(skill) && <span className="ua-mine-tag">My skills</span>}
             </span>
             <span className="ua-row-description">
               {compact
@@ -2181,7 +2181,7 @@ export function UnifiedApp({
                               <span className="ua-creator-github-mark" aria-hidden="true" />
                             </a>
                           )}
-                          {discovery && signedIn && inMine(detail) && <span className="ua-mine-tag">In My skills</span>}
+                          {discovery && signedIn && inMine(detail) && <span className="ua-mine-tag">My skills</span>}
                         </div>
                       </div>
                     </div>
