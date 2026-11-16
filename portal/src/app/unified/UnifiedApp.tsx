@@ -2226,8 +2226,8 @@ export function UnifiedApp({
                       Install <Download />
                     </button>
                   )}
-                  {/* A library skill can join My skills without installing it. Once it's in, the trash takes it out. */}
-                  {signedIn && additions && detail.catalogId && !installedHere && !detail.cloudKey && !inMySkills(detail.catalogId) && (
+                  {/* A library skill can join My skills without installing it. Once it's in (added, saved or on a Mac), the trash takes it out. */}
+                  {signedIn && additions && detail.catalogId && !installedHere && !detail.cloudKey && !inMySkills(detail.catalogId) && !inMine(detail) && (
                     <button type="button" className="ua-pill ua-detail-copy" disabled={additions.pending.includes(detail.catalogId)}
                       onClick={() => changeMySkills(detail.catalogId!, true)}>
                       Add to My skills <Plus aria-hidden="true" />
