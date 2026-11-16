@@ -657,6 +657,8 @@ export function UnifiedApp({
   const savedInstall = !!(onMac && signedIn && (!readOnlyAccount || management) && detail?.cloudKey && !detail.catalogId);
   const missingAgent = installedHere && !(installedAgents.includes("claude") && installedAgents.includes("codex"));
   // The app installs any library skill, from Discover or My skills (Set rows keep the copy command).
+  const addable = !!(signedIn && additions && detail?.catalogId && !installedHere && !detail.cloudKey
+    && !inMySkills(detail.catalogId) && !inMine(detail));
   const canInstall = !!(onMac && signedIn && publicInstallAction && detail?.catalogId && !detail.setItemKind && !detail.installed?.isLocalOnly);
   // Skills the app can't install from the library (personal ones): the Mac app copies them across agents itself.
   const localAddAgent = !!(onMac && signedIn && (!readOnlyAccount || management) && missingAgent && !canInstall
@@ -2226,16 +2228,17 @@ export function UnifiedApp({
                       Install <Download />
                     </button>
                   )}
-                  {/* A library skill can join My skills without installing it. Once it's in (added, saved or on a Mac), the trash takes it out. */}
-                  {signedIn && additions && detail.catalogId && !installedHere && !detail.cloudKey && !inMySkills(detail.catalogId) && !inMine(detail) && (
-                    <button type="button" className="ua-pill ua-detail-copy" disabled={additions.pending.includes(detail.catalogId)}
+                  {/* A library skill can join My skills without installing it. Once it's in (added, saved or on a Mac), the trash takes it out.
+                      Off a Mac (phones too) it's the main action: My skills reaches any agent through the MCP. */}
+                  {addable && (
+                    <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} disabled={additions!.pending.includes(detail.catalogId!)}
                       onClick={() => changeMySkills(detail.catalogId!, true)}>
                       Add to My skills <Plus aria-hidden="true" />
                     </button>
                   )}
                   {/* On a Mac the app installs it, so the terminal command isn't a second button. */}
                   {detail.installCommand && !canInstall ? (
-                    <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
+                    <button type="button" className={onMac || addable ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
                       Copy <Copy />
                     </button>
                   ) : statusLabel && statusLabel !== kindLabel && <span className="ua-pill">{statusLabel}</span>}

@@ -66,6 +66,8 @@ test("deletes confirm with a red toast: at once for My skills, after the Mac's c
 test("Discover marks skills already in My skills with a quiet My skills tag, not a button", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /const inMine = \(skill: SkillDisplay\) => !!skill\.installed \|\| \(!!skill\.catalogId && mineCatalogIds\.has\(skill\.catalogId\)\);/);
-  assert.match(source, /!detail\.cloudKey && !inMySkills\(detail\.catalogId\) && !inMine\(detail\) && \(/, "no Add next to the trash for a skill My skills already has");
+  assert.match(source, /!detail\.cloudKey\s+&& !inMySkills\(detail\.catalogId\) && !inMine\(detail\)\);/, "no Add next to the trash for a skill My skills already has");
+  assert.match(source, /\{addable && \(\s+<button type="button" className=\{onMac \? "ua-pill ua-detail-copy" : "ua-pill ua-primary"\}/, "off a Mac, Add to My skills is the main button");
+  assert.match(source, /className=\{onMac \|\| addable \? "ua-pill ua-detail-copy" : "ua-pill ua-primary"\} aria-label="Copy install command"/, "Copy steps back when Add is there");
   assert.equal(source.match(/\{discovery && signedIn && inMine\((skill|detail)\) && <span className="ua-mine-tag">My skills<\/span>\}/g)?.length, 2, "row and panel");
 });
