@@ -44,9 +44,10 @@
   --ua-muted: #a3a3ac;
   --ua-faint: #85858f;
   --ua-side: #19191c;
-  --ua-chip: #242428;
+  /* Buttons and cards must stand out from the page in dark mode. */
+  --ua-chip: #2a2a2f;
   --ua-saved: #4cc27a;
-  --ua-selection: #303035;
+  --ua-selection: #36363c;
   --ua-line: #333338;
   --rd-row-divider: var(--ua-line);
   --ua-blue: #409cff;
@@ -54,7 +55,18 @@
   --ua-shadow: 0 1px 2px #0006, 0 12px 40px #0009;
   color-scheme: dark;
 }
+/* Page cards (creator/company header, developer cards, the open row) use the sidebar grey, which is too close
+   to the page in dark mode; use the button grey there instead. */
+.ua-theme[data-theme="dark"] :is(.ua-creator-banner, .ua-dev-card) {
+  background: var(--ua-chip) !important;
+}
+.ua-theme[data-theme="dark"] .ua-row[data-selected="true"] {
+  background: var(--ua-chip);
+}
 .ua-theme[data-theme="dark"]:is(.ua-drawer, .ua-detail) {
+  /* The panel is lighter than the page, so its buttons and cards go lighter again. */
+  --ua-chip: #34343a;
+  --ua-selection: #404047;
   background: #202024;
   box-shadow: inset 0 0 0 1px var(--ua-line), var(--ua-shadow);
 }
@@ -859,6 +871,21 @@
   color: var(--ua-muted);
   font-size: 11px;
   white-space: nowrap;
+}
+.ua-mine-tag {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(52, 199, 89, 0.15); /* macOS system green, like the install confirmation */
+  color: #248a3d;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  white-space: nowrap;
+}
+.ua-theme[data-theme="dark"] .ua-mine-tag {
+  background: rgba(48, 209, 88, 0.18);
+  color: #30d158;
 }
 .ua-row-heading:has(.ua-row-author) .ua-row-name {
   flex-shrink: 0;
@@ -1958,6 +1985,13 @@
 .ua-detail-actions .ua-detail-copy {
   color: var(--ua-muted);
 }
+/* Copy is just its icon, the same size as the round buttons beside it, so the row fits on a phone. */
+.ua-detail-actions .ua-detail-copy-icon {
+  justify-content: center;
+  width: 32px;
+  min-width: 32px;
+  padding: 0;
+}
 .ua-detail-signin {
   margin-left: auto;
 }
@@ -2099,6 +2133,7 @@
   align-self: flex-start;
 }
 .ua-detail-account h3,
+.ua-detail-sets h3,
 .ua-saved-versions h3,
 .ua-more h3 {
   font-family: var(--ua-sans);
@@ -2238,6 +2273,18 @@
 .ua-detail .ua-more {
   gap: 4px;
   margin-top: auto;
+}
+.ua-detail-sets {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/* Bottom of the panel, under "More from" when it's there. */
+.ua-detail .ua-detail-sets {
+  margin-top: auto;
+}
+.ua-detail .ua-more ~ .ua-detail-sets {
+  margin-top: 0;
 }
 .ua-more > button {
   display: grid;

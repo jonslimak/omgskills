@@ -573,6 +573,9 @@ export function UnifiedApp({
   const notInstalledAll = useMemo(() => [...notInstalled, ...added.filter(skill =>
     !notInstalled.some(other => other.catalogId === skill.catalogId))], [notInstalled, added]);
   const allMine = useMemo(() => [...mine, ...notInstalledAll], [mine, notInstalledAll]);
+  // Discover's quiet "In My skills" tag: library skills My skills has (on a Mac, saved or added).
+  const mineCatalogIds = useMemo(() => new Set(allMine.flatMap(skill => skill.catalogId ?? [])), [allMine]);
+  const inMine = (skill: SkillDisplay) => !!skill.installed || (!!skill.catalogId && mineCatalogIds.has(skill.catalogId));
   // Forget removed keys once the list no longer has them, so a skill added again shows.
   useEffect(() => { setRemoved(old => old.length && old.some(key => !allMine.some(skill => skill.key === key))
     ? old.filter(key => allMine.some(skill => skill.key === key)) : old); }, [allMine]);
@@ -654,6 +657,8 @@ export function UnifiedApp({
   const savedInstall = !!(onMac && signedIn && (!readOnlyAccount || management) && detail?.cloudKey && !detail.catalogId);
   const missingAgent = installedHere && !(installedAgents.includes("claude") && installedAgents.includes("codex"));
   // The app installs any library skill, from Discover or My skills (Set rows keep the copy command).
+  const addable = !!(signedIn && additions && detail?.catalogId && !installedHere && !detail.cloudKey
+    && !inMySkills(detail.catalogId) && !inMine(detail));
   const canInstall = !!(onMac && signedIn && publicInstallAction && detail?.catalogId && !detail.setItemKind && !detail.installed?.isLocalOnly);
   // Skills the app can't install from the library (personal ones): the Mac app copies them across agents itself.
   const localAddAgent = !!(onMac && signedIn && (!readOnlyAccount || management) && missingAgent && !canInstall
@@ -1082,6 +1087,8 @@ export function UnifiedApp({
               {versionCount > 1 && <span className="ua-row-versions" title="Your agents have different versions of this skill">
                 {versionCount} versions
               </span>}
+              {/* Before the phone-only stars, so it stays by the name. */}
+              {discovery && signedIn && inMine(skill) && <span className="ua-mine-tag">My skills</span>}
               {skill.stars !== undefined && (
                 <span className="ua-row-stars ua-row-stars-mobile" aria-label={`${starCount(skill.stars)} stars`}>
                   <Star aria-hidden="true" />{starCount(skill.stars)}
@@ -2177,6 +2184,7 @@ export function UnifiedApp({
                               <span className="ua-creator-github-mark" aria-hidden="true" />
                             </a>
                           )}
+                          {discovery && signedIn && inMine(detail) && <span className="ua-mine-tag">My skills</span>}
                         </div>
                       </div>
                     </div>
@@ -2220,23 +2228,18 @@ export function UnifiedApp({
                       Install <Download />
                     </button>
                   )}
-                  {/* A library skill can join My skills without installing it. */}
-                  {signedIn && additions && detail.catalogId && !installedHere && !detail.cloudKey && (inMySkills(detail.catalogId) ? (
-                    <button type="button" className="ua-pill ua-detail-copy" aria-label="In My skills. Remove from My skills"
-                      title="Remove from My skills" disabled={additions.pending.includes(detail.catalogId)}
-                      onClick={() => changeMySkills(detail.catalogId!, false)}>
-                      <Check aria-hidden="true" />In My skills
-                    </button>
-                  ) : (
-                    <button type="button" className="ua-pill ua-detail-copy" disabled={additions.pending.includes(detail.catalogId)}
+                  {/* A library skill can join My skills without installing it. Once it's in (added, saved or on a Mac), the trash takes it out.
+                      Off a Mac (phones too) it's the main action: My skills reaches any agent through the MCP. */}
+                  {addable && (
+                    <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} disabled={additions!.pending.includes(detail.catalogId!)}
                       onClick={() => changeMySkills(detail.catalogId!, true)}>
-                      Add to My skills <Plus aria-hidden="true" />
+                      Add to My skills
                     </button>
-                  ))}
+                  )}
                   {/* On a Mac the app installs it, so the terminal command isn't a second button. */}
                   {detail.installCommand && !canInstall ? (
-                    <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
-                      Copy <Copy />
+                    <button type="button" className={`ua-pill ua-detail-copy-icon ${onMac || addable ? "ua-detail-copy" : "ua-primary"}`} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
+                      <Copy />
                     </button>
                   ) : statusLabel && statusLabel !== kindLabel && <span className="ua-pill">{statusLabel}</span>}
                   <span className="ua-detail-icons">
@@ -2268,25 +2271,23 @@ export function UnifiedApp({
                       <Share />
                     </IconButton>
                   )}
-                  {/* Trash: take one skill out of My skills or off this Mac, without Edit. Same rules as Edit:
-                      only skills no Mac has leave My skills; the Mac app asks before it deletes. */}
-                  {(() => {
-                    const onThisMac = (!readOnlyAccount || management) && !!detailLive;
-                    // Like Edit: only in views Edit has, never for a Set's own entry; on a Mac it waits for the Mac delete.
-                    const savable = editableView && !detail.setItemKind && !!(cloud?.remove || additions)
-                      && !!(detail.cloudKey || (detail.added && detail.catalogId)) && (!detail.installed || onThisMac);
-                    if (discovery || (!savable && !onThisMac)) return null;
-                    return <Menu theme={theme} label={`Remove ${detail.name}`}
-                      trigger={<IconButton label={`Remove ${detail.name}`}><Trash2 /></IconButton>}>
-                      {savable && <MenuItem icon={X} disabled={!!detail.installed} onSelect={() => setRemoving([detail])}>
-                        {detail.installed ? "Remove from My skills (delete from Mac first)" : "Remove from My skills"}
-                      </MenuItem>}
-                      {onThisMac && <MenuItem icon={Trash2} danger
-                        onSelect={() => deleteFromMac([detailLive!.name])}>
-                        Delete from my Mac…
-                      </MenuItem>}
-                    </Menu>;
-                  })()}
+                  {/* Trash, before the kind icon: one action, named for what it does. On a Mac it deletes there (the Mac app asks first);
+                      otherwise it takes the skill out of My skills (after a confirm). A Set's own entry has none. */}
+                  {signedIn && (!readOnlyAccount || management) && !detail.setItemKind && (detailLive ? (
+                    <IconButton label="Delete from Mac" title="Delete from Mac (the Mac app asks first)"
+                      onClick={() => deleteFromMac([detailLive.name])}>
+                      <Trash2 />
+                    </IconButton>
+                  ) : (() => {
+                    // Discover shows the library row; remove what My skills has (its synced copy too), as My skills would.
+                    const target = discovery && detail.catalogId ? allMine.find(skill => skill.catalogId === detail.catalogId) ?? detail : detail;
+                    const adding = !!target.catalogId && !!additions?.pending.includes(target.catalogId);
+                    return !target.installed && !adding && (cloud?.remove || additions) && (target.cloudKey || inMySkills(target.catalogId)) && (
+                      <IconButton label="Remove from My skills" onClick={() => setRemoving([target])}>
+                        <Trash2 />
+                      </IconButton>
+                    );
+                  })())}
                   {/* Personal vs library is a quiet icon at the end: hover or tap shows the words. */}
                   {kindLabel && KindIcon && <KindTip label={kindLabel} icon={KindIcon} />}
                   </span>
@@ -2355,7 +2356,7 @@ export function UnifiedApp({
                     </button>
                   )}
                 </div>
-                {detail.installed && (
+                {detailVersions.length > 1 && (
                   <section className="ua-detail-account">
                     {detailVersions.length > 1 && <div className="ua-detail-versions">
                       <span>{detailVersions.length} versions</span>
@@ -2365,23 +2366,6 @@ export function UnifiedApp({
                       className="ua-pill ua-detail-match" onClick={() => window.location.assign(matchVersionsLink(detailLive.name))}>
                       <RefreshCw />Make versions match
                     </button>}
-                    {(!readOnlyAccount || management) && <div className="ua-set-chips">
-                      {data.sets
-                        .filter((set) => isMember(set, detail.installed!))
-                        .map((set) => (
-                          <button
-                            type="button"
-                            className="ua-pill"
-                            key={set.id}
-                            onClick={() =>
-                              go(set.isFavorites ? "favorites" : "set", set.id)
-                            }
-                          >
-                            {set.isFavorites ? <Heart /> : <Folder />}
-                            {set.name}
-                          </button>
-                        ))}
-                    </div>}
                   </section>
                 )}
                 <SkillReadme skill={detail} />
@@ -2450,6 +2434,22 @@ export function UnifiedApp({
                       ))}
                   </section>
                 )}
+                {/* The Sets it's in, at the bottom of the panel. */}
+                {detail.installed && (!readOnlyAccount || management) && (() => {
+                  const sets = data.sets.filter(set => isMember(set, detail.installed!));
+                  return sets.length > 0 && <section className="ua-detail-sets">
+                    <h3>In sets</h3>
+                    <div className="ua-set-chips">
+                      {sets.map(set => (
+                        <button type="button" className="ua-pill" key={set.id}
+                          onClick={() => go(set.isFavorites ? "favorites" : "set", set.id)}>
+                          {set.isFavorites ? <Heart /> : <Folder />}
+                          {set.name}
+                        </button>
+                      ))}
+                    </div>
+                  </section>;
+                })()}
                 {selectedInstallations.some(installation => inventorySummary(installation)) && (
                   <section className="ua-detail-history">
                     <button

@@ -44,12 +44,12 @@ test("+ on a personal skill opens the Mac app with only the skill's name", () =>
   assert.match(source, /const localAddAgent = [^;]*missingAgent && !canInstall[^;]*macAddsAgent\(data\.devices\)/);
 });
 
-test("the panel's trash removes one skill from My skills or the Mac, without Edit", () => {
+test("the panel's trash is one action named for what it does, and In My skills isn't a button", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
-  assert.match(source, /if \(discovery \|\| \(!savable && !onThisMac\)\) return null;/, "My skills only, and only when one choice applies");
-  assert.match(source, /<MenuItem icon=\{X\} disabled=\{!!detail\.installed\} onSelect=\{\(\) => setRemoving\(\[detail\]\)\}>/, "same confirm as Edit; a skill on a Mac stays");
-  assert.match(source, /onSelect=\{\(\) => deleteFromMac\(\[detailLive!\.name\]\)\}>/, "the Mac app asks before it deletes");
-  assert.match(source, /const savable = editableView && !detail\.setItemKind && !!\(cloud\?\.remove \|\| additions\)\s+&& !!\(detail\.cloudKey \|\| \(detail\.added && detail\.catalogId\)\) && \(!detail\.installed \|\| onThisMac\);/, "same skills as Edit's Remove from My skills");
+  assert.match(source, /<IconButton label="Delete from Mac" title="Delete from Mac \(the Mac app asks first\)"\s+onClick=\{\(\) => deleteFromMac\(\[detailLive\.name\]\)\}>/, "on a Mac: the Mac app asks first");
+  assert.match(source, /const target = discovery && detail\.catalogId \? allMine\.find\(skill => skill\.catalogId === detail\.catalogId\) \?\? detail : detail;/, "Discover removes what My skills has");
+  assert.match(source, /return !target\.installed && !adding && \(cloud\?\.remove \|\| additions\) && \(target\.cloudKey \|\| inMySkills\(target\.catalogId\)\) && \(\s+<IconButton label="Remove from My skills" onClick=\{\(\) => setRemoving\(\[target\]\)\}>/, "not on a Mac: same confirm as Edit, not while still adding");
+  assert.equal(source.includes("<Check aria-hidden=\"true\" />In My skills"), false, "no In My skills button");
   assert.match(source, /if \(selected && keys\.includes\(selected\.key\) && !discovery\) closeDetail\(\);\s+const results = await/, "the panel closes before the request, never after the view changed");
 });
 
@@ -61,4 +61,13 @@ test("deletes confirm with a red toast: at once for My skills, after the Mac's c
   assert.match(source, /setDeletedNotice\(skills\.length === 1 \? `Removed \$\{skills\[0\]\.name\}`/);
   assert.match(source, /<div className="ua-toast ua-toast-danger" role="status">/);
   assert.equal(source.match(/removeFromMacLink\(/g)?.length, 1, "every Mac delete goes through deleteFromMac");
+});
+
+test("Discover marks skills already in My skills with a quiet My skills tag, not a button", () => {
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(source, /const inMine = \(skill: SkillDisplay\) => !!skill\.installed \|\| \(!!skill\.catalogId && mineCatalogIds\.has\(skill\.catalogId\)\);/);
+  assert.match(source, /!detail\.cloudKey\s+&& !inMySkills\(detail\.catalogId\) && !inMine\(detail\)\);/, "no Add next to the trash for a skill My skills already has");
+  assert.match(source, /\{addable && \(\s+<button type="button" className=\{onMac \? "ua-pill ua-detail-copy" : "ua-pill ua-primary"\}/, "off a Mac, Add to My skills is the main button");
+  assert.match(source, /className=\{`ua-pill ua-detail-copy-icon \$\{onMac \|\| addable \? "ua-detail-copy" : "ua-primary"\}`\} aria-label="Copy install command"/, "Copy steps back when Add is there");
+  assert.equal(source.match(/\{discovery && signedIn && inMine\((skill|detail)\) && <span className="ua-mine-tag">My skills<\/span>\}/g)?.length, 2, "row and panel");
 });
