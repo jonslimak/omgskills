@@ -530,6 +530,13 @@ export function UnifiedApp({
     const timer = setTimeout(() => setInstalledNotice(""), 3000);
     return () => clearTimeout(timer);
   }, [installedNotice]);
+  // Red confirmation, like the install one: removed from My skills, or gone from the Mac after the app deletes it.
+  const [deletedNotice, setDeletedNotice] = useState("");
+  useEffect(() => {
+    if (!deletedNotice) return;
+    const timer = setTimeout(() => setDeletedNotice(""), 3000);
+    return () => clearTimeout(timer);
+  }, [deletedNotice]);
   // Long descriptions start as their "Use when" summary.
   const [descriptionOpen, setDescriptionOpen] = useState(false);
   // Per-Mac scan history stays behind "Show history" at the bottom of the panel.
@@ -612,6 +619,30 @@ export function UnifiedApp({
   const detail = selected ?? closingDetail.current?.skill;
   const selectedInstallations = detail?.installed?.sourceSkills ?? [];
   // A Set or Favorites row holds the saved copy; versions come from all of that skill's copies Macs have now.
+  // Names sent to the Mac app to delete; the toast shows when the Mac's next check-in no longer has them.
+  // The app asks first, so a canceled delete just expires.
+  const macDeletes = useRef<{ names: string[]; until: number } | null>(null);
+  function deleteFromMac(names: string[]) {
+    // Adds to deletes still waiting, so an earlier one keeps its toast.
+    const waiting = macDeletes.current && Date.now() <= macDeletes.current.until ? macDeletes.current.names : [];
+    macDeletes.current = { names: [...new Set([...waiting, ...names])], until: Date.now() + 10 * 60_000 };
+    window.location.assign(removeFromMacLink(names));
+  }
+  const onMacKey = [...new Set(mine.flatMap(skill => skill.installed ? [skill.installed.name.trim().toLowerCase()] : []))].sort().join("\n");
+  const macSeen = macAppSeen(data.devices);
+  useEffect(() => {
+    const pending = macDeletes.current;
+    if (!pending) return;
+    if (Date.now() > pending.until) { macDeletes.current = null; return; }
+    // No skills and no Mac means the list didn't load (or access ended); with the Mac there, it deleted the last one.
+    if (!onMacKey && !macSeen) return;
+    const still = new Set(onMacKey.split("\n"));
+    const gone = pending.names.filter(name => !still.has(name.trim().toLowerCase()));
+    if (!gone.length) return;
+    pending.names = pending.names.filter(name => still.has(name.trim().toLowerCase()));
+    if (!pending.names.length) macDeletes.current = null;
+    setDeletedNotice(gone.length === 1 ? `Deleted ${gone[0]} from your Mac` : `Deleted ${gone.length} skills from your Mac`);
+  }, [onMacKey, macSeen]);
   const liveCopiesOf = (skill: SkillDisplay) => skill.installed && (mine.find(mineSkill =>
     mineSkill.installed?.allSkillIds.includes(skill.installed!.id))?.installed ?? liveSkill(skill).installed);
   const detailLive = detail ? liveCopiesOf(detail) : undefined;
@@ -798,6 +829,9 @@ export function UnifiedApp({
     const keys = skills.map(skill => skill.key);
     setRemoved(old => [...old, ...keys]);
     setPicked(old => old.filter(key => !keys.includes(key)));
+    // Removed from its open panel: the skill leaves the list now, so close the panel now (not after the request,
+    // when the view may have changed).
+    if (selected && keys.includes(selected.key) && !discovery) closeDetail();
     const results = await Promise.allSettled(skills.map(async skill => {
       if (skill.cloudKey && cloud?.remove) {
         await cloud.remove(skill.cloudKey);
@@ -810,7 +844,8 @@ export function UnifiedApp({
     if (failed.length) {
       setRemoved(old => old.filter(key => !failed.some(skill => skill.key === key)));
       setNotice(failed.length === skills.length ? "Couldn't remove. Try again." : `Couldn't remove ${failed.map(skill => skill.name).join(", ")}. Try again.`);
-    } else setNotice(skills.length === 1 ? `Removed ${skills[0].name}` : `Removed ${skills.length} skills`);
+    } else setDeletedNotice(skills.length === 1 ? `Removed ${skills[0].name}` : `Removed ${skills.length} skills`);
+
   }
   function closeDetail() {
     navigate({ ...nav, selected: "" });
@@ -1139,7 +1174,7 @@ export function UnifiedApp({
                 Make versions match…
               </MenuItem>}
               {(!readOnlyAccount || management) && liveCopies && <MenuItem icon={Trash2} danger
-                onSelect={() => window.location.assign(removeFromMacLink([liveCopies.name]))}>
+                onSelect={() => deleteFromMac([liveCopies.name])}>
                 Delete from my Mac…
               </MenuItem>}
             </Menu>
@@ -1999,7 +2034,7 @@ export function UnifiedApp({
                             onClick={() => addToSet(forSets)}><ListPlus />Add to set</button>
                           {(!readOnlyAccount || management) && <button type="button" className="ua-pill ua-pill-danger" disabled={!names.length || tooMany}
                             title={tooMany ? `Select up to ${maxRemoveFromMac} skills` : "The Mac app asks first"}
-                            onClick={() => window.location.assign(removeFromMacLink(names))}>
+                            onClick={() => deleteFromMac(names)}>
                             <Trash2 />Delete from Mac
                           </button>}
                           {(cloud?.remove || additions) && <button type="button" className="ua-pill ua-pill-danger" disabled={!savedOnly.length}
@@ -2233,6 +2268,25 @@ export function UnifiedApp({
                       <Share />
                     </IconButton>
                   )}
+                  {/* Trash: take one skill out of My skills or off this Mac, without Edit. Same rules as Edit:
+                      only skills no Mac has leave My skills; the Mac app asks before it deletes. */}
+                  {(() => {
+                    const onThisMac = (!readOnlyAccount || management) && !!detailLive;
+                    // Like Edit: only in views Edit has, never for a Set's own entry; on a Mac it waits for the Mac delete.
+                    const savable = editableView && !detail.setItemKind && !!(cloud?.remove || additions)
+                      && !!(detail.cloudKey || (detail.added && detail.catalogId)) && (!detail.installed || onThisMac);
+                    if (discovery || (!savable && !onThisMac)) return null;
+                    return <Menu theme={theme} label={`Remove ${detail.name}`}
+                      trigger={<IconButton label={`Remove ${detail.name}`}><Trash2 /></IconButton>}>
+                      {savable && <MenuItem icon={X} disabled={!!detail.installed} onSelect={() => setRemoving([detail])}>
+                        {detail.installed ? "Remove from My skills (delete from Mac first)" : "Remove from My skills"}
+                      </MenuItem>}
+                      {onThisMac && <MenuItem icon={Trash2} danger
+                        onSelect={() => deleteFromMac([detailLive!.name])}>
+                        Delete from my Mac…
+                      </MenuItem>}
+                    </Menu>;
+                  })()}
                   {/* Personal vs library is a quiet icon at the end: hover or tap shows the words. */}
                   {kindLabel && KindIcon && <KindTip label={kindLabel} icon={KindIcon} />}
                   </span>
@@ -2544,6 +2598,11 @@ export function UnifiedApp({
       {installedNotice && (
         <div className="ua-toast ua-toast-success" role="status">
           <Check aria-hidden="true" /> {installedNotice}
+        </div>
+      )}
+      {deletedNotice && (
+        <div className="ua-toast ua-toast-danger" role="status">
+          <Trash2 aria-hidden="true" /> {deletedNotice}
         </div>
       )}
       {notice && (

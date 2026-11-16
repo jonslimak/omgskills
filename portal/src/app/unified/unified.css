@@ -2376,7 +2376,8 @@
   box-shadow: var(--ua-shadow);
   z-index: 100;
 }
-.ua-toast.ua-toast-success {
+.ua-toast.ua-toast-success,
+.ua-toast.ua-toast-danger {
   top: 16px;
   bottom: auto;
   display: flex;
@@ -2393,7 +2394,14 @@
 .ua-theme[data-theme="dark"] .ua-toast.ua-toast-success {
   background: #30d158;
 }
-.ua-toast.ua-toast-success svg {
+.ua-toast.ua-toast-danger {
+  background: #ff3b30; /* macOS system red */
+}
+.ua-theme[data-theme="dark"] .ua-toast.ua-toast-danger {
+  background: #ff453a;
+}
+.ua-toast.ua-toast-success svg,
+.ua-toast.ua-toast-danger svg {
   width: 14px;
   height: 14px;
 }
