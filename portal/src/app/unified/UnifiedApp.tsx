@@ -623,7 +623,9 @@ export function UnifiedApp({
   // The app asks first, so a canceled delete just expires.
   const macDeletes = useRef<{ names: string[]; until: number } | null>(null);
   function deleteFromMac(names: string[]) {
-    macDeletes.current = { names, until: Date.now() + 10 * 60_000 };
+    // Adds to deletes still waiting, so an earlier one keeps its toast.
+    const waiting = macDeletes.current && Date.now() <= macDeletes.current.until ? macDeletes.current.names : [];
+    macDeletes.current = { names: [...new Set([...waiting, ...names])], until: Date.now() + 10 * 60_000 };
     window.location.assign(removeFromMacLink(names));
   }
   const onMacKey = [...new Set(mine.flatMap(skill => skill.installed ? [skill.installed.name.trim().toLowerCase()] : []))].sort().join("\n");
@@ -631,6 +633,8 @@ export function UnifiedApp({
     const pending = macDeletes.current;
     if (!pending) return;
     if (Date.now() > pending.until) { macDeletes.current = null; return; }
+    // No skills at all usually means the list didn't load (or access ended), not that the Mac deleted them.
+    if (!onMacKey) return;
     const still = new Set(onMacKey.split("\n"));
     const gone = pending.names.filter(name => !still.has(name.trim().toLowerCase()));
     if (!gone.length) return;
@@ -824,6 +828,9 @@ export function UnifiedApp({
     const keys = skills.map(skill => skill.key);
     setRemoved(old => [...old, ...keys]);
     setPicked(old => old.filter(key => !keys.includes(key)));
+    // Removed from its open panel: the skill leaves the list now, so close the panel now (not after the request,
+    // when the view may have changed).
+    if (selected && keys.includes(selected.key) && !discovery) closeDetail();
     const results = await Promise.allSettled(skills.map(async skill => {
       if (skill.cloudKey && cloud?.remove) {
         await cloud.remove(skill.cloudKey);
@@ -837,8 +844,7 @@ export function UnifiedApp({
       setRemoved(old => old.filter(key => !failed.some(skill => skill.key === key)));
       setNotice(failed.length === skills.length ? "Couldn't remove. Try again." : `Couldn't remove ${failed.map(skill => skill.name).join(", ")}. Try again.`);
     } else setDeletedNotice(skills.length === 1 ? `Removed ${skills[0].name}` : `Removed ${skills.length} skills`);
-    // Removed from its open panel: the skill left the list, so close the panel too.
-    if (selected && keys.includes(selected.key) && !failed.some(skill => skill.key === selected.key) && !discovery) closeDetail();
+
   }
   function closeDetail() {
     navigate({ ...nav, selected: "" });

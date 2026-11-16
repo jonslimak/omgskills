@@ -50,12 +50,13 @@ test("the panel's trash removes one skill from My skills or the Mac, without Edi
   assert.match(source, /<MenuItem icon=\{X\} disabled=\{!!detail\.installed\} onSelect=\{\(\) => setRemoving\(\[detail\]\)\}>/, "same confirm as Edit; a skill on a Mac stays");
   assert.match(source, /onSelect=\{\(\) => deleteFromMac\(\[detailLive!\.name\]\)\}>/, "the Mac app asks before it deletes");
   assert.match(source, /const savable = editableView && !detail\.setItemKind && !!\(cloud\?\.remove \|\| additions\)\s+&& !!\(detail\.cloudKey \|\| \(detail\.added && detail\.catalogId\)\) && \(!detail\.installed \|\| onThisMac\);/, "same skills as Edit's Remove from My skills");
-  assert.match(source, /if \(selected && keys\.includes\(selected\.key\) && !failed\.some\(skill => skill\.key === selected\.key\) && !discovery\) closeDetail\(\);/, "the panel closes once its skill is gone");
+  assert.match(source, /if \(selected && keys\.includes\(selected\.key\) && !discovery\) closeDetail\(\);\s+const results = await/, "the panel closes before the request, never after the view changed");
 });
 
 test("deletes confirm with a red toast: at once for My skills, after the Mac's check-in for the Mac", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
-  assert.match(source, /macDeletes\.current = \{ names, until: Date\.now\(\) \+ 10 \* 60_000 \};\s+window\.location\.assign\(removeFromMacLink\(names\)\);/);
+  assert.match(source, /macDeletes\.current = \{ names: \[\.\.\.new Set\(\[\.\.\.waiting, \.\.\.names\]\)\], until: Date\.now\(\) \+ 10 \* 60_000 \};\s+window\.location\.assign\(removeFromMacLink\(names\)\);/, "a second delete keeps the first one's toast");
+  assert.match(source, /if \(!onMacKey\) return;/, "an empty list isn't a delete");
   assert.match(source, /const gone = pending\.names\.filter\(name => !still\.has\(name\.trim\(\)\.toLowerCase\(\)\)\);/);
   assert.match(source, /setDeletedNotice\(skills\.length === 1 \? `Removed \$\{skills\[0\]\.name\}`/);
   assert.match(source, /<div className="ua-toast ua-toast-danger" role="status">/);
