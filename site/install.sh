@@ -9,10 +9,10 @@
 set -euo pipefail
 
 # Kept in step with portal/src/app/unified/production-distribution.ts (checked by tests).
-VERSION="0.0.42"
-BUILD="42"
-URL="https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.42/OMGSkills-Connected-0.0.42-42-arm64.zip"
-SHA256="1cb279bb8db4f10b5b406067a0c4beeb27431fff36483207110ddc3c1edbbe7c"
+VERSION="0.0.43"
+BUILD="43"
+URL="https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.43/OMGSkills-Connected-0.0.43-43-arm64.zip"
+SHA256="cf7f467c2d58cdb46a87ed79c653166429f9d987ddf68f3154bfceefcf71e543"
 TEAM_ID="S4R7UHY755"
 BUNDLE_ID="com.jonslimak.omgskills"
 APP="omgskills.app"
