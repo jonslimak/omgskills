@@ -811,6 +811,8 @@ export function UnifiedApp({
       setRemoved(old => old.filter(key => !failed.some(skill => skill.key === key)));
       setNotice(failed.length === skills.length ? "Couldn't remove. Try again." : `Couldn't remove ${failed.map(skill => skill.name).join(", ")}. Try again.`);
     } else setNotice(skills.length === 1 ? `Removed ${skills[0].name}` : `Removed ${skills.length} skills`);
+    // Removed from its open panel: the skill left the list, so close the panel too.
+    if (selected && keys.includes(selected.key) && !failed.some(skill => skill.key === selected.key) && !discovery) closeDetail();
   }
   function closeDetail() {
     navigate({ ...nav, selected: "" });
@@ -2233,6 +2235,25 @@ export function UnifiedApp({
                       <Share />
                     </IconButton>
                   )}
+                  {/* Trash: take one skill out of My skills or off this Mac, without Edit. Same rules as Edit:
+                      only skills no Mac has leave My skills; the Mac app asks before it deletes. */}
+                  {(() => {
+                    const onThisMac = (!readOnlyAccount || management) && !!detailLive;
+                    // Like Edit: only in views Edit has, never for a Set's own entry; on a Mac it waits for the Mac delete.
+                    const savable = editableView && !detail.setItemKind && !!(cloud?.remove || additions)
+                      && !!(detail.cloudKey || (detail.added && detail.catalogId)) && (!detail.installed || onThisMac);
+                    if (discovery || (!savable && !onThisMac)) return null;
+                    return <Menu theme={theme} label={`Remove ${detail.name}`}
+                      trigger={<IconButton label={`Remove ${detail.name}`}><Trash2 /></IconButton>}>
+                      {savable && <MenuItem icon={X} disabled={!!detail.installed} onSelect={() => setRemoving([detail])}>
+                        {detail.installed ? "Remove from My skills (delete from Mac first)" : "Remove from My skills"}
+                      </MenuItem>}
+                      {onThisMac && <MenuItem icon={Trash2} danger
+                        onSelect={() => window.location.assign(removeFromMacLink([detailLive!.name]))}>
+                        Delete from my Mac…
+                      </MenuItem>}
+                    </Menu>;
+                  })()}
                   {/* Personal vs library is a quiet icon at the end: hover or tap shows the words. */}
                   {kindLabel && KindIcon && <KindTip label={kindLabel} icon={KindIcon} />}
                   </span>

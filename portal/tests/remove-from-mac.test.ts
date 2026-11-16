@@ -43,3 +43,12 @@ test("+ on a personal skill opens the Mac app with only the skill's name", () =>
   assert.match(source, /onClick=\{\(\) => window\.location\.assign\(addAgentLink\(detailLive\.name\)\)\}/);
   assert.match(source, /const localAddAgent = [^;]*missingAgent && !canInstall[^;]*macAddsAgent\(data\.devices\)/);
 });
+
+test("the panel's trash removes one skill from My skills or the Mac, without Edit", () => {
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(source, /if \(discovery \|\| \(!savable && !onThisMac\)\) return null;/, "My skills only, and only when one choice applies");
+  assert.match(source, /<MenuItem icon=\{X\} disabled=\{!!detail\.installed\} onSelect=\{\(\) => setRemoving\(\[detail\]\)\}>/, "same confirm as Edit; a skill on a Mac stays");
+  assert.match(source, /onSelect=\{\(\) => window\.location\.assign\(removeFromMacLink\(\[detailLive!\.name\]\)\)\}>/, "the Mac app asks before it deletes");
+  assert.match(source, /const savable = editableView && !detail\.setItemKind && !!\(cloud\?\.remove \|\| additions\)\s+&& !!\(detail\.cloudKey \|\| \(detail\.added && detail\.catalogId\)\) && \(!detail\.installed \|\| onThisMac\);/, "same skills as Edit's Remove from My skills");
+  assert.match(source, /if \(selected && keys\.includes\(selected\.key\) && !failed\.some\(skill => skill\.key === selected\.key\) && !discovery\) closeDetail\(\);/, "the panel closes once its skill is gone");
+});
