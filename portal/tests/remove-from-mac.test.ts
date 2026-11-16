@@ -60,7 +60,7 @@ test("deletes confirm with a red toast: at once for My skills, after the Mac's c
   assert.match(source, /macDeletes\.current = \{ names: \[\.\.\.new Set\(\[\.\.\.\(waiting\?\.names \?\? \[\]\), \.\.\.names\]\)\], everywhere: \[\.\.\.everywhere\], until: Date\.now\(\) \+ 10 \* 60_000 \};\s+window\.location\.assign\(removeFromMacLink\(names, from\)\);/, "a second delete keeps the first one's toast");
   assert.match(source, /if \(!onMacKey && !macSeen\) return;/, "an empty list with no Mac isn't a delete; the Mac deleting its last skill is");
   assert.match(source, /const gone = pending\.names\.filter\(name => !still\.has\(name\.trim\(\)\.toLowerCase\(\)\)\);/);
-  assert.match(source, /setDeletedNotice\(skills\.length === 1 \? `Removed \$\{skills\[0\]\.name\}`/);
+  assert.match(source, /setDeletedNotice\(`Removed \$\{skills\.length === 1 \? skills\[0\]\.name : `\$\{skills\.length\} skills`\} from My skills`\);/);
   assert.match(source, /<div className="ua-toast ua-toast-danger" role="status">/);
   assert.equal(source.match(/removeFromMacLink\(/g)?.length, 1, "every Mac delete goes through deleteFromMac");
 });
@@ -86,4 +86,18 @@ test("in Discover, Add to set leaves the panel's action row when it can't fit on
   assert.match(source, /const setFits = !discovery \|\| setDroppedAt === null;/);
   assert.match(source, /if \(at !== null\) return width > at \+ 38 \? null : at;/);
   assert.match(source, /settable\(detail\)\) && setFits && \(/);
+});
+
+test("removing a skill no Mac has uses the same centered pop-up, one red button, and works without the Mac app", () => {
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(source, /<Modal title=\{removing\.length === 1 \? "Remove skill" : `Remove \$\{removing\.length\} skills`\}/);
+  assert.match(source, /\{removing\.length === 1 && <PopupSkill name=\{removing\[0\]\.name\} skill=\{removing\[0\]\} \/>\}/);
+  assert.match(source, /onClick=\{\(\) => void removeSaved\(removing\)\}>\s+Remove from My skills<\/button>/);
+});
+
+test("a skill whose source can't be found shows a package-question icon at the end, not a Source unavailable pill", () => {
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(source, /statusLabel === "Source unavailable" \? "Source unavailable" : undefined;/);
+  assert.match(source, /kindLabel === "Source unavailable" \? PackageQuestionMark : null;/);
+  assert.match(source, /statusLabel && statusLabel !== kindLabel && <span className="ua-pill">/, "the pill hides when the icon says it");
 });
