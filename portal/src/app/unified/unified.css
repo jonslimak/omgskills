@@ -1985,6 +1985,13 @@
 .ua-detail-actions .ua-detail-copy {
   color: var(--ua-muted);
 }
+/* Copy is just its icon, the same size as the round buttons beside it, so the row fits on a phone. */
+.ua-detail-actions .ua-detail-copy-icon {
+  justify-content: center;
+  width: 32px;
+  min-width: 32px;
+  padding: 0;
+}
 .ua-detail-signin {
   margin-left: auto;
 }

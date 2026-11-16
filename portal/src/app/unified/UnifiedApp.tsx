@@ -2238,8 +2238,8 @@ export function UnifiedApp({
                   )}
                   {/* On a Mac the app installs it, so the terminal command isn't a second button. */}
                   {detail.installCommand && !canInstall ? (
-                    <button type="button" className={onMac || addable ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
-                      Copy <Copy />
+                    <button type="button" className={`ua-pill ua-detail-copy-icon ${onMac || addable ? "ua-detail-copy" : "ua-primary"}`} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
+                      <Copy />
                     </button>
                   ) : statusLabel && statusLabel !== kindLabel && <span className="ua-pill">{statusLabel}</span>}
                   <span className="ua-detail-icons">
