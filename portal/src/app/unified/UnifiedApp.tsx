@@ -2220,19 +2220,13 @@ export function UnifiedApp({
                       Install <Download />
                     </button>
                   )}
-                  {/* A library skill can join My skills without installing it. */}
-                  {signedIn && additions && detail.catalogId && !installedHere && !detail.cloudKey && (inMySkills(detail.catalogId) ? (
-                    <button type="button" className="ua-pill ua-detail-copy" aria-label="In My skills. Remove from My skills"
-                      title="Remove from My skills" disabled={additions.pending.includes(detail.catalogId)}
-                      onClick={() => changeMySkills(detail.catalogId!, false)}>
-                      <Check aria-hidden="true" />In My skills
-                    </button>
-                  ) : (
+                  {/* A library skill can join My skills without installing it. Once it's in, the trash takes it out. */}
+                  {signedIn && additions && detail.catalogId && !installedHere && !detail.cloudKey && !inMySkills(detail.catalogId) && (
                     <button type="button" className="ua-pill ua-detail-copy" disabled={additions.pending.includes(detail.catalogId)}
                       onClick={() => changeMySkills(detail.catalogId!, true)}>
                       Add to My skills <Plus aria-hidden="true" />
                     </button>
-                  ))}
+                  )}
                   {/* On a Mac the app installs it, so the terminal command isn't a second button. */}
                   {detail.installCommand && !canInstall ? (
                     <button type="button" className={onMac ? "ua-pill ua-detail-copy" : "ua-pill ua-primary"} aria-label="Copy install command" title="Copy install command" onClick={() => void copyInstall(detail)}>
@@ -2268,27 +2262,20 @@ export function UnifiedApp({
                       <Share />
                     </IconButton>
                   )}
-                  {/* Trash: take one skill out of My skills or off this Mac, without Edit. Same rules as Edit:
-                      only skills no Mac has leave My skills; the Mac app asks before it deletes. */}
-                  {(() => {
-                    const onThisMac = (!readOnlyAccount || management) && !!detailLive;
-                    // Like Edit: only in views Edit has, never for a Set's own entry; on a Mac it waits for the Mac delete.
-                    const savable = editableView && !detail.setItemKind && !!(cloud?.remove || additions)
-                      && !!(detail.cloudKey || (detail.added && detail.catalogId)) && (!detail.installed || onThisMac);
-                    if (discovery || (!savable && !onThisMac)) return null;
-                    return <Menu theme={theme} label={`Remove ${detail.name}`}
-                      trigger={<IconButton label={`Remove ${detail.name}`}><Trash2 /></IconButton>}>
-                      {savable && <MenuItem icon={X} disabled={!!detail.installed} onSelect={() => setRemoving([detail])}>
-                        {detail.installed ? "Remove from My skills (delete from Mac first)" : "Remove from My skills"}
-                      </MenuItem>}
-                      {onThisMac && <MenuItem icon={Trash2} danger
-                        onSelect={() => deleteFromMac([detailLive!.name])}>
-                        Delete from my Mac…
-                      </MenuItem>}
-                    </Menu>;
-                  })()}
                   {/* Personal vs library is a quiet icon at the end: hover or tap shows the words. */}
                   {kindLabel && KindIcon && <KindTip label={kindLabel} icon={KindIcon} />}
+                  {/* Trash, last: one action, named for what it does. On a Mac it deletes there (the Mac app asks first);
+                      otherwise it takes the skill out of My skills (after a confirm). A Set's own entry has none. */}
+                  {signedIn && (!readOnlyAccount || management) && !detail.setItemKind && (detailLive ? (
+                    <IconButton label="Delete from Mac" title="Delete from Mac (the Mac app asks first)"
+                      onClick={() => deleteFromMac([detailLive.name])}>
+                      <Trash2 />
+                    </IconButton>
+                  ) : !detail.installed && (cloud?.remove || additions) && (detail.cloudKey || inMySkills(detail.catalogId)) && (
+                    <IconButton label="Remove from My skills" onClick={() => setRemoving([detail])}>
+                      <Trash2 />
+                    </IconButton>
+                  ))}
                   </span>
                   {/* Sync runs in the background; it only shows here when something needs you. */}
                   {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && needsAttention(cloudRow(detail)?.status ?? "saved")

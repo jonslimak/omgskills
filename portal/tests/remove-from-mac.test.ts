@@ -44,12 +44,11 @@ test("+ on a personal skill opens the Mac app with only the skill's name", () =>
   assert.match(source, /const localAddAgent = [^;]*missingAgent && !canInstall[^;]*macAddsAgent\(data\.devices\)/);
 });
 
-test("the panel's trash removes one skill from My skills or the Mac, without Edit", () => {
+test("the panel's trash is one action named for what it does, and In My skills isn't a button", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
-  assert.match(source, /if \(discovery \|\| \(!savable && !onThisMac\)\) return null;/, "My skills only, and only when one choice applies");
-  assert.match(source, /<MenuItem icon=\{X\} disabled=\{!!detail\.installed\} onSelect=\{\(\) => setRemoving\(\[detail\]\)\}>/, "same confirm as Edit; a skill on a Mac stays");
-  assert.match(source, /onSelect=\{\(\) => deleteFromMac\(\[detailLive!\.name\]\)\}>/, "the Mac app asks before it deletes");
-  assert.match(source, /const savable = editableView && !detail\.setItemKind && !!\(cloud\?\.remove \|\| additions\)\s+&& !!\(detail\.cloudKey \|\| \(detail\.added && detail\.catalogId\)\) && \(!detail\.installed \|\| onThisMac\);/, "same skills as Edit's Remove from My skills");
+  assert.match(source, /<IconButton label="Delete from Mac" title="Delete from Mac \(the Mac app asks first\)"\s+onClick=\{\(\) => deleteFromMac\(\[detailLive\.name\]\)\}>/, "on a Mac: the Mac app asks first");
+  assert.match(source, /!detail\.installed && \(cloud\?\.remove \|\| additions\) && \(detail\.cloudKey \|\| inMySkills\(detail\.catalogId\)\) && \(\s+<IconButton label="Remove from My skills" onClick=\{\(\) => setRemoving\(\[detail\]\)\}>/, "not on a Mac: same confirm as Edit");
+  assert.equal(source.includes("<Check aria-hidden=\"true\" />In My skills"), false, "no In My skills button");
   assert.match(source, /if \(selected && keys\.includes\(selected\.key\) && !discovery\) closeDetail\(\);\s+const results = await/, "the panel closes before the request, never after the view changed");
 });
 
