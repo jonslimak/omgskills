@@ -39,6 +39,42 @@
       "reason": "verified-trending"
     },
     {
+      "sourceId": "amplitude/mcp-marketplace:add-analytics-instrumentation",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "amplitude/mcp-marketplace:diff-intake",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "amplitude/mcp-marketplace:discover-analytics-patterns",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "amplitude/mcp-marketplace:discover-event-surfaces",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "amplitude/mcp-marketplace:instrument-events",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "amplitude/mcp-marketplace:taxonomy",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
       "sourceId": "anthropics/skills:frontend-design",
       "checkedAt": "2026-11-11T13:17:51.486Z",
       "outcome": "existing",
@@ -171,10 +207,34 @@
       "reason": "verified-trending"
     },
     {
+      "sourceId": "coreyhaines31/marketingskills:ad-creative",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "coreyhaines31/marketingskills:ai-seo",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "coreyhaines31/marketingskills:content-strategy",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
       "sourceId": "coreyhaines31/marketingskills:conversion-tracking",
       "checkedAt": "2026-11-11T13:17:51.486Z",
       "outcome": "added",
       "reason": "verified-trending"
+    },
+    {
+      "sourceId": "coreyhaines31/marketingskills:copy-editing",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
     },
     {
       "sourceId": "coreyhaines31/marketingskills:copywriting",
@@ -183,10 +243,40 @@
       "reason": "catalog-identity-or-path"
     },
     {
+      "sourceId": "coreyhaines31/marketingskills:cro",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
       "sourceId": "coreyhaines31/marketingskills:link-building",
       "checkedAt": "2026-11-12T19:52:55.556Z",
       "outcome": "added",
       "reason": "verified-trending"
+    },
+    {
+      "sourceId": "coreyhaines31/marketingskills:marketing-psychology",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "coreyhaines31/marketingskills:offers",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "coreyhaines31/marketingskills:pricing",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "coreyhaines31/marketingskills:product-marketing",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
     },
     {
       "sourceId": "coreyhaines31/marketingskills:reverse-engineer-marketing",
@@ -301,6 +391,18 @@
       "checkedAt": "2026-11-10T11:17:49.752Z",
       "outcome": "blocked",
       "reason": "non-original-provenance"
+    },
+    {
+      "sourceId": "greensock/gsap-skills:gsap-core",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "greensock/gsap-skills:gsap-scrolltrigger",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "existing",
+      "reason": "catalog-identity-or-path"
     },
     {
       "sourceId": "heygen-com/hyperframes:media-use",
@@ -598,7 +700,7 @@
     },
     {
       "sourceId": "mcollina/skills:fastify-best-practices",
-      "checkedAt": "2026-11-12T19:52:55.556Z",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
       "outcome": "unresolved",
       "reason": "path-unresolved"
     },
@@ -643,6 +745,12 @@
       "checkedAt": "2026-11-12T19:52:55.556Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "nrwl/nx-ai-agents-config:nx-workspace",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "added",
+      "reason": "verified-trending"
     },
     {
       "sourceId": "prisma/skills:prisma-postgres-upgrade",
@@ -811,6 +919,12 @@
       "checkedAt": "2026-11-13T19:37:36.375Z",
       "outcome": "added",
       "reason": "verified-trending"
+    },
+    {
+      "sourceId": "sentry/dev:sentry-cli",
+      "checkedAt": "2026-11-16T21:57:43.253Z",
+      "outcome": "unresolved",
+      "reason": "source-not-found"
     },
     {
       "sourceId": "skills-shell/superpowers:agent-browser",
