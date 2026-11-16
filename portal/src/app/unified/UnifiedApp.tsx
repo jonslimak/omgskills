@@ -2271,11 +2271,16 @@ export function UnifiedApp({
                       onClick={() => deleteFromMac([detailLive.name])}>
                       <Trash2 />
                     </IconButton>
-                  ) : !detail.installed && (cloud?.remove || additions) && (detail.cloudKey || inMySkills(detail.catalogId)) && (
-                    <IconButton label="Remove from My skills" onClick={() => setRemoving([detail])}>
-                      <Trash2 />
-                    </IconButton>
-                  ))}
+                  ) : (() => {
+                    // Discover shows the library row; remove what My skills has (its synced copy too), as My skills would.
+                    const target = discovery && detail.catalogId ? allMine.find(skill => skill.catalogId === detail.catalogId) ?? detail : detail;
+                    const adding = !!target.catalogId && !!additions?.pending.includes(target.catalogId);
+                    return !target.installed && !adding && (cloud?.remove || additions) && (target.cloudKey || inMySkills(target.catalogId)) && (
+                      <IconButton label="Remove from My skills" onClick={() => setRemoving([target])}>
+                        <Trash2 />
+                      </IconButton>
+                    );
+                  })())}
                   </span>
                   {/* Sync runs in the background; it only shows here when something needs you. */}
                   {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && needsAttention(cloudRow(detail)?.status ?? "saved")

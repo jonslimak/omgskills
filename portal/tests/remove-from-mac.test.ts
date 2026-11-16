@@ -47,7 +47,8 @@ test("+ on a personal skill opens the Mac app with only the skill's name", () =>
 test("the panel's trash is one action named for what it does, and In My skills isn't a button", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /<IconButton label="Delete from Mac" title="Delete from Mac \(the Mac app asks first\)"\s+onClick=\{\(\) => deleteFromMac\(\[detailLive\.name\]\)\}>/, "on a Mac: the Mac app asks first");
-  assert.match(source, /!detail\.installed && \(cloud\?\.remove \|\| additions\) && \(detail\.cloudKey \|\| inMySkills\(detail\.catalogId\)\) && \(\s+<IconButton label="Remove from My skills" onClick=\{\(\) => setRemoving\(\[detail\]\)\}>/, "not on a Mac: same confirm as Edit");
+  assert.match(source, /const target = discovery && detail\.catalogId \? allMine\.find\(skill => skill\.catalogId === detail\.catalogId\) \?\? detail : detail;/, "Discover removes what My skills has");
+  assert.match(source, /return !target\.installed && !adding && \(cloud\?\.remove \|\| additions\) && \(target\.cloudKey \|\| inMySkills\(target\.catalogId\)\) && \(\s+<IconButton label="Remove from My skills" onClick=\{\(\) => setRemoving\(\[target\]\)\}>/, "not on a Mac: same confirm as Edit, not while still adding");
   assert.equal(source.includes("<Check aria-hidden=\"true\" />In My skills"), false, "no In My skills button");
   assert.match(source, /if \(selected && keys\.includes\(selected\.key\) && !discovery\) closeDetail\(\);\s+const results = await/, "the panel closes before the request, never after the view changed");
 });
