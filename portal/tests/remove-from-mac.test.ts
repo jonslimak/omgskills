@@ -12,14 +12,14 @@ test("Delete from my Mac opens the app with only the skill's name", () => {
 test("the delete action is only on skills a Mac has now, in My skills, for the account owner", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /const liveCopies = !discovery \? liveCopiesOf\(skill\) : undefined;/);
-  assert.match(source, /\(!readOnlyAccount \|\| management\) && liveCopies && <MenuItem icon=\{Trash2\} danger\s+onSelect=\{\(\) => window\.location\.assign\(removeFromMacLink\(\[liveCopies\.name\]\)\)\}>/);
+  assert.match(source, /\(!readOnlyAccount \|\| management\) && liveCopies && <MenuItem icon=\{Trash2\} danger\s+onSelect=\{\(\) => deleteFromMac\(\[liveCopies\.name\]\)\}>/);
 });
 
 test("Edit can delete the selected skills a Mac has now, in one link", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /\.flatMap\(skill => liveCopiesOf\(skill\)\?\.name \?\? \[\]\)/);
   assert.match(source, /disabled=\{!names\.length \|\| tooMany\}/);
-  assert.match(source, /onClick=\{\(\) => window\.location\.assign\(removeFromMacLink\(names\)\)\}/);
+  assert.match(source, /onClick=\{\(\) => deleteFromMac\(names\)\}/);
 });
 
 test("Make versions match opens the app for a skill whose agents have different versions", () => {
@@ -48,7 +48,16 @@ test("the panel's trash removes one skill from My skills or the Mac, without Edi
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /if \(discovery \|\| \(!savable && !onThisMac\)\) return null;/, "My skills only, and only when one choice applies");
   assert.match(source, /<MenuItem icon=\{X\} disabled=\{!!detail\.installed\} onSelect=\{\(\) => setRemoving\(\[detail\]\)\}>/, "same confirm as Edit; a skill on a Mac stays");
-  assert.match(source, /onSelect=\{\(\) => window\.location\.assign\(removeFromMacLink\(\[detailLive!\.name\]\)\)\}>/, "the Mac app asks before it deletes");
+  assert.match(source, /onSelect=\{\(\) => deleteFromMac\(\[detailLive!\.name\]\)\}>/, "the Mac app asks before it deletes");
   assert.match(source, /const savable = editableView && !detail\.setItemKind && !!\(cloud\?\.remove \|\| additions\)\s+&& !!\(detail\.cloudKey \|\| \(detail\.added && detail\.catalogId\)\) && \(!detail\.installed \|\| onThisMac\);/, "same skills as Edit's Remove from My skills");
   assert.match(source, /if \(selected && keys\.includes\(selected\.key\) && !failed\.some\(skill => skill\.key === selected\.key\) && !discovery\) closeDetail\(\);/, "the panel closes once its skill is gone");
+});
+
+test("deletes confirm with a red toast: at once for My skills, after the Mac's check-in for the Mac", () => {
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(source, /macDeletes\.current = \{ names, until: Date\.now\(\) \+ 10 \* 60_000 \};\s+window\.location\.assign\(removeFromMacLink\(names\)\);/);
+  assert.match(source, /const gone = pending\.names\.filter\(name => !still\.has\(name\.trim\(\)\.toLowerCase\(\)\)\);/);
+  assert.match(source, /setDeletedNotice\(skills\.length === 1 \? `Removed \$\{skills\[0\]\.name\}`/);
+  assert.match(source, /<div className="ua-toast ua-toast-danger" role="status">/);
+  assert.equal(source.match(/removeFromMacLink\(/g)?.length, 1, "every Mac delete goes through deleteFromMac");
 });
