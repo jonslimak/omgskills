@@ -44,9 +44,10 @@
   --ua-muted: #a3a3ac;
   --ua-faint: #85858f;
   --ua-side: #19191c;
-  --ua-chip: #242428;
+  /* Buttons and cards must stand out from the page in dark mode. */
+  --ua-chip: #2a2a2f;
   --ua-saved: #4cc27a;
-  --ua-selection: #303035;
+  --ua-selection: #36363c;
   --ua-line: #333338;
   --rd-row-divider: var(--ua-line);
   --ua-blue: #409cff;
@@ -55,6 +56,9 @@
   color-scheme: dark;
 }
 .ua-theme[data-theme="dark"]:is(.ua-drawer, .ua-detail) {
+  /* The panel is lighter than the page, so its buttons and cards go lighter again. */
+  --ua-chip: #34343a;
+  --ua-selection: #404047;
   background: #202024;
   box-shadow: inset 0 0 0 1px var(--ua-line), var(--ua-shadow);
 }
