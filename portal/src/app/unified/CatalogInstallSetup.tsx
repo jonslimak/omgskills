@@ -36,8 +36,11 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
   const pick = (next: CatalogInstallAgent) => { store.clear(); setAgent(next); };
   // Claude and Codex are toggles; both on installs in both (where the Mac can), and one always stays on.
   const on = (kind: "claude" | "codex") => agent === kind || agent === "both";
+  // An agent that already has the skill can't be picked again.
+  const already = (kind: "claude" | "codex") => !!skill.installed?.sources.some(source => agentKind(source) === kind);
   const toggle = (kind: "claude" | "codex") => {
     const other = kind === "claude" ? "codex" : "claude";
+    if (already(kind)) return;
     if (!bothOffered) return pick(kind);
     if (on(kind)) { if (on(other)) pick(other); }
     else pick(on(other) ? "both" : kind);
@@ -49,7 +52,8 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
       appKnown={appKnown || confirmed} onAppConfirmed={() => setConfirmed(true)} checkAck={checkAck}
       picker={<div className="ua-install-agents" role="group" aria-label="Agent">
       {(["claude", "codex"] as const).map(kind => <button key={kind} type="button"
-        aria-pressed={on(kind)} className="ua-install-agent" onClick={() => toggle(kind)}>
+        aria-pressed={on(kind)} className="ua-install-agent" onClick={() => toggle(kind)}
+        disabled={already(kind)} title={already(kind) ? `Already in ${kind === "claude" ? "Claude" : "Codex"}` : undefined}>
         <span className="ua-agent-logo" data-agent={kind} aria-hidden="true" />{kind === "claude" ? "Claude" : "Codex"}
       </button>)}
     </div>} />

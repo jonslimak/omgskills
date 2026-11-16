@@ -82,6 +82,8 @@ test("Claude and Codex start both selected where the Mac can, and on the missing
   assert.doesNotMatch(render(true), />Both</);
   assert.equal(pressed(render(false)), "Claude");
   assert.equal(pressed(render(true)), "Claude+Codex");
+  // The agent that already has it can't be picked again.
+  assert.match(render(true, ["Claude Code"]), /<button[^>]*aria-pressed="false"[^>]*disabled=""[^>]*title="Already in Claude"/);
   assert.equal(pressed(render(true, ["Claude Code"])), "Codex");
   assert.equal(pressed(render(true, ["Codex"])), "Claude");
 
