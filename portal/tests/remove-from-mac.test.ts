@@ -63,8 +63,8 @@ test("deletes confirm with a red toast: at once for My skills, after the Mac's c
   assert.equal(source.match(/removeFromMacLink\(/g)?.length, 1, "every Mac delete goes through deleteFromMac");
 });
 
-test("Discover marks skills already in My skills with a quiet tag by the creator, not a button", () => {
+test("Discover marks skills already in My skills with a quiet My skills tag, not a button", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /const inMine = \(skill: SkillDisplay\) => !!skill\.installed \|\| \(!!skill\.catalogId && mineCatalogIds\.has\(skill\.catalogId\)\);/);
-  assert.equal(source.match(/\{discovery && signedIn && inMine\((skill|detail)\) && <span className="ua-mine-tag">In My skills<\/span>\}/g)?.length, 2, "row and panel");
+  assert.equal(source.match(/\{discovery && signedIn && inMine\((skill|detail)\) && <span className="ua-mine-tag">My skills<\/span>\}/g)?.length, 2, "row and panel");
 });
