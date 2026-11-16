@@ -2267,9 +2267,7 @@ export function UnifiedApp({
                       <Share />
                     </IconButton>
                   )}
-                  {/* Personal vs library is a quiet icon at the end: hover or tap shows the words. */}
-                  {kindLabel && KindIcon && <KindTip label={kindLabel} icon={KindIcon} />}
-                  {/* Trash, last: one action, named for what it does. On a Mac it deletes there (the Mac app asks first);
+                  {/* Trash, before the kind icon: one action, named for what it does. On a Mac it deletes there (the Mac app asks first);
                       otherwise it takes the skill out of My skills (after a confirm). A Set's own entry has none. */}
                   {signedIn && (!readOnlyAccount || management) && !detail.setItemKind && (detailLive ? (
                     <IconButton label="Delete from Mac" title="Delete from Mac (the Mac app asks first)"
@@ -2286,6 +2284,8 @@ export function UnifiedApp({
                       </IconButton>
                     );
                   })())}
+                  {/* Personal vs library is a quiet icon at the end: hover or tap shows the words. */}
+                  {kindLabel && KindIcon && <KindTip label={kindLabel} icon={KindIcon} />}
                   </span>
                   {/* Sync runs in the background; it only shows here when something needs you. */}
                   {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && needsAttention(cloudRow(detail)?.status ?? "saved")
