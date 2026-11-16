@@ -2220,6 +2220,18 @@
   white-space: nowrap;
   cursor: default;
 }
+/* Under the panel's buttons: a quiet line, not a button-sized badge. */
+.ua-detail-sync-note .ua-cloud-badge {
+  min-height: 0;
+  padding: 0;
+  gap: 4px;
+  font-size: 11px;
+  white-space: normal;
+}
+.ua-detail-sync-note .ua-cloud-badge svg {
+  width: 12px;
+  height: 12px;
+}
 .ua-cloud-badge svg {
   width: 15px;
   height: 15px;

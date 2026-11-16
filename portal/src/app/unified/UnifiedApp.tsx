@@ -2334,15 +2334,15 @@ export function UnifiedApp({
                   {/* Discover is all library skills, so the library/personal icon says nothing there. */}
                   {!discovery && kindLabel && KindIcon && <KindTip label={kindLabel} icon={KindIcon} />}
                   </span>
-                  {/* Sync runs in the background; it only shows here when something needs you. */}
-                  {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && needsAttention(cloudRow(detail)?.status ?? "saved")
-                    && <CloudStatusBadge row={cloudRow(detail)} notInstalled={!!detail.cloudKey} />}
                   {!signedIn && (
                     <button type="button" className="ua-pill ua-primary ua-detail-signin" onClick={signIn} data-humblytics="App Sign In">
                       Sign in to manage skills
                     </button>
                   )}
                 </div>
+                {/* Sync runs in the background; it only shows when something needs you, in small text under the buttons. */}
+                {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && needsAttention(cloudRow(detail)?.status ?? "saved")
+                  && <div className="ua-detail-sync-note"><CloudStatusBadge row={cloudRow(detail)} notInstalled={!!detail.cloudKey} /></div>}
                 {!onMac && detail.installCommand && (
                   <p className="ua-muted ua-detail-copy-hint">
                     Paste in your terminal (macOS, Linux or WSL). <a className="ua-link" href="/developers/">Use with any agent (MCP)</a>
