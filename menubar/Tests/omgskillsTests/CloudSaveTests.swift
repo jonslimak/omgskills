@@ -65,6 +65,40 @@ struct CloudSaveFolderTests {
         #expect(throws: CloudSaveFolder.ReadError.invalid(.missingSkillMd)) { try CloudSaveFolder.read(directory: empty) }
     }
 
+    @Test func followsLinksIntoThisAppsOwnInstallsButNotItsStagingOrHiddenFiles() throws {
+        let home = try temporaryRoot()
+        let fm = FileManager.default
+        let state = home.appendingPathComponent("Library/Application Support/omgskills", isDirectory: true)
+        let managed = state.appendingPathComponent("managed", isDirectory: true)
+        let policy = CloudSaveFolder.LinkPolicy(home: home, libraryRoot: state.appendingPathComponent("repos"), managedRoot: managed)
+        let skills = home.appendingPathComponent(".claude/skills", isDirectory: true)
+        try fm.createDirectory(at: skills, withIntermediateDirectories: true)
+        // An install from the website: the agent's folder links to an activation, which links to the package's content.
+        let content = try makeSkill(managed.appendingPathComponent("packages/abc/def"), "content", files: ["notes.md": "n"])
+        let activation = managed.appendingPathComponent("activations/123/A1", isDirectory: true)
+        try fm.createDirectory(at: activation, withIntermediateDirectories: true)
+        try fm.createSymbolicLink(at: activation.appendingPathComponent("content"), withDestinationURL: content)
+        try fm.createSymbolicLink(at: skills.appendingPathComponent("choreograph"), withDestinationURL: activation.appendingPathComponent("content"))
+        let read = try CloudSaveFolder.read(directory: skills.appendingPathComponent("choreograph"), links: policy)
+        #expect(read.treeSha == (try CloudSaveFolder.read(directory: content)).treeSha)
+        // Without the install folder in the policy, it stays private (as before).
+        let old = CloudSaveFolder.LinkPolicy(home: home, libraryRoot: state.appendingPathComponent("repos"))
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("choreograph")) {
+            try CloudSaveFolder.read(directory: skills.appendingPathComponent("choreograph"), links: old)
+        }
+        // Half-done installs and hidden files in the install folder are never read.
+        let staged = try makeSkill(managed.appendingPathComponent("staging/x"), "content")
+        try fm.createSymbolicLink(at: skills.appendingPathComponent("staged"), withDestinationURL: staged)
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("staged")) {
+            try CloudSaveFolder.read(directory: skills.appendingPathComponent("staged"), links: policy)
+        }
+        let hidden = try makeSkill(managed.appendingPathComponent("packages/.cache"), "content")
+        try fm.createSymbolicLink(at: skills.appendingPathComponent("hidden"), withDestinationURL: hidden)
+        #expect(throws: CloudSaveFolder.ReadError.privateLink("hidden")) {
+            try CloudSaveFolder.read(directory: skills.appendingPathComponent("hidden"), links: policy)
+        }
+    }
+
     @Test func followsLinksToYourOwnFilesAndTheOldLibraryButNotPrivatePlaces() throws {
         let home = try temporaryRoot()
         let fm = FileManager.default

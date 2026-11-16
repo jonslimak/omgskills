@@ -37,6 +37,15 @@ struct CloudSaveFolder: Equatable, Sendable {
         let home: URL
         /// Where older omgskills versions kept library repos and linked skills into.
         let libraryRoot: URL
+        /// Where this app installs skills (library, Sets, saved copies) and links agents' skill folders to.
+        /// Its finished installs are read like the library; half-done ones (staging) never are.
+        var managedRoot: URL? = nil
+
+        init(home: URL, libraryRoot: URL, managedRoot: URL? = nil) {
+            self.home = home
+            self.libraryRoot = libraryRoot
+            self.managedRoot = managedRoot
+        }
 
         /// Hidden folders in the home folder that hold skills; any other hidden folder holds settings or keys.
         private static let agentFolders: Set<String> = [".claude", ".codex", ".agents", ".cursor"]
@@ -64,6 +73,15 @@ struct CloudSaveFolder: Equatable, Sendable {
                 // Library copies are public, but a repo's hidden files (.git holds its settings) are never read.
                 let inside = path.dropFirst(library.count).split(separator: "/")
                 return inside.contains { $0.hasPrefix(".") } ? .privateFile : .library
+            }
+            if let managedRoot {
+                let managed = managedRoot.resolvingSymlinksInPath().standardizedFileURL.path
+                if path.hasPrefix(managed + "/") {
+                    let inside = path.dropFirst(managed.count).split(separator: "/")
+                    guard let area = inside.first, ["activations", "packages"].contains(area),
+                          !inside.contains(where: { $0.hasPrefix(".") }) else { return .privateFile }
+                    return .library
+                }
             }
             let homePath = home.resolvingSymlinksInPath().standardizedFileURL.path
             guard path.hasPrefix(homePath + "/") else { return .privateFile }

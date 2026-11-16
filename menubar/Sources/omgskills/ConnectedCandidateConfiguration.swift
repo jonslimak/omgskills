@@ -93,7 +93,8 @@ extension ConnectedCandidateConfiguration {
             credential: { [weak connection] in connection?.currentCredential },
             scan: { try await InstalledSkillsScanner.scanForReconciliation(filesystemPaths: paths, pathAnchor: paths.homeDirectory) },
             folderKeys: { CloudSaveController.folderKeys(in: paths.allSkillsRoots) },
-            links: CloudSaveFolder.LinkPolicy(home: paths.homeDirectory, libraryRoot: paths.legacyRepoCacheRoot))
+            links: CloudSaveFolder.LinkPolicy(home: paths.homeDirectory, libraryRoot: paths.legacyRepoCacheRoot,
+                managedRoot: paths.legacyRepoCacheRoot.deletingLastPathComponent().appendingPathComponent("managed", isDirectory: true)))
         return runtime
     }
 }
