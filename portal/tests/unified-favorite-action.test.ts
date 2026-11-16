@@ -111,7 +111,7 @@ test("failed and uncertain heart actions release the pending lock without unhand
 test("save feedback is available inside an open detail sheet instead of behind it", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.ok(source.includes('management?.notice && !detail && <p className="ua-muted" role="status">'));
-  const actions = source.indexOf('<div className="ua-detail-actions">');
+  const actions = source.indexOf('<div className="ua-detail-actions" ref={actionsRef}>');
   const description = source.indexOf('<div className="ua-description">', actions);
   assert.match(source.slice(actions, description), /management\?\.notice && <p className="ua-muted" role="status">\{management.notice\}/);
 });

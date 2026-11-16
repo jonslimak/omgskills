@@ -80,3 +80,10 @@ test("removing a skill on a Mac asks in a centered pop-up: This device, or This 
   assert.match(source, /onClick=\{\(\) => removeFromMac\(removingFromMac\.names, "everywhere"\)\}>\s+This device and My skills<\/button>/);
   assert.match(source, /deleteFromMac\(names, macTakesChoice \? from : undefined\);/, "older Macs get the plain link and ask again");
 });
+
+test("in Discover, Add to set leaves the panel's action row when it can't fit on one line, and comes back with room", () => {
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(source, /const setFits = !discovery \|\| setDroppedAt === null;/);
+  assert.match(source, /if \(at !== null\) return width > at \+ 38 \? null : at;/);
+  assert.match(source, /settable\(detail\)\) && setFits && \(/);
+});

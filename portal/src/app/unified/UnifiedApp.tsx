@@ -736,6 +736,30 @@ export function UnifiedApp({
   const creatorGroups = useMemo(() => discoveryCreatorGroups(catalog.creators), [catalog.creators]);
   const creatorHeader = nav.view === "creator" && !nav.query;
   const discovery = !signedIn || isDiscovery(nav.view);
+  // In Discover, Add to set leaves the panel's action row when the row can't fit on one line.
+  // The width it was dropped at is kept, so it comes back once there's room for it again.
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const [setDroppedAt, setSetDroppedAt] = useState<number | null>(null);
+  const setFits = !discovery || setDroppedAt === null;
+  const detailKey = detail?.key;
+  useEffect(() => { setSetDroppedAt(null); }, [detailKey, discovery]);
+  useEffect(() => {
+    const row = actionsRef.current;
+    if (!row || !discovery || typeof ResizeObserver === "undefined") return;
+    const check = () => {
+      const width = row.clientWidth;
+      setSetDroppedAt(at => {
+        if (at !== null) return width > at + 38 ? null : at;
+        const icons = row.querySelector<HTMLElement>(".ua-detail-icons");
+        const squeezed = [...row.querySelectorAll<HTMLElement>(":scope > .ua-pill")].some(pill => pill.scrollWidth > pill.clientWidth + 1);
+        return (icons && icons.offsetHeight > 40) || squeezed ? width : null;
+      });
+    };
+    check();
+    const observer = new ResizeObserver(check);
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, [detailKey, discovery, panelPending, setDroppedAt === null]);
   // Developers is in both sidebars: opened from My skills, the sidebar stays on My skills.
   const sidebarMine = useRef(false);
   if (nav.view !== "developers") sidebarMine.current = !discovery;
@@ -2208,7 +2232,7 @@ export function UnifiedApp({
                   )}
                 </div>
                 {!panelPending && <>
-                <div className="ua-detail-actions">
+                <div className="ua-detail-actions" ref={actionsRef}>
                   {/* Where it's installed, in one place; + adds it to the agent that doesn't have it. */}
                   {detailLive && <span className="ua-on-agents">
                     {/* "Installed" plus each agent's logo; agents without a logo keep their name. */}
@@ -2274,7 +2298,7 @@ export function UnifiedApp({
                         <Heart />
                       </IconButton>
                   )}
-                  {(!readOnlyAccount || management) && signedIn && (detail.installed || detail.catalogId || settable(detail)) && (
+                  {(!readOnlyAccount || management) && signedIn && (detail.installed || detail.catalogId || settable(detail)) && setFits && (
                       <IconButton
                         label="Add to set"
                         disabled={!!management && !canManage}
