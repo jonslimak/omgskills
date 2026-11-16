@@ -1080,7 +1080,6 @@ export function UnifiedApp({
               {!compact && !creatorHeader && (discovery || nav.query) && skill.author && (
                 <span className="ua-row-author">@{skill.author}</span>
               )}
-              {discovery && signedIn && inMine(skill) && <span className="ua-mine-tag">In My skills</span>}
               {!discovery && <CloudAttention status={cloudRow(skill)?.status} />}
               {(skill.cloudKey || skill.added) && <span className="ua-row-versions" title="In My skills, not on any of your Macs">Not installed</span>}
               {versionCount > 1 && <span className="ua-row-versions" title="Your agents have different versions of this skill">
@@ -1091,6 +1090,7 @@ export function UnifiedApp({
                   <Star aria-hidden="true" />{starCount(skill.stars)}
                 </span>
               )}
+              {discovery && signedIn && inMine(skill) && <span className="ua-mine-tag">In My skills</span>}
             </span>
             <span className="ua-row-description">
               {compact
@@ -2163,7 +2163,6 @@ export function UnifiedApp({
                               @{detail.author}
                             </button>
                           )}
-                          {discovery && signedIn && inMine(detail) && <span className="ua-mine-tag">In My skills</span>}
                           {detail.stars !== undefined && (
                             <span>
                               <Star />
@@ -2182,6 +2181,7 @@ export function UnifiedApp({
                               <span className="ua-creator-github-mark" aria-hidden="true" />
                             </a>
                           )}
+                          {discovery && signedIn && inMine(detail) && <span className="ua-mine-tag">In My skills</span>}
                         </div>
                       </div>
                     </div>

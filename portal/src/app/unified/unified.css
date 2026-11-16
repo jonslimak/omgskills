@@ -864,12 +864,16 @@
   flex-shrink: 0;
   padding: 1px 6px;
   border-radius: 999px;
-  background: var(--ua-chip);
-  color: var(--ua-muted);
+  background: rgba(52, 199, 89, 0.15); /* macOS system green, like the install confirmation */
+  color: #248a3d;
   font-size: 10px;
   font-weight: 500;
   line-height: 14px;
   white-space: nowrap;
+}
+.ua-theme[data-theme="dark"] .ua-mine-tag {
+  background: rgba(48, 209, 88, 0.18);
+  color: #30d158;
 }
 .ua-row-heading:has(.ua-row-author) .ua-row-name {
   flex-shrink: 0;
