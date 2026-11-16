@@ -738,13 +738,14 @@ export function UnifiedApp({
   const discovery = !signedIn || isDiscovery(nav.view);
   // In Discover, Add to set leaves the panel's action row when the row can't fit on one line.
   // The width it was dropped at is kept, so it comes back once there's room for it again.
-  const actionsRef = useRef<HTMLDivElement>(null);
+  // The row node itself, so a remounted panel (closed and reopened, side panel or full width) is measured again.
+  const [actionsRow, actionsRef] = useState<HTMLDivElement | null>(null);
   const [setDroppedAt, setSetDroppedAt] = useState<number | null>(null);
   const setFits = !discovery || setDroppedAt === null;
   const detailKey = detail?.key;
-  useEffect(() => { setSetDroppedAt(null); }, [detailKey, discovery]);
+  useEffect(() => { setSetDroppedAt(null); }, [actionsRow, detailKey, discovery]);
   useEffect(() => {
-    const row = actionsRef.current;
+    const row = actionsRow;
     if (!row || !discovery || typeof ResizeObserver === "undefined") return;
     const check = () => {
       const width = row.clientWidth;
@@ -759,7 +760,7 @@ export function UnifiedApp({
     const observer = new ResizeObserver(check);
     observer.observe(row);
     return () => observer.disconnect();
-  }, [detailKey, discovery, panelPending, setDroppedAt === null]);
+  }, [actionsRow, detailKey, discovery, setDroppedAt === null]);
   // Developers is in both sidebars: opened from My skills, the sidebar stays on My skills.
   const sidebarMine = useRef(false);
   if (nav.view !== "developers") sidebarMine.current = !discovery;
