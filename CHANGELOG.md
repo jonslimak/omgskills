@@ -4,6 +4,11 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.44] - 2026-11-16
+
+### App
+- Removing a skill from the website now asks there whether to remove it from this Mac or from My skills too; the app just confirms.
+
 ## [0.0.43] - 2026-11-15
 
 ### App
