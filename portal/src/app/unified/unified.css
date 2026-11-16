@@ -1967,7 +1967,18 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  /* One row: buttons never drop to a second line; on a very narrow panel the text pills give way first. */
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+.ua-detail-actions > .ua-pill {
+  flex-shrink: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ua-detail-actions > :not(.ua-pill) {
+  flex-shrink: 0;
 }
 .ua-detail-actions .ua-pill {
   min-height: 32px;

@@ -2306,7 +2306,8 @@ export function UnifiedApp({
                     );
                   })())}
                   {/* Personal vs library is a quiet icon at the end: hover or tap shows the words. */}
-                  {kindLabel && KindIcon && <KindTip label={kindLabel} icon={KindIcon} />}
+                  {/* Discover is all library skills, so the library/personal icon says nothing there. */}
+                  {!discovery && kindLabel && KindIcon && <KindTip label={kindLabel} icon={KindIcon} />}
                   </span>
                   {/* Sync runs in the background; it only shows here when something needs you. */}
                   {cloud && !detail.setItemReleaseId && (detail.installed || detail.cloudKey) && needsAttention(cloudRow(detail)?.status ?? "saved")
