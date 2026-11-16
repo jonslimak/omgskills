@@ -4,6 +4,11 @@ All notable changes to omgskills are documented here.
 
 ## [Unreleased]
 
+## [0.0.45] - 2026-11-16
+
+### App
+- Skills installed by omgskills now sync to My skills instead of showing Can't sync.
+
 ## [0.0.44] - 2026-11-16
 
 ### App
