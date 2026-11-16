@@ -319,6 +319,20 @@ function MenuItem({
   );
 }
 
+/** The skill at the top of the Install and Remove pop-ups: avatar, name, creator and stars, centered. */
+function PopupSkill({ name, skill }: { name: string; skill?: SkillDisplay }) {
+  return <div className="ua-install-skill">
+    <Avatar src={skill?.avatar} name={skill?.author || name} size="large" />
+    <div>
+      <strong>{name}</strong>
+      {skill && (skill.author || skill.stars !== undefined) && <div className="ua-detail-meta">
+        {skill.author && <span>@{skill.author}</span>}
+        {skill.stars !== undefined && <span><Star />{starCount(skill.stars)}</span>}
+      </div>}
+    </div>
+  </div>;
+}
+
 function ManagedSetHeader({ set, skills, choices, management, theme, headingActions }: {
   set: PortalSet; skills: SkillDisplay[]; choices: SkillDisplay[]; management: UnifiedManagement; theme: string; headingActions: ReactNode;
 }) {
@@ -891,7 +905,7 @@ export function UnifiedApp({
     if (failed.length) {
       setRemoved(old => old.filter(key => !failed.some(skill => skill.key === key)));
       setNotice(failed.length === skills.length ? "Couldn't remove. Try again." : `Couldn't remove ${failed.map(skill => skill.name).join(", ")}. Try again.`);
-    } else setDeletedNotice(skills.length === 1 ? `Removed ${skills[0].name}` : `Removed ${skills.length} skills`);
+    } else setDeletedNotice(`Removed ${skills.length === 1 ? skills[0].name : `${skills.length} skills`} from My skills`);
 
   }
   function closeDetail() {
@@ -2526,17 +2540,7 @@ export function UnifiedApp({
         <Modal title={removingFromMac.names.length === 1 ? "Remove skill" : `Remove ${removingFromMac.names.length} skills`}
           label={`Remove ${removingFromMac.names.join(", ")}`}
           theme={theme} close={() => setRemovingFromMac(null)} className="ua-modal-compact">
-          {/* The same skill header as Install. */}
-          {removingFromMac.names.length === 1 && <div className="ua-install-skill">
-            <Avatar src={removingFromMac.skill?.avatar} name={removingFromMac.skill?.author || removingFromMac.names[0]} size="large" />
-            <div>
-              <strong>{removingFromMac.names[0]}</strong>
-              {removingFromMac.skill && <div className="ua-detail-meta">
-                {removingFromMac.skill.author && <span>@{removingFromMac.skill.author}</span>}
-                {removingFromMac.skill.stars !== undefined && <span><Star />{starCount(removingFromMac.skill.stars)}</span>}
-              </div>}
-            </div>
-          </div>}
+          {removingFromMac.names.length === 1 && <PopupSkill name={removingFromMac.names[0]} skill={removingFromMac.skill} />}
           <p className="ua-muted">Remove from:</p>
           <div className="ua-modal-choices">
             <button type="button" className="ua-pill ua-modal-action" onClick={() => removeFromMac(removingFromMac.names, "mac")}>
@@ -2547,11 +2551,17 @@ export function UnifiedApp({
           <p className="ua-muted ua-modal-note">Please confirm on your Mac app</p>
         </Modal>
       )}
+      {/* Not on any Mac: the website removes it itself, so it works from a phone too. Same look as the other pop-ups. */}
       {removing && (
-        <Modal title={removing.length === 1 ? `Remove ${removing[0].name}?` : `Remove ${removing.length} skills?`} theme={theme} close={() => setRemoving(null)}>
-          <p className="ua-muted">{removeWarning(removing)}</p>
-          <button type="button" className="ua-pill ua-pill-danger ua-modal-action" onClick={() => void removeSaved(removing)}>
-            {removing.some(skill => skill.cloudKey) ? "Delete" : "Remove"}</button>
+        <Modal title={removing.length === 1 ? "Remove skill" : `Remove ${removing.length} skills`}
+          label={`Remove ${removing.map(skill => skill.name).join(", ")}`}
+          theme={theme} close={() => setRemoving(null)} className="ua-modal-compact">
+          {removing.length === 1 && <PopupSkill name={removing[0].name} skill={removing[0]} />}
+          <div className="ua-modal-choices">
+            <button type="button" className="ua-pill ua-pill-danger ua-modal-action" onClick={() => void removeSaved(removing)}>
+              Remove from My skills</button>
+          </div>
+          <p className="ua-muted ua-modal-note">{removeWarning(removing)}</p>
         </Modal>
       )}
       {!readOnlyAccount && dialog === "new-set" && (
