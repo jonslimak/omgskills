@@ -56,7 +56,7 @@ test("the panel's trash removes one skill from My skills or the Mac, without Edi
 test("deletes confirm with a red toast: at once for My skills, after the Mac's check-in for the Mac", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /macDeletes\.current = \{ names: \[\.\.\.new Set\(\[\.\.\.waiting, \.\.\.names\]\)\], until: Date\.now\(\) \+ 10 \* 60_000 \};\s+window\.location\.assign\(removeFromMacLink\(names\)\);/, "a second delete keeps the first one's toast");
-  assert.match(source, /if \(!onMacKey\) return;/, "an empty list isn't a delete");
+  assert.match(source, /if \(!onMacKey && !macSeen\) return;/, "an empty list with no Mac isn't a delete; the Mac deleting its last skill is");
   assert.match(source, /const gone = pending\.names\.filter\(name => !still\.has\(name\.trim\(\)\.toLowerCase\(\)\)\);/);
   assert.match(source, /setDeletedNotice\(skills\.length === 1 \? `Removed \$\{skills\[0\]\.name\}`/);
   assert.match(source, /<div className="ua-toast ua-toast-danger" role="status">/);

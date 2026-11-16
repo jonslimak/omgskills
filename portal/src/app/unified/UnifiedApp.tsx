@@ -629,19 +629,20 @@ export function UnifiedApp({
     window.location.assign(removeFromMacLink(names));
   }
   const onMacKey = [...new Set(mine.flatMap(skill => skill.installed ? [skill.installed.name.trim().toLowerCase()] : []))].sort().join("\n");
+  const macSeen = macAppSeen(data.devices);
   useEffect(() => {
     const pending = macDeletes.current;
     if (!pending) return;
     if (Date.now() > pending.until) { macDeletes.current = null; return; }
-    // No skills at all usually means the list didn't load (or access ended), not that the Mac deleted them.
-    if (!onMacKey) return;
+    // No skills and no Mac means the list didn't load (or access ended); with the Mac there, it deleted the last one.
+    if (!onMacKey && !macSeen) return;
     const still = new Set(onMacKey.split("\n"));
     const gone = pending.names.filter(name => !still.has(name.trim().toLowerCase()));
     if (!gone.length) return;
     pending.names = pending.names.filter(name => still.has(name.trim().toLowerCase()));
     if (!pending.names.length) macDeletes.current = null;
     setDeletedNotice(gone.length === 1 ? `Deleted ${gone[0]} from your Mac` : `Deleted ${gone.length} skills from your Mac`);
-  }, [onMacKey]);
+  }, [onMacKey, macSeen]);
   const liveCopiesOf = (skill: SkillDisplay) => skill.installed && (mine.find(mineSkill =>
     mineSkill.installed?.allSkillIds.includes(skill.installed!.id))?.installed ?? liveSkill(skill).installed);
   const detailLive = detail ? liveCopiesOf(detail) : undefined;
