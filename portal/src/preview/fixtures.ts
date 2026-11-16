@@ -180,6 +180,8 @@ export function makeFixtures(scenario: Scenario = "populated"): PortalData {
         name: "Jonathan's MacBook Pro",
         lastActive: "Sep 24, 2026",
         status: "active",
+        // The newest app, so the preview shows what current Macs get (e.g. choosing where to remove a skill).
+        appBuild: 44,
       },
       {
         id: "old-mac",

@@ -3112,6 +3112,19 @@ main:has(> .ua-az-anchor) .ua-content {
   .ua-kind-tip:hover .ua-kind-tip-text { visibility: visible; }
 }
 .ua-modal .ua-modal-action { align-self: flex-start; min-height: 36px; padding: 0 16px; }
+.ua-modal-choices { display: flex; flex-direction: column; gap: 8px; }
+/* A short centered question, like a Mac alert. */
+.ua-modal.ua-modal-compact { width: min(300px, calc(100vw - 32px)); gap: 14px; text-align: center; }
+.ua-modal.ua-modal-compact h2 { padding-inline: 20px; font-size: 13px; font-weight: 600; }
+/* The skill name is the only large text; it beats install-setup.css's own header rule. */
+.ua-modal.ua-modal-compact:has(.ua-install-skill) h2 { font-size: 13px; }
+/* The same skill header as the Install pop-up (install-setup.css), which may not be loaded here. */
+.ua-modal-compact .ua-install-skill { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+.ua-modal-compact .ua-install-skill > div { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; max-width: 100%; }
+.ua-modal-compact .ua-install-skill strong { font-size: 17px; letter-spacing: -.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.ua-modal-compact .ua-install-skill .ua-detail-meta { justify-content: center; font-size: 11px; }
+.ua-modal .ua-modal-choices .ua-modal-action { align-self: stretch; justify-content: center; width: 100%; }
+.ua-modal-note { font-size: 11px; }
 /* A narrow list column (the skill panel open): the heading's buttons go under the title instead of squeezing it. */
 @media (min-width: 760px) {
   @container (max-width: 600px) {

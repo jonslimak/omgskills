@@ -1,10 +1,13 @@
 import Foundation
 import Observation
 
-/// "Delete from my Mac" on the website opens `omgskills://remove?name=<skill>[&name=<skill>...]`. The app finds
-/// every copy of those skills in the agent folders, asks once, and moves them to the Trash. A link alone never
-/// deletes anything.
+/// "Delete from my Mac" on the website opens `omgskills://remove?name=<skill>[&name=<skill>...][&from=mac|everywhere]`.
+/// The app finds every copy of those skills in the agent folders, asks once, and moves them to the Trash. A link
+/// alone never deletes anything. With `from`, the website already asked where to remove it from, so the app shows
+/// one button; without it (older pages, Edit), the app asks: this Mac, or My skills too.
 enum SkillRemoval {
+    /// Where the website asked to remove the skills from.
+    enum Scope: String, Equatable { case mac, everywhere }
     /// One skill per name, the same rule the web and the skill count use.
     nonisolated static func normalizedName(_ name: String) -> String {
         name.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ")
@@ -13,14 +16,26 @@ enum SkillRemoval {
     static let maximumSkills = 200
 
     /// The skill names in a removal link (duplicates dropped, order kept), or nil if any part is invalid.
-    static func names(from url: URL) -> [String]? {
+    static func names(from url: URL) -> [String]? { request(from: url)?.names }
+
+    /// The names and, when the website chose, where to remove them from. At most one `from`.
+    static func request(from url: URL) -> (names: [String], scope: Scope?)? {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               components.scheme?.lowercased() == "omgskills",
               components.host?.lowercased() == "remove",
               components.path.isEmpty, components.fragment == nil,
               components.user == nil, components.password == nil, components.port == nil,
-              let items = components.queryItems, !items.isEmpty, items.count <= maximumSkills
+              let all = components.queryItems
         else { return nil }
+        let scopes = all.filter { $0.name == "from" }
+        guard scopes.count <= 1 else { return nil }
+        var scope: Scope?
+        if let item = scopes.first {
+            guard let value = item.value, let chosen = Scope(rawValue: value) else { return nil }
+            scope = chosen
+        }
+        let items = all.filter { $0.name != "from" }
+        guard !items.isEmpty, items.count <= maximumSkills else { return nil }
         var names: [String] = [], seen = Set<String>()
         for item in items {
             guard item.name == "name", let name = item.value?.trimmingCharacters(in: .whitespaces),
@@ -29,7 +44,7 @@ enum SkillRemoval {
             else { return nil }
             if seen.insert(normalizedName(name)).inserted { names.append(name) }
         }
-        return names
+        return (names, scope)
     }
 
     /// This Mac's copies of the skills; links go first so a linked folder is never emptied under them.
@@ -89,7 +104,8 @@ final class SkillRemovalController {
     enum State: Equatable {
         case idle
         /// `names` are the skills this Mac has; `missing` were asked for but are not here.
-        case confirm(names: [String], copies: [Skill], missing: [String])
+        /// `onlyHere`: the website already chose this Mac, so there's no My skills button.
+        case confirm(names: [String], copies: [Skill], missing: [String], onlyHere: Bool = false)
         /// Delete everywhere, asked a second time; `sets` is how many Sets share them, once known.
         case confirmEverywhere(names: [String], copies: [Skill], sets: Int?)
         case working(title: String)
@@ -130,7 +146,7 @@ final class SkillRemovalController {
         guard url.scheme?.lowercased() == "omgskills", url.host?.lowercased() == "remove" else { return false }
         guard !isWorking else { return true }
         attempt = UUID()
-        guard let names = SkillRemoval.names(from: url) else {
+        guard let (names, scope) = SkillRemoval.request(from: url) else {
             state = .failed(message: "This delete link is invalid.")
             return true
         }
@@ -138,13 +154,22 @@ final class SkillRemovalController {
         let here = Set(copies.map { SkillRemoval.normalizedName($0.name) })
         let found = names.filter { here.contains(SkillRemoval.normalizedName($0)) }
         let missing = names.filter { !here.contains(SkillRemoval.normalizedName($0)) }
-        state = copies.isEmpty ? .notFound(names: names) : .confirm(names: found, copies: copies, missing: missing)
+        guard !copies.isEmpty else { state = .notFound(names: names); return true }
+        state = .confirm(names: found, copies: copies, missing: missing, onlyHere: scope == .mac)
+        // The website chose My skills and this Mac: go straight to that one confirmation.
+        if scope == .everywhere {
+            guard canDeleteEverywhere else {
+                state = .failed(message: "Reconnect this Mac to your account to remove from My skills. Nothing was deleted.")
+                return true
+            }
+            chooseEverywhere()
+        }
         return true
     }
 
     /// Remove from this Mac: every copy here goes to the Trash; My skills keeps it.
     func confirm() {
-        guard case .confirm(let names, let asked, _) = state else { return }
+        guard case .confirm(let names, let asked, _, _) = state else { return }
         guard let outcome = trashShown(names: names, asked: asked) else { return }
         state = outcome.failures.isEmpty
             ? .done(title: "Removed \(SkillRemoval.title(outcome.removed))",
@@ -154,7 +179,7 @@ final class SkillRemovalController {
 
     /// Asks again before deleting everywhere, with how many Sets would lose the skills.
     func chooseEverywhere() {
-        guard canDeleteEverywhere, case .confirm(let names, let copies, _) = state else { return }
+        guard canDeleteEverywhere, case .confirm(let names, let copies, _, false) = state else { return }
         let id = UUID()
         attempt = id
         state = .confirmEverywhere(names: names, copies: copies, sets: nil)
@@ -265,9 +290,9 @@ struct SkillRemovalView: View {
             switch controller.state {
             case .idle:
                 EmptyView()
-            case .confirm(let names, let copies, let missing):
+            case .confirm(let names, let copies, let missing, let onlyHere):
                 Text("Remove \(SkillRemoval.title(names)) from this Mac?").font(.headline)
-                Text(controller.canDeleteEverywhere ? "Every copy here moves to the Trash. If synced, My skills keeps \(names.count == 1 ? "it" : "them")."
+                Text(controller.canDeleteEverywhere || onlyHere ? "Every copy here moves to the Trash. If synced, My skills keeps \(names.count == 1 ? "it" : "them")."
                      : "Every copy moves to the Trash.").font(.callout).foregroundStyle(.secondary)
                 let skills = SkillRemoval.grouped(names: names, copies: copies)
                 let list = VStack(alignment: .leading, spacing: 8) {
@@ -288,7 +313,7 @@ struct SkillRemovalView: View {
                     Button(role: .destructive) { controller.confirm() } label: {
                         Text("Remove from this Mac").frame(maxWidth: .infinity)
                     }
-                    if controller.canDeleteEverywhere {
+                    if controller.canDeleteEverywhere && !onlyHere {
                         Button(role: .destructive) { controller.chooseEverywhere() } label: {
                             Text("Remove from My skills…").frame(maxWidth: .infinity)
                         }

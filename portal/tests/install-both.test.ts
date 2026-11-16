@@ -73,14 +73,15 @@ const render = (installsBoth: boolean, installed?: string[]) => renderToStaticMa
   skill: { ...skill, installed: installed ? { sources: installed } : undefined } as SkillDisplay,
   detailReady: true, returnRoute: "/app/?view=discover", store: new CatalogInstallIntentStore(storage, "production"),
   appKnown: true, installsBoth }));
-const pressed = (html: string) => /aria-pressed="true"[^>]*>(?:<span[^>]*><\/span>)?([A-Za-z]+)/.exec(html)?.[1];
+const pressedAll = (html: string) => [...html.matchAll(/aria-pressed="true"[^>]*>(?:<span[^>]*><\/span>)?([A-Za-z]+)/g)].map(m => m[1]).join("+");
+const pressed = (html: string) => pressedAll(html) || undefined;
 
-test("the picker starts on Both where the Mac can, and on the missing agent otherwise", async () => {
+test("Claude and Codex start both selected where the Mac can, and on the missing agent otherwise; no Both button", async () => {
   CatalogInstallSetup = await loadSetup();
   assert.doesNotMatch(render(false), />Both</);
+  assert.doesNotMatch(render(true), />Both</);
   assert.equal(pressed(render(false)), "Claude");
-  assert.match(render(true), />Both</);
-  assert.equal(pressed(render(true)), "Both");
+  assert.equal(pressed(render(true)), "Claude+Codex");
   assert.equal(pressed(render(true, ["Claude Code"])), "Codex");
   assert.equal(pressed(render(true, ["Codex"])), "Claude");
 

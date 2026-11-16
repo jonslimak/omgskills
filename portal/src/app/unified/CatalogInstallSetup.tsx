@@ -15,7 +15,7 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
   distribution?: CandidateDistribution;
   /** The account has a connected Mac, so the app is most likely installed. */
   appKnown?: boolean;
-  /** Every connected Mac can install in Claude and Codex at once, so "Both" is offered. */
+  /** Every connected Mac can install in Claude and Codex at once, so both can be selected together. */
   installsBoth?: boolean;
   /** Signed in: asks whether the Mac app received the request, so the pop-over can say "Approve it". */
   checkAck?: InstallAckCheck;
@@ -34,15 +34,23 @@ export function CatalogInstallSetup({ skill, detailReady, returnRoute, store, di
   });
   const selectId = useId();
   const pick = (next: CatalogInstallAgent) => { store.clear(); setAgent(next); };
+  // Claude and Codex are toggles; both on installs in both (where the Mac can), and one always stays on.
+  const on = (kind: "claude" | "codex") => agent === kind || agent === "both";
+  const toggle = (kind: "claude" | "codex") => {
+    const other = kind === "claude" ? "codex" : "claude";
+    if (!bothOffered) return pick(kind);
+    if (on(kind)) { if (on(other)) pick(other); }
+    else pick(on(other) ? "both" : kind);
+  };
   // Once a check succeeds, switching agents stays on Install now.
   const [confirmed, setConfirmed] = useState(false);
   if (store.client === "production") return <section className="ua-install-setup ua-install-pop" aria-label="Install skill">
     <ProductionInstall key={agent} skill={skill} detailReady={detailReady} returnRoute={returnRoute} store={store} agent={agent}
       appKnown={appKnown || confirmed} onAppConfirmed={() => setConfirmed(true)} checkAck={checkAck}
       picker={<div className="ua-install-agents" role="group" aria-label="Agent">
-      {(bothOffered ? ["claude", "codex", "both"] as const : ["claude", "codex"] as const).map(kind => <button key={kind} type="button"
-        aria-pressed={agent === kind} className="ua-install-agent" onClick={() => pick(kind)}>
-        {kind === "both" ? "Both" : <><span className="ua-agent-logo" data-agent={kind} aria-hidden="true" />{kind === "claude" ? "Claude" : "Codex"}</>}
+      {(["claude", "codex"] as const).map(kind => <button key={kind} type="button"
+        aria-pressed={on(kind)} className="ua-install-agent" onClick={() => toggle(kind)}>
+        <span className="ua-agent-logo" data-agent={kind} aria-hidden="true" />{kind === "claude" ? "Claude" : "Codex"}
       </button>)}
     </div>} />
   </section>;
