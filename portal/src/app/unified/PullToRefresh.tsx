@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { RefreshCw } from "lucide-react";
 
 /** How far the indicator follows the finger, and how far a pull must go to refresh. */
 export const PULL_MAX = 80;
@@ -28,20 +27,30 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
     let startX = 0;
     let startY: number | null = null;
     let distance = 0;
-    const reset = () => { startY = null; distance = 0; setPull(0); };
+    // Set once the finger has moved a little: a pull, or not (then the gesture is left to the page).
+    let pulling = false;
+    const reset = () => { startY = null; distance = 0; pulling = false; setPull(0); };
     const start = (event: TouchEvent) => {
       setTop(element.getBoundingClientRect().top);
       startY = event.touches.length === 1 && element.scrollTop <= 0 ? event.touches[0].clientY : null;
       startX = event.touches[0]?.clientX ?? 0;
       distance = 0;
+      pulling = false;
     };
     const move = (event: TouchEvent) => {
       if (startY === null) return;
-      // A second finger, an upward drag or a page that has scrolled ends the pull.
-      if (event.touches.length !== 1 || element.scrollTop > 0) { reset(); return; }
+      // A second finger ends the pull.
+      if (event.touches.length !== 1) { reset(); return; }
       const dy = event.touches[0].clientY - startY;
-      // A sideways swipe (a carousel) isn't a pull.
-      if (dy <= 0 || Math.abs(event.touches[0].clientX - startX) > dy) { reset(); return; }
+      const dx = Math.abs(event.touches[0].clientX - startX);
+      if (!pulling) {
+        if (dx < 8 && Math.abs(dy) < 8) return;
+        // Mostly sideways (a carousel), upward, or a page that has scrolled: not a pull, and the page keeps the gesture.
+        if (dy <= 0 || dx > dy || element.scrollTop > 0) { startY = null; return; }
+        pulling = true;
+      }
+      // Pushed back up past where it started: the pull is over.
+      if (dy <= 0) { reset(); return; }
       // The page moves itself (below), so the browser's own stretch would double it.
       if (event.cancelable) event.preventDefault();
       distance = pullDistance(dy);
@@ -86,8 +95,9 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
   if (!enabled || (!pull && !refreshing)) return null;
   return <div className="ua-ptr" style={{ top }} data-ready={refreshing || pull >= PULL_REFRESH}>
     <span className="ua-ptr-dot" style={{ transform: `translateY(-4px) scale(${0.6 + 0.4 * Math.min(1, shown / PULL_REFRESH)})`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
-      <RefreshCw aria-hidden="true" className={refreshing ? "ua-page-spinner" : undefined}
-        style={refreshing ? undefined : { transform: `rotate(${shown * 4}deg)` }} />
+      {/* Turns with the finger while pulling, spins on its own while refreshing. */}
+      <span className="ua-ptr-ring" aria-hidden="true"
+        style={refreshing ? undefined : { animation: "none", transform: `rotate(${shown * 4}deg)` }} />
     </span>
     {refreshing && <span className="ua-sr" role="status">Refreshing</span>}
   </div>;

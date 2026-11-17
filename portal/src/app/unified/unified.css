@@ -3210,16 +3210,22 @@ main:has(> .ua-az-anchor) .ua-content {
   place-items: center;
   width: 32px;
   height: 32px;
-  border-radius: 999px;
-  background: var(--ua-bg);
-  color: var(--ua-muted);
-  box-shadow: var(--ua-shadow);
 }
-.ua-ptr[data-ready="true"] .ua-ptr-dot { color: var(--ua-ink); }
+/* The same blue ring as the page loader (loading.css). */
+@keyframes ua-ptr-spin { to { transform: rotate(360deg); } }
+.ua-ptr-ring {
+  width: 28px;
+  height: 28px;
+  box-sizing: border-box;
+  border: 3px solid #e5e5ea;
+  border-top-color: #0071e3;
+  border-radius: 50%;
+  animation: ua-ptr-spin 0.8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) { .ua-ptr-ring { animation: none; } }
 /* The page under the spinner moves down to make room; only while pulling, refreshing or sliding back. */
 .ua-main[data-ptr] > .ua-content {
   transform: translateY(var(--ua-ptr, 0px));
   transition: transform 200ms var(--ua-ease-out);
 }
 .ua-main[data-ptr="pulling"] > .ua-content { transition: none; }
-.ua-ptr-dot svg { width: 16px; height: 16px; }
