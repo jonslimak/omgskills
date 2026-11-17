@@ -145,6 +145,7 @@ import { saveTheme, storedTheme, type Theme } from "./theme-preference";
 import { trackEvent } from "./analytics";
 import { SavedSkillReadme, SavedVersionsList, SharedSkillReadme, SkillReadme, savedSkillKeys } from "./SkillReadme";
 import type { SavedSkillMdLoader, SavedVersionsLoader, SharedSkillMdLoader } from "../../cloud-save/cloud-save";
+import { PullToRefresh } from "./PullToRefresh";
 import { AlphaRail, railLetter, railLettersOf as railLetters } from "./AlphaRail";
 import { CloudStatusBadge, CloudStatusSection, type CloudInfo } from "./CloudStatus";
 import { looksLikeGithubLink, type MySkillAdditions } from "../my-skills-additions";
@@ -1714,6 +1715,7 @@ export function UnifiedApp({
             )}
           </header>
           <main className="ua-main" data-view={nav.view} ref={main} id="unified-main" tabIndex={-1} inert={!!selected && expanded}>
+            <PullToRefresh scroller={main} enabled={phone} />
             {railList && <AlphaRail scroller={main} letters={railLetters(visible)} count={visible.length} />}
             <div className="ua-content">
               {!collectionHeader && !creatorHeader && ((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||

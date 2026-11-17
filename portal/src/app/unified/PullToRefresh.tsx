@@ -1,0 +1,67 @@
+import { useEffect, useRef, useState, type RefObject } from "react";
+import { RefreshCw } from "lucide-react";
+
+/** How far the indicator follows the finger, and how far a pull must go to refresh. */
+export const PULL_MAX = 80;
+export const PULL_REFRESH = 60;
+/** The indicator moves at half the finger's speed, up to PULL_MAX. */
+export const pullDistance = (dy: number) => (dy > 0 ? Math.min(PULL_MAX, dy / 2) : 0);
+
+/**
+ * Pull down at the top of the page to refresh, on phones. The page scrolls inside the app's main pane,
+ * so the browser's own pull-to-refresh never fires there.
+ */
+export function PullToRefresh({ scroller, enabled, onRefresh = () => window.location.reload() }: {
+  scroller: RefObject<HTMLElement | null>; enabled: boolean; onRefresh?: () => void;
+}) {
+  const [pull, setPull] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const refresh = useRef(onRefresh);
+  refresh.current = onRefresh;
+  useEffect(() => {
+    const element = scroller.current;
+    if (!element || !enabled) return;
+    let startY: number | null = null;
+    let distance = 0;
+    const reset = () => { startY = null; distance = 0; setPull(0); };
+    const start = (event: TouchEvent) => {
+      startY = event.touches.length === 1 && element.scrollTop <= 0 ? event.touches[0].clientY : null;
+      distance = 0;
+    };
+    const move = (event: TouchEvent) => {
+      if (startY === null) return;
+      // A second finger, an upward drag or a page that has scrolled ends the pull.
+      if (event.touches.length !== 1 || element.scrollTop > 0) { reset(); return; }
+      const dy = event.touches[0].clientY - startY;
+      if (dy <= 0) { reset(); return; }
+      distance = pullDistance(dy);
+      setPull(distance);
+    };
+    const end = () => {
+      if (startY !== null && distance >= PULL_REFRESH) {
+        startY = null;
+        setRefreshing(true);
+        refresh.current();
+      } else reset();
+    };
+    element.addEventListener("touchstart", start, { passive: true });
+    element.addEventListener("touchmove", move, { passive: true });
+    element.addEventListener("touchend", end);
+    element.addEventListener("touchcancel", reset);
+    return () => {
+      element.removeEventListener("touchstart", start);
+      element.removeEventListener("touchmove", move);
+      element.removeEventListener("touchend", end);
+      element.removeEventListener("touchcancel", reset);
+    };
+  }, [scroller, enabled]);
+  if (!enabled || (!pull && !refreshing)) return null;
+  const shown = refreshing ? PULL_REFRESH : pull;
+  return <div className="ua-ptr" data-ready={refreshing || pull >= PULL_REFRESH}>
+    <span className="ua-ptr-dot" style={{ transform: `translateY(${shown - 36}px)`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
+      <RefreshCw aria-hidden="true" className={refreshing ? "ua-page-spinner" : undefined}
+        style={refreshing ? undefined : { transform: `rotate(${shown * 4}deg)` }} />
+    </span>
+    {refreshing && <span className="ua-sr" role="status">Refreshing</span>}
+  </div>;
+}
