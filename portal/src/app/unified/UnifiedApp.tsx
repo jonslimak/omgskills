@@ -2105,7 +2105,6 @@ export function UnifiedApp({
                           ? chosen.filter(skill => !skill.installed && (skill.cloudKey || (skill.added && skill.catalogId))) : [];
                         const names = [...new Map(installed.flatMap(skill => liveCopiesOf(skill)?.name ?? [])
                           .map(name => [name.trim().toLowerCase(), name] as const)).values()];
-                        const tooMany = names.length > maxRemoveFromMac;
                         const one = installed.length === 1 && !savedOnly.length ? installed[0] : undefined;
                         return <>
                           <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
@@ -2113,8 +2112,7 @@ export function UnifiedApp({
                           <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
                             onClick={() => addToSet(forSets)}><ListPlus />Add to set</button>
                           {(fromMac || cloud?.remove || additions) && <button type="button" className="ua-pill ua-pill-danger"
-                            disabled={(!names.length && !savedOnly.length) || tooMany}
-                            title={tooMany ? `Select up to ${maxRemoveFromMac} skills on your Mac` : undefined}
+                            disabled={!names.length && !savedOnly.length}
                             onClick={() => names.length ? setRemovingFromMac({ names, skill: one, saved: savedOnly }) : setRemoving(savedOnly)}>
                             <Trash2 />Remove
                           </button>}
@@ -2560,6 +2558,12 @@ export function UnifiedApp({
           {/* Away from a Mac (a phone, another computer) there's no app to open: say why, and where to do it. */}
           {!onMac ? <>
             <p className="ua-muted">For your safety, skills can't be removed from your Mac remotely. Open omgskills on your Mac to remove {saved.length ? `the ${names.length} on your Mac` : names.length === 1 ? "it" : "them"}.</p>
+            {!saved.length && <div className="ua-modal-choices">
+              <button type="button" className="ua-pill ua-modal-action" onClick={() => setRemovingFromMac(null)}>OK</button>
+            </div>}
+          </> : names.length > maxRemoveFromMac ? <>
+            {/* Too many for one Mac link: say so, and still let the saved ones go below. */}
+            <p className="ua-muted">Your Mac app removes up to {maxRemoveFromMac} skills at a time. Select fewer to remove them from this device.</p>
             {!saved.length && <div className="ua-modal-choices">
               <button type="button" className="ua-pill ua-modal-action" onClick={() => setRemovingFromMac(null)}>OK</button>
             </div>}

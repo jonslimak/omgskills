@@ -20,7 +20,8 @@ test("the delete action is only on skills a Mac has now, in My skills, for the a
 test("Edit can delete the selected skills a Mac has now, in one link", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /\.flatMap\(skill => liveCopiesOf\(skill\)\?\.name \?\? \[\]\)/);
-  assert.match(source, /disabled=\{\(!names\.length && !savedOnly\.length\) \|\| tooMany\}/);
+  assert.match(source, /disabled=\{!names\.length && !savedOnly\.length\}/, "too many Mac skills doesn't block the saved ones");
+  assert.match(source, /: names\.length > maxRemoveFromMac \? <>/, "too many for one Mac link: the pop-up says so");
 });
 
 test("Make versions match opens the app for a skill whose agents have different versions", () => {
