@@ -17,6 +17,8 @@ test("phones get pull to refresh on the main pane, which reloads the page", () =
   assert.match(source, /onRefresh = \(\) => window\.location\.reload\(\)/);
   // Only starts at the top of the page.
   assert.match(source, /element\.scrollTop <= 0/);
+  // The spinner stays under the search bar, not on the stretching page.
+  assert.match(source, /setTop\(element\.getBoundingClientRect\(\)\.top\)/);
   // Sideways swipes are left alone.
   assert.match(source, /Math\.abs\(event\.touches\[0\]\.clientX - startX\) > dy/);
 });

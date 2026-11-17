@@ -3194,11 +3194,12 @@ main:has(> .ua-az-anchor) .ua-content {
   }
 }
 
-/* Pull down to refresh, on phones. A zero-height bar at the top of the main pane holds the indicator. */
+/* Pull down to refresh, on phones. A zero-height bar fixed at the top of the main pane, under the search bar, holds the indicator. */
 .ua-ptr {
-  position: sticky;
-  top: 0;
-  z-index: 5;
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 25;
   height: 0;
   display: flex;
   justify-content: center;

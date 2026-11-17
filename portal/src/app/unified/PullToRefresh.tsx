@@ -15,6 +15,8 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
   scroller: RefObject<HTMLElement | null>; enabled: boolean; onRefresh?: () => void;
 }) {
   const [pull, setPull] = useState(0);
+  // The top of the main pane, just under the search bar: the spinner stays there while the page stretches.
+  const [top, setTop] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const refresh = useRef(onRefresh);
   refresh.current = onRefresh;
@@ -26,6 +28,7 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
     let distance = 0;
     const reset = () => { startY = null; distance = 0; setPull(0); };
     const start = (event: TouchEvent) => {
+      setTop(element.getBoundingClientRect().top);
       startY = event.touches.length === 1 && element.scrollTop <= 0 ? event.touches[0].clientY : null;
       startX = event.touches[0]?.clientX ?? 0;
       distance = 0;
@@ -61,8 +64,8 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
   }, [scroller, enabled]);
   if (!enabled || (!pull && !refreshing)) return null;
   const shown = refreshing ? PULL_REFRESH : pull;
-  return <div className="ua-ptr" data-ready={refreshing || pull >= PULL_REFRESH}>
-    <span className="ua-ptr-dot" style={{ transform: `translateY(${shown - 36}px)`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
+  return <div className="ua-ptr" style={{ top }} data-ready={refreshing || pull >= PULL_REFRESH}>
+    <span className="ua-ptr-dot" style={{ transform: `translateY(${12 + shown / 5}px) scale(${0.6 + 0.4 * Math.min(1, shown / PULL_REFRESH)})`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
       <RefreshCw aria-hidden="true" className={refreshing ? "ua-page-spinner" : undefined}
         style={refreshing ? undefined : { transform: `rotate(${shown * 4}deg)` }} />
     </span>
