@@ -3194,11 +3194,12 @@ main:has(> .ua-az-anchor) .ua-content {
   }
 }
 
-/* Pull down to refresh, on phones. A zero-height bar at the top of the main pane holds the indicator. */
+/* Pull down to refresh, on phones. A zero-height bar fixed at the top of the main pane, under the search bar, holds the indicator. */
 .ua-ptr {
-  position: sticky;
-  top: 0;
-  z-index: 5;
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 25;
   height: 0;
   display: flex;
   justify-content: center;
@@ -3207,15 +3208,43 @@ main:has(> .ua-az-anchor) .ua-content {
 .ua-ptr-dot {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  background: var(--ua-bg);
-  color: var(--ua-muted);
-  box-shadow: var(--ua-shadow);
+  width: 22px;
+  height: 22px;
 }
-.ua-ptr[data-ready="true"] .ua-ptr-dot { color: var(--ua-ink); }
-.ua-ptr-dot svg { width: 16px; height: 16px; }
+/* The iPhone's spinner: eight grey spokes, each a little fainter, turning a spoke at a time. */
+@keyframes ua-ptr-spin { to { transform: rotate(360deg); } }
+.ua-ptr-spokes {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  opacity: 0.6;
+}
+.ua-ptr-spokes[data-spinning] { animation: ua-ptr-spin 0.8s steps(8) infinite; }
+.ua-ptr-spokes i {
+  position: absolute;
+  left: 9.75px;
+  top: 0;
+  width: 2.5px;
+  height: 6.5px;
+  border-radius: 2px;
+  background: var(--ua-muted);
+  transform-origin: 1.25px 11px;
+}
+.ua-ptr-spokes i:nth-child(1) { opacity: 1; }
+.ua-ptr-spokes i:nth-child(2) { opacity: 0.3; }
+.ua-ptr-spokes i:nth-child(3) { opacity: 0.35; }
+.ua-ptr-spokes i:nth-child(4) { opacity: 0.4; }
+.ua-ptr-spokes i:nth-child(5) { opacity: 0.5; }
+.ua-ptr-spokes i:nth-child(6) { opacity: 0.6; }
+.ua-ptr-spokes i:nth-child(7) { opacity: 0.75; }
+.ua-ptr-spokes i:nth-child(8) { opacity: 0.9; }
+@media (prefers-reduced-motion: reduce) { .ua-ptr-spokes[data-spinning] { animation: none; } }
+/* The page under the spinner moves down to make room; only while pulling, refreshing or sliding back. */
+.ua-main[data-ptr] > .ua-content {
+  transform: translateY(var(--ua-ptr, 0px));
+  transition: transform 200ms var(--ua-ease-out);
+}
+.ua-main[data-ptr="pulling"] > .ua-content { transition: none; }
 
 /* Add skills to a Set: a drawer from the bottom with a search and a checkable list of My skills. */
 .ua-add-sheet {
