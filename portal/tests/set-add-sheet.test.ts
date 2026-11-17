@@ -22,4 +22,9 @@ test("Add skill on a Set opens the drawer of My skills; several can be picked", 
   // Skills already in the Set show checked and can't be picked again.
   assert.match(sheet, /checked=\{has \|\| picked\.includes\(skill\.key\)\} disabled=\{disabled \|\| has\}/);
   assert.match(sheet, /placeholder="Search My skills"/);
+  // Enter in the search doesn't add; only the Add button does.
+  assert.doesNotMatch(sheet, /onSubmit/);
+  assert.match(sheet, /if \(event\.key === "Enter"\) \{ event\.preventDefault\(\); event\.currentTarget\.blur\(\); \}/);
+  // The sheet reads the Set as it is now, so what just went in shows "In set".
+  assert.match(management, /set=\{detail\.set\?\.id === request\.set\.id \? detail\.set : request\.set\}/);
 });

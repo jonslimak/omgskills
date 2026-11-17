@@ -20,31 +20,36 @@ export function SetAddSheet({ set, choices, picked, toggle, busy, disabled, erro
 }) {
   const [query, setQuery] = useState("");
   const trigger = useRef(document.activeElement as HTMLElement | null);
-  const shown = useMemo(() => choices.filter(skill => matchesSearch(skill, query)), [choices, query]);
-  const count = picked.length;
+  // A skill with no copy to point at can't go in a Set.
+  const settable = useMemo(() => choices.filter(skill => skill.installed || skill.catalogId || skill.cloudKey), [choices]);
+  const shown = useMemo(() => settable.filter(skill => matchesSearch(skill, query)), [settable, query]);
+  // Only picks still in My skills count; ones hidden by the search still go in.
+  const count = picked.filter(key => settable.some(skill => skill.key === key)).length;
   return <Dialog.Root open onOpenChange={open => !open && close()}>
     <Dialog.Portal>
       <Dialog.Overlay className="ua-overlay" />
       <Dialog.Content className="ua-add-sheet ua-theme" data-theme={theme} aria-describedby={undefined}
         onCloseAutoFocus={event => { event.preventDefault(); if (trigger.current?.isConnected) trigger.current.focus(); }}>
         <Dialog.Title className="ua-sr">Add skills to {set.name}</Dialog.Title>
-        <form className="ua-add-sheet-bar" onSubmit={event => { event.preventDefault(); if (count) submit(); }}>
+        <div className="ua-add-sheet-bar">
           <button type="button" className="ua-pill" disabled={busy} onClick={close}>Cancel</button>
           <label className="ua-add-sheet-search">
             <Search aria-hidden="true" />
             {/* On phones the keyboard would cover the list, so the search waits for a tap. */}
             <input type="search" autoFocus={window.matchMedia("(min-width: 760px)").matches} value={query} placeholder="Search My skills" aria-label="Search My skills"
-              onChange={event => setQuery(event.target.value)} />
+              onChange={event => setQuery(event.target.value)}
+              // Enter only closes the keyboard; adding takes the Add button.
+              onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); event.currentTarget.blur(); } }} />
           </label>
-          <button type="submit" className="ua-pill ua-primary" disabled={disabled || !count}>
+          <button type="button" className="ua-pill ua-primary" disabled={disabled || !count} onClick={submit}>
             {busy ? "Adding..." : count > 1 ? `Add ${count}` : "Add"}
           </button>
-        </form>
+        </div>
         {error && <p className="ua-add-sheet-error" role="alert">{error}</p>}
         <div className="ua-add-sheet-list" role="group" aria-label="My skills">
           {shown.map(skill => {
             const has = setStatus(set, skill) === true;
-            return <label key={skill.key} className="ua-add-sheet-row">
+            return <label key={skill.key} className="ua-add-sheet-row" data-in-set={has || undefined}>
               <input type="checkbox" checked={has || picked.includes(skill.key)} disabled={disabled || has}
                 onChange={event => toggle(skill.key, event.target.checked)} />
               <Avatar name={skill.author || skill.name} src={skill.avatar} />
@@ -54,7 +59,7 @@ export function SetAddSheet({ set, choices, picked, toggle, busy, disabled, erro
               </span>
             </label>;
           })}
-          {!shown.length && <p className="ua-muted">{choices.length ? "No skills match." : "No skills in My skills yet."}</p>}
+          {!shown.length && <p className="ua-muted">{settable.length ? "No skills match." : "No skills in My skills yet."}</p>}
         </div>
       </Dialog.Content>
     </Dialog.Portal>

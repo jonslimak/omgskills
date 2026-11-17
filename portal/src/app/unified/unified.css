@@ -3240,7 +3240,7 @@ main:has(> .ua-az-anchor) .ua-content {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 20px;
+  padding: 16px max(20px, env(safe-area-inset-right)) 16px max(20px, env(safe-area-inset-left));
   border-bottom: 1px solid var(--ua-line);
 }
 .ua-add-sheet-search {
@@ -3265,13 +3265,13 @@ main:has(> .ua-az-anchor) .ua-content {
   color: var(--ua-ink);
   font: inherit;
 }
-.ua-add-sheet-error { margin: 12px 20px 0; color: #ff3b30; }
+.ua-add-sheet-error { margin: 12px 20px 0; color: var(--ua-danger); }
 .ua-add-sheet-list {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 8px 12px calc(16px + env(safe-area-inset-bottom));
+  padding: 8px max(12px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
 }
 .ua-add-sheet-list > .ua-muted { padding: 24px 8px; text-align: center; }
 .ua-add-sheet-row {
@@ -3282,10 +3282,10 @@ main:has(> .ua-az-anchor) .ua-content {
   border-radius: 10px;
   cursor: pointer;
 }
-.ua-add-sheet-row:has(input:checked:not(:disabled)) { background: var(--ua-selection); }
-.ua-add-sheet-row:has(input:disabled) { cursor: default; opacity: 0.55; }
+.ua-add-sheet-row:not([data-in-set]):has(input:checked) { background: var(--ua-selection); }
+.ua-add-sheet-row[data-in-set] { cursor: default; opacity: 0.55; }
 @media (hover: hover) and (pointer: fine) {
-  .ua-add-sheet-row:not(:has(input:disabled)):hover { background: var(--ua-chip); }
+  .ua-add-sheet-row:not([data-in-set]):not(:has(input:checked)):hover { background: var(--ua-chip); }
 }
 .ua-add-sheet-row input {
   flex: none;

@@ -157,7 +157,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         const where = added.length === 1 ? added[0].name
           : added.length < targetSets.length ? `${added.length} of ${targetSets.length} sets` : `${added.length} sets`;
         const count = added[0]?.count ?? 0;
-        if (!added.length) message = targetSets.length === 1 ? "This skill is already in the set." : "Already in those sets.";
+        if (!added.length) message = targetSets.length > 1 ? "Already in those sets." : targetSkills.length === 1 ? "This skill is already in the set." : "Already in the set.";
         else toastText = targetSkills.length === 1 ? `Added ${targetSkills[0].name} to ${where}`
           : added.length === 1 ? `Added ${count} ${count === 1 ? "skill" : "skills"} to ${where}` : `Added skills to ${where}`;
       }
@@ -232,7 +232,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
     },
     copyLink,
     installLink: set => setInstallLink(set.appDeepLink, installEnabled, local),
-    dialog: theme => request?.kind === "add" && request.set && !request.skills.length ? <SetAddSheet key={request.set.id} set={request.set}
+    dialog: theme => request?.kind === "add" && request.set && !request.skills.length ? <SetAddSheet key={request.set.id} set={detail.set?.id === request.set.id ? detail.set : request.set}
       choices={choices} picked={skillKeys} busy={busy} disabled={disabled} error={error} theme={theme} close={close}
       toggle={(key, on) => setSkillKeys(keys => on ? [...keys, key] : keys.filter(other => other !== key))}
       submit={() => void submit(request)} />
