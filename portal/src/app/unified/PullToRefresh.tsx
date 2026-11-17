@@ -5,6 +5,8 @@ import { RefreshCw } from "lucide-react";
 export const PULL_MAX = 80;
 export const PULL_REFRESH = 60;
 /** The indicator moves at half the finger's speed, up to PULL_MAX. */
+/** Room the page makes for the spinner: 8px under the search bar, the 32px spinner, 8px above the page (which has 6px of its own). */
+export const PULL_GAP = 30;
 export const pullDistance = (dy: number) => (dy > 0 ? Math.min(PULL_MAX, dy / 2) : 0);
 
 /**
@@ -71,7 +73,7 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
     if (!element) return;
     if (shown > 0) {
       element.dataset.ptr = pull && !refreshing ? "pulling" : "held";
-      element.style.setProperty("--ua-ptr", `${shown}px`);
+      element.style.setProperty("--ua-ptr", `${Math.min(PULL_GAP, shown)}px`);
       return;
     }
     if (!element.dataset.ptr) return;
@@ -83,7 +85,7 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
   }, [scroller, shown, pull, refreshing]);
   if (!enabled || (!pull && !refreshing)) return null;
   return <div className="ua-ptr" style={{ top }} data-ready={refreshing || pull >= PULL_REFRESH}>
-    <span className="ua-ptr-dot" style={{ transform: `translateY(${Math.max(4, shown / 2 - 16)}px) scale(${0.6 + 0.4 * Math.min(1, shown / PULL_REFRESH)})`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
+    <span className="ua-ptr-dot" style={{ transform: `translateY(-4px) scale(${0.6 + 0.4 * Math.min(1, shown / PULL_REFRESH)})`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
       <RefreshCw aria-hidden="true" className={refreshing ? "ua-page-spinner" : undefined}
         style={refreshing ? undefined : { transform: `rotate(${shown * 4}deg)` }} />
     </span>
