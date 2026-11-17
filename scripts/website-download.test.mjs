@@ -8,7 +8,7 @@ const read = file => readFileSync(new URL(`../${file}`, import.meta.url), "utf8"
 test("both website download routes pin the published companion, without rewriting the legacy DMG", () => {
   const redirects = read("site/_redirects").split(/\r?\n/).filter(line => /^\/download(?:\s|\/\s)/.test(line));
   assert.deepEqual(redirects, [`/download ${defaultDownloadURL} 302`, `/download/ ${defaultDownloadURL} 302`]);
-  assert.match(defaultDownloadURL, /connected-v0\.0\.44\/OMGSkills-Connected-0\.0\.44-44-arm64\.zip$/);
+  assert.match(defaultDownloadURL, /connected-v0\.0\.45\/OMGSkills-Connected-0\.0\.45-45-arm64\.zip$/);
   assert.ok(read("portal/src/app/unified/production-distribution.ts").includes(`url: "${defaultDownloadURL}"`));
   assert.doesNotMatch(read("site/_redirects"), /^\/downloads\/omgskills-mac\.dmg\s/m);
   assert.ok(read("scripts/check-product-health.mjs").includes(`const defaultDownloadURL = "${defaultDownloadURL}"`));
