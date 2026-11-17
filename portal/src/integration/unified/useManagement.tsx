@@ -8,6 +8,7 @@ import type { UnifiedManagement } from "../../app/unified/management";
 import type { SetCommand } from "../set-data";
 import type { MembershipCommand } from "../membership-data";
 import { SetPermissions } from "./SetPermissions";
+import { SetAddSheet } from "./SetAddSheet";
 import { copySetLink, setLink } from "../../app/set-link";
 import { setInstallLink } from "../../app/set-install";
 import { navigationSearch, initialNavigation } from "../../app/unified/model";
@@ -32,7 +33,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
   const [request, setRequest] = useState<Request | null>(null);
   const [name, setName] = useState("");
   const [setIds, setSetIds] = useState<string[]>([]);
-  const [skillKey, setSkillKey] = useState("");
+  const [skillKeys, setSkillKeys] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [toast, setToast] = useState<{ text: string; id: number } | null>(null);
@@ -53,7 +54,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
     setError(""); setNotice(""); setRequest(next);
     setName(next.kind === "rename" ? next.set.name : "");
     setSetIds(next.kind === "add" && next.set ? [next.set.id] : []);
-    setSkillKey("");
+    setSkillKeys([]);
   }
   const owned = data.sets.filter(set => set.role === "owner" && !set.isFavorites && !set.hidden);
   // A set that already has every picked skill.
@@ -61,9 +62,8 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
   // Add to set can go to several sets at once; one that turns out to have the skills already is left out.
   const targetSets = request?.kind === "add" ? request.set ? [request.set]
     : data.sets.filter(set => setIds.includes(set.id) && !hasAll(set)) : [];
-  const targetSet = targetSets[0];
   const choices = request?.kind === "add" ? request.choices ?? mine : mine;
-  const targetSkills = request?.kind === "add" ? request.skills.length ? request.skills : choices.filter(skill => skill.key === skillKey) : [];
+  const targetSkills = request?.kind === "add" ? request.skills.length ? request.skills : choices.filter(skill => skillKeys.includes(skill.key)) : [];
   const disabled = busy || blocked;
   const close = () => { if (!busy && !pending.current) setRequest(null); };
   async function changeVisibility(set: PortalSet, visibility: Visibility) {
@@ -157,7 +157,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         const where = added.length === 1 ? added[0].name
           : added.length < targetSets.length ? `${added.length} of ${targetSets.length} sets` : `${added.length} sets`;
         const count = added[0]?.count ?? 0;
-        if (!added.length) message = targetSets.length === 1 ? "This skill is already in the set." : "Already in those sets.";
+        if (!added.length) message = targetSets.length > 1 ? "Already in those sets." : targetSkills.length === 1 ? "This skill is already in the set." : "Already in the set.";
         else toastText = targetSkills.length === 1 ? `Added ${targetSkills[0].name} to ${where}`
           : added.length === 1 ? `Added ${count} ${count === 1 ? "skill" : "skills"} to ${where}` : `Added skills to ${where}`;
       }
@@ -232,7 +232,11 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
     },
     copyLink,
     installLink: set => setInstallLink(set.appDeepLink, installEnabled, local),
-    dialog: theme => request?.kind === "access" ? <SetPermissions key={request.set.id} theme={theme} close={close}
+    dialog: theme => request?.kind === "add" && request.set && !request.skills.length ? <SetAddSheet key={request.set.id} set={detail.set?.id === request.set.id ? detail.set : request.set}
+      choices={choices} picked={skillKeys} busy={busy} disabled={disabled} error={error} theme={theme} close={close}
+      toggle={(key, on) => setSkillKeys(keys => on ? [...keys, key] : keys.filter(other => other !== key))}
+      submit={() => void submit(request)} />
+      : request?.kind === "access" ? <SetPermissions key={request.set.id} theme={theme} close={close}
       detail={detail} busy={busy} blocked={blocked} save={saveSet} copyLink={() => copyLink(detail.set ?? request.set)} copyNotice={notice} /> : request && <Modal theme={theme} close={close} title={
       request.kind === "moderate" ? request.set.hidden ? "Restore set?" : "Hide set?"
         : request.kind === "publish" ? "Make this set public?"
@@ -268,14 +272,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
             {request.skills.length > 0 && <button type="button" className="ua-link ua-set-pick-new" disabled={disabled}
               onClick={() => show({ kind: "create", skills: request.skills })}><Plus aria-hidden="true" />New set</button>}
           </div>}
-          {request.skills.length ? request.set && <p>{request.skills.length === 1 ? request.skills[0].name : `${request.skills.length} skills`}</p> : <label>Skill
-            <select required value={skillKey} disabled={disabled} onChange={event => setSkillKey(event.target.value)}>
-              <option value="">Choose a skill</option>
-              {choices.map(skill => <option key={skill.key} value={skill.key} disabled={!targetSet || setStatus(targetSet, skill) !== false}>
-                {skill.name}{targetSet && setStatus(targetSet, skill) === true ? " (included)" : ""}
-              </option>)}
-            </select>
-          </label>}
+          {request.set && request.skills.length > 0 && <p>{request.skills.length === 1 ? request.skills[0].name : `${request.skills.length} skills`}</p>}
         </>}
         {error && <p role="alert">{error}</p>}
         <div className="ua-toolbar">
