@@ -21,7 +21,9 @@ export function sheetPlace(): Place | null {
   const main = document.getElementById("unified-main")?.getBoundingClientRect();
   if (!main) return null;
   const heading = document.querySelector(".ua-set-identity")?.getBoundingClientRect();
-  return { left: main.left, width: main.width, top: Math.max(main.top, (heading?.bottom ?? main.top) + 20) };
+  // On very wide screens, no wider than the skill list (1120px plus its padding), centred in the pane.
+  const width = Math.min(main.width, 1168);
+  return { left: main.left + (main.width - width) / 2, width, top: Math.max(main.top, (heading?.bottom ?? main.top) + 20) };
 }
 
 /** A drawer from the bottom listing My skills, to pick several to add to a Set. */
@@ -33,9 +35,13 @@ export function SetAddSheet({ set, choices, picked, toggle, busy, disabled, erro
   const trigger = useRef(document.activeElement as HTMLElement | null);
   const [place, setPlace] = useState(sheetPlace);
   useEffect(() => {
+    // The pane changes size with the window and when the detail panel opens or closes.
     const update = () => setPlace(sheetPlace());
+    const main = document.getElementById("unified-main");
+    const observer = typeof ResizeObserver === "undefined" || !main ? null : new ResizeObserver(update);
+    if (main) observer?.observe(main);
     window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    return () => { observer?.disconnect(); window.removeEventListener("resize", update); };
   }, []);
   // A skill with no copy to point at can't go in a Set.
   const settable = useMemo(() => choices.filter(skill => skill.installed || skill.catalogId || skill.cloudKey), [choices]);
