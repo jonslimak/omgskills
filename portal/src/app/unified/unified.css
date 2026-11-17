@@ -3211,18 +3211,33 @@ main:has(> .ua-az-anchor) .ua-content {
   width: 32px;
   height: 32px;
 }
-/* The same blue ring as the page loader (loading.css). */
+/* The iPhone's spinner: eight grey spokes, each a little fainter, turning a spoke at a time. */
 @keyframes ua-ptr-spin { to { transform: rotate(360deg); } }
-.ua-ptr-ring {
+.ua-ptr-spokes {
+  position: relative;
   width: 28px;
   height: 28px;
-  box-sizing: border-box;
-  border: 3px solid #e5e5ea;
-  border-top-color: #0071e3;
-  border-radius: 50%;
-  animation: ua-ptr-spin 0.8s linear infinite;
 }
-@media (prefers-reduced-motion: reduce) { .ua-ptr-ring { animation: none; } }
+.ua-ptr-spokes[data-spinning] { animation: ua-ptr-spin 0.8s steps(8) infinite; }
+.ua-ptr-spokes i {
+  position: absolute;
+  left: 12.5px;
+  top: 0;
+  width: 3px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--ua-muted);
+  transform-origin: 1.5px 14px;
+}
+.ua-ptr-spokes i:nth-child(1) { opacity: 1; }
+.ua-ptr-spokes i:nth-child(2) { opacity: 0.3; }
+.ua-ptr-spokes i:nth-child(3) { opacity: 0.35; }
+.ua-ptr-spokes i:nth-child(4) { opacity: 0.4; }
+.ua-ptr-spokes i:nth-child(5) { opacity: 0.5; }
+.ua-ptr-spokes i:nth-child(6) { opacity: 0.6; }
+.ua-ptr-spokes i:nth-child(7) { opacity: 0.75; }
+.ua-ptr-spokes i:nth-child(8) { opacity: 0.9; }
+@media (prefers-reduced-motion: reduce) { .ua-ptr-spokes[data-spinning] { animation: none; } }
 /* The page under the spinner moves down to make room; only while pulling, refreshing or sliding back. */
 .ua-main[data-ptr] > .ua-content {
   transform: translateY(var(--ua-ptr, 0px));

@@ -95,9 +95,11 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
   if (!enabled || (!pull && !refreshing)) return null;
   return <div className="ua-ptr" style={{ top }} data-ready={refreshing || pull >= PULL_REFRESH}>
     <span className="ua-ptr-dot" style={{ transform: `translateY(-4px) scale(${0.6 + 0.4 * Math.min(1, shown / PULL_REFRESH)})`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
-      {/* Turns with the finger while pulling, spins on its own while refreshing. */}
-      <span className="ua-ptr-ring" aria-hidden="true"
-        style={refreshing ? undefined : { animation: "none", transform: `rotate(${shown * 4}deg)` }} />
+      {/* The iPhone's spokes: they appear one by one as you pull, then turn while refreshing. */}
+      <span className="ua-ptr-spokes" aria-hidden="true" data-spinning={refreshing || undefined}>
+        {Array.from({ length: 8 }, (_, index) => <i key={index}
+          style={{ transform: `rotate(${index * 45}deg)`, visibility: refreshing || index < Math.ceil(8 * shown / PULL_REFRESH) ? "visible" : "hidden" }} />)}
+      </span>
     </span>
     {refreshing && <span className="ua-sr" role="status">Refreshing</span>}
   </div>;
