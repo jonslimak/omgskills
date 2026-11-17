@@ -3216,3 +3216,106 @@ main:has(> .ua-az-anchor) .ua-content {
 }
 .ua-ptr[data-ready="true"] .ua-ptr-dot { color: var(--ua-ink); }
 .ua-ptr-dot svg { width: 16px; height: 16px; }
+
+/* Add skills to a Set: a drawer from the bottom with a search and a checkable list of My skills. */
+.ua-add-sheet {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(960px, 100vw);
+  height: min(86dvh, 900px);
+  display: flex;
+  flex-direction: column;
+  background: var(--ua-bg);
+  color: var(--ua-ink);
+  border-radius: 20px 20px 0 0;
+  box-shadow: var(--ua-shadow);
+  z-index: 60;
+  animation: ua-add-sheet-in 280ms var(--ua-ease-drawer);
+}
+@keyframes ua-add-sheet-in { from { transform: translate(-50%, 100%); } }
+@media (prefers-reduced-motion: reduce) { .ua-add-sheet { animation: none; } }
+.ua-add-sheet-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--ua-line);
+}
+.ua-add-sheet-search {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--ua-chip);
+  color: var(--ua-muted);
+}
+.ua-add-sheet-search svg { width: 16px; height: 16px; flex: none; }
+.ua-add-sheet-search input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ua-ink);
+  font: inherit;
+}
+.ua-add-sheet-error { margin: 12px 20px 0; color: #ff3b30; }
+.ua-add-sheet-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 12px calc(16px + env(safe-area-inset-bottom));
+}
+.ua-add-sheet-list > .ua-muted { padding: 24px 8px; text-align: center; }
+.ua-add-sheet-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.ua-add-sheet-row:has(input:checked:not(:disabled)) { background: var(--ua-selection); }
+.ua-add-sheet-row:has(input:disabled) { cursor: default; opacity: 0.55; }
+@media (hover: hover) and (pointer: fine) {
+  .ua-add-sheet-row:not(:has(input:disabled)):hover { background: var(--ua-chip); }
+}
+.ua-add-sheet-row input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--ua-blue);
+}
+.ua-add-sheet-row > span:last-child {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ua-add-sheet-row strong { font-size: 15px; font-weight: 600; }
+.ua-add-sheet-row em {
+  margin-left: 8px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ua-muted);
+}
+.ua-add-sheet-row small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--ua-muted);
+}
+@media (max-width: 759px) {
+  .ua-add-sheet { height: 92dvh; }
+  .ua-add-sheet-bar { padding: 12px; gap: 8px; }
+}
