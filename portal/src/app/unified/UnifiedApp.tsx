@@ -666,10 +666,8 @@ export function UnifiedApp({
   // The website asks where to remove from; Macs that take that choice (build 44+) then just confirm.
   // Older Macs get the plain link and ask again themselves.
   const macTakesChoice = macTakesRemoveChoice(data.devices);
-  function removeFromMac(names: string[], from: "mac" | "everywhere", saved: SkillDisplay[] = []) {
+  function removeFromMac(names: string[], from: "mac" | "everywhere") {
     setRemovingFromMac(null);
-    // "This device and My skills" also takes out the picked skills that are only saved.
-    if (from === "everywhere" && saved.length) void removeSaved(saved);
     deleteFromMac(names, macTakesChoice ? from : undefined);
   }
   const onMacKey = [...new Set(mine.flatMap(skill => skill.installed ? [skill.installed.name.trim().toLowerCase()] : []))].sort().join("\n");
@@ -2562,23 +2560,27 @@ export function UnifiedApp({
           {/* Away from a Mac (a phone, another computer) there's no app to open: say why, and where to do it. */}
           {!onMac ? <>
             <p className="ua-muted">For your safety, skills can't be removed from your Mac remotely. Open omgskills on your Mac to remove {saved.length ? `the ${names.length} on your Mac` : names.length === 1 ? "it" : "them"}.</p>
-            <div className="ua-modal-choices">
-              {saved.length > 0 && <button type="button" className="ua-pill ua-pill-danger ua-modal-action"
-                onClick={() => { setRemovingFromMac(null); void removeSaved(saved); }}>
-                Remove the other {saved.length} from My skills</button>}
-              <button type="button" className="ua-pill ua-modal-action" onClick={() => setRemovingFromMac(null)}>{saved.length ? "Cancel" : "OK"}</button>
-            </div>
+            {!saved.length && <div className="ua-modal-choices">
+              <button type="button" className="ua-pill ua-modal-action" onClick={() => setRemovingFromMac(null)}>OK</button>
+            </div>}
           </> : <>
-          <p className="ua-muted">Remove from:</p>
+          <p className="ua-muted">{saved.length ? `Remove the ${names.length} on this device from:` : "Remove from:"}</p>
           <div className="ua-modal-choices">
             <button type="button" className="ua-pill ua-modal-action" onClick={() => removeFromMac(names, "mac")}>
               This device</button>
-            <button type="button" className="ua-pill ua-pill-danger ua-modal-action" onClick={() => removeFromMac(names, "everywhere", saved)}>
+            <button type="button" className="ua-pill ua-pill-danger ua-modal-action" onClick={() => removeFromMac(names, "everywhere")}>
               This device and My skills</button>
           </div>
-          <p className="ua-muted ua-modal-note">{saved.length
-            ? `Please confirm on your Mac app. ${saved.length} not on this device ${saved.length === 1 ? "is" : "are"} only removed with My skills.`
-            : "Please confirm on your Mac app"}</p>
+          <p className="ua-muted ua-modal-note">Please confirm on your Mac app</p>
+          </>}
+          {/* Saved skills picked with them: the website removes those itself, with their own button and warning. */}
+          {saved.length > 0 && <>
+            <div className="ua-modal-choices">
+              <button type="button" className="ua-pill ua-pill-danger ua-modal-action"
+                onClick={() => { setRemovingFromMac(old => old && { ...old, saved: [] }); void removeSaved(saved); }}>
+                Remove the {saved.length} not on a Mac from My skills</button>
+            </div>
+            <p className="ua-muted ua-modal-note">{removeWarning(saved)}</p>
           </>}
         </Modal>;
       })()}
