@@ -4,8 +4,8 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 export const PULL_MAX = 80;
 export const PULL_REFRESH = 60;
 /** The indicator moves at half the finger's speed, up to PULL_MAX. */
-/** Room the page makes for the spinner: 8px under the search bar, the 22px spinner, 8px above the page (which has 6px of its own). */
-export const PULL_GAP = 20;
+/** Room the page makes for the spinner: 18px under the search bar, the 22px spinner, 18px above the page (which has 6px of its own). */
+export const PULL_GAP = 40;
 export const pullDistance = (dy: number) => (dy > 0 ? Math.min(PULL_MAX, dy / 2) : 0);
 
 /**
@@ -94,7 +94,7 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
   }, [scroller, shown, pull, refreshing]);
   if (!enabled || (!pull && !refreshing)) return null;
   return <div className="ua-ptr" style={{ top }} data-ready={refreshing || pull >= PULL_REFRESH}>
-    <span className="ua-ptr-dot" style={{ transform: `translateY(-4px) scale(${0.6 + 0.4 * Math.min(1, shown / PULL_REFRESH)})`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
+    <span className="ua-ptr-dot" style={{ transform: `translateY(6px) scale(${0.6 + 0.4 * Math.min(1, shown / PULL_REFRESH)})`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
       {/* The iPhone's spokes: they appear one by one as you pull, then turn while refreshing. */}
       <span className="ua-ptr-spokes" aria-hidden="true" data-spinning={refreshing || undefined}>
         {Array.from({ length: 8 }, (_, index) => <i key={index}
