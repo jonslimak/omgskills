@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import type { PortalData, PortalSet, MembershipResult, Visibility } from "../../app/model";
+import { Check, Folder, Plus } from "lucide-react";
+import { visibilityLabels, type PortalData, type PortalSet, type MembershipResult, type Visibility } from "../../app/model";
 import { addable, setStatus } from "./set-adds";
 import { isFavorite, type SkillDisplay } from "../../app/unified/model";
 import { Modal } from "../../app/unified/UnifiedApp";
@@ -48,6 +49,9 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
     setSetId(next.kind === "add" ? next.set?.id ?? "" : "");
     setSkillKey("");
   }
+  const owned = data.sets.filter(set => set.role === "owner" && !set.isFavorites && !set.hidden);
+  // A set that already has every picked skill.
+  const hasAll = (set: PortalSet) => request?.kind === "add" && request.skills.length > 0 && request.skills.every(skill => setStatus(set, skill) === true);
   const targetSet = request?.kind === "add" ? request.set ?? data.sets.find(set => set.id === setId) : undefined;
   const choices = request?.kind === "add" ? request.choices ?? mine : mine;
   const targetSkills = request?.kind === "add" ? request.skills.length ? request.skills : choices.filter(skill => skill.key === skillKey) : [];
@@ -205,14 +209,24 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         </label>}
         {request.kind === "create" && <p className="ua-muted">Only me{request.skills.length ? ` · ${request.skills.length} skills` : ""}</p>}
         {request.kind === "add" && <>
-          {request.set ? <p>{request.set.name}</p> : <label>Set
-            <select required value={setId} disabled={disabled} onChange={event => setSetId(event.target.value)}>
-              <option value="">Choose a set</option>
-              {data.sets.filter(set => set.role === "owner" && !set.isFavorites && !set.hidden)
-                .map(set => <option value={set.id} key={set.id}>{set.name}</option>)}
-            </select>
-          </label>}
-          {request.skills.length ? <p>{request.skills.length === 1 ? request.skills[0].name : `${request.skills.length} skills`}</p> : <label>Skill
+          {!request.set && request.skills.length > 0 && <p className="ua-muted">Add {request.skills.length === 1 ? request.skills[0].name : `${request.skills.length} skills`} to:</p>}
+          {request.set ? <p>{request.set.name}</p> : <div className="ua-set-picker" role="radiogroup" aria-label="Choose a set">
+            {owned.map(set => {
+              const count = set.itemCount ?? set.items.length;
+              const has = hasAll(set);
+              return <label key={set.id} className="ua-set-pick">
+                <input type="radio" name="add-to-set" value={set.id} checked={setId === set.id} disabled={disabled || has}
+                  onChange={() => setSetId(set.id)} />
+                <Folder aria-hidden="true" />
+                <span>{set.name}<small>{has ? "Already added" : `${visibilityLabels[set.visibility]} · ${count} ${count === 1 ? "skill" : "skills"}`}</small></span>
+                <Check className="ua-set-pick-check" aria-hidden="true" />
+              </label>;
+            })}
+            {!owned.length && <p className="ua-muted">No sets yet.</p>}
+            {request.skills.length > 0 && <button type="button" className="ua-link ua-set-pick-new" disabled={disabled}
+              onClick={() => show({ kind: "create", skills: request.skills })}><Plus aria-hidden="true" />New set</button>}
+          </div>}
+          {request.skills.length ? request.set && <p>{request.skills.length === 1 ? request.skills[0].name : `${request.skills.length} skills`}</p> : <label>Skill
             <select required value={skillKey} disabled={disabled} onChange={event => setSkillKey(event.target.value)}>
               <option value="">Choose a skill</option>
               {choices.map(skill => <option key={skill.key} value={skill.key} disabled={!targetSet || setStatus(targetSet, skill) !== false}>
@@ -226,7 +240,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
           <button type="button" className="ua-pill" disabled={busy} onClick={close}>Cancel</button>
           <button type="submit" className="ua-pill ua-primary" disabled={disabled ||
             ((request.kind === "create" || request.kind === "rename") && !name.trim()) ||
-            (request.kind === "add" && (!targetSet || !targetSkills.length))}>
+            (request.kind === "add" && (!targetSet || !targetSkills.length || (!request.set && hasAll(targetSet))))}>
             {busy ? "Saving..." : request.kind === "moderate" ? request.set.hidden ? "Restore" : "Hide" : request.kind === "publish" ? "Make public" : request.kind === "create" ? "Create set" : request.kind === "rename" ? "Save name"
               : request.kind === "remove" || (request.kind === "favorite" && !request.add) ? "Remove" : "Add"}
           </button>

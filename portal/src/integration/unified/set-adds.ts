@@ -16,6 +16,8 @@ export function addable(skills: SkillDisplay[]) {
 /** Whether a skill is in a Set: true, false, or null when the Set can't tell. */
 export function setStatus(set: PortalSet, skill: SkillDisplay): boolean | null {
   if (skill.installed) return membershipStatus(set, skill.installed);
+  // Set lists carry no items, only a count: saved skills can't be checked until the Set is opened.
+  if (!set.items.length && (set.itemCount ?? 0) > 0) return null;
   if (skill.catalogId) return set.items.some(item => item.catalogSkillId === skill.catalogId);
   if (skill.cloudKey) return set.items.some(item => item.cloudKey === skill.cloudKey);
   return null;
