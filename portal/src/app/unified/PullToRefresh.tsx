@@ -4,8 +4,8 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 export const PULL_MAX = 80;
 export const PULL_REFRESH = 60;
 /** The indicator moves at half the finger's speed, up to PULL_MAX. */
-/** Room the page makes for the spinner: 8px under the search bar, the 32px spinner, 8px above the page (which has 6px of its own). */
-export const PULL_GAP = 30;
+/** Room the page makes for the spinner: 8px under the search bar, the 22px spinner, 8px above the page (which has 6px of its own). */
+export const PULL_GAP = 20;
 export const pullDistance = (dy: number) => (dy > 0 ? Math.min(PULL_MAX, dy / 2) : 0);
 
 /**

@@ -3208,26 +3208,27 @@ main:has(> .ua-az-anchor) .ua-content {
 .ua-ptr-dot {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 22px;
+  height: 22px;
 }
 /* The iPhone's spinner: eight grey spokes, each a little fainter, turning a spoke at a time. */
 @keyframes ua-ptr-spin { to { transform: rotate(360deg); } }
 .ua-ptr-spokes {
   position: relative;
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
+  opacity: 0.6;
 }
 .ua-ptr-spokes[data-spinning] { animation: ua-ptr-spin 0.8s steps(8) infinite; }
 .ua-ptr-spokes i {
   position: absolute;
-  left: 12.5px;
+  left: 9.75px;
   top: 0;
-  width: 3px;
-  height: 8px;
+  width: 2.5px;
+  height: 6.5px;
   border-radius: 2px;
   background: var(--ua-muted);
-  transform-origin: 1.5px 14px;
+  transform-origin: 1.25px 11px;
 }
 .ua-ptr-spokes i:nth-child(1) { opacity: 1; }
 .ua-ptr-spokes i:nth-child(2) { opacity: 0.3; }
