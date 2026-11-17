@@ -3216,4 +3216,10 @@ main:has(> .ua-az-anchor) .ua-content {
   box-shadow: var(--ua-shadow);
 }
 .ua-ptr[data-ready="true"] .ua-ptr-dot { color: var(--ua-ink); }
+/* The page under the spinner moves down to make room; only while pulling, refreshing or sliding back. */
+.ua-main[data-ptr] > .ua-content {
+  transform: translateY(var(--ua-ptr, 0px));
+  transition: transform 200ms var(--ua-ease-out);
+}
+.ua-main[data-ptr="pulling"] > .ua-content { transition: none; }
 .ua-ptr-dot svg { width: 16px; height: 16px; }

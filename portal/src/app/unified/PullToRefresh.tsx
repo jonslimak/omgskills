@@ -40,6 +40,8 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
       const dy = event.touches[0].clientY - startY;
       // A sideways swipe (a carousel) isn't a pull.
       if (dy <= 0 || Math.abs(event.touches[0].clientX - startX) > dy) { reset(); return; }
+      // The page moves itself (below), so the browser's own stretch would double it.
+      if (event.cancelable) event.preventDefault();
       distance = pullDistance(dy);
       setPull(distance);
     };
@@ -51,7 +53,7 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
       } else reset();
     };
     element.addEventListener("touchstart", start, { passive: true });
-    element.addEventListener("touchmove", move, { passive: true });
+    element.addEventListener("touchmove", move, { passive: false });
     element.addEventListener("touchend", end);
     element.addEventListener("touchcancel", reset);
     return () => {
@@ -62,10 +64,26 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
       setPull(0);
     };
   }, [scroller, enabled]);
-  if (!enabled || (!pull && !refreshing)) return null;
   const shown = refreshing ? PULL_REFRESH : pull;
+  // The page moves down by the pull, and stays down while refreshing, so the spinner never covers it.
+  useEffect(() => {
+    const element = scroller.current;
+    if (!element) return;
+    if (shown > 0) {
+      element.dataset.ptr = pull && !refreshing ? "pulling" : "held";
+      element.style.setProperty("--ua-ptr", `${shown}px`);
+      return;
+    }
+    if (!element.dataset.ptr) return;
+    // Let go short of a refresh: the page slides back, then the move is dropped.
+    element.dataset.ptr = "back";
+    element.style.setProperty("--ua-ptr", "0px");
+    const timer = setTimeout(() => { delete element.dataset.ptr; element.style.removeProperty("--ua-ptr"); }, 220);
+    return () => clearTimeout(timer);
+  }, [scroller, shown, pull, refreshing]);
+  if (!enabled || (!pull && !refreshing)) return null;
   return <div className="ua-ptr" style={{ top }} data-ready={refreshing || pull >= PULL_REFRESH}>
-    <span className="ua-ptr-dot" style={{ transform: `translateY(${12 + shown / 5}px) scale(${0.6 + 0.4 * Math.min(1, shown / PULL_REFRESH)})`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
+    <span className="ua-ptr-dot" style={{ transform: `translateY(${Math.max(4, shown / 2 - 16)}px) scale(${0.6 + 0.4 * Math.min(1, shown / PULL_REFRESH)})`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
       <RefreshCw aria-hidden="true" className={refreshing ? "ua-page-spinner" : undefined}
         style={refreshing ? undefined : { transform: `rotate(${shown * 4}deg)` }} />
     </span>

@@ -19,6 +19,10 @@ test("phones get pull to refresh on the main pane, which reloads the page", () =
   assert.match(source, /element\.scrollTop <= 0/);
   // The spinner stays under the search bar, not on the stretching page.
   assert.match(source, /setTop\(element\.getBoundingClientRect\(\)\.top\)/);
+  // The page moves down to make room for the spinner, and stays down while refreshing.
+  assert.match(source, /element\.style\.setProperty\("--ua-ptr", `\$\{shown\}px`\)/);
+  const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
+  assert.match(css, /\.ua-main\[data-ptr\] > \.ua-content \{\s*transform: translateY\(var\(--ua-ptr, 0px\)\)/);
   // Sideways swipes are left alone.
   assert.match(source, /Math\.abs\(event\.touches\[0\]\.clientX - startX\) > dy/);
 });
