@@ -7,13 +7,21 @@ import type { SkillDisplay } from "../src/app/unified/model";
 
 const source = readFileSync(new URL("../src/integration/unified/useManagement.tsx", import.meta.url), "utf8");
 
-test("Add to set lists the sets right away instead of a dropdown", () => {
+test("Add to set lists the sets right away, several can be picked", () => {
   assert.doesNotMatch(source, /<option value="">Choose a set<\/option>/);
-  assert.match(source, /className="ua-set-picker" role="radiogroup"/);
-  assert.match(source, /type="radio" name="add-to-set" value=\{set\.id\} checked=\{setId === set\.id\}/);
+  assert.match(source, /className="ua-set-picker" role="group"/);
+  assert.match(source, /type="checkbox" value=\{set\.id\} checked=\{!has && setIds\.includes\(set\.id\)\}/);
+  // Each picked set is saved; a failed one stays picked to try again.
+  assert.match(source, /for \(const \[index, set\] of targetSets\.entries\(\)\)/);
+  // A thrown or unsure save stops the loop; the sets not tried stay picked.
+  assert.match(source, /failed\.push\(\.\.\.targetSets\.slice\(index \+ 1\)\.map\(rest => rest\.id\)\)/);
+  assert.match(source, /`Added to \$\{added\} of \$\{targetSets\.length\} sets\. The rest already had it\.`/);
+  assert.match(source, /setSetIds\(failed\)/);
+  assert.match(source, /`Add to \$\{targetSets\.length\} sets`/);
   // A set that already has the skill can't be picked; Add stays off until a set is picked.
   assert.match(source, /disabled=\{disabled \|\| has\}/);
-  assert.match(source, /request\.kind === "add" && \(!targetSet \|\| !targetSkills\.length \|\| \(!request\.set && hasAll\(targetSet\)\)\)/);
+  assert.match(source, /setIds\.includes\(set\.id\) && !hasAll\(set\)/);
+  assert.match(source, /request\.kind === "add" && \(!targetSets\.length \|\| !targetSkills\.length\)/);
   // Only sets the person owns, not Favorites or hidden ones.
   assert.match(source, /const owned = data\.sets\.filter\(set => set\.role === "owner" && !set\.isFavorites && !set\.hidden\)/);
   assert.match(source, /show\(\{ kind: "create", skills: request\.skills \}\)/);

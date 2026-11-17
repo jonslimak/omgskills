@@ -144,11 +144,10 @@ test("missing membership is unknown, never a guessed unchecked state", async () 
   const summary = setSummary({ id: "set", name: "Set", slug: "set" }, true, "Owner");
   assert.equal(membershipStatus(summary, pair), null);
   assert.equal(membershipStatus({ ...summary, membershipSkillIds: [] }, pair), false);
+  // Removing can't tell if an unlinked item is this skill; adding leaves duplicates to the server (409).
   const f = fixture([item("legacy", null)]);
-  for (const add of [true, false]) {
-    const result = await changeMembership(f.api, "set", [pair], add, signal());
-    assert.equal(result.failed.length, 1);
-  }
+  const result = await changeMembership(f.api, "set", [pair], false, signal());
+  assert.equal(result.failed.length, 1);
   assert.ok(f.calls.every((call) => call.method === "GET"));
 });
 
@@ -391,4 +390,13 @@ test("a favorite shows at once, rereads only Sets, and goes back (rereading skil
       assert.equal(reads.some(path => path.endsWith("/synced-skills")), outcome === "failed");
     } finally { session.dispose(); }
   }
+});
+
+test("a Set holding a skill that left the Mac still takes adds; removing still waits for a refresh", async () => {
+  const f = fixture([item("orphan", null)]);
+  const added = await changeMembership(f.api, "set", [second], true, signal());
+  assert.equal(added.added, 1); assert.deepEqual(added.failed, []);
+  assert.deepEqual(f.calls.find(call => call.method === "POST")?.body, { kind: "synced", syncedSkillId: "second" });
+  const removed = await changeMembership(fixture([item("orphan", null)]).api, "set", [third], false, signal());
+  assert.match(removed.failed[0].message, /incomplete/);
 });

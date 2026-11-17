@@ -97,7 +97,10 @@ export async function changeMembership(api: PortalApi, id: string, skills: Group
       if ((add && matches.length) || (!add && !matches.length && !unknown)) {
         result.unchanged++;
       } else {
-        if (unknown) {
+        // An item loses its skill link when its Mac moves to another account or its saved copy is deleted.
+        // That mustn't block every add: the server refuses linked duplicates (409, handled below).
+        // Only removing needs every item matched.
+        if (unknown && !add) {
           throw new PortalApiError("Membership information is incomplete. Refresh this set.", 409);
         }
         if (add) {

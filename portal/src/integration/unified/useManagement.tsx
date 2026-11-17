@@ -31,7 +31,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
 }): UnifiedManagement {
   const [request, setRequest] = useState<Request | null>(null);
   const [name, setName] = useState("");
-  const [setId, setSetId] = useState("");
+  const [setIds, setSetIds] = useState<string[]>([]);
   const [skillKey, setSkillKey] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -46,13 +46,16 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
     if (busy || blocked || pending.current) return;
     setError(""); setNotice(""); setRequest(next);
     setName(next.kind === "rename" ? next.set.name : "");
-    setSetId(next.kind === "add" ? next.set?.id ?? "" : "");
+    setSetIds(next.kind === "add" && next.set ? [next.set.id] : []);
     setSkillKey("");
   }
   const owned = data.sets.filter(set => set.role === "owner" && !set.isFavorites && !set.hidden);
   // A set that already has every picked skill.
   const hasAll = (set: PortalSet) => request?.kind === "add" && request.skills.length > 0 && request.skills.every(skill => setStatus(set, skill) === true);
-  const targetSet = request?.kind === "add" ? request.set ?? data.sets.find(set => set.id === setId) : undefined;
+  // Add to set can go to several sets at once; one that turns out to have the skills already is left out.
+  const targetSets = request?.kind === "add" ? request.set ? [request.set]
+    : data.sets.filter(set => setIds.includes(set.id) && !hasAll(set)) : [];
+  const targetSet = targetSets[0];
   const choices = request?.kind === "add" ? request.choices ?? mine : mine;
   const targetSkills = request?.kind === "add" ? request.skills.length ? request.skills : choices.filter(skill => skill.key === skillKey) : [];
   const disabled = busy || blocked;
@@ -109,24 +112,48 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         result = await saveMembership({ kind: "remove-item", id: request.set.id, itemId: request.skill.setItemId });
         message = "Removed from set. Installed skills are unchanged.";
       } else {
-        if (!targetSet || targetSet.role !== "owner" || targetSet.hidden || targetSet.isFavorites || !targetSkills.length) {
+        if (!targetSets.length || targetSets.some(set => set.role !== "owner" || set.hidden || set.isFavorites) || !targetSkills.length) {
           throw new Error("Choose a set you own and a skill.");
         }
-        result = targetSkills.every(skill => skill.installed)
-          ? await saveMembership({ kind: "change", id: targetSet.id, skills: targetSkills.map(skill => skill.installed!), add: true })
-          : await saveMembership({ kind: "add-many", id: targetSet.id, ...addable(targetSkills) });
-        message = result.unchanged ? "This skill is already in the set." : "Added to set.";
+        // One set at a time. A set that fails stays picked to try again; skills already in a set count as unchanged.
+        const failed: string[] = [];
+        const messages: string[] = [];
+        let added = 0;
+        for (const [index, set] of targetSets.entries()) {
+          let why = "";
+          let stop = false;
+          try {
+            const next = targetSkills.every(skill => skill.installed)
+              ? await saveMembership({ kind: "change", id: set.id, skills: targetSkills.map(skill => skill.installed!), add: true })
+              : await saveMembership({ kind: "add-many", id: set.id, ...addable(targetSkills) });
+            if (next.failed.length || next.uncertain) {
+              why = next.failed.map(item => item.message).join(" ") || "Could not confirm the save. Refresh before continuing.";
+              stop = next.uncertain;
+            } else if (next.added) added++;
+          } catch (error) {
+            why = error instanceof Error ? error.message : "Could not save. Try again.";
+            stop = true;
+          }
+          if (why) {
+            failed.push(set.id);
+            messages.push(targetSets.length === 1 ? why : `${set.name}: ${why}`);
+          }
+          // After an unsure save, the rest aren't tried: they stay picked.
+          if (stop) { failed.push(...targetSets.slice(index + 1).map(rest => rest.id)); break; }
+        }
+        if (failed.length) {
+          if (generation.current === version) setSetIds(failed);
+          throw new Error(messages.join(" "));
+        }
+        message = !added ? targetSets.length === 1 ? "This skill is already in the set." : "Already in those sets."
+          : added === targetSets.length ? targetSets.length === 1 ? "Added to set." : `Added to ${added} sets.`
+          : `Added to ${added} of ${targetSets.length} sets. The rest already had it.`;
       }
       if (result?.failed.length || result?.uncertain) {
-        if (request.kind === "add" && result.failed.length && !result.uncertain && generation.current === version) {
-          const failed = new Set(result.failed.map(item => item.id));
-          setRequest({ ...request, skills: targetSkills.filter(skill => skill.installed ? failed.has(skill.installed.id)
-            : failed.has(skill.catalogId ?? skill.cloudKey ?? "")) });
-        }
         // The Set was made; trying again adds what didn't go in, instead of making a second Set.
         if (request.kind === "create" && result.groupId && result.failed.length && !result.uncertain && generation.current === version) {
           const failed = new Set(result.failed.map(item => item.id));
-          setSetId(result.groupId);
+          setSetIds([result.groupId]);
           setRequest({ kind: "add", skills: request.skills.filter(skill => skill.installed ? failed.has(skill.installed.id)
             : failed.has(skill.catalogId ?? skill.cloudKey ?? "")) });
         }
@@ -210,13 +237,13 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         {request.kind === "create" && <p className="ua-muted">Only me{request.skills.length ? ` · ${request.skills.length} skills` : ""}</p>}
         {request.kind === "add" && <>
           {!request.set && request.skills.length > 0 && <p className="ua-muted">Add {request.skills.length === 1 ? request.skills[0].name : `${request.skills.length} skills`} to:</p>}
-          {request.set ? <p>{request.set.name}</p> : <div className="ua-set-picker" role="radiogroup" aria-label="Choose a set">
+          {request.set ? <p>{request.set.name}</p> : <div className="ua-set-picker" role="group" aria-label="Choose sets">
             {owned.map(set => {
               const count = set.itemCount ?? set.items.length;
               const has = hasAll(set);
               return <label key={set.id} className="ua-set-pick">
-                <input type="radio" name="add-to-set" value={set.id} checked={setId === set.id} disabled={disabled || has}
-                  onChange={() => setSetId(set.id)} />
+                <input type="checkbox" value={set.id} checked={!has && setIds.includes(set.id)} disabled={disabled || has}
+                  onChange={event => setSetIds(ids => event.target.checked ? [...ids, set.id] : ids.filter(id => id !== set.id))} />
                 <Folder aria-hidden="true" />
                 <span>{set.name}<small>{has ? "Already added" : `${visibilityLabels[set.visibility]} · ${count} ${count === 1 ? "skill" : "skills"}`}</small></span>
                 <Check className="ua-set-pick-check" aria-hidden="true" />
@@ -240,9 +267,10 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
           <button type="button" className="ua-pill" disabled={busy} onClick={close}>Cancel</button>
           <button type="submit" className="ua-pill ua-primary" disabled={disabled ||
             ((request.kind === "create" || request.kind === "rename") && !name.trim()) ||
-            (request.kind === "add" && (!targetSet || !targetSkills.length || (!request.set && hasAll(targetSet))))}>
+            (request.kind === "add" && (!targetSets.length || !targetSkills.length))}>
             {busy ? "Saving..." : request.kind === "moderate" ? request.set.hidden ? "Restore" : "Hide" : request.kind === "publish" ? "Make public" : request.kind === "create" ? "Create set" : request.kind === "rename" ? "Save name"
-              : request.kind === "remove" || (request.kind === "favorite" && !request.add) ? "Remove" : "Add"}
+              : request.kind === "remove" || (request.kind === "favorite" && !request.add) ? "Remove"
+              : targetSets.length > 1 ? `Add to ${targetSets.length} sets` : "Add"}
           </button>
         </div>
       </form>
