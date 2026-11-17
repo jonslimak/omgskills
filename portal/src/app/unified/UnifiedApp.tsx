@@ -145,6 +145,7 @@ import { saveTheme, storedTheme, type Theme } from "./theme-preference";
 import { trackEvent } from "./analytics";
 import { SavedSkillReadme, SavedVersionsList, SharedSkillReadme, SkillReadme, savedSkillKeys } from "./SkillReadme";
 import type { SavedSkillMdLoader, SavedVersionsLoader, SharedSkillMdLoader } from "../../cloud-save/cloud-save";
+import { PullToRefresh } from "./PullToRefresh";
 import { AlphaRail, railLetter, railLettersOf as railLetters } from "./AlphaRail";
 import { CloudStatusBadge, CloudStatusSection, type CloudInfo } from "./CloudStatus";
 import { looksLikeGithubLink, type MySkillAdditions } from "../my-skills-additions";
@@ -868,6 +869,12 @@ export function UnifiedApp({
     mq.addEventListener("change", change);
     return () => mq.removeEventListener("change", change);
   }, []);
+  // One toast at a time: a set change replaces any other toast still showing.
+  const setToast = management?.toast?.id;
+  useEffect(() => {
+    if (!setToast) return;
+    setNotice(""); setInstalledNotice(""); setDeletedNotice("");
+  }, [setToast]);
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(""), 3000);
@@ -1714,6 +1721,7 @@ export function UnifiedApp({
             )}
           </header>
           <main className="ua-main" data-view={nav.view} ref={main} id="unified-main" tabIndex={-1} inert={!!selected && expanded}>
+            <PullToRefresh scroller={main} enabled={phone && !picked.length && !management?.busy} />
             {railList && <AlphaRail scroller={main} letters={railLetters(visible)} count={visible.length} />}
             <div className="ua-content">
               {!collectionHeader && !creatorHeader && ((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
@@ -2718,6 +2726,11 @@ export function UnifiedApp({
       {deletedNotice && (
         <div className="ua-toast ua-toast-danger" role="status">
           <Trash2 aria-hidden="true" /> {deletedNotice}
+        </div>
+      )}
+      {management?.toast && (
+        <div key={management.toast.id} className="ua-toast ua-toast-success" role="status">
+          <Check aria-hidden="true" /> {management.toast.text}
         </div>
       )}
       {notice && (

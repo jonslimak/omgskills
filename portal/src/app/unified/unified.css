@@ -3193,3 +3193,26 @@ main:has(> .ua-az-anchor) .ua-content {
     .ua-page-heading.ua-heading-filter:not(.ua-set-heading) > .ua-heading-actions { grid-column: 1; grid-row: 2; }
   }
 }
+
+/* Pull down to refresh, on phones. A zero-height bar at the top of the main pane holds the indicator. */
+.ua-ptr {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  height: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.ua-ptr-dot {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--ua-bg);
+  color: var(--ua-muted);
+  box-shadow: var(--ua-shadow);
+}
+.ua-ptr[data-ready="true"] .ua-ptr-dot { color: var(--ua-ink); }
+.ua-ptr-dot svg { width: 16px; height: 16px; }
