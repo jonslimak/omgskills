@@ -12,7 +12,10 @@ test("Add to set lists the sets right away, several can be picked", () => {
   assert.match(source, /className="ua-set-picker" role="group"/);
   assert.match(source, /type="checkbox" value=\{set\.id\} checked=\{!has && setIds\.includes\(set\.id\)\}/);
   // Each picked set is saved; a failed one stays picked to try again.
-  assert.match(source, /for \(const set of targetSets\)/);
+  assert.match(source, /for \(const \[index, set\] of targetSets\.entries\(\)\)/);
+  // A thrown or unsure save stops the loop; the sets not tried stay picked.
+  assert.match(source, /failed\.push\(\.\.\.targetSets\.slice\(index \+ 1\)\.map\(rest => rest\.id\)\)/);
+  assert.match(source, /`Added to \$\{added\} of \$\{targetSets\.length\} sets\. The rest already had it\.`/);
   assert.match(source, /setSetIds\(failed\)/);
   assert.match(source, /`Add to \$\{targetSets\.length\} sets`/);
   // A set that already has the skill can't be picked; Add stays off until a set is picked.

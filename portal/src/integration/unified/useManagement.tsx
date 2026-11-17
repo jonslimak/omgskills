@@ -119,23 +119,35 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         const failed: string[] = [];
         const messages: string[] = [];
         let added = 0;
-        for (const set of targetSets) {
-          const next = targetSkills.every(skill => skill.installed)
-            ? await saveMembership({ kind: "change", id: set.id, skills: targetSkills.map(skill => skill.installed!), add: true })
-            : await saveMembership({ kind: "add-many", id: set.id, ...addable(targetSkills) });
-          if (next.failed.length || next.uncertain) {
+        for (const [index, set] of targetSets.entries()) {
+          let why = "";
+          let stop = false;
+          try {
+            const next = targetSkills.every(skill => skill.installed)
+              ? await saveMembership({ kind: "change", id: set.id, skills: targetSkills.map(skill => skill.installed!), add: true })
+              : await saveMembership({ kind: "add-many", id: set.id, ...addable(targetSkills) });
+            if (next.failed.length || next.uncertain) {
+              why = next.failed.map(item => item.message).join(" ") || "Could not confirm the save. Refresh before continuing.";
+              stop = next.uncertain;
+            } else if (next.added) added++;
+          } catch (error) {
+            why = error instanceof Error ? error.message : "Could not save. Try again.";
+            stop = true;
+          }
+          if (why) {
             failed.push(set.id);
-            const why = next.failed.map(item => item.message).join(" ") || "Could not confirm the save. Refresh before continuing.";
             messages.push(targetSets.length === 1 ? why : `${set.name}: ${why}`);
-            if (next.uncertain) break;
-          } else if (next.added) added++;
+          }
+          // After an unsure save, the rest aren't tried: they stay picked.
+          if (stop) { failed.push(...targetSets.slice(index + 1).map(rest => rest.id)); break; }
         }
         if (failed.length) {
           if (generation.current === version) setSetIds(failed);
           throw new Error(messages.join(" "));
         }
         message = !added ? targetSets.length === 1 ? "This skill is already in the set." : "Already in those sets."
-          : targetSets.length === 1 ? "Added to set." : `Added to ${targetSets.length} sets.`;
+          : added === targetSets.length ? targetSets.length === 1 ? "Added to set." : `Added to ${added} sets.`
+          : `Added to ${added} of ${targetSets.length} sets. The rest already had it.`;
       }
       if (result?.failed.length || result?.uncertain) {
         // The Set was made; trying again adds what didn't go in, instead of making a second Set.
