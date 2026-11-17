@@ -2455,6 +2455,21 @@
 .ua-membership small {
   display: block;
 }
+/* Add to set: the sets are listed right away; pick one, then Add. */
+.ua-set-picker { display: flex; flex-direction: column; gap: 2px; max-height: min(50vh, 360px); overflow-y: auto; margin: 0 -8px 12px; padding: 2px; }
+.ua-modal form label.ua-set-pick { position: relative; flex-direction: row; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 10px; border-radius: 10px; cursor: pointer; }
+.ua-modal form .ua-set-pick input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.ua-set-pick > svg { width: 18px; height: 18px; flex: none; color: var(--ua-muted); }
+.ua-set-pick > span { flex: 1; min-width: 0; overflow-wrap: anywhere; color: var(--ua-ink); }
+.ua-set-pick small { display: block; color: var(--ua-muted); font-size: 12px; }
+.ua-set-pick .ua-set-pick-check { color: var(--ua-blue); visibility: hidden; }
+.ua-set-pick:has(input:checked) { background: var(--ua-selection); }
+.ua-set-pick:has(input:checked) .ua-set-pick-check { visibility: visible; }
+.ua-set-pick:has(input:disabled) { cursor: default; opacity: 0.55; }
+@media (hover: hover) and (pointer: fine) {
+  .ua-set-pick:not(:has(input:disabled)):not(:has(input:checked)):hover { background: var(--ua-chip); }
+}
+.ua-set-pick-new { align-self: flex-start; margin: 6px 10px 0; }
 .ua-toast {
   position: fixed;
   bottom: 20px;
