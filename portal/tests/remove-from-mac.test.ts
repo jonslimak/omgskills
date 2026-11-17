@@ -20,8 +20,8 @@ test("the delete action is only on skills a Mac has now, in My skills, for the a
 test("Edit can delete the selected skills a Mac has now, in one link", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /\.flatMap\(skill => liveCopiesOf\(skill\)\?\.name \?\? \[\]\)/);
-  assert.match(source, /disabled=\{!names\.length \|\| tooMany\}/);
-  assert.match(source, /onClick=\{\(\) => setRemovingFromMac\(\{ names \}\)\}/);
+  assert.match(source, /disabled=\{!names\.length && !savedOnly\.length\}/, "too many Mac skills doesn't block the saved ones");
+  assert.match(source, /: names\.length > maxRemoveFromMac \? <>/, "too many for one Mac link: the pop-up says so");
 });
 
 test("Make versions match opens the app for a skill whose agents have different versions", () => {
@@ -76,8 +76,8 @@ test("Discover marks skills already in My skills with a quiet My skills tag, not
 
 test("removing a skill on a Mac asks in a centered pop-up: This device, or This device and My skills", () => {
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
-  assert.match(source, /onClick=\{\(\) => removeFromMac\(removingFromMac\.names, "mac"\)\}>\s+This device<\/button>/);
-  assert.match(source, /onClick=\{\(\) => removeFromMac\(removingFromMac\.names, "everywhere"\)\}>\s+This device and My skills<\/button>/);
+  assert.match(source, /onClick=\{\(\) => removeFromMac\(names, "mac"\)\}>\s+This device<\/button>/);
+  assert.match(source, /onClick=\{\(\) => removeFromMac\(names, "everywhere"\)\}>\s+This device and My skills<\/button>/);
   assert.match(source, /deleteFromMac\(names, macTakesChoice \? from : undefined\);/, "older Macs get the plain link and ask again");
 });
 
@@ -106,4 +106,12 @@ test("away from a Mac, removing a skill a Mac has explains it can't be done remo
   const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(source, /\{!onMac \? <>\s+<p className="ua-muted">For your safety, skills can't be removed from your Mac remotely\. Open omgskills on your Mac to remove/);
   assert.match(source, /onClick=\{\(\) => setRemovingFromMac\(null\)\}>OK<\/button>/);
+});
+
+test("Edit has one Remove: Mac skills go through the Mac pop-up, saved-only ones are removed by the website", () => {
+  const source = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /Delete from Mac</);
+  assert.match(source, /onClick=\{\(\) => names\.length \? setRemovingFromMac\(\{ names, skill: one, saved: savedOnly \}\) : setRemoving\(savedOnly\)\}>\s+<Trash2 \/>Remove/);
+  assert.match(source, /void removeSaved\(saved\); \}\}>\s+Remove the \{saved\.length\} not on a Mac from My skills<\/button>\s+<\/div>\s+<p className="ua-muted ua-modal-note">\{removeWarning\(saved\)\}<\/p>/,
+    "saved ones picked with Mac ones: their own button and warning, never tied to the Mac's confirm");
 });
