@@ -32,7 +32,9 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
     const reset = () => { startY = null; distance = 0; pulling = false; setPull(0); };
     const start = (event: TouchEvent) => {
       setTop(element.getBoundingClientRect().top);
-      startY = event.touches.length === 1 && element.scrollTop <= 0 ? event.touches[0].clientY : null;
+      // The A–Z rail scrubs with its own drag.
+      const onRail = event.target instanceof Element && !!event.target.closest(".ua-az-anchor");
+      startY = event.touches.length === 1 && element.scrollTop <= 0 && !onRail ? event.touches[0].clientY : null;
       startX = event.touches[0]?.clientX ?? 0;
       distance = 0;
       pulling = false;
@@ -47,12 +49,15 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
         if (dx < 8 && Math.abs(dy) < 8) return;
         // Mostly sideways (a carousel), upward, or a page that has scrolled: not a pull, and the page keeps the gesture.
         if (dy <= 0 || dx > dy || element.scrollTop > 0) { startY = null; return; }
+        // The browser already took the gesture (its own stretch): let it, rather than moving the page twice.
+        if (!event.cancelable) { startY = null; return; }
         pulling = true;
       }
       // Pushed back up past where it started: the pull is over.
       if (dy <= 0) { reset(); return; }
       // The page moves itself (below), so the browser's own stretch would double it.
-      if (event.cancelable) event.preventDefault();
+      if (!event.cancelable) { reset(); return; }
+      event.preventDefault();
       distance = pullDistance(dy);
       setPull(distance);
     };
