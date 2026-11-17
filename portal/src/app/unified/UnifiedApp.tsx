@@ -2720,6 +2720,11 @@ export function UnifiedApp({
           <Trash2 aria-hidden="true" /> {deletedNotice}
         </div>
       )}
+      {management?.toast && (
+        <div key={management.toast.id} className="ua-toast ua-toast-success" role="status">
+          <Check aria-hidden="true" /> {management.toast.text}
+        </div>
+      )}
       {notice && (
         <div className="ua-toast" role="status">
           {notice}

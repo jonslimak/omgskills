@@ -35,6 +35,12 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
   const [skillKey, setSkillKey] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [toast, setToast] = useState<{ text: string; id: number } | null>(null);
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
   const pending = useRef(false);
   const generation = useRef(0);
   useEffect(() => {
@@ -81,6 +87,8 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
     try {
       let result: MembershipResult | undefined;
       let message = "Saved.";
+      // Adds and removes confirm with a toast instead of the inline note.
+      let toastText = "";
       if (request.kind === "publish") {
         const saved = await saveSet({ kind: "update", id: request.set.id, changes: { visibility: "public" } });
         message = saved.refreshed ? "Set is now public." : "Saved. Refresh to confirm public access.";
@@ -106,11 +114,11 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
           : request.skill.installed
           ? await saveMembership({ kind: "favorites", skills: [request.skill.installed], add: request.add })
           : await saveMembership({ kind: "catalog", catalogId: request.skill.catalogId!, favorite: true });
-        message = request.add ? "Added to Favorites." : "Removed from Favorites.";
+        toastText = request.add ? `Added ${request.skill.name} to Favorites` : `Removed ${request.skill.name} from Favorites`;
       } else if (request.kind === "remove") {
         if (!request.skill.setItemId) throw new Error("Refresh this set before removing an item.");
         result = await saveMembership({ kind: "remove-item", id: request.set.id, itemId: request.skill.setItemId });
-        message = "Removed from set. Installed skills are unchanged.";
+        toastText = `Removed ${request.skill.name} from ${request.set.name}`;
       } else {
         if (!targetSets.length || targetSets.some(set => set.role !== "owner" || set.hidden || set.isFavorites) || !targetSkills.length) {
           throw new Error("Choose a set you own and a skill.");
@@ -118,7 +126,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         // One set at a time. A set that fails stays picked to try again; skills already in a set count as unchanged.
         const failed: string[] = [];
         const messages: string[] = [];
-        let added = 0;
+        const added: string[] = [];
         for (const [index, set] of targetSets.entries()) {
           let why = "";
           let stop = false;
@@ -129,7 +137,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
             if (next.failed.length || next.uncertain) {
               why = next.failed.map(item => item.message).join(" ") || "Could not confirm the save. Refresh before continuing.";
               stop = next.uncertain;
-            } else if (next.added) added++;
+            } else if (next.added) added.push(set.name);
           } catch (error) {
             why = error instanceof Error ? error.message : "Could not save. Try again.";
             stop = true;
@@ -145,9 +153,10 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
           if (generation.current === version) setSetIds(failed);
           throw new Error(messages.join(" "));
         }
-        message = !added ? targetSets.length === 1 ? "This skill is already in the set." : "Already in those sets."
-          : added === targetSets.length ? targetSets.length === 1 ? "Added to set." : `Added to ${added} sets.`
-          : `Added to ${added} of ${targetSets.length} sets. The rest already had it.`;
+        const what = targetSkills.length === 1 ? targetSkills[0].name : `${targetSkills.length} skills`;
+        if (!added.length) message = targetSets.length === 1 ? "This skill is already in the set." : "Already in those sets.";
+        else toastText = `Added ${what} to ${added.length === 1 ? added[0] : `${added.length} sets`}`
+          + (added.length < targetSets.length ? ". The rest already had it." : "");
       }
       if (result?.failed.length || result?.uncertain) {
         // The Set was made; trying again adds what didn't go in, instead of making a second Set.
@@ -159,7 +168,10 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         }
         throw new Error(result.failed.map(item => item.message).join(" ") || "Could not confirm the save. Refresh before continuing.");
       }
-      if (generation.current === version) { setRequest(null); setNotice(message); }
+      if (generation.current === version) {
+        setRequest(null);
+        if (toastText) { setNotice(""); setToast({ text: toastText, id: Date.now() }); } else setNotice(message);
+      }
     } catch (error) {
       if (generation.current === version) {
         const message = error instanceof Error ? error.message : "Could not save. Try again.";
@@ -177,7 +189,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
     }, error => { if (generation.current === version) setNotice(error.message); });
   }
   return {
-    busy, blocked, notice, detail,
+    busy, blocked, notice, toast, detail,
     create: (skills = []) => show({ kind: "create", skills }),
     add: (skills, set, choices) => show({ kind: "add", skills, set, choices }),
     favorite: skill => {

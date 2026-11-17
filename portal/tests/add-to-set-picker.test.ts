@@ -15,7 +15,8 @@ test("Add to set lists the sets right away, several can be picked", () => {
   assert.match(source, /for \(const \[index, set\] of targetSets\.entries\(\)\)/);
   // A thrown or unsure save stops the loop; the sets not tried stay picked.
   assert.match(source, /failed\.push\(\.\.\.targetSets\.slice\(index \+ 1\)\.map\(rest => rest\.id\)\)/);
-  assert.match(source, /`Added to \$\{added\} of \$\{targetSets\.length\} sets\. The rest already had it\.`/);
+  assert.match(source, /toastText = `Added \$\{what\} to \$\{added\.length === 1 \? added\[0\] : `\$\{added\.length\} sets`\}`/);
+  assert.match(source, /"\. The rest already had it\."/);
   assert.match(source, /setSetIds\(failed\)/);
   assert.match(source, /`Add to \$\{targetSets\.length\} sets`/);
   // A set that already has the skill can't be picked; Add stays off until a set is picked.
@@ -33,4 +34,11 @@ test("a saved skill in a Set list without items is unknown, not missing", () => 
   assert.equal(setStatus(summary, saved), null);
   assert.equal(setStatus({ items: [], itemCount: 0 } as unknown as PortalSet, saved), false);
   assert.equal(setStatus({ items: [{ catalogSkillId: "o/r/x" }], itemCount: 1 } as unknown as PortalSet, saved), true);
+});
+
+test("adding to or removing from a set confirms with a toast", () => {
+  assert.match(source, /toastText = `Removed \$\{request\.skill\.name\} from \$\{request\.set\.name\}`/);
+  assert.match(source, /setToast\(\{ text: toastText, id: Date\.now\(\) \}\)/);
+  const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(app, /management\?\.toast && \(\s*<div key=\{management\.toast\.id\} className="ua-toast ua-toast-success" role="status">/);
 });

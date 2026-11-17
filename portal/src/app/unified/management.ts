@@ -6,6 +6,8 @@ export type UnifiedManagement = {
   busy: boolean;
   blocked: boolean;
   notice: string;
+  /** A short confirmation after a skill is added to or removed from a set; `id` changes each time. */
+  toast?: { text: string; id: number } | null;
   create: (skills?: SkillDisplay[]) => void;
   /** `choices`: what the Set's skill picker offers (all of My skills, saved ones too); defaults to installed skills. */
   add: (skills: SkillDisplay[], set?: PortalSet, choices?: SkillDisplay[]) => void;
