@@ -21,11 +21,13 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
   useEffect(() => {
     const element = scroller.current;
     if (!element || !enabled) return;
+    let startX = 0;
     let startY: number | null = null;
     let distance = 0;
     const reset = () => { startY = null; distance = 0; setPull(0); };
     const start = (event: TouchEvent) => {
       startY = event.touches.length === 1 && element.scrollTop <= 0 ? event.touches[0].clientY : null;
+      startX = event.touches[0]?.clientX ?? 0;
       distance = 0;
     };
     const move = (event: TouchEvent) => {
@@ -33,7 +35,8 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
       // A second finger, an upward drag or a page that has scrolled ends the pull.
       if (event.touches.length !== 1 || element.scrollTop > 0) { reset(); return; }
       const dy = event.touches[0].clientY - startY;
-      if (dy <= 0) { reset(); return; }
+      // A sideways swipe (a carousel) isn't a pull.
+      if (dy <= 0 || Math.abs(event.touches[0].clientX - startX) > dy) { reset(); return; }
       distance = pullDistance(dy);
       setPull(distance);
     };
@@ -53,6 +56,7 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
       element.removeEventListener("touchmove", move);
       element.removeEventListener("touchend", end);
       element.removeEventListener("touchcancel", reset);
+      setPull(0);
     };
   }, [scroller, enabled]);
   if (!enabled || (!pull && !refreshing)) return null;

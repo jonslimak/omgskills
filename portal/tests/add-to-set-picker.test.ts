@@ -15,8 +15,9 @@ test("Add to set lists the sets right away, several can be picked", () => {
   assert.match(source, /for \(const \[index, set\] of targetSets\.entries\(\)\)/);
   // A thrown or unsure save stops the loop; the sets not tried stay picked.
   assert.match(source, /failed\.push\(\.\.\.targetSets\.slice\(index \+ 1\)\.map\(rest => rest\.id\)\)/);
-  assert.match(source, /toastText = `Added \$\{what\} to \$\{added\.length === 1 \? added\[0\] : `\$\{added\.length\} sets`\}`/);
-  assert.match(source, /"\. The rest already had it\."/);
+  // The toast counts what went in, not what was picked.
+  assert.match(source, /added\.push\(\{ name: set\.name, count: next\.added \}\)/);
+  assert.match(source, /`\$\{added\.length\} of \$\{targetSets\.length\} sets`/);
   assert.match(source, /setSetIds\(failed\)/);
   assert.match(source, /`Add to \$\{targetSets\.length\} sets`/);
   // A set that already has the skill can't be picked; Add stays off until a set is picked.

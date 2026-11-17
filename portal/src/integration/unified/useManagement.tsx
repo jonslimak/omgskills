@@ -126,7 +126,8 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         // One set at a time. A set that fails stays picked to try again; skills already in a set count as unchanged.
         const failed: string[] = [];
         const messages: string[] = [];
-        const added: string[] = [];
+        // Each set that took something, and how many of the skills went in.
+        const added: { name: string; count: number }[] = [];
         for (const [index, set] of targetSets.entries()) {
           let why = "";
           let stop = false;
@@ -137,7 +138,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
             if (next.failed.length || next.uncertain) {
               why = next.failed.map(item => item.message).join(" ") || "Could not confirm the save. Refresh before continuing.";
               stop = next.uncertain;
-            } else if (next.added) added.push(set.name);
+            } else if (next.added) added.push({ name: set.name, count: next.added });
           } catch (error) {
             why = error instanceof Error ? error.message : "Could not save. Try again.";
             stop = true;
@@ -153,10 +154,12 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
           if (generation.current === version) setSetIds(failed);
           throw new Error(messages.join(" "));
         }
-        const what = targetSkills.length === 1 ? targetSkills[0].name : `${targetSkills.length} skills`;
+        const where = added.length === 1 ? added[0].name
+          : added.length < targetSets.length ? `${added.length} of ${targetSets.length} sets` : `${added.length} sets`;
+        const count = added[0]?.count ?? 0;
         if (!added.length) message = targetSets.length === 1 ? "This skill is already in the set." : "Already in those sets.";
-        else toastText = `Added ${what} to ${added.length === 1 ? added[0] : `${added.length} sets`}`
-          + (added.length < targetSets.length ? ". The rest already had it." : "");
+        else toastText = targetSkills.length === 1 ? `Added ${targetSkills[0].name} to ${where}`
+          : added.length === 1 ? `Added ${count} ${count === 1 ? "skill" : "skills"} to ${where}` : `Added skills to ${where}`;
       }
       if (result?.failed.length || result?.uncertain) {
         // The Set was made; trying again adds what didn't go in, instead of making a second Set.
