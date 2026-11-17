@@ -22,6 +22,12 @@ test("Add skill on a Set opens the drawer of My skills; several can be picked", 
   // Skills already in the Set show checked and can't be picked again.
   assert.match(sheet, /checked=\{has \|\| picked\.includes\(skill\.key\)\} disabled=\{disabled \|\| has\}/);
   assert.match(sheet, /placeholder="Search My skills"/);
+  // Rows use the same text as My skills rows.
+  assert.match(sheet, /<span className="ua-row-name">\{skill\.name\}<\/span>/);
+  assert.match(sheet, /<span className="ua-row-description">\{skill\.description\}<\/span>/);
+  // Wide screens: over the skill list, from under the Set's name.
+  assert.match(sheet, /document\.getElementById\("unified-main"\)/);
+  assert.match(sheet, /data-pane=\{place \? true : undefined\}/);
   // Enter in the search doesn't add; only the Add button does.
   assert.doesNotMatch(sheet, /onSubmit/);
   assert.match(sheet, /if \(event\.key === "Enter"\) \{ event\.preventDefault\(\); event\.currentTarget\.blur\(\); \}/);

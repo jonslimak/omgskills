@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Dialog } from "radix-ui";
 import { Search } from "lucide-react";
 import type { PortalSet } from "../../app/model";
@@ -13,6 +13,19 @@ export function matchesSearch(skill: SkillDisplay, query: string) {
   return words.every(word => text.includes(word));
 }
 
+type Place = { left: number; width: number; top: number };
+
+/** On wide screens the drawer covers the skill list: the main pane's width, from just under the Set's name. */
+export function sheetPlace(): Place | null {
+  if (!window.matchMedia("(min-width: 760px)").matches) return null;
+  const main = document.getElementById("unified-main")?.getBoundingClientRect();
+  if (!main) return null;
+  const heading = document.querySelector(".ua-set-identity")?.getBoundingClientRect();
+  // On very wide screens, no wider than the skill list (1120px plus its padding), centred in the pane.
+  const width = Math.min(main.width, 1168);
+  return { left: main.left + (main.width - width) / 2, width, top: Math.max(main.top, (heading?.bottom ?? main.top) + 20) };
+}
+
 /** A drawer from the bottom listing My skills, to pick several to add to a Set. */
 export function SetAddSheet({ set, choices, picked, toggle, busy, disabled, error, theme, close, submit }: {
   set: PortalSet; choices: SkillDisplay[]; picked: string[]; toggle: (key: string, on: boolean) => void;
@@ -20,6 +33,16 @@ export function SetAddSheet({ set, choices, picked, toggle, busy, disabled, erro
 }) {
   const [query, setQuery] = useState("");
   const trigger = useRef(document.activeElement as HTMLElement | null);
+  const [place, setPlace] = useState(sheetPlace);
+  useEffect(() => {
+    // The pane changes size with the window and when the detail panel opens or closes.
+    const update = () => setPlace(sheetPlace());
+    const main = document.getElementById("unified-main");
+    const observer = typeof ResizeObserver === "undefined" || !main ? null : new ResizeObserver(update);
+    if (main) observer?.observe(main);
+    window.addEventListener("resize", update);
+    return () => { observer?.disconnect(); window.removeEventListener("resize", update); };
+  }, []);
   // A skill with no copy to point at can't go in a Set.
   const settable = useMemo(() => choices.filter(skill => skill.installed || skill.catalogId || skill.cloudKey), [choices]);
   const shown = useMemo(() => settable.filter(skill => matchesSearch(skill, query)), [settable, query]);
@@ -28,7 +51,8 @@ export function SetAddSheet({ set, choices, picked, toggle, busy, disabled, erro
   return <Dialog.Root open onOpenChange={open => !open && close()}>
     <Dialog.Portal>
       <Dialog.Overlay className="ua-overlay" />
-      <Dialog.Content className="ua-add-sheet ua-theme" data-theme={theme} aria-describedby={undefined}
+      <Dialog.Content className="ua-add-sheet ua-theme" data-theme={theme} data-pane={place ? true : undefined}
+        style={place ? { left: place.left, width: place.width, top: place.top } : undefined} aria-describedby={undefined}
         onCloseAutoFocus={event => { event.preventDefault(); if (trigger.current?.isConnected) trigger.current.focus(); }}>
         <Dialog.Title className="ua-sr">Add skills to {set.name}</Dialog.Title>
         <div className="ua-add-sheet-bar">
@@ -53,9 +77,11 @@ export function SetAddSheet({ set, choices, picked, toggle, busy, disabled, erro
               <input type="checkbox" checked={has || picked.includes(skill.key)} disabled={disabled || has}
                 onChange={event => toggle(skill.key, event.target.checked)} />
               <Avatar name={skill.author || skill.name} src={skill.avatar} />
-              <span>
-                <strong>{skill.name}{has ? <em>In set</em> : !skill.installed ? <em>Not installed</em> : null}</strong>
-                <small>{skill.description}</small>
+              {/* The same text as a row in My skills. */}
+              <span className="ua-row-text">
+                <span className="ua-row-heading"><span className="ua-row-name">{skill.name}</span>
+                  {has ? <span className="ua-row-versions">In set</span> : !skill.installed ? <span className="ua-row-versions">Not installed</span> : null}</span>
+                <span className="ua-row-description">{skill.description}</span>
               </span>
             </label>;
           })}

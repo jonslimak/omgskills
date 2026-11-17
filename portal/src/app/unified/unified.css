@@ -3323,27 +3323,15 @@ main:has(> .ua-az-anchor) .ua-content {
   margin: 0;
   accent-color: var(--ua-blue);
 }
-.ua-add-sheet-row > span:last-child {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.ua-add-sheet-row .ua-row-text { flex: 1; }
+/* Wide screens: over the skill list, from under the Set's name to the bottom. */
+.ua-add-sheet[data-pane] {
+  transform: none;
+  height: auto;
+  bottom: 0;
+  animation-name: ua-add-sheet-rise;
 }
-.ua-add-sheet-row strong { font-size: 15px; font-weight: 600; }
-.ua-add-sheet-row em {
-  margin-left: 8px;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  color: var(--ua-muted);
-}
-.ua-add-sheet-row small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 12px;
-  color: var(--ua-muted);
-}
+@keyframes ua-add-sheet-rise { from { transform: translateY(100%); } }
 @media (max-width: 759px) {
   .ua-add-sheet { height: 92dvh; }
   .ua-add-sheet-bar { padding: 12px; gap: 8px; }
