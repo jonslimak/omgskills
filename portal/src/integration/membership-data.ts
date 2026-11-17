@@ -97,7 +97,9 @@ export async function changeMembership(api: PortalApi, id: string, skills: Group
       if ((add && matches.length) || (!add && !matches.length && !unknown)) {
         result.unchanged++;
       } else {
-        if (unknown) {
+        // A Set keeps an item after its skill leaves the Mac, with no skill link left. Adding is still safe:
+        // the server refuses a duplicate (409, handled below). Only removing needs every item matched.
+        if (unknown && !add) {
           throw new PortalApiError("Membership information is incomplete. Refresh this set.", 409);
         }
         if (add) {
