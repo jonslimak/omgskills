@@ -184,6 +184,8 @@ type Props = {
   onVisibility: (setId: string, visibility: Visibility) => void;
   state: LoadState;
   retry: () => void;
+  /** Reloads the signed-in data in place, for pull to refresh. */
+  refresh?: () => Promise<unknown>;
   previewBar: ReactNode;
   publicStatus?: PublicStatus;
   readOnlyAccount?: boolean;
@@ -507,6 +509,7 @@ export function UnifiedApp({
   onVisibility,
   state,
   retry,
+  refresh,
   previewBar,
   publicStatus,
   readOnlyAccount = false,
@@ -1721,7 +1724,7 @@ export function UnifiedApp({
             )}
           </header>
           <main className="ua-main" data-view={nav.view} ref={main} id="unified-main" tabIndex={-1} inert={!!selected && expanded}>
-            <PullToRefresh scroller={main} enabled={phone && !picked.length && !management?.busy} />
+            <PullToRefresh scroller={main} enabled={phone && !picked.length && !management?.busy} onRefresh={refresh} />
             {railList && <AlphaRail scroller={main} letters={railLetters(visible)} count={visible.length} />}
             <div className="ua-content">
               {!collectionHeader && !creatorHeader && ((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
