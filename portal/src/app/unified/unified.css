@@ -63,8 +63,8 @@
 .ua-theme[data-theme="dark"] .ua-row[data-selected="true"] {
   background: var(--ua-chip);
 }
-.ua-theme[data-theme="dark"]:is(.ua-drawer, .ua-detail) {
-  /* The panel is lighter than the page, so its buttons and cards go lighter again. */
+.ua-theme[data-theme="dark"]:is(.ua-drawer, .ua-detail, .ua-modal, .ua-add-sheet) {
+  /* Panels and pop-ups are lighter than the page, so its buttons and cards go lighter again. */
   --ua-chip: #34343a;
   --ua-selection: #404047;
   background: #202024;
@@ -1064,6 +1064,8 @@
   margin-right: auto;
 }
 .ua-bulk > .ua-pill:not(.ua-primary) { --ua-pill-bg: var(--ua-bg); }
+/* Dark mode: the bar is already dark, so its buttons go lighter to stand out. */
+.ua-theme[data-theme="dark"] .ua-bulk > .ua-pill:not(.ua-primary) { --ua-pill-bg: #34343a; --ua-pill-hover: #404047; }
 /* Unavailable buttons stay white; only their words fade. */
 .ua-bulk > .ua-pill:disabled { opacity: 1; color: var(--ua-faint); }
 @media (max-width: 759px) {
@@ -1799,6 +1801,8 @@
   background: #0003;
   z-index: 30;
 }
+/* Dark mode: a deeper dim, so the pop-up stands out from the page behind it. */
+.ua-overlay[data-theme="dark"] { background: #000000b3; }
 .ua-detail {
   display: flex;
   flex-direction: column;
