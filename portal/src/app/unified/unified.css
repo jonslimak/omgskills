@@ -461,9 +461,12 @@
   container-type: inline-size;
 }
 .ua-content {
+  /* Side padding as variables: the edit bar reaches past them to the pane's edges. */
+  --ua-pad-l: 32px;
+  --ua-pad-r: 32px;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 26px 32px 56px;
+  padding: 26px var(--ua-pad-r) 56px var(--ua-pad-l);
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -1050,7 +1053,9 @@
   bottom: 0;
   z-index: 3;
   margin-top: auto;
-  margin-inline: calc(50% - 50cqw);
+  /* Out to both edges of the pane, whatever the side padding (wider on the right beside the A–Z rail). */
+  margin-left: calc(50% - 50cqw + (var(--ua-pad-r) - var(--ua-pad-l)) / 2);
+  margin-right: calc(50% - 50cqw - (var(--ua-pad-r) - var(--ua-pad-l)) / 2);
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -2670,7 +2675,9 @@
     display: none;
   }
   .ua-content {
-    padding: 6px 16px 28px;
+    --ua-pad-l: 16px;
+    --ua-pad-r: 16px;
+    padding: 6px var(--ua-pad-r) 28px var(--ua-pad-l);
     gap: 24px;
   }
   .ua-mobile-header {
@@ -3110,7 +3117,7 @@ main:has(> .ua-az-anchor) .ua-row {
   scroll-margin-top: 8px;
 }
 main:has(> .ua-az-anchor) .ua-content {
-  padding-right: 40px;
+  --ua-pad-r: 40px;
 }
 /* "Add skill": find library skills by GitHub link. */
 .ua-add-skill { display: flex; flex-direction: column; gap: 16px; }
