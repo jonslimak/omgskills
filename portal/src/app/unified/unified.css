@@ -1065,6 +1065,8 @@
   margin-right: auto;
 }
 .ua-bulk > .ua-pill:not(.ua-primary) { --ua-pill-bg: var(--ua-bg); }
+/* Unavailable buttons stay white; only their words fade. */
+.ua-bulk > .ua-pill:disabled { opacity: 1; color: var(--ua-faint); }
 @media (max-width: 759px) {
   /* Phones: words only, on one line. */
   /* Fits one line on most phones; the narrowest wrap rather than cut a button off. */
