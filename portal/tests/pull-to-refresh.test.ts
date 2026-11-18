@@ -27,14 +27,17 @@ test("phones get pull to refresh on the main pane, which reloads the data in pla
   // Signed out there's nothing to reload, so no pull; a refresh under way keeps its spinner.
   assert.match(source, /if \(!element \|\| !enabled \|\| !refresh\.current\) return;/);
   assert.match(source, /if \(!refreshing && \(!enabled \|\| !pull\)\) return null;/);
-  // No second pull while one is refreshing.
-  assert.match(source, /!busy\.current \? event\.touches\[0\]\.clientY/);
+  // A pull during a refresh moves the page but starts no second refresh.
+  assert.match(source, /distance >= PULL_REFRESH && !busy\.current\)/);
+  assert.match(source, /setPull\(busy\.current \? PULL_GAP \+ distance : distance\)/);
+  assert.match(source, /`\$\{pull \|\| PULL_GAP\}px`/);
+  // The first move down claims the gesture, so Safari can't take it and leave the pull stuck.
+  assert.match(source, /event\.preventDefault\(\);\n\s*if \(dy < 8\) return;\n\s*pulling = true;/);
   // Only starts at the top of the page.
   assert.match(source, /element\.scrollTop <= 0/);
   // The spinner stays under the search bar, not on the stretching page.
   assert.match(source, /setTop\(element\.getBoundingClientRect\(\)\.top\)/);
   // The page follows the finger, then stays down just enough for the spinner while refreshing.
-  assert.match(source, /element\.style\.setProperty\("--ua-ptr", `\$\{refreshing \? PULL_GAP : pull\}px`\)/);
   const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
   assert.match(css, /\.ua-main\[data-ptr\] > \.ua-content \{\s*transform: translateY\(var\(--ua-ptr, 0px\)\)/);
   // The A–Z rail keeps its drag; a gesture the browser already took is left to it.
@@ -42,7 +45,7 @@ test("phones get pull to refresh on the main pane, which reloads the data in pla
   assert.match(source, /if \(!event\.cancelable\) \{ startY = null; return; \}/);
   // Sideways swipes are left to the page: decided once, before anything is blocked.
   assert.match(source, /if \(!pulling\) \{/);
-  assert.match(source, /if \(dy <= 0 \|\| dx > dy \|\| element\.scrollTop > 0\) \{ startY = null; return; \}/);
+  assert.match(source, /if \(dy <= 0 \|\| dx \* 2 > dy \|\| element\.scrollTop > 0\) \{ startY = null; return; \}/);
 });
 
 test("a refresh keeps the open Set on screen while it reloads", () => {
