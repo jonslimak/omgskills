@@ -326,6 +326,7 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     state={!available || shown ? "ready" : snapshot.error ? "error" : "loading"}
     mySkillsLoading={myListLoading}
     retry={account.refresh}
+    refresh={available ? account.reload : undefined}
     savedSkillMd={available && !snapshot.accessDenied && !composition?.readOnly && !local
       ? (keys, signal) => loadSavedSkillMd(api, keys, signal) : undefined}
     savedVersions={available && !snapshot.accessDenied && !composition?.readOnly && !local

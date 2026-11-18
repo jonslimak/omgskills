@@ -49,6 +49,8 @@ export function useAccount(api: PortalApi, identity: AccountIdentity, enabled: b
     saveMembership: (command: MembershipCommand) => readOnly ? Promise.reject(new Error("Account editing is unavailable.")) : session.current
       ? session.current.saveMembership(command) : Promise.reject(new Error("Sign in before saving.")),
     refresh: () => { void session.current?.refresh(); },
+    /** Reloads the account in place; settles when the answer is in (or failed). */
+    reload: () => session.current?.refresh() ?? Promise.resolve(),
     clear: () => { session.current?.dispose(); setSnapshot(initial); },
     recover: () => setRecovery(value => value + 1),
   };

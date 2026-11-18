@@ -1,19 +1,21 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 
-/** How far the indicator follows the finger, and how far a pull must go to refresh. */
-export const PULL_MAX = 80;
-export const PULL_REFRESH = 60;
-/** The indicator moves at half the finger's speed, up to PULL_MAX. */
-/** Room the page makes for the spinner: 18px under the search bar, the 22px spinner, 18px above the page (which has 6px of its own). */
+/** The page follows the finger with growing resistance, never quite reaching PULL_MAX; past PULL_REFRESH, letting go refreshes. */
+export const PULL_MAX = 150;
+export const PULL_REFRESH = 55;
+/** Room the page keeps for the spinner while refreshing: 18px under the search bar, the 22px spinner, 18px above the page (which has 6px of its own). */
 export const PULL_GAP = 40;
-export const pullDistance = (dy: number) => (dy > 0 ? Math.min(PULL_MAX, dy / 2) : 0);
+/** The shortest time the spinner shows, so a quick answer doesn't flash it. */
+export const PULL_MIN_SPIN = 600;
+export const pullDistance = (dy: number) => (dy > 0 ? PULL_MAX * (1 - 1 / (dy * 0.55 / PULL_MAX + 1)) : 0);
 
 /**
  * Pull down at the top of the page to refresh, on phones. The page scrolls inside the app's main pane,
- * so the browser's own pull-to-refresh never fires there.
+ * so the browser's own pull-to-refresh never fires there. Like Mail, the page stays on screen and the
+ * data reloads in place; the spinner turns until it arrives.
  */
-export function PullToRefresh({ scroller, enabled, onRefresh = () => window.location.reload() }: {
-  scroller: RefObject<HTMLElement | null>; enabled: boolean; onRefresh?: () => void;
+export function PullToRefresh({ scroller, enabled, onRefresh }: {
+  scroller: RefObject<HTMLElement | null>; enabled: boolean; onRefresh?: () => Promise<unknown>;
 }) {
   const [pull, setPull] = useState(0);
   // The top of the main pane, just under the search bar: the spinner stays there while the page stretches.
@@ -21,6 +23,7 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
   const [refreshing, setRefreshing] = useState(false);
   const refresh = useRef(onRefresh);
   refresh.current = onRefresh;
+  const busy = useRef(false);
   useEffect(() => {
     const element = scroller.current;
     if (!element || !enabled) return;
@@ -34,7 +37,7 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
       setTop(element.getBoundingClientRect().top);
       // The A–Z rail scrubs with its own drag.
       const onRail = event.target instanceof Element && !!event.target.closest(".ua-az-anchor");
-      startY = event.touches.length === 1 && element.scrollTop <= 0 && !onRail ? event.touches[0].clientY : null;
+      startY = event.touches.length === 1 && element.scrollTop <= 0 && !onRail && !busy.current ? event.touches[0].clientY : null;
       startX = event.touches[0]?.clientX ?? 0;
       distance = 0;
       pulling = false;
@@ -64,8 +67,13 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
     const end = () => {
       if (startY !== null && distance >= PULL_REFRESH) {
         startY = null;
+        busy.current = true;
         setRefreshing(true);
-        refresh.current();
+        setPull(0);
+        const minimum = new Promise(resolve => setTimeout(resolve, PULL_MIN_SPIN));
+        // A failed refresh still ends: the app reports its own load errors.
+        void Promise.all([Promise.resolve(refresh.current?.()).catch(() => {}), minimum])
+          .finally(() => { busy.current = false; setRefreshing(false); });
       } else reset();
     };
     element.addEventListener("touchstart", start, { passive: true });
@@ -81,13 +89,13 @@ export function PullToRefresh({ scroller, enabled, onRefresh = () => window.loca
     };
   }, [scroller, enabled]);
   const shown = refreshing ? PULL_REFRESH : pull;
-  // The page moves down by the pull, and stays down while refreshing, so the spinner never covers it.
+  // The page follows the finger, then settles just under the spinner while refreshing, so the spinner never covers it.
   useEffect(() => {
     const element = scroller.current;
     if (!element) return;
     if (shown > 0) {
-      element.dataset.ptr = pull && !refreshing ? "pulling" : "held";
-      element.style.setProperty("--ua-ptr", `${Math.min(PULL_GAP, shown)}px`);
+      element.dataset.ptr = refreshing ? "held" : "pulling";
+      element.style.setProperty("--ua-ptr", `${refreshing ? PULL_GAP : pull}px`);
       return;
     }
     if (!element.dataset.ptr) return;
