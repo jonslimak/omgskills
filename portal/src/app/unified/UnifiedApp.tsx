@@ -1857,6 +1857,10 @@ export function UnifiedApp({
                 )}
               </div>}
               {management?.notice && !detail && <p className="ua-muted" role="status">{management.notice}</p>}
+              {setPage && management.detail.set && management.detail.error && <div className="ua-toolbar" role="status">
+                <span className="ua-muted">Could not refresh. Showing the last loaded Set.</span>
+                <button type="button" className="ua-pill" onClick={management.detail.retry}>Retry</button>
+              </div>}
               {setPage && management.detail.catalog?.state === "loading" && <p className="ua-muted" role="status">Loading catalog details...</p>}
               {setPage && management.detail.catalog?.note && <div className="ua-toolbar" role="status">
                 <span className="ua-muted">{management.detail.catalog.note}</span>

@@ -48,7 +48,9 @@ test("phones get pull to refresh on the main pane, which reloads the data in pla
 test("a refresh keeps the open Set on screen while it reloads", () => {
   const source = readFileSync(new URL("../src/integration/unified/useSetDetail.ts", import.meta.url), "utf8");
   assert.match(source, /enabled && id && result\.id === id && result\.set \? \{ set: result\.set, state: "ready" as const, error: "", refreshing: true \}/);
-  assert.match(source, /previous\.id === id && previous\.set \? \{ \.\.\.previous, key \}/);
+  assert.match(source, /previous\.id === id && previous\.set \? \{ \.\.\.previous, key, error: message, refreshing: true \}/);
   const access = readFileSync(new URL("../src/integration/unified/SetPermissions.tsx", import.meta.url), "utf8");
   assert.match(access, /detail\.state !== "ready" \|\| !!detail\.refreshing/);
+  const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(app, /Could not refresh\. Showing the last loaded Set\./);
 });

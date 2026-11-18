@@ -36,7 +36,7 @@ export function SetPermissions({ detail, busy, blocked, theme, close, save, copy
   }
   return <Modal theme={theme} title="Invite to set" close={() => { if (!busy && !pending.current) close(); }}>
     {detail.state === "loading" ? <p role="status">Loading access...</p>
-      : detail.state === "error" ? <><p role="alert">{detail.error}</p><button type="button" className="ua-pill" onClick={detail.retry}>Retry</button></>
+      : detail.state === "error" || detail.error ? <><p role="alert">{detail.error}</p><button type="button" className="ua-pill" onClick={detail.retry}>Retry</button></>
       : !editable || !set ? <p>Only the owner can change access. Favorites stays public.</p>
       : <>
         <p>{set.name}</p>
