@@ -9,6 +9,17 @@
          Static library pages and the future homepage must not reuse this tag. -->
     <meta name="robots" content="noindex, follow" />
     <title>omgskills</title>
+    <!-- Paint the loading screen in the saved theme (src/app/unified/theme-preference.ts), so dark mode never flashes white. -->
+    <script>
+      (function () {
+        var theme = "";
+        try { theme = localStorage.getItem("omgskills-theme") || localStorage.getItem("omgskills-home-theme") || ""; } catch (e) {}
+        if (theme !== "dark" && theme !== "light") {
+          try { theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } catch (e) { theme = "light"; }
+        }
+        document.documentElement.dataset.uaTheme = theme;
+      })();
+    </script>
     <link rel="stylesheet" href="/src/app/loading.css" />
   </head>
   <body>
