@@ -25,5 +25,7 @@ export type UnifiedManagement = {
   installLink?: (set: PortalSet) => string | null;
   dialog: (theme: string) => ReactNode;
   detail: { set: PortalSet | null; state: LoadState; error: string; retry: () => void;
+    /** The Set shown is the last loaded one while a newer copy loads. */
+    refreshing?: boolean;
     catalog?: { state: LoadState; note: string; retry: () => void } };
 };

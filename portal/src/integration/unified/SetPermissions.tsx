@@ -19,7 +19,8 @@ export function SetPermissions({ detail, busy, blocked, theme, close, save, copy
   const active = useRef(false);
   useEffect(() => { active.current = true; return () => { active.current = false; }; }, []);
   const editable = set?.role === "owner" && !set.hidden && !set.isFavorites;
-  const disabled = busy || blocked || !editable || detail.state !== "ready";
+  // Access changes wait for the fresh copy, not the one kept on screen while it loads.
+  const disabled = busy || blocked || !editable || detail.state !== "ready" || !!detail.refreshing;
   async function perform(command: SetCommand) {
     if (disabled || pending.current) return;
     pending.current = true; setError(""); setNotice("");
