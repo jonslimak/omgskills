@@ -427,7 +427,7 @@ export function Modal({
   return (
     <Dialog.Root open onOpenChange={(open) => !open && close()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="ua-overlay" />
+        <Dialog.Overlay className="ua-overlay" data-theme={theme} />
         <Dialog.Content
           className={`ua-modal ua-theme ${className}`}
           data-theme={theme}

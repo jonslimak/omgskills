@@ -50,7 +50,7 @@ export function SetAddSheet({ set, choices, picked, toggle, busy, disabled, erro
   const count = picked.filter(key => settable.some(skill => skill.key === key)).length;
   return <Dialog.Root open onOpenChange={open => !open && close()}>
     <Dialog.Portal>
-      <Dialog.Overlay className="ua-overlay" />
+      <Dialog.Overlay className="ua-overlay" data-theme={theme} />
       <Dialog.Content className="ua-add-sheet ua-theme" data-theme={theme} data-pane={place ? true : undefined}
         style={place ? { left: place.left, width: place.width, top: place.top } : undefined} aria-describedby={undefined}
         onCloseAutoFocus={event => { event.preventDefault(); if (trigger.current?.isConnected) trigger.current.focus(); }}>
