@@ -2402,7 +2402,7 @@ export function UnifiedApp({
                   && <div className="ua-detail-sync-note"><CloudStatusBadge row={cloudRow(detail)} notInstalled={!!detail.cloudKey} /></div>}
                 {!onMac && detail.installCommand && (
                   <p className="ua-muted ua-detail-copy-hint">
-                    Paste in your terminal (macOS, Linux or WSL). <a className="ua-link" href="/developers/">Use with any agent (MCP)</a>
+                    <a className="ua-link" href="/developers/">Use with any agent (MCP)</a>
                   </p>
                 )}
                 {installOpen && selected && signedIn && publicInstallAction && (
