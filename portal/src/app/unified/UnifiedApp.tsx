@@ -1232,7 +1232,7 @@ export function UnifiedApp({
                   : "Add to favorites"}
               </MenuItem>
               </>}
-              {management && skill.setItemId && activeSet && (editableSet || (activeSet.isFavorites && activeSet.role === "owner")) && <MenuItem icon={X} disabled={!canManage} onSelect={() => management.remove(activeSet, skill)}>
+              {management && skill.setItemId && activeSet && (editableSet || (activeSet.isFavorites && activeSet.role === "owner")) && <MenuItem icon={X} disabled={!canManage} onSelect={() => management.remove(activeSet, [skill])}>
                 Remove from set
               </MenuItem>}
               {management?.updateItem && skill.setItemId && skill.setItemUpdateAvailable && activeSet && editableSet && <MenuItem icon={RefreshCw} disabled={!canManage} onSelect={() => management.updateItem!(activeSet, skill.setItemId!)}>
@@ -2114,9 +2114,15 @@ export function UnifiedApp({
                         const names = [...new Map(installed.flatMap(skill => liveCopiesOf(skill)?.name ?? [])
                           .map(name => [name.trim().toLowerCase(), name] as const)).values()];
                         const one = installed.length === 1 && !savedOnly.length ? installed[0] : undefined;
+                        // In a Set you can change, picks come out of the Set; a new Set isn't offered there.
+                        const ownSet = nav.view === "set" && !!management && !!activeSet
+                          && (editableSet || (activeSet.isFavorites && activeSet.role === "owner"));
+                        const inSet = ownSet ? chosen.filter(skill => skill.setItemId) : [];
                         return <>
-                          <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
-                            onClick={() => newSet(forSets)}><Plus />New set</button>
+                          {ownSet ? <button type="button" className="ua-pill ua-pill-danger" disabled={!inSet.length || !canManage}
+                            onClick={() => management!.remove(activeSet!, inSet)}><X />Remove from set</button>
+                            : <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
+                            onClick={() => newSet(forSets)}><Plus />New set</button>}
                           <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
                             onClick={() => addToSet(forSets)}><ListPlus />Add to set</button>
                           {(fromMac || cloud?.remove || additions) && <button type="button" className="ua-pill ua-pill-danger"
