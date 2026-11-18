@@ -461,9 +461,12 @@
   container-type: inline-size;
 }
 .ua-content {
+  /* Side padding as variables: the edit bar reaches past them to the pane's edges. */
+  --ua-pad-l: 32px;
+  --ua-pad-r: 32px;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 26px 32px 56px;
+  padding: 26px var(--ua-pad-r) 56px var(--ua-pad-l);
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -1042,20 +1045,42 @@
 .ua-agent-logo[data-agent="codex"] {
   --agent-logo: url("../../../../web-handoff/app/assets/agent-codex.png");
 }
+/* Edit: a bar along the bottom of the pane, full width. The page fills the pane so the bar sits at the
+   bottom even under a short list, and sticks there while a long one scrolls. */
+.ua-main[data-editing] > .ua-content { min-height: 100%; padding-bottom: 0; }
 .ua-bulk {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin-top: auto;
+  /* Out to both edges of the pane, whatever the side padding (wider on the right beside the A–Z rail). */
+  margin-left: calc(50% - 50cqw + (var(--ua-pad-r) - var(--ua-pad-l)) / 2);
+  margin-right: calc(50% - 50cqw - (var(--ua-pad-r) - var(--ua-pad-l)) / 2);
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  padding: 10px 14px;
-  min-height: 44px;
-  background: var(--ua-chip);
-  border-radius: 8px;
-  margin-bottom: -16px;
+  padding: 8px 32px calc(8px + env(safe-area-inset-bottom));
+  /* Same height as the sidebar's account footer, so the two bottom bars line up. */
+  min-height: calc(59px + env(safe-area-inset-bottom));
+  background: var(--ua-side);
+  border-top: 1px solid var(--ua-line);
 }
 .ua-bulk > span {
   color: var(--ua-muted);
   margin-right: auto;
+}
+.ua-bulk > .ua-pill:not(.ua-primary) { --ua-pill-bg: var(--ua-bg); }
+/* Unavailable buttons stay white; only their words fade. */
+.ua-bulk > .ua-pill:disabled { opacity: 1; color: var(--ua-faint); }
+@media (max-width: 759px) {
+  /* Phones: words only, on one line. */
+  /* Fits one line on most phones; the narrowest wrap rather than cut a button off. */
+  .ua-bulk { gap: 4px; padding-inline: 10px; justify-content: flex-end; font-size: 12px; }
+  .ua-bulk svg { display: none; }
+  .ua-bulk > span, .ua-bulk > button { white-space: nowrap; }
+  .ua-bulk > .ua-pill { padding-inline: 8px; }
+  .ua-bulk > .ua-link { padding-inline: 2px; }
 }
 .ua-collections {
   display: grid;
@@ -2650,7 +2675,9 @@
     display: none;
   }
   .ua-content {
-    padding: 6px 16px 28px;
+    --ua-pad-l: 16px;
+    --ua-pad-r: 16px;
+    padding: 6px var(--ua-pad-r) 28px var(--ua-pad-l);
     gap: 24px;
   }
   .ua-mobile-header {
@@ -3090,7 +3117,7 @@ main:has(> .ua-az-anchor) .ua-row {
   scroll-margin-top: 8px;
 }
 main:has(> .ua-az-anchor) .ua-content {
-  padding-right: 40px;
+  --ua-pad-r: 40px;
 }
 /* "Add skill": find library skills by GitHub link. */
 .ua-add-skill { display: flex; flex-direction: column; gap: 16px; }
