@@ -51,3 +51,8 @@ test("the panel's MCP link opens the app's Developers page in place, keeping the
   assert.doesNotMatch(app, /Paste in your terminal/);
   assert.match(app, /event\.preventDefault\(\); go\("developers"\);\s*\}\}>Use with any agent \(MCP\)<\/a>/);
 });
+
+test("a Set you own shows a blue Add Skills button, labelled on phones too", () => {
+  const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(app, /<button className="ua-pill ua-primary ua-set-add" type="button" disabled=\{disabled\} onClick=\{\(\) => management\.add\(\[\], set, choices\)\}>Add Skills<\/button>/);
+});

@@ -395,7 +395,7 @@ function ManagedSetHeader({ set, skills, choices, management, theme, headingActi
     </div>}
     <div className="ua-set-actions">
       {editable && <>
-        <button className="ua-pill ua-set-action" type="button" aria-label="Add skill" title="Add skill" disabled={disabled} onClick={() => management.add([], set, choices)}><Plus /><span>Add skill</span></button>
+        <button className="ua-pill ua-primary ua-set-add" type="button" disabled={disabled} onClick={() => management.add([], set, choices)}>Add Skills</button>
       </>}
       {installLink && !disabled && <a className="ua-pill ua-set-action" href={installLink} title="Install this Set with the omgskills Mac app">
         <Download /><span>Install on Mac</span></a>}
