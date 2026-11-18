@@ -14,7 +14,9 @@ export function useSetDetail(api: PortalApi, id: string, revision: number, enabl
     return startSetRead((path, init) => apiRef.current(path, init), id,
       set => setResult({ key, id, set: { ...set, membershipSkillIds: set.role === "owner" && !set.items.some(item => item.kind === "synced" && !item.syncedSkillId)
         ? set.items.flatMap(item => item.syncedSkillId ? [item.syncedSkillId] : []) : undefined }, state: "ready", error: "" }),
-      error => setResult({ key, id, set: null, state: "error", error: error instanceof Error ? error.message : "Could not load this set." }));
+      // A failed reload keeps the Set already on screen, like the account keeps its last loaded data.
+      error => setResult(previous => previous.id === id && previous.set ? { ...previous, key }
+        : { key, id, set: null, state: "error", error: error instanceof Error ? error.message : "Could not load this set." }));
   }, [id, key, enabled]);
   // A reload of the same Set (an account refresh, a save) keeps the loaded one on screen until the new answer lands.
   const current = enabled && id && result.key === key ? result
