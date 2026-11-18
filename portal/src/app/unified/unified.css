@@ -1042,20 +1042,37 @@
 .ua-agent-logo[data-agent="codex"] {
   --agent-logo: url("../../../../web-handoff/app/assets/agent-codex.png");
 }
+/* Edit: a bar along the bottom of the pane, full width. The page fills the pane so the bar sits at the
+   bottom even under a short list, and sticks there while a long one scrolls. */
+.ua-main[data-editing] > .ua-content { min-height: 100%; padding-bottom: 0; }
 .ua-bulk {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin-top: auto;
+  margin-inline: calc(50% - 50cqw);
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  padding: 10px 14px;
-  min-height: 44px;
-  background: var(--ua-chip);
-  border-radius: 8px;
-  margin-bottom: -16px;
+  padding: 12px 32px calc(12px + env(safe-area-inset-bottom));
+  min-height: 64px;
+  background: var(--ua-side);
+  border-top: 1px solid var(--ua-line);
 }
 .ua-bulk > span {
   color: var(--ua-muted);
   margin-right: auto;
+}
+.ua-bulk > .ua-pill:not(.ua-primary) { --ua-pill-bg: var(--ua-bg); }
+@media (max-width: 759px) {
+  /* Phones: words only, on one line. */
+  /* Fits one line on most phones; the narrowest wrap rather than cut a button off. */
+  .ua-bulk { gap: 4px; padding-inline: 10px; justify-content: flex-end; font-size: 12px; }
+  .ua-bulk svg { display: none; }
+  .ua-bulk > span, .ua-bulk > button { white-space: nowrap; }
+  .ua-bulk > .ua-pill { padding-inline: 8px; }
+  .ua-bulk > .ua-link { padding-inline: 2px; }
 }
 .ua-collections {
   display: grid;

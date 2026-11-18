@@ -51,10 +51,22 @@ test("Edit in a Set you own removes the picked skills from the Set, without a Ne
   assert.match(app, /onClick=\{\(\) => management!\.remove\(activeSet!, inSet\)\}><X \/>Remove from set<\/button>/);
   // Sets and Favorites alike; the uninstall Remove isn't offered beside it; removed rows leave the selection.
   assert.match(app, /const ownSet = setPage && !!activeSet/);
-  assert.match(app, /\{!ownSet && \(fromMac \|\| cloud\?\.remove \|\| additions\) && <button/);
+  assert.match(app, /: \(fromMac \|\| cloud\?\.remove \|\| additions\) && <button type="button" className="ua-pill ua-pill-danger"/);
   assert.match(app, /old\.filter\(key => !key\.startsWith\("set-item:"\) \|\| keys\.has\(key\)\)/);
   const management = readFileSync(new URL("../src/integration/unified/useManagement.tsx", import.meta.url), "utf8");
   assert.match(management, /saveMembership\(\{ kind: "remove-items", id: request\.set\.id, itemIds \}\)/);
   const session = readFileSync(new URL("../src/integration/account-session.ts", import.meta.url), "utf8");
   assert.match(session, /for \(const itemId of command\.itemIds\) \{ await removeMembershipItem\(scoped, command\.id, itemId, signal\);/);
+});
+
+test("Edit uses a bar along the bottom: count, Select all, Add to set, Remove, Done; words only on phones", () => {
+  const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(app, /data-editing=\{editing \|\| undefined\}/);
+  assert.match(app, /<div className="ua-bulk" role="toolbar" aria-label="Edit skills">\s*<span>\{picked\.length\} selected<\/span>/);
+  assert.match(app, /className="ua-pill ua-primary" onClick=\{\(\) => \{ setEditing\(false\); setPicked\(\[\]\); closeDetail\(\); \}\}>Done<\/button>/);
+  // The heading offers Edit only; Done is in the bar.
+  assert.match(app, /\{editableView && !editing && <button/);
+  const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
+  assert.match(css, /\.ua-bulk \{\s*position: sticky;\s*bottom: 0;/);
+  assert.match(css, /\.ua-bulk svg \{ display: none; \}/);
 });
