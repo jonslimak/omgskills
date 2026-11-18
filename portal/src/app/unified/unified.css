@@ -616,6 +616,8 @@
 .ua-pill.ua-invite { --ua-pill-bg: #34c759; --ua-pill-hover: #2aab4a; height: 36px; padding: 0 16px; color: #fff; font-size: 13px; }
 .ua-set-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: -20px; }
 .ua-set-actions > .ua-heading-actions { margin-left: auto; flex-shrink: 0; }
+/* The Set's main action: a blue "Add Skills" button, labelled on phones too. */
+.ua-pill.ua-set-add { padding: 0 14px; flex-shrink: 0; font-weight: 600; }
 .ua-visibility-check { width: 14px; flex-shrink: 0; color: var(--ua-blue); }
 .ua-visibility-option { display: flex; flex-direction: column; gap: 1px; width: 202px; }
 .ua-visibility-option strong { font-size: 13px; font-weight: 600; }

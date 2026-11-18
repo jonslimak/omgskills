@@ -395,7 +395,7 @@ function ManagedSetHeader({ set, skills, choices, management, theme, headingActi
     </div>}
     <div className="ua-set-actions">
       {editable && <>
-        <button className="ua-pill ua-set-action" type="button" aria-label="Add skill" title="Add skill" disabled={disabled} onClick={() => management.add([], set, choices)}><Plus /><span>Add skill</span></button>
+        <button className="ua-pill ua-primary ua-set-add" type="button" disabled={disabled} onClick={() => management.add([], set, choices)}>Add Skills</button>
       </>}
       {installLink && !disabled && <a className="ua-pill ua-set-action" href={installLink} title="Install this Set with the omgskills Mac app">
         <Download /><span>Install on Mac</span></a>}
@@ -2402,7 +2402,11 @@ export function UnifiedApp({
                   && <div className="ua-detail-sync-note"><CloudStatusBadge row={cloudRow(detail)} notInstalled={!!detail.cloudKey} /></div>}
                 {!onMac && detail.installCommand && (
                   <p className="ua-muted ua-detail-copy-hint">
-                    Paste in your terminal (macOS, Linux or WSL). <a className="ua-link" href="/developers/">Use with any agent (MCP)</a>
+                    {/* Opens the app's own Developers page (same theme, no page load); a new-tab click still gets the address. */}
+                    <a className="ua-link" href="/developers/" onClick={event => {
+                      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || !supportsView("developers")) return;
+                      event.preventDefault(); go("developers");
+                    }}>Use with any agent (MCP)</a>
                   </p>
                 )}
                 {installOpen && selected && signedIn && publicInstallAction && (
