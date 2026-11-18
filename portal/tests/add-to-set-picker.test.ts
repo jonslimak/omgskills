@@ -49,6 +49,10 @@ test("Edit in a Set you own removes the picked skills from the Set, without a Ne
   const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(app, /\{ownSet \? <button type="button" className="ua-pill ua-pill-danger" disabled=\{!inSet\.length \|\| !canManage\}/);
   assert.match(app, /onClick=\{\(\) => management!\.remove\(activeSet!, inSet\)\}><X \/>Remove from set<\/button>/);
+  // Sets and Favorites alike; the uninstall Remove isn't offered beside it; removed rows leave the selection.
+  assert.match(app, /const ownSet = setPage && !!activeSet/);
+  assert.match(app, /\{!ownSet && \(fromMac \|\| cloud\?\.remove \|\| additions\) && <button/);
+  assert.match(app, /old\.filter\(key => !key\.startsWith\("set-item:"\) \|\| keys\.has\(key\)\)/);
   const management = readFileSync(new URL("../src/integration/unified/useManagement.tsx", import.meta.url), "utf8");
   assert.match(management, /saveMembership\(\{ kind: "remove-items", id: request\.set\.id, itemIds \}\)/);
   const session = readFileSync(new URL("../src/integration/account-session.ts", import.meta.url), "utf8");
