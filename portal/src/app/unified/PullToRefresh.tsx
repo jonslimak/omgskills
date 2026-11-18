@@ -36,6 +36,7 @@ export function PullToRefresh({ scroller, enabled, onRefresh }: {
     let distance = 0;
     // Set once the finger has moved a little: a pull, or not (then the gesture is left to the page).
     let pulling = false;
+    let fromHeld = false;
     const reset = () => { startY = null; distance = 0; pulling = false; setPull(0); };
     const start = (event: TouchEvent) => {
       setTop(element.getBoundingClientRect().top);
@@ -62,8 +63,9 @@ export function PullToRefresh({ scroller, enabled, onRefresh }: {
         // Claim it on the very first move down: Safari keeps any gesture whose first move it was allowed to scroll,
         // and the pull would then stick until the next try.
         event.preventDefault();
-        if (dy < 8) return;
         pulling = true;
+        // Started while refreshing: the page is held down for the spinner and moves on from there, to the end of this touch.
+        fromHeld = busy.current;
       }
       // Pushed back up past where it started: the pull is over.
       if (dy <= 0) { reset(); return; }
@@ -71,8 +73,7 @@ export function PullToRefresh({ scroller, enabled, onRefresh }: {
       if (!event.cancelable) { reset(); return; }
       event.preventDefault();
       distance = pullDistance(dy);
-      // During a refresh the page is already held down for the spinner: it moves on from there.
-      setPull(busy.current ? PULL_GAP + distance : distance);
+      setPull(fromHeld ? PULL_GAP + distance : distance);
     };
     const end = () => {
       // A pull during a refresh just lets go; the refresh under way carries on.

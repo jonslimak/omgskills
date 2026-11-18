@@ -29,10 +29,10 @@ test("phones get pull to refresh on the main pane, which reloads the data in pla
   assert.match(source, /if \(!refreshing && \(!enabled \|\| !pull\)\) return null;/);
   // A pull during a refresh moves the page but starts no second refresh.
   assert.match(source, /distance >= PULL_REFRESH && !busy\.current\)/);
-  assert.match(source, /setPull\(busy\.current \? PULL_GAP \+ distance : distance\)/);
+  assert.match(source, /setPull\(fromHeld \? PULL_GAP \+ distance : distance\)/);
   assert.match(source, /`\$\{pull \|\| PULL_GAP\}px`/);
   // The first move down claims the gesture, so Safari can't take it and leave the pull stuck.
-  assert.match(source, /event\.preventDefault\(\);\n\s*if \(dy < 8\) return;\n\s*pulling = true;/);
+  assert.match(source, /event\.preventDefault\(\);\n\s*pulling = true;/);
   // Only starts at the top of the page.
   assert.match(source, /element\.scrollTop <= 0/);
   // The spinner stays under the search bar, not on the stretching page.
