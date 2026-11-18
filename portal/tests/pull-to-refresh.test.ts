@@ -21,7 +21,12 @@ test("phones get pull to refresh on the main pane, which reloads the data in pla
   const source = readFileSync(new URL("../src/app/unified/PullToRefresh.tsx", import.meta.url), "utf8");
   // No page reload (a white screen and the page loader); the spinner turns until the data is in.
   assert.doesNotMatch(source, /location\.reload/);
-  assert.match(source, /Promise\.all\(\[Promise\.resolve\(refresh\.current\?\.\(\)\)\.catch\(\(\) => \{\}\), minimum\]\)/);
+  assert.match(source, /Promise\.resolve\(\)\.then\(\(\) => refresh\.current\?\.\(\)\)\.catch\(\(\) => \{\}\)/);
+  assert.match(source, /setTimeout\(resolve, PULL_MAX_SPIN\)/);
+  assert.match(source, /Promise\.all\(\[answer, minimum\]\)/);
+  // Signed out there's nothing to reload, so no pull; a refresh under way keeps its spinner.
+  assert.match(source, /if \(!element \|\| !enabled \|\| !refresh\.current\) return;/);
+  assert.match(source, /if \(!refreshing && \(!enabled \|\| !pull\)\) return null;/);
   // No second pull while one is refreshing.
   assert.match(source, /!busy\.current \? event\.touches\[0\]\.clientY/);
   // Only starts at the top of the page.

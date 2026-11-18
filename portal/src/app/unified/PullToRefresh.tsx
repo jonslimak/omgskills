@@ -7,6 +7,8 @@ export const PULL_REFRESH = 55;
 export const PULL_GAP = 40;
 /** The shortest time the spinner shows, so a quick answer doesn't flash it. */
 export const PULL_MIN_SPIN = 600;
+/** The longest the page waits on a slow answer before it lets go; the data still lands when it arrives. */
+export const PULL_MAX_SPIN = 12000;
 export const pullDistance = (dy: number) => (dy > 0 ? PULL_MAX * (1 - 1 / (dy * 0.55 / PULL_MAX + 1)) : 0);
 
 /**
@@ -24,9 +26,11 @@ export function PullToRefresh({ scroller, enabled, onRefresh }: {
   const refresh = useRef(onRefresh);
   refresh.current = onRefresh;
   const busy = useRef(false);
+  const canRefresh = !!onRefresh;
   useEffect(() => {
     const element = scroller.current;
-    if (!element || !enabled) return;
+    // Nothing to reload (signed out): no pull.
+    if (!element || !enabled || !refresh.current) return;
     let startX = 0;
     let startY: number | null = null;
     let distance = 0;
@@ -71,8 +75,10 @@ export function PullToRefresh({ scroller, enabled, onRefresh }: {
         setRefreshing(true);
         setPull(0);
         const minimum = new Promise(resolve => setTimeout(resolve, PULL_MIN_SPIN));
-        // A failed refresh still ends: the app reports its own load errors.
-        void Promise.all([Promise.resolve(refresh.current?.()).catch(() => {}), minimum])
+        // A failed refresh still ends (the app reports its own load errors), and a stalled one gives up.
+        const answer = Promise.race([Promise.resolve().then(() => refresh.current?.()).catch(() => {}),
+          new Promise(resolve => setTimeout(resolve, PULL_MAX_SPIN))]);
+        void Promise.all([answer, minimum])
           .finally(() => { busy.current = false; setRefreshing(false); });
       } else reset();
     };
@@ -87,7 +93,7 @@ export function PullToRefresh({ scroller, enabled, onRefresh }: {
       element.removeEventListener("touchcancel", reset);
       setPull(0);
     };
-  }, [scroller, enabled]);
+  }, [scroller, enabled, canRefresh]);
   const shown = refreshing ? PULL_REFRESH : pull;
   // The page follows the finger, then settles just under the spinner while refreshing, so the spinner never covers it.
   useEffect(() => {
@@ -105,7 +111,8 @@ export function PullToRefresh({ scroller, enabled, onRefresh }: {
     const timer = setTimeout(() => { delete element.dataset.ptr; element.style.removeProperty("--ua-ptr"); }, 220);
     return () => clearTimeout(timer);
   }, [scroller, shown, pull, refreshing]);
-  if (!enabled || (!pull && !refreshing)) return null;
+  // A refresh under way keeps its spinner even if the pull turns off meanwhile (a save, a selection).
+  if (!refreshing && (!enabled || !pull)) return null;
   return <div className="ua-ptr" style={{ top }} data-ready={refreshing || pull >= PULL_REFRESH}>
     <span className="ua-ptr-dot" style={{ transform: `translateY(6px) scale(${0.6 + 0.4 * Math.min(1, shown / PULL_REFRESH)})`, opacity: Math.min(1, shown / PULL_REFRESH) }}>
       {/* The iPhone's spokes: they appear one by one as you pull, then turn while refreshing. */}
