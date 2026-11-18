@@ -15,7 +15,8 @@ export type UnifiedManagement = {
   rename: (set: PortalSet) => void;
   access: (set: PortalSet) => void;
   visibility: (set: PortalSet, visibility: Visibility) => void;
-  remove: (set: PortalSet, skill: SkillDisplay) => void;
+  /** Asks, then takes one or more skills out of a Set (not off the Mac). */
+  remove: (set: PortalSet, skills: SkillDisplay[]) => void;
   reorder: (set: PortalSet, itemId: string, offset: -1 | 1) => void;
   /** Moves a skill shared from cloud save to the owner's newest saved version. */
   updateItem?: (set: PortalSet, itemId: string) => void;

@@ -21,7 +21,7 @@ type Request =
   | { kind: "rename"; set: PortalSet }
   | { kind: "add"; skills: SkillDisplay[]; set?: PortalSet; choices?: SkillDisplay[] }
   | { kind: "favorite"; skill: SkillDisplay; add: boolean }
-  | { kind: "remove"; set: PortalSet; skill: SkillDisplay };
+  | { kind: "remove"; set: PortalSet; skills: SkillDisplay[] };
 
 export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveMembership, detail, base, local, installEnabled = false }: {
   data: PortalData; mine: SkillDisplay[]; busy: boolean; blocked: boolean; scope: string;
@@ -116,9 +116,11 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
           : await saveMembership({ kind: "catalog", catalogId: request.skill.catalogId!, favorite: true });
         toastText = request.add ? `Added ${request.skill.name} to Favorites` : `Removed ${request.skill.name} from Favorites`;
       } else if (request.kind === "remove") {
-        if (!request.skill.setItemId) throw new Error("Refresh this set before removing an item.");
-        result = await saveMembership({ kind: "remove-item", id: request.set.id, itemId: request.skill.setItemId });
-        toastText = `Removed ${request.skill.name} from ${request.set.name}`;
+        const itemIds = request.skills.flatMap(skill => skill.setItemId ? [skill.setItemId] : []);
+        if (!itemIds.length || itemIds.length < request.skills.length) throw new Error("Refresh this set before removing skills.");
+        result = await saveMembership({ kind: "remove-items", id: request.set.id, itemIds });
+        toastText = request.skills.length === 1 ? `Removed ${request.skills[0].name} from ${request.set.name}`
+          : `Removed ${request.skills.length} skills from ${request.set.name}`;
       } else {
         if (!targetSets.length || targetSets.some(set => set.role !== "owner" || set.hidden || set.isFavorites) || !targetSkills.length) {
           throw new Error("Choose a set you own and a skill.");
@@ -206,7 +208,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
       if (visibility === "public") show({ kind: "publish", set });
       else void changeVisibility(set, visibility);
     },
-    remove: (set, skill) => show({ kind: "remove", set, skill }),
+    remove: (set, skills) => { if (skills.length) show({ kind: "remove", set, skills }); },
     moderate: set => { if (set.role === "owner" && !set.isFavorites) show({ kind: "moderate", set }); },
     reorder: (set, itemId, offset) => {
       if (disabled || pending.current || set.role !== "owner" || set.hidden) return;
@@ -249,7 +251,7 @@ export function useManagement({ data, mine, busy, blocked, scope, saveSet, saveM
         {request.kind === "favorite" && <p>{request.add
           ? "Favorites is public. Anyone with its link can view the skills you add."
           : "This removes the favorite, not the installed skill."}</p>}
-        {request.kind === "remove" && <p>Remove {request.skill.name} from {request.set.name}? This does not uninstall the skill.</p>}
+        {request.kind === "remove" && <p>Remove {request.skills.length === 1 ? request.skills[0].name : `${request.skills.length} skills`} from {request.set.name}? {request.skills.length === 1 ? "This does not uninstall the skill." : "This does not uninstall them."}</p>}
         {(request.kind === "create" || request.kind === "rename") && <label>Set name
           <input autoFocus required maxLength={120} value={name} disabled={disabled} onChange={event => setName(event.target.value)} />
         </label>}

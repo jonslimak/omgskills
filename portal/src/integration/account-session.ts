@@ -225,6 +225,9 @@ export function createAccountSession({ api, identity, cacheKey, storage: supplie
       let failure: unknown;
       try {
         if (command.kind === "remove-item") await removeMembershipItem(scoped, command.id, command.itemId, signal);
+        else if (command.kind === "remove-items") {
+          for (const itemId of command.itemIds) { await removeMembershipItem(scoped, command.id, itemId, signal); result.removed += 1; }
+        }
         else if (command.kind === "reorder") await reorderMembership(scoped, command.id, command.itemIds, signal);
         else if (command.kind === "update-item") await updateMembershipItem(scoped, command.id, command.itemId, signal);
         else if (command.kind === "catalog") result = await addCatalogMembership(scoped, current.sets, command, signal);

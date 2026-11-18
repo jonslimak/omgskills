@@ -631,6 +631,16 @@ export function UnifiedApp({
     [mine],
   );
   const setRows = management?.detail.set ? setSkillDisplays(management.detail.set, everMine, catalog.skills) : [];
+  // Skills taken out of the Set drop out of the selection too.
+  const setRowKeys = management?.detail.set ? setRows.map(row => row.key).join("\n") : null;
+  useEffect(() => {
+    if (setRowKeys === null) return;
+    const keys = new Set(setRowKeys.split("\n"));
+    setPicked(old => {
+      const next = old.filter(key => !key.startsWith("set-item:") || keys.has(key));
+      return next.length === old.length ? old : next;
+    });
+  }, [setRowKeys]);
   // A Discover skill counts as yours only while a Mac has it, so Favorites and Sets get a live copy.
   const library = useMemo(() => models.library.map((skill) =>
     signedIn ? liveSkill(skill) : { ...skill, installed: undefined }), [signedIn, models]);
@@ -1235,7 +1245,7 @@ export function UnifiedApp({
                   : "Add to favorites"}
               </MenuItem>
               </>}
-              {management && skill.setItemId && activeSet && (editableSet || (activeSet.isFavorites && activeSet.role === "owner")) && <MenuItem icon={X} disabled={!canManage} onSelect={() => management.remove(activeSet, skill)}>
+              {management && skill.setItemId && activeSet && (editableSet || (activeSet.isFavorites && activeSet.role === "owner")) && <MenuItem icon={X} disabled={!canManage} onSelect={() => management.remove(activeSet, [skill])}>
                 Remove from set
               </MenuItem>}
               {management?.updateItem && skill.setItemId && skill.setItemUpdateAvailable && activeSet && editableSet && <MenuItem icon={RefreshCw} disabled={!canManage} onSelect={() => management.updateItem!(activeSet, skill.setItemId!)}>
@@ -2121,12 +2131,19 @@ export function UnifiedApp({
                         const names = [...new Map(installed.flatMap(skill => liveCopiesOf(skill)?.name ?? [])
                           .map(name => [name.trim().toLowerCase(), name] as const)).values()];
                         const one = installed.length === 1 && !savedOnly.length ? installed[0] : undefined;
+                        // In a Set you can change, picks come out of the Set; a new Set isn't offered there.
+                        const ownSet = setPage && !!activeSet
+                          && (editableSet || (activeSet.isFavorites && activeSet.role === "owner"));
+                        const inSet = ownSet ? chosen.filter(skill => skill.setItemId) : [];
                         return <>
-                          <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
-                            onClick={() => newSet(forSets)}><Plus />New set</button>
+                          {ownSet ? <button type="button" className="ua-pill ua-pill-danger" disabled={!inSet.length || !canManage}
+                            onClick={() => management!.remove(activeSet!, inSet)}><X />Remove from set</button>
+                            : <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
+                            onClick={() => newSet(forSets)}><Plus />New set</button>}
                           <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
                             onClick={() => addToSet(forSets)}><ListPlus />Add to set</button>
-                          {(fromMac || cloud?.remove || additions) && <button type="button" className="ua-pill ua-pill-danger"
+                          {/* In your own Set, removing means out of the Set; uninstalling stays in each skill's panel. */}
+                          {!ownSet && (fromMac || cloud?.remove || additions) && <button type="button" className="ua-pill ua-pill-danger"
                             disabled={!names.length && !savedOnly.length}
                             onClick={() => names.length ? setRemovingFromMac({ names, skill: one, saved: savedOnly }) : setRemoving(savedOnly)}>
                             <Trash2 />Remove

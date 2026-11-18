@@ -16,6 +16,8 @@ export type MembershipCommand =
   | { kind: "add-many"; id?: string; name?: string; skills: GroupedSyncedSkill[]; catalogIds: string[];
       saved: { key: string; name: string }[] }
   | { kind: "remove-item"; id: string; itemId: string }
+  /** Several items out of one Set, one at a time; the first failure stops the rest. */
+  | { kind: "remove-items"; id: string; itemIds: string[] }
   | { kind: "reorder"; id: string; itemIds: string[] }
   | { kind: "update-item"; id: string; itemId: string };
 /** The server's answer when a skill is already in the Set, however it got there. */
