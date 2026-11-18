@@ -184,6 +184,8 @@ type Props = {
   onVisibility: (setId: string, visibility: Visibility) => void;
   state: LoadState;
   retry: () => void;
+  /** Reloads the signed-in data in place, for pull to refresh. */
+  refresh?: () => Promise<unknown>;
   previewBar: ReactNode;
   publicStatus?: PublicStatus;
   readOnlyAccount?: boolean;
@@ -507,6 +509,7 @@ export function UnifiedApp({
   onVisibility,
   state,
   retry,
+  refresh,
   previewBar,
   publicStatus,
   readOnlyAccount = false,
@@ -1721,7 +1724,7 @@ export function UnifiedApp({
             )}
           </header>
           <main className="ua-main" data-view={nav.view} ref={main} id="unified-main" tabIndex={-1} inert={!!selected && expanded}>
-            <PullToRefresh scroller={main} enabled={phone && !picked.length && !management?.busy} />
+            <PullToRefresh scroller={main} enabled={phone && !picked.length && !management?.busy} onRefresh={refresh} />
             {railList && <AlphaRail scroller={main} letters={railLetters(visible)} count={visible.length} />}
             <div className="ua-content">
               {!collectionHeader && !creatorHeader && ((["creator", "collection", "category"].includes(nav.view) && !nav.query) ||
@@ -1854,6 +1857,10 @@ export function UnifiedApp({
                 )}
               </div>}
               {management?.notice && !detail && <p className="ua-muted" role="status">{management.notice}</p>}
+              {setPage && management.detail.set && management.detail.error && <div className="ua-toolbar" role="status">
+                <span className="ua-muted">Could not refresh. Showing the last loaded Set.</span>
+                <button type="button" className="ua-pill" onClick={management.detail.retry}>Retry</button>
+              </div>}
               {setPage && management.detail.catalog?.state === "loading" && <p className="ua-muted" role="status">Loading catalog details...</p>}
               {setPage && management.detail.catalog?.note && <div className="ua-toolbar" role="status">
                 <span className="ua-muted">{management.detail.catalog.note}</span>
