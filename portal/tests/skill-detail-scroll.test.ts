@@ -45,3 +45,9 @@ test("mobile skill overlays reserve their full height before content loads", () 
   const desktop = styles.slice(styles.indexOf(".ua-detail {")).split("}")[0];
   assert.doesNotMatch(desktop, /\n\s+height:/);
 });
+
+test("the panel's MCP link opens the app's Developers page in place, keeping the theme", () => {
+  const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(app, /Paste in your terminal/);
+  assert.match(app, /event\.preventDefault\(\); go\("developers"\);\s*\}\}>Use with any agent \(MCP\)<\/a>/);
+});

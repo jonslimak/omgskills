@@ -2402,7 +2402,11 @@ export function UnifiedApp({
                   && <div className="ua-detail-sync-note"><CloudStatusBadge row={cloudRow(detail)} notInstalled={!!detail.cloudKey} /></div>}
                 {!onMac && detail.installCommand && (
                   <p className="ua-muted ua-detail-copy-hint">
-                    <a className="ua-link" href="/developers/">Use with any agent (MCP)</a>
+                    {/* Opens the app's own Developers page (same theme, no page load); a new-tab click still gets the address. */}
+                    <a className="ua-link" href="/developers/" onClick={event => {
+                      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || !supportsView("developers")) return;
+                      event.preventDefault(); go("developers");
+                    }}>Use with any agent (MCP)</a>
                   </p>
                 )}
                 {installOpen && selected && signedIn && publicInstallAction && (
