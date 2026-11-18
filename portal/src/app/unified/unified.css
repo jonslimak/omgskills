@@ -1045,17 +1045,10 @@
 .ua-agent-logo[data-agent="codex"] {
   --agent-logo: url("../../../../web-handoff/app/assets/agent-codex.png");
 }
-/* Edit: a bar along the bottom of the pane, full width. The page fills the pane so the bar sits at the
-   bottom even under a short list, and sticks there while a long one scrolls. */
-.ua-main[data-editing] > .ua-content { min-height: 100%; padding-bottom: 0; }
+/* Edit: a bar along the bottom of the pane, full width, outside the scroller so it never moves. */
 .ua-bulk {
-  position: sticky;
-  bottom: 0;
+  flex-shrink: 0;
   z-index: 3;
-  margin-top: auto;
-  /* Out to both edges of the pane, whatever the side padding (wider on the right beside the A–Z rail). */
-  margin-left: calc(50% - 50cqw + (var(--ua-pad-r) - var(--ua-pad-l)) / 2);
-  margin-right: calc(50% - 50cqw - (var(--ua-pad-r) - var(--ua-pad-l)) / 2);
   display: flex;
   align-items: center;
   flex-wrap: wrap;

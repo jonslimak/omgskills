@@ -87,3 +87,8 @@ test("a picked folder loses its own name and the files the Mac skips; it is chec
   assert.equal(form.getAll("file").length, 2);
   assert.equal(form.get("add"), null);
 });
+
+test("My skills: Add skill is the last button in the heading row, in blue", () => {
+  const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(app, /<\/select>\s*<\/label>\}\s*\{\/\*[^*]*\*\/\}\s*\{findByGithubLink && nav\.view === "all" && !nav\.id && !editing && <button type="button" className="ua-pill ua-primary ua-add-skill-button"[\s\S]*?<\/button>\}\s*<\/div>/);
+});

@@ -1517,8 +1517,6 @@ export function UnifiedApp({
       >
         Edit
       </button>}
-      {findByGithubLink && nav.view === "all" && !nav.id && !editing && <button type="button" className="ua-pill ua-add-skill-button"
-        aria-label="Add skill" onClick={() => openAddSkill()}><Plus aria-hidden="true" /><span className="ua-add-skill-label">Add skill</span></button>}
       {nav.source !== "all" && <button type="button" className="ua-pill" aria-label={`Stop showing only ${displaySourceName(nav.source)} skills`}
         onClick={() => navigate({ ...nav, source: "all" })}>{displaySourceName(nav.source)} <X aria-hidden="true" /></button>}
       {!setPage && <label className="ua-filter">
@@ -1541,6 +1539,9 @@ export function UnifiedApp({
           <option value="origin">By origin</option>
         </select>
       </label>}
+      {/* Last in the row, in blue. */}
+      {findByGithubLink && nav.view === "all" && !nav.id && !editing && <button type="button" className="ua-pill ua-primary ua-add-skill-button"
+        aria-label="Add skill" onClick={() => openAddSkill()}><Plus aria-hidden="true" /><span className="ua-add-skill-label">Add skill</span></button>}
     </div>
     ) : null;
 
@@ -2150,52 +2151,52 @@ export function UnifiedApp({
                   {publicStatus.restartPages ? "Refresh results" : publicStatus.moreError ? "Retry" : publicStatus.moreState === "loading" ? "Loading" : "Load more"}
                 </button>
               </div>}
-              {/* Edit: a bar fixed to the bottom of the pane (kept under the list, which leaves room for it). */}
-              {editing && (
-                <div className="ua-bulk" role="toolbar" aria-label="Edit skills">
-                  <span>{picked.length} selected</span>
-                  <button
-                    type="button"
-                    className="ua-link"
-                    onClick={() => setPicked(visible.every(s => picked.includes(s.key)) ? [] : visible.map((s) => s.key))}
-                  >
-                    {visible.every(s => picked.includes(s.key)) && picked.length ? "Deselect all" : "Select all"}
-                  </button>
-                  {(() => {
-                    // Sets take installed and saved skills. One Remove: skills on a Mac go through the Mac app,
-                    // saved-only ones the website removes itself; the pop-up is the same as the panel's trash.
-                    const chosen = visible.filter(skill => picked.includes(skill.key));
-                    const forSets = chosen.filter(settable);
-                    const fromMac = !readOnlyAccount || !!management;
-                    const installed = fromMac ? chosen.filter(skill => skill.installed) : [];
-                    const savedOnly = cloud?.remove || additions
-                      ? chosen.filter(skill => !skill.installed && (skill.cloudKey || (skill.added && skill.catalogId))) : [];
-                    const names = [...new Map(installed.flatMap(skill => liveCopiesOf(skill)?.name ?? [])
-                      .map(name => [name.trim().toLowerCase(), name] as const)).values()];
-                    const one = installed.length === 1 && !savedOnly.length ? installed[0] : undefined;
-                    // In a Set you can change, picks come out of the Set.
-                    const ownSet = setPage && !!activeSet
-                      && (editableSet || (activeSet.isFavorites && activeSet.role === "owner"));
-                    const inSet = ownSet ? chosen.filter(skill => skill.setItemId) : [];
-                    return <>
-                      {/* New set is inside Add to set's picker. */}
-                      <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
-                        onClick={() => addToSet(forSets)}><ListPlus />Add to set</button>
-                      {/* In your own Set, removing means out of the Set; uninstalling stays in each skill's panel. */}
-                      {ownSet ? <button type="button" className="ua-pill ua-pill-danger" disabled={!inSet.length || !canManage}
-                        onClick={() => management!.remove(activeSet!, inSet)}><X />Remove from set</button>
-                        : (fromMac || cloud?.remove || additions) && <button type="button" className="ua-pill ua-pill-danger"
-                        disabled={!names.length && !savedOnly.length}
-                        onClick={() => names.length ? setRemovingFromMac({ names, skill: one, saved: savedOnly }) : setRemoving(savedOnly)}>
-                        <Trash2 />Remove
-                      </button>}
-                    </>;
-                  })()}
-                  <button type="button" className="ua-pill ua-primary" onClick={() => { setEditing(false); setPicked([]); closeDetail(); }}>Done</button>
-                </div>
-              )}
             </div>
           </main>
+          {/* Edit: a bar under the scrolling pane, so it stays put while the list scrolls or bounces. */}
+          {editing && (
+            <div className="ua-bulk" role="toolbar" aria-label="Edit skills" inert={!!selected && expanded}>
+              <span>{picked.length} selected</span>
+              <button
+                type="button"
+                className="ua-link"
+                onClick={() => setPicked(visible.every(s => picked.includes(s.key)) ? [] : visible.map((s) => s.key))}
+              >
+                {visible.every(s => picked.includes(s.key)) && picked.length ? "Deselect all" : "Select all"}
+              </button>
+              {(() => {
+                // Sets take installed and saved skills. One Remove: skills on a Mac go through the Mac app,
+                // saved-only ones the website removes itself; the pop-up is the same as the panel's trash.
+                const chosen = visible.filter(skill => picked.includes(skill.key));
+                const forSets = chosen.filter(settable);
+                const fromMac = !readOnlyAccount || !!management;
+                const installed = fromMac ? chosen.filter(skill => skill.installed) : [];
+                const savedOnly = cloud?.remove || additions
+                  ? chosen.filter(skill => !skill.installed && (skill.cloudKey || (skill.added && skill.catalogId))) : [];
+                const names = [...new Map(installed.flatMap(skill => liveCopiesOf(skill)?.name ?? [])
+                  .map(name => [name.trim().toLowerCase(), name] as const)).values()];
+                const one = installed.length === 1 && !savedOnly.length ? installed[0] : undefined;
+                // In a Set you can change, picks come out of the Set.
+                const ownSet = setPage && !!activeSet
+                  && (editableSet || (activeSet.isFavorites && activeSet.role === "owner"));
+                const inSet = ownSet ? chosen.filter(skill => skill.setItemId) : [];
+                return <>
+                  {/* New set is inside Add to set's picker. */}
+                  <button type="button" className="ua-pill" disabled={!forSets.length || (!!management && !canManage)}
+                    onClick={() => addToSet(forSets)}><ListPlus />Add to set</button>
+                  {/* In your own Set, removing means out of the Set; uninstalling stays in each skill's panel. */}
+                  {ownSet ? <button type="button" className="ua-pill ua-pill-danger" disabled={!inSet.length || !canManage}
+                    onClick={() => management!.remove(activeSet!, inSet)}><X />Remove from set</button>
+                    : (fromMac || cloud?.remove || additions) && <button type="button" className="ua-pill ua-pill-danger"
+                    disabled={!names.length && !savedOnly.length}
+                    onClick={() => names.length ? setRemovingFromMac({ names, skill: one, saved: savedOnly }) : setRemoving(savedOnly)}>
+                    <Trash2 />Remove
+                  </button>}
+                </>;
+              })()}
+              <button type="button" className="ua-pill ua-primary" onClick={() => { setEditing(false); setPicked([]); closeDetail(); }}>Done</button>
+            </div>
+          )}
         </div>
         {detail && (
           <Dialog.Root

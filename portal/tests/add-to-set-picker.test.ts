@@ -62,11 +62,13 @@ test("Edit in a Set you own removes the picked skills from the Set, without a Ne
 test("Edit uses a bar along the bottom: count, Select all, Add to set, Remove, Done; words only on phones", () => {
   const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(app, /data-editing=\{editing \|\| undefined\}/);
-  assert.match(app, /<div className="ua-bulk" role="toolbar" aria-label="Edit skills">\s*<span>\{picked\.length\} selected<\/span>/);
+  // Outside the scrolling pane, so the bar stays put when the list bounces at the end.
+  assert.match(app, /<\/main>\s*\{\/\*[^*]*\*\/\}\s*\{editing && \(\s*<div className="ua-bulk" role="toolbar" aria-label="Edit skills" inert=\{!!selected && expanded\}>\s*<span>\{picked\.length\} selected<\/span>/);
   assert.match(app, /className="ua-pill ua-primary" onClick=\{\(\) => \{ setEditing\(false\); setPicked\(\[\]\); closeDetail\(\); \}\}>Done<\/button>/);
   // The heading offers Edit only; Done is in the bar.
   assert.match(app, /\{editableView && !editing && <button/);
   const css = readFileSync(new URL("../src/app/unified/unified.css", import.meta.url), "utf8");
-  assert.match(css, /\.ua-bulk \{\s*position: sticky;\s*bottom: 0;/);
+  assert.match(css, /\.ua-bulk \{\s*flex-shrink: 0;/);
+  assert.doesNotMatch(css, /\.ua-bulk \{\s*position: sticky/);
   assert.match(css, /\.ua-bulk svg \{ display: none; \}/);
 });
