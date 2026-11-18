@@ -1517,8 +1517,6 @@ export function UnifiedApp({
       >
         Edit
       </button>}
-      {findByGithubLink && nav.view === "all" && !nav.id && !editing && <button type="button" className="ua-pill ua-add-skill-button"
-        aria-label="Add skill" onClick={() => openAddSkill()}><Plus aria-hidden="true" /><span className="ua-add-skill-label">Add skill</span></button>}
       {nav.source !== "all" && <button type="button" className="ua-pill" aria-label={`Stop showing only ${displaySourceName(nav.source)} skills`}
         onClick={() => navigate({ ...nav, source: "all" })}>{displaySourceName(nav.source)} <X aria-hidden="true" /></button>}
       {!setPage && <label className="ua-filter">
@@ -1541,6 +1539,9 @@ export function UnifiedApp({
           <option value="origin">By origin</option>
         </select>
       </label>}
+      {/* Last in the row, in blue. */}
+      {findByGithubLink && nav.view === "all" && !nav.id && !editing && <button type="button" className="ua-pill ua-primary ua-add-skill-button"
+        aria-label="Add skill" onClick={() => openAddSkill()}><Plus aria-hidden="true" /><span className="ua-add-skill-label">Add skill</span></button>}
     </div>
     ) : null;
 
