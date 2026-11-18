@@ -51,6 +51,7 @@ test("a refresh keeps the open Set on screen while it reloads", () => {
   assert.match(source, /previous\.id === id && previous\.set \? \{ \.\.\.previous, key, error: message, refreshing: true \}/);
   const access = readFileSync(new URL("../src/integration/unified/SetPermissions.tsx", import.meta.url), "utf8");
   assert.match(access, /detail\.state !== "ready" \|\| !!detail\.refreshing/);
+  assert.match(access, /\{detail\.error && <p role="alert">Could not refresh access\./);
   const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(app, /Could not refresh\. Showing the last loaded Set\./);
 });
