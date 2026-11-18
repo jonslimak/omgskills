@@ -36,12 +36,13 @@ export function PullToRefresh({ scroller, enabled, onRefresh }: {
     let distance = 0;
     // Set once the finger has moved a little: a pull, or not (then the gesture is left to the page).
     let pulling = false;
+    let fromHeld = false;
     const reset = () => { startY = null; distance = 0; pulling = false; setPull(0); };
     const start = (event: TouchEvent) => {
       setTop(element.getBoundingClientRect().top);
       // The A–Z rail scrubs with its own drag.
       const onRail = event.target instanceof Element && !!event.target.closest(".ua-az-anchor");
-      startY = event.touches.length === 1 && element.scrollTop <= 0 && !onRail && !busy.current ? event.touches[0].clientY : null;
+      startY = event.touches.length === 1 && element.scrollTop <= 0 && !onRail ? event.touches[0].clientY : null;
       startX = event.touches[0]?.clientX ?? 0;
       distance = 0;
       pulling = false;
@@ -53,12 +54,18 @@ export function PullToRefresh({ scroller, enabled, onRefresh }: {
       const dy = event.touches[0].clientY - startY;
       const dx = Math.abs(event.touches[0].clientX - startX);
       if (!pulling) {
-        if (dx < 8 && Math.abs(dy) < 8) return;
-        // Mostly sideways (a carousel), upward, or a page that has scrolled: not a pull, and the page keeps the gesture.
-        if (dy <= 0 || dx > dy || element.scrollTop > 0) { startY = null; return; }
+        // Barely moved (a tap's jitter, a finger landing): wait, and leave the gesture alone.
+        if (Math.abs(dy) < 3 && dx < 3) return;
+        // Not clearly down (upward, a carousel, a diagonal), or a page that has scrolled: not a pull, and the page keeps the gesture.
+        if (dy <= 0 || dx * 2 > dy || element.scrollTop > 0) { startY = null; return; }
         // The browser already took the gesture (its own stretch): let it, rather than moving the page twice.
         if (!event.cancelable) { startY = null; return; }
+        // Claim it on the very first move down: Safari keeps any gesture whose first move it was allowed to scroll,
+        // and the pull would then stick until the next try.
+        event.preventDefault();
         pulling = true;
+        // Started while refreshing: the page is held down for the spinner and moves on from there, to the end of this touch.
+        fromHeld = busy.current;
       }
       // Pushed back up past where it started: the pull is over.
       if (dy <= 0) { reset(); return; }
@@ -66,10 +73,11 @@ export function PullToRefresh({ scroller, enabled, onRefresh }: {
       if (!event.cancelable) { reset(); return; }
       event.preventDefault();
       distance = pullDistance(dy);
-      setPull(distance);
+      setPull(fromHeld ? PULL_GAP + distance : distance);
     };
     const end = () => {
-      if (startY !== null && distance >= PULL_REFRESH) {
+      // A pull during a refresh just lets go; the refresh under way carries on.
+      if (startY !== null && distance >= PULL_REFRESH && !busy.current) {
         startY = null;
         busy.current = true;
         setRefreshing(true);
@@ -100,8 +108,9 @@ export function PullToRefresh({ scroller, enabled, onRefresh }: {
     const element = scroller.current;
     if (!element) return;
     if (shown > 0) {
-      element.dataset.ptr = refreshing ? "held" : "pulling";
-      element.style.setProperty("--ua-ptr", `${refreshing ? PULL_GAP : pull}px`);
+      // Pulled again while refreshing: the page follows the finger from where it is held.
+      element.dataset.ptr = pull ? "pulling" : "held";
+      element.style.setProperty("--ua-ptr", `${pull || PULL_GAP}px`);
       return;
     }
     if (!element.dataset.ptr) return;
