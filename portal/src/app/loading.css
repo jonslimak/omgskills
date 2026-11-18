@@ -20,3 +20,7 @@
 @media (prefers-reduced-motion: reduce) {
   .portal-loading-spinner { animation: none; }
 }
+/* Dark mode, set before the app loads (index.html) and kept current by saveTheme. */
+html[data-ua-theme="dark"] { background: #101012; color-scheme: dark; }
+html[data-ua-theme="dark"] .portal-loading { background: #101012; }
+html[data-ua-theme="dark"] .portal-loading-spinner { border-color: #333338; border-top-color: #0a84ff; }

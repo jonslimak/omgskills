@@ -18,4 +18,6 @@ export function storedTheme(storage?: Pick<Storage, "getItem">): Theme {
 
 export function saveTheme(theme: Theme, storage?: Pick<Storage, "setItem">) {
   try { (storage ?? globalThis.localStorage)?.setItem(themeStorageKey, theme); } catch { /* The theme still works for this visit. */ }
+  // The loading screen (index.html, loading.css) follows the theme too.
+  if (!storage && globalThis.document) globalThis.document.documentElement.dataset.uaTheme = theme;
 }
