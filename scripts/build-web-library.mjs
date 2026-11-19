@@ -937,8 +937,8 @@ function renderSkillPage(
     path: urlPath,
     body,
     structuredData: [
-      skillStructuredData(skill, urlPath, description, profilePathByCreatorHandle),
-      skillBreadcrumbData(skill, urlPath, profilePathByCreatorHandle),
+      skillStructuredData(skill, indexDecision.canonicalPath || urlPath, description, profilePathByCreatorHandle),
+      skillBreadcrumbData(skill, indexDecision.canonicalPath || urlPath, profilePathByCreatorHandle),
     ],
     ogType: "article",
     indexTier: indexDecision.tier,
@@ -1767,6 +1767,7 @@ async function main() {
   const noindexReasons = new Map();
   let indexableCount = 0;
   let noindexCount = 0;
+  let copyCount = 0;
   const addNoindexReason = (reason) => noindexReasons.set(reason, (noindexReasons.get(reason) || 0) + 1);
   const includedSkills = [];
   const generatedSkillUrlById = new Map();
@@ -1811,6 +1812,8 @@ async function main() {
     if (indexDecision.tier === "indexable") {
       sitemapUrls.set(urlPath, { source: `skill ${skill.id}`, lastmod: skill.last_updated });
       indexableCount += 1;
+    } else if (indexDecision.tier === "copy") {
+      copyCount += 1;
     } else {
       noindexCount += 1;
       addNoindexReason(indexDecision.reason);
@@ -1973,7 +1976,7 @@ async function main() {
     .slice(0, 4)
     .map(([reason, count]) => `${reason}:${count}`)
     .join(", ") || "none";
-  console.log(`Built web library test set: ${allUrls.size - 1} HTML pages and ${allUrls.size - 1} Markdown mirrors (${indexableCount} indexable, ${noindexCount} noindex; noindex reasons: ${noindexSummary})`);
+  console.log(`Built web library test set: ${allUrls.size - 1} HTML pages and ${allUrls.size - 1} Markdown mirrors (${indexableCount} indexable, ${copyCount} copies of another page, ${noindexCount} noindex; noindex reasons: ${noindexSummary})`);
   console.log(`Built llms-gold.txt: ${llmsGold.pageCount} pages, ${generatedGoldSkillCount}/${goldSkillIds.size} Gold skills, ${llmsGold.outputBytes} bytes`);
 }
 

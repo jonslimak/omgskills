@@ -652,7 +652,9 @@ async function verifyLocalSitemap() {
     const html = await readFile(filePath, "utf8");
     const canonical = html.match(/<link rel="canonical" href="([^"]+)">/)?.[1];
     const own = `${publicOrigin}/${path.relative(siteDir, path.dirname(filePath)).split(path.sep).join("/")}/`;
-    if (!canonical || canonical === own) continue;
+    // The href is HTML-escaped and percent-encoded; the folder name is neither.
+    const canonicalAddress = canonical && decodeURI(canonical.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'"));
+    if (!canonical || canonicalAddress === own) continue;
     copies += 1;
     assertNotIncludes(sitemap, `<loc>${own}</loc>`, `${filePath} (copy of ${canonical})`);
     assertIncludes(sitemap, `<loc>${canonical}</loc>`, `${filePath} (copy of ${canonical})`);
