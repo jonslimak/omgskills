@@ -28,3 +28,10 @@ test("at most five, two per creator, one copy of each name, nothing for a skill 
   assert.equal(new Set(picked.map(item => item.name)).size, picked.length);
   assert.deepEqual(related(skill("z/repo:none", "none", "")), []);
 });
+
+test("another creator's skill of the same name counts, unless it's a copy", () => {
+  const base = skill("a/repo:figma-export", "figma-export", "Export Figma frames as React components and design tokens");
+  const sameName = skill("b/repo:figma-export", "figma-export", "Pull Figma frames into React components with design tokens and variants");
+  const copy = skill("c/repo:figma-export", "figma-export", "Export Figma frames as React components and design tokens");
+  assert.deepEqual(relatedSkillsPicker([base, sameName, copy, ...filler])(base).map(item => item.id), ["b/repo:figma-export"]);
+});

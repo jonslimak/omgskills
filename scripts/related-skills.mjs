@@ -30,6 +30,7 @@ function words(text) {
 
 const author = skill => String(skill.author_handle || "").toLowerCase();
 const nameKey = skill => String(skill.name || "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
+const aboutKey = skill => String(skill.description || "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
 
 /**
  * Builds a picker over the skills that have pages. `topicsBySkill` maps a skill ID to the editorial
@@ -39,7 +40,7 @@ export function relatedSkillsPicker(pool, { topicsBySkill = new Map(), limit = r
   const facts = pool.map(skill => {
     const name = words(skill.name);
     const all = new Set([...name, ...words(skill.description)]);
-    return { skill, author: author(skill), nameKey: nameKey(skill), name, all, topics: new Set(topicsBySkill.get(skill.id) || []) };
+    return { skill, author: author(skill), nameKey: nameKey(skill), aboutKey: aboutKey(skill), name, all, topics: new Set(topicsBySkill.get(skill.id) || []) };
   });
   const byId = new Map(facts.map(fact => [fact.skill.id, fact]));
   // Rarer words say more: weight = log(pool size / skills using the word).
@@ -62,8 +63,10 @@ export function relatedSkillsPicker(pool, { topicsBySkill = new Map(), limit = r
     const candidates = new Set([...base.all].flatMap(word => byWord.get(word) || []));
     const scored = [];
     for (const other of candidates) {
-      // Other creators only: the creator's own skills have their own section.
-      if (other.skill.id === skill.id || other.author === base.author || other.nameKey === base.nameKey || exclude.has(other.skill.id)) continue;
+      // Other creators only: the creator's own skills have their own section. Another creator's
+      // skill of the same name counts unless it's a copy (same name and description).
+      const copy = other.nameKey === base.nameKey && other.aboutKey === base.aboutKey;
+      if (other.skill.id === skill.id || other.author === base.author || copy || exclude.has(other.skill.id)) continue;
       let score = 0, shared = 0, sameJob = false;
       for (const word of base.all) {
         if (!other.all.has(word)) continue;
