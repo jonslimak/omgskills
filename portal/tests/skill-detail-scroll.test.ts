@@ -64,3 +64,8 @@ test("the panel's Related skills: folded, other creators only, not repeated unde
   const hook = readFileSync(new URL("../src/app/unified/use-public-catalog.ts", import.meta.url), "utf8");
   assert.match(hook, /client\.related\(skill\.id, controller\.signal\)\.catch\(\(\) => \[\] as CatalogSummary\[\]\)/);
 });
+
+test("the expanded skill page has no back link to the creator above the title", () => {
+  const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(app, /ua-detail-back|Back to @/);
+});

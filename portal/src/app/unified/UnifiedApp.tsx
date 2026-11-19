@@ -2232,11 +2232,6 @@ export function UnifiedApp({
                 }}
               >
                 <div className="ua-detail-header">
-                {expanded && detail.author && (
-                  <button type="button" className="ua-link ua-detail-back" aria-label={`Back to @${detail.author}`} onClick={() => go("creator", detail.author)}>
-                    <ArrowLeft />@{detail.author}
-                  </button>
-                )}
                 <div className="ua-detail-top">
                   <span className="ua-grabber" />
                   <span className="ua-detail-window">

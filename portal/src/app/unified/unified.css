@@ -1861,17 +1861,6 @@
   background: transparent;
   color: var(--ua-muted);
 }
-.ua-detail-back {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-}
-.ua-detail-back svg {
-  width: 14px;
-  height: 14px;
-}
 /* Full width: the panel covers the list, the sidebar stays. */
 .ua-detail[data-expanded="true"] {
   left: 213px;
