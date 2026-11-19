@@ -42,15 +42,17 @@ export const takeoverWaitMs = 5000;
 export const takeoverWaitStyle = `html.${takeoverWaitClass} #omgskills-static{visibility:hidden}`
   + `html.${takeoverWaitClass}::before{content:"";position:fixed;left:50%;top:50%;width:28px;height:28px;margin:-14px 0 0 -14px;`
   + "box-sizing:border-box;border:3px solid #e5e5ea;border-top-color:#0071e3;border-radius:50%;animation:omgskills-wait-spin .8s linear infinite}"
-  + `html.${takeoverWaitClass}[data-ua-theme="dark"],html.${takeoverWaitClass}[data-ua-theme="dark"] body{background:#101012;color-scheme:dark}`
-  + `html.${takeoverWaitClass}[data-ua-theme="dark"]::before{border-color:#333338;border-top-color:#0a84ff}`
+  + `html.${takeoverWaitClass}[data-omgskills-wait-theme="dark"],html.${takeoverWaitClass}[data-omgskills-wait-theme="dark"] body{background:#101012;color-scheme:dark}`
+  + `html.${takeoverWaitClass}[data-omgskills-wait-theme="dark"]::before{border-color:#333338;border-top-color:#0a84ff}`
   + "@keyframes omgskills-wait-spin{to{transform:rotate(360deg)}}"
   + `@media (prefers-reduced-motion:reduce){html.${takeoverWaitClass}::before{animation:none}}`;
 // Same saved-theme read as the app shell (portal/index.html), so dark mode never flashes white.
+// Its own attribute, not the app's data-ua-theme: the app's dark rules must not reach the light
+// static page if it ends up showing.
 export const takeoverWaitScript = `(function(){var d=document.documentElement,t="";`
   + `try{t=localStorage.getItem("omgskills-theme")||localStorage.getItem("omgskills-home-theme")||""}catch(e){}`
   + `if(t!=="dark"&&t!=="light"){try{t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}catch(e){t="light"}}`
-  + `d.dataset.uaTheme=t;d.classList.add("${takeoverWaitClass}");`
+  + `d.dataset.omgskillsWaitTheme=t;d.classList.add("${takeoverWaitClass}");`
   + `setTimeout(function(){d.classList.remove("${takeoverWaitClass}")},${takeoverWaitMs})})();`;
 
 /** The app shell's entry script and stylesheet tags, as built by Vite. */
