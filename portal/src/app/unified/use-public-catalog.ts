@@ -41,6 +41,7 @@ export function usePublicCatalog(client: PublicCatalogClient, nav: Navigation, e
   const appendRequest = useRef<{ scope: string; controller: AbortController } | null>(null);
   const seenCursors = useRef(new Set<string>());
   const [detail, setDetail] = useState({ key: "", skill: null as CatalogSummary | null, state: "loading" as LoadState, error: "", missing: false });
+  const [related, setRelated] = useState({ key: "", skills: [] as CatalogSummary[] });
   const selectedId = enabled && nav.selected.startsWith("catalog:") ? nav.selected.slice(8) : "";
 
   useEffect(() => {
@@ -131,8 +132,17 @@ export function usePublicCatalog(client: PublicCatalogClient, nav: Navigation, e
         return;
       }
       if (!controller.signal.aborted) setDetail({ key: selectedId, skill, state: "ready", error: "", missing: false });
-      const publicUrl = await client.publicUrl(skill.id, controller.signal).catch(() => undefined);
-      if (!controller.signal.aborted && publicUrl) setDetail({ key: selectedId, skill: { ...skill, publicUrl }, state: "ready", error: "", missing: false });
+      // The page link and the related skills arrive separately; neither waits for the other.
+      void client.publicUrl(skill.id, controller.signal).catch(() => undefined).then(publicUrl => {
+        if (controller.signal.aborted || !publicUrl) return;
+        setDetail(current => current.key === selectedId && current.skill
+          ? { ...current, skill: { ...current.skill, publicUrl } } : current);
+      });
+      const relatedSkills = await client.related(skill.id, controller.signal).catch(() => [] as CatalogSummary[]);
+      if (controller.signal.aborted || !relatedSkills.length) return;
+      setRelated({ key: selectedId, skills: relatedSkills });
+      setDetail(current => current.key === selectedId && current.skill
+        ? { ...current, skill: { ...current.skill, relatedIds: relatedSkills.map(item => item.id) } } : current);
     }).catch((error) => {
       if (!controller.signal.aborted) setDetail({ key: selectedId, skill: null, state: "error", error: message(error), missing: false });
     });
@@ -142,7 +152,11 @@ export function usePublicCatalog(client: PublicCatalogClient, nav: Navigation, e
   const currentDetail = detail.key === selectedId ? detail : null;
   const cached = active ? client.cachedView(request) : undefined;
   const current = view.scope === scope ? view : cached ? { ...cached, state: "ready" as const, metadata: "ready" as const, metadataError: "", error: "" } : { catalog: emptyCatalog(), state: "loading" as const, metadata: "loading" as const, metadataError: "", error: "", note: "", page: undefined };
-  const catalog = { ...current.catalog, skills: [...current.catalog.skills.filter((skill) => skill.id !== currentDetail?.skill?.id), ...(currentDetail?.skill ? [currentDetail.skill] : [])] };
+  // The open skill and its related skills are in the catalog for the panel; lists show only their own results.
+  const relatedSkills = related.key === selectedId && currentDetail?.skill ? related.skills : [];
+  const extra = new Set([currentDetail?.skill?.id, ...relatedSkills.map(skill => skill.id)]);
+  const catalog = { ...current.catalog, skills: [...current.catalog.skills.filter((skill) => !extra.has(skill.id)), ...relatedSkills,
+    ...(currentDetail?.skill ? [currentDetail.skill] : [])] };
   const status: PublicStatus = {
     list: active ? current.state : "ready",
     metadata: active ? current.metadata : "ready", metadataError: current.metadataError,

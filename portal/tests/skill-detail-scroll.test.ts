@@ -56,3 +56,11 @@ test("a Set you own shows a blue Add Skills button, labelled on phones too", () 
   const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
   assert.match(app, /<button className="ua-pill ua-primary ua-set-add" type="button" disabled=\{disabled\} onClick=\{\(\) => management\.add\(\[\], set, choices\)\}>Add Skills<\/button>/);
 });
+
+test("the panel's Related skills: folded, other creators only, not repeated under More from", () => {
+  const app = readFileSync(new URL("../src/app/unified/UnifiedApp.tsx", import.meta.url), "utf8");
+  assert.match(app, /\.filter\(\(skill\) => skill\.author !== detail\.author && !relatedSkills\.some\(\(more\) => more\.catalogId === skill\.catalogId\)\)\s*\.slice\(0, 5\)/);
+  assert.match(app, /<details className="ua-detail-section" key=\{`related:\$\{detail\.key\}`\}>\s*<summary>Related skills<\/summary>/);
+  const hook = readFileSync(new URL("../src/app/unified/use-public-catalog.ts", import.meta.url), "utf8");
+  assert.match(hook, /client\.related\(skill\.id, controller\.signal\)\.catch\(\(\) => \[\] as CatalogSummary\[\]\)/);
+});

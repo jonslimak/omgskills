@@ -1,6 +1,6 @@
 import type { ProxyOptions } from "vite";
 
-export const publicCatalogPathPattern = "^/(?:mcp(?:/health)?|data/(?:crawl4|v2)/[^?]+|catalog-skill-urls\\.json)(?:\\?.*)?$";
+export const publicCatalogPathPattern = "^/(?:mcp(?:/health)?|data/(?:crawl4|v2)/[^?]+|catalog-skill-urls\\.json|catalog-related-skills\\.json)(?:\\?.*)?$";
 
 export function isPublicCatalogRequest(url: string, method = "GET") {
   if (!new RegExp(publicCatalogPathPattern).test(url)) return false;

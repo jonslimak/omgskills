@@ -38,7 +38,7 @@ export function hostingFiles(options = {}) {
   const clerkSource = configuration ? ` ${configuration.clerkFrontendOrigin}` : "";
   const framePolicy = configuration ? ` frame-src ${configuration.clerkFrontendOrigin};` : "";
   // Explicit public reads only. No portal/account route or public app/download fallback.
-  const reads = ["/mcp", "/mcp/health", "/catalog-skill-urls.json"];
+  const reads = ["/mcp", "/mcp/health", "/catalog-skill-urls.json", "/catalog-related-skills.json"];
   const redirects = ["/ /app/ 302", ...reads.map(route => `${route} ${productionOrigin}${route} 200`),
     `/data/crawl4/* ${productionOrigin}/data/crawl4/:splat 200`,
     `/data/v2/* ${productionOrigin}/data/v2/:splat 200`];
