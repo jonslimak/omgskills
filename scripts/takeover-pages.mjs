@@ -33,6 +33,26 @@ export const takeoverGuardStyle = "html{line-height:normal;-webkit-text-size-adj
   + ":where(h1,h2,h3,h4,h5,h6,b,strong,th){font-weight:revert}"
   + ":where(img,svg,video,canvas,audio,iframe,embed,object){display:revert;vertical-align:revert}";
 
+// While the app loads, the static page stays hidden behind the app's own loading screen, so
+// readers don't see one page and then another. Search engines and readers without JavaScript get
+// the static page as is; if the app isn't ready in time, the static page shows (takeover.ts
+// swaps in place while waiting, and waits for the top once the page is showing).
+export const takeoverWaitClass = "omgskills-wait";
+export const takeoverWaitMs = 5000;
+export const takeoverWaitStyle = `html.${takeoverWaitClass} #omgskills-static{visibility:hidden}`
+  + `html.${takeoverWaitClass}::before{content:"";position:fixed;left:50%;top:50%;width:28px;height:28px;margin:-14px 0 0 -14px;`
+  + "box-sizing:border-box;border:3px solid #e5e5ea;border-top-color:#0071e3;border-radius:50%;animation:omgskills-wait-spin .8s linear infinite}"
+  + `html.${takeoverWaitClass}[data-ua-theme="dark"],html.${takeoverWaitClass}[data-ua-theme="dark"] body{background:#101012;color-scheme:dark}`
+  + `html.${takeoverWaitClass}[data-ua-theme="dark"]::before{border-color:#333338;border-top-color:#0a84ff}`
+  + "@keyframes omgskills-wait-spin{to{transform:rotate(360deg)}}"
+  + `@media (prefers-reduced-motion:reduce){html.${takeoverWaitClass}::before{animation:none}}`;
+// Same saved-theme read as the app shell (portal/index.html), so dark mode never flashes white.
+export const takeoverWaitScript = `(function(){var d=document.documentElement,t="";`
+  + `try{t=localStorage.getItem("omgskills-theme")||localStorage.getItem("omgskills-home-theme")||""}catch(e){}`
+  + `if(t!=="dark"&&t!=="light"){try{t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}catch(e){t="light"}}`
+  + `d.dataset.uaTheme=t;d.classList.add("${takeoverWaitClass}");`
+  + `setTimeout(function(){d.classList.remove("${takeoverWaitClass}")},${takeoverWaitMs})})();`;
+
 /** The app shell's entry script and stylesheet tags, as built by Vite. */
 export function appShellTags(appIndexHtml) {
   const tags = appIndexHtml.match(/<script type="module"[^>]*><\/script>|<link rel="stylesheet"[^>]*>/g) ?? [];
@@ -79,7 +99,7 @@ export function addTakeover(pageHtml, tags = [loaderTag]) {
   if (headEnd < 0 || bodyStart < headEnd || bodyEnd < bodyStart) throw new Error("Takeover pilot: unexpected page structure");
   const head = pageHtml.slice(0, headEnd).replace(/<style>/g, "<style data-omgskills-static>");
   const body = pageHtml.slice(bodyStart + "<body>".length, bodyEnd);
-  return `${head}  <style data-omgskills-static>${takeoverGuardStyle}</style>\n  ${tags.join("\n  ")}\n</head>\n<body>`
+  return `${head}  <style data-omgskills-static>${takeoverGuardStyle}${takeoverWaitStyle}</style>\n  <script>${takeoverWaitScript}</script>\n  ${tags.join("\n  ")}\n</head>\n<body>`
     + `\n<div id="omgskills-static">${body}</div>\n<div id="root" hidden></div>\n${pageHtml.slice(bodyEnd)}`;
 }
 

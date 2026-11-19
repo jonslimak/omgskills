@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { addTakeover, appShellTags, librarySkillPath, takeoverAllPagesEnabled, takeoverGuardStyle, takeoverLoader, takeoverLoaderPath, takeoverPilotEnabled, takeoverPilotPages, writeTakeover, writeTakeoverPilot } from "./takeover-pages.mjs";
+import { addTakeover, appShellTags, librarySkillPath, takeoverAllPagesEnabled, takeoverGuardStyle, takeoverLoader, takeoverLoaderPath, takeoverPilotEnabled, takeoverPilotPages, takeoverWaitScript, takeoverWaitStyle, writeTakeover, writeTakeoverPilot } from "./takeover-pages.mjs";
 
 const shell = `<!doctype html><html><head><title>omgskills</title>
 <script type="module" crossorigin src="/app/assets/index-abc.js"></script>
@@ -26,7 +26,12 @@ test("a static page keeps its content and metadata, gains the app, and marks its
   const html = addTakeover(page, appShellTags(shell));
   assert.match(html, /<link rel="canonical" href="https:\/\/omgskills.com\/skills\/a\/">/, "canonical unchanged");
   assert.match(html, /<style data-omgskills-static>\n    main \{ max-width: 880px; \}/);
-  assert.ok(html.includes(`<style data-omgskills-static>${takeoverGuardStyle}</style>`));
+  assert.ok(html.includes(`<style data-omgskills-static>${takeoverGuardStyle}${takeoverWaitStyle}</style>`));
+  // The loading screen starts in <head>, before the static body paints, and gives up after a few seconds.
+  assert.ok(html.indexOf(`<script>${takeoverWaitScript}</script>`) < html.indexOf("<body>"));
+  assert.match(takeoverWaitScript, /classList\.add\("omgskills-wait"\)/);
+  assert.match(takeoverWaitScript, /setTimeout\(function\(\)\{d\.classList\.remove\("omgskills-wait"\)\},5000\)/);
+  assert.match(takeoverWaitStyle, /html\.omgskills-wait #omgskills-static\{visibility:hidden\}/);
   assert.ok(html.indexOf('src="/app/assets/index-abc.js"') < html.indexOf("</head>"));
   assert.ok(html.indexOf('href="/app/assets/index-def.css"') < html.indexOf("</head>"));
   assert.match(html, /<div id="omgskills-static">\n  <main><h1>Anthropic<\/h1><\/main>\n  <script>window.copy = 1;<\/script>\n<\/div>\n<div id="root" hidden><\/div>\n<\/body>/);

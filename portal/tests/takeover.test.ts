@@ -2,16 +2,18 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { announceAppReady, startTakeover } from "../src/takeover";
 
-function page({ withStatic = true, scrollY = 0 } = {}) {
+function page({ withStatic = true, scrollY = 0, waiting = false } = {}) {
+  const classes = new Set(waiting ? ["omgskills-wait"] : []);
+  const documentElement = { classList: { contains: (name: string) => classes.has(name), remove: (name: string) => { classes.delete(name); } } };
   const staticPage = { removed: false, remove() { this.removed = true; } };
   const root = { hidden: true };
   const staticStyle = { removed: false, remove() { this.removed = true; } };
-  const doc = { getElementById: (id: string) => id === "omgskills-static" ? (withStatic ? staticPage : null) : id === "root" ? root : null,
+  const doc = { documentElement, getElementById: (id: string) => id === "omgskills-static" ? (withStatic ? staticPage : null) : id === "root" ? root : null,
     querySelectorAll: (selector: string) => selector === "[data-omgskills-static]" ? [staticStyle] : [] };
   const win = Object.assign(new EventTarget(), { scrollY, scrolledTo: -1,
     scrollTo(_x: number, y: number) { this.scrolledTo = y; }, requestAnimationFrame: (run: () => void) => { run(); return 0; },
     setTimeout: (run: () => void) => { run(); return 0; } });
-  return { staticPage, staticStyle, root, doc: doc as unknown as Document, win: win as unknown as Window & typeof win };
+  return { classes, staticPage, staticStyle, root, doc: doc as unknown as Document, win: win as unknown as Window & typeof win };
 }
 
 test("ordinary /app pages are not takeover pages", () => {
@@ -41,6 +43,15 @@ test("a reader who has scrolled down keeps the static page until they return nea
   win.scrollY = 40; win.dispatchEvent(new Event("scroll"));
   assert.equal(root.hidden, false);
   assert.equal(staticPage.removed, true);
+});
+
+test("while the static page is still hidden, the app swaps in at once, whatever the scroll", () => {
+  const { doc, win, staticPage, root, classes } = page({ scrollY: 900, waiting: true });
+  startTakeover(doc, win);
+  announceAppReady(win);
+  assert.equal(root.hidden, false);
+  assert.equal(staticPage.removed, true);
+  assert.equal(classes.has("omgskills-wait"), false, "the loading screen goes with the swap");
 });
 
 test("readiness is announced even when the browser never paints a frame", () => {

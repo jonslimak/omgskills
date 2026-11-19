@@ -4,7 +4,10 @@
 // ready. If the app never becomes ready, the static page simply stays. The static page's
 // own styles are marked data-omgskills-static and removed with it: they target page-wide
 // elements (main, header) that the app also uses.
+// While the static page is still hidden behind the loading screen (scripts/takeover-pages.mjs),
+// the swap happens at once: nothing has been shown, so nothing moves under a reader.
 export const appReadyEvent = "omgskills:app-ready";
+const waitClass = "omgskills-wait";
 const nearTop = 200;
 
 export function startTakeover(doc: Document = document, win: Window = window) {
@@ -19,13 +22,14 @@ export function startTakeover(doc: Document = document, win: Window = window) {
     staticPage.remove();
     doc.querySelectorAll("[data-omgskills-static]").forEach(element => element.remove());
     root.hidden = false;
+    doc.documentElement.classList.remove(waitClass);
     win.scrollTo(0, 0);
   };
   // Never move the page under a reader: if they have scrolled down, wait until they
   // are back near the top.
   const whenNearTop = () => { if (win.scrollY < nearTop) swap(); };
   win.addEventListener(appReadyEvent, () => {
-    if (win.scrollY < nearTop) swap();
+    if (doc.documentElement.classList.contains(waitClass) || win.scrollY < nearTop) swap();
     else win.addEventListener("scroll", whenNearTop, { passive: true });
   }, { once: true });
   return true;
