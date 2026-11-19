@@ -5,7 +5,7 @@ export function isReviewRoute(pathname: string) {
   return /^\/app\/review(?:\/|$)/.test(pathname);
 }
 
-// app.omgskills.com also serves the portal at the host root.
+// Test and pilot entries serve the portal at the host root.
 export function normalPortalBase(pathname: string): string {
   return /^\/app(?:\/|$)/.test(pathname) ? "/app/" : "/";
 }

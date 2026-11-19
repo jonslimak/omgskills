@@ -11,8 +11,7 @@ export function setLink(set: PortalSet, profile: PortalData["profile"], origin: 
   const validSegment = (value: string) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(value) && value.length <= 80;
   if (set.role === "owner" && !set.hidden && set.visibility === "public" && profile.published &&
     validSegment(profile.handle) && set.slug && validSegment(set.slug)) {
-    const publicOrigin = new URL(origin).hostname === "app.omgskills.com" ? "https://omgskills.com" : origin;
-    return { url: publicGroupUrl(profile.handle.toLowerCase(), set.slug.toLowerCase(), publicOrigin),
+    return { url: publicGroupUrl(profile.handle.toLowerCase(), set.slug.toLowerCase(), origin),
       description: "Anyone with this link can view this public set.", copied: "Public set link copied." };
   }
   return { url: detail, description, copied: "Portal set link copied." };

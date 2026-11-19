@@ -10,7 +10,7 @@ export function unknownAppAddress(pathname: string, base: string) {
 }
 
 /** A static page the app took over keeps its own address: /developers/ or /library/...
- * (app.omgskills.com serves the app itself at "/", with base "/".) */
+ * (Entries served at the host root use base "/".) */
 export function staticPageAddress(pathname: string, base: string) {
   return (pathname === "/developers/" && base === "/app/") || pathname.startsWith("/library/");
 }

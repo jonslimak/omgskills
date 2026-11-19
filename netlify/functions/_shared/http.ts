@@ -1,5 +1,4 @@
 const allowedOrigins = new Set([
-  "https://app.omgskills.com",
   "http://localhost:5173",
   "http://localhost:8888"
 ]);

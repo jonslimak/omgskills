@@ -129,7 +129,7 @@ test("unknown email outcomes require refresh; authorization failures clear data"
 const set: PortalSet = { ...setSummary(group, true, "Owner"), visibility: "public" };
 const profile: PortalData["profile"] = { name: "Owner", email: "owner@example.test", handle: "Owner", published: true };
 test("only eligible owned public sets get a canonical URL", () => {
-  assert.equal(setLink(set, profile, "https://app.omgskills.com", "/app/", false).url, "https://omgskills.com/u/owner/sets/test");
+  assert.equal(setLink(set, profile, "https://omgskills.com", "/app/", false).url, "https://omgskills.com/u/owner/sets/test");
   for (const changes of [{ visibility: "restricted" as const }, { visibility: "private" as const }, { hidden: true },
     { role: "invited" as const }, { slug: undefined }, { slug: "../escape" }]) {
     assert.equal(setLink({ ...set, ...changes }, profile, "https://omgskills.com", "/app/", false).url, "https://omgskills.com/app/groups/set");

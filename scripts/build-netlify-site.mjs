@@ -61,7 +61,7 @@ async function mergeRedirects() {
   }
   const webLibraryRedirects = await readFile(webLibraryRedirectsPath, "utf8");
   const merged = [
-    "# app.omgskills.com portal rewrites",
+    "# app.omgskills.com (retired): moves to omgskills.com/app/",
     ...appDomainRedirects,
     "",
     "# web-library redirects",

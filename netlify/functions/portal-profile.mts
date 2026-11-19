@@ -11,12 +11,7 @@ function randomHandle(): string {
 }
 
 function publicSiteOrigin(req: Request): string {
-  const url = new URL(req.url);
-  if (url.hostname === "app.omgskills.com") {
-    return "https://omgskills.com";
-  }
-
-  return url.origin;
+  return new URL(req.url).origin;
 }
 
 async function uniqueHandle(preferred: string): Promise<string> {
