@@ -1022,6 +1022,7 @@
       "xUrl": "https://x.com/lexnlin"
     },
     "garrytan": {
+      "title": "Garry Tan",
       "featuredSkillIds": [
         "garrytan/gstack",
         "garrytan/gstack:autoplan",
@@ -1049,6 +1050,7 @@
       "description": "GStack tools for planning, research, benchmarking, and founder-led execution."
     },
     "steipete": {
+      "title": "Peter Steinberger",
       "featuredSkillIds": [
         "steipete/agent-scripts:video-transcript-downloader",
         "steipete/agent-scripts:skills/obsidian"
@@ -1057,8 +1059,11 @@
       "description": "Practical agent tools for everyday applications, research, and development.",
       "xUrl": "https://x.com/steipete"
     },
-    "shubhamsaboo": {},
+    "shubhamsaboo": {
+      "title": "Shubham Saboo"
+    },
     "danielmiessler": {
+      "title": "Daniel Miessler",
       "featuredSkillIds": [
         "danielmiessler/LifeOS:Harvest",
         "danielmiessler/LifeOS:Interceptor",
@@ -1087,6 +1092,7 @@
       "description": "Concise skills for clearer writing, note capture, and decision support."
     },
     "shadcn": {
+      "title": "shadcn",
       "featuredSkillIds": [
         "shadcn-ui/ui:shadcn",
         "shadcn/improve:improve"
@@ -1096,6 +1102,7 @@
       "xUrl": "https://x.com/shadcn"
     },
     "nousresearch": {
+      "title": "Nous Research",
       "featuredSkillIds": [
         "nousresearch/hermes-agent:dogfood"
       ],
@@ -1104,6 +1111,7 @@
       "xUrl": "https://x.com/nousresearch"
     },
     "paperclipai": {
+      "title": "Paperclip",
       "featuredSkillIds": [
         "paperclipai/paperclip:paperclip",
         "paperclipai/paperclip:paperclip-create-agent",
@@ -1119,6 +1127,7 @@
       "xUrl": "https://x.com/papercliping"
     },
     "jakubkrehel": {
+      "title": "Jakub Krehel",
       "featuredSkillIds": [
         "jakubkrehel/make-interfaces-feel-better:make-interfaces-feel-better",
         "jakubkrehel/oklch-skill:oklch-skill"
@@ -1128,6 +1137,7 @@
       "xUrl": "https://x.com/jakubkrehel"
     },
     "higgsfield-ai": {
+      "title": "Higgsfield AI",
       "featuredSkillIds": [
         "higgsfield-ai/skills:higgsfield-generate",
         "higgsfield-ai/skills:higgsfield-marketplace-cards",
@@ -1154,6 +1164,7 @@
       "description": "File-based planning tools for long-running agent work and reliable recovery."
     },
     "muratcankoylan": {
+      "title": "Muratcan Koylan",
       "featuredSkillIds": [
         "muratcankoylan/Agent-Skills-for-Context-Engineering:skills/context-optimization",
         "muratcankoylan/Agent-Skills-for-Context-Engineering:skills/evaluation",
@@ -1171,6 +1182,7 @@
       "description": "Skills for memory, compression, evaluation, and agent tool design."
     },
     "emilkowalski": {
+      "title": "Emil Kowalski",
       "featuredSkillIds": [
         "emilkowalski/skills:emil-design-eng"
       ],
@@ -1179,6 +1191,7 @@
       "xUrl": "https://x.com/emilkowalski"
     },
     "coreyhaines31": {
+      "title": "Corey Haines",
       "featuredSkillIds": [
         "coreyhaines31/marketingskills:churn-prevention",
         "coreyhaines31/marketingskills:cold-email",
@@ -1202,6 +1215,7 @@
       "xUrl": "https://x.com/coreyhainesco"
     },
     "obra": {
+      "title": "Jesse Vincent",
       "featuredSkillIds": [
         "obra/superpowers:requesting-code-review",
         "obra/superpowers:using-superpowers",
@@ -1228,6 +1242,7 @@
       "description": "Skills for debugging, reviews, planning, testing, and parallel execution."
     },
     "samber": {
+      "title": "Samuel Berthe",
       "featuredSkillIds": [
         "samber/cc-skills-golang:golang-benchmark",
         "samber/cc-skills-golang:golang-cli",
@@ -1255,6 +1270,7 @@
       "xUrl": "https://x.com/samuelberthe"
     },
     "juliusbrussee": {
+      "title": "Julius Brussee",
       "featuredSkillIds": [
         "juliusbrussee/caveman:compress",
         "juliusbrussee/caveman:caveman-commit",
@@ -1279,6 +1295,7 @@
       "description": "Focused tools for reviews, specifications, context management, and clearer engineering."
     },
     "wshobson": {
+      "title": "Seth Hobson",
       "featuredSkillIds": [
         "wshobson/agents:plugins/ui-design/skills/accessibility-compliance",
         "wshobson/agents:airflow-dag-patterns",
@@ -1305,6 +1322,7 @@
       "description": "A broad skill library spanning architecture, security, testing, and operations."
     },
     "kepano": {
+      "title": "Steph Ango",
       "featuredSkillIds": [
         "kepano/obsidian-skills:obsidian-markdown",
         "kepano/obsidian-skills:defuddle",
@@ -1317,6 +1335,7 @@
       "xUrl": "https://x.com/kepano"
     },
     "pbakaus": {
+      "title": "Paul Bakaus",
       "featuredSkillIds": [
         "pbakaus/impeccable:impeccable"
       ],
@@ -1325,6 +1344,7 @@
       "xUrl": "https://x.com/pbakaus"
     },
     "antfu": {
+      "title": "Anthony Fu",
       "featuredSkillIds": [
         "antfu/skills:nuxt",
         "antfu/skills:pinia",
@@ -1340,6 +1360,7 @@
       "description": "Open-source skills for Vue, Vite, Nuxt, and modern web development."
     },
     "addyosmani": {
+      "title": "Addy Osmani",
       "featuredSkillIds": [
         "addyosmani/agent-skills:skills/api-and-interface-design",
         "addyosmani/agent-skills:browser-testing-with-devtools",
@@ -1367,6 +1388,7 @@
       "xUrl": "https://x.com/addyosmani"
     },
     "twostraws": {
+      "title": "Paul Hudson",
       "featuredSkillIds": [
         "twostraws/swiftui-agent-skill:swiftui-pro",
         "twostraws/swift-concurrency-agent-skill:swift-concurrency-pro",
@@ -1378,6 +1400,7 @@
       "xUrl": "https://x.com/twostraws"
     },
     "mvanhorn": {
+      "title": "Matt Van Horn",
       "featuredSkillIds": [
         "mvanhorn/last30days-skill:last30days-skill",
         "mvanhorn/cli-printing-press:printing-press",
@@ -1402,6 +1425,7 @@
       "xUrl": "https://x.com/mvanhorn"
     },
     "yeachan-heo": {
+      "title": "Yeachan Heo",
       "featuredSkillIds": [
         "yeachan-heo/oh-my-claudecode:ralplan",
         "yeachan-heo/oh-my-claudecode:ai-slop-cleaner",
@@ -1425,6 +1449,7 @@
       "description": "Skills for agent setup, autopilot, quality assurance, and team operations."
     },
     "phuryn": {
+      "title": "Paweł Huryn",
       "featuredSkillIds": [
         "phuryn/pm-skills:summarize-meeting",
         "phuryn/pm-skills:ab-test-analysis",
@@ -1452,6 +1477,7 @@
       "xUrl": "https://x.com/PawelHuryn"
     },
     "avdlee": {
+      "title": "Antoine van der Lee",
       "featuredSkillIds": [
         "avdlee/swiftui-agent-skill:swiftui-expert-skill",
         "avdlee/swiftui-agent-skill:update-swiftui-apis",
@@ -1471,6 +1497,7 @@
       "xUrl": "https://x.com/twannl"
     },
     "rohitg00": {
+      "title": "Rohit Ghumare",
       "featuredSkillIds": [
         "rohitg00/agentmemory:agentmemory-agents",
         "rohitg00/pro-workflow:skills/agent-teams",
@@ -1496,6 +1523,7 @@
       "xUrl": "https://x.com/ghumare64"
     },
     "simonw": {
+      "title": "Simon Willison",
       "featuredSkillIds": [
         "simonw/research:datasette-plugin-skill"
       ],
@@ -1530,6 +1558,7 @@
       "description": "Open-source tools for SEO, advertising, content, and marketing analysis."
     },
     "kieranklaassen": {
+      "title": "Kieran Klaassen",
       "featuredSkillIds": [
         "everyinc/compound-engineering-plugin:ce-brainstorm",
         "everyinc/compound-engineering-plugin:ce-code-review",
@@ -1557,6 +1586,7 @@
       "xUrl": "https://x.com/kieranklaassen"
     },
     "disler": {
+      "title": "IndyDevDan",
       "featuredSkillIds": [
         "disler/claude-code-damage-control:.claude/skills/damage-control"
       ],
@@ -1564,6 +1594,7 @@
       "description": "Practical skills for agent engineering, guardrails, and safer execution."
     },
     "github": {
+      "title": "GitHub",
       "featuredSkillIds": [
         "github/spec-kit:add-community-extension",
         "github/awesome-copilot:skills/agent-governance",
@@ -1580,6 +1611,7 @@
       "description": "Skills for specifications, governance, repositories, and developer operations."
     },
     "microsoft": {
+      "title": "Microsoft",
       "featuredSkillIds": [
         "microsoft/vscode:accessibility",
         "microsoft/vscode:act-on-feedback",
@@ -1595,6 +1627,7 @@
       "xUrl": "https://x.com/OpenAtMicrosoft"
     },
     "google-gemini": {
+      "title": "Google Gemini",
       "featuredSkillIds": [
         "google-gemini/gemini-cli:code-reviewer",
         "google-gemini/gemini-cli:async-pr-review",
@@ -1612,6 +1645,7 @@
       "xUrl": "https://x.com/googleaidevs"
     },
     "googleworkspace": {
+      "title": "Google Workspace",
       "featuredSkillIds": [
         "googleworkspace/cli:gws-gmail",
         "googleworkspace/cli:gws-admin-reports",
@@ -1629,6 +1663,7 @@
       "xUrl": "https://x.com/workspacedevs"
     },
     "facebook": {
+      "title": "Meta",
       "featuredSkillIds": [
         "react/react:extract-errors",
         "react/react:feature-flags",
@@ -1645,6 +1680,7 @@
       "xUrl": "https://x.com/MetaOpenSource"
     },
     "react": {
+      "title": "React",
       "featuredSkillIds": [
         "react/react:extract-errors",
         "react/react:feature-flags",
@@ -1658,6 +1694,7 @@
       "description": "Official skills for React maintenance, testing, flags, and verification."
     },
     "google-labs-code": {
+      "title": "Google Labs",
       "featuredSkillIds": [
         "google-labs-code/design.md:typed-service-contracts",
         "google-labs-code/design.md:agent-dx-cli-scale",
@@ -1674,6 +1711,7 @@
       "description": "Experiments in agentic coding, design systems, and component generation."
     },
     "n8n-io": {
+      "title": "n8n",
       "featuredSkillIds": [
         "n8n-io/n8n:create-pr",
         "n8n-io/n8n:content-design",
@@ -1691,6 +1729,7 @@
       "xUrl": "https://x.com/n8n_io"
     },
     "expo": {
+      "title": "Expo",
       "featuredSkillIds": [
         "expo/expo:android-e2e-testing",
         "expo/expo:deep-code-review",
@@ -1705,6 +1744,7 @@
       "xUrl": "https://x.com/expo"
     },
     "pytorch": {
+      "title": "PyTorch",
       "featuredSkillIds": [
         "pytorch/pytorch:skill-writer",
         "pytorch/pytorch:add-uint-support",
@@ -1721,6 +1761,7 @@
       "description": "PyTorch skills for kernels, debugging, documentation, and model infrastructure."
     },
     "firecrawl": {
+      "title": "Firecrawl",
       "featuredSkillIds": [
         "firecrawl/firecrawl-agent:competitor-analysis",
         "firecrawl/firecrawl-agent:deep-research",
@@ -1738,6 +1779,7 @@
       "xUrl": "https://x.com/firecrawl_dev"
     },
     "firebase": {
+      "title": "Firebase",
       "featuredSkillIds": [
         "firebase/genkit:developing-genkit-tooling",
         "firebase/firebase-tools:resolve-docker-vulnerabilities",
@@ -1754,6 +1796,7 @@
       "description": "Firebase skills for auth, hosting, Firestore, AI, and application tooling."
     },
     "supabase": {
+      "title": "Supabase",
       "featuredSkillIds": [
         "supabase/supabase:vitest",
         "supabase/supabase:dev-toolbar-review",
@@ -1771,6 +1814,7 @@
       "xUrl": "https://x.com/supabase"
     },
     "stripe": {
+      "title": "Stripe",
       "featuredSkillIds": [
         "stripe/ai:connect-recommend",
         "stripe/ai:stripe-best-practices",
@@ -1785,6 +1829,7 @@
       "description": "Stripe skills for payments, integrations, upgrades, and AI commerce."
     },
     "cloudflare": {
+      "title": "Cloudflare",
       "featuredSkillIds": [
         "cloudflare/moltworker:cloudflare-browser",
         "cloudflare/vinext:migrate-to-vinext",
@@ -1798,6 +1843,7 @@
       "description": "Cloudflare skills for Workers, browser tooling, migrations, and testing."
     },
     "getsentry": {
+      "title": "Sentry",
       "featuredSkillIds": [
         "getsentry/sentry:cell-architecture",
         "getsentry/sentry:cmdk-actions",
@@ -1815,6 +1861,7 @@
       "xUrl": "https://x.com/sentry"
     },
     "vercel": {
+      "title": "Vercel",
       "featuredSkillIds": [
         "vercel/turbo:turborepo",
         "vercel/ai:add-provider-package",
@@ -1832,6 +1879,7 @@
       "xUrl": "https://x.com/vercel"
     },
     "vercel-labs": {
+      "title": "Vercel Labs",
       "featuredSkillIds": [
         "vercel-labs/agent-browser:agent-browser",
         "vercel-labs/agent-browser:agentcore",
@@ -1849,6 +1897,7 @@
       "xUrl": "https://x.com/vercel"
     },
     "posthog": {
+      "title": "PostHog",
       "featuredSkillIds": [
         "posthog/posthog:implementing-agent-modes",
         "posthog/posthog:adding-personhog-rpc",
@@ -1866,6 +1915,7 @@
       "xUrl": "https://x.com/PostHog"
     },
     "huggingface": {
+      "title": "Hugging Face",
       "featuredSkillIds": [
         "huggingface/transformers:add-or-fix-type-checking",
         "huggingface/sentence-transformers:train-sentence-transformers",
@@ -1883,6 +1933,7 @@
       "xUrl": "https://x.com/huggingface"
     },
     "flutter": {
+      "title": "Flutter",
       "featuredSkillIds": [
         "flutter/flutter:rebuilding-flutter-tool",
         "flutter/flutter:upgrade-browser",
@@ -1898,6 +1949,7 @@
       "xUrl": "https://x.com/FlutterDev"
     },
     "automattic": {
+      "title": "Automattic",
       "featuredSkillIds": [
         "automattic/wp-calypso:calypso-react-query-migration",
         "automattic/wp-calypso:dashboard-create-screen",
@@ -1915,6 +1967,7 @@
       "xUrl": "https://x.com/automatticeng"
     },
     "trailofbits": {
+      "title": "Trail of Bits",
       "featuredSkillIds": [
         "trailofbits/skills:address-sanitizer",
         "trailofbits/skills:aflpp",
@@ -1931,6 +1984,7 @@
       "xUrl": "https://x.com/trailofbits"
     },
     "langchain-ai": {
+      "title": "LangChain",
       "featuredSkillIds": [
         "langchain-ai/deepagents:arxiv-search",
         "langchain-ai/deepagents:blog-post",
@@ -1948,6 +2002,7 @@
       "xUrl": "https://x.com/LangChain"
     },
     "clickhouse": {
+      "title": "ClickHouse",
       "featuredSkillIds": [
         "clickhouse/clickhouse:review",
         "clickhouse/clickhouse:alloc-profile",
@@ -1965,6 +2020,7 @@
       "xUrl": "https://x.com/ClickHouseDB"
     },
     "lobehub": {
+      "title": "LobeHub",
       "featuredSkillIds": [
         "lobehub/lobehub:zustand",
         "lobehub/lobehub:.agents/skills/add-model-provider",
@@ -1982,6 +2038,7 @@
       "xUrl": "https://x.com/lobehub"
     },
     "heygen-com": {
+      "title": "HeyGen",
       "featuredSkillIds": [
         "heygen-com/hyperframes:hyperframes",
         "heygen-com/hyperframes:website-to-hyperframes",
@@ -1992,6 +2049,7 @@
       "description": "Skills for HyperFrames, animation systems, and media-rich website creation."
     },
     "browser-use": {
+      "title": "Browser Use",
       "featuredSkillIds": [
         "browser-use/browser-use:browser-use",
         "browser-use/browser-use:cloud",
@@ -2008,6 +2066,7 @@
       "xUrl": "https://x.com/browser_use"
     },
     "warpdotdev": {
+      "title": "Warp",
       "featuredSkillIds": [
         "warpdotdev/warp:add-telemetry",
         "warpdotdev/oz-skills:seo-aeo-audit",
