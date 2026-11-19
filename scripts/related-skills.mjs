@@ -79,13 +79,15 @@ export function relatedSkillsPicker(pool, { topicsBySkill = new Map(), limit = r
       if (!(sameJob || (sameTopic && score >= minScore * 1.5)) || score < minScore || shared < minSharedWords) continue;
       scored.push({ other, score });
     }
-    return scored
-      .sort((a, b) => b.score - a.score || decade(b.other.skill.stars) - decade(a.other.skill.stars)
-        || (b.other.skill.stars || 0) - (a.other.skill.stars || 0) || String(a.other.skill.id).localeCompare(String(b.other.skill.id)))
-      // At most two from one creator, so one big repo can't fill the list; one copy of each name.
-      .filter(({ other }, index, list) => list.slice(0, index).filter(earlier => earlier.other.author === other.author).length < 2
-        && !list.slice(0, index).some(earlier => earlier.other.nameKey === other.nameKey))
-      .slice(0, limit)
-      .map(({ other }) => other.skill);
+    scored.sort((a, b) => b.score - a.score || decade(b.other.skill.stars) - decade(a.other.skill.stars)
+      || (b.other.skill.stars || 0) - (a.other.skill.stars || 0) || String(a.other.skill.id).localeCompare(String(b.other.skill.id)));
+    // At most two from one creator, so one big repo can't fill the list; one copy of each name.
+    const kept = [];
+    for (const { other } of scored) {
+      if (kept.length >= limit) break;
+      if (kept.filter(earlier => earlier.author === other.author).length >= 2 || kept.some(earlier => earlier.nameKey === other.nameKey)) continue;
+      kept.push(other);
+    }
+    return kept.map(other => other.skill);
   };
 }

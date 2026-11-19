@@ -132,14 +132,17 @@ export function usePublicCatalog(client: PublicCatalogClient, nav: Navigation, e
         return;
       }
       if (!controller.signal.aborted) setDetail({ key: selectedId, skill, state: "ready", error: "", missing: false });
-      const [publicUrl, relatedSkills] = await Promise.all([
-        client.publicUrl(skill.id, controller.signal).catch(() => undefined),
-        client.related(skill.id, controller.signal).catch(() => [] as CatalogSummary[]),
-      ]);
-      if (controller.signal.aborted || (!publicUrl && !relatedSkills.length)) return;
+      // The page link and the related skills arrive separately; neither waits for the other.
+      void client.publicUrl(skill.id, controller.signal).catch(() => undefined).then(publicUrl => {
+        if (controller.signal.aborted || !publicUrl) return;
+        setDetail(current => current.key === selectedId && current.skill
+          ? { ...current, skill: { ...current.skill, publicUrl } } : current);
+      });
+      const relatedSkills = await client.related(skill.id, controller.signal).catch(() => [] as CatalogSummary[]);
+      if (controller.signal.aborted || !relatedSkills.length) return;
       setRelated({ key: selectedId, skills: relatedSkills });
-      setDetail({ key: selectedId, skill: { ...skill, ...(publicUrl ? { publicUrl } : {}),
-        ...(relatedSkills.length ? { relatedIds: relatedSkills.map(item => item.id) } : {}) }, state: "ready", error: "", missing: false });
+      setDetail(current => current.key === selectedId && current.skill
+        ? { ...current, skill: { ...current.skill, relatedIds: relatedSkills.map(item => item.id) } } : current);
     }).catch((error) => {
       if (!controller.signal.aborted) setDetail({ key: selectedId, skill: null, state: "error", error: message(error), missing: false });
     });

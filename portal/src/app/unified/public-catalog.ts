@@ -119,11 +119,22 @@ export function collectionAssetPath(manifest: unknown, track: "crawl4" | "v2") {
   return `/data/${track}/${path}`;
 }
 
+/** Waits for a shared request, but lets this caller stop waiting. */
+function abortable<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
+  signal.throwIfAborted();
+  return new Promise<T>((resolve, reject) => {
+    const abort = () => reject(signal.reason);
+    signal.addEventListener("abort", abort, { once: true });
+    promise.then(resolve, reject).finally(() => signal.removeEventListener("abort", abort));
+  });
+}
+
 export class PublicCatalogClient {
   private cache = new Map<string, { at: number; value: unknown }>();
   private pending = new Map<string, Pending>();
   private requestId = 0;
   private views = new Map<string, { at: number; value: PublicView }>();
+  private relatedMap?: { at: number; value: Promise<RecordValue> };
   constructor(private fetcher: Fetcher = (input, init) => fetch(input, init), private timeoutMs = 15_000, private now = Date.now,
     readonly pagingEnabled = false) {
     const stored = storedCapabilities(this.now());
@@ -375,7 +386,13 @@ export class PublicCatalogClient {
   }
   /** The skill page's Related skills (built with the pages), so the panel and the page list the same ones. */
   async related(id: string, signal: AbortSignal) {
-    const map = await this.cached("related", async (signal) => record(record(await this.json("/catalog-related-skills.json", signal)).skills), signal, 600_000);
+    // Kept apart from the small per-skill cache, which opening a few skills would push it out of.
+    if (!this.relatedMap || this.now() - this.relatedMap.at > 600_000) {
+      this.relatedMap = { at: this.now(), value: this.json("/catalog-related-skills.json", new AbortController().signal)
+        .then(value => record(record(value).skills)) };
+      this.relatedMap.value.catch(() => { this.relatedMap = undefined; });
+    }
+    const map = await abortable(this.relatedMap.value, signal);
     const listed = map[id];
     const ids = Array.isArray(listed) ? listed.filter((value): value is string => typeof value === "string" && value !== id).slice(0, 5) : [];
     return ids.length ? (await this.collection(ids, signal)).skills : [];

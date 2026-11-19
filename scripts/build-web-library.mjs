@@ -1754,6 +1754,7 @@ async function main() {
   );
 
   const relatedById = {};
+  const relatedByUrl = new Map();
 
   const allUrls = new Map([["/", "home"]]);
   const sitemapUrls = new Map([
@@ -1778,6 +1779,9 @@ async function main() {
     if (!urlPath) continue;
     if (generatedPageUrls.has(urlPath)) {
       generatedSkillUrlById.set(skill.id, urlPath);
+      // The twin's panel lists what the shared page lists.
+      const sharedIds = relatedByUrl.get(urlPath);
+      if (sharedIds) relatedById[skill.id] = sharedIds;
       continue;
     }
     generatedPageUrls.add(urlPath);
@@ -1803,7 +1807,10 @@ async function main() {
       .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id) && !repoSkillIds.has(candidate.id))
       .slice(0, Math.max(0, 3 - repoSkills.length));
     const relatedSkills = relatedFor(skill, { exclude: new Set([...repoSkillIds, ...authorSkills.map((candidate) => candidate.id)]) });
-    if (relatedSkills.length) relatedById[skill.id] = relatedSkills.map((candidate) => candidate.id);
+    if (relatedSkills.length) {
+      relatedById[skill.id] = relatedSkills.map((candidate) => candidate.id);
+      relatedByUrl.set(urlPath, relatedById[skill.id]);
+    }
     const skillCollections = topicsBySkill.get(skill.id) || [];
     await writeGeneratedPage(urlPath, {
       html: renderSkillPage(
