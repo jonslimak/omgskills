@@ -294,12 +294,7 @@ function pageShell({
     a { color: inherit; }
     .brand { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; min-height: 28px; font-size: 18px; line-height: 1; text-decoration: none; }
     .brand:hover { opacity: .72; }
-    .cta { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 38px; padding: 0 16px; border-radius: 999px; background: var(--blue); color: #fff; text-decoration: none; font-size: 10px; font-weight: 400; letter-spacing: 0; transition: opacity .15s; }
-    .cta:hover { opacity: .82; }
-    .mac-download { text-align: right; }
-    .mac-download small { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; }
-    .brand:focus-visible, .cta:focus-visible { outline: 3px solid rgba(0, 122, 255, .3); outline-offset: 3px; }
-    .apple-icon { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 15px; line-height: 1; transform: translateY(-1px); }
+    .brand:focus-visible { outline: 3px solid rgba(0, 122, 255, .3); outline-offset: 3px; }
     .eyebrow { color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
     h1 { font-size: clamp(34px, 7vw, 64px); line-height: .95; margin: 12px 0 16px; letter-spacing: -0.04em; }
     h2 { font-size: 20px; margin: 0 0 12px; letter-spacing: -0.02em; }
@@ -416,7 +411,6 @@ function pageShell({
 <body>
   <header>
     <a class="brand" href="/library/" aria-label="omgskills skills library"><span aria-hidden="true">&#128064;</span></a>
-    <div class="mac-download"><a class="cta" href="/download"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for Mac</a><small>Apple silicon, macOS 14+</small></div>
   </header>
   <main>
 ${body}

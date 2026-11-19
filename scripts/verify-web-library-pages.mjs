@@ -459,12 +459,8 @@ function verifyMetadata(html, page, label) {
     '<a class="brand" href="/library/" aria-label="omgskills skills library"><span aria-hidden="true">&#128064;</span></a>',
     label,
   );
-  assertIncludes(
-    html,
-    '<a class="cta" href="/download"><span class="apple-icon" aria-hidden="true">&#63743;</span>Download for Mac</a><small>Apple silicon, macOS 14+</small>',
-    label,
-  );
-  assertNotIncludes(html, '<a class="cta" href="/">', label);
+  // Library pages no longer promote the Mac app download (the web app is the product).
+  assertNotIncludes(html, "Download for Mac", label);
   if (page.titleText) assertIncludes(html, page.titleText, label);
   if (page.descriptionText) assertIncludes(html, page.descriptionText, label);
   if (page.visibleText) assertIncludes(html, page.visibleText, label);
