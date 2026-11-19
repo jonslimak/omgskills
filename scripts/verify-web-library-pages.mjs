@@ -84,7 +84,7 @@ const pages = [
     path: "/library/openai/codex/skill-creator/",
     canonical: "https://omgskills.com/library/openai/codex/skill-creator/",
     text: "skill-creator",
-    titleText: "Claude skill by openai",
+    titleText: "skill-creator — agent skill by openai",
     descriptionText: "Install skill-creator",
     visibleText: "Create or update a Codex skill",
     metadata: true,

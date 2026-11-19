@@ -10,9 +10,9 @@ test("homepage marketing stays intact with adjacent Coming soon labels", () => {
     '<h1 id="hero-title">share skills<br>across teams &amp; agents</h1>',
     "Keep your skills in one place. Use them in Claude, ChatGPT, Cursor, Grok, Muse and more.",
     'From your library to your team\'s agents. No zip files, no Slack threads, no "which version do you have?"',
-    "Add teammates by email, or share one link. Everyone gets the same skills, at the same version.",
-    "Install the set in Claude Code or Codex. When the set changes, everyone stays up to date.",
-    "Public, invite only, or only me. Share one link, and when you update a set, your team gets the change.",
+    "Add teammates&rsquo; emails, then send them the set&rsquo;s link, or make it public. Everyone gets the same skills, at the same version.",
+    "Install the whole set in Claude Code or Codex in one step.",
+    "Public, invite only, or only me. Share one link, and when you update a set, your team can install the new version.",
     '<h2 id="closing-title">Share skills across teams &amp; agents</h2>',
   ]) assert.ok(home.includes(copy), copy);
   const labels = [...home.matchAll(/<small class="coming-soon" data-planned-feature="([^"]+)">([^<]+)<\/small>/g)];

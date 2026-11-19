@@ -5,6 +5,7 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { relatedSkillsFilename, relatedSkillsPicker } from "./related-skills.mjs";
 import { duplicateSkillPages } from "./duplicate-skill-pages.mjs";
+import { isDeprecatedSkill, manualInstallCommand } from "./skill-install-command.mjs";
 import {
   assertStaticProfileHandlesReserved,
   buildProfilePathByCreatorHandle,
@@ -385,7 +386,7 @@ function pageShell({
     .about { max-width: 72ch; }
     .section { margin-top: 36px; }
     .directory-recommendations { margin-top: 66px; }
-    .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    .tags { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0 0; padding: 0; list-style: none; }
     .tag { border: 1px solid var(--line); border-radius: 999px; padding: 6px 9px; color: var(--muted); font-size: 13px; }
     .lede { max-width: 68ch; font-size: 17px; }
     .site-footer { border-top: 1px solid var(--line); margin-top: 64px; }
@@ -628,7 +629,7 @@ function skillAuthor(skill) {
 }
 
 function skillTitle(skill) {
-  return `${skill.name} \u2014 Claude skill by ${skillAuthor(skill)} | omgskills`;
+  return `${skill.name} \u2014 agent skill by ${skillAuthor(skill)} | omgskills`;
 }
 
 function skillMetaDescription(skill) {
@@ -740,7 +741,7 @@ function recommendationSection(collections) {
 function tagsForSkill(skill) {
   const tags = Array.isArray(skill.tags) ? skill.tags.filter(Boolean).slice(0, 8) : [];
   if (!tags.length) return "";
-  return `<div class="tags">${tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>`;
+  return `<ul class="tags" aria-label="Tags">${tags.map((tag) => `<li class="tag">${escapeHtml(tag)}</li>`).join(" ")}</ul>`;
 }
 
 function visibleDescriptionForSkill(skill) {
@@ -895,6 +896,7 @@ function renderSkillPage(
   const readmeSnippet = readmeSnippetForSkill(skill);
   const installId = `install-${createHash("sha256").update(skill.id).digest("hex").slice(0, 10)}`;
   const pinnedInstall = hasPinnedInstall(skill);
+  const manualCommand = manualInstallCommand(skill);
   const agentPrompt = `Install OMGSkills skill ${JSON.stringify(skill.id)} into this agent's normal skills directory: call the OMGSkills MCP get_install_plan tool for your agent and run the script it returns (it installs only the pinned commit and verifies SKILL.md), and stop if MCP or the pin is unavailable. Do not overwrite or change existing skills without asking me.`;
   const author = skill.author_handle
     ? skillAuthorReference(skill, profilePathByCreatorHandle)
@@ -912,19 +914,19 @@ function renderSkillPage(
     </div>
     ${visibleDescription ? `<p class="lede">${escapeHtml(visibleDescription)}</p>` : ""}
     ${tagsForSkill(skill)}
-    <div class="section">
+    ${pinnedInstall || manualCommand ? `<div class="section">
       ${pageHeading("Install")}
       ${pinnedInstall ? `<p class="install-method">With your agent</p>
       <div class="install-box agent-install">
         <p class="agent-instructions" id="${escapeHtml(installId)}-agent">${escapeHtml(agentPrompt)}</p>
         <button class="copy agent-copy" type="button" data-copy="${escapeHtml(installId)}-agent" data-copy-label="Copy for agent" aria-label="Copy for agent" title="Copy for agent"><svg class="copy-icon" data-copy-icon viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="copy-icon" data-copied-icon viewBox="0 0 24 24" aria-hidden="true" hidden><path d="m20 6-11 11-5-5"/></svg><span>Copy for agent</span></button>
       </div>
-      <p class="install-method">Manual command</p>` : ""}
-      <div class="install-box">
-      <pre class="install"><code id="${escapeHtml(installId)}">${escapeHtml(skill.install_cmd || "")}</code></pre>
+      ${manualCommand ? '<p class="install-method">Manual command</p>' : ""}` : ""}
+      ${manualCommand ? `<div class="install-box">
+      <pre class="install"><code id="${escapeHtml(installId)}">${escapeHtml(manualCommand)}</code></pre>
       <button class="copy" type="button" data-copy="${escapeHtml(installId)}" aria-label="Copy install command" title="Copy install command"><svg class="copy-icon" data-copy-icon viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="copy-icon" data-copied-icon viewBox="0 0 24 24" aria-hidden="true" hidden><path d="m20 6-11 11-5-5"/></svg></button>
-      </div>
-    </div>
+      </div>` : ""}
+    </div>` : ""}
     ${readmeSnippet ? `<div class="section about">${pageHeading("From README")}<p>${escapeHtml(readmeSnippet)}</p></div>` : ""}
     ${repoSkills.length ? skillSection("More from this repo", repoSkills, skillUrlById) : ""}
     ${authorSkills.length ? skillSection("More skills", authorSkills, skillUrlById) : ""}
@@ -1201,8 +1203,8 @@ function renderMarkdownSkillList(
       `${prefix} ${markdownLink(skill.name, markdownMirrorUrl(urlPath))} — ${escapeMarkdownText(subtitleForSkill(skill))}`,
       `   - ${details.join(" · ")}`,
     ];
-    if (includeInstall && skill.install_cmd) {
-      lines.push(`   - Install: ${markdownInlineCode(skill.install_cmd)}`);
+    if (includeInstall && manualInstallCommand(skill)) {
+      lines.push(`   - Install: ${markdownInlineCode(manualInstallCommand(skill))}`);
     }
     return lines.join("\n");
   }).join("\n");
@@ -1239,7 +1241,7 @@ function renderSkillMarkdown(
 
 ${escapeMarkdownText(description || descriptionForSkill(skill))}
 ${tags.length ? `\nTags: ${tags.map(escapeMarkdownText).join(", ")}\n` : ""}
-${skill.install_cmd ? `## Install\n\n${markdownCodeBlock(skill.install_cmd, "sh")}\n\n` : ""}${readmeSnippet ? `## From README\n\n${escapeMarkdownText(readmeSnippet)}\n\n` : ""}## Links
+${manualInstallCommand(skill) ? `## Install\n\n${markdownCodeBlock(manualInstallCommand(skill), "sh")}\n\n` : ""}${readmeSnippet ? `## From README\n\n${escapeMarkdownText(readmeSnippet)}\n\n` : ""}## Links
 
 ${links}
 ${repoSkills.length ? `\n## More from this repo\n\n${renderMarkdownSkillList(repoSkills, skillUrlById, profilePathByCreatorHandle)}\n` : ""}${authorSkills.length ? `\n## More skills by this author\n\n${renderMarkdownSkillList(authorSkills, skillUrlById, profilePathByCreatorHandle)}\n` : ""}${relatedSkills.length ? `\n## Related skills\n\n${renderMarkdownSkillList(relatedSkills, skillUrlById, profilePathByCreatorHandle)}\n` : ""}`;
@@ -1750,7 +1752,8 @@ async function main() {
     }
   }
   const relatedFor = relatedSkillsPicker(
-    [...includedSkillIds].map((id) => skillById.get(id)).filter((skill) => skill && skillUrlById.get(skill.id)),
+    // Deprecated skills are never suggested, and get no suggestions of their own.
+    [...includedSkillIds].map((id) => skillById.get(id)).filter((skill) => skill && skillUrlById.get(skill.id) && !isDeprecatedSkill(skill)),
     { topicsBySkill: new Map([...topicsBySkill].map(([id, list]) => [id, list.map((collection) => collection.id)])) },
   );
 
@@ -1820,11 +1823,11 @@ async function main() {
     }
     includedSkills.push(skill);
     const repoSkills = (skillsByRepo.get(repoKeyForSkill(skill)) || [])
-      .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id))
+      .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id) && !isDeprecatedSkill(candidate))
       .slice(0, 3);
     const repoSkillIds = new Set(repoSkills.map((candidate) => candidate.id));
     const authorSkills = uniqueSkills(skillsByAuthor.get(String(skill.author_handle || "").toLowerCase()) || [])
-      .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id) && !repoSkillIds.has(candidate.id))
+      .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id) && !repoSkillIds.has(candidate.id) && !isDeprecatedSkill(candidate))
       .slice(0, Math.max(0, 3 - repoSkills.length));
     const relatedSkills = relatedFor(skill, { exclude: new Set([...repoSkillIds, ...authorSkills.map((candidate) => candidate.id)]) });
     if (relatedSkills.length) {
