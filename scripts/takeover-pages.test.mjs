@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { addTakeover, appShellTags, librarySkillPath, takeoverAllPagesEnabled, takeoverGuardStyle, takeoverLoader, takeoverLoaderPath, takeoverPilotEnabled, takeoverPilotPages, takeoverWaitScript, takeoverWaitStyle, writeTakeover, writeTakeoverPilot } from "./takeover-pages.mjs";
+import { addTakeover, appShellTags, librarySkillPath, takeoverAllPagesEnabled, takeoverGuardStyle, takeoverLoader, takeoverLoaderPath, takeoverPilotEnabled, takeoverPilotPages, takeoverWaitScript, takeoverWaitStatus, takeoverWaitStyle, writeTakeover, writeTakeoverPilot } from "./takeover-pages.mjs";
 
 const shell = `<!doctype html><html><head><title>omgskills</title>
 <script type="module" crossorigin src="/app/assets/index-abc.js"></script>
@@ -32,6 +32,11 @@ test("a static page keeps its content and metadata, gains the app, and marks its
   assert.match(takeoverWaitScript, /classList\.add\("omgskills-wait"\)/);
   assert.match(takeoverWaitScript, /setTimeout\(function\(\)\{d\.classList\.remove\("omgskills-wait"\)\},5000\)/);
   assert.match(takeoverWaitStyle, /html\.omgskills-wait #omgskills-static\{visibility:hidden\}/);
+  assert.ok(html.includes(`<body>\n${takeoverWaitStatus}\n<div id="omgskills-static">`), "a loading status screen readers announce");
+  assert.match(takeoverWaitStatus, /role="status"[^>]*aria-label="Loading omgskills"/);
+  assert.match(takeoverWaitStatus, /data-omgskills-static/, "removed by the swap");
+  assert.match(takeoverWaitStyle, /^html\.omgskills-wait\{overflow:hidden\}/, "no scrolling a blank page");
+  assert.match(takeoverWaitStyle, /\.omgskills-wait-status\{display:none\}/, "hidden unless waiting");
   assert.doesNotMatch(takeoverWaitScript, /uaTheme/, "the app's dark theme must not reach the static page");
   assert.ok(html.indexOf('src="/app/assets/index-abc.js"') < html.indexOf("</head>"));
   assert.ok(html.indexOf('href="/app/assets/index-def.css"') < html.indexOf("</head>"));

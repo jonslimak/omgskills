@@ -39,13 +39,21 @@ export const takeoverGuardStyle = "html{line-height:normal;-webkit-text-size-adj
 // swaps in place while waiting, and waits for the top once the page is showing).
 export const takeoverWaitClass = "omgskills-wait";
 export const takeoverWaitMs = 5000;
-export const takeoverWaitStyle = `html.${takeoverWaitClass} #omgskills-static{visibility:hidden}`
-  + `html.${takeoverWaitClass}::before{content:"";position:fixed;left:50%;top:50%;width:28px;height:28px;margin:-14px 0 0 -14px;`
-  + "box-sizing:border-box;border:3px solid #e5e5ea;border-top-color:#0071e3;border-radius:50%;animation:omgskills-wait-spin .8s linear infinite}"
-  + `html.${takeoverWaitClass}[data-omgskills-wait-theme="dark"],html.${takeoverWaitClass}[data-omgskills-wait-theme="dark"] body{background:#101012;color-scheme:dark}`
-  + `html.${takeoverWaitClass}[data-omgskills-wait-theme="dark"]::before{border-color:#333338;border-top-color:#0a84ff}`
+// The spinner is a real element with role="status", so screen readers hear "Loading" too. It is
+// marked data-omgskills-static, so the swap removes it, and it only shows while waiting (never
+// without JavaScript). Scrolling is locked while waiting: there is nothing to scroll to yet.
+const w = `html.${takeoverWaitClass}`, dark = `${w}[data-omgskills-wait-theme="dark"]`;
+export const takeoverWaitStyle = `${w}{overflow:hidden}${w} #omgskills-static{visibility:hidden}`
+  + ".omgskills-wait-status{display:none}"
+  + `${w} .omgskills-wait-status{display:grid;place-items:center;position:fixed;inset:0;z-index:1}`
+  + ".omgskills-wait-status span{width:28px;height:28px;box-sizing:border-box;border:3px solid #e5e5ea;border-top-color:#0071e3;"
+  + "border-radius:50%;animation:omgskills-wait-spin .8s linear infinite}"
+  + `${dark},${dark} body{background:#101012;color-scheme:dark}`
+  + `${dark} .omgskills-wait-status span{border-color:#333338;border-top-color:#0a84ff}`
   + "@keyframes omgskills-wait-spin{to{transform:rotate(360deg)}}"
-  + `@media (prefers-reduced-motion:reduce){html.${takeoverWaitClass}::before{animation:none}}`;
+  + "@media (prefers-reduced-motion:reduce){.omgskills-wait-status span{animation:none}}";
+export const takeoverWaitStatus = '<div class="omgskills-wait-status" data-omgskills-static role="status" aria-label="Loading omgskills">'
+  + '<span aria-hidden="true"></span></div>';
 // Same saved-theme read as the app shell (portal/index.html), so dark mode never flashes white.
 // Its own attribute, not the app's data-ua-theme: the app's dark rules must not reach the light
 // static page if it ends up showing.
@@ -102,7 +110,7 @@ export function addTakeover(pageHtml, tags = [loaderTag]) {
   const head = pageHtml.slice(0, headEnd).replace(/<style>/g, "<style data-omgskills-static>");
   const body = pageHtml.slice(bodyStart + "<body>".length, bodyEnd);
   return `${head}  <style data-omgskills-static>${takeoverGuardStyle}${takeoverWaitStyle}</style>\n  <script>${takeoverWaitScript}</script>\n  ${tags.join("\n  ")}\n</head>\n<body>`
-    + `\n<div id="omgskills-static">${body}</div>\n<div id="root" hidden></div>\n${pageHtml.slice(bodyEnd)}`;
+    + `\n${takeoverWaitStatus}\n<div id="omgskills-static">${body}</div>\n<div id="root" hidden></div>\n${pageHtml.slice(bodyEnd)}`;
 }
 
 async function exists(file) {
