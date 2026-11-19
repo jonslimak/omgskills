@@ -4,6 +4,7 @@ import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { relatedSkillsFilename, relatedSkillsPicker } from "./related-skills.mjs";
+import { duplicateSkillPages } from "./duplicate-skill-pages.mjs";
 import {
   assertStaticProfileHandlesReserved,
   buildProfilePathByCreatorHandle,
@@ -256,8 +257,9 @@ function pageShell({
   ogImageAlt = "",
   twitterCard = "summary",
   indexTier = "indexable",
+  canonicalPath = urlPath,
 }) {
-  const canonical = `${origin}${urlPath}`;
+  const canonical = `${origin}${canonicalPath}`;
   const structuredDataItems = Array.isArray(structuredData) ? structuredData : [structuredData];
   return `<!doctype html>
 <html lang="en">
@@ -940,6 +942,7 @@ function renderSkillPage(
     ],
     ogType: "article",
     indexTier: indexDecision.tier,
+    canonicalPath: indexDecision.canonicalPath,
   });
 }
 
@@ -1768,6 +1771,19 @@ async function main() {
   const includedSkills = [];
   const generatedSkillUrlById = new Map();
   const generatedPageUrls = new Set();
+  // Same rule as the loop below: one page per address, the first skill with it.
+  const pageEntries = new Map();
+  for (const id of includedSkillIds) {
+    const skill = skillById.get(id);
+    const urlPath = skill && skillUrlById.get(skill.id);
+    if (!urlPath || pageEntries.has(urlPath)) continue;
+    const merged = { ...skill, ...(trendingById.get(skill.id) || {}) };
+    const isEditorial = editorialSkillIds.has(skill.id);
+    const isTrending = trendingById.has(skill.id);
+    const indexable = skillIndexDecision(merged, { isEditorial, isTrending }).tier === "indexable";
+    pageEntries.set(urlPath, { skill: merged, urlPath, indexable, isEditorial, isTrending });
+  }
+  const mainPathByCopy = duplicateSkillPages([...pageEntries.values()], readmeSnippetForSkill);
   for (const id of includedSkillIds) {
     const skill = skillById.get(id);
     if (!skill) continue;
@@ -1783,10 +1799,13 @@ async function main() {
       continue;
     }
     generatedPageUrls.add(urlPath);
-    const indexDecision = skillIndexDecision(skill, {
-      isEditorial: editorialSkillIds.has(skill.id),
-      isTrending: trendingById.has(skill.id),
-    });
+    const mainPath = mainPathByCopy.get(urlPath);
+    const indexDecision = mainPath
+      ? { tier: "copy", reason: "copy", canonicalPath: mainPath }
+      : skillIndexDecision(skill, {
+        isEditorial: editorialSkillIds.has(skill.id),
+        isTrending: trendingById.has(skill.id),
+      });
     registerUrl(allUrls, urlPath, `skill ${skill.id}`);
     allUrls.set(urlPath, { source: `skill ${skill.id}`, lastmod: skill.last_updated, indexTier: indexDecision.tier });
     if (indexDecision.tier === "indexable") {

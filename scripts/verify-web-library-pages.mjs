@@ -9,7 +9,7 @@ import {
   urlPathToFilePath,
 } from "./web-library-skill-urls.mjs";
 import { homepageCollectionPaths } from "./home-preview-content.mjs";
-import { assertIndexStateMatchesSitemap } from "./web-library-index-verification.mjs";
+import { assertIndexStateMatchesSitemap, isNoindexPage } from "./web-library-index-verification.mjs";
 import { defaultDownloadURL } from "./verify-production-deploy.mjs";
 import { createLiveLinkVerifier } from "./web-library-live-links.mjs";
 import { fetchForVerification } from "./verification-fetch.mjs";
@@ -645,6 +645,20 @@ async function verifyLocalSitemap() {
       label: sitemapPath,
     });
   }
+  // A copy of another skill page names that page as canonical: the copy stays out of the
+  // sitemap, and the page it names is listed.
+  let copies = 0;
+  for (const filePath of await collectFiles(path.join(siteDir, "library"), "index.html")) {
+    const html = await readFile(filePath, "utf8");
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)">/)?.[1];
+    const own = `${publicOrigin}/${path.relative(siteDir, path.dirname(filePath)).split(path.sep).join("/")}/`;
+    if (!canonical || canonical === own) continue;
+    copies += 1;
+    assertNotIncludes(sitemap, `<loc>${own}</loc>`, `${filePath} (copy of ${canonical})`);
+    assertIncludes(sitemap, `<loc>${canonical}</loc>`, `${filePath} (copy of ${canonical})`);
+    if (isNoindexPage(html)) throw new Error(`${filePath}: a copy page should name its canonical page, not be noindex`);
+  }
+  if (copies > 500) throw new Error(`${copies} skill pages are copies; expected about 100`);
   assertIncludes(sitemap, "<loc>https://omgskills.com/about/</loc>", sitemapPath);
   assertIncludes(sitemap, "<lastmod>", sitemapPath);
   assertNotIncludes(sitemap, "index.md", sitemapPath);
