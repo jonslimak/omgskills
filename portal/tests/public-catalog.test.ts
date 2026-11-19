@@ -448,3 +448,20 @@ test("view snapshots are bounded and cancelled loads cannot replace them", async
   await assert.rejects(loadPublicView(client, nav, controller.signal));
   assert.equal(client.cachedView(nav), undefined);
 });
+
+test("Related skills come from the list built with the pages, read once, at most five", async () => {
+  let listReads = 0;
+  const requested: unknown[] = [];
+  const ids = ["a/b:one", "c/d:two", "e/f:three", "g/h:four", "i/j:five", "k/l:six"];
+  const client = new PublicCatalogClient(async (path, init) => {
+    if (path === "/catalog-related-skills.json") { listReads += 1; return json({ skills: { "author/repo:pdf": ["author/repo:pdf", 7, ...ids] } }); }
+    const request = JSON.parse(init!.body as string) as Request;
+    requested.push(request.params.arguments.ids);
+    return reply(init, { skills: (request.params.arguments.ids as string[]).map(id => skill(id)) });
+  });
+  const related = await client.related("author/repo:pdf", signal());
+  assert.deepEqual(related.map(item => item.id), ids.slice(0, 5));
+  assert.deepEqual(requested, [ids.slice(0, 5)]);
+  assert.deepEqual(await client.related("other/repo:x", signal()), []);
+  assert.equal(listReads, 1);
+});

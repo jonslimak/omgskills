@@ -3,6 +3,7 @@
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
+import { relatedSkillsFilename, relatedSkillsPicker } from "./related-skills.mjs";
 import {
   assertStaticProfileHandlesReserved,
   buildProfilePathByCreatorHandle,
@@ -887,6 +888,7 @@ function renderSkillPage(
   skillUrlById,
   profilePathByCreatorHandle,
   indexDecision,
+  { relatedSkills = [], skillCollections = [] } = {},
 ) {
   const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id) || "/library/";
   const description = skillMetaDescription(skill);
@@ -927,6 +929,8 @@ function renderSkillPage(
     ${readmeSnippet ? `<div class="section about">${pageHeading("From README")}<p>${escapeHtml(readmeSnippet)}</p></div>` : ""}
     ${repoSkills.length ? skillSection("More from this repo", repoSkills, skillUrlById) : ""}
     ${authorSkills.length ? skillSection("More skills", authorSkills, skillUrlById) : ""}
+    ${relatedSkills.length ? skillSection("Related skills", relatedSkills, skillUrlById) : ""}
+    ${skillCollections.length ? `<div class="section">${pageHeading("In collections")}<p>${skillCollections.map((collection) => `<a href="${escapeHtml(collectionPath(collection.id))}">${escapeHtml(collection.name || collection.title || collection.id)}</a>`).join(" · ")}</p></div>` : ""}
     </div>`;
   return pageShell({
     title: skillTitle(skill),
@@ -1209,6 +1213,7 @@ function renderSkillMarkdown(
   authorSkills,
   skillUrlById,
   profilePathByCreatorHandle,
+  { relatedSkills = [] } = {},
 ) {
   const urlPath = skillUrlById.get(skill.id) || skillPathForId(skill.id) || "/library/";
   const metadata = [
@@ -1236,7 +1241,7 @@ ${tags.length ? `\nTags: ${tags.map(escapeMarkdownText).join(", ")}\n` : ""}
 ${skill.install_cmd ? `## Install\n\n${markdownCodeBlock(skill.install_cmd, "sh")}\n\n` : ""}${readmeSnippet ? `## From README\n\n${escapeMarkdownText(readmeSnippet)}\n\n` : ""}## Links
 
 ${links}
-${repoSkills.length ? `\n## More from this repo\n\n${renderMarkdownSkillList(repoSkills, skillUrlById, profilePathByCreatorHandle)}\n` : ""}${authorSkills.length ? `\n## More skills by this author\n\n${renderMarkdownSkillList(authorSkills, skillUrlById, profilePathByCreatorHandle)}\n` : ""}`;
+${repoSkills.length ? `\n## More from this repo\n\n${renderMarkdownSkillList(repoSkills, skillUrlById, profilePathByCreatorHandle)}\n` : ""}${authorSkills.length ? `\n## More skills by this author\n\n${renderMarkdownSkillList(authorSkills, skillUrlById, profilePathByCreatorHandle)}\n` : ""}${relatedSkills.length ? `\n## Related skills\n\n${renderMarkdownSkillList(relatedSkills, skillUrlById, profilePathByCreatorHandle)}\n` : ""}`;
 }
 
 function renderProfileMarkdown(
@@ -1667,6 +1672,7 @@ async function main() {
     await rm(path.join(siteDir, dir), { recursive: true, force: true });
   }
   await rm(path.join(siteDir, catalogSkillUrlsFilename), { force: true });
+  await rm(path.join(siteDir, relatedSkillsFilename), { force: true });
   await rm(path.join(siteDir, "agents.md"), { force: true });
   await rm(path.join(siteDir, "llms.txt"), { force: true });
   await rm(path.join(siteDir, "llms-gold.txt"), { force: true });
@@ -1734,6 +1740,21 @@ async function main() {
     includedSkillIds.add(redirect.catalogSkillId);
   }
 
+  // Related skills (other creators, same job) and editorial collections for each skill page.
+  const topicsBySkill = new Map();
+  for (const collection of collections.collections) {
+    if (collection.type === "author") continue;
+    for (const id of new Set([...(collection.featuredSkillIds || []), ...(collection.skillIds || [])])) {
+      (topicsBySkill.get(id) ?? topicsBySkill.set(id, []).get(id)).push(collection);
+    }
+  }
+  const relatedFor = relatedSkillsPicker(
+    [...includedSkillIds].map((id) => skillById.get(id)).filter((skill) => skill && skillUrlById.get(skill.id)),
+    { topicsBySkill: new Map([...topicsBySkill].map(([id, list]) => [id, list.map((collection) => collection.id)])) },
+  );
+
+  const relatedById = {};
+
   const allUrls = new Map([["/", "home"]]);
   const sitemapUrls = new Map([
     ["/", { source: "home" }],
@@ -1781,6 +1802,9 @@ async function main() {
     const authorSkills = uniqueSkills(skillsByAuthor.get(String(skill.author_handle || "").toLowerCase()) || [])
       .filter((candidate) => candidate.id !== skill.id && includedSkillIds.has(candidate.id) && !repoSkillIds.has(candidate.id))
       .slice(0, Math.max(0, 3 - repoSkills.length));
+    const relatedSkills = relatedFor(skill, { exclude: new Set([...repoSkillIds, ...authorSkills.map((candidate) => candidate.id)]) });
+    if (relatedSkills.length) relatedById[skill.id] = relatedSkills.map((candidate) => candidate.id);
+    const skillCollections = topicsBySkill.get(skill.id) || [];
     await writeGeneratedPage(urlPath, {
       html: renderSkillPage(
         skill,
@@ -1789,6 +1813,7 @@ async function main() {
         skillUrlById,
         profilePathByCreatorHandle,
         indexDecision,
+        { relatedSkills, skillCollections },
       ),
       markdown: renderSkillMarkdown(
         skill,
@@ -1796,6 +1821,7 @@ async function main() {
         authorSkills,
         skillUrlById,
         profilePathByCreatorHandle,
+        { relatedSkills, skillCollections },
       ),
       includeInGoldBundle: goldSkillIds.has(skill.id),
     });
@@ -1902,6 +1928,8 @@ async function main() {
     path.join(siteDir, catalogSkillUrlsFilename),
     `${JSON.stringify(buildCatalogSkillUrlsAsset(generatedSkillUrlById), null, 2)}\n`,
   );
+  // The app panel reads the same Related skills as the pages.
+  await writeFile(path.join(siteDir, relatedSkillsFilename), `${JSON.stringify({ skills: relatedById })}\n`);
   const llmsExampleSkill = includedSkills[0];
   await writeFile(
     path.join(siteDir, "llms.txt"),

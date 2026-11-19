@@ -373,6 +373,13 @@ export class PublicCatalogClient {
     if (typeof path !== "string" || !/^\/(skills|library)\/[^?#\\]+\/$/.test(path) || path.includes("..") || /%2[ef]/i.test(path)) return undefined;
     return `https://omgskills.com${path}`;
   }
+  /** The skill page's Related skills (built with the pages), so the panel and the page list the same ones. */
+  async related(id: string, signal: AbortSignal) {
+    const map = await this.cached("related", async (signal) => record(record(await this.json("/catalog-related-skills.json", signal)).skills), signal, 600_000);
+    const listed = map[id];
+    const ids = Array.isArray(listed) ? listed.filter((value): value is string => typeof value === "string" && value !== id).slice(0, 5) : [];
+    return ids.length ? (await this.collection(ids, signal)).skills : [];
+  }
   async collection(ids: string[], signal: AbortSignal) {
     signal.throwIfAborted();
     const requested = [...new Set(ids)].slice(0, LIST_LIMIT);

@@ -35,6 +35,8 @@ export type CatalogSummary = {
   stars?: number;
   tags: string[];
   publicUrl?: string;
+  /** Other creators' skills for the same job, as on the skill's library page (catalog-related-skills.json). */
+  relatedIds?: string[];
 };
 export type SkillDisplay = Omit<CatalogSummary, "id" | "githubUrl"> & {
   key: string;

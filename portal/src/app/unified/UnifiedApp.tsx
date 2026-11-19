@@ -746,6 +746,12 @@ export function UnifiedApp({
         .filter((skill) => skill.author === detail.author && skill.catalogId !== detail.catalogId)
         .slice(0, 3)
     : [];
+  // Other creators' skills for the same job (the same list as the skill's library page); none shown twice.
+  const otherCreatorSkills = detail?.relatedIds
+    ? detail.relatedIds.flatMap((id) => library.find((skill) => skill.catalogId === id) ?? [])
+        .filter((skill) => skill.author !== detail.author && !relatedSkills.some((more) => more.catalogId === skill.catalogId))
+        .slice(0, 5)
+    : [];
   const activeSet = signedIn
     ? management?.detail.set ?? data.sets.find((set) => set.id === nav.id)
     : undefined;
@@ -2520,6 +2526,23 @@ export function UnifiedApp({
                         </button>
                       ))}
                     </div>
+                  </details>
+                )}
+                {otherCreatorSkills.length > 0 && (
+                  <details className="ua-detail-section" key={`related:${detail.key}`}>
+                    <summary>Related skills</summary>
+                    <section className="ua-more">
+                      {otherCreatorSkills.map((skill) => (
+                        <button type="button" key={skill.key} onClick={() => open(skill)}>
+                          <Avatar src={skill.avatar} name={skill.author || skill.name} size="small" />
+                          <span className="ua-more-copy">
+                            <strong>{skill.name}</strong>
+                            <small>{skill.description}</small>
+                          </span>
+                          <ChevronRight />
+                        </button>
+                      ))}
+                    </section>
                   </details>
                 )}
                 {relatedSkills.length > 0 && (
