@@ -25,7 +25,7 @@ test("public catalog exceptions win before the app fallback on both schemes", ()
 
 test("every other app.omgskills.com address moves to the same place under omgskills.com/app/", () => {
   for (const scheme of ["http", "https"]) {
-    const cases = { "/": "/app/", "/sets": "/app/sets", "/groups/abc": "/app/groups/abc", "/app/connect": "/app/connect", "/app/": "/app/" };
+    const cases = { "/": "/app/", "/sets": "/app/sets", "/groups/abc": "/app/groups/abc", "/app/connect": "/app/connect", "/app/": "/app/", "/app": "/app/", "/u/owner/sets/test": "/u/owner/sets/test" };
     for (const [path, to] of Object.entries(cases)) {
       assert.deepEqual(destination(`${scheme}://app.omgskills.com${path}`), { to: `https://omgskills.com${to}`, status: "301!" });
     }

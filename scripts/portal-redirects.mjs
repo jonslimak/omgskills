@@ -9,6 +9,11 @@ export const appDomainRedirects = [
       `${scheme}://app.omgskills.com${route}  ${target}  200!`
     );
   }),
+  // Public profile and Set pages live at the site root, not inside the app.
+  "https://app.omgskills.com/u/*    https://omgskills.com/u/:splat     301!",
+  "http://app.omgskills.com/u/*     https://omgskills.com/u/:splat     301!",
+  "https://app.omgskills.com/app    https://omgskills.com/app/         301!",
+  "http://app.omgskills.com/app     https://omgskills.com/app/         301!",
   "https://app.omgskills.com/app/*  https://omgskills.com/app/:splat  301!",
   "http://app.omgskills.com/app/*   https://omgskills.com/app/:splat  301!",
   "https://app.omgskills.com/*      https://omgskills.com/app/:splat  301!",
