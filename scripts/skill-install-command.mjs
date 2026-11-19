@@ -34,7 +34,8 @@ function catalogCommand(skill) {
 /**
  * Copies the skill folder into ~/.claude/skills/<name>, at the pinned commit when there is one.
  * The catalog's own command clones into /tmp and links to it, which breaks after a restart and
- * fails for a second skill from the same repo. An old /tmp link at the target is replaced, and the
+ * fails for a second skill from the same repo. An old /tmp link at the target is replaced; an
+ * existing folder is left alone and the command stops, so nothing is merged or lost. The
  * temporary clone is removed whether or not the copy worked. When the parts aren't plain paths it
  * falls back to the catalog's command unless that uses /tmp, else returns "".
  */
@@ -50,7 +51,8 @@ export function manualInstallCommand(skill) {
     : `git clone -q --depth 1 ${url} "$tmp"`;
   const source = `"$tmp/${dir ? `${dir}/` : ""}."`;
   const target = `~/.claude/skills/${name}`;
-  return `tmp="$(mktemp -d)" && { ${clone} && { [ ! -L ${target} ] || rm ${target}; } && mkdir -p ${target} && cp -R ${source} ${target}/; ok=$?; rm -rf "$tmp"; [ "$ok" = 0 ]; }`;
+  const exists = `{ [ ! -e ${target} ] || { echo "${target} already exists; move it away to reinstall." >&2; false; }; }`;
+  return `tmp="$(mktemp -d)" && { ${clone} && { [ ! -L ${target} ] || rm ${target}; } && ${exists} && mkdir -p ${target} && cp -R ${source} ${target}/; ok=$?; rm -rf "$tmp"; [ "$ok" = 0 ]; }`;
 }
 
 /** A skill whose description says it is deprecated ("Deprecated.", "DEPRECATED: use x"). */

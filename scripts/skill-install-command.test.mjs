@@ -13,7 +13,7 @@ const nested = {
 
 test("copies the skill folder at the pinned commit into ~/.claude/skills, replacing an old link", () => {
   const command = manualInstallCommand(nested);
-  assert.equal(command, `tmp="$(mktemp -d)" && { git clone -q --filter=blob:none --no-checkout https://github.com/apify/apify-mcp-server "$tmp" && git -C "$tmp" checkout -q ${sha} && { [ ! -L ~/.claude/skills/bug-triage ] || rm ~/.claude/skills/bug-triage; } && mkdir -p ~/.claude/skills/bug-triage && cp -R "$tmp/.claude/skills/bug-triage/." ~/.claude/skills/bug-triage/; ok=$?; rm -rf "$tmp"; [ "$ok" = 0 ]; }`);
+  assert.equal(command, `tmp="$(mktemp -d)" && { git clone -q --filter=blob:none --no-checkout https://github.com/apify/apify-mcp-server "$tmp" && git -C "$tmp" checkout -q ${sha} && { [ ! -L ~/.claude/skills/bug-triage ] || rm ~/.claude/skills/bug-triage; } && { [ ! -e ~/.claude/skills/bug-triage ] || { echo "~/.claude/skills/bug-triage already exists; move it away to reinstall." >&2; false; }; } && mkdir -p ~/.claude/skills/bug-triage && cp -R "$tmp/.claude/skills/bug-triage/." ~/.claude/skills/bug-triage/; ok=$?; rm -rf "$tmp"; [ "$ok" = 0 ]; }`);
   assert.doesNotMatch(command, /\/tmp\/|ln -s/);
 });
 
