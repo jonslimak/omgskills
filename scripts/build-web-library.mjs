@@ -636,10 +636,13 @@ function skillMetaDescription(skill) {
   return shortText(`${summary} Install ${skill.name}, a Claude and Codex skill by ${author}, from the omgskills library.`, 155);
 }
 
+// Creator pages lead with "agent skills", so they answer searches for a company's skills, not
+// every search about the company ("planetscale certification" went to /library/planetscale/).
 function profileMetaDescription(collection, skillCount) {
   const handle = collection.authorHandle;
-  const description = collection.description || collection.subtitle || `Browse Claude and Codex skills by @${handle}.`;
-  return shortText(`${description} Explore ${skillCount} featured skills and install them with omgskills.`, 155);
+  const description = collection.description || collection.subtitle || "";
+  const count = skillCount === 1 ? "1 agent skill" : `${compactNumber(skillCount)} agent skills`;
+  return shortText(`${collection.title} (@${handle}): ${count} for Claude Code and Codex, free to install with omgskills. ${description}`.trim(), 155);
 }
 
 function collectionMetaDescription(collection, skillCount) {
@@ -960,7 +963,8 @@ function hasPinnedInstall(skill) {
 function renderProfilePage(collection, skills, skillUrlById, authorStats, recommendations = [], indexTier = "indexable") {
   const handle = collection.authorHandle;
   const urlPath = profilePath(handle);
-  const description = profileMetaDescription(collection, skills.length);
+  const skillCount = authorStats?.stats?.skillCount || skills.length;
+  const description = profileMetaDescription(collection, skillCount);
   const avatarUrl = collection.imageUrl || githubAvatarUrl(handle);
   const githubUrl = collection.githubUrl || githubProfileUrl(handle);
   const socialLinks = [
@@ -968,7 +972,7 @@ function renderProfilePage(collection, skills, skillUrlById, authorStats, recomm
     collection.xUrl ? { href: collection.xUrl, label: `${collection.title} on X`, icon: "x" } : null,
   ].filter(Boolean);
   const body = `    ${entityHero({
-    title: collection.title,
+    title: /\bskills?$/i.test(collection.title) ? collection.title : `${collection.title} skills`,
     subtitle: collection.subtitle,
     description: collection.description || `Skills by @${handle}.`,
     imageUrl: avatarUrl,
@@ -979,7 +983,7 @@ function renderProfilePage(collection, skills, skillUrlById, authorStats, recomm
     ${skillSection("Featured skills", skills, skillUrlById)}
     ${recommendationSection(recommendations)}`;
   return pageShell({
-    title: `${collection.title}'s Claude & Codex skills (${skills.length}) | omgskills`,
+    title: `${collection.title.replace(/\s+skills?$/i, "")} agent skills for Claude Code & Codex | omgskills`,
     description,
     path: urlPath,
     body,
