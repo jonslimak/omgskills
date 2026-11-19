@@ -10,25 +10,25 @@
     },
     {
       "sourceId": "101-skills/superpowers:ai-avatar-video",
-      "checkedAt": "2026-11-11T13:17:51.486Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
-      "reason": "reviewed-copy-content"
+      "reason": "confirmed-upstream-copy"
     },
     {
       "sourceId": "101-skills/superpowers:ai-image-generation",
-      "checkedAt": "2026-11-11T13:17:51.486Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
       "reason": "non-original-provenance"
     },
     {
       "sourceId": "101-skills/superpowers:ai-video-generation",
-      "checkedAt": "2026-11-11T13:17:51.486Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
       "reason": "non-original-provenance"
     },
     {
       "sourceId": "101-skills/superpowers:twitter-automation",
-      "checkedAt": "2026-11-11T13:17:51.486Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
       "reason": "non-original-provenance"
     },
@@ -112,19 +112,19 @@
     },
     {
       "sourceId": "bankai-skills/superpowers:ai-avatar-video",
-      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
       "reason": "non-original-provenance"
     },
     {
       "sourceId": "bankai-skills/superpowers:ai-image-generation",
-      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
       "reason": "non-original-provenance"
     },
     {
       "sourceId": "bankai-skills/superpowers:ai-video-generation",
-      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
       "reason": "non-original-provenance"
     },
@@ -148,7 +148,7 @@
     },
     {
       "sourceId": "bankai-skills/superpowers:twitter-automation",
-      "checkedAt": "2026-11-10T11:17:49.752Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
       "reason": "non-original-provenance"
     },
@@ -441,6 +441,12 @@
       "reason": "verified-trending"
     },
     {
+      "sourceId": "felipebasurto/unslop-ui:unslop-ui",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
+      "outcome": "unresolved",
+      "reason": "path-unresolved"
+    },
+    {
       "sourceId": "flowkit-labs/skills:doany-website-builder",
       "checkedAt": "2026-11-10T11:17:49.752Z",
       "outcome": "added",
@@ -508,7 +514,7 @@
     },
     {
       "sourceId": "heygen-com/hyperframes:remotion-to-hyperframes",
-      "checkedAt": "2026-11-11T13:17:51.486Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
     },
@@ -550,9 +556,9 @@
     },
     {
       "sourceId": "its-a-skill-issue/superpowers:ai-image-generation",
-      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
-      "reason": "reviewed-copy-content"
+      "reason": "confirmed-upstream-copy"
     },
     {
       "sourceId": "its-a-skill-issue/superpowers:ai-video-generation",
@@ -580,9 +586,9 @@
     },
     {
       "sourceId": "its-a-skill-issue/superpowers:twitter-automation",
-      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
-      "reason": "reviewed-copy-content"
+      "reason": "confirmed-upstream-copy"
     },
     {
       "sourceId": "its-a-skill-issue/superpowers:web-search",
@@ -640,27 +646,27 @@
     },
     {
       "sourceId": "magentosh/superpowers:ai-avatar-video",
-      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
-      "reason": "reviewed-copy-content"
+      "reason": "confirmed-upstream-copy"
     },
     {
       "sourceId": "magentosh/superpowers:ai-image-generation",
-      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
-      "reason": "reviewed-copy-content"
+      "reason": "confirmed-upstream-copy"
     },
     {
       "sourceId": "magentosh/superpowers:ai-video-generation",
-      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
-      "reason": "reviewed-copy-content"
+      "reason": "confirmed-upstream-copy"
     },
     {
       "sourceId": "magentosh/superpowers:twitter-automation",
-      "checkedAt": "2026-11-11T13:17:51.486Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "blocked",
-      "reason": "reviewed-copy-content"
+      "reason": "confirmed-upstream-copy"
     },
     {
       "sourceId": "mattpocock/skills:ask-matt",
@@ -694,19 +700,19 @@
     },
     {
       "sourceId": "mattpocock/skills:domain-modeling",
-      "checkedAt": "2026-11-11T13:17:51.486Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
     },
     {
       "sourceId": "mattpocock/skills:grill-me",
-      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
     },
     {
       "sourceId": "mattpocock/skills:grilling",
-      "checkedAt": "2026-11-10T19:41:25.403Z",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
     },
@@ -733,6 +739,12 @@
       "checkedAt": "2026-11-11T19:33:08.232Z",
       "outcome": "existing",
       "reason": "catalog-identity-or-path"
+    },
+    {
+      "sourceId": "mattpocock/skills:software-factory",
+      "checkedAt": "2026-11-19T20:29:40.734Z",
+      "outcome": "added",
+      "reason": "verified-trending"
     },
     {
       "sourceId": "mattpocock/skills:tdd",
