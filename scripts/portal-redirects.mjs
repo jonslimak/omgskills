@@ -1,6 +1,7 @@
 const catalogPaths = ["/mcp", "/mcp/health", "/data/crawl4/*", "/data/v2/*", "/catalog-skill-urls.json", "/api/public/skill-readme"];
 
-// Public catalog exceptions must precede the app subdomain's forced SPA fallback.
+// app.omgskills.com is retired: every address moves to the same place under omgskills.com/app/.
+// Public catalog and MCP addresses keep answering in place (200), so old agent setups that POST there still work.
 export const appDomainRedirects = [
   ...catalogPaths.flatMap((route) => {
     const target = `https://omgskills.com${route.replace("*", ":splat")}`;
@@ -8,10 +9,8 @@ export const appDomainRedirects = [
       `${scheme}://app.omgskills.com${route}  ${target}  200!`
     );
   }),
-  "https://app.omgskills.com/app/assets/*  /app/assets/:splat  200!",
-  "http://app.omgskills.com/app/assets/*   /app/assets/:splat  200!",
-  "https://app.omgskills.com/assets/*      /app/assets/:splat  200!",
-  "http://app.omgskills.com/assets/*       /app/assets/:splat  200!",
-  "https://app.omgskills.com/*             /app/index.html     200!",
-  "http://app.omgskills.com/*              /app/index.html     200!"
+  "https://app.omgskills.com/app/*  https://omgskills.com/app/:splat  301!",
+  "http://app.omgskills.com/app/*   https://omgskills.com/app/:splat  301!",
+  "https://app.omgskills.com/*      https://omgskills.com/app/:splat  301!",
+  "http://app.omgskills.com/*       https://omgskills.com/app/:splat  301!"
 ];

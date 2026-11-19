@@ -1,6 +1,5 @@
 // The static site's footer, shown under Discover: the takeover removes the static page's
-// footer, so visitors and rendering crawlers still get these links. Absolute URLs so they
-// also work on app.omgskills.com.
+// footer, so visitors and rendering crawlers still get these links. Absolute URLs.
 const site = "https://omgskills.com";
 
 export const siteFooterColumns = [

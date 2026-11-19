@@ -1,10 +1,6 @@
 import type { GroupVisibility } from "@/groups/types";
 
 export function publicSiteOrigin() {
-  if (window.location.hostname === "app.omgskills.com") {
-    return "https://omgskills.com";
-  }
-
   return window.location.origin;
 }
 

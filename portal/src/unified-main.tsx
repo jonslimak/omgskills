@@ -15,7 +15,7 @@ const takeover = startTakeover();
 const base = takeover ? "/app/" : normalPortalBase(location.pathname);
 const production = productionConnectedProfile(location.href, publishableKey);
 // Clean public addresses only for the normal production app at /app/ (urls.md U-01):
-// test entries, the Mac pilot site and app.omgskills.com keep ?view=.
+// test entries, and the Mac pilot site keep ?view=.
 const cleanPaths = !import.meta.env.DEV && base === "/app/" && !connectedInventoryTest;
 createRoot(document.getElementById("root")!).render(<StrictMode>
   {!publishableKey ? <main><h1>Portal unavailable</h1><p>Missing sign-in configuration.</p></main>

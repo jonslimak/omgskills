@@ -23,20 +23,18 @@ test("public catalog exceptions win before the app fallback on both schemes", ()
   }
 });
 
-test("existing assets and app deep links retain their destinations", () => {
+test("every other app.omgskills.com address moves to the same place under omgskills.com/app/", () => {
   for (const scheme of ["http", "https"]) {
-    for (const path of ["/assets/main.js", "/app/assets/main.js"]) {
-      assert.equal(destination(`${scheme}://app.omgskills.com${path}`).to, "/app/assets/main.js");
-    }
-    for (const path of ["/", "/sets", "/groups/abc", "/connect", "/app/connect"]) {
-      assert.equal(destination(`${scheme}://app.omgskills.com${path}`).to, "/app/index.html");
+    const cases = { "/": "/app/", "/sets": "/app/sets", "/groups/abc": "/app/groups/abc", "/app/connect": "/app/connect", "/app/": "/app/" };
+    for (const [path, to] of Object.entries(cases)) {
+      assert.deepEqual(destination(`${scheme}://app.omgskills.com${path}`), { to: `https://omgskills.com${to}`, status: "301!" });
     }
   }
 });
 
 test("exceptions do not forward private APIs, protected health, or other hosts", () => {
   for (const path of ["/api/portal/groups", "/data/health.json", "/health/check", "/mcpx", "/mcp/private", "/data/crawl40/manifest.json"]) {
-    assert.equal(destination(`https://app.omgskills.com${path}`).to, "/app/index.html");
+    assert.equal(destination(`https://app.omgskills.com${path}`).status, "301!");
   }
   assert.equal(destination("https://omgskills.com/mcp"), null);
   assert.equal(destination("https://example.test/mcp"), null);
