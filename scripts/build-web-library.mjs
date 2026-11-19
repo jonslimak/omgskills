@@ -896,6 +896,7 @@ function renderSkillPage(
   const readmeSnippet = readmeSnippetForSkill(skill);
   const installId = `install-${createHash("sha256").update(skill.id).digest("hex").slice(0, 10)}`;
   const pinnedInstall = hasPinnedInstall(skill);
+  const manualCommand = manualInstallCommand(skill);
   const agentPrompt = `Install OMGSkills skill ${JSON.stringify(skill.id)} into this agent's normal skills directory: call the OMGSkills MCP get_install_plan tool for your agent and run the script it returns (it installs only the pinned commit and verifies SKILL.md), and stop if MCP or the pin is unavailable. Do not overwrite or change existing skills without asking me.`;
   const author = skill.author_handle
     ? skillAuthorReference(skill, profilePathByCreatorHandle)
@@ -913,19 +914,19 @@ function renderSkillPage(
     </div>
     ${visibleDescription ? `<p class="lede">${escapeHtml(visibleDescription)}</p>` : ""}
     ${tagsForSkill(skill)}
-    <div class="section">
+    ${pinnedInstall || manualCommand ? `<div class="section">
       ${pageHeading("Install")}
       ${pinnedInstall ? `<p class="install-method">With your agent</p>
       <div class="install-box agent-install">
         <p class="agent-instructions" id="${escapeHtml(installId)}-agent">${escapeHtml(agentPrompt)}</p>
         <button class="copy agent-copy" type="button" data-copy="${escapeHtml(installId)}-agent" data-copy-label="Copy for agent" aria-label="Copy for agent" title="Copy for agent"><svg class="copy-icon" data-copy-icon viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="copy-icon" data-copied-icon viewBox="0 0 24 24" aria-hidden="true" hidden><path d="m20 6-11 11-5-5"/></svg><span>Copy for agent</span></button>
       </div>
-      <p class="install-method">Manual command</p>` : ""}
-      <div class="install-box">
-      <pre class="install"><code id="${escapeHtml(installId)}">${escapeHtml(manualInstallCommand(skill))}</code></pre>
+      ${manualCommand ? '<p class="install-method">Manual command</p>' : ""}` : ""}
+      ${manualCommand ? `<div class="install-box">
+      <pre class="install"><code id="${escapeHtml(installId)}">${escapeHtml(manualCommand)}</code></pre>
       <button class="copy" type="button" data-copy="${escapeHtml(installId)}" aria-label="Copy install command" title="Copy install command"><svg class="copy-icon" data-copy-icon viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="copy-icon" data-copied-icon viewBox="0 0 24 24" aria-hidden="true" hidden><path d="m20 6-11 11-5-5"/></svg></button>
-      </div>
-    </div>
+      </div>` : ""}
+    </div>` : ""}
     ${readmeSnippet ? `<div class="section about">${pageHeading("From README")}<p>${escapeHtml(readmeSnippet)}</p></div>` : ""}
     ${repoSkills.length ? skillSection("More from this repo", repoSkills, skillUrlById) : ""}
     ${authorSkills.length ? skillSection("More skills", authorSkills, skillUrlById) : ""}
