@@ -2,9 +2,10 @@
 
 import { readFileSync } from "node:fs";
 
-// The homepage no longer loads leaderboards; it is taken over by the app.
+// The homepage no longer loads leaderboards; it is taken over by the app. The data page's
+// loading code lives in site/data/leaderboards.js (the build fills the page from v2 data).
 const pages = [
-  "site/data/index.html",
+  "site/data/leaderboards.js",
 ];
 
 const failures = [];
