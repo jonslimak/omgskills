@@ -63,22 +63,33 @@ export async function deleteAccount(
     `,
     [userId]
   );
-  if (await saved()) {
-    if (!store) throw new AccountDeleteError("storage_unavailable", "Saved skills can't be deleted right now");
-    // Also detaches this person's saved skills from other people's Sets.
-    await deleteCloudSkills(pool, store, { userId });
+  // Saved skills go first, in their own step (it also removes their files); it's the step that
+  // deleting the account repeats if a save finished in between.
+  for (let attempt = 0; ; attempt += 1) {
+    if (await saved()) {
+      if (!store) throw new AccountDeleteError("storage_unavailable", "Saved skills can't be deleted right now");
+      // Also detaches this person's saved skills from other people's Sets.
+      await deleteCloudSkills(pool, store, { userId });
+    }
+    const result = await deleteRecords(pool, userId);
+    if (result) return finish(pool, dependencies, input, result);
+    if (attempt >= 2) throw new AccountDeleteError("busy", "A skill was still saving, and some of your data is already deleted. Try again to finish.");
   }
+}
 
+/** Everything but saved skills, in one transaction; null when a saved skill appeared first. */
+async function deleteRecords(pool: Pool, userId: string): Promise<{ deletedSets: number } | null> {
   const client = await pool.connect();
   let deletedSets: number;
   try {
     await client.query("BEGIN");
     await client.query("SELECT 1 FROM users WHERE id = $1 FOR UPDATE", [userId]);
     // Takes the upload lock, so no Mac saves a skill while the account goes; a save that slipped in
-    // before cloud save turned off means starting over.
+    // before cloud save turned off sends the delete back to remove it.
     await client.query("SELECT 1 FROM cloud_save_settings WHERE user_id = $1 FOR UPDATE", [userId]);
     if ((await client.query<{ count: number }>(cloudCount, [userId])).rows[0].count > 0) {
-      throw new AccountDeleteError("busy", "A skill was saving. Try again.");
+      await client.query("ROLLBACK");
+      return null;
     }
 
     const privateSources = await client.query<{ id: string }>(
@@ -173,7 +184,16 @@ export async function deleteAccount(
   } finally {
     client.release();
   }
+  return { deletedSets };
+}
 
+/** Deletes the sign-in last; the records are already gone, so trying again finishes it. */
+async function finish(
+  pool: Pool,
+  dependencies: AccountDeleteDependencies,
+  input: { clerkUserId: string },
+  result: { deletedSets: number }
+) {
   try {
     await dependencies.deleteSignIn(input.clerkUserId);
   } catch {
@@ -181,5 +201,5 @@ export async function deleteAccount(
   }
   // A request that arrived mid-delete may have made a fresh record for this sign-in; empty it too.
   await pool.query(`${emptyRecord} WHERE clerk_user_id = $1`, [input.clerkUserId]);
-  return { deletedSets };
+  return result;
 }

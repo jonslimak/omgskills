@@ -58,7 +58,8 @@ function DeleteAccountDialog({ theme, remove, close }: { theme: string; remove: 
     setDeleting(true);
     setFailure("");
     try { await remove(); }
-    catch (error) { setFailure(error instanceof Error ? error.message : "Could not delete your account. Try again."); setDeleting(false); }
+    // Some data may already be gone (saved skills go first), so the fallback says to finish it.
+    catch (error) { setFailure(error instanceof Error && error.message ? error.message : "Could not finish deleting your account. Some of your data may already be deleted; try again to finish."); setDeleting(false); }
   }
   return <Modal theme={theme} title="Delete your account?" close={() => { if (!deleting) close(); }}>
     <form onSubmit={event => { event.preventDefault(); void submit(); }}>

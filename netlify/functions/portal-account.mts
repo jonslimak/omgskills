@@ -63,7 +63,7 @@ export async function portalAccount(
     if (error instanceof AccountDeleteError) {
       return secretJsonResponse(req, { error: error.message, code: error.code }, { status: 503 });
     }
-    return secretJsonResponse(req, { error: "Failed to delete the account" }, { status: 500 });
+    return secretJsonResponse(req, { error: "Could not finish deleting your account. Some of your data may already be deleted; try again to finish." }, { status: 500 });
   }
 }
 
