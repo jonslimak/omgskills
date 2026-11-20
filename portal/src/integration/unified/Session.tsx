@@ -240,6 +240,14 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     window.addEventListener("popstate", pop);
     return () => window.removeEventListener("popstate", pop);
   }, [base, installStore, catalogStore]);
+  async function deleteAccount() {
+    await api("/api/portal/account", { method: "DELETE", body: JSON.stringify({ confirm: "delete" }) });
+    account.clear();
+    clearMySkillsCache();
+    // The sign-in is already gone; signing out clears what this browser still holds.
+    try { await clerk.signOut({ redirectUrl: base }); }
+    catch { window.location.assign(base); }
+  }
   async function signOut() {
     if (leaving) return;
     setLeaving(true);
@@ -338,7 +346,8 @@ function AccountView({ identity, signedIn, accountKey, base, local, connectedInv
     accountPages={available && !snapshot.accessDenied ? (view, theme) => view === "profile" && !composition?.readOnly ? <ProfilePanel profile={data.profile} theme={theme}
       busy={snapshot.profileSaving || snapshot.setSaving || snapshot.refreshing}
       blocked={!!snapshot.error || !snapshot.data || snapshot.accessDenied}
-      error={snapshot.profileError || snapshot.error} save={account.saveProfile} settings={() => clerk.openUserProfile()} />
+      error={snapshot.profileError || snapshot.error} save={account.saveProfile} settings={() => clerk.openUserProfile()}
+      deleteAccount={local ? undefined : deleteAccount} />
       : view === "devices" ? <div className="portal-design ua-connected-panel"><DevicesPanel key={accountKey} sessionKey={accountKey} api={api} local={local} readOnly={composition?.readOnly} browserConnection={productionInstall} denied={account.invalidate} theme={theme} inventoryDevices={connectedInventory ? data.devices : undefined} /></div>
       : view === "github" && !composition?.readOnly ? <div className="portal-design ua-connected-panel"><PrivateSourcesPanel api={api} local={local} denied={account.invalidate} /></div>
       : view === "cloud" && !composition?.readOnly && !local ? <div className="portal-design ua-connected-panel"><CloudSavePanel key={accountKey} api={api} skills={data.skills} denied={account.invalidate} /></div>
