@@ -24,7 +24,11 @@ test("the leaderboards render as plain HTML, linking skills to their own pages w
   assert.match(html, /<time datetime="2026-11-19">2026-11-19<\/time>/);
   assert.match(html, /<a class="skill-link" href="\/library\/a\/b\/one\/">one<\/a>/);
   assert.match(html, /<a class="skill-link" href="https:\/\/github.com\/c\/d" target="_blank" rel="noreferrer">&lt;two&gt;<\/a>/);
-  assert.match(html, /data-vendor="1"/);
+  assert.match(html, /<tr class="goat-row hidden" data-vendor="1">/);
+  assert.match(html, /<div class="lb-row lb-winner " data-vendor="0">\s*<span class="lb-medal">🥇<\/span>/);
+  const unsafe = renderLeaderboards({ ...data, topSkills: [{ ...data.topSkills[1], githubUrl: "javascript:alert(1)" }] });
+  assert.doesNotMatch(unsafe, /javascript:/);
+  assert.match(unsafe, /<span class="skill-link">&lt;two&gt;<\/span>/);
   assert.throws(() => renderLeaderboards({ ...data, generatedAt: "soon" }), /Invalid leaderboard view data/);
 });
 

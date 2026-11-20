@@ -59,7 +59,19 @@ function skillAnchor(record, paths) {
   if (typeof own === "string" && /^\/(skills|library)\/[^?#\\]+\/$/.test(own) && !own.includes("..")) {
     return `<a class="skill-link" href="${esc(own)}">${esc(record.name)}</a>`;
   }
-  return `<a class="skill-link" href="${esc(record.githubUrl)}" target="_blank" rel="noreferrer">${esc(record.name)}</a>`;
+  return isGithubUrl(record.githubUrl)
+    ? `<a class="skill-link" href="${esc(record.githubUrl)}" target="_blank" rel="noreferrer">${esc(record.name)}</a>`
+    : `<span class="skill-link">${esc(record.name)}</span>`;
+}
+
+// Crawled links: only https GitHub addresses become links.
+function isGithubUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname === "github.com";
+  } catch {
+    return false;
+  }
 }
 
 const MEDALS = ["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
@@ -95,8 +107,10 @@ function renderGoats(records) {
           </thead>
           <tbody>
         ${records.map((record) => {
+          // Built as Show Corpos off shows it: no vendors, the first 15 others.
+          const shown = !record.isVendor && records.filter((other) => !other.isVendor).indexOf(record) < MAX_ALL_ROUNDERS_VISIBLE;
           return `
-            <tr class="goat-row" data-vendor="${record.isVendor ? "1" : "0"}">
+            <tr class="goat-row${shown ? "" : " hidden"}" data-vendor="${record.isVendor ? "1" : "0"}">
               <td><span class="goat-handle">@${esc(record.authorHandle)}${vendorDot(record)}</span></td>
               <td class="goat-num">${record.skillCount}</td>
               <td class="goat-num">${fmt(record.totalStars)} ⭐</td>
@@ -149,10 +163,14 @@ function renderTrendingSkills(records, paths) {
 
 function renderTrophy(category) {
   const winner = category.rows[0];
-  const rows = category.rows.map((record, index) => {
+  // Built as Show Corpos off shows it: vendors hidden, the others ranked, ten shown.
+  let shown = 0;
+  const rows = category.rows.map((record) => {
+    const place = record.isVendor ? -1 : shown++;
+    const state = place < 0 ? "hidden" : `${place === 0 ? "lb-winner" : ""} ${place >= MAX_VISIBLE ? "overflow-hidden" : ""}`;
     return `
-      <div class="lb-row ${index === 0 ? "lb-winner" : ""} ${index >= 10 ? "overflow-hidden" : ""}" data-vendor="${record.isVendor ? "1" : "0"}">
-        <span class="lb-medal">${MEDALS[index] ?? String(index + 1)}</span>
+      <div class="lb-row ${state}" data-vendor="${record.isVendor ? "1" : "0"}">
+        <span class="lb-medal">${place < 0 ? "" : MEDALS[place] ?? String(place + 1)}</span>
         <span class="lb-handle">@${esc(record.authorHandle)}${vendorDot(record)}</span>
         <span class="lb-value">${esc(record.value)}</span>
         <span class="lb-detail">${esc(record.detail)}</span>
