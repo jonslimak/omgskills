@@ -1493,7 +1493,6 @@ Yes. Skills are open-source Markdown files on GitHub. Every skill indexed here i
 - HTML guide: ${origin}/guide/
 - Browse skills: ${origin}/library/
 - Mac app (Apple silicon, macOS 14+): ${origin}/download
-- Original Mac app download: ${origin}/downloads/omgskills-mac.dmg
 - Mac app setup: open a skill's install panel at ${origin}/app/
 `;
 }

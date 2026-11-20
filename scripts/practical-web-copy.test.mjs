@@ -32,7 +32,7 @@ test("guide, structured answers and generated Markdown describe the same availab
   for (const text of [html, generator]) {
     assert.match(text, /connect the Mac app to your account and your skills sync to My skills/);
     assert.match(text, /Automatic team updates: Coming soon\./);
-    assert.match(text, /Original Mac app/);
+    assert.doesNotMatch(text, /Original Mac app/);
   }
 });
 

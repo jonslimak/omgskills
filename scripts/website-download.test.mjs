@@ -15,13 +15,14 @@ test("both website download routes pin the published companion, without rewritin
   assert.ok(read("scripts/check-product-health.mjs").includes("redirect.status === 302 && location === defaultDownloadURL"));
 });
 
-test("primary links show Mac requirements and retain an explicit original-app option", () => {
+test("primary links show Mac requirements; only support keeps the original-app download", () => {
   for (const file of ["site/guide/index.html", "site/support/index.html", "site/about/index.html", "scripts/build-web-library.mjs"]) {
     const source = read(file);
     assert.match(source, /(?:href="\/download"|\$\{origin\}\/download)/, file);
     assert.match(source, /Apple silicon, macOS 14\+/, file);
-    assert.match(source, /[Oo]riginal Mac app/, file);
-    assert.match(source, /\/downloads\/omgskills-mac\.dmg/, file);
+    const original = file === "site/support/index.html" ? assert.match : assert.doesNotMatch;
+    original(source, /[Oo]riginal Mac app/, file);
+    original(source, /\/downloads\/omgskills-mac\.dmg/, file);
   }
   const structured = [...read("site/index.html").matchAll(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/g)]
     .flatMap(match => { const value = JSON.parse(match[1]); return value["@graph"] ?? [value]; });
