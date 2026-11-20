@@ -43,6 +43,8 @@ export default async (req: Request, _context: Context) => {
         FROM skill_groups g
         JOIN users owner ON owner.id = g.owner_user_id
         WHERE g.id = $1
+        -- Holds off an account delete until the copy is made, so the delete sees the copied items.
+        FOR SHARE OF g
       `,
       [sourceGroupId]
     );

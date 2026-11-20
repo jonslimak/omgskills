@@ -9,6 +9,7 @@ import { AccountDeleteError, deleteAccount } from "./account-delete.js";
 import { saveCloudVersion, storeCloudBlob, updateCloudSaveSettings } from "./cloud-save.js";
 import { CloudStoreError, type CloudObjectStore } from "./cloud-store.js";
 import { appendSkillRelease, createSkillSource } from "./group-storage.js";
+import { bindGithubBrokerInstallation, upsertOwnerPrivateSource } from "./private-sources.js";
 import { gitObjectSha } from "./skill-package.js";
 
 const connectionString = process.env.AUTH_TEST_DATABASE_URL;
@@ -198,6 +199,10 @@ test("deleting an account removes its data, empties its record, retires its priv
       "INSERT INTO skill_group_items (group_id, kind, catalog_skill_id, name) VALUES ($1, 'catalog', 'a/b/c', 'public one')",
       [bobSet]
     );
+    await pool.query(
+      "INSERT INTO skill_group_copies (new_group_id, source_group_id, source_owner_handle, source_group_slug, source_owner_display_name) VALUES ($1, $2, 'ada', 'tools', 'ada')",
+      [bobSet, ada.setId]
+    );
 
     const signedOut: string[] = [];
     const result = await deleteAccount(pool, {
@@ -244,6 +249,19 @@ test("deleting an account removes its data, empties its record, retires its priv
     assert.equal(bobRevision, 2);
     const bobRecord = (await pool.query("SELECT email, handle FROM users WHERE id = $1", [bob])).rows[0];
     assert.equal(bobRecord.handle, "bob");
+    const copy = (await pool.query("SELECT source_group_id, source_owner_handle, source_owner_display_name, source_group_slug FROM skill_group_copies WHERE new_group_id = $1", [bobSet])).rows[0];
+    assert.deepEqual(copy, { source_group_id: null, source_owner_handle: null, source_owner_display_name: null, source_group_slug: "tools" });
+
+    // The GitHub app link is emptied, and the same install and repo folder can be connected again.
+    const links = (await pool.query("SELECT installation_id, account_id, account_login FROM github_broker_installations WHERE owner_user_id = $1", [ada.userId])).rows;
+    assert.equal(links.length, 1);
+    assert.match(links[0].installation_id, /^0\d+$/);
+    assert.equal(links[0].account_login, "deleted");
+    assert.equal(links[0].account_id, "0");
+    const again = await bindGithubBrokerInstallation(pool, { ownerUserId: bob, installationId: "42", accountId: "7", accountLogin: "ada", accountType: "User" });
+    assert.equal(again.installationId, "42");
+    const reused = await upsertOwnerPrivateSource(pool, { ownerUserId: bob, installationId: "42", repositoryId: "99", repositorySlug: "ada/private", normalizedRoot: "skills/secret" });
+    assert.notEqual(reused.id, ada.sourceId);
   });
 });
 
@@ -257,6 +275,7 @@ test("saved files without storage stop the delete before anything changes", asyn
     );
     assert.equal(await count(pool, "skill_groups", "owner_user_id", ada.userId), 2);
     assert.equal(await count(pool, "cloud_saved_skills", "user_id", ada.userId), 1);
+    assert.equal((await pool.query("SELECT enabled FROM cloud_save_settings WHERE user_id = $1", [ada.userId])).rows[0].enabled, true);
   });
 });
 
