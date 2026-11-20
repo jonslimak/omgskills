@@ -250,8 +250,9 @@ export function renderLeaderboards(viewData, paths = {}) {
   `;
 }
 
-/** Hooks up the Show Corpos switch and applies its default (off). */
+/** Hooks up the Show Corpos switch and applies its state (a browser may restore it on back or reload). */
 export function wireLeaderboards(root) {
-  root.querySelector("#show-corpos")?.addEventListener("change", (event) => applyFilter(root, event.target.checked));
-  applyFilter(root, false);
+  const toggle = root.querySelector("#show-corpos");
+  toggle?.addEventListener("change", (event) => applyFilter(root, event.target.checked));
+  applyFilter(root, toggle?.checked ?? false);
 }
