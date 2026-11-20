@@ -306,7 +306,7 @@ function verifyHomepageTrustMetadata(html, label) {
   if (!organization || !website || !application) {
     throw new Error(`${label} must define Organization, WebSite, and SoftwareApplication JSON-LD`);
   }
-  if (!organization.sameAs?.includes("https://github.com/jonslimak/omgskills")) {
+  if (!organization.sameAs?.includes("https://github.com/omgskillshq/omgskills")) {
     throw new Error(`${label} Organization JSON-LD is missing the omgskills GitHub sameAs link`);
   }
   if (!organization.sameAs?.includes("https://x.com/omgskills")) {

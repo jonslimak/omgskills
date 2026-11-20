@@ -23,7 +23,7 @@ Updated: 2026-10-19. Release worktree: `/private/tmp/omgskills-runtime-dependenc
   None of the remaining flagged packages appeared in that function output;
   the standalone MCP runtime audit reports zero findings.
 - [x] Guarded draft/production deployment and read-only live verification.
-  [Workflow 39317144079](https://github.com/jonslimak/omgskills/actions/runs/39317144079)
+  [Workflow 39317144079](https://github.com/omgskillshq/omgskills/actions/runs/39317144079)
   succeeded. Draft `6ad679ab9b812259a6086a70` and production
   `6ad67ad8b04a91d6639c86ca` both verified on their first attempt. The downloaded
   receipt is `verified` for merge `616035f92b78eb428eda6d225b3c6193e6f44e5a`;
@@ -74,7 +74,7 @@ Updated: 2026-10-19. Release worktree: `/private/tmp/omgskills-runtime-dependenc
   public static pages, catalog publication, helper inventory, and Mac releases.
 - [x] Guarded combined draft/production deploy and live read-only verification.
 - Source `532c13fa`, including `64c441df`, was merged as `20e83d64` and pushed
-  to main. [Guarded workflow 39313157959](https://github.com/jonslimak/omgskills/actions/runs/39313157959)
+  to main. [Guarded workflow 39313157959](https://github.com/omgskillshq/omgskills/actions/runs/39313157959)
   succeeded. Draft `6ad672f59de3682a513e875e` and production
   `6ad673f526de9591adefd787` both verified on their first attempt. Receipt
   status is `verified`; the public appcast is unchanged.
@@ -120,7 +120,7 @@ Updated: 2026-10-19. Release worktree: `/private/tmp/omgskills-runtime-dependenc
   dependency or Mac release changes. Primary dirty worktree remains untouched.
 - [x] Guarded current-main draft/production deployment and live UI verification.
 - Source `a3663fce` was merged as `cf1575d5` and pushed to main.
-  [Guarded workflow 39296735562](https://github.com/jonslimak/omgskills/actions/runs/39296735562)
+  [Guarded workflow 39296735562](https://github.com/omgskillshq/omgskills/actions/runs/39296735562)
   succeeded. Draft `6ad65775cc5cf3bd22dc98a9` and production
   `6ad6587fc3c09ecce5f09864` both verified on their first attempt. The combined
   artifact preserved the public appcast and all signed helper pins.
@@ -150,7 +150,7 @@ Updated: 2026-10-19. Release worktree: `/private/tmp/omgskills-runtime-dependenc
 - Before release: strict validation had zero findings; all 18 images, 246 portal
   tests, 39 collection/policy tests, 190 deployment-safety tests, index typecheck,
   production-configured portal build, and full root checks passed.
-- [Guarded publisher 39286443823](https://github.com/jonslimak/omgskills/actions/runs/39286443823)
+- [Guarded publisher 39286443823](https://github.com/omgskillshq/omgskills/actions/runs/39286443823)
   succeeded. It generated identical `collections-3bc6c019362f.json` assets for
   v2 and Crawl 4 (92 entries: 74 creators and 18 topics), with zero stale
   references. Publication impact passed without an override.
@@ -188,7 +188,7 @@ Updated: 2026-10-19. Release worktree: `/private/tmp/omgskills-runtime-dependenc
 - Release uses the combined artifact and guarded current-main workflow. No Mac
   release, backend/schema changes, account writes or connection resets are included.
 - Committed/pushed as `562877c955ceebbfd2620bbdc23da52ea9be0a38`.
-  [Guarded workflow 37833148102](https://github.com/jonslimak/omgskills/actions/runs/37833148102)
+  [Guarded workflow 37833148102](https://github.com/omgskillshq/omgskills/actions/runs/37833148102)
   succeeded: draft `6ac7f104ef42caae499626e4` and production
   `6ac7f21b11544c078bc5185c` both verified on the first attempt. Appcast unchanged.
   All 2,213 public non-app file hashes and all 30 backend function digests match
@@ -223,7 +223,7 @@ Updated: 2026-10-19. Release worktree: `/private/tmp/omgskills-runtime-dependenc
   pinned files matched their sizes and SHA-256 hashes. Preserve these and all
   other non-app surfaces; no backend/schema, account writes, or Mac release.
 - Committed/pushed as `475a9f96d9076f8c7fef18c3e5e4a2d8ca601a17`.
-  [Guarded workflow 37805480984](https://github.com/jonslimak/omgskills/actions/runs/37805480984)
+  [Guarded workflow 37805480984](https://github.com/omgskillshq/omgskills/actions/runs/37805480984)
   succeeded: draft `6ac7beaf48b917c760376db4` and production
   `6ac7bfa6ac9d5965126c160a` both verified on the first attempt. Public appcast
   comparison passed. All 2,213 public non-app files matched the pre-release
@@ -260,7 +260,7 @@ Updated: 2026-10-19. Release worktree: `/private/tmp/omgskills-runtime-dependenc
   cancellation, cache and private-data boundaries have unit coverage. The expanded
   standalone browser regression was not run; its new focus cases were checked
   through the local browser instead.
-- Release receipt: [workflow 37788897276](https://github.com/jonslimak/omgskills/actions/runs/37788897276)
+- Release receipt: [workflow 37788897276](https://github.com/omgskillshq/omgskills/actions/runs/37788897276)
   succeeded. Draft `6ac7a7e180a53b428ebad6f5` and production
   `6ac7a90cedba638c90e33545` both verified on the first attempt. Public appcast
   comparison passed. All 2,210 public non-app files matched the preceding

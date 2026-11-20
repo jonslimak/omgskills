@@ -710,7 +710,7 @@ type Manifest = {
 };
 
 const defaultManifestUrl = "https://omgskills.com/data/manifest.json";
-const defaultGoldBasketUrl = "https://raw.githubusercontent.com/jonslimak/omgskills/main/index/gold-basket.json";
+const defaultGoldBasketUrl = "https://raw.githubusercontent.com/omgskillshq/omgskills/main/index/gold-basket.json";
 
 function isUrl(value: string): boolean {
   return value.startsWith("http://") || value.startsWith("https://");

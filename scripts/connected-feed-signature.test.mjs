@@ -24,7 +24,7 @@ test('the production connected feed is signed by the app update key', async () =
 
 test('each release uses the URL accepted by the app and an unshadowed GitHub redirect', () => {
   const item = (version, build) => `<item><sparkle:version>${build}</sparkle:version><sparkle:shortVersionString>${version}</sparkle:shortVersionString><enclosure url="https://omgskills.com/updates/connected/OMGSkills-Connected-${version}-${build}-arm64.zip" sparkle:installationType="application" /></item>`;
-  const redirect = (version, build) => `/updates/connected/OMGSkills-Connected-${version}-${build}-arm64.zip https://github.com/jonslimak/omgskills/releases/download/connected-v${version}/OMGSkills-Connected-${version}-${build}-arm64.zip 302`;
+  const redirect = (version, build) => `/updates/connected/OMGSkills-Connected-${version}-${build}-arm64.zip https://github.com/omgskillshq/omgskills/releases/download/connected-v${version}/OMGSkills-Connected-${version}-${build}-arm64.zip 302`;
   const feed = `<rss>${item('0.0.31', '31')}${item('0.0.32', '32')}</rss>`;
   const rules = `${redirect('0.0.31', '31')}\n${redirect('0.0.32', '32')}\n/* /index.html 200`;
   verifyConnectedFeedUrls(feed, rules);

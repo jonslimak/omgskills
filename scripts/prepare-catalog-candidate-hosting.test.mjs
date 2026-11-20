@@ -88,7 +88,7 @@ test('prepared record function reuses the raw contract and only reads public cat
     t.mock.method(globalThis, 'fetch', async (input, options) => {
       const url = String(input); calls.push(url); assert.equal(options?.method, undefined);
       assert.ok(url.startsWith('https://omgskills.com/data/crawl4/')
-        || url === 'https://raw.githubusercontent.com/jonslimak/omgskills/main/index/gold-basket.json');
+        || url === 'https://raw.githubusercontent.com/omgskillshq/omgskills/main/index/gold-basket.json');
       if (url.endsWith('/manifest.json')) return Response.json({ skills: { path: 'skills.json' } });
       if (url.endsWith('/skills.json')) return Response.json([{
         id: 'example/repo:one', name: 'one', description: 'Fixture', author_handle: 'example',

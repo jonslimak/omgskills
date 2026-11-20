@@ -83,7 +83,7 @@ export function DevelopersPage() {
       </Card>
       <Card icon={ShieldCheck} title="Links & safety">
         <Item title="npm package" href="https://www.npmjs.com/package/omgskills-mcp">Install the local MCP server.</Item>
-        <Item title="Source" href="https://github.com/jonslimak/omgskills">Repository, documentation, and issue tracking.</Item>
+        <Item title="Source" href="https://github.com/omgskillshq/omgskills">Repository, documentation, and issue tracking.</Item>
         <Item title="Safety">The Library MCP reads only public catalog data. The My skills MCP reads only your own skills, after you sign in.
           Neither installs skills, writes files, or runs shell commands.</Item>
       </Card>

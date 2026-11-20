@@ -9,7 +9,7 @@ import {
   type AssetReference, type DetailIndex, type RawSkill, type SearchDescriptor,
 } from "./search-catalog-format.mjs";
 
-export const defaultGoldBasketUrl = "https://raw.githubusercontent.com/jonslimak/omgskills/main/index/gold-basket.json";
+export const defaultGoldBasketUrl = "https://raw.githubusercontent.com/omgskillshq/omgskills/main/index/gold-basket.json";
 export type CatalogReadOptions = { fetcher?: typeof fetch; goldBasketUrl?: string; cacheBytes?: number; ranking?: boolean };
 type Manifest = { skills: AssetReference; searchCatalog?: AssetReference; trending?: AssetReference };
 

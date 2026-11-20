@@ -12,7 +12,7 @@ export const siteFooterColumns = [
   ] },
   { title: "Company", links: [
     ["About", "/about/"], ["Support", "/support/"], ["Privacy", "/privacy/"], ["Terms", "/terms/"],
-    ["GitHub", "https://github.com/jonslimak/omgskills"],
+    ["GitHub", "https://github.com/omgskillshq/omgskills"],
   ] },
 ] as const;
 

@@ -6,7 +6,7 @@
   },
   "description": "Read-only MCP server for the omgskills open library of agent skills. For your own skills, use the My skills MCP at https://omgskills.com/my/mcp.",
   "homepage": "https://omgskills.com/developers/",
-  "bugs": "https://github.com/jonslimak/omgskills/issues",
+  "bugs": "https://github.com/omgskillshq/omgskills/issues",
   "keywords": [
     "agent-skills",
     "claude",
@@ -22,7 +22,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jonslimak/omgskills.git",
+    "url": "git+https://github.com/omgskillshq/omgskills.git",
     "directory": "mcp"
   },
   "files": [
