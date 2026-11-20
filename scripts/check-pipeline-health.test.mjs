@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
@@ -129,6 +130,16 @@ test("health recognizes every guarded production deploy path", () => {
     "publish-collections.yml",
     "scrape.yml",
     "shadow-crawl-health.yml",
+    "trending-intake.yml",
     "x-refresh.yml",
   ]);
+});
+
+test("every workflow that deploys production counts as a verified deploy", () => {
+  const dir = new URL("../.github/workflows/", import.meta.url);
+  const deploying = readdirSync(dir)
+    .filter((name) => name.endsWith(".yml"))
+    .filter((name) => /name: Deploy site to Netlify\b/.test(readFileSync(new URL(name, dir), "utf8")))
+    .sort();
+  assert.deepEqual(deploying, [...VERIFIED_DEPLOY_WORKFLOWS].sort());
 });
