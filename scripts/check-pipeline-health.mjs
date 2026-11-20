@@ -59,6 +59,7 @@ export const VERIFIED_DEPLOY_WORKFLOWS = [
   "publish-collections.yml",
   "scrape.yml",
   "shadow-crawl-health.yml",
+  "trending-intake.yml",
   "x-refresh.yml",
 ];
 
