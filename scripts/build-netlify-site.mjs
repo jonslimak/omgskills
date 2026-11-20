@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { verifyReleaseDeployArtifacts, verifyWebLibraryDeployArtifacts } from "./deploy-artifact-guard.mjs";
 import { validateSearchCatalog } from "./search-catalog.mjs";
 import { refreshHomePreview } from "./home-preview-content.mjs";
+import { refreshDataPage } from "./data-page-content.mjs";
 import {
   loadProductionFeatures,
   portalBuildEnvironment,
@@ -121,6 +122,7 @@ async function main() {
     if (await exists(manifestPath)) validateSearchCatalog(dataDir, JSON.parse(await readFile(manifestPath, "utf8")));
   }
   await refreshHomePreview({ siteDir: outputDir });
+  await refreshDataPage({ siteDir: outputDir });
   await verifyWebLibraryDeployArtifacts(outputDir, "Netlify deploy artifact");
   await verifyReleaseDeployArtifacts(outputDir, "Netlify deploy artifact");
   await rm(outputAppDir, { recursive: true, force: true });
