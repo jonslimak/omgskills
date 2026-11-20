@@ -35,7 +35,7 @@ Default remote sources, the same as the hosted server at `https://omgskills.com/
 
 - `https://omgskills.com/data/crawl4/manifest.json`, then the `v2` and root manifests if it is unavailable
 - the compact search index and skill details from that manifest, plus its trending data
-- `https://raw.githubusercontent.com/jonslimak/omgskills/main/index/gold-basket.json`
+- `https://raw.githubusercontent.com/omgskillshq/omgskills/main/index/gold-basket.json`
 
 Local repo sources:
 

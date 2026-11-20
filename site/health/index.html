@@ -164,7 +164,7 @@
       <p>Operator status for release assets, the shipped v2 app data path, new crawler freshness, and cutover integrity.</p>
       <div class="top-row">
         <div id="status" class="status degraded">loading</div>
-        <a class="button" href="https://github.com/jonslimak/omgskills/actions/workflows/pipeline-health.yml" target="_blank" rel="noopener">Test now</a>
+        <a class="button" href="https://github.com/omgskillshq/omgskills/actions/workflows/pipeline-health.yml" target="_blank" rel="noopener">Test now</a>
       </div>
       <ul id="summary" class="kv-list"></ul>
       <div class="section-title">Summary</div>
@@ -420,7 +420,7 @@
           const links = [
             [location.protocol === "file:" ? new URL("../data/v2/manifest.json", location.href).href : "/data/v2/manifest.json", "v2 manifest"],
             [dataUrl, "health json"],
-            ["https://github.com/jonslimak/omgskills/actions", "GitHub Actions"],
+            ["https://github.com/omgskillshq/omgskills/actions", "GitHub Actions"],
           ];
           if (health.tracks?.v2?.skills?.path) links.push([dataAssetUrl(`v2/${health.tracks.v2.skills.path}`), "v2 skills asset"]);
           if (health.tracks?.v2?.trending?.path) links.push([dataAssetUrl(`v2/${health.tracks.v2.trending.path}`), "v2 trending asset"]);
@@ -470,7 +470,7 @@
         <a href="/support/">Support</a>
         <a href="/privacy/">Privacy</a>
         <a href="/terms/">Terms</a>
-        <a href="https://github.com/jonslimak/omgskills" rel="noreferrer">GitHub</a>
+        <a href="https://github.com/omgskillshq/omgskills" rel="noreferrer">GitHub</a>
       </div>
     </div>
   </footer>

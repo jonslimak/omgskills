@@ -35,7 +35,7 @@ export function verifyConnectedFeedUrls(feed, redirects) {
     }
     const filename = `OMGSkills-Connected-${version}-${build}-arm64.zip`;
     const pathname = `/updates/connected/${filename}`;
-    const target = `https://github.com/jonslimak/omgskills/releases/download/connected-v${version}/${filename}`;
+    const target = `https://github.com/omgskillshq/omgskills/releases/download/connected-v${version}/${filename}`;
     if (!/\bsparkle:installationType="application"/.test(enclosures[0]?.[0] || '') || /<sparkle:deltas\b/.test(item)) {
       throw new Error(`Connected appcast has an unsupported archive type for ${version}`);
     }

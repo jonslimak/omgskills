@@ -240,7 +240,7 @@ const siteFooterHtml = `  <footer class="site-footer">
         <a href="/support/">Support</a>
         <a href="/privacy/">Privacy</a>
         <a href="/terms/">Terms</a>
-        <a href="https://github.com/jonslimak/omgskills" rel="noreferrer">GitHub</a>
+        <a href="https://github.com/omgskillshq/omgskills" rel="noreferrer">GitHub</a>
       </div>
     </div>
   </footer>`;
@@ -1136,7 +1136,7 @@ function renderDevelopersPage() {
       <div class="eyebrow">Links</div>
       <div class="grid">
         <a class="card" href="https://www.npmjs.com/package/omgskills-mcp"><h2>npm package</h2><p>Install the local MCP server.</p></a>
-        <a class="card" href="https://github.com/jonslimak/omgskills"><h2>Source</h2><p>Repository, documentation, and issue tracking.</p></a>
+        <a class="card" href="https://github.com/omgskillshq/omgskills"><h2>Source</h2><p>Repository, documentation, and issue tracking.</p></a>
       </div>
     </div>
 
@@ -1165,7 +1165,7 @@ function renderDevelopersPage() {
         name: "omgskills",
         url: origin,
         sameAs: [
-          "https://github.com/jonslimak/omgskills",
+          "https://github.com/omgskillshq/omgskills",
           "https://www.npmjs.com/package/omgskills-mcp",
         ],
         contactPoint: {
@@ -1408,7 +1408,7 @@ Both MCP servers are read only. The Library MCP reads only public catalog data. 
 
 - HTML page: ${origin}/developers/
 - npm: https://www.npmjs.com/package/omgskills-mcp
-- Source: https://github.com/jonslimak/omgskills
+- Source: https://github.com/omgskillshq/omgskills
 `;
 }
 

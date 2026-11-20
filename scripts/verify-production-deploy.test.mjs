@@ -316,8 +316,8 @@ test("the deploy helper's search override enforces the reviewed flag independent
 test("default download rejects old, unpinned and other release targets on either route", async () => {
   for (const path of ["/download", "/download/"]) {
     for (const location of ["/downloads/omgskills-mac.dmg",
-      "https://github.com/jonslimak/omgskills/releases/download/connected-v0.0.27/OMGSkills-Connected-0.0.27-27-arm64.zip",
-      "https://github.com/jonslimak/omgskills/releases/latest/download/omgskills.zip", `${defaultDownloadURL}?unexpected=1`]) {
+      "https://github.com/omgskillshq/omgskills/releases/download/connected-v0.0.27/OMGSkills-Connected-0.0.27-27-arm64.zip",
+      "https://github.com/omgskillshq/omgskills/releases/latest/download/omgskills.zip", `${defaultDownloadURL}?unexpected=1`]) {
       await assert.rejects(verifyProductionDeploy({
         origin, expectedFeatures: disabledFeatures, expectedHelperRelease: disabledHelper,
         fetchImpl: async (url, options) => new URL(url).pathname === path
