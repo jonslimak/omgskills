@@ -25,7 +25,9 @@ test('all five skills have canonical links and persistent installer commands', (
 
 test('analytics and direct download remain available', () => {
   assert.equal(html.split('https://app.humblytics.com/hmbl.min.js?id=a156a68').length - 1, 1);
-  assert.match(html, /href="\/downloads\/omgskills-mac.dmg" data-humblytics="Stripe Guide Download Mac DMG"/);
+  // The label stays as it was so earlier clicks still count together.
+  assert.match(html, /href="\/download" data-humblytics="Stripe Guide Download Mac DMG"/);
+  assert.ok(!html.includes("omgskills-mac.dmg"));
 });
 
 test('structured data and sitemap use production canonical URL', () => {
