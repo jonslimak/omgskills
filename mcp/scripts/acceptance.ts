@@ -1,7 +1,7 @@
 /**
  * Release acceptance against the live catalog, for the hosted endpoint or a stdio server:
- *   tsx scripts/acceptance.ts --url https://omgskills.com/mcp --version 0.2.5
- *   tsx scripts/acceptance.ts --stdio "npx -y omgskills-mcp@0.2.5" --version 0.2.5
+ *   tsx scripts/acceptance.ts --url https://omgskills.com/mcp --version 0.2.6
+ *   tsx scripts/acceptance.ts --stdio "npx -y omgskills-mcp@0.2.6" --version 0.2.6
  * Covers the 2026-10-31 audit items and the behavior earlier releases fixed. Exits 1 on any failure.
  */
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
