@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { PortalApiError } from "../src/api-error";
-import { cloudSkillKey, cloudSkillRows, deleteCloudSaved, loadSavedSkillMd, formatBytes, isDeletingAllCloudSkills, isDeletingCloudSkill, loadCloudSave, type CloudSaveState } from "../src/cloud-save/cloud-save";
+import { cleanScan, cloudSkillKey, cloudSkillRows, deleteCloudSaved, loadSavedSkillMd, formatBytes, isDeletingAllCloudSkills, isDeletingCloudSkill, loadCloudSave, type CloudSaveState } from "../src/cloud-save/cloud-save";
 import type { SyncedSkill } from "../src/synced-skill-grouping";
 import { savedSkillKeys } from "../src/app/unified/SkillReadme";
 import { notInstalledSkills } from "../src/app/unified/model";
@@ -304,4 +304,23 @@ test("a row carries its saved version's background scan, or null before it has r
     skills: [{ ...saved("notes"), currentVersion: { ...saved("notes").currentVersion, scan } }, saved("other")],
   }), []);
   assert.deepEqual(rows.map(row => [row.key, row.scan]), [["notes", scan], ["other", null]]);
+});
+
+test("the shield needs every copy saved as it is now and scanned clean", () => {
+  const clean = (at: string) => ({ status: "clean" as const, scannedAt: at });
+  const rows = new Map(cloudSkillRows(state({
+    settings: { enabled: true, excludedSkillKeys: ["left-out"] },
+    skills: [
+      { ...saved("a"), currentVersion: { ...saved("a").currentVersion, scan: clean("2026-11-21T10:00:00Z") } },
+      { ...saved("b"), currentVersion: { ...saved("b").currentVersion, scan: clean("2026-11-21T11:00:00Z") } },
+      { ...saved("flagged"), currentVersion: { ...saved("flagged").currentVersion, scan: { status: "flagged" as const, scannedAt: "2026-11-21T10:00:00Z" } } },
+      { ...saved("left-out"), currentVersion: { ...saved("left-out").currentVersion, scan: clean("2026-11-21T10:00:00Z") } },
+    ],
+  }), [installed("a", { installationFolder: "a" }), installed("b", { installationFolder: "b" }), installed("waiting", { installationFolder: "waiting" })])
+    .map(row => [row.key, row]));
+  assert.equal(cleanScan(rows, ["a", "b"]), "2026-11-21T11:00:00Z");
+  assert.equal(cleanScan(rows, ["a", "flagged"]), null, "one copy flagged");
+  assert.equal(cleanScan(rows, ["a", "waiting"]), null, "one copy not saved yet");
+  assert.equal(cleanScan(rows, ["left-out"]), null, "left out of saving");
+  assert.equal(cleanScan(rows, []), null);
 });
