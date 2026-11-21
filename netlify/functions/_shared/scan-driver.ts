@@ -24,7 +24,7 @@ export type ScanDriverDeps = {
 
 export type ScanRunResult = {
   queued: number; scanned: number; alreadyScanned: number; retried: number; dropped: number; stoppedBy?: string;
-  /** Why jobs were retried, by error code (never file contents). */
+  /** Why jobs didn't finish (retried or given up), by error code; never file contents. */
   errors: Record<string, number>;
 };
 
