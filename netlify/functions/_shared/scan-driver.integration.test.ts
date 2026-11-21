@@ -156,7 +156,7 @@ test("a saved skill is scanned in the background and its findings stored with fi
     const { fetchImpl, calls } = scanner(store);
 
     const result = await runScanQueue(pool, deps(fetchImpl));
-    assert.deepEqual(result, { queued: 0, scanned: 1, alreadyScanned: 0, retried: 0, dropped: 0 });
+    assert.deepEqual(result, { queued: 0, scanned: 1, alreadyScanned: 0, retried: 0, dropped: 0, errors: {} });
     assert.deepEqual(calls, ["/scanners", "/scan"]);
     const [scan] = await scans(pool);
     assert.equal(scan.tree_sha, saved.status === "saved" ? saved.skill.currentVersion.treeSha : "");
@@ -167,7 +167,7 @@ test("a saved skill is scanned in the background and its findings stored with fi
       ["run.sh", "scripts", null]
     ]);
     assert.equal((await pool.query("SELECT 1 FROM scan_jobs")).rowCount, 0);
-    assert.deepEqual(await runScanQueue(pool, deps(fetchImpl)), { queued: 0, scanned: 0, alreadyScanned: 0, retried: 0, dropped: 0 });
+    assert.deepEqual(await runScanQueue(pool, deps(fetchImpl)), { queued: 0, scanned: 0, alreadyScanned: 0, retried: 0, dropped: 0, errors: {} });
   });
 });
 
@@ -237,6 +237,7 @@ test("when the scanner is down the job waits and tries again later, never counti
     const { fetchImpl } = scanner(store, { scanStatus: 503 });
     const result = await runScanQueue(pool, deps(fetchImpl));
     assert.equal(result.retried, 1);
+    assert.deepEqual(result.errors, { scanner_failed: 1 });
     const job = (await pool.query("SELECT attempts, last_error, lease_token, not_before > now() AS later FROM scan_jobs")).rows[0];
     assert.deepEqual(job, { attempts: 1, last_error: "scanner_failed", lease_token: null, later: true });
     assert.equal((await scans(pool)).length, 0);
