@@ -275,6 +275,21 @@ export function skillCloudRow(rows: Map<string, CloudSkillRow>, keys: string[]):
   return best;
 }
 
+/**
+ * When the scan shield may show for a skill: every one of the given copies has a saved copy that
+ * is what's installed now and whose scan came back clean. Returns the newest scan time, or null.
+ */
+export function cleanScan(rows: Map<string, CloudSkillRow>, keys: string[]): string | null {
+  if (keys.length === 0) return null;
+  let newest: string | null = null;
+  for (const key of keys) {
+    const row = rows.get(key);
+    if (!row || !["saved", "deleted", "set", "library"].includes(row.status) || row.scan?.status !== "clean") return null;
+    if (!newest || row.scan.scannedAt > newest) newest = row.scan.scannedAt;
+  }
+  return newest;
+}
+
 /** What to do about a skill that isn't saved, for its detail panel. */
 export const statusHelp: Partial<Record<CloudSkillRow["status"], string>> = {
   review: "A file looks like it contains a key or password, so it wasn't synced. Remove the key on your Mac and it syncs by itself, or confirm it's safe.",

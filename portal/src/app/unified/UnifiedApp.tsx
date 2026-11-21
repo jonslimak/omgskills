@@ -151,7 +151,7 @@ import { CloudStatusBadge, CloudStatusSection, type CloudInfo } from "./CloudSta
 import { looksLikeGithubLink, type MySkillAdditions } from "../my-skills-additions";
 import { AddSkillForm } from "./AddSkillDialog";
 import { PortalApiError } from "../../api-error";
-import { cloudSkillRows, needsAttention, setsNote, skillCloudRow, statusText } from "../../cloud-save/cloud-save";
+import { cleanScan, cloudSkillRows, installationCloudKey, needsAttention, setsNote, skillCloudRow, statusText } from "../../cloud-save/cloud-save";
 
 // Official Lucide artwork (ISC): https://lucide.dev/icons/package-question-mark (not in our installed version yet).
 const PackageQuestionMark = createLucideIcon("PackageQuestionMark", [
@@ -255,13 +255,14 @@ function KindTip({ label, icon: Icon }: { label: string; icon: LucideIcon }) {
   );
 }
 /**
- * A small grey shield by the creator and stars when the saved version's background scan finished
+ * A small grey shield by the creator and stars when your saved copy's background scan finished
  * and found nothing. Hover or tap for what was checked; it never claims the skill is safe.
  */
-function ScanTip({ scannedAt }: { scannedAt: string }) {
+function ScanTip({ scannedAt, yourCopy }: { scannedAt: string; yourCopy: boolean }) {
   const [open, setOpen] = useState(false);
   const day = new Date(scannedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" });
-  const label = `Scanned ${day}: no leaked keys, hidden instructions or download-and-run commands found`;
+  // On a library skill it's your installed copy that was scanned, not the library's.
+  const label = `${yourCopy ? "Your copy scanned" : "Scanned"} ${day}: no leaked keys, hidden instructions or download-and-run commands found`;
   return (
     <button type="button" className="ua-scan-tip" aria-label={label} data-open={open}
       onClick={() => setOpen(value => !value)} onBlur={() => setOpen(false)}
@@ -2292,13 +2293,16 @@ export function UnifiedApp({
                               {starCount(detail.stars)}
                             </span>
                           )}
-                          {!discovery && !detail.catalogId && !detail.setItemReleaseId && (() => {
-                            // Your own skills only: library skills aren't scanned yet, and a saved copy
-                            // of one says nothing about the library's. Only while the saved copy is what
-                            // this skill is now; one waiting for review, left out or not saving may differ.
-                            const row = cloudRow(detail);
-                            const current = row && ["saved", "deleted", "set"].includes(row.status);
-                            return current && row.scan?.status === "clean" ? <ScanTip scannedAt={row.scan.scannedAt} /> : null;
+                          {!detail.setItemReleaseId && cloudRows.size > 0 && (() => {
+                            // Your installed copies of this skill: on a library skill only the copies of
+                            // that library skill (copies are grouped by name, so others may share it).
+                            // Every one must be saved as it is now and scanned clean. On a library skill
+                            // the words say it's your copy; the library itself isn't scanned yet.
+                            const copies = (detail.installed?.sourceSkills ?? []).filter(copy => copy.isCurrent !== false
+                              && (!detail.catalogId || copy.catalogSkillId?.trim() === detail.catalogId));
+                            const keys = detail.cloudKey ? [detail.cloudKey] : [...new Set(copies.map(installationCloudKey))];
+                            const scannedAt = cleanScan(cloudRows, keys);
+                            return scannedAt ? <ScanTip scannedAt={scannedAt} yourCopy={!!detail.catalogId || discovery} /> : null;
                           })()}
                           {detail.githubUrl && (
                             <a
