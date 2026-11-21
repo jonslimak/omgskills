@@ -329,3 +329,21 @@ test("a refused signature stops the run without using up any job's tries", async
     assert.deepEqual((await pool.query("SELECT attempts, lease_token FROM scan_jobs")).rows, [{ attempts: 0, lease_token: null }]);
   });
 });
+
+test("a scan that timed out is tried again only when the run has time for a longer try", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    await saveSkill(pool, store, await createUser(pool), "setup", risky);
+    await pool.query("UPDATE scan_jobs SET last_error = 'unreachable', attempts = 1");
+    // The scanner list took 10 s, so 13.5 s are left: enough for a usual try, not a long one.
+    const start = Date.now();
+    let calls = 0;
+    const late = { ...deps(scanner(store).fetchImpl), now: () => start + (calls++ === 0 ? 0 : 10_000) };
+    const handedBack = await runScanQueue(pool, late);
+    assert.equal(handedBack.scanned, 0);
+    assert.deepEqual((await pool.query("SELECT attempts, lease_token FROM scan_jobs")).rows, [{ attempts: 1, lease_token: null }], "not counted as a try");
+
+    // With the whole run ahead of it, it goes.
+    assert.equal((await runScanQueue(pool, deps(scanner(store).fetchImpl))).scanned, 1);
+  });
+});

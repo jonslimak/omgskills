@@ -29,12 +29,17 @@ export type ScanRunResult = {
 };
 
 /**
- * Scheduled functions stop at about 30 s. No new job starts after this, so the slowest job
- * (reading from GitHub, then the scanner call, then storing) still finishes in time.
+ * Scheduled functions stop at about 30 s; everything in a run, storing included, ends by this.
+ * A job starts only if the time left covers its reads and its scanner call.
  */
-const DEFAULT_BUDGET_MS = 8_000;
-/** One request to the scanner, including a cold start. A timeout is retried, never counted clean. */
-const REQUEST_TIMEOUT_MS = 12_000;
+const DEFAULT_RUN_LIMIT_MS = 25_000;
+/** Kept for storing results after the last scanner call. */
+const STORE_MARGIN_MS = 1_500;
+/** A scanner call's usual allowance, and the most any one call gets (one that timed out before waits for it). */
+const SCAN_TIMEOUT_MS = 8_000;
+const LONG_SCAN_TIMEOUT_MS = 20_000;
+/** The scanner list, which also wakes the scanner for the scans after it. */
+const LIST_TIMEOUT_MS = 12_000;
 /** Reading a private GitHub version's files. */
 const GITHUB_TIMEOUT_MS = 6_000;
 /** Longer than any run, so a crashed run's jobs come back by themselves. */
@@ -57,7 +62,7 @@ class ScannerCallError extends Error {
   }
 }
 
-async function callScanner<T>(deps: ScanDriverDeps, method: "GET" | "POST", path: string, body?: unknown): Promise<T> {
+async function callScanner<T>(deps: ScanDriverDeps, method: "GET" | "POST", path: string, timeoutMs: number, body?: unknown): Promise<T> {
   const bytes = body === undefined ? new Uint8Array() : new TextEncoder().encode(JSON.stringify(body));
   const headers = await signRequest(deps.config.signingKey, method, path, bytes, deps.now?.() ?? Date.now());
   let response: Response;
@@ -66,7 +71,7 @@ async function callScanner<T>(deps: ScanDriverDeps, method: "GET" | "POST", path
       method,
       headers: { ...headers, ...(body === undefined ? {} : { "content-type": "application/json" }) },
       body: method === "GET" ? undefined : bytes,
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+      signal: AbortSignal.timeout(timeoutMs)
     });
   } catch {
     throw new ScannerCallError("unreachable", true);
@@ -170,9 +175,11 @@ type LeasedJob = {
   ownerUserId: string | null;
   tombstoned: boolean;
   scanned: boolean;
+  /** Why the last try didn't finish, if it didn't. */
+  lastError: string | null;
 };
 
-/** Newest first, so fresh saves get results quickly while older ones fill in behind. */
+/** Newest first, so fresh saves get results quickly while older ones fill in behind; timed-out ones lead. */
 async function leaseJobs(pool: Pool, scanners: ScannerInfo[], limit: number): Promise<LeasedJob[]> {
   const leaseToken = randomUUID();
   const result = await pool.query<LeasedJob>(
@@ -180,17 +187,18 @@ async function leaseJobs(pool: Pool, scanners: ScannerInfo[], limit: number): Pr
       WITH due AS (
         SELECT release_id FROM scan_jobs
         WHERE not_before <= now() AND (lease_until IS NULL OR lease_until < now()) AND attempts < $3
-        ORDER BY queued_at DESC
+        -- One that timed out goes first, while the run still has time for its longer try.
+        ORDER BY (last_error = 'unreachable') DESC NULLS LAST, queued_at DESC
         LIMIT $2
         FOR UPDATE SKIP LOCKED
       ), leased AS (
         UPDATE scan_jobs job
         SET lease_token = $1, lease_until = now() + interval '${LEASE}', attempts = job.attempts + 1
         FROM due WHERE job.release_id = due.release_id
-        RETURNING job.release_id, job.tree_sha, job.attempts, job.lease_token
+        RETURNING job.release_id, job.tree_sha, job.attempts, job.lease_token, job.last_error
       )
       SELECT leased.release_id AS "releaseId", leased.tree_sha AS "treeSha", leased.attempts,
-        leased.lease_token AS "leaseToken", source.kind, source.owner_user_id AS "ownerUserId",
+        leased.lease_token AS "leaseToken", leased.last_error AS "lastError", source.kind, source.owner_user_id AS "ownerUserId",
         source.tombstoned_at IS NOT NULL AS tombstoned,
         NOT EXISTS (
           SELECT 1 FROM unnest($4::text[], $5::text[]) AS s(scanner, version)
@@ -323,12 +331,12 @@ async function finishJob(pool: Pool, job: LeasedJob) {
 }
 
 /** One scheduled run. Does nothing until the scanner is set up (SCAN_WORKER_URL, SCAN_SIGNING_KEY). */
-export async function runScanQueue(pool: Pool, deps: ScanDriverDeps, budgetMs = DEFAULT_BUDGET_MS): Promise<ScanRunResult> {
+export async function runScanQueue(pool: Pool, deps: ScanDriverDeps, runLimitMs = DEFAULT_RUN_LIMIT_MS): Promise<ScanRunResult> {
   const started = deps.now?.() ?? Date.now();
   const elapsed = () => (deps.now?.() ?? Date.now()) - started;
   const result: ScanRunResult = { queued: 0, scanned: 0, alreadyScanned: 0, retried: 0, dropped: 0, errors: {} };
 
-  const scanners = validScanners(await callScanner<unknown>(deps, "GET", "/scanners"));
+  const scanners = validScanners(await callScanner<unknown>(deps, "GET", "/scanners", LIST_TIMEOUT_MS));
   result.queued = await queueMissing(pool, scanners);
 
   // Hands a job back for a later run without counting this try.
@@ -338,22 +346,36 @@ export async function runScanQueue(pool: Pool, deps: ScanDriverDeps, budgetMs = 
   );
   let stopped = false;
 
-  while (!stopped && elapsed() < budgetMs) {
+  // How long this job's scanner call may take, or null if the run hasn't time for a fair try.
+  // One that timed out before waits until it can have the long allowance.
+  const allowance = (job: LeasedJob): number | null => {
+    const reads = job.kind === "cloud" ? 0 : GITHUB_TIMEOUT_MS;
+    const left = runLimitMs - elapsed() - STORE_MARGIN_MS - reads;
+    const needed = job.lastError === "unreachable" ? LONG_SCAN_TIMEOUT_MS : SCAN_TIMEOUT_MS;
+    return left >= needed ? Math.min(left, LONG_SCAN_TIMEOUT_MS) : null;
+  };
+
+  while (!stopped && runLimitMs - elapsed() - STORE_MARGIN_MS >= SCAN_TIMEOUT_MS) {
     const jobs = await leaseJobs(pool, scanners, BATCH);
     if (jobs.length === 0) break;
+    // Jobs handed back would be leased again at once; a batch that's all handed back ends the run.
+    let progressed = false;
     for (const job of jobs) {
       if (job.tombstoned || job.scanned) {
         await finishJob(pool, job);
         result.alreadyScanned += 1;
+        progressed = true;
         continue;
       }
-      if (stopped || elapsed() >= budgetMs) {
+      const timeoutMs = stopped ? null : allowance(job);
+      if (timeoutMs === null) {
         await handBack(job);
         continue;
       }
+      progressed = true;
       try {
         const files = await requestFiles(pool, deps, job);
-        const response = await callScanner<ScanResponse>(deps, "POST", "/scan", { treeSha: job.treeSha, files });
+        const response = await callScanner<ScanResponse>(deps, "POST", "/scan", timeoutMs, { treeSha: job.treeSha, files });
         if (response.treeSha !== job.treeSha || !Array.isArray(response.results)) throw new ScannerCallError("bad_response", true);
         const stored = await storeResults(pool, job, response.results);
         if (stored === "stored") result.scanned += 1;
@@ -384,6 +406,7 @@ export async function runScanQueue(pool: Pool, deps: ScanDriverDeps, budgetMs = 
         result.errors[code] = (result.errors[code] ?? 0) + 1;
       }
     }
+    if (!progressed) break;
   }
   return result;
 }
