@@ -1981,13 +1981,12 @@
   display: inline-flex;
   color: var(--ua-muted);
 }
-/* Scanned, nothing found: a light green shield the size of the star, with words on hover or tap. */
+/* Scanned, nothing found: a shield the size and grey of the star, with words on hover or tap. */
 .ua-scan-tip {
   position: relative; display: inline-flex; align-items: center;
   padding: 0; border: 0; background: none !important; cursor: default;
-  color: #34c759 !important; /* macOS system green */
+  color: var(--ua-muted) !important;
 }
-.ua-theme[data-theme="dark"] .ua-scan-tip { color: #30d158 !important; }
 .ua-scan-tip-text {
   /* Starts at the icon and runs right: the panel clips anything past its left edge. */
   position: absolute; top: calc(100% + 4px); left: -6px; z-index: 5;

@@ -255,7 +255,7 @@ function KindTip({ label, icon: Icon }: { label: string; icon: LucideIcon }) {
   );
 }
 /**
- * A small green shield by the creator and stars when the saved version's background scan finished
+ * A small grey shield by the creator and stars when the saved version's background scan finished
  * and found nothing. Hover or tap for what was checked; it never claims the skill is safe.
  */
 function ScanTip({ scannedAt }: { scannedAt: string }) {
