@@ -330,20 +330,27 @@ test("a refused signature stops the run without using up any job's tries", async
   });
 });
 
-test("a scan that timed out is tried again only when the run has time for a longer try", async () => {
+test("a scan that timed out waits for a longer slot, without holding up the jobs behind it", async () => {
   await withMigratedSchema(async (pool) => {
     const store = new MemoryStore();
-    await saveSkill(pool, store, await createUser(pool), "setup", risky);
+    for (let index = 0; index < 5; index += 1) {
+      await saveSkill(pool, store, await createUser(pool), `slow-${index}`, [{ ...risky[0], text: `${risky[0].text}Slow ${index}.\n` }]);
+    }
     await pool.query("UPDATE scan_jobs SET last_error = 'unreachable', attempts = 1");
-    // The scanner list took 10 s, so 13.5 s are left: enough for a usual try, not a long one.
+    await saveSkill(pool, store, await createUser(pool), "fresh", risky);
+    // The scanner list took 12 s, so 11.5 s are left: enough for a usual try, not a retry's.
     const start = Date.now();
     let calls = 0;
-    const late = { ...deps(scanner(store).fetchImpl), now: () => start + (calls++ === 0 ? 0 : 10_000) };
-    const handedBack = await runScanQueue(pool, late);
-    assert.equal(handedBack.scanned, 0);
-    assert.deepEqual((await pool.query("SELECT attempts, lease_token FROM scan_jobs")).rows, [{ attempts: 1, lease_token: null }], "not counted as a try");
+    const late = { ...deps(scanner(store).fetchImpl), now: () => start + (calls++ === 0 ? 0 : 12_000) };
+    const result = await runScanQueue(pool, late);
+    assert.equal(result.scanned, 1, "the fresh one isn't held up by five that timed out");
+    assert.deepEqual(
+      (await pool.query("SELECT DISTINCT attempts, lease_token FROM scan_jobs")).rows,
+      [{ attempts: 1, lease_token: null }],
+      "the timed-out ones aren't counted as a try"
+    );
 
-    // With the whole run ahead of it, it goes.
-    assert.equal((await runScanQueue(pool, deps(scanner(store).fetchImpl))).scanned, 1);
+    // With the whole run ahead, they go.
+    assert.equal((await runScanQueue(pool, deps(scanner(store).fetchImpl))).scanned, 5);
   });
 });
