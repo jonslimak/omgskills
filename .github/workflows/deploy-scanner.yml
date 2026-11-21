@@ -1,0 +1,78 @@
+name: deploy-scanner
+
+# Deploys the skill scanner (scanner/) to Cloudflare, by hand only, then checks the live
+# container can't reach the internet. Needs secrets CLOUDFLARE_API_TOKEN, SCAN_SIGNING_KEY and
+# SCAN_WORKER_URL (the same key and URL Netlify uses).
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact reviewed origin/main commit to deploy
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scanner-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-scanner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      EXPECTED_SHA: ${{ inputs.expected_sha }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Check the reviewed commit
+        run: |
+          if [[ ! "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "expected_sha must be a full Git commit SHA" >&2
+            exit 1
+          fi
+          if [ "$(git rev-parse HEAD)" != "$EXPECTED_SHA" ]; then
+            echo "main changed after review; review and dispatch again" >&2
+            exit 1
+          fi
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            scanner/package-lock.json
+
+      - name: Install
+        run: |
+          npm ci --no-audit --no-fund
+          npm --prefix scanner ci --no-audit --no-fund
+
+      - name: Check, build and deploy
+        working-directory: scanner
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npm run deploy
+
+      - name: Set the signing key
+        working-directory: scanner
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          SCAN_SIGNING_KEY: ${{ secrets.SCAN_SIGNING_KEY }}
+        run: printf '%s' "$SCAN_SIGNING_KEY" | npx wrangler secret put SCAN_SIGNING_KEY
+
+      - name: Check the container has no internet
+        env:
+          SCAN_WORKER_URL: ${{ secrets.SCAN_WORKER_URL }}
+          SCAN_SIGNING_KEY: ${{ secrets.SCAN_SIGNING_KEY }}
+        run: npx tsx scanner/scripts/selftest.ts

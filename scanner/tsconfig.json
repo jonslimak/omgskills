@@ -9,5 +9,5 @@
     "noEmit": true,
     "types": ["@cloudflare/workers-types", "node"]
   },
-  "include": ["src/**/*.ts", "container/src/**/*.ts", "test/**/*.ts"]
+  "include": ["src/**/*.ts", "container/src/**/*.ts", "test/**/*.ts", "scripts/**/*.ts"]
 }
