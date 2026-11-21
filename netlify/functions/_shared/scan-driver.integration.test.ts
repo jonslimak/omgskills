@@ -354,3 +354,23 @@ test("a scan that timed out waits for a longer slot, without holding up the jobs
     assert.equal((await runScanQueue(pool, deps(scanner(store).fetchImpl))).scanned, 5);
   });
 });
+
+test("a new save is scanned before older jobs that failed for other reasons", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    await saveSkill(pool, store, await createUser(pool), "older", [{ ...risky[0], text: `${risky[0].text}Older.\n` }]);
+    await pool.query("UPDATE scan_jobs SET last_error = 'scanner_failed', attempts = 1");
+    const fresh = await saveSkill(pool, store, await createUser(pool), "fresh", risky);
+    // Time for exactly one scan: after the first, the run is out of time.
+    const { fetchImpl } = scanner(store);
+    let scanCount = 0;
+    const counting = (async (url: string | URL | Request, init?: RequestInit) => {
+      if (new URL(new Request(url, init).url).pathname === "/scan") scanCount += 1;
+      return fetchImpl(url, init);
+    }) as typeof fetch;
+    const start = Date.now();
+    const result = await runScanQueue(pool, { ...deps(counting), now: () => start + (scanCount > 0 ? 18_000 : 0) });
+    assert.equal(result.scanned, 1);
+    assert.deepEqual((await scans(pool)).map((s) => s.tree_sha), [fresh.status === "saved" ? fresh.skill.currentVersion.treeSha : ""]);
+  });
+});

@@ -193,14 +193,14 @@ async function leaseJobs(pool: Pool, scanners: ScannerInfo[], limit: number, ski
         WHERE not_before <= now() AND (lease_until IS NULL OR lease_until < now()) AND attempts < $3
           AND NOT (release_id = ANY($6::uuid[]))
         -- One that timed out goes first, while the run still has time for its longer try.
-        ORDER BY (last_error = 'unreachable') DESC NULLS LAST, queued_at DESC
+        ORDER BY (last_error = 'unreachable') IS TRUE DESC, queued_at DESC
         LIMIT $2
         FOR UPDATE SKIP LOCKED
       ), leased AS (
         UPDATE scan_jobs job
         SET lease_token = $1, lease_until = now() + interval '${LEASE}', attempts = job.attempts + 1
         FROM due WHERE job.release_id = due.release_id
-        RETURNING job.release_id, job.tree_sha, job.attempts, job.lease_token, job.last_error
+        RETURNING job.release_id, job.tree_sha, job.attempts, job.lease_token, job.last_error, job.queued_at
       )
       SELECT leased.release_id AS "releaseId", leased.tree_sha AS "treeSha", leased.attempts,
         leased.lease_token AS "leaseToken", leased.last_error AS "lastError", source.kind, source.owner_user_id AS "ownerUserId",
@@ -216,6 +216,7 @@ async function leaseJobs(pool: Pool, scanners: ScannerInfo[], limit: number, ski
       FROM leased
       JOIN skill_releases release ON release.id = leased.release_id
       JOIN skill_sources source ON source.id = release.source_id
+      ORDER BY (leased.last_error = 'unreachable') IS TRUE DESC, leased.queued_at DESC
     `,
     [leaseToken, limit, MAX_ATTEMPTS, scanners.map((s) => s.scanner), scanners.map((s) => s.version), skip]
   );
