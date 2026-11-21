@@ -296,3 +296,12 @@ test("a skill added from GitHub shows its saved description before any Mac has i
   const shown = notInstalledSkills(rows, [], [], () => []);
   assert.equal(shown.find(skill => skill.cloudKey === "prompt-architect")?.description, "Improves prompts");
 });
+
+test("a row carries its saved version's background scan, or null before it has run", () => {
+  const scan = { status: "clean" as const, scannedAt: "2026-11-21T10:00:00.000Z" };
+  const rows = cloudSkillRows(state({
+    settings: { enabled: true, excludedSkillKeys: [] },
+    skills: [{ ...saved("notes"), currentVersion: { ...saved("notes").currentVersion, scan } }, saved("other")],
+  }), []);
+  assert.deepEqual(rows.map(row => [row.key, row.scan]), [["notes", scan], ["other", null]]);
+});

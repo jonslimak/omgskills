@@ -254,6 +254,22 @@ function KindTip({ label, icon: Icon }: { label: string; icon: LucideIcon }) {
     </button>
   );
 }
+/**
+ * A small green shield by the creator and stars when the saved version's background scan finished
+ * and found nothing. Hover or tap for what was checked; it never claims the skill is safe.
+ */
+function ScanTip({ scannedAt }: { scannedAt: string }) {
+  const [open, setOpen] = useState(false);
+  const day = new Date(scannedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const label = `Scanned ${day}: no leaked keys, hidden instructions or download-and-run commands found`;
+  return (
+    <button type="button" className="ua-scan-tip" aria-label={label} data-open={open}
+      onClick={() => setOpen(value => !value)} onBlur={() => setOpen(false)}>
+      <ShieldCheck aria-hidden="true" />
+      <span className="ua-scan-tip-text" aria-hidden="true">{label}</span>
+    </button>
+  );
+}
 function CollectionCover({ src }: { src: string }) {
   const [loaded, setLoaded] = useState(false);
   return (
@@ -2275,6 +2291,10 @@ export function UnifiedApp({
                               {starCount(detail.stars)}
                             </span>
                           )}
+                          {!detail.setItemReleaseId && (() => {
+                            const scan = cloudRow(detail)?.scan;
+                            return scan?.status === "clean" ? <ScanTip scannedAt={scan.scannedAt} /> : null;
+                          })()}
                           {detail.githubUrl && (
                             <a
                               className="ua-detail-source"

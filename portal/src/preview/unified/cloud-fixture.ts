@@ -15,10 +15,13 @@ export function previewCloudState(skills: SyncedSkill[]): CloudSaveState {
     usage: { bytes: 6_800_000, limitBytes: 1024 ** 3 },
     skills: saved.map((key, index): CloudSaveState["skills"][number] => ({ key, versionCount: 1 + (index % 3), deletedLocallyAt: null,
       currentVersion: { id: `v-${key}`, savedAt: "2026-11-03T10:00:00Z", fileCount: 3, totalBytes: 12_000,
-        labels: index % 4 === 0 ? ["scripts" as const] : [] } })).concat(
+        labels: index % 4 === 0 ? ["scripts" as const] : [],
+        // Most have been scanned and came back clean; the rest wait for the background scan.
+        scan: index % 3 === 2 ? null : { status: "clean" as const, scannedAt: "2026-11-21T10:00:00Z" } } })).concat(
       // Two kept only in the account: deleted from this Mac, or saved from another one.
       ["meeting-notes", "old-deploy-checklist"].map(key => ({ key, versionCount: 2, deletedLocallyAt: "2026-11-01T10:00:00Z",
-        currentVersion: { id: `v-${key}`, savedAt: "2026-10-30T10:00:00Z", fileCount: 2, totalBytes: 8_000, labels: [] } }))),
+        currentVersion: { id: `v-${key}`, savedAt: "2026-10-30T10:00:00Z", fileCount: 2, totalBytes: 8_000, labels: [],
+          scan: key === "meeting-notes" ? { status: "clean" as const, scannedAt: "2026-11-21T10:00:00Z" } : null } }))),
     needsReview: review ? [{ key: review, confirmed: false, updatedAt: "2026-11-05T10:00:00Z",
       files: [{ path: "rules/1-safety.md", findings: [{ rule: "password", kind: "Password", line: 580 }] }] }] : [],
     skipped,

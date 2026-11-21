@@ -4,6 +4,8 @@ import type { SyncedSkill } from "../synced-skill-grouping";
 
 export type CloudFinding = { rule: string; kind: string; line: number };
 export type CloudLabel = "scripts" | "download_and_run" | "invisible_characters" | "hidden_instructions" | "confirmed_secret";
+/** The background scan of a saved version; "incomplete" is never shown as clean. */
+export type CloudScan = { status: "clean" | "flagged" | "incomplete"; scannedAt: string };
 
 export type CloudSaveState = {
   settings: { enabled: boolean; excludedSkillKeys: string[] };
@@ -16,7 +18,7 @@ export type CloudSaveState = {
     deletedLocallyAt: string | null;
     /** Sets that share this skill; older servers leave it out. */
     setCount?: number;
-    currentVersion: { id: string; savedAt: string; fileCount: number; totalBytes: number; labels?: CloudLabel[] };
+    currentVersion: { id: string; savedAt: string; fileCount: number; totalBytes: number; labels?: CloudLabel[]; scan?: CloudScan | null };
   }[];
   needsReview: { key: string; files: { path: string; findings: CloudFinding[] }[]; confirmed: boolean; updatedAt: string }[];
   /** Why a Mac didn't save each skill on its last pass. */
@@ -139,6 +141,8 @@ export type CloudSkillRow = {
   setCount: number;
   savedAt: string | null;
   labels: CloudLabel[];
+  /** The saved version's background scan, once it has run. */
+  scan: CloudScan | null;
   findings: { path: string; findings: CloudFinding[] }[];
   /** Installed on one of your Macs now, as opposed to kept only in the cloud. */
   onMac: boolean;
@@ -198,6 +202,7 @@ export function cloudSkillRows(state: CloudSaveState, installed: SyncedSkill[]):
       setCount: copy?.setCount ?? 0,
       savedAt: copy?.currentVersion.savedAt ?? null,
       labels: copy?.currentVersion.labels ?? [],
+      scan: copy?.currentVersion.scan ?? null,
       findings: review?.files ?? [],
       onMac: names.has(key),
       origin: fromCatalog.has(key) ? "library" : fromLibrary.has(key) ? "set" : null,
