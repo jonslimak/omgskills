@@ -254,6 +254,23 @@ function KindTip({ label, icon: Icon }: { label: string; icon: LucideIcon }) {
     </button>
   );
 }
+/**
+ * A small grey shield by the creator and stars when the saved version's background scan finished
+ * and found nothing. Hover or tap for what was checked; it never claims the skill is safe.
+ */
+function ScanTip({ scannedAt }: { scannedAt: string }) {
+  const [open, setOpen] = useState(false);
+  const day = new Date(scannedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const label = `Scanned ${day}: no leaked keys, hidden instructions or download-and-run commands found`;
+  return (
+    <button type="button" className="ua-scan-tip" aria-label={label} data-open={open}
+      onClick={() => setOpen(value => !value)} onBlur={() => setOpen(false)}
+      onKeyDown={event => { if (event.key === "Escape" && open) { event.stopPropagation(); setOpen(false); } }}>
+      <ShieldCheck aria-hidden="true" />
+      <span className="ua-scan-tip-text" aria-hidden="true">{label}</span>
+    </button>
+  );
+}
 function CollectionCover({ src }: { src: string }) {
   const [loaded, setLoaded] = useState(false);
   return (
@@ -2275,6 +2292,14 @@ export function UnifiedApp({
                               {starCount(detail.stars)}
                             </span>
                           )}
+                          {!discovery && !detail.catalogId && !detail.setItemReleaseId && (() => {
+                            // Your own skills only: library skills aren't scanned yet, and a saved copy
+                            // of one says nothing about the library's. Only while the saved copy is what
+                            // this skill is now; one waiting for review, left out or not saving may differ.
+                            const row = cloudRow(detail);
+                            const current = row && ["saved", "deleted", "set"].includes(row.status);
+                            return current && row.scan?.status === "clean" ? <ScanTip scannedAt={row.scan.scannedAt} /> : null;
+                          })()}
                           {detail.githubUrl && (
                             <a
                               className="ua-detail-source"

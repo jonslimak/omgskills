@@ -883,6 +883,33 @@ test("each new saved version is queued for scanning, and its results go with the
   });
 });
 
+test("a saved version carries its scan: none yet, then clean, flagged or incomplete from each scanner's newest result", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const { userId, deviceId } = await createUser(pool);
+    await updateCloudSaveSettings(pool, userId, { enabled: true });
+    await uploadAll(pool, store, userId, v1);
+    await saveCloudVersion(pool, { userId, deviceId, skillKey: "notes", files: manifest(v1) });
+    const scanOf = async () => (await readCloudSave(pool, userId)).skills[0].currentVersion.scan;
+    assert.equal(await scanOf(), null);
+    const tree = (await readCloudSave(pool, userId)).skills[0].currentVersion.treeSha;
+    const put = (scanner: string, version: string, status: string, findings: unknown[], at: string) => pool.query(
+      "INSERT INTO skill_scans (tree_sha, scanner, scanner_version, status, findings, started_at, finished_at) VALUES ($1, $2, $3, $4, $5::jsonb, $6, $6)",
+      [tree, scanner, version, status, JSON.stringify(findings), at]
+    );
+    const info = { rule: "scripts", label: "scripts", severity: "info", path: "scripts/run.sh", line: null };
+    await put("omg-rules", "1", "complete", [info], "2026-11-21T10:00:00Z");
+    assert.deepEqual(await scanOf(), { status: "clean", scannedAt: "2026-11-21T10:00:00.000Z" });
+    await put("other", "1", "partial", [], "2026-11-21T11:00:00Z");
+    assert.equal((await scanOf())?.status, "incomplete", "partial never shows as clean");
+    await put("other", "2", "complete", [{ ...info, rule: "download_and_run", label: "download_and_run", severity: "high" }], "2026-11-21T12:00:00Z");
+    assert.deepEqual(await scanOf(), { status: "flagged", scannedAt: "2026-11-21T12:00:00.000Z" });
+    await put("third", "1", "complete", [{ ...info, severity: "critical" }], "2026-11-21T13:00:00Z");
+    await pool.query("DELETE FROM skill_scans WHERE scanner = 'other'");
+    assert.equal((await scanOf())?.status, "flagged", "an unknown severity never counts as clean");
+  });
+});
+
 test("deleting everything removes all saved skills, files and reviews, and turns cloud save off", async () => {
   const { deleteCloudSkills } = await import("./cloud-save.js");
   await withMigratedSchema(async (pool) => {

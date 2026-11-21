@@ -134,7 +134,15 @@ export type CloudSavedVersion = {
   deviceId: string | null;
   savedAt: string;
   labels: SkillLabel[];
+  /** The background scan of this content; null until it has been scanned. */
+  scan: CloudScanSummary | null;
 };
+
+/**
+ * clean: every scanner finished and found nothing above low (an unknown severity counts as serious). flagged: something was found.
+ * incomplete: a scanner couldn't finish (never shown as clean).
+ */
+export type CloudScanSummary = { status: "clean" | "flagged" | "incomplete"; scannedAt: string };
 
 export type CloudSavedSkill = {
   key: string;
@@ -201,7 +209,24 @@ const versionColumns = `
   cloud.total_bytes AS "totalBytes",
   cloud.device_id AS "deviceId",
   to_char(release.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "savedAt",
-  cloud.labels
+  cloud.labels,
+  (
+    -- Each scanner's newest result for this content.
+    SELECT CASE WHEN count(*) = 0 THEN NULL ELSE json_build_object(
+      'status', CASE
+        WHEN bool_or(latest.status <> 'complete') THEN 'incomplete'
+        WHEN bool_or(latest.serious) THEN 'flagged'
+        ELSE 'clean' END,
+      'scannedAt', to_char(max(latest.finished_at) AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')
+    ) END
+    FROM (
+      SELECT DISTINCT ON (scan.scanner) scan.status, scan.finished_at,
+        EXISTS (SELECT 1 FROM jsonb_array_elements(scan.findings) finding WHERE finding->>'severity' IS DISTINCT FROM 'low' AND finding->>'severity' IS DISTINCT FROM 'info') AS serious
+      FROM skill_scans scan
+      WHERE scan.tree_sha = release.tree_sha
+      ORDER BY scan.scanner, scan.finished_at DESC, scan.scanner_version DESC
+    ) latest
+  ) AS scan
 `;
 
 async function readReviews(db: Database, userId: string): Promise<CloudSkillReview[]> {

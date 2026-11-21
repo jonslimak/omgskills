@@ -1981,6 +1981,25 @@
   display: inline-flex;
   color: var(--ua-muted);
 }
+/* Scanned, nothing found: a shield the size and grey of the star, with words on hover or tap. */
+.ua-scan-tip {
+  position: relative; display: inline-flex; align-items: center;
+  padding: 0; border: 0; background: none !important; cursor: default;
+  color: var(--ua-muted) !important;
+}
+.ua-scan-tip-text {
+  /* Starts at the icon and runs right: the panel clips anything past its left edge. */
+  position: absolute; top: calc(100% + 4px); left: -6px; z-index: 5;
+  width: max-content; max-width: 220px; padding: 4px 8px; border-radius: 6px;
+  background: var(--ua-ink); color: var(--ua-bg);
+  font-size: 12px; font-weight: 500; line-height: 1.35; text-align: left; white-space: normal;
+  pointer-events: none; visibility: hidden;
+}
+.ua-scan-tip[data-open="true"] .ua-scan-tip-text,
+.ua-scan-tip:focus-visible .ua-scan-tip-text { visibility: visible; }
+@media (hover: hover) and (pointer: fine) {
+  .ua-scan-tip:hover .ua-scan-tip-text { visibility: visible; }
+}
 .ua-detail-source .ua-creator-github-mark {
   width: 12px;
   height: 12px;
