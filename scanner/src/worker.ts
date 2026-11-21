@@ -1,4 +1,4 @@
-import { Container, getRandom } from "@cloudflare/containers";
+import { Container, getContainer } from "@cloudflare/containers";
 import { handle } from "./handler.js";
 
 /** The scanner: files in, findings out. No internet, no keys, never runs skill code. */
@@ -14,7 +14,11 @@ type Env = {
   SCAN_SIGNING_KEY: string;
 };
 
-const INSTANCES = 2;
+/**
+ * One scanner, always the same one: the scanner-list call at the start of a run wakes it, so the
+ * scans right after don't wait for another copy to start.
+ */
+const INSTANCE = "scanner";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -25,7 +29,7 @@ export default {
         return object ? new Uint8Array(await object.arrayBuffer()) : null;
       },
       async container(path, init) {
-        const stub = await getRandom(env.SCANNER, INSTANCES);
+        const stub = getContainer(env.SCANNER, INSTANCE);
         return stub.fetch(new Request(`http://scanner${path}`, { method: init?.method ?? "GET", body: init?.body }));
       }
     });

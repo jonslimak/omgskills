@@ -329,3 +329,48 @@ test("a refused signature stops the run without using up any job's tries", async
     assert.deepEqual((await pool.query("SELECT attempts, lease_token FROM scan_jobs")).rows, [{ attempts: 0, lease_token: null }]);
   });
 });
+
+test("a scan that timed out waits for a longer slot, without holding up the jobs behind it", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    for (let index = 0; index < 5; index += 1) {
+      await saveSkill(pool, store, await createUser(pool), `slow-${index}`, [{ ...risky[0], text: `${risky[0].text}Slow ${index}.\n` }]);
+    }
+    await pool.query("UPDATE scan_jobs SET last_error = 'unreachable', attempts = 1");
+    await saveSkill(pool, store, await createUser(pool), "fresh", risky);
+    // The scanner list took 12 s, so 11.5 s are left: enough for a usual try, not a retry's.
+    const start = Date.now();
+    let calls = 0;
+    const late = { ...deps(scanner(store).fetchImpl), now: () => start + (calls++ === 0 ? 0 : 12_000) };
+    const result = await runScanQueue(pool, late);
+    assert.equal(result.scanned, 1, "the fresh one isn't held up by five that timed out");
+    assert.deepEqual(
+      (await pool.query("SELECT DISTINCT attempts, lease_token FROM scan_jobs")).rows,
+      [{ attempts: 1, lease_token: null }],
+      "the timed-out ones aren't counted as a try"
+    );
+
+    // With the whole run ahead, they go.
+    assert.equal((await runScanQueue(pool, deps(scanner(store).fetchImpl))).scanned, 5);
+  });
+});
+
+test("a new save is scanned before older jobs that failed for other reasons", async () => {
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    await saveSkill(pool, store, await createUser(pool), "older", [{ ...risky[0], text: `${risky[0].text}Older.\n` }]);
+    await pool.query("UPDATE scan_jobs SET last_error = 'scanner_failed', attempts = 1");
+    const fresh = await saveSkill(pool, store, await createUser(pool), "fresh", risky);
+    // Time for exactly one scan: after the first, the run is out of time.
+    const { fetchImpl } = scanner(store);
+    let scanCount = 0;
+    const counting = (async (url: string | URL | Request, init?: RequestInit) => {
+      if (new URL(new Request(url, init).url).pathname === "/scan") scanCount += 1;
+      return fetchImpl(url, init);
+    }) as typeof fetch;
+    const start = Date.now();
+    const result = await runScanQueue(pool, { ...deps(counting), now: () => start + (scanCount > 0 ? 18_000 : 0) });
+    assert.equal(result.scanned, 1);
+    assert.deepEqual((await scans(pool)).map((s) => s.tree_sha), [fresh.status === "saved" ? fresh.skill.currentVersion.treeSha : ""]);
+  });
+});
