@@ -1,0 +1,25 @@
+// The scan Worker. Netlify sends it signed requests; it reads saved files through a binding (no
+// keys) and hands them to the scanner container, which has no internet.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "omgskills-scan",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "containers": [
+    {
+      "class_name": "Scanner",
+      "image": "./container/Dockerfile",
+      "instance_type": "basic",
+      "max_instances": 2
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "SCANNER", "class_name": "Scanner" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Scanner"] }],
+  "r2_buckets": [{ "binding": "CLOUD_FILES", "bucket_name": "omgskills-cloud-save" }]
+  // Secret, set with `wrangler secret put SCAN_SIGNING_KEY`: the same value Netlify signs with.
+}
