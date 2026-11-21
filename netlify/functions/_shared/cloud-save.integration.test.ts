@@ -833,6 +833,56 @@ test("deleting one skill removes every version and its own files, and stops savi
   });
 });
 
+test("each new saved version is queued for scanning, and its results go with the last copy of its content", async () => {
+  const { deleteCloudSkills } = await import("./cloud-save.js");
+  await withMigratedSchema(async (pool) => {
+    const store = new MemoryStore();
+    const owner = await createUser(pool);
+    const other = await createUser(pool);
+    for (const user of [owner, other]) {
+      await updateCloudSaveSettings(pool, user.userId, { enabled: true });
+      await uploadAll(pool, store, user.userId, [...v1, ...v2]);
+    }
+    const first = await saveCloudVersion(pool, { userId: owner.userId, deviceId: owner.deviceId, skillKey: "notes", files: manifest(v1) });
+    await saveCloudVersion(pool, { userId: owner.userId, deviceId: owner.deviceId, skillKey: "notes", files: manifest(v1) });
+    await saveCloudVersion(pool, { userId: owner.userId, deviceId: owner.deviceId, skillKey: "notes", files: manifest(v2) });
+    await saveCloudVersion(pool, { userId: other.userId, deviceId: other.deviceId, skillKey: "copy", files: manifest(v1) });
+
+    const jobs = await pool.query<{ tree_sha: string }>("SELECT tree_sha FROM scan_jobs ORDER BY queued_at");
+    assert.equal(jobs.rowCount, 3, "an unchanged save queues nothing");
+    const [v1Tree, v2Tree] = [jobs.rows[0].tree_sha, jobs.rows[1].tree_sha];
+    assert.equal(first.status === "saved" && first.skill.currentVersion.treeSha, v1Tree);
+    assert.equal(jobs.rows[2].tree_sha, v1Tree);
+    for (const tree of [v1Tree, v2Tree]) {
+      await pool.query(
+        "INSERT INTO skill_scans (tree_sha, scanner, scanner_version, status, started_at) VALUES ($1, 'omg-rules', '1', 'complete', now())",
+        [tree]
+      );
+    }
+
+    await deleteCloudSkills(pool, store, { userId: owner.userId, skillKey: "notes" });
+    assert.deepEqual((await pool.query("SELECT tree_sha FROM scan_jobs")).rows, [{ tree_sha: v1Tree }]);
+    assert.deepEqual(
+      (await pool.query("SELECT tree_sha FROM skill_scans")).rows,
+      [{ tree_sha: v1Tree }],
+      "the other person's copy keeps its results"
+    );
+    // A retired version with the same content (a deleted account's private skill) doesn't keep them.
+    const client = await pool.connect();
+    try {
+      const { appendSkillRelease, createSkillSource, tombstoneSkillSource } = await import("./group-storage.js");
+      const retired = await createSkillSource(client, { kind: "catalog", normalizedRoot: "skills/notes", catalogSkillId: "gone/notes:skills/notes" });
+      await appendSkillRelease(client, { sourceId: retired, commitSha: v1Tree, treeSha: v1Tree, skillMdSha: v1Tree, createdBy: "test" });
+      await tombstoneSkillSource(client, retired);
+    } finally {
+      client.release();
+    }
+    await deleteCloudSkills(pool, store, { userId: other.userId });
+    assert.equal((await pool.query("SELECT 1 FROM scan_jobs")).rowCount, 0);
+    assert.equal((await pool.query("SELECT 1 FROM skill_scans")).rowCount, 0);
+  });
+});
+
 test("deleting everything removes all saved skills, files and reviews, and turns cloud save off", async () => {
   const { deleteCloudSkills } = await import("./cloud-save.js");
   await withMigratedSchema(async (pool) => {

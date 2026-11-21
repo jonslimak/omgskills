@@ -429,6 +429,11 @@ test("owner release registration is idempotent and opaque release loading stays 
       )).rows[0].count),
       1
     );
+    assert.deepEqual(
+      (await pool.query("SELECT release_id, tree_sha FROM scan_jobs")).rows,
+      [{ release_id: first.id, tree_sha: sha.tree }],
+      "a private version is queued for scanning once"
+    );
 
     const loaded = await loadOwnerPrivateReleasePackage(pool, broker, {
       ownerUserId,
@@ -787,6 +792,7 @@ test("adding a materialized public item atomically reuses its source and release
       Number((await pool.query("SELECT count(*) FROM skill_releases")).rows[0].count),
       1,
     );
+    assert.equal((await pool.query("SELECT 1 FROM scan_jobs")).rowCount, 0, "public versions aren't queued yet");
     assert.equal(
       (await pool.query("SELECT revision FROM skill_groups WHERE id = $1", [firstGroupId])).rows[0].revision,
       2,

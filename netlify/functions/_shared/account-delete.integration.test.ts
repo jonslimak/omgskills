@@ -204,6 +204,26 @@ test("deleting an account removes its data, empties its record, retires its priv
       [bobSet, ada.setId]
     );
 
+    // Scan results: Ada's content goes, except what a live public version of Bob's also has.
+    const scanned = async (tree: string) =>
+      pool.query(
+        "INSERT INTO skill_scans (tree_sha, scanner, scanner_version, status, started_at) VALUES ($1, 'omg-rules', '1', 'complete', now())",
+        [tree]
+      );
+    const adaTrees = (await pool.query<{ tree_sha: string }>("SELECT tree_sha FROM scan_jobs ORDER BY tree_sha")).rows.map((row) => row.tree_sha);
+    assert.equal(adaTrees.length, 2, "the private GitHub and the saved version are queued");
+    for (const tree of adaTrees) await scanned(tree);
+    const sharedTree = sha("tree").slice(0, 40);
+    const bobClient = await pool.connect();
+    try {
+      await appendSkillRelease(bobClient, {
+        sourceId: await createSkillSource(bobClient, { kind: "catalog", normalizedRoot: "skills/x", catalogSkillId: "bob/x:skills/x" }),
+        commitSha: sha("bob-commit").slice(0, 40), treeSha: sharedTree, skillMdSha: sha("bob-md").slice(0, 40), createdBy: bob
+      });
+    } finally {
+      bobClient.release();
+    }
+
     const signedOut: string[] = [];
     const result = await deleteAccount(pool, {
       store: () => store,
@@ -236,6 +256,8 @@ test("deleting an account removes its data, empties its record, retires its priv
 
     const source = (await pool.query("SELECT tombstoned_at FROM skill_sources WHERE id = $1", [ada.sourceId])).rows[0];
     assert.ok(source.tombstoned_at);
+    assert.equal((await pool.query("SELECT 1 FROM scan_jobs")).rowCount, 0);
+    assert.deepEqual((await pool.query("SELECT tree_sha FROM skill_scans")).rows, [{ tree_sha: sharedTree }]);
 
     const bobItems = (await pool.query(
       "SELECT name, github_url, source_id, release_id, metadata_only_reason FROM skill_group_items WHERE group_id = $1 ORDER BY name DESC",
