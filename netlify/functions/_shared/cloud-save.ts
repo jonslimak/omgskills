@@ -139,7 +139,7 @@ export type CloudSavedVersion = {
 };
 
 /**
- * clean: every scanner finished and found nothing above low. flagged: something was found.
+ * clean: every scanner finished and found nothing above low (an unknown severity counts as serious). flagged: something was found.
  * incomplete: a scanner couldn't finish (never shown as clean).
  */
 export type CloudScanSummary = { status: "clean" | "flagged" | "incomplete"; scannedAt: string };
@@ -221,10 +221,10 @@ const versionColumns = `
     ) END
     FROM (
       SELECT DISTINCT ON (scan.scanner) scan.status, scan.finished_at,
-        EXISTS (SELECT 1 FROM jsonb_array_elements(scan.findings) finding WHERE finding->>'severity' IN ('high', 'medium')) AS serious
+        EXISTS (SELECT 1 FROM jsonb_array_elements(scan.findings) finding WHERE finding->>'severity' IS DISTINCT FROM 'low' AND finding->>'severity' IS DISTINCT FROM 'info') AS serious
       FROM skill_scans scan
       WHERE scan.tree_sha = release.tree_sha
-      ORDER BY scan.scanner, scan.finished_at DESC
+      ORDER BY scan.scanner, scan.finished_at DESC, scan.scanner_version DESC
     ) latest
   ) AS scan
 `;

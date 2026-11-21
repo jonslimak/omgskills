@@ -904,6 +904,9 @@ test("a saved version carries its scan: none yet, then clean, flagged or incompl
     assert.equal((await scanOf())?.status, "incomplete", "partial never shows as clean");
     await put("other", "2", "complete", [{ ...info, rule: "download_and_run", label: "download_and_run", severity: "high" }], "2026-11-21T12:00:00Z");
     assert.deepEqual(await scanOf(), { status: "flagged", scannedAt: "2026-11-21T12:00:00.000Z" });
+    await put("third", "1", "complete", [{ ...info, severity: "critical" }], "2026-11-21T13:00:00Z");
+    await pool.query("DELETE FROM skill_scans WHERE scanner = 'other'");
+    assert.equal((await scanOf())?.status, "flagged", "an unknown severity never counts as clean");
   });
 });
 

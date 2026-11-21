@@ -264,7 +264,8 @@ function ScanTip({ scannedAt }: { scannedAt: string }) {
   const label = `Scanned ${day}: no leaked keys, hidden instructions or download-and-run commands found`;
   return (
     <button type="button" className="ua-scan-tip" aria-label={label} data-open={open}
-      onClick={() => setOpen(value => !value)} onBlur={() => setOpen(false)}>
+      onClick={() => setOpen(value => !value)} onBlur={() => setOpen(false)}
+      onKeyDown={event => { if (event.key === "Escape" && open) { event.stopPropagation(); setOpen(false); } }}>
       <ShieldCheck aria-hidden="true" />
       <span className="ua-scan-tip-text" aria-hidden="true">{label}</span>
     </button>
@@ -2292,8 +2293,11 @@ export function UnifiedApp({
                             </span>
                           )}
                           {!detail.setItemReleaseId && (() => {
-                            const scan = cloudRow(detail)?.scan;
-                            return scan?.status === "clean" ? <ScanTip scannedAt={scan.scannedAt} /> : null;
+                            // Only while the saved copy is what this skill is now; a skill waiting for
+                            // review, left out or not saving may differ from what was scanned.
+                            const row = cloudRow(detail);
+                            const current = row && ["saved", "deleted", "library", "set"].includes(row.status);
+                            return current && row.scan?.status === "clean" ? <ScanTip scannedAt={row.scan.scannedAt} /> : null;
                           })()}
                           {detail.githubUrl && (
                             <a
