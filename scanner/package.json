@@ -1,0 +1,18 @@
+{
+  "name": "omgskills-scan",
+  "private": true,
+  "type": "module",
+  "description": "The skill scanner: a Cloudflare Worker and a container with no internet that scans skill files.",
+  "scripts": {
+    "build:container": "node scripts/build-container.mjs",
+    "typecheck": "../node_modules/.bin/tsc --noEmit -p .",
+    "test": "../node_modules/.bin/tsx --test test/scanner.test.ts",
+    "dev": "npm run build:container && wrangler dev",
+    "deploy": "npm run typecheck && npm test && npm run build:container && wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/containers": "0.3.7",
+    "@cloudflare/workers-types": "5.20261104.1",
+    "wrangler": "4.158.0"
+  }
+}

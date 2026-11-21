@@ -98,7 +98,7 @@ const INJECTION = [
 
 const SCRIPT_EXTENSIONS = /\.(?:sh|bash|zsh|fish|py|js|mjs|cjs|ts|rb|pl|php|ps1|psm1|bat|cmd|applescript|scpt|lua|go|rs|swift|jar)$/i;
 
-function isBinary(data: Uint8Array): boolean {
+export function isBinary(data: Uint8Array): boolean {
   return data.subarray(0, 8192).includes(0);
 }
 
@@ -111,8 +111,8 @@ function lineAt(text: string, index: number): number {
 }
 
 /** Scans one file's contents. Labels that depend on the file's path or mode come from pathLabels. */
-export function scanFileContents(data: Uint8Array): FileScan {
-  if (isBinary(data)) return { secrets: [], labels: [] };
+export function scanFileContents(data: Uint8Array, options: { text?: boolean } = {}): FileScan {
+  if (!options.text && isBinary(data)) return { secrets: [], labels: [] };
   const text = Buffer.from(data).toString("utf8");
   const secrets: SecretFinding[] = [];
   const seen = new Set<string>();
@@ -145,4 +145,31 @@ export function combineLabels(lists: Iterable<readonly string[]>): SkillLabel[] 
   const all = new Set<string>();
   for (const list of lists) for (const label of list) all.add(label);
   return LABEL_ORDER.filter((label) => all.has(label));
+}
+
+/**
+ * The first line that set each content label, for showing where a flag came from. Same rules as
+ * scanFileContents; binary files have none unless `text` says to read them anyway.
+ */
+export function labelLines(data: Uint8Array, options: { text?: boolean } = {}): { label: SkillLabel; line: number }[] {
+  if (!options.text && isBinary(data)) return [];
+  const text = Buffer.from(data).toString("utf8");
+  const first = (patterns: RegExp[]) => {
+    let index = -1;
+    for (const pattern of patterns) {
+      const match = new RegExp(pattern.source, pattern.flags.replace("g", "")).exec(text);
+      if (match && (index === -1 || match.index < index)) index = match.index;
+    }
+    return index;
+  };
+  const found: { label: SkillLabel; line: number }[] = [];
+  for (const [label, patterns] of [
+    ["download_and_run", DOWNLOAD_AND_RUN],
+    ["invisible_characters", [INVISIBLE]],
+    ["hidden_instructions", INJECTION]
+  ] as const) {
+    const index = first([...patterns]);
+    if (index !== -1) found.push({ label, line: lineAt(text, index) });
+  }
+  return found;
 }
