@@ -24,7 +24,7 @@ async function key(secret: string) {
 }
 
 async function message(method: string, path: string, timestamp: string, body: Uint8Array) {
-  const digest = hex(await crypto.subtle.digest("SHA-256", body));
+  const digest = hex(await crypto.subtle.digest("SHA-256", body as BufferSource));
   return encoder.encode(`${method.toUpperCase()}\n${path}\n${timestamp}\n${digest}`);
 }
 
@@ -44,6 +44,6 @@ export async function verifyRequest(
   const signature = unhex(request.signature);
   if (!signature) return false;
   return crypto.subtle.verify(
-    "HMAC", await key(secret), signature, await message(request.method, request.path, request.timestamp, request.body)
+    "HMAC", await key(secret), signature as BufferSource, await message(request.method, request.path, request.timestamp, request.body)
   );
 }
