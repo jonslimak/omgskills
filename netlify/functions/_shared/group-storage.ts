@@ -149,8 +149,8 @@ export async function createSkillSource(client: PoolClient, input: SkillSourceIn
 }
 
 export async function appendSkillRelease(client: PoolClient, input: SkillReleaseInput) {
-  const source = await client.query<{ id: string }>(
-    "SELECT id FROM skill_sources WHERE id = $1 AND tombstoned_at IS NULL FOR SHARE",
+  const source = await client.query<{ id: string; kind: string }>(
+    "SELECT id, kind FROM skill_sources WHERE id = $1 AND tombstoned_at IS NULL FOR SHARE",
     [input.sourceId]
   );
   if (!source.rowCount) {
@@ -169,7 +169,15 @@ export async function appendSkillRelease(client: PoolClient, input: SkillRelease
     [input.sourceId, input.commitSha, input.treeSha, input.skillMdSha, input.createdBy]
   );
   if (inserted.rowCount) {
-    return inserted.rows[0].id;
+    const releaseId = inserted.rows[0].id;
+    // Private versions (saved and private GitHub) get scanned; public ones come later, on the same queue.
+    if (source.rows[0].kind === "cloud" || source.rows[0].kind === "private_github") {
+      await client.query(
+        "INSERT INTO scan_jobs (release_id, tree_sha) VALUES ($1, $2) ON CONFLICT (release_id) DO NOTHING",
+        [releaseId, input.treeSha]
+      );
+    }
+    return releaseId;
   }
 
   const existing = await client.query<{ id: string }>(

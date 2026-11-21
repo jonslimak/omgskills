@@ -165,6 +165,22 @@ async function deleteRecords(pool: Pool, userId: string): Promise<{ deletedSets:
       [userId]
     );
 
+    // Retired private versions are never scanned, and their results go unless a live version
+    // (someone else's) has the same content.
+    await client.query("DELETE FROM scan_jobs WHERE release_id IN (SELECT id FROM skill_releases WHERE source_id = ANY($1::uuid[]))", [sourceIds]);
+    await client.query(
+      `
+        DELETE FROM skill_scans scan
+        WHERE scan.tree_sha IN (SELECT tree_sha FROM skill_releases WHERE source_id = ANY($1::uuid[]))
+          AND NOT EXISTS (
+            SELECT 1 FROM skill_releases release
+            JOIN skill_sources source ON source.id = release.source_id
+            WHERE release.tree_sha = scan.tree_sha AND source.tombstoned_at IS NULL
+          )
+      `,
+      [sourceIds]
+    );
+
     // Synced skills and runs point at Macs without cascading, so they go first.
     await client.query("DELETE FROM synced_skills WHERE user_id = $1", [userId]);
     await client.query("DELETE FROM sync_runs WHERE user_id = $1", [userId]);

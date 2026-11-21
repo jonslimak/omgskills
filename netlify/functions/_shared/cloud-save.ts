@@ -1093,7 +1093,23 @@ export async function deleteCloudSkills(
       [sourceIds]
     );
     await client.query("DELETE FROM cloud_releases WHERE source_id = ANY($1::uuid[])", [sourceIds]);
-    await client.query("DELETE FROM skill_releases WHERE source_id = ANY($1::uuid[])", [sourceIds]);
+    const deletedTrees = await client.query<{ tree_sha: string }>(
+      "DELETE FROM skill_releases WHERE source_id = ANY($1::uuid[]) RETURNING tree_sha",
+      [sourceIds]
+    );
+    // Scan results go with the last live version that has the same content.
+    await client.query(
+      `
+        DELETE FROM skill_scans scan
+        WHERE scan.tree_sha = ANY($1::text[])
+          AND NOT EXISTS (
+            SELECT 1 FROM skill_releases release
+            JOIN skill_sources source ON source.id = release.source_id
+            WHERE release.tree_sha = scan.tree_sha AND source.tombstoned_at IS NULL
+          )
+      `,
+      [deletedTrees.rows.map((row) => row.tree_sha)]
+    );
     await client.query("DELETE FROM skill_sources WHERE id = ANY($1::uuid[])", [sourceIds]);
     await client.query(
       "DELETE FROM cloud_skill_reviews WHERE user_id = $1 AND ($2::text IS NULL OR skill_key = $2::text)",

@@ -186,7 +186,8 @@ export const skillReleases = pgTable(
       table.skillMdSha
     ),
     uniqueIndex("skill_releases_id_source_unique").on(table.id, table.sourceId),
-    index("skill_releases_source_created_idx").on(table.sourceId, table.createdAt)
+    index("skill_releases_source_created_idx").on(table.sourceId, table.createdAt),
+    index("skill_releases_tree_sha_idx").on(table.treeSha)
   ]
 );
 
@@ -688,5 +689,52 @@ export const installAcks = pgTable(
     index("install_acks_user_received_idx").on(table.userId, table.receivedAt),
     check("install_acks_catalog_id_check", sql`octet_length(${table.catalogId}) BETWEEN 1 AND 500`),
     check("install_acks_agent_check", sql`${table.agent} IN ('claude', 'codex')`)
+  ]
+);
+
+/** Scan results per skill content and scanner version; see the 20261120120000_add_skill_scans migration. */
+export const skillScans = pgTable(
+  "skill_scans",
+  {
+    treeSha: text("tree_sha").notNull(),
+    scanner: text("scanner").notNull(),
+    scannerVersion: text("scanner_version").notNull(),
+    status: text("status").notNull(),
+    findings: jsonb("findings").notNull().default(sql`'[]'::jsonb`),
+    filesScanned: integer("files_scanned").notNull().default(0),
+    filesSkipped: integer("files_skipped").notNull().default(0),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    finishedAt: timestamp("finished_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    primaryKey({ columns: [table.treeSha, table.scanner, table.scannerVersion] }),
+    check("skill_scans_tree_sha_check", sql`${table.treeSha} ~ '^[0-9a-f]{40}$'`),
+    check(
+      "skill_scans_scanner_check",
+      sql`${table.scanner} ~ '^[a-z0-9][a-z0-9-]{0,62}$' AND char_length(${table.scannerVersion}) BETWEEN 1 AND 64`
+    ),
+    check("skill_scans_status_check", sql`${table.status} IN ('complete', 'partial', 'failed')`),
+    check("skill_scans_findings_check", sql`jsonb_typeof(${table.findings}) = 'array'`),
+    check("skill_scans_counts_check", sql`${table.filesScanned} >= 0 AND ${table.filesSkipped} >= 0`)
+  ]
+);
+
+/** Private skill versions waiting to be scanned. */
+export const scanJobs = pgTable(
+  "scan_jobs",
+  {
+    releaseId: uuid("release_id").primaryKey().references(() => skillReleases.id, { onDelete: "cascade" }),
+    treeSha: text("tree_sha").notNull(),
+    queuedAt: timestamp("queued_at", { withTimezone: true }).notNull().defaultNow(),
+    notBefore: timestamp("not_before", { withTimezone: true }).notNull().defaultNow(),
+    attempts: integer("attempts").notNull().default(0),
+    lastError: text("last_error"),
+    leaseToken: uuid("lease_token"),
+    leaseUntil: timestamp("lease_until", { withTimezone: true })
+  },
+  (table) => [
+    index("scan_jobs_due_idx").on(table.notBefore, table.queuedAt),
+    check("scan_jobs_tree_sha_check", sql`${table.treeSha} ~ '^[0-9a-f]{40}$'`),
+    check("scan_jobs_attempts_check", sql`${table.attempts} >= 0`)
   ]
 );
