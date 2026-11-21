@@ -24,6 +24,8 @@ export type ScanDriverDeps = {
 
 export type ScanRunResult = {
   queued: number; scanned: number; alreadyScanned: number; retried: number; dropped: number; stoppedBy?: string;
+  /** Why jobs didn't finish (retried or given up), by error code; never file contents. */
+  errors: Record<string, number>;
 };
 
 /**
@@ -324,7 +326,7 @@ async function finishJob(pool: Pool, job: LeasedJob) {
 export async function runScanQueue(pool: Pool, deps: ScanDriverDeps, budgetMs = DEFAULT_BUDGET_MS): Promise<ScanRunResult> {
   const started = deps.now?.() ?? Date.now();
   const elapsed = () => (deps.now?.() ?? Date.now()) - started;
-  const result: ScanRunResult = { queued: 0, scanned: 0, alreadyScanned: 0, retried: 0, dropped: 0 };
+  const result: ScanRunResult = { queued: 0, scanned: 0, alreadyScanned: 0, retried: 0, dropped: 0, errors: {} };
 
   const scanners = validScanners(await callScanner<unknown>(deps, "GET", "/scanners"));
   result.queued = await queueMissing(pool, scanners);
@@ -355,7 +357,10 @@ export async function runScanQueue(pool: Pool, deps: ScanDriverDeps, budgetMs = 
         if (response.treeSha !== job.treeSha || !Array.isArray(response.results)) throw new ScannerCallError("bad_response", true);
         const stored = await storeResults(pool, job, response.results);
         if (stored === "stored") result.scanned += 1;
-        else if (stored === "retry") result.retried += 1;
+        else if (stored === "retry") {
+          result.retried += 1;
+          result.errors.scanner_failed = (result.errors.scanner_failed ?? 0) + 1;
+        }
         else result.dropped += 1;
       } catch (error) {
         const code = error instanceof ScannerCallError ? error.code : "internal";
@@ -376,6 +381,7 @@ export async function runScanQueue(pool: Pool, deps: ScanDriverDeps, budgetMs = 
           );
         }
         result.retried += 1;
+        result.errors[code] = (result.errors[code] ?? 0) + 1;
       }
     }
   }
